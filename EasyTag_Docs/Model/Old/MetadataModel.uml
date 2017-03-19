@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_qb8akM37EdqwVrslYOdUDA">
+  <packagedElement xmi:type="uml:Package" xmi:id="_w8IxIM37EdqwVrslYOdUDA" name="MetadataModel_General">
+    <packagedElement xmi:type="uml:Class" xmi:id="_uNF3IKiLEd-S7sHQpIicZg" name="DataPart">
+      <ownedAttribute xmi:id="_wQ9zYKiLEd-S7sHQpIicZg" name="rawBytes"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_2gnMgKiLEd-S7sHQpIicZg" name="Field">
+      <generalization xmi:id="_AVuGc6trEd-l4sUjjyHiFQ" general="_uNF3IKiLEd-S7sHQpIicZg"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_Be6GEKiMEd-S7sHQpIicZg" name="DataFormat"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_Ts6uqKiMEd-S7sHQpIicZg" name="Tag">
+      <generalization xmi:id="_XLP2tKiMEd-S7sHQpIicZg" general="_uNF3IKiLEd-S7sHQpIicZg"/>
+      <ownedAttribute xmi:id="_28snYqiSEd-S7sHQpIicZg" name="subject" visibility="private"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_VYW8yKiMEd-S7sHQpIicZg" name="ContainerPart">
+      <generalization xmi:id="_X6CPVKiMEd-S7sHQpIicZg" general="_uNF3IKiLEd-S7sHQpIicZg"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_XMxEOKiNEd-S7sHQpIicZg" name="Medium"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_99R1m6iPEd-S7sHQpIicZg" name="A_&lt;medium>_&lt;dataPart>" memberEnd="_99R1nKiPEd-S7sHQpIicZg _99R1n6iPEd-S7sHQpIicZg" navigableOwnedEnd="_99R1n6iPEd-S7sHQpIicZg">
+      <ownedEnd xmi:id="_99R1nKiPEd-S7sHQpIicZg" name="" visibility="private" type="_XMxEOKiNEd-S7sHQpIicZg" isUnique="false" association="_99R1m6iPEd-S7sHQpIicZg">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_99R1naiPEd-S7sHQpIicZg" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_99R1nqiPEd-S7sHQpIicZg" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_99R1n6iPEd-S7sHQpIicZg" name="" visibility="private" type="_uNF3IKiLEd-S7sHQpIicZg" isUnique="false" association="_99R1m6iPEd-S7sHQpIicZg">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_99R1oKiPEd-S7sHQpIicZg" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_99R1oaiPEd-S7sHQpIicZg" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_-eDna6iPEd-S7sHQpIicZg" name="A_&lt;dataFormat>_&lt;dataPart>" memberEnd="_-eDnbKiPEd-S7sHQpIicZg _-eDnb6iPEd-S7sHQpIicZg">
+      <ownedEnd xmi:id="_-eDnbKiPEd-S7sHQpIicZg" name="" visibility="private" type="_Be6GEKiMEd-S7sHQpIicZg" isUnique="false" aggregation="composite" association="_-eDna6iPEd-S7sHQpIicZg">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-eDnbaiPEd-S7sHQpIicZg" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-eDnbqiPEd-S7sHQpIicZg" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_-eDnb6iPEd-S7sHQpIicZg" name="" visibility="private" type="_uNF3IKiLEd-S7sHQpIicZg" isUnique="false" association="_-eDna6iPEd-S7sHQpIicZg">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-eDncKiPEd-S7sHQpIicZg" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-eDncaiPEd-S7sHQpIicZg" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_QkzU66iREd-S7sHQpIicZg" name="A_&lt;dataPart>_&lt;dataPart>" memberEnd="_QkzU7KiREd-S7sHQpIicZg _QkzU76iREd-S7sHQpIicZg">
+      <ownedEnd xmi:id="_QkzU7KiREd-S7sHQpIicZg" name="" visibility="private" type="_uNF3IKiLEd-S7sHQpIicZg" isUnique="false" association="_QkzU66iREd-S7sHQpIicZg">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_QkzU7aiREd-S7sHQpIicZg" value="*"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_QkzU7qiREd-S7sHQpIicZg"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_QkzU76iREd-S7sHQpIicZg" name="" visibility="private" type="_uNF3IKiLEd-S7sHQpIicZg" isUnique="false" aggregation="composite" association="_QkzU66iREd-S7sHQpIicZg">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_QkzU8KiREd-S7sHQpIicZg" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_QkzU8aiREd-S7sHQpIicZg" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+  </packagedElement>
+</uml:Model>

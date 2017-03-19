@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extb:ExtensionBundle
+	name="defJMeta"
+	version="1.0"
+	xmlns:extb="www.easytag.de/XMLSchema_v1_0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="www.easytag.de/XMLSchema_v1_0 ExtensionBundleConfiguration.xsd">
+
+   <!-- The basic properties of the bundle -->
+	<BundleProperties>
+		<Name>Default jMeta extension bundle</Name>
+		<Description>This bundle contains all of the default extensions for jMeta.</Description>
+		<Author>Marta Chomentowska</Author>
+		<Date>2011-05-05</Date>
+		<Version>1.0</Version>
+		<Type>DEFAULT</Type>
+	</BundleProperties>
+
+	<BundleJar>
+		<JarRelPath>defaultBundle.jar</JarRelPath>
+	</BundleJar>
+
+   <!-- List of all extensions in the bundle -->
+	<BundledExtensions>
+   	<!-- Media extension for files -->
+		<Extension id="DefaultjMetaFileMediaExtension">
+			<ExtensionPointId>MediaExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.media.impl.FileMediumExtension</Provider>
+			<RelativePath>.</RelativePath>
+		</Extension>
+
+   	<!-- Media extension for input streams -->
+		<Extension id="DefaultjMetaStreamMediaExtension">
+			<ExtensionPointId>MediaExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.media.impl.StreamMediumExtension</Provider>
+			<RelativePath>.</RelativePath>
+		</Extension>
+
+   	<!-- Media extension for byte arrays -->
+		<Extension id="DefaultjMetaMemoryMediaExtension">
+			<ExtensionPointId>MediaExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.media.impl.MemoryMediumExtension</Provider>
+			<RelativePath>.</RelativePath>
+		</Extension>
+
+   	<!-- DataFormats extension for ID3v1 and ID3v1.1 -->
+		<Extension id="DefaultjMetaID3v1FormatExtension">
+			<ExtensionPointId>DataFormatsExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.dataformats.impl.ID3v1DummyDataFormatExtension</Provider>
+			<RelativePath>.</RelativePath>
+		</Extension>
+   	<!-- DataFormats extension for ID3v2.3 -->
+		<Extension id="DefaultjMetaID3v23FormatExtension">
+			<ExtensionPointId>DataFormatsExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.dataformats.impl.ID3v23DummyDataFormatExtension</Provider>
+			<RelativePath>.</RelativePath>
+		</Extension>
+   	<!-- DataFormats extension for MP3 -->
+		<Extension id="DefaultjMetaMP3FormatExtension">
+			<ExtensionPointId>DataFormatsExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.dataformats.impl.MP3DummyDataFormatExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+   	<!-- DataFormats extension for APEv2 -->
+		<Extension id="DefaultjMetaAPEv2FormatsExtension">
+			<ExtensionPointId>DataFormatsExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.dataformats.impl.APEv2DummyDataFormatExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+   	<!-- DataFormats extension for Lyrics3v2 -->
+		<Extension id="DefaultjMetaLyrics3v2FormatsExtension">
+			<ExtensionPointId>DataFormatsExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.dataformats.impl.Lyrics3v2DummyDataFormatExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+   	<!-- DataFormats extension for Ogg -->
+		<Extension id="DefaultjMetaOggFormatsExtension">
+			<ExtensionPointId>DataFormatsExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.dataformats.impl.OggDummyDataFormatExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+
+   	<!-- DataBlocks extension for ID3v1 and ID3v1.1 -->
+		<Extension id="DefaultjMetaID3v1BlocksExtension">
+			<ExtensionPointId>DataBlocksExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.datablocks.impl.ID3v1DataBlocksExtension</Provider>
+			<RelativePath>.</RelativePath>
+		</Extension>
+   	<!-- DataBlocks extension for ID3v2.3 -->
+		<Extension id="DefaultjMetaID3v23BlocksExtension">
+			<ExtensionPointId>DataBlocksExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.datablocks.impl.ID3v23DataBlocksExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+   	<!-- DataFormats extension for MP3 -->
+		<Extension id="DefaultjMetaMP3BlocksExtension">
+			<ExtensionPointId>DataBlocksExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.datablocks.impl.MP3DataBlocksExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+   	<!-- DataBlocks extension for APEv2 -->
+		<Extension id="DefaultjMetaAPEv2BlocksExtension">
+			<ExtensionPointId>DataBlocksExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.datablocks.impl.APEv2DataBlocksExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+   	<!-- DataBlocks extension for Lyrics3v2 -->
+		<Extension id="DefaultjMetaLyrics3v2BlocksExtension">
+			<ExtensionPointId>DataBlocksExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.datablocks.impl.Lyrics3v2DataBlocksExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+   	<!-- DataBlocks extension for Ogg -->
+		<Extension id="DefaultjMetaOggBlocksExtension">
+			<ExtensionPointId>DataBlocksExtension</ExtensionPointId>
+			<Provider>de.je.jmeta.defext.datablocks.impl.OggDataBlocksExtension</Provider>
+			<RelativePath>../bin</RelativePath>
+		</Extension>
+	</BundledExtensions>
+
+</extb:ExtensionBundle>

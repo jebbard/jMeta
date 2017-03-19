@@ -1,0 +1,232 @@
+%===============================================================================================
+%		Introduction
+%===============================================================================================
+
+\chapter{Introduction}
+\label{sec:Introduction}
+
+\LibName{} is a Java library for reading and writing meta data to audio and video files in a variety of different formats.
+
+%-----------------------------------------------------------------------------------------------
+%		Scope and intended audience
+%-----------------------------------------------------------------------------------------------
+
+\section{Scope and intended audience}
+\label{sec:Scopeandintendedaudience}
+
+This document gives a short introduction for users of \LibName{}. The intended audience is:
+\begin{itemize}
+	\item Application developers that want to use the library for reading and writing descriptive meta data
+	\item Developers that want to extend \LibName{} for supporting additional formats
+\end{itemize}
+
+The document is meant to be a high-level guide on how to use or extend \LibName{}. Saying this, the document gives a feature overview and explains the main terms as well as the programming interface for application development. For API details refer to the JavaDoc (\cite{}), for details on design and implementation please look at the \LibName{} technical design concept (\cite{}).
+
+%-----------------------------------------------------------------------------------------------
+%		Yet another tagging library
+%-----------------------------------------------------------------------------------------------
+
+\section{Yet another tagging library}
+\label{sec:Yetanothertagginglibrary}
+
+One might say: "`This is the n+1nth library dealing with tags. I am well off with my personal favourite tagging library. We do not need another one."' - Well, you might be right with your choice. But suppose you want to develop a maintainable and easily extendable application dealing with meta data: Then \LibName{} is your new love.
+
+As every library or framework promises you, \LibName{} is...
+\begin{itemize}
+	\item ... highly extendable
+	\item ... as easy to use as it can get
+	\item ... kick-ass fast
+	\item ... way ahead of its time
+\end{itemize}
+
+And not to mention that it increases your productivity by about 100\%. However, if you are lucky with your jAudioTagger, ID3Tag, MyID3 or whatever other library or own godly optimized implementation you use, then go ahead and forget about \LibName{}.
+
+Otherwise \LibName{} can offer you:
+\begin{itemize}
+	\item A narrow interface allowing to treat all those nasty formats commonly with just a few method calls
+	\item Reading and writing tags of every "`important"' format for audio and video files, and not only some domain specific ones
+	\item Getting all those nitty gritty detail functionality of over-specified formats such as ID3v2, if you really want to
+	\item Straight-to-the-point POJO programming without any magical configuration files, reflection or non-deterministic program flows. We don't call you, you have to call us. Where you want, whenever you want.
+\end{itemize}
+
+Of course \LibName{} is free, but thats only a side note.
+
+%-----------------------------------------------------------------------------------------------
+%		Whetting appetite example
+%-----------------------------------------------------------------------------------------------
+
+\section{Whetting appetite example}
+\label{sec:Whettingappetiteexample}
+
+Now lets get to the point. Here is an example Java code snippet that shows how users may print all the descriptive meta data beeing there in a given audio file:
+
+\OpenIssue{Make real example}{Make real example - include code}
+
+IMetaData metaData = registry.getServiceProvider(IMetaData.class);
+
+metaData.setDataAccessor(new FileDataAccessor("`Anthrax - My safe home.mp3"'));
+
+for (Tag currentTag : metaData.getSupportedTags())
+{
+	ITagAccessor accessor = metaData.getTagAccessor(currentTag);
+	
+	// For all tags that are present in the media file
+	if (accessor.isTagAvailable(currentTag))
+	{
+		// The text representation is some human-readable tag name
+		System.out.println("`Tag: "` + currentTag);
+		
+		// Print string representation of all attributes
+		// (of course typed information is also available)
+		System.out.println(accessor.getAllAttributes());
+	}
+}
+
+Imagine a tool that lists or manipulates tag contents. Something like the above generic code is perfectly sufficient for every tag format currently available. No need to use six different libraries for six different tag formats. No need to have duplicated code. No need to only focus on some pre-defined attributes such as "`artist"' or "`title"'.
+
+Imagine there is a new and cool tag format that everyone uses. The \LibName{} developer team will provide another little jar that will support the new format. If we should not exist anymore (god may prevent...), than write your own extension or pay someone to do so. All you have to do is put the extension jar file into the right directory - done. It should be, however, unlikely that you have to change your existing application code in such a case. But, hey, no one can of course really guarantee that. At least, with the generic and simple approach, the chances for change are small.
+
+If you can't help but need to use all those quite exhausting ID3v2 (or other tag's) features like encryption, compression, grouping or the likes (which, to be honest no current software implementation fully supports, or does one?), then, yes, \LibName{} also enables you to support this. Of course such features cannot be provided as generic as the above code snippet. For such specialties, there are tag-specific interfaces. See \hyperref[]{~\ref{}} for more information.
+
+%-----------------------------------------------------------------------------------------------
+%		Basic terms 
+%-----------------------------------------------------------------------------------------------
+
+\section{Basic terms}
+\label{sec:BasicTerms}
+
+\LibName{} is all about reading and writing so called \emph{descriptive meta data} stored in audio and video files. Descriptive meta data is stored in addition to the "`real"' payload, which is audio and video information. Artist name, title, album and maybe the track number might be the most commonly known meta data items for audio and video files. As such, the descriptive meta data is usually not essential for parsing the payload data itself.
+
+In the following, we will summarize audio and video files under the term "`media file"'.
+
+A \emph{tag} is a cohesive chunk of descriptive meta data with a specific format. Well-known examples for tags are:
+\begin{itemize}
+	\item ID3v1 (see \cite{}) and ID3v2 (see \cite{}) used in combination with the widely-spread MP3 audio container format.
+	\item VorbisComment (see \cite{})
+	\item APEv2 (see \cite{})
+	\item ... and many others
+\end{itemize}
+
+A media file may contain multiple tags of different types. A common structure of a media file is shown in the following figure:
+
+\OpenIssue{Add media file figure}{Add media file figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Attributes}
+\label{sec:Attributes}
+
+A tag basically contains some optional header and footer information (which can be, again, referred to as the meta data of the descriptive meta data) as well as a list of key-value pairs. In \LibName{}, these key-value pairs are called "`attributes"'. Note that the various tag formats call their key-value pairs differently:
+\begin{itemize}
+	\item ID3v1: Field
+	\item ID3v2: Frame
+	\item APEv1 and APEv2: Item
+	\item VorbisComment: Field
+	\item ... and various others
+\end{itemize}
+
+So here we just call it "`attribute"'. An attribute has an id (=key) revealing the type, structure and semantics of the attribute. In some tag formats there may be multiple attributes with the same id within one tag. This might be useful for e.g. storing multiple artists.
+
+There are some different categories of attribute that mainly differ in what kind of typed data they store (=value). See \hyperref[]{~\ref{}} for more information.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Tag format specification}
+\label{sec:TagFormatspecification}
+
+For each tag format, a lot of paper documentation exists that is mostly available on the net. We have something similar yet much easier in \LibName{}. Each tag has its very own tag specification object revealing information on some format properties and the attributes that are defined by default by the tag format. If you are interested on such details, you can query them from a tag specification. It is also possible to add new attributes using a tag specification.
+
+See \hyperref[]{~\ref{}} for more information.
+
+%-----------------------------------------------------------------------------------------------
+%		Feature matrix
+%-----------------------------------------------------------------------------------------------
+
+\section{Feature Matrix}
+\label{sec:FeatureMatrix}
+
+Which formats and what kind of special functionality does \LibName{} in its current version support? Take a look at the following table.
+
+\OpenIssue{Unterstützte Formate}{Welche Formate werden in Version \LibVersion{} unterstützt?}
+\OpenIssue{Add feature matrix}{Add feature matrix}
+
+%-----------------------------------------------------------------------------------------------
+%		Official FAQ
+%-----------------------------------------------------------------------------------------------
+
+\section{Official FAQ}
+\label{sec:OfficialFAQ}
+
+\textbf{\emph{Q: }}As far as I saw, \LibName{} is only available for Java? Which Java version do I need? Is there a way to use it with my favourite kick-ass programming language (Fortran\|Pascal\|C\|Cobol...)?
+\emph{\textbf{A: }}Yes its only Java. You would be needing at least \JavaVersion{}. Okay, you can maybe try to abuse \LibName{} to be available for whatever other language by using whatever runtime magical environment that can call Java. But try to avoid it. Yes, real man program in C++, but unfortunately or luckily this language will be more and more displaced by Java. There are so much open source projects out there, you will find your personal favourite for your lovely little language.
+
+\textbf{\emph{Q: }}Can I use \LibName{} with audio or video streams?
+\emph{\textbf{A: }}Yes, you can. However, there is something special about it. See \hyperref[]{~\ref{}}.
+
+\textbf{\emph{Q: }}I have a very special question on how to use a special feature of some special tag format with the library. Where can I find information?
+\emph{\textbf{A: }}Consult the remaining QAs of this official FAQ. If you do not find anything that matches your question, visit the \hyperref[use case examples]{~\ref{}}. There, a lot of specific possibilities of using special features with \LibName{} are shown.
+
+\emph{\textbf{Q: }}Is there some special support for binary data such as JPEG images?
+\emph{\textbf{A: }}You can extract the picture or other binary data as plain byte array. And, depending on the tag format, you will also get to know which picture or data format it is exactly. That's it. You have all you need. Go and use your favourite byte mangling library that gets those bytes to display.
+
+\emph{\textbf{Q: }}Why are there no setSingleAttribute(), getSingleAttribute() or removeSingleAttribute() methods?
+\emph{\textbf{A: }}All these functionalities are possible with getAllAttributes() and setAllAttributes() - using your favorite Java API java.util.Collection. In most cases, you may want to get mutliple attributes at once. Even if you are not interested in all the attributes, in 90\% of all cases the performance between reading or writing a single attribute is the same (or even worse) than reading or writing all attributes at once. If you think you have to store a 5 MB JPEG image within an ID3 tag, than you may want to rethink what you're doing. In this case we would rather suggest to store only an external link to this file within the tag.
+
+\emph{\textbf{Q: }}All those other tagging libraries such as jAudioTagger and entagged support something like default field names (in your language: attribute ids). Why doesn't \LibName{} support this, too?
+\emph{\textbf{A: }}First of all, it has not been a design goal to clutter our interfaces with dozens of "`hardcoded"' methods (like getTitle(), getArtist(), getAlbum() and so on) to confuse our users. 
+
+\OpenIssue{Why not getTitle()?}{Why not getTitle()? - Sollte man lieber die "`semantic id"' als weitere Attribut-Eigenschaft einführen, so dass gleichartige Felder gleich heißen?}.
+
+\emph{\textbf{Q: }}Does \LibName{} give access to raw byte data?
+\emph{\textbf{A: }}Partly. \LibName{} can give you all descriptive meta data found (and currently supported) as raw bytes. Writing raw bytes is not supported. If you need this, consult the JavaDoc of the FileOutputStream or RandomAccessFile classes.
+
+\emph{\textbf{Q: }}Why does lib name NOT support tag format <XY>?
+\emph{\textbf{A: }}Hmm. This seems to be a quite odd format no one ever heard of. If you don't agree, just mail us or be a man and write your own extension.
+
+\emph{\textbf{Q: }}Your library sucks. It gave me a <XYZ>Exception!
+\emph{\textbf{A: }}Well. Humans are designed to fail. If you are sure that the problem does not sit infront of your screen, then we may want to help you. You heard about BugZilla? Submit a bug with your log-files and a really exhaustive description what you did - e.g. your code snippet producing those exception. Please don't attach your media files leaked from eMule or Napster.
+
+\emph{\textbf{Q: }}You claim your library won't change and will work with any new tag format that will arise in future. Soon we will have fat interfaces with a lot of deprecated methods and a lot of code changes in our applications, if we use your library...
+\emph{\textbf{A: }}One can never say that an interface is stable for all times, you can only pray. If there is a heavy change in what descriptive meta data means for all those bright new formats (that will come for sure), then we won't be trying to squeeze all this into our interfaces. Then maybe the time will come for another library (or proprietary software). However, our opinion is that an approach that is as narrow and generic or common as possible will resist changes even longer. We don't think that other tagging libraries are as resilient to change as \LibName{}.
+
+\emph{\textbf{Q: }}I want to join your development team.
+\emph{\textbf{A: }}Really? If you have a strong faith, are clear-minded and abjure all kinds of digital evil, then you are not our man. Currently, we have a quite over-crowded team, sorry. If you really - really want to join us, then sent your mail with top 5 reasons why you bring \LibName{} to the next higher level (if possible at all).
+
+%-----------------------------------------------------------------------------------------------
+%		Inofficial FAQ
+%-----------------------------------------------------------------------------------------------
+
+\section{Inofficial FAQ}
+\label{sec:InofficialFAQ}
+
+\emph{\textbf{Q: }}Why is there an inofficial FAQ, too?
+\emph{\textbf{A: }}Because we want to be true with our users. Here, we provide you some further background info, if you want it or not.
+
+\emph{\textbf{Q: }}The name \LibName{} seems quite uninspired.
+\emph{\textbf{A: }}Yes, you are right. Can you think of how many libraries and tools are out there having some name like *tag*? There are a lot, believe me...
+
+\emph{\textbf{Q: }}I am CEO\|technical chief designer of <whatever group or two-man firm>. We want to re-design and totally re-define our market leading software i<insert name here> to maximize our profit - and we need a tagging library. Your style of writing here does not give me a good feeling about your library. If your coding style is similar to this document, then I don't see a chance to take it seriously.
+\emph{\textbf{A: }}Calm down. We are all specialists on what we do. You know, Java programming, OO design principles and all those nice patterns. However, this is an open source project. Yes, we are active. Yes, we still want to extend the library. Yes, we still maintain \LibName{} (State: Dec. 2010). But of course, if you want some "`really"' supported software with a well-paid contract to make your management happy, than you should search for some tagging library product suite by Microsoft, Oracle or others ... Just compare the quality of our documentation with the other tagging libraries and make your own judgement. Furthermore you may want to try our \hyperref[starter kit]{~\ref{starter kit}}.
+
+\emph{\textbf{Q: }}I have an improvement on your website\|javadoc\|documents\|source code\|...
+\emph{\textbf{A: }}Send all your suggestions for improvement to: wedontc@re.de or bill@XXX.com
+
+\emph{\textbf{Q: }}You pretend that your library is so awesome. So really, what is so special about it?
+\emph{\textbf{A: }}See \hyperref[]{~\ref{}}. Just compare which of the various available tag libraries best fits your needs (see links section). If you think you can go better with another one, then we encourage you to use this one instead! Don't believe us, just believe your own intuition by trying our \hyperref[starter kit]{~\ref{starter kit}}.
+
+\emph{\textbf{Q: }}I am an iTunes user and I don't need this stuff here.
+\emph{\textbf{A: }}Then why are you reading this?
+
+\emph{\textbf{Q: }}You think your style of writing is cool? So who do you want to improve here?
+\emph{\textbf{A: }}Nobody of course (just look at our web site visitor count...). We just want to be informative without beeing a sleeping-aid.
+
+\emph{\textbf{Q: }}Be honest. You are just a bunch of homeless students without girl-friends.
+\emph{\textbf{A: }}Not really. All of us work for some German IT giants... Well, and do you have a girl-friend?
+
+%###############################################################################################
+%###############################################################################################
+%
+%		Document end
+%
+%###############################################################################################
+%###############################################################################################

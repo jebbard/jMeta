@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ======================================================================
+     06.09.2011 09:39:08
+
+     DeploymentSmoke
+     A simple smoke test for checking whether jMeta deployment works as exepcted.
+
+     Jens Ebert
+     ====================================================================== -->
+<project name="DeploymentSmoke" default="runSmokeTest" basedir="../../../">
+    <description>
+            A simple smoke test for checking whether jMeta deployment works as exepcted.
+    </description>
+
+	<property name="project_jMetaInterface_dir" value="EasyTagCore_Interface"/>
+	<property name="project_jMetaExport_dir" value="EasyTagCore_Export"/>
+	<property name="project_jMetaImpl_dir" value="EasyTagCore"/>
+
+	<property name="project_jMetaDefaultBundleImpl_dir" value="EasyTagExt_DefaultBundle"/>
+	<property name="project_jMetaDefaultBundleInterface_dir" value="EasyTagExt_DefaultBundleInterface"/>
+
+	<property name="project_Utility_dir" value="Utility"/>
+	<property name="project_ComponentRegistry_dir" value="ComponentRegistry"/>
+
+	<property name="project_Deployment_dir" value="EasyTag_Deployment/Deployment_Filesystem/jMeta_vX.X.X"/>
+	<property name="project_IntergrationTest_dir" value="EasyTag_IntegrationTest"/>
+
+	<property name="project_CommonLibs_dir" value="CommonLibs"/>
+
+	<property name="project_jMetaTestUtil_dir" value="EasyTagTest_Util"/>
+
+	<property name="binDir" value="bin"/>
+	<property name="srcDir" value="src"/>
+
+    <!-- =================================
+          target: runSmokeTest
+         ================================= -->
+    <target name="runSmokeTest" depends="packageAsJar" description="A simple smoke test for checking whether jMeta deployment works as exepcted.">
+		<junit showoutput="true" printsummary="on" haltonerror="true">
+			<classpath>
+				<pathelement location="${project_CommonLibs_dir}/jUnit4.8.2/junit-4.8.2.jar"/>
+				<pathelement location="${project_CommonLibs_dir}/logChecker/logChecker.jar"/>
+				<pathelement location="${project_IntergrationTest_dir}/${binDir}"/>
+				<pathelement location="${project_Deployment_dir}/jMeta.jar"/>
+			</classpath>
+			<test name="de.je.jmeta.context.JMetaContextTest" todir="${project_IntergrationTest_dir}/scripts/deploymentSmoke/results">
+				<formatter type="xml"/>
+			</test>
+		</junit>
+    	<java dir="${project_IntergrationTest_dir}" fork="true" failonerror="true" classname="integration.deployment.DataFormatsSmoke">
+    		<classpath>
+    			<pathelement location="${project_IntergrationTest_dir}/${binDir}"/>
+				<pathelement location="${project_Deployment_dir}/jMeta.jar"/>
+    			<pathelement location="${project_Deployment_dir}/ext/default/defaultBundle_IF.jar"/>
+    			<fileset dir="${project_CommonLibs_dir}/jaxb2.2/jaxb-ri-20091104/lib" includes="*.jar"/>
+    		</classpath>
+    	</java>
+    	<java dir="${project_IntergrationTest_dir}" fork="true" failonerror="true" classname="integration.deployment.DataFormatsSmoke_ReverseReading">
+    		<classpath>
+    			<pathelement location="${project_IntergrationTest_dir}/${binDir}"/>
+				<pathelement location="${project_Deployment_dir}/jMeta.jar"/>
+    			<pathelement location="${project_Deployment_dir}/ext/default/defaultBundle_IF.jar"/>
+    			<fileset dir="${project_CommonLibs_dir}/jaxb2.2/jaxb-ri-20091104/lib" includes="*.jar"/>
+    		</classpath>
+    	</java>
+    </target>
+
+   <!-- =================================
+         target: deleteJars
+        ================================= -->
+	<target name="deleteJars" description="Deletes all JARs in the deployment directory">
+		<delete>
+			<fileset dir="${project_Deployment_dir}" includes="**/*.jar"/>
+			<fileset dir="${project_CommonLibs_dir}" includes="**/LogChecker.jar"/>
+		</delete>
+	</target>
+
+   <!-- =================================
+         target: packageAsJar
+        ================================= -->
+    <target name="packageAsJar" depends="deleteJars" description="Package all libraries as Jars into deployment directory. It is assumed that all files are already compiled by the IDE and reside in their corresponding bin folders.">
+    	<jar destfile="${project_Deployment_dir}/jMeta.jar" manifest="${project_IntergrationTest_dir}/interface_MANIFEST.MF" update="true">
+    		<fileset dir="${project_jMetaInterface_dir}/${binDir}"/>
+    		<fileset dir="${project_jMetaInterface_dir}/${srcDir}"/>
+    	</jar>
+    	<jar destfile="${project_Deployment_dir}/core/jMetaCore.jar" update="true">
+    		<fileset dir="${project_jMetaImpl_dir}/${binDir}"/>
+    		<fileset dir="${project_jMetaImpl_dir}/${srcDir}"/>
+    	</jar>
+    	<jar destfile="${project_Deployment_dir}/core/jMetaExport.jar" update="true">
+    		<fileset dir="${project_jMetaExport_dir}/${binDir}"/>
+    		<fileset dir="${project_jMetaExport_dir}/${srcDir}"/>
+    	</jar>
+    	<jar destfile="${project_Deployment_dir}/core/utility.jar" update="true">
+    		<fileset dir="${project_Utility_dir}/${binDir}"/>
+    		<fileset dir="${project_Utility_dir}/${srcDir}"/>
+    	</jar>
+    	<jar destfile="${project_Deployment_dir}/core/componentRegistry.jar" update="true">
+    		<fileset dir="${project_ComponentRegistry_dir}/${binDir}"/>
+    		<fileset dir="${project_ComponentRegistry_dir}/${srcDir}"/>
+    	</jar>
+    	<jar destfile="${project_Deployment_dir}/ext/default/defaultBundle.jar" manifest="${project_IntergrationTest_dir}/defaultBundle_MANIFEST.MF" update="true">
+    		<fileset dir="${project_jMetaDefaultBundleImpl_dir}/${binDir}"/>
+    		<fileset dir="${project_jMetaDefaultBundleImpl_dir}/${srcDir}"/>
+    	</jar>
+    	<jar destfile="${project_Deployment_dir}/ext/default/defaultBundle_IF.jar" update="true">
+    		<fileset dir="${project_jMetaDefaultBundleInterface_dir}/${binDir}"/>
+    		<fileset dir="${project_jMetaDefaultBundleInterface_dir}/${srcDir}"/>
+    	</jar>
+    	<jar destfile="${project_CommonLibs_dir}/logChecker/logChecker.jar" update="true">
+    		<fileset dir="${project_jMetaTestUtil_dir}/${binDir}" includes="**/LogChecker*,**/LogUnitTest*"/>
+    		<fileset dir="${project_jMetaTestUtil_dir}/${srcDir}" includes="**/LogChecker*,**/LogUnitTest*"/>
+    	</jar>
+    </target>
+
+</project>

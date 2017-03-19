@@ -1,0 +1,2124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CommonStereotypes="http:///schemas/CommonStereotypes/_uYpKYBtLEeC9cZmFpNV5dw/20" xmlns:CommonStereotypes_1="http:///schemas/CommonStereotypes/_nUFjQLLkEd-fJ-POBtm0jQ/17" xmlns:CommonStereotypes_2="http:///schemas/CommonStereotypes/_U0Cz4AYEEeC-MfabKwExLQ/18" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xsi:schemaLocation="http:///schemas/CommonStereotypes/_uYpKYBtLEeC9cZmFpNV5dw/20 ../../GeneratorTemplates/models/CommonStereotypes.uml#_uYpKYRtLEeC9cZmFpNV5dw http:///schemas/CommonStereotypes/_nUFjQLLkEd-fJ-POBtm0jQ/17 ../../GeneratorTemplates/models/CommonStereotypes.uml#_nUOtMLLkEd-fJ-POBtm0jQ http:///schemas/CommonStereotypes/_U0Cz4AYEEeC-MfabKwExLQ/18 ../../GeneratorTemplates/models/CommonStereotypes.uml#_U0Cz4QYEEeC-MfabKwExLQ">
+  <uml:Model xmi:id="idModel" name="DesignModel">
+    <packagedElement xmi:type="uml:Package" xmi:id="idPackage" name="DesignModelPackage">
+      <packagedElement xmi:type="uml:Component" xmi:id="idComponent" name="DesignModelComponent">
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_4a_hkAO8EeCYKaNo9SPZvQ" name="DataBlocks" clientDependency="_cF2bgwO9EeCYKaNo9SPZvQ _cZqvYwO9EeCYKaNo9SPZvQ"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_56gMggO8EeCYKaNo9SPZvQ" name="DataFormats"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_8T1bYgO8EeCYKaNo9SPZvQ" name="Media"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_AMr8QgO9EeCYKaNo9SPZvQ" name="jMetaContext" clientDependency="_JZ4EkwO9EeCYKaNo9SPZvQ _Jqt89AO9EeCYKaNo9SPZvQ _KBNxZAO9EeCYKaNo9SPZvQ _KU47VAO9EeCYKaNo9SPZvQ _Kn9oVAO9EeCYKaNo9SPZvQ __2P7AxHaEeC8O4a4uHjcTw _Yb3aExKEEeCmY8FE9I3w_w"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_F69GogO9EeCYKaNo9SPZvQ" name="Validation" clientDependency="_MJj98wO9EeCYKaNo9SPZvQ _MgNjYwO9EeCYKaNo9SPZvQ"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_HBSckgO9EeCYKaNo9SPZvQ" name="MetadataConversion" clientDependency="_LnvDQwO9EeCYKaNo9SPZvQ _M10nAAO9EeCYKaNo9SPZvQ"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_zEVHshHaEeC8O4a4uHjcTw" name="Metadata" clientDependency="_3tTd9BHaEeC8O4a4uHjcTw _9Db1IxHaEeC8O4a4uHjcTw _9b4KUxHaEeC8O4a4uHjcTw"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_RnHIwhKEEeCmY8FE9I3w_w" name="ExtensionManagement"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_JZ4EkwO9EeCYKaNo9SPZvQ" name="" supplier="_8T1bYgO8EeCYKaNo9SPZvQ" client="_AMr8QgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_Jqt89AO9EeCYKaNo9SPZvQ" name="" supplier="_4a_hkAO8EeCYKaNo9SPZvQ" client="_AMr8QgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_KBNxZAO9EeCYKaNo9SPZvQ" name="" supplier="_56gMggO8EeCYKaNo9SPZvQ" client="_AMr8QgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_KU47VAO9EeCYKaNo9SPZvQ" name="" supplier="_F69GogO9EeCYKaNo9SPZvQ" client="_AMr8QgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_Kn9oVAO9EeCYKaNo9SPZvQ" name="" supplier="_HBSckgO9EeCYKaNo9SPZvQ" client="_AMr8QgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_LnvDQwO9EeCYKaNo9SPZvQ" name="" supplier="_4a_hkAO8EeCYKaNo9SPZvQ" client="_HBSckgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_MJj98wO9EeCYKaNo9SPZvQ" name="" supplier="_4a_hkAO8EeCYKaNo9SPZvQ" client="_F69GogO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_MgNjYwO9EeCYKaNo9SPZvQ" name="" supplier="_56gMggO8EeCYKaNo9SPZvQ" client="_F69GogO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_M10nAAO9EeCYKaNo9SPZvQ" name="" supplier="_56gMggO8EeCYKaNo9SPZvQ" client="_HBSckgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_cF2bgwO9EeCYKaNo9SPZvQ" name="" supplier="_8T1bYgO8EeCYKaNo9SPZvQ" client="_4a_hkAO8EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_cZqvYwO9EeCYKaNo9SPZvQ" name="" supplier="_56gMggO8EeCYKaNo9SPZvQ" client="_4a_hkAO8EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_3tTd9BHaEeC8O4a4uHjcTw" name="" supplier="_4a_hkAO8EeCYKaNo9SPZvQ" client="_zEVHshHaEeC8O4a4uHjcTw"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_9Db1IxHaEeC8O4a4uHjcTw" name="" supplier="_56gMggO8EeCYKaNo9SPZvQ" client="_zEVHshHaEeC8O4a4uHjcTw"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_9b4KUxHaEeC8O4a4uHjcTw" name="" supplier="_8T1bYgO8EeCYKaNo9SPZvQ" client="_zEVHshHaEeC8O4a4uHjcTw"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="__2P7AxHaEeC8O4a4uHjcTw" name="" supplier="_zEVHshHaEeC8O4a4uHjcTw" client="_AMr8QgO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_Yb3aExKEEeCmY8FE9I3w_w" name="" supplier="_RnHIwhKEEeCmY8FE9I3w_w" client="_AMr8QgO9EeCYKaNo9SPZvQ"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_y7pukAO9EeCYKaNo9SPZvQ" name="de.je.jmeta.media">
+      <packagedElement xmi:type="uml:Package" xmi:id="_dczPUA9NEeC5mKKa1YlKHQ" name="export">
+        <packagedElement xmi:type="uml:Interface" xmi:id="_6BizOAO9EeCYKaNo9SPZvQ" name="IMediumAccessor" clientDependency="_-3XdNQO-EeCYKaNo9SPZvQ _aTeohQPJEeCYKaNo9SPZvQ _t0GndROLEeCftvNWGQmhpw">
+          <ownedComment xmi:id="_t0SAkAPHEeCYKaNo9SPZvQ">
+            <body>This class represents a physical medium that stores data.&#xD;
+The {@IMedium} can be accessed in either a reading or writing way or both.&#xD;
+To access the {@IMedium}, it must be opened. If there are any access errors when &#xD;
+reading or writing the {@IMedium}, an {@MediumAccessException} is thrown. &#xD;
+The concrete access to the {@IMedium}, after opening it, happens with the interfaces&#xD;
+{@IMediumReader} and  {@IMediumWriter}.&#xD;
+&#xD;
+An {@IMedium} has the following additional properties:&#xD;
+&lt;li>&#xD;
+&lt;ul>Allows random access or only sequential access. A random-access medium has a size, too.&lt;/ul>&#xD;
+&lt;ul>Is read-only or allows write access too.&lt;/ul>&#xD;
+&lt;ul>May block when reading or writing, or may not block.&lt;/ul>&#xD;
+&lt;/li></body>
+          </ownedComment>
+          <ownedOperation xmi:id="_86nSEgO9EeCYKaNo9SPZvQ" name="getName">
+            <ownedComment xmi:id="_ibBpUAPHEeCYKaNo9SPZvQ">
+              <body>Returns the human-readable name of this {@IMedium}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_9kofcAO9EeCYKaNo9SPZvQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_QO9QkgO-EeCYKaNo9SPZvQ" name="isReadOnly">
+            <ownedComment xmi:id="_kDr-UAPJEeCYKaNo9SPZvQ">
+              <body>Returns whether the {@IMedium} is read-only or can be accessed writing.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_REwQIAO-EeCYKaNo9SPZvQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_erucIgO-EeCYKaNo9SPZvQ" name="isOpened">
+            <ownedComment xmi:id="_v-MBcAPJEeCYKaNo9SPZvQ">
+              <body>Returns whether this {@IMedium} is currently opened or closed.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_fQ1UUAO-EeCYKaNo9SPZvQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_hrgnAgO-EeCYKaNo9SPZvQ" name="close">
+            <ownedComment xmi:id="_2qloAAPJEeCYKaNo9SPZvQ">
+              <body>Closes this {@IMedium}. All access methods cannot be used if the {@IMedium} is closed.&#xD;
+&#xD;
+@post #isOpened() == false</body>
+            </ownedComment>
+          </ownedOperation>
+          <ownedOperation xmi:id="_KAhM0gPIEeCYKaNo9SPZvQ" name="isRandomAccess">
+            <ownedComment xmi:id="_9q96gAPJEeCYKaNo9SPZvQ">
+              <body>Returns whether this {@IMedium} is a random access {@IMedium}. &#xD;
+Such {@IMedium}s have the following properties:&#xD;
+&lt;li>&#xD;
+&lt;ul>They have a current length in bytes.&lt;/ul>&#xD;
+&lt;ul>They can be accessed at any specific position by specifying an offset &#xD;
+for any read or write operation.&#xD;
+&lt;/li></body>
+            </ownedComment>
+            <ownedParameter xmi:id="_KppCUAPIEeCYKaNo9SPZvQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_8Etj0gPIEeCYKaNo9SPZvQ" name="getLength">
+            <ownedComment xmi:id="_MhN9EAPKEeCYKaNo9SPZvQ">
+              <body>Returns the total length of the {@IMedium} in bytes. &#xD;
+ Make sure to only call this method if the &#xD;
+{@IMedium} is a random-access {@IMedium}. &#xD;
+For non-random-access {@IMedium}s, a length cannot be &#xD;
+specified.&#xD;
+&#xD;
+@pre #isRandomAccess() == true</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_9Mr4gAPIEeCYKaNo9SPZvQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_68dRYgO_EeCYKaNo9SPZvQ" name="write">
+            <ownedComment xmi:id="_Y6aHUAPKEeCYKaNo9SPZvQ">
+              <body>Writes bytes to the {@IMedium} at the current offset. This operation is &#xD;
+only possible if the {@IMedium} is not read-only. If the {@IMedium} is allowed &#xD;
+to block, this method blocks until the number of bytes requested could be &#xD;
+written or if the specified timeout has expired. In case of an expired&#xD;
+timeout or if the {@ByteBuffer} is empty, the method returns without&#xD;
+any action.&#xD;
+&#xD;
+The properties of the specified {@ByteBuffer} are not&#xD;
+changed.&#xD;
+&#xD;
+@pre #isReadOnly() == false</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_YimFUBaDEeCEnt58MkSEug" name="offset">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Z-h30BaDEeCEnt58MkSEug" name="buffer">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_iquL0gO_EeCYKaNo9SPZvQ" name="read" raisedException="_sDJnOBOLEeCftvNWGQmhpw">
+            <ownedComment xmi:id="_qDknsAPKEeCYKaNo9SPZvQ">
+              <body>Reads bytes from the {@IMedium} from the current&#xD;
+offset. If the {@IMedium} is allowed to block, this method&#xD;
+blocks until the number of bytes requested are available or &#xD;
+if the specified timeout has expired. In case of an expired&#xD;
+timeout or if the specified size is 0, the method returns an &#xD;
+empty {@ByteBuffer}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_cAUwcBaDEeCEnt58MkSEug" name="offset">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_dOsoEBaDEeCEnt58MkSEug" name="buffer">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_ME70QgPLEeCYKaNo9SPZvQ" name="setTimeout">
+            <ownedComment xmi:id="_j_6KMAPMEeCYKaNo9SPZvQ">
+              <body>Sets the timeout value in milliseconds used for blocking access operations.&#xD;
+If the set timeout has expired, the access operation will return without&#xD;
+any further actions, especially now exceptions.&#xD;
+This timeout value is only internally used by the access&#xD;
+operations if this {@IMedium} is a possibly blocking {@IMedium}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_N140gAPLEeCYKaNo9SPZvQ" name="timeoutMillis">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_NA_M0gPLEeCYKaNo9SPZvQ" name="getTimeout">
+            <ownedComment xmi:id="_yYpxYAPMEeCYKaNo9SPZvQ">
+              <body>Returns the timeout value in milliseconds used for blocking access operations.&#xD;
+If the set timeout has expired, the access operation will return without&#xD;
+any further actions, especially now exceptions.&#xD;
+This timeout value is only internally used by the access&#xD;
+operations if this {@IMedium} is a possibly blocking {@IMedium}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_RdJ2IAPLEeCYKaNo9SPZvQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_a0LP4gPLEeCYKaNo9SPZvQ" name="mayReadBlock">
+            <ownedComment xmi:id="_jzNncAPLEeCYKaNo9SPZvQ">
+              <body>Returns whether this {@IMedium} is possible to block when accessing&#xD;
+it in a read or write operation.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_cAU58APLEeCYKaNo9SPZvQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_tycyIBffEeCykeCvNqnASQ" name="isAtEOF">
+            <ownedParameter xmi:id="_vIbGkBffEeCykeCvNqnASQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_RR8wwBjJEeCecP1nht5UNw" name="offset">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_XMzJAhfhEeCykeCvNqnASQ" name="getMedium">
+            <ownedParameter xmi:id="_Xv-HgBfhEeCykeCvNqnASQ" name="return" type="_4q50YAYCEeC-MfabKwExLQ" direction="return"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_2pW5-AO-EeCYKaNo9SPZvQ" name="MediumAccessException">
+          <ownedComment xmi:id="_AkKYYAPOEeCYKaNo9SPZvQ">
+            <body>This exception is thrown whenever an {@IMedium} could not be accessed.</body>
+          </ownedComment>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_-3XdNQO-EeCYKaNo9SPZvQ" name="Dependency3" supplier="_2pW5-AO-EeCYKaNo9SPZvQ" client="_6BizOAO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_aTeohQPJEeCYKaNo9SPZvQ" name="Dependency1" client="_6BizOAO9EeCYKaNo9SPZvQ"/>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_aJPzeAYDEeC-MfabKwExLQ" name="IMediumFactory" clientDependency="_qBgFlQYDEeC-MfabKwExLQ">
+          <ownedOperation xmi:id="_cB8acgYDEeC-MfabKwExLQ" name="getMediumAccessor">
+            <ownedParameter xmi:id="_drvp0AYDEeC-MfabKwExLQ" name="return" type="_6BizOAO9EeCYKaNo9SPZvQ" direction="return"/>
+            <ownedParameter xmi:id="_fLHK0AYDEeC-MfabKwExLQ" name="medium" type="_4q50YAYCEeC-MfabKwExLQ"/>
+            <ownedParameter xmi:id="_0EDCoA9FEeC5mKKa1YlKHQ" name="forceReadOnly">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_h7Y6EgYDEeC-MfabKwExLQ" name="hasMedium">
+            <ownedParameter xmi:id="_in8eEAYDEeC-MfabKwExLQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_j2xosAYDEeC-MfabKwExLQ" name="medium" type="_4q50YAYCEeC-MfabKwExLQ"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_qBgFlQYDEeC-MfabKwExLQ" name="Dependency2" supplier="_6BizOAO9EeCYKaNo9SPZvQ" client="_aJPzeAYDEeC-MfabKwExLQ"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_sDJnOBOLEeCftvNWGQmhpw" name="EndOfFileException">
+          <ownedComment xmi:id="_yVyC4BOLEeCftvNWGQmhpw">
+            <body>Thrown whenever EOF (end of file) is reached while reading from a medium.</body>
+          </ownedComment>
+          <ownedOperation xmi:id="_UufJEhjJEeCecP1nht5UNw" name="getBytesRead">
+            <ownedParameter xmi:id="_VjO_wBjJEeCecP1nht5UNw" name="bytesRead">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_t0GndROLEeCftvNWGQmhpw" name="Dependency4" supplier="_sDJnOBOLEeCftvNWGQmhpw" client="_6BizOAO9EeCYKaNo9SPZvQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Package" xmi:id="_lZq_QA9NEeC5mKKa1YlKHQ" name="impl">
+        <packagedElement xmi:type="uml:Class" xmi:id="_P4gsOAPOEeCYKaNo9SPZvQ" name="AbstractMediumAccessor" clientDependency="_SSSnBQPOEeCYKaNo9SPZvQ" isAbstract="true">
+          <ownedComment xmi:id="_H9dEsAPPEeCYKaNo9SPZvQ">
+            <body>An abstract base class for easier implementation of an {@IMedium}.</body>
+          </ownedComment>
+          <interfaceRealization xmi:id="_SSSnBQPOEeCYKaNo9SPZvQ" name="InterfaceRealization1" supplier="_6BizOAO9EeCYKaNo9SPZvQ" client="_P4gsOAPOEeCYKaNo9SPZvQ" contract="_6BizOAO9EeCYKaNo9SPZvQ"/>
+          <ownedOperation xmi:id="_UqSZIgPOEeCYKaNo9SPZvQ" name="AbstractMedium">
+            <ownedParameter xmi:id="_YYZpoAPOEeCYKaNo9SPZvQ" name="isReadOnly">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_axlukAPOEeCYKaNo9SPZvQ" name="isRandomAccess">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_cZAYUAPOEeCYKaNo9SPZvQ" name="mayBlock">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_ffCVIAPOEeCYKaNo9SPZvQ" name="initialTimoutMillis">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_uyfRGAPOEeCYKaNo9SPZvQ" name="FileMediumAcessor">
+          <ownedComment xmi:id="_dMvs8APPEeCYKaNo9SPZvQ">
+            <body>Represents an {@IMedium} that is a physical file with random access.</body>
+          </ownedComment>
+          <generalization xmi:id="_vyt_BAPOEeCYKaNo9SPZvQ" general="_P4gsOAPOEeCYKaNo9SPZvQ"/>
+          <ownedOperation xmi:id="_ZGfCMgPPEeCYKaNo9SPZvQ" name="FileMedium">
+            <ownedParameter xmi:id="_akqQYAPPEeCYKaNo9SPZvQ" name="file">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_RtQVYAPQEeCYKaNo9SPZvQ" name="isReadOnly">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_iljkuAPPEeCYKaNo9SPZvQ" name="StreamingMediumAccessor">
+          <ownedComment xmi:id="_mELnsAPPEeCYKaNo9SPZvQ">
+            <body>Represents a read-only streaming media {@IMedium} that may block when reading.</body>
+          </ownedComment>
+          <generalization xmi:id="_qxBxVAPPEeCYKaNo9SPZvQ" general="_P4gsOAPOEeCYKaNo9SPZvQ"/>
+          <ownedOperation xmi:id="_rongogPPEeCYKaNo9SPZvQ" name="StreamingMedium">
+            <ownedParameter xmi:id="_uh-6cAPPEeCYKaNo9SPZvQ" name="inputStream">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_dHGykM8XEd-NZcvRTr-rhA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_0B8jEAPPEeCYKaNo9SPZvQ" name="MemoryMediumAccessor">
+          <ownedComment xmi:id="_BVjHIAPQEeCYKaNo9SPZvQ">
+            <body>Represents an in-memory, random-access {@IMedium}.</body>
+          </ownedComment>
+          <generalization xmi:id="__GWrtAPPEeCYKaNo9SPZvQ" general="_P4gsOAPOEeCYKaNo9SPZvQ"/>
+          <ownedOperation xmi:id="_2l3RUgPPEeCYKaNo9SPZvQ" name="MemoryMedium">
+            <ownedParameter xmi:id="_4zHzEAPPEeCYKaNo9SPZvQ" name="memory">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Pz9RcAPQEeCYKaNo9SPZvQ" name="isReadOnly">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_5ynN4AYDEeC-MfabKwExLQ" name="MediumFactory" clientDependency="_7xbD9AYDEeC-MfabKwExLQ">
+          <interfaceRealization xmi:id="_7xbD9AYDEeC-MfabKwExLQ" name="InterfaceRealization1" supplier="_aJPzeAYDEeC-MfabKwExLQ" client="_5ynN4AYDEeC-MfabKwExLQ" contract="_aJPzeAYDEeC-MfabKwExLQ"/>
+        </packagedElement>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Package" xmi:id="_qFo_IA9NEeC5mKKa1YlKHQ" name="iface">
+        <packagedElement xmi:type="uml:Class" xmi:id="_4q50YAYCEeC-MfabKwExLQ" name="Medium">
+          <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="__OEmcgYCEeC-MfabKwExLQ" name="T">
+            <parameter xmi:type="uml:ClassifierTemplateParameter" href="pathmap://UML_METAMODELS/Ecore.metamodel.uml#EJavaClass-_ownedTemplateSignature-_ownedParameter.0"/>
+          </ownedTemplateSignature>
+          <ownedOperation xmi:id="_6XYkUgYCEeC-MfabKwExLQ" name="getMedium">
+            <ownedParameter xmi:id="_O9iwAAYDEeC-MfabKwExLQ" name="return" direction="return">
+              <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/Ecore.metamodel.uml#EJavaClass-_ownedTemplateSignature-_ownedParameter.0-_ownedParameteredElement"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_NaZHMg9DEeC5mKKa1YlKHQ" name="Medium">
+            <ownedParameter xmi:id="_OsMtUA9DEeC5mKKa1YlKHQ" name="medium">
+              <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/Ecore.metamodel.uml#EJavaClass-_ownedTemplateSignature-_ownedParameter.0-_ownedParameteredElement"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Q0o5IA9GEeC5mKKa1YlKHQ" name="externalName">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_UPiSsg9GEeC5mKKa1YlKHQ" name="getExternalName">
+            <ownedParameter xmi:id="_VP6KkA9GEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_FWtGwBjJEeCecP1nht5UNw" name="toString">
+            <ownedParameter xmi:id="_F5bZUBjJEeCecP1nht5UNw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_D6UeIA9OEeC5mKKa1YlKHQ" name="de.je.jmeta.dataformats">
+      <packagedElement xmi:type="uml:Package" xmi:id="_rVirUA9OEeC5mKKa1YlKHQ" name="impl">
+        <packagedElement xmi:type="uml:Class" xmi:id="_ir1LGA9wEeC5aZvFX1u-HA" name="StandardDataFormatSpecification" clientDependency="_lJoqRA9wEeC5aZvFX1u-HA _dvJ4VBjJEeCecP1nht5UNw">
+          <interfaceRealization xmi:id="_lJoqRA9wEeC5aZvFX1u-HA" name="InterfaceRealization1" client="_ir1LGA9wEeC5aZvFX1u-HA"/>
+          <interfaceRealization xmi:id="_dvJ4VBjJEeCecP1nht5UNw" name="InterfaceRealization2" supplier="_RUOCCA9PEeC5mKKa1YlKHQ" client="_ir1LGA9wEeC5aZvFX1u-HA" contract="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_mq8E-A9wEeC5aZvFX1u-HA" name="DefaultDataFormatRepository" clientDependency="_o3AT5A9wEeC5aZvFX1u-HA">
+          <interfaceRealization xmi:id="_o3AT5A9wEeC5aZvFX1u-HA" name="InterfaceRealization1" supplier="_PcHQ4A9PEeC5mKKa1YlKHQ" client="_mq8E-A9wEeC5aZvFX1u-HA" contract="_PcHQ4A9PEeC5mKKa1YlKHQ"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_hIJX-BjKEeCecP1nht5UNw" name="StandardDataFormatRepositoryLoader" clientDependency="_mGSs9BjKEeCecP1nht5UNw">
+          <interfaceRealization xmi:id="_mGSs9BjKEeCecP1nht5UNw" name="InterfaceRealization1" supplier="_zTTWSBjJEeCecP1nht5UNw" client="_hIJX-BjKEeCecP1nht5UNw" contract="_zTTWSBjJEeCecP1nht5UNw"/>
+        </packagedElement>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Package" xmi:id="_sjK8EA9OEeC5mKKa1YlKHQ" name="iface">
+        <packagedElement xmi:type="uml:Class" xmi:id="_9PJKKA9OEeC5mKKa1YlKHQ" name="DataFormat">
+          <ownedAttribute xmi:id="_cFfMIhT1EeCXXJGQsqBrgw" name="name" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_dVgpkhT1EeCXXJGQsqBrgw" name="author" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_ixct0hT1EeCXXJGQsqBrgw" name="specificationLinks" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_lLiKohT1EeCXXJGQsqBrgw" name="mimeTypes" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_nS-_UhT1EeCXXJGQsqBrgw" name="fileExtensions" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_iWR7IhT9EeCXXJGQsqBrgw" name="ID3v1" type="_9PJKKA9OEeC5mKKa1YlKHQ"/>
+          <ownedAttribute xmi:id="_YV0tkhUjEeCnFrgwFHk7Yw" name="revisionDate" visibility="private">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_O4X_cBgHEeCW_sZKIcO_yg"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_PcHQ4A9PEeC5mKKa1YlKHQ" name="IDataFormatRepository" clientDependency="_JnNO1Q9WEeC5mKKa1YlKHQ _J8XmhA9WEeC5mKKa1YlKHQ">
+          <ownedOperation xmi:id="_U4pyEg9PEeC5mKKa1YlKHQ" name="getSupportedDataFormats">
+            <ownedParameter xmi:id="_WMGW8A9PEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_X31gAg9PEeC5mKKa1YlKHQ" name="getDataFormatSpecification">
+            <ownedParameter xmi:id="_ZaoIcA9PEeC5mKKa1YlKHQ" name="return" type="_RUOCCA9PEeC5mKKa1YlKHQ" direction="return"/>
+            <ownedParameter xmi:id="_bXgE0A9PEeC5mKKa1YlKHQ" name="dataFormat" type="_9PJKKA9OEeC5mKKa1YlKHQ"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_VU9dwhjKEeCecP1nht5UNw" name="setLoader">
+            <ownedParameter xmi:id="_WQaZYBjKEeCecP1nht5UNw" name="loader" type="_zTTWSBjJEeCecP1nht5UNw"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_RUOCCA9PEeC5mKKa1YlKHQ" name="IDataFormatSpecification" clientDependency="_HlHbRg9WEeC5mKKa1YlKHQ _H9HEhQ9WEeC5mKKa1YlKHQ _IMdIFQ9WEeC5mKKa1YlKHQ _isfe5RKQEeCmY8FE9I3w_w _CqcXdRN8EeCftvNWGQmhpw _uVM9tRUdEeCnFrgwFHk7Yw _IYTaFRjKEeCecP1nht5UNw">
+          <ownedComment xmi:id="_vw_k4BJtEeCQ6KaJ3EOFKQ">
+            <body>Represents the complete specification of a single {@link DataFormat}. The specification contains all {@link DataBlockDescription}s for the {@link DataFormat}.</body>
+          </ownedComment>
+          <ownedOperation xmi:id="_fIcm4g9PEeC5mKKa1YlKHQ" name="getDataFormat">
+            <ownedParameter xmi:id="_f1TF0A9PEeC5mKKa1YlKHQ" name="return" type="_9PJKKA9OEeC5mKKa1YlKHQ" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_nN98gg9PEeC5mKKa1YlKHQ" name="getTopLevelDataBlockIds">
+            <ownedParameter xmi:id="_oebe0A9PEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_plhCsg9PEeC5mKKa1YlKHQ" name="getDataBlockDescription">
+            <ownedParameter xmi:id="_x1dfoA9PEeC5mKKa1YlKHQ" name="return" type="_raCUUA9PEeC5mKKa1YlKHQ" direction="return"/>
+            <ownedParameter xmi:id="_0Ck3cA9PEeC5mKKa1YlKHQ" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_-Mj_Mg9PEeC5mKKa1YlKHQ" name="getSupportedCharacterEncodings">
+            <ownedParameter xmi:id="__q4-YA9PEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_B_5t8g9QEeC5mKKa1YlKHQ" name="getSupportedByteOrders">
+            <ownedParameter xmi:id="_DRQoIA9QEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_FdB8Ig9QEeC5mKKa1YlKHQ" name="getDefaultCharacterEncoding">
+            <ownedParameter xmi:id="_GfVtsA9QEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_Lb_N4g9QEeC5mKKa1YlKHQ" name="getDefaultByteOrder">
+            <ownedParameter xmi:id="_MSrlUA9QEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_51USIg9PEeC5mKKa1YlKHQ" name="getOrderedDataTransformations">
+            <ownedParameter xmi:id="_7BnGIA9PEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_0bY3whN7EeCftvNWGQmhpw" name="getTransformationHandler">
+            <ownedParameter xmi:id="_1qg9UBN7EeCftvNWGQmhpw" name="dataTransformationType" type="_4ShCqA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_4l034BN7EeCftvNWGQmhpw" name="return" type="_szOzmBN7EeCftvNWGQmhpw" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_5m8WohN7EeCftvNWGQmhpw" name="setTransformationHandler">
+            <ownedParameter xmi:id="_6ziFkBN7EeCftvNWGQmhpw" name="dataTransformationType" type="_4ShCqA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_9BZEQBN7EeCftvNWGQmhpw" name="handler" type="_szOzmBN7EeCftvNWGQmhpw"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_z7UKIg9VEeC5mKKa1YlKHQ" name="getMagicKeys">
+            <ownedParameter xmi:id="_1G2wMA9VEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_zXXywg9ZEeC5mKKa1YlKHQ" name="getPaddingBlockIds">
+            <ownedParameter xmi:id="_3oN84A9ZEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_vk7b4g9ZEeC5mKKa1YlKHQ" name="getGenericDataBlockIds">
+            <ownedParameter xmi:id="_w3fP8A9ZEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_tQTq0hUgEeCnFrgwFHk7Yw" name="specifiesBlockWithId">
+            <ownedParameter xmi:id="_u9YQoBUgEeCnFrgwFHk7Yw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_vu_60BUgEeCnFrgwFHk7Yw" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_raCUUA9PEeC5mKKa1YlKHQ" name="DataBlockDescription" clientDependency="_oH669Q9dEeC5mKKa1YlKHQ _hy72NRHLEeCj6sa1lWUOBg">
+          <ownedAttribute xmi:id="_kWKFAhT5EeCXXJGQsqBrgw" name="id" visibility="private" type="_wF_tIA9PEeC5mKKa1YlKHQ" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_loaXEhT5EeCXXJGQsqBrgw" name="name" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_oFoAYhT5EeCXXJGQsqBrgw" name="specDescription" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_q3_aUhT5EeCXXJGQsqBrgw" name="physicalType" visibility="private" type="_gmnFqA9dEeC5mKKa1YlKHQ" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_s6hSwhT5EeCXXJGQsqBrgw" name="orderedChildIds" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_cbmZyHVhEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_4bO84hT5EeCXXJGQsqBrgw" name="childOrder" visibility="private" type="_eiLQEBHLEeCj6sa1lWUOBg" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_6qSOYhT5EeCXXJGQsqBrgw" name="fieldProperties" visibility="private" type="_x54CSBgmEeCW_sZKIcO_yg" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_CEmD0hT6EeCXXJGQsqBrgw" name="locationProperties" visibility="private" type="_X7t0SA9sEeC5aZvFX1u-HA" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_keS_QhT3EeCXXJGQsqBrgw" name="minimumByteLength" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_jtt24hT3EeCXXJGQsqBrgw" name="maximumByteLength" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_Uzy_ghjMEeCecP1nht5UNw" name="UNKNOWN_SIZE" isStatic="true" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_aXCloBjMEeCecP1nht5UNw" value="-1"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_wF_tIA9PEeC5mKKa1YlKHQ" name="DataBlockId">
+          <ownedAttribute xmi:id="_Sg53ghT1EeCXXJGQsqBrgw" name="globalId" visibility="private" isReadOnly="true" isDerived="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_UMMUoBT1EeCXXJGQsqBrgw" name="idSegments" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedOperation xmi:id="_PploAg9WEeC5mKKa1YlKHQ" name="getLocalId">
+            <ownedParameter xmi:id="_QTnccA9WEeC5mKKa1YlKHQ" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_cGqMsg9WEeC5mKKa1YlKHQ" name="DataBlockId">
+            <ownedParameter xmi:id="_dsIVsA9WEeC5mKKa1YlKHQ" name="parent" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_fPXqEA9WEeC5mKKa1YlKHQ" name="localId">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_hf6wYg9WEeC5mKKa1YlKHQ" name="DataBlockId">
+            <ownedParameter xmi:id="_iknHkA9WEeC5mKKa1YlKHQ" name="segments">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_kbhl4g9WEeC5mKKa1YlKHQ" name="DataBlockId">
+            <ownedParameter xmi:id="_mQpUcA9WEeC5mKKa1YlKHQ" name="globalId">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_HlHbRg9WEeC5mKKa1YlKHQ" name="Dependency1" supplier="_9PJKKA9OEeC5mKKa1YlKHQ" client="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_H9HEhQ9WEeC5mKKa1YlKHQ" name="Dependency2" supplier="_wF_tIA9PEeC5mKKa1YlKHQ" client="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_IMdIFQ9WEeC5mKKa1YlKHQ" name="Dependency3" supplier="_raCUUA9PEeC5mKKa1YlKHQ" client="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_JnNO1Q9WEeC5mKKa1YlKHQ" name="Dependency6" supplier="_RUOCCA9PEeC5mKKa1YlKHQ" client="_PcHQ4A9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_J8XmhA9WEeC5mKKa1YlKHQ" name="Dependency7" supplier="_9PJKKA9OEeC5mKKa1YlKHQ" client="_PcHQ4A9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_gmnFqA9dEeC5mKKa1YlKHQ" name="PhysicalDataBlockType">
+          <ownedAttribute xmi:id="_QfNy8hT9EeCXXJGQsqBrgw" name="PAYLOAD" type="_gmnFqA9dEeC5mKKa1YlKHQ"/>
+          <ownedAttribute xmi:id="_RC-nUhT9EeCXXJGQsqBrgw" name="FIELD" type="_gmnFqA9dEeC5mKKa1YlKHQ"/>
+          <ownedAttribute xmi:id="_Rt5MkBT9EeCXXJGQsqBrgw" name="HEADER" type="_gmnFqA9dEeC5mKKa1YlKHQ"/>
+          <ownedAttribute xmi:id="_SkI4EhT9EeCXXJGQsqBrgw" name="FOOTER" type="_gmnFqA9dEeC5mKKa1YlKHQ"/>
+          <ownedAttribute xmi:id="_TY4uwhT9EeCXXJGQsqBrgw" name="CONTAINER" type="_gmnFqA9dEeC5mKKa1YlKHQ"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_oH669Q9dEeC5mKKa1YlKHQ" name="Dependency8" supplier="_gmnFqA9dEeC5mKKa1YlKHQ" client="_raCUUA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_X7t0SA9sEeC5aZvFX1u-HA" name="LocationProperties">
+          <ownedAttribute xmi:id="_rR0-AhT2EeCXXJGQsqBrgw" name="parentId" visibility="private" type="_wF_tIA9PEeC5mKKa1YlKHQ" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_uNSCghT2EeCXXJGQsqBrgw" name="byteOffset" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_wF04ghT2EeCXXJGQsqBrgw" name="maxOccurrences" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_0F-7QhT2EeCXXJGQsqBrgw" name="minOccurrences" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_2W0VchT2EeCXXJGQsqBrgw" name="byteInterval" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_4LDTMhT2EeCXXJGQsqBrgw" name="predecessors" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_52ycQhT2EeCXXJGQsqBrgw" name="successors" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_SyR_2w9tEeC5aZvFX1u-HA" name="A_&lt;dataBlockDescription>_&lt;locationProperties>" memberEnd="_SyR_3A9tEeC5aZvFX1u-HA _SyR_3w9tEeC5aZvFX1u-HA">
+          <ownedEnd xmi:id="_SyR_3A9tEeC5aZvFX1u-HA" name="" type="_raCUUA9PEeC5mKKa1YlKHQ" association="_SyR_2w9tEeC5aZvFX1u-HA">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SyR_3Q9tEeC5aZvFX1u-HA" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SyR_3g9tEeC5aZvFX1u-HA" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_SyR_3w9tEeC5aZvFX1u-HA" name="" type="_X7t0SA9sEeC5aZvFX1u-HA" aggregation="shared" association="_SyR_2w9tEeC5aZvFX1u-HA">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SyR_4A9tEeC5aZvFX1u-HA" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SyR_4Q9tEeC5aZvFX1u-HA" value="1"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_4ShCqA9PEeC5mKKa1YlKHQ" name="DataTransformationType">
+          <ownedAttribute xmi:id="_3BFFUBT0EeCXXJGQsqBrgw" name="name" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_METAMODELS/UML.metamodel.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_3nhaQhT0EeCXXJGQsqBrgw" name="dataFormat" visibility="private" type="_9PJKKA9OEeC5mKKa1YlKHQ" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_6317ghT0EeCXXJGQsqBrgw" name="affectedBlockIds" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_9WGGohT0EeCXXJGQsqBrgw" name="triggeringBlockValues" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="__0VqshT0EeCXXJGQsqBrgw" name="isBuildIn" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_CU0qchT1EeCXXJGQsqBrgw" name="readOrder" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_EG0zkhT1EeCXXJGQsqBrgw" name="writeOrder" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_eiLQEBHLEeCj6sa1lWUOBg" name="ChildOrder">
+          <ownedAttribute xmi:id="_KjroohT9EeCXXJGQsqBrgw" name="SEQUENTIAL" type="_eiLQEBHLEeCj6sa1lWUOBg"/>
+          <ownedAttribute xmi:id="_NKujYhT9EeCXXJGQsqBrgw" name="UNORDERED" type="_eiLQEBHLEeCj6sa1lWUOBg"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_hy72NRHLEeCj6sa1lWUOBg" name="Dependency4" supplier="_eiLQEBHLEeCj6sa1lWUOBg" client="_raCUUA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_isfe5RKQEeCmY8FE9I3w_w" name="Dependency5" supplier="_4ShCqA9PEeC5mKKa1YlKHQ" client="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_szOzmBN7EeCftvNWGQmhpw" name="ITransformationHandler">
+          <ownedOperation xmi:id="_tuY0QhN7EeCftvNWGQmhpw" name="transform">
+            <ownedParameter xmi:id="_vTRHYBN7EeCftvNWGQmhpw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_yQqFkBN7EeCftvNWGQmhpw" name="bytes">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_uPBcIhN7EeCftvNWGQmhpw" name="untransform">
+            <ownedParameter xmi:id="_v8it4BN7EeCftvNWGQmhpw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_wuUJEBN7EeCftvNWGQmhpw" name="bytes">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_CqcXdRN8EeCftvNWGQmhpw" name="Dependency9" supplier="_szOzmBN7EeCftvNWGQmhpw" client="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_6tPJ6A9VEeC5mKKa1YlKHQ" name="MagicKey">
+          <ownedAttribute xmi:id="_PyRUwhT6EeCXXJGQsqBrgw" name="magicKeyBytes" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_R-8AohT6EeCXXJGQsqBrgw" name="bitLength" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_UTgEQhT6EeCXXJGQsqBrgw" name="stringRepresentation" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_W5WsMhT6EeCXXJGQsqBrgw" name="headerBlockId" visibility="private" type="_wF_tIA9PEeC5mKKa1YlKHQ" isReadOnly="true"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_wTc-uA9tEeC5aZvFX1u-HA" name="FieldFunctionType">
+          <ownedAttribute xmi:id="_ofhxUhT9EeCXXJGQsqBrgw" name="SIZE_OF" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+          <ownedAttribute xmi:id="_qZQ6IhT9EeCXXJGQsqBrgw" name="COUNT_OF" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+          <ownedAttribute xmi:id="_r2GrkhT9EeCXXJGQsqBrgw" name="BYTE_ORDER_OF" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+          <ownedAttribute xmi:id="_tVxHghT9EeCXXJGQsqBrgw" name="CRC_OF" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+          <ownedAttribute xmi:id="_usyk0hT9EeCXXJGQsqBrgw" name="CHARACTER_ENCODING_OF" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+          <ownedAttribute xmi:id="_6I4MghtyEeC9cZmFpNV5dw" name="PRESENCE_OF" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_uVM9tRUdEeCnFrgwFHk7Yw" name="Dependency10" supplier="_6tPJ6A9VEeC5mKKa1YlKHQ" client="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Association" xmi:id="_xxvWChUdEeCnFrgwFHk7Yw" name="A_&lt;dataBlockDescription>_&lt;dataBlockFunction>" memberEnd="_xxvWCxUdEeCnFrgwFHk7Yw _xxvWDhUdEeCnFrgwFHk7Yw">
+          <ownedEnd xmi:id="_xxvWCxUdEeCnFrgwFHk7Yw" name="" type="_O7q7eBtyEeC9cZmFpNV5dw" association="_xxvWChUdEeCnFrgwFHk7Yw">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_xxvWDBUdEeCnFrgwFHk7Yw" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_xxvWDRUdEeCnFrgwFHk7Yw" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_xxvWDhUdEeCnFrgwFHk7Yw" name="" type="_wTc-uA9tEeC5aZvFX1u-HA" aggregation="shared" association="_xxvWChUdEeCnFrgwFHk7Yw">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_xxvWDxUdEeCnFrgwFHk7Yw" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_xxvWEBUdEeCnFrgwFHk7Yw" value="1"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_GKQAoBgmEeCW_sZKIcO_yg" name="FieldType">
+          <ownedAttribute xmi:id="_L6KJwhgmEeCW_sZKIcO_yg" name="BINARY" type="_GKQAoBgmEeCW_sZKIcO_yg"/>
+          <ownedAttribute xmi:id="_OFoi0hgmEeCW_sZKIcO_yg" name="STRING" type="_GKQAoBgmEeCW_sZKIcO_yg"/>
+          <ownedAttribute xmi:id="_PVqAQhgmEeCW_sZKIcO_yg" name="ENUMERATED" type="_GKQAoBgmEeCW_sZKIcO_yg"/>
+          <ownedAttribute xmi:id="_QisbIBgmEeCW_sZKIcO_yg" name="NUMERIC" type="_GKQAoBgmEeCW_sZKIcO_yg"/>
+          <ownedAttribute xmi:id="_TQSp0hgmEeCW_sZKIcO_yg" name="FLAGS" type="_GKQAoBgmEeCW_sZKIcO_yg"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_x54CSBgmEeCW_sZKIcO_yg" name="FieldProperties" clientDependency="_G7e-ZRgoEeCW_sZKIcO_yg">
+          <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_2noK0hgmEeCW_sZKIcO_yg"/>
+          <ownedAttribute xmi:id="_nz0wohT3EeCXXJGQsqBrgw" name="terminationBytes" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_obd_chT3EeCXXJGQsqBrgw" name="defaultValue" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_pkVE8hT3EeCXXJGQsqBrgw" name="enumeratedValues" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_ZlmmEhgmEeCW_sZKIcO_yg" name="fieldType" visibility="private" type="_GKQAoBgmEeCW_sZKIcO_yg" isReadOnly="true"/>
+          <ownedAttribute xmi:id="_SKw9ghT3EeCXXJGQsqBrgw" name="flagSpecification" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Class" href="../../Utility/model/Utility.uml#_sbrn2aCOEd6zlNXooB-z8A"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_ClIschT3EeCXXJGQsqBrgw" name="minimumValue" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_IYBREhT3EeCXXJGQsqBrgw" name="maximumValue" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_BFxLchT3EeCXXJGQsqBrgw" name="patterns" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_JEiyEhgnEeCW_sZKIcO_yg" name="maximumStringLength" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_L9nQ8BgnEeCW_sZKIcO_yg" name="minimumStringLength" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_PizO8hgnEeCW_sZKIcO_yg" name="terminactionCharacter" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_cDAYwKFBEd65IuaqNIiRdw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_Dlot0hgxEeCW_sZKIcO_yg" name="fixedCharacterEncoding" visibility="private">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_gqTo4hT6EeCXXJGQsqBrgw" name="fieldFunctions" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_5DLfoBjIEeCecP1nht5UNw" name="fixedByteOrder" visibility="private">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_GQ3UGxgoEeCW_sZKIcO_yg" name="A_&lt;dataBlockDescription>_&lt;fieldProperties>" memberEnd="_GQ3UHBgoEeCW_sZKIcO_yg _GQ3UHxgoEeCW_sZKIcO_yg">
+          <ownedEnd xmi:id="_GQ3UHBgoEeCW_sZKIcO_yg" name="" type="_raCUUA9PEeC5mKKa1YlKHQ" association="_GQ3UGxgoEeCW_sZKIcO_yg">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_GQ3UHRgoEeCW_sZKIcO_yg" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_GQ3UHhgoEeCW_sZKIcO_yg" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_GQ3UHxgoEeCW_sZKIcO_yg" name="" type="_x54CSBgmEeCW_sZKIcO_yg" aggregation="shared" association="_GQ3UGxgoEeCW_sZKIcO_yg">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_GQ3UIBgoEeCW_sZKIcO_yg" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_GQ3UIRgoEeCW_sZKIcO_yg" value="1"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_G7e-ZRgoEeCW_sZKIcO_yg" name="Dependency11" supplier="_GKQAoBgmEeCW_sZKIcO_yg" client="_x54CSBgmEeCW_sZKIcO_yg"/>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_zTTWSBjJEeCecP1nht5UNw" name="IDataFormatRepositoryLoader">
+          <ownedOperation xmi:id="_2qLLchjJEeCecP1nht5UNw" name="load"/>
+          <ownedOperation xmi:id="_3U8mwhjJEeCecP1nht5UNw" name="hasLoaded">
+            <ownedParameter xmi:id="_5rckEBjJEeCecP1nht5UNw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_6rqq8hjJEeCecP1nht5UNw" name="getDataFormats">
+            <ownedParameter xmi:id="_7R0E8BjJEeCecP1nht5UNw" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_95dcohjJEeCecP1nht5UNw" name="getSpecification">
+            <ownedParameter xmi:id="_-mm2gBjJEeCecP1nht5UNw" name="return" type="_RUOCCA9PEeC5mKKa1YlKHQ" direction="return"/>
+            <ownedParameter xmi:id="__kcXwBjJEeCecP1nht5UNw" name="dataFormat" type="_9PJKKA9OEeC5mKKa1YlKHQ"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_IYTaFRjKEeCecP1nht5UNw" name="Dependency12" supplier="_zTTWSBjJEeCecP1nht5UNw" client="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_O7q7eBtyEeC9cZmFpNV5dw" name="FieldFunction">
+          <ownedAttribute xmi:id="_nCc2shT6EeCXXJGQsqBrgw" name="affectedFunctionBlockIds" visibility="private" isReadOnly="true">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_t1NbchtyEeC9cZmFpNV5dw" name="function" visibility="private" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+          <ownedAttribute xmi:id="_w97f4htyEeC9cZmFpNV5dw" name="flagName" visibility="private">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_SZGrqhtyEeC9cZmFpNV5dw" name="A_&lt;fieldFunction>_&lt;fieldProperties>" memberEnd="_SZGrqxtyEeC9cZmFpNV5dw _SZGrrhtyEeC9cZmFpNV5dw">
+          <ownedEnd xmi:id="_SZGrqxtyEeC9cZmFpNV5dw" name="" visibility="public" type="_O7q7eBtyEeC9cZmFpNV5dw" isUnique="false" association="_SZGrqhtyEeC9cZmFpNV5dw">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SZGrrBtyEeC9cZmFpNV5dw" value="*"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SZGrrRtyEeC9cZmFpNV5dw"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_SZGrrhtyEeC9cZmFpNV5dw" name="" type="_x54CSBgmEeCW_sZKIcO_yg" aggregation="shared" association="_SZGrqhtyEeC9cZmFpNV5dw">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SZGrrxtyEeC9cZmFpNV5dw" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SZGrsBtyEeC9cZmFpNV5dw" value="1"/>
+          </ownedEnd>
+        </packagedElement>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_iWAcQBBFEeCWwuTUj8c31Q" name="de.je.jmeta.datablocks">
+      <packagedElement xmi:type="uml:Package" xmi:id="_1x_sIBBLEeCWwuTUj8c31Q" name="iface">
+        <packagedElement xmi:type="uml:Interface" xmi:id="_1owC2BBGEeCWwuTUj8c31Q" name="IDataBlock">
+          <ownedComment xmi:id="_t4DJwBN_EeCftvNWGQmhpw">
+            <body>Represents a contiguous block of data bytes that can be stored on a {@link Medium}. An {@link IDataBlock} basically has the following properties:&#xD;
+&lt;li>&#xD;
+&lt;ul>Belongs to exactly one {@link DataFormat}&lt;/ul>&#xD;
+&lt;ul>Is currently stored on exactly one or no {@link Medium}&lt;/ul>&#xD;
+&lt;ul>Has a total size in bytes&lt;/ul>&#xD;
+&lt;ul>Refers to a {@link DataBlockId} to identify the {@link IDataBlock}&lt;/ul>&#xD;
+&lt;ul> Has zero or exactly one parent {@link IDataBlock}&lt;/ul>&#xD;
+&lt;/li>&#xD;
+&#xD;
+An {@link IDataBlock} need not be persistantly stored on a {@link Medium} but can be only created in memory. This is usually its first state after&#xD;
+creation and before writing it to the {@link Medium}.&#xD;
+Furthermore, it may not have a parent. Such {@link IDataBlock}s are said to be &lt;i>top-level&lt;/i> {@link IDataBlock}s. Physically, they are stored&#xD;
+on the first level of the {@link Medium} and need to be read first.&#xD;
+Thus, {@link IDataBlock}s form a hierarchy of data where a single {@link IDataBlock} consists of an arbitrary number of so-called &lt;i>child&lt;/i> {@link IDataBlock}s.&#xD;
+The children can only be read using derived interfaces.&#xD;
+&#xD;
+Note that this class does not support {@link IDataBlock}s with a size larger than LONG_MAX, e.g. sizes larger than 2^63-1 bytes. Such {@link IDataBlock}s can only be read partly which produces incorrectly interpreted data read beyond 2^63-1 bytes.</body>
+          </ownedComment>
+          <ownedAttribute xmi:id="_36D6ghgPEeCW_sZKIcO_yg" name="UNKNOWN_SIZE" isStatic="true" isReadOnly="true">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedOperation xmi:id="_ABWOUhBHEeCWwuTUj8c31Q" name="getMedium">
+            <ownedComment xmi:id="_0fap4BOAEeCftvNWGQmhpw">
+              <body>Returns the {@link Medium} the {@link IDataBlock} is currently stored on. May return null if the {@link IDataBlock} has not been persisted yet.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_bYYQ4BBHEeCWwuTUj8c31Q" name="return" type="_4q50YAYCEeC-MfabKwExLQ" direction="return">
+              <ownedComment xmi:id="__NAHEBS2EeCCdI4pKGnu6Q">
+                <body>the {@link Medium} the {@link IDataBlock} is currently stored on. May return null if the {@link IDataBlock} has not been persisted yet.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_Au8UIhBHEeCWwuTUj8c31Q" name="getTotalSize">
+            <ownedComment xmi:id="_LrIikBOBEeCftvNWGQmhpw">
+              <body>Returns the total size of the {@link IDataBlock} in bytes.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_dM6JkBBHEeCWwuTUj8c31Q" name="return" direction="return">
+              <ownedComment xmi:id="_B3LOUBS3EeCCdI4pKGnu6Q">
+                <body>the total size of the {@link IDataBlock} in bytes.</body>
+              </ownedComment>
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_BeVJshBHEeCWwuTUj8c31Q" name="getBytes">
+            <ownedComment xmi:id="_Q_xE8BOBEeCftvNWGQmhpw">
+              <body>Reads raw bytes that build the {@link IDataBlock}.&#xD;
+&#xD;
+@pre offset + size &lt; #getTotalSize()&#xD;
+@pre offset >= 0&#xD;
+@pre size >= 0</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_j4a_UBBHEeCWwuTUj8c31Q" name="return" direction="return">
+              <ownedComment xmi:id="_GFMG4BS3EeCCdI4pKGnu6Q">
+                <body>the bytes that build this {@IDataBlock} from the given offset and size.</body>
+              </ownedComment>
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_mce3gBBHEeCWwuTUj8c31Q" name="offset">
+              <ownedComment xmi:id="_PxqzQBS3EeCCdI4pKGnu6Q">
+                <body>the start offset from which to retrieve the bytes. Must not be beyond the total size of {@link IDataBlock}.</body>
+              </ownedComment>
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_oicecBBHEeCWwuTUj8c31Q" name="size">
+              <ownedComment xmi:id="_YrpEoBS3EeCCdI4pKGnu6Q">
+                <body>the size of the bytes to read. Must not reach beyond the total size of the {@link IDataBlock}.</body>
+              </ownedComment>
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_ENQ1IhBHEeCWwuTUj8c31Q" name="getId">
+            <ownedComment xmi:id="_hZtH0BOBEeCftvNWGQmhpw">
+              <body>Returns the {@link DataBlockId} of the {@link IDataBlock}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_YwS0UBBHEeCWwuTUj8c31Q" name="return" type="_wF_tIA9PEeC5mKKa1YlKHQ" direction="return">
+              <ownedComment xmi:id="_eNZdABS3EeCCdI4pKGnu6Q">
+                <body>the id of the {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_NjUFwhHMEeCj6sa1lWUOBg" name="getParent">
+            <ownedComment xmi:id="_lHiEcBOBEeCftvNWGQmhpw">
+              <body>Returns the parent {@link IDataBlock} of this instance. May return null if this is a top-level {@link IDataBlock}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_SHYG0BHMEeCj6sa1lWUOBg" name="return" type="_1owC2BBGEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_jBGckBS3EeCCdI4pKGnu6Q">
+                <body>the parent of this {@link IDataBlock} or null if this is a top-level {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_6UJy0hgZEeCW_sZKIcO_yg" name="initParent">
+            <ownedParameter xmi:id="_7O3HkBgZEeCW_sZKIcO_yg" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_uxzdEhgxEeCW_sZKIcO_yg" name="getCharacterEncoding">
+            <ownedParameter xmi:id="_w2kxMBgxEeCW_sZKIcO_yg" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_x8dbMhgxEeCW_sZKIcO_yg" name="getByteOrder">
+            <ownedParameter xmi:id="_zA23cBgxEeCW_sZKIcO_yg" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_bltQWBBJEeCWwuTUj8c31Q" name="IHeader">
+          <ownedComment xmi:id="_rcbUgBOCEeCftvNWGQmhpw">
+            <body>Represents both &lt;i>headers&lt;/i> and &lt;i>footers&lt;/i>. These two types of {@link IDataBlock}s have the purpose to ease parsing of&#xD;
+a chunk of data. Most data formats define their data to be preceeded or followed by a well-known, often fixed-size header or footer.&#xD;
+Such an {@link IDataBlock} is used to identify the data chunk to belong to a given data format or to have a specific type. Furthermore,&#xD;
+it is very common for headers and footers to contain the size of the {@link IPayload}.&#xD;
+&#xD;
+An {@link IHeader} may only consist of {@link Field}s.</body>
+          </ownedComment>
+          <generalization xmi:id="_R1oEAxODEeCftvNWGQmhpw" general="_1owC2BBGEeCWwuTUj8c31Q"/>
+          <ownedOperation xmi:id="_eUWA0hBJEeCWwuTUj8c31Q" name="getFields">
+            <ownedComment xmi:id="_pZ60wBODEeCftvNWGQmhpw">
+              <body>Returns all {@link Field}s that built this {@link IHeader}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_gCBDkBBJEeCWwuTUj8c31Q" name="return" direction="return">
+              <ownedComment xmi:id="_nra2oBS3EeCCdI4pKGnu6Q">
+                <body>the {@link List} of all {@link IField}s the {@link IHeader} consists of.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_JRHFQhODEeCftvNWGQmhpw" name="getPayloadSize">
+            <ownedComment xmi:id="_xCiL8BODEeCftvNWGQmhpw">
+              <body>Returns the total size of the {@link IPayload} stored near to this {@link IHeader} with the same parent {@link IDataBlock}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_LCqicBODEeCftvNWGQmhpw" name="return" direction="return">
+              <ownedComment xmi:id="_up3PcBS3EeCCdI4pKGnu6Q">
+                <body>the total size of the {@link IPayload} of the same {@link IContainer}.</body>
+              </ownedComment>
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_LGXZ4hOHEeCftvNWGQmhpw" name="isFooter">
+            <ownedComment xmi:id="_PmjAgBOHEeCftvNWGQmhpw">
+              <body>Returns whether this {@link IHeader} instance represents a footer (= true) or a header (=false).</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_Nu47UBOHEeCftvNWGQmhpw" name="return" direction="return">
+              <ownedComment xmi:id="_4KR1wBS3EeCCdI4pKGnu6Q">
+                <body>true if this {@link IHeader} logically is a footer, false otherwise.</body>
+              </ownedComment>
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Interface" xmi:id="__q7yGBBJEeCWwuTUj8c31Q" name="IPayload">
+          <ownedComment xmi:id="_8ppZABODEeCftvNWGQmhpw">
+            <body>The {@link IPayload} is the part of the data of an {@link IContainer} that holds the information valuable for the user, while&#xD;
+{@link IHeader}s usually only store technical and version information mainly required for parsing.&#xD;
+&#xD;
+The {@link IPayload} might both consist of {@link Field}s or child {@link IContainer}s. Usually, it is an either or.&#xD;
+E.g. an ID3v2.3 tag has a payload that usually contains child {@link IContainer}s only while these {@link IContainer} children&#xD;
+are the metadata attributes that usually only contain {@link Field}s as children of their {@link IPayload}.&#xD;
+&#xD;
+However, there might be cases where an {@link IPayload} both contains {@link IContainer} and {@link Field} children, so always both &#xD;
+should be considered.</body>
+          </ownedComment>
+          <generalization xmi:id="_fk2J9BBKEeCWwuTUj8c31Q" general="_1owC2BBGEeCWwuTUj8c31Q"/>
+          <ownedOperation xmi:id="_MgJJ8hBKEeCWwuTUj8c31Q" name="getFields">
+            <ownedComment xmi:id="_qrAzwBOEEeCftvNWGQmhpw">
+              <body>Returns the {@link List} of {@link Field}s belonging to this {@link IPayload}. The returned {@link List} might be empty if the &#xD;
+{@link IPayload} does not contain {@link Field}s as children.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_UMLBgBBKEeCWwuTUj8c31Q" name="return" direction="return">
+              <ownedComment xmi:id="_Bx_W4BS4EeCCdI4pKGnu6Q">
+                <body>the {@link List} of {@link IField}s that build this {@link IPayload}. Might return an empty {@link List} if there are no child {@link IField}s.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_Vsb6YhBKEeCWwuTUj8c31Q" name="getContainerIterator">
+            <ownedComment xmi:id="_0H2hoBOEEeCftvNWGQmhpw">
+              <body>Returns the child {@link IContainer}s contained in this {@link IPayload}. If there are no {@link IContainer} children,&#xD;
+the returned {@link Iterator} will not return any {@link IContainer}s.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_dJHuYBBKEeCWwuTUj8c31Q" name="return" type="_WYHJuBJwEeCQ6KaJ3EOFKQ" direction="return">
+              <ownedComment xmi:id="_SOm6UBS4EeCCdI4pKGnu6Q">
+                <body>an {@link Iterator} for retrieving the child {@link IContainer}s of this {@link IPayload}. Might return an {@link Iterator} that does not return any children if this {@link IPayload} has none.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_BPhKSBBKEeCWwuTUj8c31Q" name="IContainer">
+          <ownedComment xmi:id="_NCk50BOFEeCftvNWGQmhpw">
+            <body>An {@link IContainer} represents the integral parts of the so called container formats such as MP3, Ogg, TIFF and so on. These parts are always called differently in any data format: Might it be &lt;i>chunk&lt;/i>, &lt;i>page&lt;/i>, &lt;i>packet&lt;/i>, &lt;i>segment&lt;/i>, &lt;i>frame&lt;/i> and so on - the basic principles are the same. Thereby, a container part wraps payload data, usually multimedia data such as audio, image, textual or video data, but also metadata. It contains metainformation required for parsing the payload. The structure of an {@link IContainer} in the same data format is well-defined which usually allows extensions of the data format with new container parts, &quot;without breaking existing software&quot;. The latter sentence  is an important phrase often written when describing the advantages of such &quot;chunky&quot; formats. The idea is that software that does not know the type of a container part can safely skip and ignore it.&#xD;
+&#xD;
+Here, an {@link IContainer} consists of an arbitrary number of optional headers and footers, both represented by {@link IHeader} instances and exactly one {@link IPayload}.</body>
+          </ownedComment>
+          <generalization xmi:id="_fSNh1BBKEeCWwuTUj8c31Q" general="_1owC2BBGEeCWwuTUj8c31Q"/>
+          <ownedOperation xmi:id="_EbEgQhBKEeCWwuTUj8c31Q" name="getPayload">
+            <ownedComment xmi:id="_FV-lEBOGEeCftvNWGQmhpw">
+              <body>Returns the {@link IPayload} of this {@link Container}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_FVCOIBBKEeCWwuTUj8c31Q" name="return" type="__q7yGBBJEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_eSVx8BS4EeCCdI4pKGnu6Q">
+                <body>the {@link IPayload} of this {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_GKE_whBKEeCWwuTUj8c31Q" name="getHeaders">
+            <ownedComment xmi:id="_ISn8YBOGEeCftvNWGQmhpw">
+              <body>Returns the headers of this {@link IContainer}. This might return an empty {@link List} if there are no headers.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_Gl8cYBBKEeCWwuTUj8c31Q" name="return" direction="return">
+              <ownedComment xmi:id="_hUzdYBS4EeCCdI4pKGnu6Q">
+                <body>the {@link IHeader}s of this {@link IContainer}, maybe zero headers.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_ICyN0hBKEeCWwuTUj8c31Q" name="getFooters">
+            <ownedComment xmi:id="_NOh1sBOGEeCftvNWGQmhpw">
+              <body>Returns the footers of this {@link IContainer}. This might return an empty {@link List} if there are no footers.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IpOiwBBKEeCWwuTUj8c31Q" name="return" direction="return">
+              <ownedComment xmi:id="_lLHnoBS4EeCCdI4pKGnu6Q">
+                <body>the footers of this {@link IContainer}, maybe zero footers.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_fMhzyBBOEeCWwuTUj8c31Q" name="IDataBlockAccessor" clientDependency="_j7x-xRHbEeC8O4a4uHjcTw _l7v0tRKGEeCmY8FE9I3w_w _IcMppBKKEeCmY8FE9I3w_w _NDCKhRKNEeCmY8FE9I3w_w">
+          <ownedComment xmi:id="_P9nSIBOGEeCftvNWGQmhpw">
+            <body>This interface is the starting point when accessing the {@link IDataBlock}s of a {@link Medium}. For any existing {@link Medium}, it returns an {@link Iterator} &#xD;
+that allows to iterate the top-level {@link IDataBlock}s of that {@link Medium}.</body>
+          </ownedComment>
+          <ownedOperation xmi:id="_ghnXYhBOEeCWwuTUj8c31Q" name="getContainerIterator">
+            <ownedComment xmi:id="_cOKdwBOGEeCftvNWGQmhpw">
+              <body>Returns the {@link Iterator} for retrieving all the top-level {@link IDataBlock}s in the given {@link Medium}. Optionally, a {@link List} of expected {@link DataFormat}s can be specified&#xD;
+to support the library to identify the {@link DataFormat}s faster.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_pwStcBBOEeCWwuTUj8c31Q" name="return" type="_WYHJuBJwEeCQ6KaJ3EOFKQ" direction="return">
+              <ownedComment xmi:id="_rQMIcBS4EeCCdI4pKGnu6Q">
+                <body>the {@link Iterator} for iterating all the top-level {@link IDataBlock}s of the {@link Medium}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_q6zYwBBOEeCWwuTUj8c31Q" name="medium" type="_4q50YAYCEeC-MfabKwExLQ">
+              <ownedComment xmi:id="_v7jEUBS4EeCCdI4pKGnu6Q">
+                <body>the {@link Medium} for which to get the top-level {@link IDataBlock}s.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_yPdGkBBYEeCWwuTUj8c31Q" name="dataFormatHints">
+              <ownedComment xmi:id="_zk5woBS4EeCCdI4pKGnu6Q">
+                <body>a {@link List} containing {@link DataFormat}s expected by the user in the {@link Medium}. This ensures best performance by facilitating the users knowledge.  The {@link List} may be empty if there are no concrete hints.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Lp36kBfwEeC60oqmlxIBhA" name="forceMediumReadOnly">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_hKbawhKGEeCmY8FE9I3w_w" name="getDataBlockFactory">
+            <ownedComment xmi:id="_quWwwBOGEeCftvNWGQmhpw">
+              <body>Returns an {@link IDataBlockFactory} that is used for creating {@link IDataBlock} instances for a given {@link DataFormat}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_iV024BKGEeCmY8FE9I3w_w" name="return" type="_fHTFaBKGEeCmY8FE9I3w_w" direction="return">
+              <ownedComment xmi:id="_Htjg8BS5EeCCdI4pKGnu6Q">
+                <body>the {@link IDataBlockFactory}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_jZn2MBKGEeCmY8FE9I3w_w" name="dataFormat" type="_9PJKKA9OEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_KB0poBS5EeCCdI4pKGnu6Q">
+                <body>the {@link DataFormat} for which to retrieve the {@link IDataBlockFactory}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_j7x-xRHbEeC8O4a4uHjcTw" name="" supplier="_1owC2BBGEeCWwuTUj8c31Q" client="_fMhzyBBOEeCWwuTUj8c31Q"/>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_fHTFaBKGEeCmY8FE9I3w_w" name="IDataBlockFactory" clientDependency="_5tEYNBKIEeCmY8FE9I3w_w">
+          <ownedComment xmi:id="_yOUiQBOGEeCftvNWGQmhpw">
+            <body>A factory used for creating {@link IDataBlock} instances of the various types.</body>
+          </ownedComment>
+          <ownedOperation xmi:id="_BpTxAhBPEeCWwuTUj8c31Q" name="createContainer">
+            <ownedComment xmi:id="_648JABOGEeCftvNWGQmhpw">
+              <body>Creates an {@link IContainer} instance.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_E2MjwBBPEeCWwuTUj8c31Q" name="return" type="_BPhKSBBKEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_YqEFYBS5EeCCdI4pKGnu6Q">
+                <body>the created {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_1Z0PwBKHEeCmY8FE9I3w_w" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_OntaMBS6EeCCdI4pKGnu6Q">
+                <body>the {@link DataBlockId}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_3YBo4BKHEeCmY8FE9I3w_w" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_PK3xoBS6EeCCdI4pKGnu6Q">
+                <body>the parent {@link IDataBlock} or null if there is not parent {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_-w_agBKHEeCmY8FE9I3w_w" name="medium" type="_4q50YAYCEeC-MfabKwExLQ">
+              <ownedComment xmi:id="_PmSiUBS6EeCCdI4pKGnu6Q">
+                <body>the {@link Medium} of the {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_EObTkBKIEeCmY8FE9I3w_w" name="headers">
+              <ownedComment xmi:id="_P-4BcBS6EeCCdI4pKGnu6Q">
+                <body>the headers building this {@link IContainer}.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_FuYqcBKIEeCmY8FE9I3w_w" name="footers">
+              <ownedComment xmi:id="_QXA0oBS6EeCCdI4pKGnu6Q">
+                <body>the footers building this {@link IContainer}.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Hb6jQBKIEeCmY8FE9I3w_w" name="payload" type="__q7yGBBJEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_Qujx8BS6EeCCdI4pKGnu6Q">
+                <body>the {@link IPayload} building this {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_DGI7YhBPEeCWwuTUj8c31Q" name="createPayload">
+            <ownedComment xmi:id="_9TKvwBOGEeCftvNWGQmhpw">
+              <body>Creates an {@link IPayload} instance.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_F4WkUBBPEeCWwuTUj8c31Q" name="return" type="__q7yGBBJEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_baC5sBS5EeCCdI4pKGnu6Q">
+                <body>the created {@link IPayload}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_ClomQBKHEeCmY8FE9I3w_w" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_WBj8oBS6EeCCdI4pKGnu6Q">
+                <body>the {@link DataBlockId}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_FI83kBKHEeCmY8FE9I3w_w" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_aF4tsBS6EeCCdI4pKGnu6Q">
+                <body>the parent {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_VKTbUBKHEeCmY8FE9I3w_w" name="bytes">
+              <ownedComment xmi:id="_afEpwBS6EeCCdI4pKGnu6Q">
+                <body>the {@link ByteBuffer} that contains the bytes of the {@link IDataBlock} to create. The bytes are used starting from the buffers position up to its limit.</body>
+              </ownedComment>
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_D5sfQhBPEeCWwuTUj8c31Q" name="createHeader">
+            <ownedComment xmi:id="__CL2UBOGEeCftvNWGQmhpw">
+              <body>Creates an {@link IHeader} instance.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_HM2SEBBPEeCWwuTUj8c31Q" name="return" type="_bltQWBBJEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_dAkLkBS5EeCCdI4pKGnu6Q">
+                <body>the created {@link IHeader}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_uAOogBKGEeCmY8FE9I3w_w" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_XWDDUBS6EeCCdI4pKGnu6Q">
+                <body>the {@link DataBlockId}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_1XjbYBKGEeCmY8FE9I3w_w" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_a3qI4BS6EeCCdI4pKGnu6Q">
+                <body>the parent {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_4OFjoBKGEeCmY8FE9I3w_w" name="fields">
+              <ownedComment xmi:id="_bNkHcBS6EeCCdI4pKGnu6Q">
+                <body>the {@link Field}s building the {@link IHeader}.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_oCT4khKGEeCmY8FE9I3w_w" name="createHeader">
+            <ownedComment xmi:id="_ApmgEBOHEeCftvNWGQmhpw">
+              <body>Creates an {@link IHeader} instance.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_5x7U8BKGEeCmY8FE9I3w_w" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_YSs40BS6EeCCdI4pKGnu6Q">
+                <body>the {@link DataBlockId}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_82LJEBKGEeCmY8FE9I3w_w" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_bvFgIBS6EeCCdI4pKGnu6Q">
+                <body>the parent {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="__ZfaYBKGEeCmY8FE9I3w_w" name="bytes">
+              <ownedComment xmi:id="_cEGG0BS6EeCCdI4pKGnu6Q">
+                <body>the {@link ByteBuffer} that contains the bytes of the {@link IDataBlock} to create. The bytes are used starting from the buffers position up to its limit.</body>
+              </ownedComment>
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_fFLusBS5EeCCdI4pKGnu6Q" name="return" type="_bltQWBBJEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_gpLRABS5EeCCdI4pKGnu6Q">
+                <body>the created {@link IHeader}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_bbS4QhKHEeCmY8FE9I3w_w" name="createPayload">
+            <ownedComment xmi:id="_FLbFcBOHEeCftvNWGQmhpw">
+              <body>Creates an {@link IPayload} instance.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_cQfa4BKHEeCmY8FE9I3w_w" name="return" type="__q7yGBBJEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_k6KlEBS5EeCCdI4pKGnu6Q">
+                <body>the created {@link IPayload}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_dfdvcBKHEeCmY8FE9I3w_w" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_dfS5gBS6EeCCdI4pKGnu6Q">
+                <body>the {@link DataBlockId}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_eynZYBKHEeCmY8FE9I3w_w" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_d1DHEBS6EeCCdI4pKGnu6Q">
+                <body>the parent {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_g5BsQBKHEeCmY8FE9I3w_w" name="containers">
+              <ownedComment xmi:id="_eGVrYBS6EeCCdI4pKGnu6Q">
+                <body>the {@link IContainer}s building this {@link IPayload}.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_jSnW0BUZEeCnFrgwFHk7Yw" name="fields">
+              <ownedComment xmi:id="_oxYsoBUZEeCnFrgwFHk7Yw">
+                <body>the {@link IField}s building this {@link IPayload}.</body>
+              </ownedComment>
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_vqptghKHEeCmY8FE9I3w_w" name="getDataFormatSpecification">
+            <ownedComment xmi:id="_2OLDABOGEeCftvNWGQmhpw">
+              <body>Returns the {@link DataFormat} of this factory.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_whfO4BKHEeCmY8FE9I3w_w" name="return" type="_RUOCCA9PEeC5mKKa1YlKHQ" direction="return">
+              <ownedComment xmi:id="_pNFy0BS5EeCCdI4pKGnu6Q">
+                <body>the {@link DataFormat} of this {@link IDataBlockFactory}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_JnY8UhKIEeCmY8FE9I3w_w" name="createContainer">
+            <ownedComment xmi:id="_I3UIYBOHEeCftvNWGQmhpw">
+              <body>Creates an {@link IContainer} instance.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_K61hMBKIEeCmY8FE9I3w_w" name="return" type="_BPhKSBBKEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_v5MecBS5EeCCdI4pKGnu6Q">
+                <body>the created {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_LwevwBKIEeCmY8FE9I3w_w" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_gFccYBS6EeCCdI4pKGnu6Q">
+                <body>the {@link DataBlockId}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_MxvYcBKIEeCmY8FE9I3w_w" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_gWbesBS6EeCCdI4pKGnu6Q">
+                <body>the parent {@link IDataBlock} or null if there is not parent {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_O862kBKIEeCmY8FE9I3w_w" name="medium" type="_4q50YAYCEeC-MfabKwExLQ">
+              <ownedComment xmi:id="_gvdpwBS6EeCCdI4pKGnu6Q">
+                <body>the {@link Medium} of the {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_QOIm0BKIEeCmY8FE9I3w_w" name="bytes">
+              <ownedComment xmi:id="_hzQpEBS6EeCCdI4pKGnu6Q">
+                <body>the {@link ByteBuffer} that contains the bytes of the {@link IDataBlock} to create. The bytes are used starting from the buffers position up to its limit.</body>
+              </ownedComment>
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_SyVo8hKIEeCmY8FE9I3w_w" name="createContainer">
+            <ownedComment xmi:id="_J1vfgBOHEeCftvNWGQmhpw">
+              <body>Creates an {@link IContainer} instance.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_T-ViABKIEeCmY8FE9I3w_w" name="return" type="_BPhKSBBKEeCWwuTUj8c31Q" direction="return">
+              <ownedComment xmi:id="_xObzEBS5EeCCdI4pKGnu6Q">
+                <body>the created {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Urfi8BKIEeCmY8FE9I3w_w" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ">
+              <ownedComment xmi:id="_ihTa0BS6EeCCdI4pKGnu6Q">
+                <body>the {@link DataBlockId}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_WSJ-wBKIEeCmY8FE9I3w_w" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_i0h40BS6EeCCdI4pKGnu6Q">
+                <body>the parent {@link IDataBlock} or null if there is not parent {@link IDataBlock}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Xjqp8BKIEeCmY8FE9I3w_w" name="medium" type="_4q50YAYCEeC-MfabKwExLQ">
+              <ownedComment xmi:id="_jK4jUBS6EeCCdI4pKGnu6Q">
+                <body>the {@link Medium} of the {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Y0IzUBKIEeCmY8FE9I3w_w" name="firstHeader" type="_bltQWBBJEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_jiubkBS6EeCCdI4pKGnu6Q">
+                <body>the first {@link IHeader} of this {@link IContainer}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_l7v0tRKGEeCmY8FE9I3w_w" name="Dependency1" supplier="_fHTFaBKGEeCmY8FE9I3w_w" client="_fMhzyBBOEeCWwuTUj8c31Q"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_5tEYNBKIEeCmY8FE9I3w_w" name="Dependency2" supplier="_1owC2BBGEeCWwuTUj8c31Q" client="_fHTFaBKGEeCmY8FE9I3w_w"/>
+        <packagedElement xmi:type="uml:Association" xmi:id="_T-Em2hKJEeCmY8FE9I3w_w" name="A_&lt;iContainer>_&lt;iPayload>" memberEnd="_T-Em2xKJEeCmY8FE9I3w_w _T-Em3hKJEeCmY8FE9I3w_w">
+          <ownedEnd xmi:id="_T-Em2xKJEeCmY8FE9I3w_w" name="" type="_BPhKSBBKEeCWwuTUj8c31Q" association="_T-Em2hKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_T-Em3BKJEeCmY8FE9I3w_w" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_T-Em3RKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_T-Em3hKJEeCmY8FE9I3w_w" name="" type="__q7yGBBJEeCWwuTUj8c31Q" aggregation="shared" association="_T-Em2hKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_T-Em3xKJEeCmY8FE9I3w_w" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_T-Em4BKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_WxCduhKJEeCmY8FE9I3w_w" name="A_&lt;iPayload>_&lt;iContainer>" memberEnd="_WxCduxKJEeCmY8FE9I3w_w _WxCdvhKJEeCmY8FE9I3w_w">
+          <ownedEnd xmi:id="_WxCduxKJEeCmY8FE9I3w_w" name="" type="__q7yGBBJEeCWwuTUj8c31Q" isUnique="false" association="_WxCduhKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_WxCdvBKJEeCmY8FE9I3w_w" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_WxCdvRKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_WxCdvhKJEeCmY8FE9I3w_w" name="" type="_BPhKSBBKEeCWwuTUj8c31Q" isUnique="false" aggregation="shared" association="_WxCduhKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_WxCdvxKJEeCmY8FE9I3w_w" value="*"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_WxCdwBKJEeCmY8FE9I3w_w"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_dQLrahKJEeCmY8FE9I3w_w" name="A_&lt;iPayload>_&lt;field>" memberEnd="_dQLraxKJEeCmY8FE9I3w_w _dQLrbhKJEeCmY8FE9I3w_w">
+          <ownedEnd xmi:id="_dQLraxKJEeCmY8FE9I3w_w" name="" type="__q7yGBBJEeCWwuTUj8c31Q" isUnique="false" association="_dQLrahKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_dQLrbBKJEeCmY8FE9I3w_w" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_dQLrbRKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_dQLrbhKJEeCmY8FE9I3w_w" name="" type="_0QuDeBBHEeCWwuTUj8c31Q" isUnique="false" aggregation="shared" association="_dQLrahKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_dQLrbxKJEeCmY8FE9I3w_w" value="*"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_dQLrcBKJEeCmY8FE9I3w_w"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_jA1bahKJEeCmY8FE9I3w_w" name="A_&lt;iHeader>_&lt;field>" memberEnd="_jA1baxKJEeCmY8FE9I3w_w _jA1bbhKJEeCmY8FE9I3w_w">
+          <ownedEnd xmi:id="_jA1baxKJEeCmY8FE9I3w_w" name="" type="_bltQWBBJEeCWwuTUj8c31Q" isUnique="false" association="_jA1bahKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_jA1bbBKJEeCmY8FE9I3w_w" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_jA1bbRKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_jA1bbhKJEeCmY8FE9I3w_w" name="" type="_0QuDeBBHEeCWwuTUj8c31Q" isUnique="false" aggregation="shared" association="_jA1bahKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_jA1bbxKJEeCmY8FE9I3w_w" value="*"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_jA1bcBKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_phed6hKJEeCmY8FE9I3w_w" name="A_&lt;iContainer>_&lt;iHeader>" memberEnd="_phed6xKJEeCmY8FE9I3w_w _phed7hKJEeCmY8FE9I3w_w">
+          <ownedEnd xmi:id="_phed6xKJEeCmY8FE9I3w_w" name="" type="_BPhKSBBKEeCWwuTUj8c31Q" isUnique="false" association="_phed6hKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_phed7BKJEeCmY8FE9I3w_w" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_phed7RKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_phed7hKJEeCmY8FE9I3w_w" name="header of" type="_bltQWBBJEeCWwuTUj8c31Q" isUnique="false" aggregation="shared" association="_phed6hKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_phed7xKJEeCmY8FE9I3w_w" value="*"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_phed8BKJEeCmY8FE9I3w_w"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_umeByhKJEeCmY8FE9I3w_w" name="A_&lt;iContainer>_&lt;iHeader>_2" memberEnd="_umeByxKJEeCmY8FE9I3w_w _umeBzhKJEeCmY8FE9I3w_w">
+          <ownedEnd xmi:id="_umeByxKJEeCmY8FE9I3w_w" name="" type="_BPhKSBBKEeCWwuTUj8c31Q" isUnique="false" association="_umeByhKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_umeBzBKJEeCmY8FE9I3w_w" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_umeBzRKJEeCmY8FE9I3w_w" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_umeBzhKJEeCmY8FE9I3w_w" name="footer of" type="_bltQWBBJEeCWwuTUj8c31Q" isUnique="false" aggregation="shared" association="_umeByhKJEeCmY8FE9I3w_w">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_umeBzxKJEeCmY8FE9I3w_w" value="*"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_umeB0BKJEeCmY8FE9I3w_w"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_WYHJuBJwEeCQ6KaJ3EOFKQ" name="AbstractDataBlockIterator" clientDependency="_bw_UFBKKEeCmY8FE9I3w_w" isAbstract="true">
+          <ownedComment xmi:id="_b73XYBOHEeCftvNWGQmhpw">
+            <body>An {@link Iterator} used for iterating over {@link IDataBlock}s. This {@link Iterator} will throw an {@link UnsupportedOperationException} when&#xD;
+the #remove() method is called.&#xD;
+&#xD;
+The #next() method might throw an {@link UnknownDataFormatException} which is a {@link RuntimeException}.</body>
+          </ownedComment>
+          <interfaceRealization xmi:id="_bw_UFBKKEeCmY8FE9I3w_w" name="InterfaceRealization1" client="_WYHJuBJwEeCQ6KaJ3EOFKQ">
+            <supplier xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_o7zK8HVhEd6FgeqRnn-mAw"/>
+            <contract href="../../GeneratorTemplates/models/CommonElements.uml#_o7zK8HVhEd6FgeqRnn-mAw"/>
+          </interfaceRealization>
+          <ownedOperation xmi:id="_YbjBEhJwEeCQ6KaJ3EOFKQ" name="AbstractDataBlockIterator">
+            <ownedParameter xmi:id="_ZpLR0BJwEeCQ6KaJ3EOFKQ" name="mediumAccessor" type="_6BizOAO9EeCYKaNo9SPZvQ">
+              <ownedComment xmi:id="_COhP8BS6EeCCdI4pKGnu6Q">
+                <body>The {@link IMediumAccessor} used for reading the {@link Medium}.</body>
+              </ownedComment>
+            </ownedParameter>
+            <ownedParameter xmi:id="_WNCG0BKLEeCmY8FE9I3w_w" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q">
+              <ownedComment xmi:id="_F9h4UBS6EeCCdI4pKGnu6Q">
+                <body>The {@link IDataBlockAccessor}.</body>
+              </ownedComment>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_IyydWBKNEeCmY8FE9I3w_w" name="UnknownDataFormatException">
+          <ownedComment xmi:id="__r2JQBOEEeCftvNWGQmhpw">
+            <body>Thrown whenever the {@link DataFormat} of a top-level {@link IDataBlock} within a {@link Medium} is unknown. I.e. whenever a {@link Medium} contains at least one top-level data block whose {@link DataFormat} could not be identified, this exception is thrown.</body>
+          </ownedComment>
+          <ownedOperation xmi:id="_LkEgkBjMEeCecP1nht5UNw" name="getMedium">
+            <ownedParameter xmi:id="_NLejQBjMEeCecP1nht5UNw" name="return" type="_4q50YAYCEeC-MfabKwExLQ" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_OHh70hjMEeCecP1nht5UNw" name="getOffset">
+            <ownedParameter xmi:id="_O5mR8BjMEeCecP1nht5UNw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_NDCKhRKNEeCmY8FE9I3w_w" name="Dependency3" supplier="_IyydWBKNEeCmY8FE9I3w_w" client="_fMhzyBBOEeCWwuTUj8c31Q"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_0QuDeBBHEeCWwuTUj8c31Q" name="AbstractField" clientDependency="_yDnakxjKEeCecP1nht5UNw" isAbstract="true">
+          <ownedComment xmi:id="_qKluoBOBEeCftvNWGQmhpw">
+            <body>Represents a leaf node in the data hierarchy of a {@link Medium}. A {@link Field} usually has a small size and represents a concrete value, &#xD;
+e.g. for parsing, descriptive properties or containing raw binary data.&#xD;
+&#xD;
+For {@link Field}s, one must distinguish the raw byte value and the so-called &lt;i>interpreted&lt;/i> value. The interpreted value is the value &#xD;
+interesting for the user, therefore often human-readable. To convert raw bytes to an interpreted value, specific knowledge about and interpretation&#xD;
+of the raw bytes is necessary.&#xD;
+&#xD;
+Derived classes represent the concrete value types a {@link Field} can have.</body>
+          </ownedComment>
+          <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_3wHtEBBIEeCWwuTUj8c31Q" name="T"/>
+          <interfaceRealization xmi:id="_yDnakxjKEeCecP1nht5UNw" name="InterfaceRealization1" supplier="_1owC2BBGEeCWwuTUj8c31Q" client="_0QuDeBBHEeCWwuTUj8c31Q" contract="_1owC2BBGEeCWwuTUj8c31Q"/>
+          <ownedOperation xmi:id="_V-2yAhBIEeCWwuTUj8c31Q" name="Field">
+            <ownedComment xmi:id="_HOsXABOCEeCftvNWGQmhpw">
+              <body>Creates a new {@link Field}.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_TCFhgBS_EeCCdI4pKGnu6Q" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_2Iu7IBS_EeCCdI4pKGnu6Q" name="interpretedValue">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_CUg7ghTAEeCCdI4pKGnu6Q" name="Field">
+            <ownedParameter xmi:id="_FtLgcBTAEeCCdI4pKGnu6Q" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_JEy8gBTAEeCCdI4pKGnu6Q" name="byteValue">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_P0fHohTAEeCCdI4pKGnu6Q" name="convert" visibility="public">
+            <ownedParameter xmi:id="_ceD3QBTAEeCCdI4pKGnu6Q" name="byteOrder">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_fMQi4BTAEeCCdI4pKGnu6Q" name="charset">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_hla_whUaEeCnFrgwFHk7Yw" name="getInterpretedValue">
+            <ownedParameter xmi:id="_i72AIBUaEeCnFrgwFHk7Yw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_pTZYEhUaEeCnFrgwFHk7Yw" name="getByteValue">
+            <ownedParameter xmi:id="_qBvEwBUaEeCnFrgwFHk7Yw" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_5UFXghjKEeCecP1nht5UNw" name="convertToInterpreted" visibility="protected" isAbstract="true">
+            <ownedParameter xmi:id="_9rL6oBjKEeCecP1nht5UNw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Ayj7QBjLEeCecP1nht5UNw" name="byteValue">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_KE96wBjLEeCecP1nht5UNw" name="spec" type="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_MBZLMBjLEeCecP1nht5UNw" name="byteOrder">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_S95DQBjLEeCecP1nht5UNw" name="characterEncoding">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_6pnnEhjKEeCecP1nht5UNw" name="convertToBytes" visibility="protected" isAbstract="true">
+            <ownedParameter xmi:id="_-0fsEBjKEeCecP1nht5UNw" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Uz6JsBjLEeCecP1nht5UNw" name="interpretedValue">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_XP7gMBjLEeCecP1nht5UNw" name="spec" type="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_Yn_fUBjLEeCecP1nht5UNw" name="byteOrder">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_dS6WUBjLEeCecP1nht5UNw" name="characterEncoding">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_60D_MBBIEeCWwuTUj8c31Q" name="StringField">
+          <ownedComment xmi:id="_Sb5PQBOCEeCftvNWGQmhpw">
+            <body>{@link Field} with a textual interpreted value.</body>
+          </ownedComment>
+          <generalization xmi:id="_F3X0RBBMEeCWwuTUj8c31Q" general="_0QuDeBBHEeCWwuTUj8c31Q"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_7yNCeBBIEeCWwuTUj8c31Q" name="NumericField">
+          <ownedComment xmi:id="_WDKQ4BOCEeCftvNWGQmhpw">
+            <body>{@link Field} with a numeric interpreted value.</body>
+          </ownedComment>
+          <generalization xmi:id="_bRgQBBBLEeCWwuTUj8c31Q" general="_0QuDeBBHEeCWwuTUj8c31Q"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="__LnOSBBIEeCWwuTUj8c31Q" name="FlagsField">
+          <ownedComment xmi:id="_Y-dkYBOCEeCftvNWGQmhpw">
+            <body>{@link Field} with an interpreted value that represents flags.</body>
+          </ownedComment>
+          <generalization xmi:id="_biocRBBLEeCWwuTUj8c31Q" general="_0QuDeBBHEeCWwuTUj8c31Q"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_HikSKBBJEeCWwuTUj8c31Q" name="BinaryField">
+          <ownedComment xmi:id="_crsEEBOCEeCftvNWGQmhpw">
+            <body>{@link Field} with a binary value, i.e. where byte value and interpreted value are the same. It can also be seen as uninterpreted raw data {@link Field}.</body>
+          </ownedComment>
+          <generalization xmi:id="_b3f5BBBLEeCWwuTUj8c31Q" general="_0QuDeBBHEeCWwuTUj8c31Q"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_cfiPWBggEeCW_sZKIcO_yg" name="EnumeratedField">
+          <generalization xmi:id="_glCsJBggEeCW_sZKIcO_yg" general="_0QuDeBBHEeCWwuTUj8c31Q"/>
+        </packagedElement>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Package" xmi:id="_PXh64BBXEeCWwuTUj8c31Q" name="impl">
+        <packagedElement xmi:type="uml:Class" xmi:id="_Yt9eyBBXEeCWwuTUj8c31Q" name="AbstractDataBlock" clientDependency="_a8kEVRBXEeCWwuTUj8c31Q" isAbstract="true">
+          <interfaceRealization xmi:id="_a8kEVRBXEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="_1owC2BBGEeCWwuTUj8c31Q" client="_Yt9eyBBXEeCWwuTUj8c31Q" contract="_1owC2BBGEeCWwuTUj8c31Q"/>
+          <ownedOperation xmi:id="_h2slURS_EeCCdI4pKGnu6Q" name="setMediumDataReference" visibility="package">
+            <ownedComment xmi:id="_tUIR8BS_EeCCdI4pKGnu6Q">
+              <body>Sets the {@link Medium} this {@link IDataBlock} is stored on.</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_lIak8BgFEeCW_sZKIcO_yg" name="mediumDataReference" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_lRmBABgDEeCW_sZKIcO_yg" name="setId" visibility="package">
+            <ownedParameter xmi:id="_nAKboBgDEeCW_sZKIcO_yg" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_mSRokBjMEeCecP1nht5UNw" name="setByteOrder" visibility="package">
+            <ownedParameter xmi:id="_qb9awBjMEeCecP1nht5UNw" name="byteOrder">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_nGIHYhjMEeCecP1nht5UNw" name="setCharacterEncoding" visibility="package">
+            <ownedParameter xmi:id="_oWmQwBjMEeCecP1nht5UNw" name="characterEncoding">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_4F6pUhjMEeCecP1nht5UNw" name="getDataBlockFacrory" visibility="package"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_pqw-KBBXEeCWwuTUj8c31Q" name="StandardHeader" clientDependency="_04HAUxBXEeCWwuTUj8c31Q">
+          <generalization xmi:id="_L0GGMxfzEeC60oqmlxIBhA" general="_Yt9eyBBXEeCWwuTUj8c31Q"/>
+          <interfaceRealization xmi:id="_04HAUxBXEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="_bltQWBBJEeCWwuTUj8c31Q" client="_pqw-KBBXEeCWwuTUj8c31Q" contract="_bltQWBBJEeCWwuTUj8c31Q"/>
+          <ownedOperation xmi:id="_SQOeUhzkEeCTjboh27C6Gg" name="determinePayloadSize">
+            <ownedParameter xmi:id="_WrpgwBzkEeCTjboh27C6Gg" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_YdDM8BzkEeCTjboh27C6Gg" name="spec" type="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_aohmABzkEeCTjboh27C6Gg" name="context" type="_re6nmBt0EeC9cZmFpNV5dw"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_rDuVKBBXEeCWwuTUj8c31Q" name="StandardContainer" clientDependency="_F0wusxBYEeCWwuTUj8c31Q">
+          <generalization xmi:id="_TAZU0xfzEeC60oqmlxIBhA" general="_Yt9eyBBXEeCWwuTUj8c31Q"/>
+          <interfaceRealization xmi:id="_F0wusxBYEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="_BPhKSBBKEeCWwuTUj8c31Q" client="_rDuVKBBXEeCWwuTUj8c31Q" contract="_BPhKSBBKEeCWwuTUj8c31Q"/>
+          <ownedOperation xmi:id="_hE8schtbEeC9cZmFpNV5dw" name="StandardContainer">
+            <ownedParameter xmi:id="_jQRUgBtbEeC9cZmFpNV5dw" name="headerId" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_jTjSABtbEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_Hy3HshtcEeC9cZmFpNV5dw" name="determineHeaders" visibility="private">
+            <ownedParameter xmi:id="__FZSMBtkEeC9cZmFpNV5dw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Ao7hgBtlEeC9cZmFpNV5dw" name="firstHeaderId" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_Jr_dcBtlEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+            <ownedParameter xmi:id="_OAta8BtlEeC9cZmFpNV5dw" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_IqTGAhtcEeC9cZmFpNV5dw" name="determineFooters" visibility="private">
+            <ownedParameter xmi:id="__FZSMRtkEeC9cZmFpNV5dw" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_Qn5foBtlEeC9cZmFpNV5dw" name="footerRef" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+            <ownedParameter xmi:id="_SEuqABtlEeC9cZmFpNV5dw" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_Jf8UkhtcEeC9cZmFpNV5dw" name="determinePayload" visibility="private">
+            <ownedParameter xmi:id="_P7V7oBtlEeC9cZmFpNV5dw" name="payloadRef" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+            <ownedParameter xmi:id="_VllhoBtlEeC9cZmFpNV5dw" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_OsrfMhtcEeC9cZmFpNV5dw" name="getNextHeaderDesc" visibility="private">
+            <ownedParameter xmi:id="_TovJgRtcEeC9cZmFpNV5dw" name="return" type="_raCUUA9PEeC5mKKa1YlKHQ" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_PdG2khtcEeC9cZmFpNV5dw" name="getNextFooterDesc" visibility="private">
+            <ownedParameter xmi:id="_TovJgBtcEeC9cZmFpNV5dw" name="return" type="_raCUUA9PEeC5mKKa1YlKHQ" direction="return"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_w_28YBBXEeCWwuTUj8c31Q" name="LazyPayload" clientDependency="_5Mhb0xBXEeCWwuTUj8c31Q">
+          <generalization xmi:id="_Xoe6QxfzEeC60oqmlxIBhA" general="_Yt9eyBBXEeCWwuTUj8c31Q"/>
+          <interfaceRealization xmi:id="_5Mhb0xBXEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="__q7yGBBJEeCWwuTUj8c31Q" client="_w_28YBBXEeCWwuTUj8c31Q" contract="__q7yGBBJEeCWwuTUj8c31Q"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_n1heWBBYEeCWwuTUj8c31Q" name="StandardDataBlockAccessor" clientDependency="_qi0yFRBYEeCWwuTUj8c31Q _3YxjtBJvEeCQ6KaJ3EOFKQ">
+          <interfaceRealization xmi:id="_qi0yFRBYEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="_fMhzyBBOEeCWwuTUj8c31Q" client="_n1heWBBYEeCWwuTUj8c31Q" contract="_fMhzyBBOEeCWwuTUj8c31Q"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="__7vJBxBbEeCWwuTUj8c31Q" name="TopLevelContainerIterator">
+          <generalization xmi:id="_djz7YxJwEeCQ6KaJ3EOFKQ" general="_WYHJuBJwEeCQ6KaJ3EOFKQ"/>
+          <ownedOperation xmi:id="_JKuBEhBcEeCWwuTUj8c31Q" name="TopLevelContainerIterator">
+            <ownedParameter xmi:id="_N-kxoBBcEeCWwuTUj8c31Q" name="mediumAccessor" type="_6BizOAO9EeCYKaNo9SPZvQ"/>
+            <ownedParameter xmi:id="_-jKyMBKNEeCmY8FE9I3w_w" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q"/>
+            <ownedParameter xmi:id="_z5ibwBaYEeCNZOI8PyuHiQ" name="dataFormatHints">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_2Slk0BBYEeCWwuTUj8c31Q" name="identifyDataFormatHeader" visibility="private">
+            <ownedParameter xmi:id="_k-g4IBBcEeCWwuTUj8c31Q" name="return" type="_wF_tIA9PEeC5mKKa1YlKHQ" direction="return"/>
+            <ownedParameter xmi:id="_azlSgBtPEeC9cZmFpNV5dw" name="bytes">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_lIHskhN8EeCftvNWGQmhpw" name="determineDataFormatPrecedence" visibility="private">
+            <ownedParameter xmi:id="_pAE1kBN8EeCftvNWGQmhpw" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_5kYesBaYEeCNZOI8PyuHiQ" name="dataFormatHints">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_7ng0EBaYEeCNZOI8PyuHiQ" name="allDataFormats">
+              <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_3YxjtBJvEeCQ6KaJ3EOFKQ" name="Dependency1" supplier="__7vJBxBbEeCWwuTUj8c31Q" client="_n1heWBBYEeCWwuTUj8c31Q"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_PEXPSBJwEeCQ6KaJ3EOFKQ" name="PayloadContainerIterator">
+          <generalization xmi:id="_eVlWlBJwEeCQ6KaJ3EOFKQ" general="_WYHJuBJwEeCQ6KaJ3EOFKQ"/>
+          <ownedOperation xmi:id="_55btIhJwEeCQ6KaJ3EOFKQ" name="PayloadContainerIterator">
+            <ownedParameter xmi:id="_8EUQUBJwEeCQ6KaJ3EOFKQ" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q"/>
+            <ownedParameter xmi:id="_ELLjkBKOEeCmY8FE9I3w_w" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_fHWxyBJwEeCQ6KaJ3EOFKQ" name="FieldIterator">
+          <generalization xmi:id="_h246JBJwEeCQ6KaJ3EOFKQ" general="_WYHJuBJwEeCQ6KaJ3EOFKQ"/>
+          <ownedOperation xmi:id="_de7l8BJxEeCQ6KaJ3EOFKQ" name="FieldIterator">
+            <ownedParameter xmi:id="_g0BScBJxEeCQ6KaJ3EOFKQ" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q"/>
+            <ownedParameter xmi:id="_Gh1R4BKOEeCmY8FE9I3w_w" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw"/>
+            <ownedParameter xmi:id="_jHOUgBvPEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw"/>
+            <ownedParameter xmi:id="_6n8z4BvPEeCGKIBwFC0cnQ" name="minimumParentSize">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_IcMppBKKEeCmY8FE9I3w_w" name="Dependency2" supplier="_WYHJuBJwEeCQ6KaJ3EOFKQ" client="_fMhzyBBOEeCWwuTUj8c31Q"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_yikuKBKNEeCmY8FE9I3w_w" name="StandardDataBlockFactory" clientDependency="_Y5VcFRjNEeCecP1nht5UNw">
+          <interfaceRealization xmi:id="_Y5VcFRjNEeCecP1nht5UNw" name="InterfaceRealization1" supplier="_Gax2GBjNEeCecP1nht5UNw" client="_yikuKBKNEeCmY8FE9I3w_w" contract="_Gax2GBjNEeCecP1nht5UNw"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_vpLDaBgEEeCW_sZKIcO_yg" name="MediumDataReference">
+          <ownedAttribute xmi:id="_yu6FQBgEEeCW_sZKIcO_yg" name="mediumAccessor" visibility="private" type="_6BizOAO9EeCYKaNo9SPZvQ"/>
+          <ownedAttribute xmi:id="_1RVlwhgEEeCW_sZKIcO_yg" name="offset" visibility="private">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_BQqMkhgHEeCW_sZKIcO_yg" name="data" visibility="private">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:id="_Esc-AhgHEeCW_sZKIcO_yg" name="readTimeStamp" visibility="private">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_O4X_cBgHEeCW_sZKIcO_yg"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_re6nmBt0EeC9cZmFpNV5dw" name="DataBlockContext">
+          <ownedOperation xmi:id="_s9Pmwht0EeC9cZmFpNV5dw" name="pushFunctionField">
+            <ownedParameter xmi:id="_y3leQBt0EeC9cZmFpNV5dw" name="field" type="_0QuDeBBHEeCWwuTUj8c31Q"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_8vsL0ht0EeC9cZmFpNV5dw" name="popFunctionField">
+            <ownedParameter xmi:id="_-Se0QBt0EeC9cZmFpNV5dw" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_T0_TcBt1EeC9cZmFpNV5dw" name="functionType" type="_wTc-uA9tEeC5aZvFX1u-HA"/>
+            <ownedParameter xmi:id="_WTiZgBt1EeC9cZmFpNV5dw" name="return" type="_0QuDeBBHEeCWwuTUj8c31Q" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_p_lGUBt1EeC9cZmFpNV5dw" name="setGlobalByteOrder">
+            <ownedParameter xmi:id="_tLbXQBt1EeC9cZmFpNV5dw" name="byteOrder">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_utVO4ht1EeC9cZmFpNV5dw" name="setGlobalCharacterEncoding">
+            <ownedParameter xmi:id="_wB0VkBt1EeC9cZmFpNV5dw" name="characterEncoding">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_z9pR8Bt1EeC9cZmFpNV5dw" name="getGlobalByteOrder">
+            <ownedParameter xmi:id="_0imZIBt1EeC9cZmFpNV5dw" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_1vMvIht1EeC9cZmFpNV5dw" name="getGlobalCharacterEncoding">
+            <ownedParameter xmi:id="_4HCJMBt1EeC9cZmFpNV5dw" name="return" direction="return">
+              <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_bPMA6A9QEeC5mKKa1YlKHQ"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_A-aQ6xgFEeCW_sZKIcO_yg" name="A_&lt;abstractDataBlock>_&lt;mediumReference>" memberEnd="_A-aQ7BgFEeCW_sZKIcO_yg _A-aQ7xgFEeCW_sZKIcO_yg">
+          <ownedEnd xmi:id="_A-aQ7BgFEeCW_sZKIcO_yg" name="" type="_Yt9eyBBXEeCWwuTUj8c31Q" association="_A-aQ6xgFEeCW_sZKIcO_yg">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_A-aQ7RgFEeCW_sZKIcO_yg" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_A-aQ7hgFEeCW_sZKIcO_yg" value="1"/>
+          </ownedEnd>
+          <ownedEnd xmi:id="_A-aQ7xgFEeCW_sZKIcO_yg" name="" type="_vpLDaBgEEeCW_sZKIcO_yg" aggregation="shared" association="_A-aQ6xgFEeCW_sZKIcO_yg">
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_A-aQ8BgFEeCW_sZKIcO_yg" value="1"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_A-aQ8RgFEeCW_sZKIcO_yg" value="1"/>
+          </ownedEnd>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Interface" xmi:id="_Gax2GBjNEeCecP1nht5UNw" name="IInternalDataBlockFactory">
+          <generalization xmi:id="_ZRLUUxjNEeCecP1nht5UNw" general="_fHTFaBKGEeCmY8FE9I3w_w"/>
+          <ownedOperation xmi:id="_MBwFohjNEeCecP1nht5UNw" name="createTopLevelContainer">
+            <ownedParameter xmi:id="_LydqcBtUEeC9cZmFpNV5dw" name="headerId" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_MOxzABtUEeC9cZmFpNV5dw" name="return" type="_BPhKSBBKEeCWwuTUj8c31Q" direction="return"/>
+            <ownedParameter xmi:id="_PkApcBtUEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_Q16YMhjNEeCecP1nht5UNw" name="createPayload">
+            <ownedParameter xmi:id="_dVnk4BtkEeC9cZmFpNV5dw" name="return" type="__q7yGBBJEeCWwuTUj8c31Q" direction="return"/>
+            <ownedParameter xmi:id="_eUDjEBtkEeC9cZmFpNV5dw" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_eXeqgBtkEeC9cZmFpNV5dw" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q"/>
+            <ownedParameter xmi:id="_kga-sBtkEeC9cZmFpNV5dw" name="payloadRef" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+            <ownedParameter xmi:id="_69V3sBtkEeC9cZmFpNV5dw" name="totalPayloadSize">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_y7Gu4BvNEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_UQEK4hjNEeCecP1nht5UNw" name="createField"/>
+          <ownedOperation xmi:id="_nhRdYhtgEeC9cZmFpNV5dw" name="createHeader">
+            <ownedParameter xmi:id="_oMx4gBtgEeC9cZmFpNV5dw" name="return" type="_bltQWBBJEeCWwuTUj8c31Q" direction="return"/>
+            <ownedParameter xmi:id="_pDKt8BtgEeC9cZmFpNV5dw" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+            <ownedParameter xmi:id="_rYVOgBtgEeC9cZmFpNV5dw" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q"/>
+            <ownedParameter xmi:id="_suUKABtgEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg"/>
+            <ownedParameter xmi:id="_vC4NoBtgEeC9cZmFpNV5dw" name="isFooter">
+              <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_3ZzHwBvNEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_qCrhoBtJEeC9cZmFpNV5dw" name="sequ_getContainerIterator">
+          <packagedElement xmi:type="uml:Collaboration" xmi:id="_s-lSEBtJEeC9cZmFpNV5dw" name="getContainerIterator">
+            <ownedBehavior xmi:type="uml:Interaction" xmi:id="_s-lSERtJEeC9cZmFpNV5dw" name="getContainerIterator">
+              <ownedComment xmi:id="_bKfzIhtOEeC9cZmFpNV5dw" annotatedElement="_Y9cNGBtLEeC9cZmFpNV5dw">
+                <body>m_currOfs=0</body>
+              </ownedComment>
+              <ownedComment xmi:id="_eH5YYhtOEeC9cZmFpNV5dw" annotatedElement="_VcnVMhtMEeC9cZmFpNV5dw">
+                <body>additionally determines &#xD;
+m_longestHeaderMinSize</body>
+              </ownedComment>
+              <ownedComment xmi:id="_qLefAhtOEeC9cZmFpNV5dw" annotatedElement="_mYcSQxtOEeC9cZmFpNV5dw">
+                <body>Read bytes up to m_longestHeaderMinSize&#xD;
+If EOF occurs during read, all Data Formats are&#xD;
+discarded where minHeaderSize > byte count read</body>
+              </ownedComment>
+              <ownedComment xmi:id="_rXamUhtREeC9cZmFpNV5dw" annotatedElement="_mu4U-BtREeC9cZmFpNV5dw">
+                <body>For every Data Format in precede: compare read &#xD;
+bytes with magic key bytes of format (in list order)</body>
+              </ownedComment>
+              <ownedComment xmi:id="_SlOCkBtSEeC9cZmFpNV5dw" annotatedElement="_YdHHMhtLEeC9cZmFpNV5dw">
+                <body>m_currOfs += container.getTotalSize()</body>
+              </ownedComment>
+              <ownedComment xmi:id="_e8FmshtUEeC9cZmFpNV5dw">
+                <body>headerRef = new MediumDataReference(headerId, m_currOfs, accessor, bytes)</body>
+              </ownedComment>
+              <ownedAttribute xmi:id="_lkwIUBtKEeC9cZmFpNV5dw" name="Property1" type="_fMhzyBBOEeCWwuTUj8c31Q"/>
+              <ownedAttribute xmi:id="_4zcKwBtKEeC9cZmFpNV5dw" name="Property2" type="__7vJBxBbEeCWwuTUj8c31Q"/>
+              <ownedAttribute xmi:id="_-OyZIBtKEeC9cZmFpNV5dw" name="Property3" type="_WYHJuBJwEeCQ6KaJ3EOFKQ"/>
+              <ownedAttribute xmi:id="_E_GZ4BtMEeC9cZmFpNV5dw" name="Property4" type="_6BizOAO9EeCYKaNo9SPZvQ"/>
+              <ownedAttribute xmi:id="_ZhGFABtREeC9cZmFpNV5dw" name="Property5" type="_RUOCCA9PEeC5mKKa1YlKHQ"/>
+              <ownedAttribute xmi:id="_7bcqoBtREeC9cZmFpNV5dw" name="Property6" type="_fHTFaBKGEeCmY8FE9I3w_w"/>
+              <ownedAttribute xmi:id="_J3xKQBtSEeC9cZmFpNV5dw" name="Property7" type="_Gax2GBjNEeCecP1nht5UNw"/>
+              <ownedConnector xmi:id="_lkwIURtKEeC9cZmFpNV5dw" name="Connector1">
+                <end xmi:id="_lkwIUhtKEeC9cZmFpNV5dw" role="_lkwIUBtKEeC9cZmFpNV5dw"/>
+                <end xmi:id="_4zcKwRtKEeC9cZmFpNV5dw" role="_4zcKwBtKEeC9cZmFpNV5dw"/>
+                <end xmi:id="_-OyZIRtKEeC9cZmFpNV5dw" role="_-OyZIBtKEeC9cZmFpNV5dw"/>
+                <end xmi:id="_E_GZ4RtMEeC9cZmFpNV5dw" role="_E_GZ4BtMEeC9cZmFpNV5dw"/>
+                <end xmi:id="_ZhGFARtREeC9cZmFpNV5dw" role="_ZhGFABtREeC9cZmFpNV5dw"/>
+                <end xmi:id="_7bcqoRtREeC9cZmFpNV5dw" role="_7bcqoBtREeC9cZmFpNV5dw"/>
+                <end xmi:id="_J3xKQRtSEeC9cZmFpNV5dw" role="_J3xKQBtSEeC9cZmFpNV5dw"/>
+              </ownedConnector>
+              <lifeline xmi:id="_yZe0gBtJEeC9cZmFpNV5dw" name="user" coveredBy="_sy2GtRtKEeC9cZmFpNV5dw _AjHhVRtNEeC9cZmFpNV5dw _Vy2OdhtNEeC9cZmFpNV5dw _EqwPpRtOEeC9cZmFpNV5dw _YRxDwRtUEeC9cZmFpNV5dw _nx3gIhtKEeC9cZmFpNV5dw _xcENMBtNEeC9cZmFpNV5dw"/>
+              <lifeline xmi:id="_hPmF8htKEeC9cZmFpNV5dw" name="" represents="_lkwIUBtKEeC9cZmFpNV5dw" coveredBy="_sy2GthtKEeC9cZmFpNV5dw _Y9cNFRtLEeC9cZmFpNV5dw _RBYDhhtNEeC9cZmFpNV5dw _N6Q-FRtMEeC9cZmFpNV5dw _q4Wv8htKEeC9cZmFpNV5dw _xcENMBtNEeC9cZmFpNV5dw"/>
+              <lifeline xmi:id="_3-2FEhtKEeC9cZmFpNV5dw" name="topLevelIterator" represents="_4zcKwBtKEeC9cZmFpNV5dw" coveredBy="_Y9cNFhtLEeC9cZmFpNV5dw _VcnVOBtMEeC9cZmFpNV5dw _VcnVORtMEeC9cZmFpNV5dw _GWwT5RtNEeC9cZmFpNV5dw _Eq5ZkBtOEeC9cZmFpNV5dw _mYcSQBtOEeC9cZmFpNV5dw _Gk-EJhtPEeC9cZmFpNV5dw _OHeMRxtPEeC9cZmFpNV5dw _OHeMSBtPEeC9cZmFpNV5dw _glpF1RtREeC9cZmFpNV5dw _INhO8xtSEeC9cZmFpNV5dw _RBYDhRtNEeC9cZmFpNV5dw _AjHhVhtNEeC9cZmFpNV5dw _YdHHMhtLEeC9cZmFpNV5dw _VcnVMhtMEeC9cZmFpNV5dw _OHeMQRtPEeC9cZmFpNV5dw _mu4U-BtREeC9cZmFpNV5dw _xcENMBtNEeC9cZmFpNV5dw"/>
+              <lifeline xmi:id="_CVO0ohtMEeC9cZmFpNV5dw" name="accessor" represents="_E_GZ4BtMEeC9cZmFpNV5dw" coveredBy="_N6Q-FhtMEeC9cZmFpNV5dw _Vy2OdRtNEeC9cZmFpNV5dw _mYcSQRtOEeC9cZmFpNV5dw _Gk-EJRtPEeC9cZmFpNV5dw _GWwT5htNEeC9cZmFpNV5dw _I679UhtMEeC9cZmFpNV5dw _xcENMBtNEeC9cZmFpNV5dw"/>
+              <lifeline xmi:id="_YDgssBtREeC9cZmFpNV5dw" name="" represents="_ZhGFABtREeC9cZmFpNV5dw" coveredBy="_glpF1htREeC9cZmFpNV5dw _dC_echtREeC9cZmFpNV5dw _mu4U-BtREeC9cZmFpNV5dw _xcENMBtNEeC9cZmFpNV5dw"/>
+              <lifeline xmi:id="_55GuIhtREeC9cZmFpNV5dw" name="" represents="_J3xKQBtSEeC9cZmFpNV5dw" coveredBy="_YRxDwBtUEeC9cZmFpNV5dw _INhO9BtSEeC9cZmFpNV5dw _95s1whtREeC9cZmFpNV5dw _xcENMBtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_sy2GtRtKEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification1" covered="_yZe0gBtJEeC9cZmFpNV5dw" event="_sy2GtxtKEeC9cZmFpNV5dw" message="_sy2GuBtKEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_sy2GthtKEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification2" covered="_hPmF8htKEeC9cZmFpNV5dw" event="_sy2GtxtKEeC9cZmFpNV5dw" message="_sy2GuBtKEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_N6Q-FRtMEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification5" covered="_hPmF8htKEeC9cZmFpNV5dw" event="_N6Q-FxtMEeC9cZmFpNV5dw" message="_N6Q-GBtMEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_N6Q-FhtMEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification6" covered="_CVO0ohtMEeC9cZmFpNV5dw" event="_N6Q-FxtMEeC9cZmFpNV5dw" message="_N6Q-GBtMEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Y9cNFRtLEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification3" covered="_hPmF8htKEeC9cZmFpNV5dw" event="_Y9cNFxtLEeC9cZmFpNV5dw" message="_Y9cNGBtLEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Y9cNFhtLEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification4" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_Y9cNFxtLEeC9cZmFpNV5dw" message="_Y9cNGBtLEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_VcnVOBtMEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification7" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_VcnVOhtMEeC9cZmFpNV5dw" message="_VcnVOxtMEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_VcnVORtMEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification8" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_VcnVOhtMEeC9cZmFpNV5dw" message="_VcnVOxtMEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_RBYDhRtNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification13" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_RBYDhxtNEeC9cZmFpNV5dw" message="_RBYDiBtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_RBYDhhtNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification14" covered="_hPmF8htKEeC9cZmFpNV5dw" event="_RBYDhxtNEeC9cZmFpNV5dw" message="_RBYDiBtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_AjHhVRtNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification9" covered="_yZe0gBtJEeC9cZmFpNV5dw" event="_AjHhVxtNEeC9cZmFpNV5dw" message="_AjHhWBtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_AjHhVhtNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification10" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_AjHhVxtNEeC9cZmFpNV5dw" message="_AjHhWBtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_GWwT5RtNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification11" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_GW5d0BtNEeC9cZmFpNV5dw" message="_GW5d0RtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_GWwT5htNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification12" covered="_CVO0ohtMEeC9cZmFpNV5dw" event="_GW5d0BtNEeC9cZmFpNV5dw" message="_GW5d0RtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Vy2OdRtNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification15" covered="_CVO0ohtMEeC9cZmFpNV5dw" event="_Vy2OdxtNEeC9cZmFpNV5dw" message="_Vy2OeBtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Vy2OdhtNEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification16" covered="_yZe0gBtJEeC9cZmFpNV5dw" event="_Vy2OdxtNEeC9cZmFpNV5dw" message="_Vy2OeBtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_EqwPpRtOEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification17" covered="_yZe0gBtJEeC9cZmFpNV5dw" event="_Eq5ZkRtOEeC9cZmFpNV5dw" message="_Eq5ZkhtOEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Eq5ZkBtOEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification18" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_Eq5ZkRtOEeC9cZmFpNV5dw" message="_Eq5ZkhtOEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_mYcSQBtOEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification19" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_mYcSQhtOEeC9cZmFpNV5dw" message="_mYcSQxtOEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_mYcSQRtOEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification20" covered="_CVO0ohtMEeC9cZmFpNV5dw" event="_mYcSQhtOEeC9cZmFpNV5dw" message="_mYcSQxtOEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Gk-EJRtPEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification21" covered="_CVO0ohtMEeC9cZmFpNV5dw" event="_Gk-EJxtPEeC9cZmFpNV5dw" message="_Gk-EKBtPEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Gk-EJhtPEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification22" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_Gk-EJxtPEeC9cZmFpNV5dw" message="_Gk-EKBtPEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_OHeMRxtPEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification23" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_OHeMSRtPEeC9cZmFpNV5dw" message="_OHeMShtPEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_OHeMSBtPEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification24" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_OHeMSRtPEeC9cZmFpNV5dw" message="_OHeMShtPEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_glpF1RtREeC9cZmFpNV5dw" name="MessageOccurrenceSpecification25" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_glpF1xtREeC9cZmFpNV5dw" message="_glpF2BtREeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_glpF1htREeC9cZmFpNV5dw" name="MessageOccurrenceSpecification26" covered="_YDgssBtREeC9cZmFpNV5dw" event="_glpF1xtREeC9cZmFpNV5dw" message="_glpF2BtREeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_INhO8xtSEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification27" covered="_3-2FEhtKEeC9cZmFpNV5dw" event="_INhO9RtSEeC9cZmFpNV5dw" message="_INhO9htSEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_INhO9BtSEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification28" covered="_55GuIhtREeC9cZmFpNV5dw" event="_INhO9RtSEeC9cZmFpNV5dw" message="_INhO9htSEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_YRxDwBtUEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification29" covered="_55GuIhtREeC9cZmFpNV5dw" event="_YRxDwhtUEeC9cZmFpNV5dw" message="_YRxDwxtUEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_YRxDwRtUEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification30" covered="_yZe0gBtJEeC9cZmFpNV5dw" event="_YRxDwhtUEeC9cZmFpNV5dw" message="_YRxDwxtUEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_nx3gIhtKEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification1" covered="_yZe0gBtJEeC9cZmFpNV5dw" start="_sy2GtRtKEeC9cZmFpNV5dw" finish="_YRxDwRtUEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_q4Wv8htKEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification2" covered="_hPmF8htKEeC9cZmFpNV5dw" start="_sy2GthtKEeC9cZmFpNV5dw" finish="_RBYDhhtNEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_I679UhtMEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification4" covered="_CVO0ohtMEeC9cZmFpNV5dw" start="_N6Q-FhtMEeC9cZmFpNV5dw" finish="_Gk-EJRtPEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_YdHHMhtLEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification3" covered="_3-2FEhtKEeC9cZmFpNV5dw" start="_Y9cNFhtLEeC9cZmFpNV5dw" finish="_INhO8xtSEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_VcnVMhtMEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification5" covered="_3-2FEhtKEeC9cZmFpNV5dw" start="_VcnVORtMEeC9cZmFpNV5dw" finish="_VcnVORtMEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_OHeMQRtPEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification6" covered="_3-2FEhtKEeC9cZmFpNV5dw" start="_OHeMSBtPEeC9cZmFpNV5dw" finish="_glpF1RtREeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_dC_echtREeC9cZmFpNV5dw" name="BehaviorExecutionSpecification7" covered="_YDgssBtREeC9cZmFpNV5dw" start="_glpF1htREeC9cZmFpNV5dw" finish="_glpF1htREeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_95s1whtREeC9cZmFpNV5dw" name="BehaviorExecutionSpecification8" covered="_55GuIhtREeC9cZmFpNV5dw" start="_INhO9BtSEeC9cZmFpNV5dw" finish="_YRxDwBtUEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:CombinedFragment" xmi:id="_xcENMBtNEeC9cZmFpNV5dw" name="CombinedFragment2" covered="_yZe0gBtJEeC9cZmFpNV5dw _hPmF8htKEeC9cZmFpNV5dw _3-2FEhtKEeC9cZmFpNV5dw _CVO0ohtMEeC9cZmFpNV5dw _YDgssBtREeC9cZmFpNV5dw _55GuIhtREeC9cZmFpNV5dw" interactionOperator="loop">
+                <operand xmi:id="_xcENMRtNEeC9cZmFpNV5dw"/>
+              </fragment>
+              <fragment xmi:type="uml:CombinedFragment" xmi:id="_mu4U-BtREeC9cZmFpNV5dw" name="CombinedFragment3" covered="_3-2FEhtKEeC9cZmFpNV5dw _YDgssBtREeC9cZmFpNV5dw" interactionOperator="loop">
+                <operand xmi:id="_mu4U-RtREeC9cZmFpNV5dw"/>
+              </fragment>
+              <message xmi:id="_sy2GuBtKEeC9cZmFpNV5dw" name="getContainerIterator" receiveEvent="_sy2GthtKEeC9cZmFpNV5dw" sendEvent="_sy2GtRtKEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:InstanceValue" xmi:id="_toVkQhtKEeC9cZmFpNV5dw" name="return" type="_WYHJuBJwEeCQ6KaJ3EOFKQ" instance="_vkzCMBtQEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_toVkQxtKEeC9cZmFpNV5dw" name="medium" type="_4q50YAYCEeC-MfabKwExLQ" instance="_FEcQEBtQEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_toVkQBtKEeC9cZmFpNV5dw" name="dataFormatHints" value="hints">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_toVkQRtKEeC9cZmFpNV5dw" name="forceMediumReadOnly" value="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </argument>
+              </message>
+              <message xmi:id="_Y9cNGBtLEeC9cZmFpNV5dw" name="TopLevelContainerIterator" receiveEvent="_Y9cNFhtLEeC9cZmFpNV5dw" sendEvent="_Y9cNFRtLEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_ZbGZcBtLEeC9cZmFpNV5dw" name="mediumAccessor" type="_6BizOAO9EeCYKaNo9SPZvQ" value="accessor"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_ZbGZcRtLEeC9cZmFpNV5dw" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q" value="blockAccessor"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_jlqZ4BtUEeC9cZmFpNV5dw" name="dataFormatHints">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                </argument>
+              </message>
+              <message xmi:id="_N6Q-GBtMEeC9cZmFpNV5dw" name="&lt;&lt;create>>" messageSort="createMessage" receiveEvent="_N6Q-FhtMEeC9cZmFpNV5dw" sendEvent="_N6Q-FRtMEeC9cZmFpNV5dw"/>
+              <message xmi:id="_VcnVOxtMEeC9cZmFpNV5dw" name="determineDataFormatPrecedence" receiveEvent="_VcnVORtMEeC9cZmFpNV5dw" sendEvent="_VcnVOBtMEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_tngL4BtMEeC9cZmFpNV5dw" name="return" value="precede">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_Xc6ZARtMEeC9cZmFpNV5dw" name="dataFormatHints" value="hints">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_Xc6ZAhtMEeC9cZmFpNV5dw" name="allDataFormats" value="all">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+                </argument>
+              </message>
+              <message xmi:id="_AjHhWBtNEeC9cZmFpNV5dw" name="hasNext" receiveEvent="_AjHhVhtNEeC9cZmFpNV5dw" sendEvent="_AjHhVRtNEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_Ct2TgBtNEeC9cZmFpNV5dw" name="return" value="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </argument>
+              </message>
+              <message xmi:id="_GW5d0RtNEeC9cZmFpNV5dw" name="isAtEOF" receiveEvent="_GWwT5htNEeC9cZmFpNV5dw" sendEvent="_GWwT5RtNEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_G85t4BtNEeC9cZmFpNV5dw" name="return" value="false">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_G85t4RtNEeC9cZmFpNV5dw" name="offset" value="m_currOfs">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </argument>
+              </message>
+              <message xmi:id="_RBYDiBtNEeC9cZmFpNV5dw" name="topLevelIterator" messageSort="reply" receiveEvent="_RBYDhhtNEeC9cZmFpNV5dw" sendEvent="_RBYDhRtNEeC9cZmFpNV5dw"/>
+              <message xmi:id="_Vy2OeBtNEeC9cZmFpNV5dw" name="true" messageSort="reply" receiveEvent="_Vy2OdhtNEeC9cZmFpNV5dw" sendEvent="_Vy2OdRtNEeC9cZmFpNV5dw"/>
+              <message xmi:id="_Eq5ZkhtOEeC9cZmFpNV5dw" name="next" receiveEvent="_Eq5ZkBtOEeC9cZmFpNV5dw" sendEvent="_EqwPpRtOEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:InstanceValue" xmi:id="_FacAIBtOEeC9cZmFpNV5dw" name="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_jp-ZeBTCEeCCdI4pKGnu6Q"/>
+                </argument>
+              </message>
+              <message xmi:id="_mYcSQxtOEeC9cZmFpNV5dw" name="read" receiveEvent="_mYcSQRtOEeC9cZmFpNV5dw" sendEvent="_mYcSQBtOEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_nHYb4BtOEeC9cZmFpNV5dw" name="offset" value="m_currOfs">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_nHYb4RtOEeC9cZmFpNV5dw" name="buffer">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </argument>
+              </message>
+              <message xmi:id="_Gk-EKBtPEeC9cZmFpNV5dw" name="bytes" messageSort="reply" receiveEvent="_Gk-EJhtPEeC9cZmFpNV5dw" sendEvent="_Gk-EJRtPEeC9cZmFpNV5dw"/>
+              <message xmi:id="_OHeMShtPEeC9cZmFpNV5dw" name="identifyDataFormatHeader" receiveEvent="_OHeMSBtPEeC9cZmFpNV5dw" sendEvent="_OHeMRxtPEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:InstanceValue" xmi:id="_TCetsBtPEeC9cZmFpNV5dw" name="return" type="_wF_tIA9PEeC5mKKa1YlKHQ" instance="_7TpEYBtPEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_d0Z_MBtPEeC9cZmFpNV5dw" name="bytes" value="bytes">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </argument>
+              </message>
+              <message xmi:id="_glpF2BtREeC9cZmFpNV5dw" name="getMagicKeys" receiveEvent="_glpF1htREeC9cZmFpNV5dw" sendEvent="_glpF1RtREeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_hgzGgBtREeC9cZmFpNV5dw" name="return" value="keyList">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                </argument>
+              </message>
+              <message xmi:id="_INhO9htSEeC9cZmFpNV5dw" name="createTopLevelContainer" receiveEvent="_INhO9BtSEeC9cZmFpNV5dw" sendEvent="_INhO8xtSEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_aL84gBtUEeC9cZmFpNV5dw" name="headerId" type="_wF_tIA9PEeC5mKKa1YlKHQ" value="headerId"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_aL84gRtUEeC9cZmFpNV5dw" name="return" type="_BPhKSBBKEeCWwuTUj8c31Q" value="container"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_aL84ghtUEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" value="headerRef"/>
+              </message>
+              <message xmi:id="_YRxDwxtUEeC9cZmFpNV5dw" name="container" messageSort="reply" receiveEvent="_YRxDwRtUEeC9cZmFpNV5dw" sendEvent="_YRxDwBtUEeC9cZmFpNV5dw"/>
+            </ownedBehavior>
+          </packagedElement>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_sy2GtxtKEeC9cZmFpNV5dw" name="CallEvent1" operation="_ghnXYhBOEeCWwuTUj8c31Q"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_J8eIQxtLEeC9cZmFpNV5dw" name="CallEvent2" operation="_JKuBEhBcEeCWwuTUj8c31Q"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_WKoHMxtLEeC9cZmFpNV5dw" name="CallEvent3" operation="_JKuBEhBcEeCWwuTUj8c31Q"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_Y9cNFxtLEeC9cZmFpNV5dw" name="CallEvent4" operation="_JKuBEhBcEeCWwuTUj8c31Q"/>
+          <packagedElement xmi:type="uml:CreationEvent" xmi:id="_N6Q-FxtMEeC9cZmFpNV5dw" name="CreationEvent1"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_VcnVOhtMEeC9cZmFpNV5dw" name="CallEvent5" operation="_lIHskhN8EeCftvNWGQmhpw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_AjHhVxtNEeC9cZmFpNV5dw" name="CallEvent6">
+            <operation href="../../GeneratorTemplates/models/CommonElements.uml#_4e5W4hJyEeCQ6KaJ3EOFKQ"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_GW5d0BtNEeC9cZmFpNV5dw" name="CallEvent7" operation="_tycyIBffEeCykeCvNqnASQ"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_RBYDhxtNEeC9cZmFpNV5dw" name="CallEvent8"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_Vy2OdxtNEeC9cZmFpNV5dw" name="CallEvent9"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_Eq5ZkRtOEeC9cZmFpNV5dw" name="CallEvent10">
+            <operation href="../../GeneratorTemplates/models/CommonElements.uml#_6O8_QhJyEeCQ6KaJ3EOFKQ"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_mYcSQhtOEeC9cZmFpNV5dw" name="CallEvent11" operation="_iquL0gO_EeCYKaNo9SPZvQ"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_Gk-EJxtPEeC9cZmFpNV5dw" name="CallEvent12"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_OHeMSRtPEeC9cZmFpNV5dw" name="CallEvent13" operation="_2Slk0BBYEeCWwuTUj8c31Q"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_7TpEYBtPEeC9cZmFpNV5dw" name="headerId" classifier="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_FEcQEBtQEeC9cZmFpNV5dw" name="medium" classifier="_4q50YAYCEeC-MfabKwExLQ"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_vkzCMBtQEeC9cZmFpNV5dw" name="topLevelIterator" classifier="_WYHJuBJwEeCQ6KaJ3EOFKQ"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_LcdsoBtREeC9cZmFpNV5dw" name="bytes"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_glpF1xtREeC9cZmFpNV5dw" name="CallEvent14" operation="_z7UKIg9VEeC5mKKa1YlKHQ"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_INhO9RtSEeC9cZmFpNV5dw" name="CallEvent15" operation="_MBwFohjNEeCecP1nht5UNw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_PdZWBhtSEeC9cZmFpNV5dw" name="CallEvent16"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_YRxDwhtUEeC9cZmFpNV5dw" name="CallEvent17"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_kArTMBtaEeC9cZmFpNV5dw" name="sequ_createTopLevelContainer">
+          <packagedElement xmi:type="uml:Collaboration" xmi:id="_sq__ABtaEeC9cZmFpNV5dw" name="createTopLevelContainer">
+            <ownedBehavior xmi:type="uml:Interaction" xmi:id="_sq__ARtaEeC9cZmFpNV5dw" name="createTopLevelContainer">
+              <ownedComment xmi:id="_TWELghtkEeC9cZmFpNV5dw">
+                <body>payloadSize = header.getPayloadSize()</body>
+              </ownedComment>
+              <ownedAttribute xmi:id="_5YwEABtaEeC9cZmFpNV5dw" name="Property1" type="_Gax2GBjNEeCecP1nht5UNw"/>
+              <ownedAttribute xmi:id="_VW04cBtbEeC9cZmFpNV5dw" name="Property2" type="_rDuVKBBXEeCWwuTUj8c31Q"/>
+              <ownedAttribute xmi:id="_VPPGcBvOEeCGKIBwFC0cnQ" name="Property3" type="_re6nmBt0EeC9cZmFpNV5dw"/>
+              <ownedConnector xmi:id="_5YwEARtaEeC9cZmFpNV5dw" name="Connector1">
+                <end xmi:id="_5YwEAhtaEeC9cZmFpNV5dw" role="_5YwEABtaEeC9cZmFpNV5dw"/>
+                <end xmi:id="_VW04cRtbEeC9cZmFpNV5dw" role="_VW04cBtbEeC9cZmFpNV5dw"/>
+                <end xmi:id="_VPY3cBvOEeCGKIBwFC0cnQ" role="_VPPGcBvOEeCGKIBwFC0cnQ"/>
+              </ownedConnector>
+              <lifeline xmi:id="_1NasAhtaEeC9cZmFpNV5dw" name="" represents="_5YwEABtaEeC9cZmFpNV5dw" coveredBy="_8GfcpRtaEeC9cZmFpNV5dw _x2R7pRtbEeC9cZmFpNV5dw _cknikBtgEeC9cZmFpNV5dw _Y43FthtkEeC9cZmFpNV5dw _61eftRtlEeC9cZmFpNV5dw _xQxZ1RtmEeC9cZmFpNV5dw _oELHZhtmEeC9cZmFpNV5dw _0ft3hRtlEeC9cZmFpNV5dw _6_kQ0htaEeC9cZmFpNV5dw _XUvkaBtgEeC9cZmFpNV5dw __68vSBtmEeC9cZmFpNV5dw"/>
+              <lifeline xmi:id="_S-r8YhtbEeC9cZmFpNV5dw" name="container" represents="_VW04cBtbEeC9cZmFpNV5dw" coveredBy="_x2R7phtbEeC9cZmFpNV5dw _ckdxlRtgEeC9cZmFpNV5dw _Y43FtRtkEeC9cZmFpNV5dw _61efthtlEeC9cZmFpNV5dw _KZxUCBtmEeC9cZmFpNV5dw _KZxUCRtmEeC9cZmFpNV5dw _xQxZ1htmEeC9cZmFpNV5dw _bOy1IBvOEeCGKIBwFC0cnQ _CBb-1RtgEeC9cZmFpNV5dw _eM0AtRtmEeC9cZmFpNV5dw _oELHZRtmEeC9cZmFpNV5dw _CoGESRtiEeC9cZmFpNV5dw _CoGESBtiEeC9cZmFpNV5dw _0ft3hhtlEeC9cZmFpNV5dw _pwV52RtcEeC9cZmFpNV5dw _pwV52BtcEeC9cZmFpNV5dw _Yu5AchtbEeC9cZmFpNV5dw _pwV50htcEeC9cZmFpNV5dw _HHU6khtgEeC9cZmFpNV5dw _CoGEQhtiEeC9cZmFpNV5dw _KZxUAhtmEeC9cZmFpNV5dw _XUvkaBtgEeC9cZmFpNV5dw _gATXkhtmEeC9cZmFpNV5dw __68vSBtmEeC9cZmFpNV5dw"/>
+              <lifeline xmi:id="_Tgqr0hvOEeCGKIBwFC0cnQ" name="context" represents="_VPPGcBvOEeCGKIBwFC0cnQ" coveredBy="_bOy1IRvOEeCGKIBwFC0cnQ"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_8GfcpRtaEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification1" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_8GfcphtaEeC9cZmFpNV5dw" message="_8GfcpxtaEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_x2R7pRtbEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification2" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_x2R7pxtbEeC9cZmFpNV5dw" message="_x2R7qBtbEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_x2R7phtbEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification3" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_x2R7pxtbEeC9cZmFpNV5dw" message="_x2R7qBtbEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_bOy1IBvOEeCGKIBwFC0cnQ" name="MessageOccurrenceSpecification24" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_bOy1IhvOEeCGKIBwFC0cnQ" message="_bOy1IxvOEeCGKIBwFC0cnQ"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_bOy1IRvOEeCGKIBwFC0cnQ" name="MessageOccurrenceSpecification25" covered="_Tgqr0hvOEeCGKIBwFC0cnQ" event="_bOy1IhvOEeCGKIBwFC0cnQ" message="_bOy1IxvOEeCGKIBwFC0cnQ"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_pwV52BtcEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification4" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_pwV52htcEeC9cZmFpNV5dw" message="_pwV52xtcEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_pwV52RtcEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification5" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_pwV52htcEeC9cZmFpNV5dw" message="_pwV52xtcEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_CBb-1RtgEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification6" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_CBb-1htgEeC9cZmFpNV5dw" message="_CBb-1xtgEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_ckdxlRtgEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification7" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_cknikRtgEeC9cZmFpNV5dw" message="_cknikhtgEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_cknikBtgEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification8" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_cknikRtgEeC9cZmFpNV5dw" message="_cknikhtgEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_0ft3hRtlEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification13" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_0f3ogBtlEeC9cZmFpNV5dw" message="_0f3ogRtlEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_0ft3hhtlEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification14" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_0f3ogBtlEeC9cZmFpNV5dw" message="_0f3ogRtlEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_CoGESBtiEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification9" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_CoGEShtiEeC9cZmFpNV5dw" message="_CoGESxtiEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_CoGESRtiEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification10" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_CoGEShtiEeC9cZmFpNV5dw" message="_CoGESxtiEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Y43FtRtkEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification11" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_Y43FtxtkEeC9cZmFpNV5dw" message="_Y43FuBtkEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Y43FthtkEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification12" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_Y43FtxtkEeC9cZmFpNV5dw" message="_Y43FuBtkEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_61eftRtlEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification15" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_61eftxtlEeC9cZmFpNV5dw" message="_61efuBtlEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_61efthtlEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification16" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_61eftxtlEeC9cZmFpNV5dw" message="_61efuBtlEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_KZxUCBtmEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification17" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_KZxUChtmEeC9cZmFpNV5dw" message="_KZxUCxtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_KZxUCRtmEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification18" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_KZxUChtmEeC9cZmFpNV5dw" message="_KZxUCxtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_eM0AtRtmEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification19" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_eM0AthtmEeC9cZmFpNV5dw" message="_eM0AtxtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_oELHZRtmEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification20" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_oELHZxtmEeC9cZmFpNV5dw" message="_oELHaBtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_oELHZhtmEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification21" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_oELHZxtmEeC9cZmFpNV5dw" message="_oELHaBtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_xQxZ1RtmEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification22" covered="_1NasAhtaEeC9cZmFpNV5dw" event="_xQxZ1xtmEeC9cZmFpNV5dw" message="_xQxZ2BtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_xQxZ1htmEeC9cZmFpNV5dw" name="MessageOccurrenceSpecification23" covered="_S-r8YhtbEeC9cZmFpNV5dw" event="_xQxZ1xtmEeC9cZmFpNV5dw" message="_xQxZ2BtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_6_kQ0htaEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification1" covered="_1NasAhtaEeC9cZmFpNV5dw" start="_8GfcpRtaEeC9cZmFpNV5dw" finish="_xQxZ1RtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_Yu5AchtbEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification2" covered="_S-r8YhtbEeC9cZmFpNV5dw" start="_x2R7phtbEeC9cZmFpNV5dw" finish="_KZxUCBtmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_pwV50htcEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification3" covered="_S-r8YhtbEeC9cZmFpNV5dw" start="_pwV52RtcEeC9cZmFpNV5dw" finish="_0ft3hhtlEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_HHU6khtgEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification4" covered="_S-r8YhtbEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_CoGEQhtiEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification5" covered="_S-r8YhtbEeC9cZmFpNV5dw" start="_CoGESRtiEeC9cZmFpNV5dw" finish="_61efthtlEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_KZxUAhtmEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification6" covered="_S-r8YhtbEeC9cZmFpNV5dw" start="_KZxUCRtmEeC9cZmFpNV5dw" finish="_xQxZ1htmEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_gATXkhtmEeC9cZmFpNV5dw" name="BehaviorExecutionSpecification7" covered="_S-r8YhtbEeC9cZmFpNV5dw"/>
+              <fragment xmi:type="uml:CombinedFragment" xmi:id="_XUvkaBtgEeC9cZmFpNV5dw" name="CombinedFragment2" covered="_1NasAhtaEeC9cZmFpNV5dw _S-r8YhtbEeC9cZmFpNV5dw" interactionOperator="loop">
+                <operand xmi:id="_XUvkaRtgEeC9cZmFpNV5dw"/>
+              </fragment>
+              <fragment xmi:type="uml:CombinedFragment" xmi:id="__68vSBtmEeC9cZmFpNV5dw" name="CombinedFragment3" covered="_1NasAhtaEeC9cZmFpNV5dw _S-r8YhtbEeC9cZmFpNV5dw" interactionOperator="loop">
+                <operand xmi:id="__68vSRtmEeC9cZmFpNV5dw"/>
+              </fragment>
+              <message xmi:id="_8GfcpxtaEeC9cZmFpNV5dw" name="createTopLevelContainer" receiveEvent="_8GfcpRtaEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:InstanceValue" xmi:id="_9a_KYRtaEeC9cZmFpNV5dw" name="headerId" type="_wF_tIA9PEeC5mKKa1YlKHQ" instance="_C_kNQBtbEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_9a_KYBtaEeC9cZmFpNV5dw" name="return" type="_BPhKSBBKEeCWwuTUj8c31Q" value="container"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_9a_KYhtaEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" instance="_HBXOwBtbEeC9cZmFpNV5dw"/>
+              </message>
+              <message xmi:id="_x2R7qBtbEeC9cZmFpNV5dw" name="StandardContainer" receiveEvent="_x2R7phtbEeC9cZmFpNV5dw" sendEvent="_x2R7pRtbEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:InstanceValue" xmi:id="_ywZagBtbEeC9cZmFpNV5dw" name="headerId" type="_wF_tIA9PEeC5mKKa1YlKHQ" instance="_C_kNQBtbEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_ywZagRtbEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" instance="_HBXOwBtbEeC9cZmFpNV5dw"/>
+              </message>
+              <message xmi:id="_pwV52xtcEeC9cZmFpNV5dw" name="determineHeaders" receiveEvent="_pwV52RtcEeC9cZmFpNV5dw" sendEvent="_pwV52BtcEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_bKBakBtlEeC9cZmFpNV5dw" name="return" value="totalHeaderSize">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_bKBakRtlEeC9cZmFpNV5dw" name="firstHeaderId" type="_wF_tIA9PEeC5mKKa1YlKHQ" value="headerId"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_bKBakhtlEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" value="headerRef"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_bKBakxtlEeC9cZmFpNV5dw" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw" value="factory"/>
+              </message>
+              <message xmi:id="_CBb-1xtgEeC9cZmFpNV5dw" name="getNextHeaderDesc" receiveEvent="_CBb-1RtgEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:InstanceValue" xmi:id="_w4FMABtxEeC9cZmFpNV5dw" name="return" type="_raCUUA9PEeC5mKKa1YlKHQ"/>
+              </message>
+              <message xmi:id="_cknikhtgEeC9cZmFpNV5dw" name="createHeader" receiveEvent="_cknikBtgEeC9cZmFpNV5dw" sendEvent="_ckdxlRtgEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_5iBtEBtgEeC9cZmFpNV5dw" name="return" type="_bltQWBBJEeCWwuTUj8c31Q" value="header"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_5iBtExtgEeC9cZmFpNV5dw" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ" instance="_C_kNQBtbEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_5iBtERtgEeC9cZmFpNV5dw" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q" value="this"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_5iBtFBtgEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" instance="_HBXOwBtbEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_5iBtEhtgEeC9cZmFpNV5dw" name="isFooter" value="false">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_X7yzUBvOEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw" value="context"/>
+              </message>
+              <message xmi:id="_CoGESxtiEeC9cZmFpNV5dw" name="determinePayload" receiveEvent="_CoGESRtiEeC9cZmFpNV5dw" sendEvent="_CoGESBtiEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_ar7JUBtlEeC9cZmFpNV5dw" name="payloadRef" type="_vpLDaBgEEeCW_sZKIcO_yg" value="payloadRef"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_ar7JURtlEeC9cZmFpNV5dw" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw" value="factory"/>
+              </message>
+              <message xmi:id="_Y43FuBtkEeC9cZmFpNV5dw" name="createPayload" receiveEvent="_Y43FthtkEeC9cZmFpNV5dw" sendEvent="_Y43FtRtkEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_aAj4IBtlEeC9cZmFpNV5dw" name="return" type="__q7yGBBJEeCWwuTUj8c31Q" value="payload"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_aAj4IRtlEeC9cZmFpNV5dw" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ" value="payloadId"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_aAj4IhtlEeC9cZmFpNV5dw" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q" value="this"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_aAj4IxtlEeC9cZmFpNV5dw" name="payloadRef" type="_vpLDaBgEEeCW_sZKIcO_yg" value="payloadRef"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_aAj4JBtlEeC9cZmFpNV5dw" name="totalPayloadSize" value="payloadSize">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_XXuc8BvOEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw" value="context"/>
+              </message>
+              <message xmi:id="_0f3ogRtlEeC9cZmFpNV5dw" name="header" messageSort="reply" receiveEvent="_0ft3hhtlEeC9cZmFpNV5dw" sendEvent="_0ft3hRtlEeC9cZmFpNV5dw"/>
+              <message xmi:id="_61efuBtlEeC9cZmFpNV5dw" name="payload" messageSort="reply" receiveEvent="_61efthtlEeC9cZmFpNV5dw" sendEvent="_61eftRtlEeC9cZmFpNV5dw"/>
+              <message xmi:id="_KZxUCxtmEeC9cZmFpNV5dw" name="determineFooters" receiveEvent="_KZxUCRtmEeC9cZmFpNV5dw" sendEvent="_KZxUCBtmEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_Mcc9cBtmEeC9cZmFpNV5dw" name="return" value="totalFooterSize">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_Mcc9chtmEeC9cZmFpNV5dw" name="footerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" instance="_RNVSgBtmEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_Mcc9cRtmEeC9cZmFpNV5dw" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw" value="factory"/>
+              </message>
+              <message xmi:id="_eM0AtxtmEeC9cZmFpNV5dw" name="hasFurtherFooter" receiveEvent="_eM0AtRtmEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_r9EqkBtxEeC9cZmFpNV5dw" name="return" type="_raCUUA9PEeC5mKKa1YlKHQ" value="footerDesc"/>
+              </message>
+              <message xmi:id="_oELHaBtmEeC9cZmFpNV5dw" name="createHeader" receiveEvent="_oELHZhtmEeC9cZmFpNV5dw" sendEvent="_oELHZRtmEeC9cZmFpNV5dw">
+                <argument xmi:type="uml:LiteralString" xmi:id="_qYJVIBtmEeC9cZmFpNV5dw" name="return" type="_bltQWBBJEeCWwuTUj8c31Q" value="footer"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_qYJVIxtmEeC9cZmFpNV5dw" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ" instance="_6ABB4BtmEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_qYJVIRtmEeC9cZmFpNV5dw" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q" value="this"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_qYJVJBtmEeC9cZmFpNV5dw" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" instance="_RNVSgBtmEeC9cZmFpNV5dw"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_qYJVIhtmEeC9cZmFpNV5dw" name="isFooter" value="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_XGvaoBvOEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw" value="context"/>
+              </message>
+              <message xmi:id="_xQxZ2BtmEeC9cZmFpNV5dw" name="footer" messageSort="reply" receiveEvent="_xQxZ1htmEeC9cZmFpNV5dw" sendEvent="_xQxZ1RtmEeC9cZmFpNV5dw"/>
+              <message xmi:id="_bOy1IxvOEeCGKIBwFC0cnQ" name="&lt;&lt;create>>" messageSort="createMessage" receiveEvent="_bOy1IRvOEeCGKIBwFC0cnQ" sendEvent="_bOy1IBvOEeCGKIBwFC0cnQ"/>
+            </ownedBehavior>
+          </packagedElement>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_8GfcphtaEeC9cZmFpNV5dw" name="CallEvent1" operation="_MBwFohjNEeCecP1nht5UNw"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_C_kNQBtbEeC9cZmFpNV5dw" name="headerId" classifier="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_HBXOwBtbEeC9cZmFpNV5dw" name="headerRef" classifier="_vpLDaBgEEeCW_sZKIcO_yg"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_uSJGgBtbEeC9cZmFpNV5dw" name="CallEvent2" operation="_hE8schtbEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_x2R7pxtbEeC9cZmFpNV5dw" name="CallEvent3" operation="_hE8schtbEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_pwV52htcEeC9cZmFpNV5dw" name="CallEvent4" operation="_Hy3HshtcEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_fURcNhtfEeC9cZmFpNV5dw" name="CallEvent5"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_peHaBhtfEeC9cZmFpNV5dw" name="CallEvent6"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_CBb-1htgEeC9cZmFpNV5dw" name="CallEvent7" operation="_OsrfMhtcEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_cknikRtgEeC9cZmFpNV5dw" name="CallEvent8" operation="_nhRdYhtgEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_CoGEShtiEeC9cZmFpNV5dw" name="CallEvent9" operation="_Jf8UkhtcEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_Y43FtxtkEeC9cZmFpNV5dw" name="CallEvent10" operation="_Q16YMhjNEeCecP1nht5UNw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_0f3ogBtlEeC9cZmFpNV5dw" name="CallEvent11"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_61eftxtlEeC9cZmFpNV5dw" name="CallEvent12"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_KZxUChtmEeC9cZmFpNV5dw" name="CallEvent13" operation="_IqTGAhtcEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_RNVSgBtmEeC9cZmFpNV5dw" name="footerRef" classifier="_vpLDaBgEEeCW_sZKIcO_yg"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_eM0AthtmEeC9cZmFpNV5dw" name="CallEvent14" operation="_PdG2khtcEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_oELHZxtmEeC9cZmFpNV5dw" name="CallEvent15" operation="_nhRdYhtgEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_xQxZ1xtmEeC9cZmFpNV5dw" name="CallEvent16"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_6ABB4BtmEeC9cZmFpNV5dw" name="footerId" classifier="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+          <packagedElement xmi:type="uml:CreationEvent" xmi:id="_bOy1IhvOEeCGKIBwFC0cnQ" name="CreationEvent1"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_0XhNEBvOEeCGKIBwFC0cnQ" name="sequ_createHeader">
+          <packagedElement xmi:type="uml:Collaboration" xmi:id="_3QciABvOEeCGKIBwFC0cnQ" name="createHeader">
+            <ownedBehavior xmi:type="uml:Interaction" xmi:id="_3QciARvOEeCGKIBwFC0cnQ" name="createHeader">
+              <ownedAttribute xmi:id="_6WLj4BvOEeCGKIBwFC0cnQ" name="Property1" type="_Gax2GBjNEeCecP1nht5UNw"/>
+              <ownedAttribute xmi:id="_ci3PoBvPEeCGKIBwFC0cnQ" name="Property2" type="_fHWxyBJwEeCQ6KaJ3EOFKQ"/>
+              <ownedAttribute xmi:id="_3I_LQBzjEeCTjboh27C6Gg" name="Property3" type="_pqw-KBBXEeCWwuTUj8c31Q"/>
+              <ownedConnector xmi:id="_6WLj4RvOEeCGKIBwFC0cnQ" name="Connector1">
+                <end xmi:id="_6WLj4hvOEeCGKIBwFC0cnQ" role="_6WLj4BvOEeCGKIBwFC0cnQ"/>
+                <end xmi:id="_ci3PoRvPEeCGKIBwFC0cnQ" role="_ci3PoBvPEeCGKIBwFC0cnQ"/>
+                <end xmi:id="_3I_LQRzjEeCTjboh27C6Gg" role="_3I_LQBzjEeCTjboh27C6Gg"/>
+              </ownedConnector>
+              <lifeline xmi:id="_5QJI4hvOEeCGKIBwFC0cnQ" name="" represents="_6WLj4BvOEeCGKIBwFC0cnQ" coveredBy="_8O4K5BvOEeCGKIBwFC0cnQ __n_X5RzjEeCTjboh27C6Gg _8OvA8hvOEeCGKIBwFC0cnQ"/>
+              <lifeline xmi:id="_aTz-IBvPEeCGKIBwFC0cnQ" name="fieldIterator" represents="_ci3PoBvPEeCGKIBwFC0cnQ" coveredBy="_e33_NhvPEeCGKIBwFC0cnQ _FE-lBhzkEeCTjboh27C6Gg _I33AxhzkEeCTjboh27C6Gg _ebj2ohvPEeCGKIBwFC0cnQ _VHL50BzjEeCTjboh27C6Gg"/>
+              <lifeline xmi:id="_2UZFkBzjEeCTjboh27C6Gg" name="" represents="_3I_LQBzjEeCTjboh27C6Gg" coveredBy="_e33_NRvPEeCGKIBwFC0cnQ __n_X5hzjEeCTjboh27C6Gg _FE-lBRzkEeCTjboh27C6Gg _I33AxRzkEeCTjboh27C6Gg _PsBcORzkEeCTjboh27C6Gg _PsBcOBzkEeCTjboh27C6Gg _5Q4r4hzjEeCTjboh27C6Gg _VHL50BzjEeCTjboh27C6Gg _PsBcMhzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_e33_NRvPEeCGKIBwFC0cnQ" name="MessageOccurrenceSpecification2" covered="_2UZFkBzjEeCTjboh27C6Gg" event="_e33_NxvPEeCGKIBwFC0cnQ" message="_e33_OBvPEeCGKIBwFC0cnQ"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_e33_NhvPEeCGKIBwFC0cnQ" name="MessageOccurrenceSpecification3" covered="_aTz-IBvPEeCGKIBwFC0cnQ" event="_e33_NxvPEeCGKIBwFC0cnQ" message="_e33_OBvPEeCGKIBwFC0cnQ"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_8O4K5BvOEeCGKIBwFC0cnQ" name="MessageOccurrenceSpecification1" covered="_5QJI4hvOEeCGKIBwFC0cnQ" event="_8O4K5RvOEeCGKIBwFC0cnQ" message="_8O4K5hvOEeCGKIBwFC0cnQ"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="__n_X5RzjEeCTjboh27C6Gg" name="MessageOccurrenceSpecification4" covered="_5QJI4hvOEeCGKIBwFC0cnQ" event="__n_X5xzjEeCTjboh27C6Gg" message="__n_X6BzjEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="__n_X5hzjEeCTjboh27C6Gg" name="MessageOccurrenceSpecification5" covered="_2UZFkBzjEeCTjboh27C6Gg" event="__n_X5xzjEeCTjboh27C6Gg" message="__n_X6BzjEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_FE-lBRzkEeCTjboh27C6Gg" name="MessageOccurrenceSpecification6" covered="_2UZFkBzjEeCTjboh27C6Gg" event="_FE-lBxzkEeCTjboh27C6Gg" message="_FE-lCBzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_FE-lBhzkEeCTjboh27C6Gg" name="MessageOccurrenceSpecification7" covered="_aTz-IBvPEeCGKIBwFC0cnQ" event="_FE-lBxzkEeCTjboh27C6Gg" message="_FE-lCBzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_I33AxRzkEeCTjboh27C6Gg" name="MessageOccurrenceSpecification8" covered="_2UZFkBzjEeCTjboh27C6Gg" event="_I33AxxzkEeCTjboh27C6Gg" message="_I33AyBzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_I33AxhzkEeCTjboh27C6Gg" name="MessageOccurrenceSpecification9" covered="_aTz-IBvPEeCGKIBwFC0cnQ" event="_I33AxxzkEeCTjboh27C6Gg" message="_I33AyBzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_PsBcOBzkEeCTjboh27C6Gg" name="MessageOccurrenceSpecification10" covered="_2UZFkBzjEeCTjboh27C6Gg" event="_PsBcOhzkEeCTjboh27C6Gg" message="_PsBcOxzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_PsBcORzkEeCTjboh27C6Gg" name="MessageOccurrenceSpecification11" covered="_2UZFkBzjEeCTjboh27C6Gg" event="_PsBcOhzkEeCTjboh27C6Gg" message="_PsBcOxzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_8OvA8hvOEeCGKIBwFC0cnQ" name="BehaviorExecutionSpecification1" covered="_5QJI4hvOEeCGKIBwFC0cnQ" start="_8O4K5BvOEeCGKIBwFC0cnQ" finish="_8O4K5BvOEeCGKIBwFC0cnQ"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_ebj2ohvPEeCGKIBwFC0cnQ" name="BehaviorExecutionSpecification2" covered="_aTz-IBvPEeCGKIBwFC0cnQ" start="_e33_NhvPEeCGKIBwFC0cnQ" finish="_I33AxhzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_5Q4r4hzjEeCTjboh27C6Gg" name="BehaviorExecutionSpecification3" covered="_2UZFkBzjEeCTjboh27C6Gg" start="__n_X5hzjEeCTjboh27C6Gg" finish="_PsBcOBzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_PsBcMhzkEeCTjboh27C6Gg" name="BehaviorExecutionSpecification4" covered="_2UZFkBzjEeCTjboh27C6Gg" start="_PsBcORzkEeCTjboh27C6Gg" finish="_PsBcORzkEeCTjboh27C6Gg"/>
+              <fragment xmi:type="uml:CombinedFragment" xmi:id="_VHL50BzjEeCTjboh27C6Gg" name="CombinedFragment2" covered="_aTz-IBvPEeCGKIBwFC0cnQ _2UZFkBzjEeCTjboh27C6Gg" interactionOperator="loop">
+                <operand xmi:id="_VHL50RzjEeCTjboh27C6Gg"/>
+              </fragment>
+              <message xmi:id="_8O4K5hvOEeCGKIBwFC0cnQ" name="createHeader" receiveEvent="_8O4K5BvOEeCGKIBwFC0cnQ">
+                <argument xmi:type="uml:LiteralString" xmi:id="_-UGK8BvOEeCGKIBwFC0cnQ" name="return" type="_bltQWBBJEeCWwuTUj8c31Q" value="header"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_-UGK8xvOEeCGKIBwFC0cnQ" name="id" type="_wF_tIA9PEeC5mKKa1YlKHQ" instance="_GxmiwBvPEeCGKIBwFC0cnQ"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_-UGK8RvOEeCGKIBwFC0cnQ" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q" value="parent"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_-UGK9BvOEeCGKIBwFC0cnQ" name="headerRef" type="_vpLDaBgEEeCW_sZKIcO_yg" instance="_IFM4oBvPEeCGKIBwFC0cnQ"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_-UGK8hvOEeCGKIBwFC0cnQ" name="isFooter" value="false">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_-UGK9RvOEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw" instance="_JK8YsBvPEeCGKIBwFC0cnQ"/>
+              </message>
+              <message xmi:id="_e33_OBvPEeCGKIBwFC0cnQ" name="FieldIterator" receiveEvent="_e33_NhvPEeCGKIBwFC0cnQ" sendEvent="_e33_NRvPEeCGKIBwFC0cnQ">
+                <argument xmi:type="uml:LiteralString" xmi:id="_gcKccBvPEeCGKIBwFC0cnQ" name="parent" type="_1owC2BBGEeCWwuTUj8c31Q" value="parent"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_-k0SEBvPEeCGKIBwFC0cnQ" name="dataBlockFactory" type="_Gax2GBjNEeCecP1nht5UNw" value="factory"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_qAc2IBvPEeCGKIBwFC0cnQ" name="context" type="_re6nmBt0EeC9cZmFpNV5dw" value="context"/>
+                <argument xmi:type="uml:LiteralString" xmi:id="_-k0SERvPEeCGKIBwFC0cnQ" name="minimumParentSize" value="minParentSize">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </argument>
+              </message>
+              <message xmi:id="__n_X6BzjEeCTjboh27C6Gg" name="&lt;&lt;create>>" messageSort="createMessage" receiveEvent="__n_X5hzjEeCTjboh27C6Gg" sendEvent="__n_X5RzjEeCTjboh27C6Gg"/>
+              <message xmi:id="_FE-lCBzkEeCTjboh27C6Gg" name="hasNext" receiveEvent="_FE-lBhzkEeCTjboh27C6Gg" sendEvent="_FE-lBRzkEeCTjboh27C6Gg">
+                <argument xmi:type="uml:LiteralString" xmi:id="_HDe5EBzkEeCTjboh27C6Gg" name="return" value="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </argument>
+              </message>
+              <message xmi:id="_I33AyBzkEeCTjboh27C6Gg" name="next" receiveEvent="_I33AxhzkEeCTjboh27C6Gg" sendEvent="_I33AxRzkEeCTjboh27C6Gg">
+                <argument xmi:type="uml:InstanceValue" xmi:id="_JVNrIBzkEeCTjboh27C6Gg" name="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_jp-ZeBTCEeCCdI4pKGnu6Q"/>
+                </argument>
+              </message>
+              <message xmi:id="_PsBcOxzkEeCTjboh27C6Gg" name="determinePayloadSize" receiveEvent="_PsBcORzkEeCTjboh27C6Gg" sendEvent="_PsBcOBzkEeCTjboh27C6Gg">
+                <argument xmi:type="uml:LiteralString" xmi:id="_fx_aMBzkEeCTjboh27C6Gg" name="return" value="payloadSize">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </argument>
+                <argument xmi:type="uml:LiteralString" xmi:id="_fx_aMRzkEeCTjboh27C6Gg" name="spec" type="_RUOCCA9PEeC5mKKa1YlKHQ" value="spec"/>
+                <argument xmi:type="uml:InstanceValue" xmi:id="_fx_aMhzkEeCTjboh27C6Gg" name="context" type="_re6nmBt0EeC9cZmFpNV5dw" instance="_JK8YsBvPEeCGKIBwFC0cnQ"/>
+              </message>
+            </ownedBehavior>
+          </packagedElement>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_8O4K5RvOEeCGKIBwFC0cnQ" name="CallEvent1" operation="_nhRdYhtgEeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_GxmiwBvPEeCGKIBwFC0cnQ" name="headerId" classifier="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_IFM4oBvPEeCGKIBwFC0cnQ" name="headerRef" classifier="_vpLDaBgEEeCW_sZKIcO_yg"/>
+          <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_JK8YsBvPEeCGKIBwFC0cnQ" name="context" classifier="_re6nmBt0EeC9cZmFpNV5dw"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_e33_NxvPEeCGKIBwFC0cnQ" name="CallEvent2" operation="_de7l8BJxEeCQ6KaJ3EOFKQ"/>
+          <packagedElement xmi:type="uml:CreationEvent" xmi:id="__n_X5xzjEeCTjboh27C6Gg" name="CreationEvent1"/>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_FE-lBxzkEeCTjboh27C6Gg" name="CallEvent3">
+            <operation href="../../GeneratorTemplates/models/CommonElements.uml#_4e5W4hJyEeCQ6KaJ3EOFKQ"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_I33AxxzkEeCTjboh27C6Gg" name="CallEvent4">
+            <operation href="../../GeneratorTemplates/models/CommonElements.uml#_6O8_QhJyEeCQ6KaJ3EOFKQ"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:CallEvent" xmi:id="_PsBcOhzkEeCTjboh27C6Gg" name="CallEvent5" operation="_SQOeUhzkEeCTjboh27C6Gg"/>
+        </packagedElement>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_X6WRQBXNEeCXQf6TsXGXXw" name="de.je.jmeta.context">
+      <packagedElement xmi:type="uml:Package" xmi:id="_cIWiwBXNEeCXQf6TsXGXXw" name="iface">
+        <packagedElement xmi:type="uml:Class" xmi:id="_eilJiBXNEeCXQf6TsXGXXw" name="jMetaContext">
+          <ownedOperation xmi:id="_j5KMohXNEeCXQf6TsXGXXw" name="getDataFormatRepository">
+            <ownedParameter xmi:id="_lP4vABXNEeCXQf6TsXGXXw" name="return" type="_PcHQ4A9PEeC5mKKa1YlKHQ" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_nsf7YhXNEeCXQf6TsXGXXw" name="getDataAccessor">
+            <ownedParameter xmi:id="_pKOdoBXNEeCXQf6TsXGXXw" name="return" direction="return">
+              <type xmi:type="uml:Interface" href="../../Utility/model/Utility.uml#_sbroB6COEd6zlNXooB-z8A"/>
+            </ownedParameter>
+          </ownedOperation>
+          <ownedOperation xmi:id="_kItSABZxEeCEnt58MkSEug" name="getInstance">
+            <ownedParameter xmi:id="_lChO4BZxEeCEnt58MkSEug" name="return" type="_eilJiBXNEeCXQf6TsXGXXw" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_mpfMshZxEeCEnt58MkSEug" name="jMetaContext" visibility="private"/>
+        </packagedElement>
+      </packagedElement>
+    </packagedElement>
+    <profileApplication xmi:id="_5l2gQAO-EeCYKaNo9SPZvQ">
+      <eAnnotations xmi:id="_5l2gQQO-EeCYKaNo9SPZvQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../../GeneratorTemplates/models/CommonStereotypes.uml#_uYpKYRtLEeC9cZmFpNV5dw"/>
+      </eAnnotations>
+      <appliedProfile href="../../GeneratorTemplates/models/CommonStereotypes.uml#_d0ndU3L_Ed6ZZvimjx0tAA"/>
+    </profileApplication>
+  </uml:Model>
+  <CommonStereotypes:RuntimeException xmi:id="_8ex1MAO-EeCYKaNo9SPZvQ" base_Class="_2pW5-AO-EeCYKaNo9SPZvQ"/>
+  <CommonStereotypes_1:Exception xmi:id="_SkerkAPAEeCYKaNo9SPZvQ"/>
+  <CommonStereotypes:create xmi:id="_b7j8cAPQEeCYKaNo9SPZvQ" base_Operation="_UqSZIgPOEeCYKaNo9SPZvQ"/>
+  <CommonStereotypes:create xmi:id="_dGXisAPQEeCYKaNo9SPZvQ" base_Operation="_rongogPPEeCYKaNo9SPZvQ"/>
+  <CommonStereotypes:create xmi:id="_dGXisQPQEeCYKaNo9SPZvQ" base_Operation="_ZGfCMgPPEeCYKaNo9SPZvQ"/>
+  <CommonStereotypes:create xmi:id="_dGgsoAPQEeCYKaNo9SPZvQ" base_Operation="_2l3RUgPPEeCYKaNo9SPZvQ"/>
+  <CommonStereotypes:Singleton xmi:id="_bL4fsAYEEeC-MfabKwExLQ" base_Class="_5ynN4AYDEeC-MfabKwExLQ"/>
+  <CommonStereotypes:ExtendableEnum xmi:id="_-dX30A9OEeC5mKKa1YlKHQ" base_Class="_9PJKKA9OEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:ExtendableEnum xmi:id="_ln4nIA9dEeC5mKKa1YlKHQ" base_Class="_gmnFqA9dEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:create xmi:id="_Xlq-0BBIEeCWwuTUj8c31Q" base_Operation="_V-2yAhBIEeCWwuTUj8c31Q"/>
+  <CommonStereotypes:create xmi:id="_Ni3GABBcEeCWwuTUj8c31Q" base_Operation="_JKuBEhBcEeCWwuTUj8c31Q"/>
+  <CommonStereotypes:ExtendableEnum xmi:id="_f4TVgBHLEeCj6sa1lWUOBg" base_Class="_eiLQEBHLEeCj6sa1lWUOBg"/>
+  <CommonStereotypes:create xmi:id="_7hcz0BJwEeCQ6KaJ3EOFKQ" base_Operation="_55btIhJwEeCQ6KaJ3EOFKQ"/>
+  <CommonStereotypes:RuntimeException xmi:id="_L3MCcBKNEeCmY8FE9I3w_w" base_Class="_IyydWBKNEeCmY8FE9I3w_w"/>
+  <CommonStereotypes:Exception xmi:id="_vCLkIBOLEeCftvNWGQmhpw" base_Class="_sDJnOBOLEeCftvNWGQmhpw"/>
+  <CommonStereotypes:create xmi:id="_C7QycBTAEeCCdI4pKGnu6Q" base_Operation="_CUg7ghTAEeCCdI4pKGnu6Q"/>
+  <CommonStereotypes:create xmi:id="_ZVaYkBTyEeCXXJGQsqBrgw" base_Operation="_cGqMsg9WEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:create xmi:id="_Zq3rMBTyEeCXXJGQsqBrgw" base_Operation="_kbhl4g9WEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:create xmi:id="_aDdKUBTyEeCXXJGQsqBrgw" base_Operation="_hf6wYg9WEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:DataType xmi:id="_xX4BIBT0EeCXXJGQsqBrgw" base_Class="_4ShCqA9PEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:DataType xmi:id="_xrikABT0EeCXXJGQsqBrgw" base_Class="_wF_tIA9PEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:DataType xmi:id="_yNOUwBT0EeCXXJGQsqBrgw" base_Class="_raCUUA9PEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:DataType xmi:id="_ylENABT0EeCXXJGQsqBrgw" base_Class="_X7t0SA9sEeC5aZvFX1u-HA"/>
+  <CommonStereotypes_2:DataType xmi:id="_y7tycBT0EeCXXJGQsqBrgw"/>
+  <CommonStereotypes_2:DataType xmi:id="_zhaggBT0EeCXXJGQsqBrgw"/>
+  <CommonStereotypes_2:DataType xmi:id="_0AjTkBT0EeCXXJGQsqBrgw"/>
+  <CommonStereotypes:DataType xmi:id="_Z_rWMBT1EeCXXJGQsqBrgw" base_Class="_9PJKKA9OEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes:DataType xmi:id="_PQcaEBT6EeCXXJGQsqBrgw" base_Class="_6tPJ6A9VEeC5mKKa1YlKHQ"/>
+  <CommonStereotypes_2:DataType xmi:id="_f8HGIBT6EeCXXJGQsqBrgw"/>
+  <CommonStereotypes:ExtendableEnum xmi:id="_uYugsBT6EeCXXJGQsqBrgw" base_Class="_wTc-uA9tEeC5aZvFX1u-HA"/>
+  <CommonStereotypes:create xmi:id="_nX05YBZxEeCEnt58MkSEug" base_Operation="_mpfMshZxEeCEnt58MkSEug"/>
+  <CommonStereotypes:create xmi:id="_tBxvMBaXEeCNZOI8PyuHiQ" base_Operation="_YbjBEhJwEeCQ6KaJ3EOFKQ"/>
+  <CommonStereotypes:DataType xmi:id="_yHRdgBgEEeCW_sZKIcO_yg" base_Class="_vpLDaBgEEeCW_sZKIcO_yg"/>
+  <CommonStereotypes:ExtendableEnum xmi:id="_KLJDMBgmEeCW_sZKIcO_yg" base_Class="_GKQAoBgmEeCW_sZKIcO_yg"/>
+  <CommonStereotypes:create xmi:id="_xzPpABtLEeC9cZmFpNV5dw" base_Message="_Y9cNGBtLEeC9cZmFpNV5dw"/>
+  <CommonStereotypes:actor xmi:id="_ychPgBtLEeC9cZmFpNV5dw" base_Lifeline="_yZe0gBtJEeC9cZmFpNV5dw"/>
+  <CommonStereotypes:create xmi:id="_iwPJkBtbEeC9cZmFpNV5dw" base_Operation="_hE8schtbEeC9cZmFpNV5dw"/>
+  <CommonStereotypes:DataType xmi:id="_P8yaMBtyEeC9cZmFpNV5dw" base_Class="_O7q7eBtyEeC9cZmFpNV5dw"/>
+  <CommonStereotypes:create xmi:id="_DzDRgBvQEeCGKIBwFC0cnQ" base_Message="_e33_OBvPEeCGKIBwFC0cnQ"/>
+  <CommonStereotypes:create xmi:id="_Ash-EBzkEeCTjboh27C6Gg" base_Message="__n_X6BzjEeCTjboh27C6Gg"/>
+</xmi:XMI>

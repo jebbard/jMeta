@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_qb8akM37EdqwVrslYOdUDA">
+  <packagedElement xmi:type="uml:Package" xmi:id="_w8IxIM37EdqwVrslYOdUDA" name="AnalysisModel">
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_IhtOcO_dEd-Crc9oUBQ3-A" name="Read Metadata" subject="_Jb-eUO_dEd-Crc9oUBQ3-A">
+      <include xmi:id="_FjAMM-_eEd-Crc9oUBQ3-A" name="Include1" addition="_ZXgt8u_dEd-Crc9oUBQ3-A"/>
+      <include xmi:id="_KXwUo-_eEd-Crc9oUBQ3-A" name="Include2" addition="_adjI8u_dEd-Crc9oUBQ3-A"/>
+      <include xmi:id="_u4rFdPDyEd-IGvDdi5fvqg" name="Include3" addition="_BN2J0O_eEd-Crc9oUBQ3-A"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_Jb-eUO_dEd-Crc9oUBQ3-A" name="jMeta User" useCase="_IhtOcO_dEd-Crc9oUBQ3-A _ZXgt8u_dEd-Crc9oUBQ3-A _adjI8u_dEd-Crc9oUBQ3-A"/>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_ZXgt8u_dEd-Crc9oUBQ3-A" name="Map Attributes" subject="_Jb-eUO_dEd-Crc9oUBQ3-A"/>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_adjI8u_dEd-Crc9oUBQ3-A" name="Validate Data Blocks" subject="_Jb-eUO_dEd-Crc9oUBQ3-A"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_iIYtsu_dEd-Crc9oUBQ3-A" name="jMeta"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_q7DdOO_dEd-Crc9oUBQ3-A" name="" memberEnd="_q7DdOe_dEd-Crc9oUBQ3-A _q7DdPO_dEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_q7DdOe_dEd-Crc9oUBQ3-A" name="jMeta User" type="_Jb-eUO_dEd-Crc9oUBQ3-A" association="_q7DdOO_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_q7DdOu_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_q7DdO-_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_q7DdPO_dEd-Crc9oUBQ3-A" name="read Metadata" type="_IhtOcO_dEd-Crc9oUBQ3-A" association="_q7DdOO_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_q7DdPe_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_q7DdPu_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_rMytd-_dEd-Crc9oUBQ3-A" name="" memberEnd="_rMyteO_dEd-Crc9oUBQ3-A _rMyte-_dEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_rMyteO_dEd-Crc9oUBQ3-A" name="jMeta User" type="_Jb-eUO_dEd-Crc9oUBQ3-A" association="_rMytd-_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_rMytee_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_rMyteu_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_rMyte-_dEd-Crc9oUBQ3-A" name="map Attributes" type="_ZXgt8u_dEd-Crc9oUBQ3-A" association="_rMytd-_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_rMytfO_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_rMytfe_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_rgUGZ-_dEd-Crc9oUBQ3-A" name="" memberEnd="_rgUGaO_dEd-Crc9oUBQ3-A _rgUGa-_dEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_rgUGaO_dEd-Crc9oUBQ3-A" name="jMeta User" type="_Jb-eUO_dEd-Crc9oUBQ3-A" association="_rgUGZ-_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_rgUGae_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_rgUGau_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_rgUGa-_dEd-Crc9oUBQ3-A" name="validate Data Blocks" type="_adjI8u_dEd-Crc9oUBQ3-A" association="_rgUGZ-_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_rgUGbO_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_rgUGbe_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_7NZDQu_dEd-Crc9oUBQ3-A" name="Write Metadata">
+      <include xmi:id="_IWH0E-_eEd-Crc9oUBQ3-A" name="Include1" addition="_ZXgt8u_dEd-Crc9oUBQ3-A"/>
+      <include xmi:id="_M9UBo-_eEd-Crc9oUBQ3-A" name="Include2" addition="_adjI8u_dEd-Crc9oUBQ3-A"/>
+      <include xmi:id="_6vb4E_DyEd-IGvDdi5fvqg" name="Include3" addition="_CZ2C4u_eEd-Crc9oUBQ3-A"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_-TbnJ-_dEd-Crc9oUBQ3-A" name="" memberEnd="_-TbnKO_dEd-Crc9oUBQ3-A _-TbnK-_dEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_-TbnKO_dEd-Crc9oUBQ3-A" name="jMeta User" type="_Jb-eUO_dEd-Crc9oUBQ3-A" association="_-TbnJ-_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-TbnKe_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-TbnKu_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_-TbnK-_dEd-Crc9oUBQ3-A" name="write Metadata" type="_7NZDQu_dEd-Crc9oUBQ3-A" association="_-TbnJ-_dEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-TbnLO_dEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-TbnLe_dEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_BN2J0O_eEd-Crc9oUBQ3-A" name="Read Surrounding Data">
+      <include xmi:id="_P5qeBO_eEd-Crc9oUBQ3-A" name="Include1" addition="_adjI8u_dEd-Crc9oUBQ3-A"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_CZ2C4u_eEd-Crc9oUBQ3-A" name="Write Surrounding Data">
+      <include xmi:id="_QRpgNO_eEd-Crc9oUBQ3-A" name="Include1" addition="_adjI8u_dEd-Crc9oUBQ3-A"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_SXw4Ju_eEd-Crc9oUBQ3-A" name="" memberEnd="_SXw4J-_eEd-Crc9oUBQ3-A _SXw4Ku_eEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_SXw4J-_eEd-Crc9oUBQ3-A" name="jMeta User" type="_Jb-eUO_dEd-Crc9oUBQ3-A" association="_SXw4Ju_eEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SXw4KO_eEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SXw4Ke_eEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_SXw4Ku_eEd-Crc9oUBQ3-A" name="read Data Blocks" type="_BN2J0O_eEd-Crc9oUBQ3-A" association="_SXw4Ju_eEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SXw4K-_eEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SXw4LO_eEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_SuQslu_eEd-Crc9oUBQ3-A" name="" memberEnd="_SuQsl-_eEd-Crc9oUBQ3-A _SuQsmu_eEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_SuQsl-_eEd-Crc9oUBQ3-A" name="jMeta User" type="_Jb-eUO_dEd-Crc9oUBQ3-A" association="_SuQslu_eEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SuQsmO_eEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SuQsme_eEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_SuQsmu_eEd-Crc9oUBQ3-A" name="write Data Blocks" type="_CZ2C4u_eEd-Crc9oUBQ3-A" association="_SuQslu_eEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_SuQsm-_eEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_SuQsnO_eEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_FC2QAu_fEd-Crc9oUBQ3-A" name="Get Data Format Information"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_ICU45-_fEd-Crc9oUBQ3-A" name="" memberEnd="_ICU46O_fEd-Crc9oUBQ3-A _ICU46-_fEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_ICU46O_fEd-Crc9oUBQ3-A" name="jMeta User" type="_Jb-eUO_dEd-Crc9oUBQ3-A" association="_ICU45-_fEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_ICU46e_fEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_ICU46u_fEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_ICU46-_fEd-Crc9oUBQ3-A" name="get Data Format Information" type="_FC2QAu_fEd-Crc9oUBQ3-A" association="_ICU45-_fEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_ICU47O_fEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_ICU47e_fEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_MSbcIu_fEd-Crc9oUBQ3-A" name="jMeta Extender"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_1ZYLUu_fEd-Crc9oUBQ3-A" name="Patent Holder"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="__pUxIu_fEd-Crc9oUBQ3-A" name="Domain Software"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_DRVZou_gEd-Crc9oUBQ3-A" name="Related Libraries"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_TiNxsu_hEd-Crc9oUBQ3-A" name="Data Format Creator"/>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_oj74Au_hEd-Crc9oUBQ3-A" name="Add New Medium"/>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_wvj1ou_hEd-Crc9oUBQ3-A" name="Add New Data Format"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_AZOSKO_iEd-Crc9oUBQ3-A" name="" memberEnd="_AZOSKe_iEd-Crc9oUBQ3-A _AZOSLO_iEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_AZOSKe_iEd-Crc9oUBQ3-A" name="jMeta Extender" type="_MSbcIu_fEd-Crc9oUBQ3-A" association="_AZOSKO_iEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_AZOSKu_iEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_AZOSK-_iEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_AZOSLO_iEd-Crc9oUBQ3-A" name="add New Medium" type="_oj74Au_hEd-Crc9oUBQ3-A" association="_AZOSKO_iEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_AZOSLe_iEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_AZOSLu_iEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_Aw6ZZ-_iEd-Crc9oUBQ3-A" name="" memberEnd="_Aw6ZaO_iEd-Crc9oUBQ3-A _Aw6Za-_iEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_Aw6ZaO_iEd-Crc9oUBQ3-A" name="jMeta Extender" type="_MSbcIu_fEd-Crc9oUBQ3-A" association="_Aw6ZZ-_iEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_Aw6Zae_iEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_Aw6Zau_iEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_Aw6Za-_iEd-Crc9oUBQ3-A" name="add New Data Format" type="_wvj1ou_hEd-Crc9oUBQ3-A" association="_Aw6ZZ-_iEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_Aw6ZbO_iEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_Aw6Zbe_iEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:UseCase" xmi:id="_Bjbbcu_iEd-Crc9oUBQ3-A" name="Add New Data Block"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_GFZx1-_iEd-Crc9oUBQ3-A" name="" memberEnd="_GFZx2O_iEd-Crc9oUBQ3-A _GFZx2-_iEd-Crc9oUBQ3-A">
+      <ownedEnd xmi:id="_GFZx2O_iEd-Crc9oUBQ3-A" name="jMeta Extender" type="_MSbcIu_fEd-Crc9oUBQ3-A" association="_GFZx1-_iEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_GFZx2e_iEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_GFZx2u_iEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_GFZx2-_iEd-Crc9oUBQ3-A" name="add New Data Block" type="_Bjbbcu_iEd-Crc9oUBQ3-A" association="_GFZx1-_iEd-Crc9oUBQ3-A">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_GFZx3O_iEd-Crc9oUBQ3-A" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_GFZx3e_iEd-Crc9oUBQ3-A" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+  </packagedElement>
+</uml:Model>

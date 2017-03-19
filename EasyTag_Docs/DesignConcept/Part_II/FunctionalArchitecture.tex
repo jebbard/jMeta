@@ -1,0 +1,418 @@
+%===============================================================================================
+%		Fachliche Architektur
+%===============================================================================================
+
+\chapter{Fachliche Architektur}
+\label{sec:FunctionalArchitectureChap}
+
+Die fachliche Architektur umfasst die Gliederung der Library-Funktionalität in fachliche Einheiten. Auf detaillierter Ebene sind dies die bereits definierten Komponenten. Auch wenn diese rein technische Funktionen umsetzen, beispielsweise Logging, werden sie in der fachlichen Architektur aufgeführt.
+
+Hier noch einige detaillierte Designentscheidungen, die sich auf die fachliche Architektur beziehen.
+
+%-----------------------------------------------------------------------------------------------
+%		Grundlegende Designentscheidungen zur fachlichen Architektur
+%-----------------------------------------------------------------------------------------------
+
+\section{Grundlegende Designentscheidungen zur fachlichen Architektur}
+\label{sec:Grld}
+
+Die folgenden grundlegenden Designentscheidungen haben einen maßgeblichen Einfluss auf die fachliche Architektur der Library, und sie haben einen übergreifenden Effekt, sind also nicht auf einzelne Subsysteme oder Komponenten beschränkt. Daher werden sie hier definiert. Sie liefern eine generelle Begründung des später entwickelten fachlichen Designs.
+
+%-----------------------------------------------------------------------------------------------
+
+\DD{dd:100}
+{% Titel
+	High-Level- und Low-Level-API
+}
+{% Kurzbeschreibung
+	Wir untergliedern \LibName{} in einen High-Level-Anteil, der bequeme User-Funktionalität zum Zugriff auf Metadaten bietet, und einen Low-Level-Anteil, der generische Expertenfunktionalität auf Bit- und Byte-Ebene bietet.
+}
+{% Begründung
+Zunächst muss eine Low-Level-Zugriffsmöglichkeit gemäßt \SectionLink{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary} zur Vergfügung gestellt werden. Statt Low-Level- und High-Level-Zugriff in einer unübersichtlichen API gemeinsam bereitzustellen, separieren wir sowohl API als auch die Implementierung dieser Belange. Aus Anwendersicht ist dann klar, welche API für ihn als ``bequem'' gedacht ist, und welche nur für detaillierten feingranularen Zugriff verwendet werden soll. Die low-level-API kann von der High-level-API aufgerufen werden, um diese zu implementieren. Dies schafft auch eine saubere Trennung in der Implementierung.
+}
+{% Nachteile
+Ggf. höhere Komplexität der Gesamtlösung
+}
+
+%-----------------------------------------------------------------------------------------------
+
+\DD{dd:101}
+{% Titel
+	Generisches Parsen und Schreiben anhand einer Format-Spezifikation
+}
+{% Kurzbeschreibung
+	Das Parsen und Schreiben sämtlicher Metadaten- und Container-Formate wird anhand einer generellen Format-Spezifikation durch eine zentrale Komponente durchgeführt. Die Format-Spezifikation beschreibt, welche Features und Teile ein binäres Datenformat enthält, insbesondere, wie ein Datenblock dieses Formates aufgebaut ist und interpretiert werden muss. Es handelt sich also um eine Art generische Anleitung für das Parsen (und auch das Schreiben und Validieren) dieses Datenformates.
+
+Weitere Designentscheidungen in späteren Abschnitten werden diese Designentscheidung vertiefen.
+}
+{% Begründung
+Gemäß dem Dokument \cite{MetaComp} haben zumindest binäre Container- und Metadatenformate viele Gemeinsamkeiten, die unter anderem die Definition eines generellen Domänenmodells ermöglichen. Diese Gemeinsamkeiten lassen sich auch durch generelle Formatspezifikationen beschreiben. Statt für jedes neu zu unterstützende Datenformat komplett neuen Parse-Code schreiben zu müssen, können viele Formate durch einheitlichen (nur einmal zu testenden) generischen Parse-Code unterstützt werden. Es ist eine Entkopplung von Format-Beschreibung und Lesen/Schreiben möglich. Die Formatbeschreibung kann als Textdokument abgelegt werden. Eine Erweiterung um ein neues Format ist daher im Idealfall einzig und allein durch Erzeugen einer solchen konformen Textdatei umsetzbar. Somit ermöglicht diese Designentscheidung die Umsetzung der Anforderung \SectionLink{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}.
+}
+{% Nachteile
+Es kann nicht für jedes denkbare zukünftige Format sichergestellt werden, dass die Möglichkeiten der Format-Spezifikation ausreichen, um alle Features des jeweiligen Formates wirklich abzudecken. Dies kann zur Notwendigkeit führen, die Format-Spezifikation zu erweitern und damit auch das generische Parsen. Alternativ kann dies durch Möglichkeiten ausgeglichen werden, das Parsen doch selbst umzusetzen (und eine entsprechende Implementierung statt der generischen zu verwenden). Weiterer Nachteil: Evtl. leichter Performance-Verlust, da das generische Parsen natürlich viele verschiedene Fälle unterstützen muss.
+}
+
+%-----------------------------------------------------------------------------------------------
+
+\DD{dd:102}
+{% Titel
+	Überschreiben des generischen Parsens und und Schreibens
+}
+{% Kurzbeschreibung
+	Erweiterungen können für ihre Datenformate den generischen Lese- und Schreibvorgang (siehe \DesLink{dd:101}) überschreiben und erweitern, um sie an spezielle Gegebenheiten ihres Datenformates besser anzupassen.
+}
+{% Begründung
+Dies minimiert die Nachteile von \DesLink{dd:101} und ermöglicht in Einzelfällen einfacherer oder performantere Implementierungen.
+}
+{% Nachteile
+Keine erkennbar
+}
+
+%-----------------------------------------------------------------------------------------------
+
+\DD{dd:103}
+{% Titel
+	Format-Spezifika werden nur in Erweiterungen definiert
+}
+{% Kurzbeschreibung
+	Jegliche Spezifika eines Metadaten- oder Containerformates werden ausschließlich über Erweiterungen implementiert, das gilt selbst für Datenformate, die direkt mit der Kernversion von \LibName{} unterstützt werden.
+}
+{% Begründung
+So wird bereits mit der Kernlibrary selbst das Erweiterungskonzept genutzt und erprobt. Es findet eine strikte Trennung zwischen Kernimplementierung und Format-Spezifika statt, was eine bessere Beherrschung der Gesamt-Komplexität ermöglicht.
+}
+{% Nachteile
+Keine erkennbar
+}
+
+%-----------------------------------------------------------------------------------------------
+
+\DD{dd:104}
+{% Titel
+	Fassadenkomponenten für High-Level- und Low-Level-Anteile
+}
+{% Kurzbeschreibung
+	Die Subsysteme \SUBSHighLevel{} und \SUBSLowLevel{} verfügen über je eine Fassadenkomponente, die Zugriff auf die anderen \emph{öffentlichen} Komponenten des jeweiligen Subsystems gewähren. ``Öffentlich'' sind diejenigen Komponenten, die vom Anwender oder von \SUBSBootstrap{} direkt zugegriffen werden müssen.
+}
+{% Begründung
+Das Subsystem \SUBSBootstrap{} muss keine direkte Abhängkeit zu den Komponenten der Subsysteme der High-Level- und Low-Level-Anteile eingehen, sondern gibt nur eine Instanz der Fassadenkomponenten zurück, dies verringert die Kopplung. Spezielle Methoden zum Zugriff auf die anderen Komponenten des Subsystems können in den Fassadenkomponenten bereitgestellt werden und müssen nicht im Subsystem \SUBSBootstrap{} bereitgestellt werden (was auch nicht der Aufgabe von \SUBSBootstrap{} entsprechen würde).
+}
+{% Nachteile
+Keine erkennbar
+}
+
+%-----------------------------------------------------------------------------------------------
+
+\DD{dd:105}
+{% Titel
+	Technische Basiskomponenten bilden ein eigenes Subsystem ohne Fassade
+}
+{% Kurzbeschreibung
+	Alle technischen Basiskomponenten bilden ein eigenes Subsystem und werden nicht zusammen mit fachlichen Komponenten in ein Subsystem aufgenommen. Es wird keine Fassadenkomponente zum Zugriff auf die Basiskomponenten bereitgestellt.
+}
+{% Begründung
+Um die Kohärenz der Subsysteme zu erhalten, werden die technischen Komponenten in ein eigenes Subsystem ausgelagert. Die technischen Basiskomponenten können als sogenannte ``0-Software'', d.h. perfekt wiederverwendbare Software betrachtet werden. Sie haben keine inhaltlich-fachliche Funktionen und sollten (in den meisten Fällen) keine weiteren Abhängigkeiten zu anderen Komponenten haben. Da sie alle recht spezifische und umfangreiche Funktionalität anbieten, macht ein Verwenden einer Fassadenkomponenten keinerlei Sinn. Diese würde einerseits viele unterschiedliche Belange, die nicht verwandt sind, in ein Interface zwängen, und andererseits  keineswegs zu geringerer Kopplung führen.
+}
+{% Nachteile
+Keine erkennbar
+}
+
+%-----------------------------------------------------------------------------------------------
+%		Subsysteme
+%-----------------------------------------------------------------------------------------------
+
+\section{Subsysteme}
+\label{sec:Subsystems}
+
+Die Unterteilung in Subsysteme zeigt bereits grob die wichtigsten Teile der Library und erste Abhängigkeiten zwischen ihnen. Über Subsysteme verorten wir auch den Begriff der \emph{Erweiterung}. Zudem bildet sich hier direkt die Designentscheidung \DesLink{dd:100} ab.
+
+Das folgende Architekturbild zeigt die Subsysteme von \LibName{} und ihre Beziehungen zueinander. Ein Pfeil bedeutet dabei eine hier noch nicht näher konkretisierte Abhängigkeit, die sich entweder als Compile-Zeit- oder als Laufzeit-Abhängigkeit oder beides manifestieren kann.
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=1.00\textwidth]{Figures/Part_II/II_1_FunctionalArchitecture.pdf}
+		\caption{Subsysteme von \LibName{}}
+	\label{fig:5_3_SCH_TechnicalArchitecture}
+\end{figure}
+
+Der Anwender der Library kann direkt auf die Subsysteme \SUBSBootstrap{}, \SUBSExtension{}, \SUBSHighLevel{} und \SUBSLowLevel{} zugreifen, während die \SUBSTechBase{} nicht zugreifbar ist.
+
+Die Subsysteme werden im Folgenden weiter konkretisiert.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\SUBSBootstrap{}}
+\label{sec:Bootstrap}
+
+Dieses Subsystem kapselt alle Initialisierungen von \LibName{}. Das Subsystem ist der Eintrittspunkt der Benutzung von \LibName{} für den Anwender. Es nutzt daher alle anderen Subsysteme, um diese zu initialisieren.
+
+Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompBoots} aufgeführt.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\SUBSHighLevel{}}
+\label{sec:LibName2}
+
+Die High-Level-Anteile der Library gemäß \DesLink{dd:100}. Das Subsystem greift auf \SUBSTechBase{} und \SUBSLowLevel{} zu. Letzteres deshalb, weil gemäß \DesLink{dd:100} die Implementierung der High-Level-Anteile durch Verwendung der low-level-Anteile erfolgt.
+
+Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompHigh} aufgeführt.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\SUBSLowLevel{}}
+\label{sec:CoreAndUserInterface}
+
+Die Low-Level-Anteile der Library gemäß \DesLink{dd:100}. Greift nur auf die technische Basis zu.
+
+Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompLow} aufgeführt.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\SUBSTechBase{}}
+\label{sec:Techbase}
+
+Eine Sammlung von Komponenten, die als technische Rahmenkomponenten betrachtet werden können und keine fachlich-inhaltlichen Beiträge zum Thema ``Metadaten/Container'' liefern. Sie werden von so gut wie allen anderen Subsystemen benötigt.
+
+Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompTB} aufgeführt.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\SUBSExtension{}}
+\label{sec:Extensions}
+
+\LibName{} erlaubt eine beliebige Anzahl an Erweiterungen, jede davon entspricht in der fachlichen Architektur einem Subsystem.
+
+Details finden sich im Abschnitt \SectionLink{sec:KompExt}.
+
+%-----------------------------------------------------------------------------------------------
+%		Komponenten-Steckbrief
+%-----------------------------------------------------------------------------------------------
+
+\section{Komponenten-Steckbrief}
+\label{sec:StructureofaComponentDescription}
+
+Da in den folgenden Abschnitten Komponenten einführend beschrieben werden, wird hier ein Steckbrief, d.h. eine grundlegende Beschreibungsstruktur für eine Komponentengrobbeschreibung definiert. Dieser Steckbrief wird dann in den folgenden Abschnitten für jede Komponente ausgefüllt.
+
+\textbf{Komponenten-Name:} Der Name der Komponente.
+
+\textbf{Aufgabe:} Die Aufgabe der Komponente.
+
+\textbf{Kontrollierte Daten:} Die Daten, die durch die Komponente kontrolliert werden, d.h. gelesen und geschrieben werden. Nutzt die Komponente Daten anderer Komponenten, wird dies hier nicht erwähnt.
+
+\textbf{Abhängig von $<$Komponenten-Name$>$:} Dieses Element kommt mehrfach je Komponente vor, von der diese Komponente abhängt. Der Grund für die Abhängigkeit wird kurz erläutert.
+
+%-----------------------------------------------------------------------------------------------
+%		Komponenten des Subsystems \SUBSBootstrap{}
+%-----------------------------------------------------------------------------------------------
+
+\section{Komponenten des Subsystems \SUBSBootstrap{}}
+\label{sec:KompBoots}
+
+Die folgende Abbildung zeigt die Komponenten des Subsystems \SUBSBootstrap{}.
+
+\OpenIssue{Bootstrap subsystem Componenten Abbildung}{}
+%\begin{figure}[H]
+	%\centering
+		%\includegraphics[width=1.00\textwidth]{Figures/Part_III/III_1_SUBSBootstrap.pdf}
+	%\caption{Komponenten des Subsystems \SUBSBootstrap{}}
+	%\label{fig:CompSB}
+%\end{figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Komponente \COMPcontext{}}
+\label{sec:COMPContext}
+
+\textbf{Komponenten-Name:} \COMPcontext{}.
+
+\textbf{Aufgabe:} Der Einstiegspunkt für jeden User von \LibName{}. Es ermöglicht Zugriff auf alle anderen Komponenten der Library.
+
+\textbf{Kontrollierte Daten:} Keine.
+
+\textbf{Abhängig von \COMPlowLevel{}:} \COMPcontext{} gibt Zugriff auf die Komponente \COMPlowLevel{}.
+
+\textbf{Abhängig von \COMPhighLevel{}:} \COMPcontext{} gibt Zugriff auf die Komponente \COMPhighLevel{}.
+
+\textbf{Abhängig von \COMPextensionManagement{}:} \COMPcontext{} lädt alle Erweiterungen unter Nutzung dieser Komponente.
+
+\textbf{Abhängig von \COMPlogging{}:} \COMPcontext{} nutzt diese Komponente zur Protokollierung des Startup-Prozesses.
+
+\textbf{Abhängig von \COMPcomponentRegistry{}:} \COMPcontext{} nutzt diese Komponente zum Instantiieren bzw. Abfragen von Implementierungen anderer verwendeter Komponenten-Interfaces.
+
+\textbf{Abhängig von \COMPutility{}:} \COMPcontext{} nutzt diverse querschnittliche Funktionen von \COMPutility{}.
+
+%-----------------------------------------------------------------------------------------------
+%		Komponenten des Subsystems \SUBSHighLevel{}
+%-----------------------------------------------------------------------------------------------
+
+\section{Komponenten des Subsystems \SUBSHighLevel{}}
+\label{sec:KompHigh}
+
+Die Komponenten des Subsystems \SUBSHighLevel{} werden in dieser Version der Library noch nicht definiert.
+
+%-----------------------------------------------------------------------------------------------
+%		Komponenten des Subsystems \SUBSLowLevel{}
+%-----------------------------------------------------------------------------------------------
+
+\section{Komponenten des Subsystems \SUBSLowLevel{}}
+\label{sec:KompLow}
+
+Die folgende Abbildung zeigt die Komponenten des Subsystems \SUBSLowLevel{}.
+\OpenIssue{Container API subsystem Abbildung}{}
+
+%\begin{figure}[H]
+	%\centering
+		%\includegraphics[width=1.00\textwidth]{Figures/Part_III/III_1_SUBSLowLevel.pdf}
+	%\caption{Komponenten des Subsystems \SUBSLowLevel{}}
+	%\label{fig:CompLL}
+%\end{figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPlowLevel{}}
+\label{sec:COMPlowLevel}
+
+\textbf{Komponenten-Name:} \COMPlowLevel{}.
+
+\textbf{Aufgabe:} Fassadenkomponente. Gewährt allen Anwendern Zugriff auf die anderen öffentlichen Komponenten dieses Subsystems.
+
+\textbf{Kontrollierte Daten:} Keine.
+
+\textbf{Abhängig von \COMPdataPartManagement{}:} Gewährt Zugriff auf diese Komponente.
+
+\textbf{Abhängig von \COMPdataFormatManagement{}:} Gewährt Zugriff auf diese Komponente.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPdataPartManagement{}}
+\label{sec:COMPdataPartManagement}
+
+\textbf{Komponenten-Name:} \COMPdataPartManagement{}.
+
+\textbf{Aufgabe:} Gewährt lesenden Zugriff auf Metadaten und Containerdaten und schreibenden Zugriff auf Metadaten auf Bit- und Byte-Ebene, allerdings werden die Daten in handlichen Portionen gemäß Datenformat-Spezifikation geliefert.
+
+\textbf{Kontrollierte Daten:} Ein Zugriff auf \TERMcontainer{}- und \TERMtag{}-Daten ist nur über diese Komponente erlaubt. Somit hat sie die Kontrolle über diese Daten. Lediglich \COMPmedia{} darf auf noch generischerer Ebene auf Daten externer Medien zugreifen. Tatsächlich nutzt \COMPdataPartManagement{}  \COMPmedia{} für das Lesen und Schreiben.
+
+\textbf{Abhängig von \COMPmedia{}:} \COMPdataPartManagement{} muss Datenpakete von Medien lesen oder auf diese Schreiben. Dazu nutzt es \COMPmedia{}.
+
+\textbf{Abhängig von \COMPdataFormatManagement{}:} Das Lesen und Schreiben der Daten erfolgt anhand von Format-Spezifikationen, die durch \COMPdataFormatManagement{} geliefert werden.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPdataFormatManagement{}}
+\label{sec:COMPdataFormatManagement}
+
+\textbf{Komponenten-Name:} \COMPdataFormatManagement{}.
+
+\textbf{Aufgabe:} Verwaltet die konkreten Datenformat-Definitionen aller unterstützten Metadaten- und Container-Formate.
+
+\textbf{Kontrollierte Daten:} Hat Kontrolle über die Datenformat-Definitions-Daten.
+
+\textbf{Abhängig von:} Keinen anderen Komponenten.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPmedia{}}
+\label{sec:COMPmediumAccess}
+
+\textbf{Komponenten-Name:} \COMPmedia{}.
+
+\textbf{Aufgabe:} Bietet Primitive für den Zugriff auf physische Medien an.
+
+\textbf{Kontrollierte Daten:} Daten von externen Medien dürfen nur über diese Komponente zugegriffen und manipuliert werden.
+
+\textbf{Abhängig von:} Keinen anderen Komponenten.
+
+%-----------------------------------------------------------------------------------------------
+%		Komponenten des Subsystems \SUBSTechBase{}
+%-----------------------------------------------------------------------------------------------
+
+\section{Komponenten des Subsystems \SUBSTechBase{}}
+\label{sec:KompTB}
+
+Die folgende Abbildung zeigt die Komponenten des Subsystems \SUBSTechBase{}.
+\OpenIssue{Tech Base subsystem Abbildung}{}
+%\begin{figure}[H]
+	%\centering
+		%\includegraphics[width=1.00\textwidth]{Figures/Part_III/III_1_SUBSTechBase.pdf}
+	%\caption{Komponenten des Subsystems \SUBSTechBase{}}
+	%\label{fig:CompTB}
+%\end{figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPextensionManagement{}}
+\label{sec:COMPextensionManagement}
+
+\textbf{Komponenten-Name:} \COMPextensionManagement{}.
+
+\textbf{Aufgabe:} Verwaltet alle Erweiterungen von \LibName{}, d.h. laden, verifizieren und Auslesen von Informationen zu jeder Erweiterung.
+
+\textbf{Kontrollierte Daten:} Beschreibungsdaten der Erweiterungen können nur über diese Komponente geladen werden.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPlogging{}}
+\label{sec:COMPlogging}
+
+\textbf{Komponenten-Name:} \COMPlogging{}.
+
+\textbf{Aufgabe:} Bietet Primitive zum Ausgeben von Logging-Informationen.
+
+\textbf{Kontrollierte Daten:} Logging-Konfiguration.
+
+\textbf{Abhängig von:} Keiner anderen Komponente.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPutility{}}
+\label{sec:COMPutility}
+
+\textbf{Komponenten-Name:} \COMPutility{}.
+
+\textbf{Aufgabe:} Bietet diverse (technische) Querschnittsfunktionen, die von allen anderen Komponenten regelmäßig benötigt werden, z.B. Hilfsfunktionen zur Umsetzung von design-by-contract.
+
+\textbf{Kontrollierte Daten:} Keine.
+
+\textbf{Abhängig von:} Keiner anderen Komponente.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\COMPcomponentRegistry{}}
+\label{sec:COMPcomponentRegistry}
+
+\textbf{Komponenten-Name:} \COMPcomponentRegistry{}.
+
+\textbf{Aufgabe:} Technische Komponente mit Service-Locator-Funktionalität zum Abfragen der Implementierungen von Interfaces anderer Komponenten.
+
+\textbf{Kontrollierte Daten:} Konfiguration von Komponenten, Interfaces und ihren Implementierungen.
+
+\textbf{Abhängig von:} Keiner anderen Komponente.
+
+%-----------------------------------------------------------------------------------------------
+%		Erweiterungen (Subsystem \SUBSExtension{})
+%-----------------------------------------------------------------------------------------------
+
+\section{Erweiterungen (Subsystem \SUBSExtension{})}
+\label{sec:KompExt}
+
+Eine \emph{Erweiterung} fasst formatspezifische Inhalte zu einem oder mehreren Datenformaten zusammen. Je Datenformat, dass die Erweiterung definiert, sind dies (vergleiche \DesLink{dd:101}, \DesLink{dd:102} und \DesLink{dd:103}):
+\begin{itemize}
+	\item Eine Datenformat-Spezifikation, welche die Datenblöcke des Datenformats und deren Aufbau und Zusammenhang untereinander definiert
+	\item Eine API, welche Komfortfunktionen und Konstanten zum Arbeiten mit dem Datenformat (z.B. Erzeugen von Datenblöcken usw.) bietet
+	\item Die API enthält insbesondere die Datenformat-Kennung, die der Anwender von \LibName{} auch beim Arbeiten mit \SUBSHighLevel{} und \SUBSLowLevel{}verwenden kann.
+	\item Implementierungs-Erweiterungen für \SUBSLowLevel{}, welche den Parse- und Schreibevorgang beeinflussen. Mit diesem Mechanismus kann ein Datenformat den in \SUBSLowLevel{} definierten Standard-Parse- und Schreibe-Algorithmus erweitern oder überschreiben.
+\end{itemize}
+
+Die Frage ist nun: Wie korrespondiert der Begriff der Erweiterung mit dem eines Subsystems und einer Komponente? 
+Eine einzelne konkrete Erweiterung wurde oben bereits als Subsystem eingeführt. Sie besteht also aus mehreren Komponenten. Genauer sollte je enthaltenem Datenformat je eine Komponente im Sinne von \DesLink{dd:003} enthalten sein. Jede Komponente enthält die oben definierten API- und Implementierungsanteile. 
+Für die interne Gestaltung der Erweiterung ist freilich der Implementierer der Erweiterung verantwortlich. Jedoch lassen sich Richtlinien für die innere Strukturierung einer Erweiterung definieren, die sich im Wesentlichen an den Richtlinien der \LibName{}-Kernimplementierung orientieren. 
+
+Unterschiedliche Erweiterungen haben i.d.R. nichts miteinander zu tun und sollten sich wie für Komponenten üblich maximal über ihre Schnittstellen gegenseitig aufrufen. 
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

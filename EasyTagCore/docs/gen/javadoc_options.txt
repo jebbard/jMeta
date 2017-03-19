@@ -1,0 +1,20 @@
+-sourcepath ../../src;../../../EasyTagCore_Interface/src;../../../EasyTagCore_Export/src;../../../EasyTagExt_DefaultBundle/src;../../../EasyTagExt_DefaultBundleInterface/src;../../../../../01_General/02_Libraries/ComponentRegistry/ComponentRegistry/src;../../../../../01_General/02_Libraries/JavaUtils/Utility/src;
+-classpath E:\Programmieren\01_Java\01_JDKs\java6_0_25\lib\tools.jar
+-author
+-version
+-private
+-subpackages de.je.jmeta:de.je.registry:de.je.utils
+-exclude de.je.util.testUtil.testfile:de.je.util.common.time.incubation
+-breakiterator
+-umlautogen
+-docletpath E:\Programmieren\01_Java\03_Workspaces\01_General\02_Libraries\JavaUtils\CommonLibs\yworks\lib\ydoc.jar;E:\Programmieren\01_Java\03_Workspaces\01_General\02_Libraries\JavaUtils\CommonLibs\yworks\resources\;../../bin;../../../EasyTagCore_Interface/bin;../../../EasyTagCore_Export/bin;../../../EasyTagExt_DefaultBundle/bin;../../../EasyTagExt_DefaultBundleInterface/bin;../../../../../01_General/02_Libraries/ComponentRegistry/ComponentRegistry/bin;../../../../../01_General/02_Libraries/JavaUtils/Utility/bin;
+-doclet ydoc.doclets.YStandard
+-tagletpath ../../../../../01_General/02_Libraries/JavaUtils/JavadocHelpers/bin
+-taglet de.je.util.testUtil.taglet.PreTaglet
+-taglet de.je.util.testUtil.taglet.PostTaglet
+-tag params
+-tag pre
+-tag post
+-tag return
+-tag throws
+-verbose

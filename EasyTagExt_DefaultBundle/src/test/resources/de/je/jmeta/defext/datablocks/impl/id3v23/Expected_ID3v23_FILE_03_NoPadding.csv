@@ -1,0 +1,32 @@
+DataFormat;Id;Sequ_No;Parent_Row_Index;Exp_Block_Size;Exp_Field_Interpreted_Value;Exp_Failed_Field_Conv_Charset;Exp_Failed_Field_Conv_ByteOrder;Container_Backward_Readable;Comment
+ID3v2.3;id3v23;0;;115;;;;;Whole tag
+ID3v2.3;id3v23.header;0;1;10;;;;;header
+ID3v2.3;id3v23.payload;0;1;105;;;;;payload
+ID3v2.3;id3v23.header.id;0;2;3;ID3;;;;
+ID3v2.3;id3v23.header.version;0;2;2;{3,0,};;;;
+ID3v2.3;id3v23.header.flags;0;2;1;;;;;No flags are set
+ID3v2.3;id3v23.header.size;0;2;4;105;;;;
+ID3v2.3;id3v23.payload.TPE1;0;3;27;;;;;container
+ID3v2.3;id3v23.payload.TIT2;0;3;59;;;;;container
+ID3v2.3;id3v23.payload.TRCK;0;3;19;;;;;container
+ID3v2.3;id3v23.payload.TPE1.header;0;8;10;;;;;tpe1 start
+ID3v2.3;id3v23.payload.TPE1.payload;0;8;17;;;;;
+ID3v2.3;id3v23.payload.TPE1.header.id;0;11;4;TPE1;;;;
+ID3v2.3;id3v23.payload.TPE1.header.size;0;11;4;17;;;;
+ID3v2.3;id3v23.payload.TPE1.header.flags;0;11;2;;;;;No flags are set
+ID3v2.3;id3v23.payload.TPE1.payload.textEncoding;0;12;1;UTF-16;;;;
+ID3v2.3;id3v23.payload.TPE1.payload.information;0;12;16;E-Rick;;;;tpe1 end
+ID3v2.3;id3v23.payload.TIT2.header;0;9;10;;;;;tit2 start
+ID3v2.3;id3v23.payload.TIT2.payload;0;9;49;;;;;
+ID3v2.3;id3v23.payload.TIT2.header.id;0;18;4;TIT2;;;;
+ID3v2.3;id3v23.payload.TIT2.header.size;0;18;4;49;;;;
+ID3v2.3;id3v23.payload.TIT2.header.flags;0;18;2;;;;;No flags are set
+ID3v2.3;id3v23.payload.TIT2.payload.textEncoding;0;19;1;UTF-16;;;;
+ID3v2.3;id3v23.payload.TIT2.payload.information;0;19;48;Time For The Real Shit;;;;tit2 end
+ID3v2.3;id3v23.payload.TRCK.header;0;10;10;;;;;trck start
+ID3v2.3;id3v23.payload.TRCK.payload;0;10;9;;;;;
+ID3v2.3;id3v23.payload.TRCK.header.id;0;25;4;TRCK;;;;
+ID3v2.3;id3v23.payload.TRCK.header.size;0;25;4;9;;;;
+ID3v2.3;id3v23.payload.TRCK.header.flags;0;25;2;;;;;No flags are set
+ID3v2.3;id3v23.payload.TRCK.payload.textEncoding;0;26;1;UTF-16;;;;
+ID3v2.3;id3v23.payload.TRCK.payload.information;0;26;8;A2;;;;trck end

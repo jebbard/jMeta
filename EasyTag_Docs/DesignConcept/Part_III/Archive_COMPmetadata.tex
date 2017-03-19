@@ -1,0 +1,95 @@
+%===============================================================================================
+%		\COMPmetadata{} Design
+%===============================================================================================
+
+\chapter{\COMPmetadata{} Design}
+\label{sec:COMPmetadataImplementationDesign}
+
+This chapter describes the most important features of the \COMPmetadata{} component in a brief way. Generally, all details and most recent state can be found in the javadoc of the component's classes.
+
+%-----------------------------------------------------------------------------------------------
+%		Interface Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\section{Interface Layer Design}
+\label{sec:InterfaceDesignCOMPmetadata}
+
+The following figure shows the static class diagram of the component \COMPmetadata{}. The dynamics are shown in \SectionLink{sec:ImplementationDesignCOMPmetadata}:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_InterfaceCOMPmetadata.pdf}
+	\caption{Interface class diagram of the component \COMPmetadata{}}
+	\label{fig:V_4_InterfaceCOMPmetadata}
+\end{figure}
+
+The design is oriented on the domain model.
+
+%-----------------------------------------------------------------------------------------------
+%		Export Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\section{Export Layer Design}
+\label{sec:ExportDesignCOMPmetadata}
+
+There is no export layer for the \COMPmetadata{} component.
+
+%-----------------------------------------------------------------------------------------------
+%		Implementation Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\section{Implementation Layer Design}
+\label{sec:ImplementationDesignCOMPmetadata}
+
+The following figure shows the static class diagram of the component \COMPmetadata{}. The dynamics are shown in \SectionLink{sec:ImplementationDesignCOMPmetadata}:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ImplementationCOMPmetadata.pdf}
+	\caption{Implementation class diagram of the component \COMPmetadata{}}
+	\label{fig:V_4_ImplementationCOMPmetadata}
+\end{figure}
+
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Steps of \UCreadMetadata{}}
+\label{sec:StepsOfUCreadMetadata}
+
+The basic steps of \UCreadMetadata{} are as follows:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ReadingMetadata.pdf}
+	\caption{Schematic flow of the use case \UCreadMetadata{}}
+	\label{fig:V_4_ReadingMetadata.pdf}
+\end{figure}
+
+The basic flow is very similar, except that \TERMtag{}s might be stored anywhere, therefore location information can be specified as hints for searching, additionally. Similarly, the detailed steps of the use case differ a little bit:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ReadingMetadataDetailed.pdf}
+	\caption{Schematic flow of the use case \UCreadMetadata{} - detailed}
+	\label{fig:V_4_ReadingMetadataDetailed.pdf}
+\end{figure}
+
+A variation for \TERMtag{}s is that their locations might be specified as offset or file location, e.g. for ID3v1 or ID3v2, or as ``somewhere in a container format'' as e.g. for Matroska \TERMtag{}s, RIFF INFO \TERMtag{}s or the Vorbis Comment.
+
+%-----------------------------------------------------------------------------------------------
+%		ID3v2 implementation
+%-----------------------------------------------------------------------------------------------
+
+\section{ID3v2 implementation}
+\label{sec:ID3v2implementation}
+
+
+
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

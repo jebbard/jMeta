@@ -1,0 +1,45 @@
+DataFormat;Id;Sequ_No;Parent_Row_Index;Exp_Block_Size;Exp_Field_Interpreted_Value;Exp_Failed_Field_Conv_Charset;Exp_Failed_Field_Conv_ByteOrder;Container_Backward_Readable;Comment
+APEv2;apev2;0;;206;;;;true;Tag is backward readable
+APEv2;apev2.header;0;1;32;;;;;
+APEv2;apev2.payload;0;1;142;;;;;
+APEv2;apev2.footer;0;1;32;;;;;
+APEv2;apev2.header.preample;0;2;8;APETAGEX;;;;
+APEv2;apev2.header.versionNumber;0;2;4;2000;;;;
+APEv2;apev2.header.tagSize;0;2;4;174;;;;
+APEv2;apev2.header.itemCount;0;2;4;4;;;;
+APEv2;apev2.header.tagFlags;0;2;4;This is the header&&Tag contains header;;;;
+APEv2;apev2.header.reserved;0;2;8;{0,}*8;;;;
+APEv2;apev2.payload.MP3GAIN_MINMAX;0;3;30;;;;;
+APEv2;apev2.payload.MP3GAIN_MINMAX.header;0;11;23;;;;;
+APEv2;apev2.payload.MP3GAIN_MINMAX.header.size;0;12;4;7;;;;
+APEv2;apev2.payload.MP3GAIN_MINMAX.header.flags;0;12;4;;;;;No flags are set
+APEv2;apev2.payload.MP3GAIN_MINMAX.header.key;0;12;15;MP3GAIN_MINMAX;;;;
+APEv2;apev2.payload.MP3GAIN_MINMAX.payload;0;11;7;;;;;
+APEv2;apev2.payload.MP3GAIN_MINMAX.payload.value;0;16;7;111,181;;;;
+APEv2;apev2.payload.MP3GAIN_UNDO;0;3;32;;;;;
+APEv2;apev2.payload.MP3GAIN_UNDO.header;0;18;21;;;;;
+APEv2;apev2.payload.MP3GAIN_UNDO.header.size;0;19;4;11;;;;
+APEv2;apev2.payload.MP3GAIN_UNDO.header.flags;0;19;4;;;;;No flags are set
+APEv2;apev2.payload.MP3GAIN_UNDO.header.key;0;19;13;MP3GAIN_UNDO;;;;
+APEv2;apev2.payload.MP3GAIN_UNDO.payload;0;18;11;;;;;
+APEv2;apev2.payload.MP3GAIN_UNDO.payload.value;0;23;11;+001,+001,N;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_GAIN;0;3;42;;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_GAIN.header;0;25;30;;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_GAIN.header.size;0;26;4;12;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_GAIN.header.flags;0;26;4;;;;;No flags are set
+APEv2;apev2.payload.REPLAYGAIN_TRACK_GAIN.header.key;0;26;22;REPLAYGAIN_TRACK_GAIN;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_GAIN.payload;0;25;12;;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_GAIN.payload.value;0;30;12;-10.52500 dB;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_PEAK;0;3;38;;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_PEAK.header;0;32;30;;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_PEAK.header.size;0;33;4;8;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_PEAK.header.flags;0;33;4;;;;;No flags are set
+APEv2;apev2.payload.REPLAYGAIN_TRACK_PEAK.header.key;0;33;22;REPLAYGAIN_TRACK_PEAK;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_PEAK.payload;0;32;8;;;;;
+APEv2;apev2.payload.REPLAYGAIN_TRACK_PEAK.payload.value;0;37;8;0.923079;;;;
+APEv2;apev2.footer.preample;0;4;8;APETAGEX;;;;
+APEv2;apev2.footer.versionNumber;0;4;4;2000;;;;
+APEv2;apev2.footer.tagSize;0;4;4;174;;;;
+APEv2;apev2.footer.itemCount;0;4;4;4;;;;
+APEv2;apev2.footer.tagFlags;0;4;4;Tag contains header;;;;
+APEv2;apev2.footer.reserved;0;4;8;{0,}*8;;;;

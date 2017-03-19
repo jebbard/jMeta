@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsi:schema xmlns="www.easytag.de/XMLSchema_v1_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema" targetNamespace="www.easytag.de/XMLSchema_v1_0">
+
+	<!-- Root element -->
+	<xsi:element name="ExtensionPointsConfiguration" type="ExtensionPointsConfigurationType"/>
+
+	<!-- Description of whole configuration -->
+	<xsi:complexType name="ExtensionPointsConfigurationType">
+		<xsi:all>
+			<xsi:element name="ExtensionBundleSearchPath" type="ExtensionBundleSearchPathType" maxOccurs="1" minOccurs="1"/>
+			<xsi:element name="ExtensionPoints" type="ExtensionPointsType" maxOccurs="1" minOccurs="1"/>
+		</xsi:all>
+		<!-- For detecting version compliance problems -->
+		<xsi:attribute name="version" type="xsi:string" use="required"/>
+	</xsi:complexType>
+
+	<!-- Description of an extension paths group -->
+	<xsi:complexType name="ExtensionBundleSearchPathType">
+		<xsi:sequence>
+			<xsi:element name="Path" type="xsi:string" minOccurs="1" maxOccurs="unbounded"/>
+		</xsi:sequence>
+	</xsi:complexType>
+
+	<!-- Description of available extension points -->
+	<xsi:complexType name="ExtensionPointsType">
+		<xsi:sequence>
+			<xsi:element name="ExtensionPoint" type="ExtensionPointType" minOccurs="1" maxOccurs="unbounded"/>
+		</xsi:sequence>
+	</xsi:complexType>
+
+	<!-- Description of a single extension point -->
+	<xsi:complexType name="ExtensionPointType">
+		<xsi:all>
+			<xsi:element name="ExtensionInterface" type="xsi:string" minOccurs="1" maxOccurs="1"/>
+			<xsi:element name="ComponentName" type="xsi:string" minOccurs="1" maxOccurs="1"/>
+		</xsi:all>
+		<xsi:attribute name="id" type="xsi:ID" use="required"/>
+	</xsi:complexType>
+
+</xsi:schema>

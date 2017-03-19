@@ -1,0 +1,176 @@
+
+% Document class
+% LaTeX2e instead of 2.09
+
+\documentclass[english,		% english text
+					11pt,			% fontsize 11 pt
+					openright,	% new chapters start on right page
+					onecolumn,	% text covers one column
+					titlepage,	% use title page
+					twoside,		% margins change for left and right page
+					a4paper,		% DIN-A4
+					pdftex	]		
+					{scrbook}
+
+
+%***********************************************************************************************%***********************************************************************************************
+%
+%		Packages
+%
+%***********************************************************************************************%***********************************************************************************************
+
+% To include graphics and figures into the document
+\usepackage[pdftex] {graphicx}
+
+% For changeing margin settings
+\usepackage {vmargin}
+
+% For defining colors
+\usepackage {color}
+
+% Better mathematical formulas
+\usepackage {amsmath}
+
+% For including arbitrary documtens
+\usepackage{moreverb}
+
+% More on figures
+\usepackage{float}
+
+% Headers and footers
+\usepackage{fancyhdr}
+
+% Hyperlinking
+\usepackage[colorlinks, backref, linkcolor=blue, citecolor=green,%
+	plainpages=false,pdfpagelabels] {hyperref}
+
+% Tables in breadth-first format
+\usepackage{longtable}
+\usepackage{rotating}
+
+% For list of open issues
+\usepackage{makeidx}
+ 
+%***********************************************************************************************%***********************************************************************************************
+%
+%		Own environments and commands
+%
+%***********************************************************************************************%***********************************************************************************************
+
+
+\input {../Utility/StandardCommands}
+\input {../Utility/EnhancedCommands}
+
+
+%***********************************************************************************************%***********************************************************************************************
+%
+%		Global formatting options
+%
+%***********************************************************************************************%***********************************************************************************************
+
+\input {../Utility/StandardFormat}
+
+\makeindex{}
+
+%###############################################################################################%###############################################################################################
+%
+%		Document start
+%
+%###############################################################################################%###############################################################################################
+
+\begin{document}
+
+
+\frontmatter{}
+
+%===============================================================================================%		Definitions
+%===============================================================================================
+
+\newcommand{\LibName}{jTagUtils}
+\newcommand{\LibVersion}{1.0}
+\newcommand{\JavaVersion}{Java 5}
+\newcommand{\LibMainFolder}{\LibName{}-\LibVersion{}}
+\newcommand{\LibDownloadJar}{\LibName{}-\LibVersion{}.jar}
+\newcommand{\LibMainJar}{\LibName{}.jar}
+
+\newcommand{\COMtitle}{\LibName{} \LibVersion{} \-- User Guide}
+
+%===============================================================================================%		Title
+%===============================================================================================
+
+\input{../Utility/StandardTitle}
+\COMMclear{}
+
+%===============================================================================================%		Indices
+%===============================================================================================
+
+% Table of contents
+\tableofcontents
+\COMMclear{}
+
+% Table of figures
+\addcontentsline{toc}{chapter}{List of figures}
+\listoffigures
+\COMMclear{}
+
+% List of open issues
+\renewcommand{\indexname}{Index of open issues}
+\addcontentsline{toc}{chapter}{Index of open issues}
+\printindex
+\COMMclear{}
+
+% List of tables
+\addcontentsline{toc}{chapter}{List of tables}
+\listoftables
+\COMMclear{}
+
+%===============================================================================================%		Main matter
+%===============================================================================================
+
+\mainmatter{}
+
+% Mit arabischen Ziffern weiter nummerieren
+\pagenumbering{arabic}
+
+%-----------------------------------------------------------------------------------------------%		Introduction
+%-----------------------------------------------------------------------------------------------
+
+\input{Introduction/Introduction}
+
+%===============================================================================================%		Part 1: Guide for Library Users
+%===============================================================================================
+
+\part{Guide for Library Users}
+\input{Part_I/GuideForLibraryUsers}
+
+%===============================================================================================%		Part 2: Guide for Library Extenders
+%===============================================================================================
+
+\part{Guide for Library Extenders}
+\input{Part_II/GuideForLibraryExtenders}
+
+%===============================================================================================%		Part 3: Usage Examples
+%===============================================================================================
+
+\part{Usage Examples}
+\input{Part_III/UsageExamples}
+
+%===============================================================================================%		Appendix
+%===============================================================================================
+
+
+%-----------------------------------------------------------------------------------------------%		Bibliography
+%-----------------------------------------------------------------------------------------------
+\input {Appendices/Literature}
+
+\end{appendix}	
+
+\end{document}
+
+
+
+%###############################################################################################%###############################################################################################
+%
+%		Document end
+%
+%###############################################################################################%###############################################################################################

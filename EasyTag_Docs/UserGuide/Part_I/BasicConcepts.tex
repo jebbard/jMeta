@@ -1,0 +1,208 @@
+%===============================================================================================
+%		Basic Concepts and Design Guidelines
+%===============================================================================================
+
+\chapter{Basic Concepts and Design Guidelines}
+\label{sec:BasicConceptsAndDesignGuidelines}
+
+This chapter sketches basic guidelines that were applied to the library architecture. This helps to understand basic usability aspects of the library.\footnote{Not to say that we try to adhere to design principles, and yes, there are also a lot of patterns in the library design, where useful. Some of those design principles are mentioned in the following if they have major impact on library design.}
+
+The presented guidelines should also be applied when extending the library.
+
+%-----------------------------------------------------------------------------------------------
+%		General Guidelines
+%-----------------------------------------------------------------------------------------------
+
+\section{General Guidelines}
+\label{sec:GeneralGuidelines}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Less is More}
+\label{sec:LessIsMore}
+
+The library should be as narrow as possible yet providing all necessary functionality. Advantages are clear: Easier to understand and learn, better to maintain and extend etc.
+
+The "`less is more"' guideline appears in some places:
+\begin{itemize}
+	\item We tried to make this concept as small as possible. You can judge if we succeeded or failed.
+	\item We took the smallest possible number of classes and interfaces to provide the core library functionality. The extensions also do their best here. If possible, we hide any internal methods or classes from the library user.
+	\item There are no fat interfaces and no redundant methods. Special requests can most of the time be realised using a combination of existing methods. E.g. removing a single attribute is done by first getting all attributes, removing the attribute from the collection and then write all attributes again.
+	\item We tried to use only a few third party libraries to minimize the dependencies. In fact, we only use the ComponentRegistry library which is written by ourselves. This library itself uses JAXB.
+	\item Minimum library footprint in terms of memory use (singleton implementations) as well as hard disk space requirements. We also do not clutter any registry, common folders or environment variables.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Interfaces Do the Work}
+\label{sec:InterfacesDotheWork}
+
+The following types of classes can be seen when using \LibName{}:
+\begin{itemize}
+	\item Interfaces do all the real work such as storing, retrieving or calculating something.
+	\item Classes are basically only used for data types or extendable enumerations. A data type is just a comfortable data carrier without any transactional functionality. An enumeration instance a representation of a specific value for an enumerated data type.
+	\item Exceptions do only occur in terms of runtime exceptions to raise a serious error condition.
+\end{itemize}
+
+Interfaces often provide access to other interfaces, sometimes in the form of a factory.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Abstraction}
+\label{sec:Abstraction}
+
+When using \LibName{}, you are only working with abstractions instead of implementations. As mentioned in the previous section, the real work is done with Java interfaces. A dynamic class loading mechanism combined with the service locator pattern ensures that you are completely decoupled from implementations.
+
+All interfaces achieve a level of abstraction that the 80 percent cases of common usage can be done using the library core. The differences between various tag formats are hidden behind the single interface \IFTagAccessor{}, that provides a lot of functionality although having a narrow API.
+
+If you only need the 80 percent use case, then there is no need to write new code or change existing code if a new tag format appears at the horizon. You only need an extension for \LibName{} that provides the tag format implementation. Even if you are interested in the 20 percent use cases, e.g. specific ID3v2.3 functionality, you are programming against interfaces rather than concrete classes.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Provide Full Data Access}
+\label{sec:ProvideFullDataAccess}
+
+Most of the time you are satisfied with just getting those high-level data types the library returns. Sometimes you might also be interested in the raw byte data lying in your file or coming from an audio stream. \LibName{} does not hinder you from retrieving those raw bytes. Instead, there are methods that return the raw bytes of a whole tag or attribute.
+
+Sometimes a tag format specification is of such detail and feature richness \-- such as ID3v2.3 \-- that its simply not possible to implement all the stuff someone had in mind when writing those overloaded specification documents. In such cases, you can go ahead with the raw byte data and build your library layer that implements these features. But first be sure to check the feature matrix as presented in \hyperref[]{~\ref{}}.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{No Additional Buffering for Files}
+\label{sec:NoAdditionalBufferingforFiles}
+
+When reading meta data from files, \LibName{} does no additional buffering of data, as tags are usually not big enough that this could be useful. Furthermore, operating system and Java might already do some buffering behind the scences, you never know. To avoid an additional degree of complexity and potential source of errors, we omitted a buffering scheme. In turn this means that every method call that reads something from or writes something to a tag directly accesses the file on disk.
+
+If your application has to manage thousands of audio files with tags, you anyway would have to implement some buffering in some way. Most of the time the GUI will do the buffering by just load the stuff once into its models.
+
+\OpenIssue{Large Files}{Include large files into first considerations}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Files are Locked During Access}
+\label{sec:FilesareLockedDuringAccess}
+
+In the time span in which an instance of \IFTagAccessor{} is associated with a specific file, this file is completely locked for other processes. If you need to unlock the file, you have to associate the \IFTagAccessor{} with a different file or close the underlying \IFDataAccessor{}.
+
+This has the advantage that nobody else can manipulate the file while \LibName{} is using it.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Not Thread-Safe}
+\label{sec:NotThreadSafe}
+
+\LibName{} is not thread-safe. You have to ensure thread-safeness yourself.
+
+%-----------------------------------------------------------------------------------------------
+%		Error Handling and Preconditions
+%-----------------------------------------------------------------------------------------------
+
+\section{Error Handling and Preconditions}
+\label{sec:ErrorHandlingAndPreconditions}
+
+Error handling is done like this:
+\begin{itemize}
+	\item If the value of a method argument is incorrect, e.g. null or out of range, an \texttt{IllegalArgumentException} is thrown with a concrete description of the problem. For each method parameter, the javadoc specifies what the correct values are. The caller is responsible for passing correct argument values, otherwise it is a programming error. An argument value is also considered as incorrect if some of its methods returns an unexpected value. E.g. \texttt{f.exists() == true} is a common precondition for \texttt{File}s.
+	\item For technical errors, a derived \texttt{RuntimeException} is thrown. See in a minute what a technical error is
+	\item If a precondition is violated, a \EXCEPTPreconditionException{} is thrown. See in a minute what a precondition is
+	\item For violations of the tag specification, a user-defined error handler is called. See \hyperref[]{~\ref{}} for details.
+	\item When reading a tag with incorrect format, error corrections may be done. This is also notified to the user via the same mechanism as tag specification violations. See \hyperref[]{~\ref{}} for details.
+\end{itemize}
+
+\OpenIssue{Format-Verletzung}{Ist es immer möglich, diese zu erkennen und zu korrigieren? Welche Arten gibt es? Soll wirklich der gleiche Meldungsmechanismus verwendet werden wie bei Tag-Spec-Violation?}
+
+\OpenIssue{Spezifikations-Verletzung}{Wann ist es eine Spez-Verletzung und wann eine echte Fehlerbedingung (kann net weitermachen)?}
+
+Here, we only discuss technical errors and preconditions more detailed.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Exception Overview}
+\label{sec:ExceptionOverview}
+
+Find a description of all runtime exceptions that originate from the \LibName{} core in the listing below. Note that \LibName{} does not use checked exceptions because either preconditions or runtime exceptions are used depending on the kind of error conditions.
+
+\begin{table}[H]
+	\centering
+		\begin{tabular}{|l|l|}
+			\hline
+				\textbf{\LibName{} Exception}
+				& 
+				\textbf{Description}\\
+			\hline
+
+				&
+\\
+			\hline
+		\end{tabular}
+	\caption{}
+	\label{tab:Beschreibung}
+\end{table}
+
+\OpenIssue{Complete table}{Check if something is missing or has changed in this table}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Null Values}
+\label{sec:NullValues}
+
+null objects are strictly avoided within \LibName{}. In most cases, passing a null object to a method results in an \texttt{IllegalArgumentException}. This is not documented within the javadoc but rather a rule of thumb. If a method should explicitly allow null values, this is documented in the javadoc for the corresponding argument.
+
+The same holds true for method return values. Methods returning collections or arrays will always return empty collections or arrays instead of null. If null should be a valid return value, then it is explicitly specified in the javadoc.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Techical Errors}
+\label{sec:TechicalErrors}
+
+One can refer to a technical error as a lost database or server connection, an out-of-memory condition or an HD crash that does not allow writing files. However, it strongly depends on the domain how one defines a technical or a more business-related error.
+
+The basic properties of a technical error are:
+\begin{itemize}
+	\item Is expected to occur very seldom
+	\item User cannot handle or correct it in a reasonable way\footnote{A combination of logging, program termination or retry is a good way, but done usually internally, not by the user. It is of course not always necessary or possible to terminate the whole application.}
+	\item May be an error critical to the whole application or only to a part of it. It is sometimes possible to skip an element that causes the error and go on with the next one
+\end{itemize}
+
+As already said, \LibName{}'s reaction to a technical error is throwing an exception that derives from java.lang.RuntimeException. Be aware of the fact that Java, third party libaries or new extensions might also cause additional runtime exceptions.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Handling Technical Errors}
+\label{sec:HandlingTechnicalErrors}
+
+The possible runtime exceptions for a method are not documented. You can never be sure which one you might get. Often those exceptions are strongly implementation-specific, therefore might change and reveal implementation details. Not to say that other runtime exceptions thrown by called Java code or third party libraries are always possible. 
+
+In your application, you always should be sure to have a "`catch all"' statement somewhere that hinders your application from just crashing. This statement will track the exception and make note of it to the user, either via a dialog or a log entry.
+
+Each runtime exception directly caused by \LibName{} adds a US english message to the exception that directly points to the error. You can use the \texttt{getMessage()} method to get this message to display.
+
+How to proceed the application after the technical error? This strongly depends on the kind of error. Your application should allow the user to recognize the action or the object which caused the exception. E.g. when trying to write a tag and getting a file acess error, the exception message will point to the file where this ocurred. This way the user can unselect the file and do the action for other files instead or fix the problem before retrying. Here, it would be unnecessary to terminate the application.
+
+If any other error than the \LibName{} defined runtime exceptions occur, you should notify the user to store all settings (if possible) and terminate the application rather than directly shutting it down.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Preconditions}
+\label{sec:Preconditions}
+
+A precondition specifies a necessary object state that must be fulfilled to be able to call a method on the object. If that state is not established, the method call fails with an error. The user is able to and responsible for establishing the precondition. Furthermore the user can check if the required state is established beforehand.
+
+In \LibName{}, method argument ranges are not seen as preconditions. Preconditions are state conditions on the object the user currently calls a method for.  Typical preconditions are something like "`object with the given id must exist"', "`tag must exist"' etc. It is not always easy to decide what a precondition and what an illegal argument value is. E.g. the check "`id given as argument value must be known to the object"' is a precondition rather than an illegal argument value because it is related to the object's current state. Whenever a check is related to the objects current state and not only to arguments and static constants, it is treated as a precondition.
+
+Each precondition can be checked directly in the client code before calling the method. The javadoc for each \LibName{} method defines each precondition for a method with a @pre tag that also directly tells how to check the precondition beforehand. It also contains a less technical description of the precondition. Each method first checks if all of its preconditions apply. If so, it continues with its usual flow, otherwise it throws a \EXCEPTPreconditionException{}. The exception contains a textual information pointing to the violated precondition.
+
+Note that constructors cannot have preconditions.
+
+See an example below:
+
+\OpenIssue{Add example}{Add example}
+\OpenIssue{Explicitly define preconditions when designing}{In Kommentaren der Methoden. Aber auf jeden Fall muss es eine passende Methode \emph{am Objekt} geben!}
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

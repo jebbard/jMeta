@@ -1,0 +1,32 @@
+DataFormat;Id;Sequ_No;Parent_Row_Index;Exp_Block_Size;Exp_Field_Interpreted_Value;Exp_Failed_Field_Conv_Charset;Exp_Failed_Field_Conv_ByteOrder;Container_Backward_Readable;Comment
+Lyrics3v2;lyrics3v2;0;;162;;;;true;Whole tag (is backward readable)
+Lyrics3v2;lyrics3v2.header;0;1;11;;;;;header
+Lyrics3v2;lyrics3v2.payload;0;1;136;;;;;payload
+Lyrics3v2;lyrics3v2.footer;0;1;15;;;;;footer
+Lyrics3v2;lyrics3v2.header.id;0;2;11;LYRICSBEGIN;;;;
+Lyrics3v2;lyrics3v2.payload.IND;0;3;10;;;;;container
+Lyrics3v2;lyrics3v2.payload.EAL;0;3;48;;;;;container
+Lyrics3v2;lyrics3v2.payload.ETT;0;3;62;;;;;container
+Lyrics3v2;lyrics3v2.payload.CRC;0;3;16;;;;;container
+Lyrics3v2;lyrics3v2.payload.IND.header;0;6;8;;;;;IND start
+Lyrics3v2;lyrics3v2.payload.IND.payload;0;6;2;;;;;
+Lyrics3v2;lyrics3v2.payload.IND.header.id;0;10;3;IND;;;;
+Lyrics3v2;lyrics3v2.payload.IND.header.size;0;10;5;2;;;;
+Lyrics3v2;lyrics3v2.payload.IND.payload.value;0;11;2;00;;;;IND end
+Lyrics3v2;lyrics3v2.payload.EAL.header;0;7;8;;;;;EAL start
+Lyrics3v2;lyrics3v2.payload.EAL.payload;0;7;40;;;;;
+Lyrics3v2;lyrics3v2.payload.EAL.header.id;0;15;3;EAL;;;;
+Lyrics3v2;lyrics3v2.payload.EAL.header.size;0;15;5;40;;;;
+Lyrics3v2;lyrics3v2.payload.EAL.payload.value;0;16;40;Voice Of The Butcher (The Remixes) Vinyl;;;;EAL end
+Lyrics3v2;lyrics3v2.payload.ETT.header;0;8;8;;;;;ETT start
+Lyrics3v2;lyrics3v2.payload.ETT.payload;0;8;54;;;;;
+Lyrics3v2;lyrics3v2.payload.ETT.header.id;0;20;3;ETT;;;;
+Lyrics3v2;lyrics3v2.payload.ETT.header.size;0;20;5;54;;;;
+Lyrics3v2;lyrics3v2.payload.ETT.payload.value;0;21;54;The Horrorist - Voice Of The Butcher (Moleculez Remix);;;;ETT end
+Lyrics3v2;lyrics3v2.payload.CRC.header;0;9;8;;;;;CRC start
+Lyrics3v2;lyrics3v2.payload.CRC.payload;0;9;8;;;;;
+Lyrics3v2;lyrics3v2.payload.CRC.header.id;0;25;3;CRC;;;;
+Lyrics3v2;lyrics3v2.payload.CRC.header.size;0;25;5;8;;;;
+Lyrics3v2;lyrics3v2.payload.CRC.payload.value;0;26;8;144A1C4C;;;;CRC end
+Lyrics3v2;lyrics3v2.footer.size;0;4;6;147;;;;
+Lyrics3v2;lyrics3v2.footer.id;0;4;9;LYRICS200;;;;

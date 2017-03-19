@@ -1,0 +1,78 @@
+%===============================================================================================
+%		Installation
+%===============================================================================================
+
+\chapter{Installation}
+\label{sec:Installation}
+
+%-----------------------------------------------------------------------------------------------
+%		Prerequisites
+%-----------------------------------------------------------------------------------------------
+
+\section{Prerequisites}
+\label{sec:Prerequisites}
+
+What you need to use \LibName{}:
+\begin{itemize}
+	\item Some kind of computer system inlcuding an operating system that can handle Java (details see table below)
+	\item A \JavaVersion{} JRE, either installed or a private JRE
+	\item Some zipped package reader to unzip the installation package
+	\item Your brain
+\end{itemize}
+
+\OpenIssue{Add operating system table}{Add operating system table showing all supported operating systems}
+
+%-----------------------------------------------------------------------------------------------
+%		Step-by-step Installation
+%-----------------------------------------------------------------------------------------------
+
+\section{Step-by-step Installation}
+\label{sec:StepByStepInstallation}
+
+\OpenIssue{Add web page}{Add web page for getting library package}.
+
+\begin{enumerate}
+	\item Get the latest \LibName{} package of version \LibVersion{} from (XYZ)
+	We recommend the stable version if you are an application developer using the library. There is just one package for all operating systems
+	\item Unzip the package into an arbitrary folder using Java's jar tool. The top level folder in the package is called \LibMainFolder{}. If the jar tool is on your path, then on the command line change to your destination folder and execute the following statement:
+			\texttt{jar xf \LibDownloadJar{}}
+\end{enumerate}
+
+\OpenIssue{Beispiel nachspielen}{Doppelklick unter Windows auch möglich?}
+
+%-----------------------------------------------------------------------------------------------
+%		Folder structure
+%-----------------------------------------------------------------------------------------------
+
+\section{Folder Structure}
+\label{sec:FolderStructure}
+
+The \LibName{} download package has the following folder structure:
+\begin{itemize}
+	\item lib: For all required jar files for the basic library
+	\item ext: For all required jar files for the library extensions
+	\item docs: Contains this document as well as the JavaDoc of the library.
+\end{itemize}
+
+The top level folder contains a readme file for further info and release notes.
+
+%-----------------------------------------------------------------------------------------------
+%		Library use
+%-----------------------------------------------------------------------------------------------
+
+\section{Libary use}
+\label{sec:LibaryUse}
+
+Make sure you have the following jar files of your recently unzipped download package on the classpath:
+\begin{itemize}
+	\item Basic functionality: The library functionality common to all tag formats
+	\item Extension functionality: The functionality of a specific library extension, e.g. if you want to use extended ID3v2.3 functionality, you need to link to the extension library jar file for ID3v2.3.
+\end{itemize}
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

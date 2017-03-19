@@ -1,0 +1,42 @@
+DataFormat;Id;Sequ_No;Parent_Row_Index;Exp_Block_Size;Exp_Field_Interpreted_Value;Exp_Failed_Field_Conv_Charset;Exp_Failed_Field_Conv_ByteOrder;Container_Backward_Readable;Comment
+ID3v2.3;id3v23;0;;2048;;;;;Whole tag
+ID3v2.3;id3v23.header;0;1;10;;;;;header
+ID3v2.3;id3v23.payload;0;1;2038;;;;;payload
+ID3v2.3;id3v23.header.id;0;2;3;ID3;;;;
+ID3v2.3;id3v23.header.version;0;2;2;{3, 0,};;;;
+ID3v2.3;id3v23.header.flags;0;2;1;;;;;No flags are set
+ID3v2.3;id3v23.header.size;0;2;4;2038;;;;
+ID3v2.3;id3v23.payload.TALB;0;3;73;;;;;container
+ID3v2.3;id3v23.payload.TPE1;0;3;31;;;;;container
+ID3v2.3;id3v23.payload.TIT2;0;3;39;;;;;container
+ID3v2.3;id3v23.payload.TRCK;0;3;19;;;;;container
+ID3v2.3;id3v23.payload.TALB.header;0;8;10;;;;;talb start
+ID3v2.3;id3v23.payload.TALB.payload;0;8;63;;;;;
+ID3v2.3;id3v23.payload.TALB.header.id;0;12;4;TALB;;;;
+ID3v2.3;id3v23.payload.TALB.header.size;0;12;4;63;;;;
+ID3v2.3;id3v23.payload.TALB.header.flags;0;12;2;;;;;No flags are set
+ID3v2.3;id3v23.payload.TALB.payload.data;0;13;63;*;;;;
+ID3v2.3;id3v23.payload.TPE1.header;0;9;10;;;;;tpe1 start
+ID3v2.3;id3v23.payload.TPE1.payload;0;9;21;;;;;
+ID3v2.3;id3v23.payload.TPE1.header.id;0;18;4;TPE1;;;;
+ID3v2.3;id3v23.payload.TPE1.header.size;0;18;4;21;;;;
+ID3v2.3;id3v23.payload.TPE1.header.flags;0;18;2;;;;;No flags are set
+ID3v2.3;id3v23.payload.TPE1.payload.textEncoding;0;19;1;UTF-16;;;;
+ID3v2.3;id3v23.payload.TPE1.payload.information;0;19;20;N-Vitral;;;;tpe1 end
+ID3v2.3;id3v23.payload.TIT2.header;0;10;10;;;;;tit2 start
+ID3v2.3;id3v23.payload.TIT2.payload;0;10;29;;;;;
+ID3v2.3;id3v23.payload.TIT2.header.id;0;25;4;TIT2;;;;
+ID3v2.3;id3v23.payload.TIT2.header.size;0;25;4;29;;;;
+ID3v2.3;id3v23.payload.TIT2.header.flags;0;25;2;;;;;No flags are set
+ID3v2.3;id3v23.payload.TIT2.payload.textEncoding;0;26;1;UTF-16;;;;
+ID3v2.3;id3v23.payload.TIT2.payload.information;0;26;28;Hexadecimal_;;;;tit2 end
+ID3v2.3;id3v23.payload.TRCK.header;0;11;10;;;;;trck start
+ID3v2.3;id3v23.payload.TRCK.payload;0;11;9;;;;;
+ID3v2.3;id3v23.payload.TRCK.header.id;0;32;4;TRCK;;;;
+ID3v2.3;id3v23.payload.TRCK.header.size;0;32;4;9;;;;
+ID3v2.3;id3v23.payload.TRCK.header.flags;0;32;2;;;;;No flags are set
+ID3v2.3;id3v23.payload.TRCK.payload.textEncoding;0;33;1;UTF-16;;;;
+ID3v2.3;id3v23.payload.TRCK.payload.information;0;33;8;A2;;;;trck end
+ID3v2.3;id3v23.payload.padding;0;3;1876;;;;;padding
+ID3v2.3;id3v23.payload.padding.payload;0;39;1876;;;;;padding
+ID3v2.3;id3v23.payload.padding.payload.bytes;0;40;1876;{0,}*1876;;;;padding

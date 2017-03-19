@@ -1,0 +1,13 @@
+DataFormat;Id;Sequ_No;Parent_Row_Index;Exp_Block_Size;Exp_Field_Interpreted_Value;Exp_Failed_Field_Conv_Charset;Exp_Failed_Field_Conv_ByteOrder;Container_Backward_Readable;Comment
+ID3v1;id3v1;0;;128;;;;true;is backward readable
+ID3v1;id3v1.header;0;1;3;;;;;
+ID3v1;id3v1.payload;0;1;125;;;;;
+ID3v1;id3v1.header.id;0;2;3;TAG;;;;
+ID3v1;id3v1.payload.title;0;3;30;FE18 #4;;;;
+ID3v1;id3v1.payload.artist;0;3;30;Fifth Era;;;;
+ID3v1;id3v1.payload.album;0;3;30;Fifth Era #18;;;;
+ID3v1;id3v1.payload.year;0;3;4;;;;;
+ID3v1;id3v1.payload.comment;0;3;28;mp3.sbmonline.de Ref:ithink2;;;;
+ID3v1;id3v1.payload.trackIndicator;0;3;1;52;;;;Rest of comment (ASCII '4')
+ID3v1;id3v1.payload.track;0;3;1;48;;;;Rest of comment (ASCII '0')
+ID3v1;id3v1.payload.genre;0;3;1;Unknown;;;;

@@ -1,0 +1,358 @@
+%===============================================================================================
+%		\COMPextensionManagement{} Design
+%===============================================================================================
+
+\section{\COMPextensionManagement{} Design}
+\label{sec:COMPextensionManagementDesign}
+
+This chapter describes the most important features of the \COMPextensionManagement{} component in a brief way. Generally, all details and most recent state can be found in the javadoc of the component's classes.
+
+Important is to mention that the \LibName{} components \COMPlogging{}, \COMPconfiguration{},  \COMPcontext{} and \COMPextensionManagement{} itself should never be designed as extensible components, as they have such a clearly defined and vital role within the \LibName{} startup process. It simply is not possible to make e.g. \COMPlogging{} extensible, because it is needed before \COMPextensionManagement{} is already initialized and therefore its extensions could simply not be loaded or even worse, a complex mechanism would have to be added to make this possible. See \SectionLink{sec:REQUcontextStartupTasks} for details about the \LibName{} startup process.
+
+%-----------------------------------------------------------------------------------------------
+%		Interface Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Interface Layer Design}
+\label{sec:InterfaceDesignCOMPextensionManagement}
+
+The \COMPextensionManagement{} component is an internal component that is not visible to \LibName{} \ACTORuser{}s.
+
+%-----------------------------------------------------------------------------------------------
+%		Export Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Export Layer Design}
+\label{sec:ExportDesignCOMPextensionManagement}
+
+The following figure shows the static class diagram of the export layer of the component \COMPextensionManagement{}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ExportCOMPextensionManagement.pdf}
+	\caption{Export class diagram of the component \COMPextensionManagement{}}
+	\label{fig:V_4_ExportCOMPextensionManagement}
+\end{figure}
+
+The class diagram is based upon \SectionLink{sec:Scenario2DecentralExtensionManagement}.
+
+Here, the \emph{what} of this component is described, i.e. the extension requirements as such in a brief way.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{\COMPextensionManagement{} Requirements}
+\label{sec:COMPextensionManagementRequirements}
+
+\newcommand{\REQUextClearlyDefinedExtensibility}{REQU\_EXT\_CLEARLY\_DEFINED\_EXTENSIBILITY}
+\newcommand{\REQUextEasyDeployment}{REQU\_EXT\_EASY\_DEPLOYMENT}
+\newcommand{\REQUextOverwriteDefaultExtensions}{REQU\_EXT\_OVERWRITE\_DEFAULT\_EXTENSIONS}
+\newcommand{\REQUextReuseCore}{REQU\_EXT\_REUSE\_CORE}
+\newcommand{\REQUextExtensionInterface}{REQU\_EXT\_EXTENSION\_INTERFACE}
+
+The following requirements must be fulfilled for this component:
+\begin{itemize}
+	\item \REQUextClearlyDefinedExtensibility{}: Only at clearly defined places, \LibName{} can be extended in a controlled and standardized manner. There is only one strictly defined mechanism to extend \LibName{}.
+	\item \REQUextEasyDeployment{}: Only a few steps are necessary to deploy a new extension.
+	\item \REQUextExtensionInterface{}: An extension is allowed to have an own user interface part that provides data types and enumerations specific to the extension.
+	\item \REQUextOverwriteDefaultExtensions{}: It must be possible to overwrite the default extensions already provided by \LibName{} implementors, e.g. by own more powerful extensions.
+	\item \REQUreuseCore{}: An extension must be able to reuse already existing standard functionality implemented in the \LibName{} core.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUextClearlyDefinedExtensibility{}: Extensions and Extension Points}
+\label{sec:ExtensionsAndExtensionPoints}
+
+Each \LibName{} component is allowed to offer a single \emph{extension point}. This is basically an interface that can be implemented by a so called \emph{extension}, coming from an arbitrary third party. Each extension provides a custom implementation of the extension point interface.
+
+The following table shows the current extension points of \LibName{}:
+
+\begin{longtable}{|p{0.3\textwidth}|p{0.7\textwidth}|}
+	\hline
+	Component & Extension point \\
+	\endhead
+		\hline
+	\COMPmedia{} & Allows to extend the supported physical media by a new medium.\\
+	\hline
+	\COMPdataPartManagement{} & Allows to individually implement the way a specific data format is read or written.\\
+	\hline
+	\COMPdataFormatManagement{} & Allows to individually implement the way a specific data format specification is loaded and provided.\\
+	\hline
+\end{longtable}
+
+\emph{No extensions} are:
+\begin{itemize}
+	\item Changes to an existing data format, i.e. changed or added data block definitions
+	\item Custom implementations of special \LibName{} interfaces or classes that can be set via a setter method in a strategy pattern manner.
+\end{itemize}
+
+The first type is rather a component specific extension of the available data block definitions (what the \ACTORextender{} cannot do), the second type is a dynamic extension by providing a user defined class implementation. 
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUextEasyDeployment{}: Extension Bundles}
+\label{sec:ExtensionBundles}
+
+\COMPextensionManagement{} bundles several extensions into one so called \emph{extension bundle}. An extension bundle is a unit of development and deployment and as such can be tagged by several attributes such as bundle name, author, version, date and so on. This information is important for identification and debugging purposes. A single extension bundle may consist of several different extension point implementations (i.e. extensions). However, it may also contain only a single extension. For the same extension point, an extension bundle might contain several implementations.
+
+The following figure illustrates the use of extension bundles:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ExtensionBundles.pdf}
+	\caption{Export class diagram of the component \COMPextensionManagement{}}
+	\label{fig:V_4_ExtensionBundles}
+\end{figure}
+
+The abstract example shows that three extension points are provided that \emph{can} be extended. Two extension bundles take this opportunity. The first bundle A provides three extensions that implement the extension point 1, and one extension that implements extension point 2. Extension bundle B has only one extension that implements the extension point 2. There is no extension for extension point 3, neither in the bundle A nor in B, which is absolutely possible.
+
+Technically, the \ACTORextender{} needs to do the following things to extend \LibName{}:
+\begin{itemize}
+	\item Choose all extensions points he wants to extend. Provide one or several implementation for each extension point by implementing the extension point's interface.
+	\item Bundle extensions logically to one or several extension bundles and create a JAR file. The JAR file should refer to the extension bundle interface JAR file, if any (see \SectionLink{sec:ExtensionBundleInterface}).
+	\item Create a configuration file for each bundle, containing a description of the bundle and its provided extensions. For each extension it needs to be configured which extension point it implements. Furthermore, a relative path (from the configuration file's directory) to the extension bundle JAR file must be configured.
+	\item Bundle JAR, bundle interface JAR (if any) and the configuration file need to be copied to a specific \LibName{} folder.
+\end{itemize}
+
+Then, at the next startup of \LibName{}, these bundles will be loaded.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUextExtensionInterface{}: Extension Bundle User Interface}
+\label{sec:ExtensionBundleInterface}
+
+An extension bundle \emph{may} have a user interface, i.e. a set of types visible to the \LibName{} \ACTORuser{}. However, it is not recommended to provide a full set of own data types, classes and interfaces with broad functionality, because the strength of \LibName{} is its genericity among multiple different data formats and media. Therefore extension bundles, if they have a user interface at all, should only provide new enumeration constants, for e.g. new data formats. This is the only reason why extension interfaces are allowed at all.
+
+An extension interface must be deployed separately in a JAR file and copied to a specific \LibName{} folder. There should be one JAR file containing all extension interfaces for a single extension bundle.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUextOverwriteDefaultExtensions{}: Custom versus Default Extensions}
+\label{sec:CustomVersusDefaultExtensions}
+
+\LibName{} brings along some already implemented data formats. These are implemented as extensions, too, using the same infrastructure already as \ACTORextender{}s would. Such extensions are called the \LibName{} \emph{default extensions}. \ACTORuser{}s might perfectly well get along with these extensions. However, third parties such as \ACTORextender{}s might want to provide \emph{custom extensions} with better performance or additional functionality to replace one or several default extensions.
+
+\COMPextensionManagement{} offers the possibility to tag an extension bundle as custom or default. Default means the bundle is present in the default \LibName{} release, while a custom bundle is provided by a third party as additional extension. Custom extensions may replace extensions tagged as default according to specific rules.
+
+These rules have to be defined by the extensible component itself, only. E.g. the \COMPdataFormatManagement{} may decide to allow custom bundles to override an extension for a given data format that is already provided by a default extension. In such cases, the default extension is ignored. Ignored extensions must be logged.
+
+This approach allows to bundle all \LibName{} default extensions in a single extension bundle. Nevertheless the \ACTORextender{} can decide to override only a few of the existing default extensions by a custom extension. He does not need to override all.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUreuseCore{}: Extension Bundles}
+\label{sec:REQUreuseCore}
+
+Each extension point of a component may offer arbitrary methods. These usually will return implementations of other interfaces the component offers. Often, it might be appropriate for a component to reuse a \LibName{} core standard implementation for such an interface and to use a custom implementation only if there is no other way.
+
+The implementation of an extension point interface can indicate the use of a \LibName{} core standard implementation by returning null in the corresponding method of the extension point implementation. This signals the component that has loaded the extension to provide the default implementation instead.
+
+However, this approach only enables an extension to choose between core standard or own implementation. Often, a mixed approach might be necessary that allows an extension to reuse only parts of an existing core standard implementation.
+
+\OpenIssue{TODO extManager001}{How to provide the possibility to reuse only parts of an existing \LibName{} core standard implementation?}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Error Conditions}
+\label{sec:ErrorConditions}
+
+The following table summarizes error conditions and corresponding exceptions for \COMPextensionManagement{}:
+
+\begin{longtable}{|p{0.3\textwidth}|p{0.7\textwidth}|}
+	\hline
+	Error Condition & Description \\
+	\endhead
+	\hline
+	Invalid extension bundle information & Extension bundle is not loaded, error information is logged as warning to the \ACTORuser{}. The overall loading process is not affected.\\
+	\hline
+	Unknown extension point & A component asks \COMPextensionManagement{} for a list of extensions for a specific extension point. If \COMPextensionManagement{} does not know the extension point, a runtime exception is thrown. A component offering an extension point and \COMPextensionManagement{} must be perfectly in sync about what extension points exist.\\
+	\hline
+	Technical error in extension loading process & While loading extensions, a technically error occurs. E.g. one of the configuration files is missing or has a wrong format. A runtime exception follows.\\
+	\hline
+	Extension is semantically wrong & The extension returns wrong values. This can only be decided by each individual component using the extension provider. For such situations, \COMPextensionManagement{} offers an exception that can be thrown by a using component.\\
+	\hline
+\end{longtable}
+
+%-----------------------------------------------------------------------------------------------
+%		Implementation Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Implementation Layer Design}
+\label{sec:ImplementationDesignCOMPextensionManagement}
+
+The following figure shows the static class diagram of the component \COMPextensionManagement{}:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ImplementationCOMPextensionManagement.pdf}
+	\caption{Implementation class diagram of the component \COMPextensionManagement{}}
+	\label{fig:V_4_ImplementationCOMPextensionManagement}
+\end{figure}
+
+The implementation design of \COMPextensionManagement{} is based upon \SectionLink{sec:Scenario2DecentralExtensionManagement}, discussed at the end of this section.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Rules for Extension Points}
+\label{sec:RulesforExtensionPoints}
+
+A \LibName{} component may have zero, one or multiple extension points. That means that a \LibName{} component is not forced to offer extension possibilities.\footnote{Note that the extension mechanism meant here is static, i.e. it adds additional functionality at initialization time. Of course it is always possible for a component to offer dynamic extensibility, e.g. via setter methods taking custom user implementations, which corresponds to the strategy pattern. This is independent of whether or not the component offers an extension point.}
+
+If a component offers an extension point, it must be an interface in the export layer of the component that extends the tagging interface \texttt{IExtensionPoint}. The interface's implementation must additionally have a default constructor to ensure that the runtime can load it.
+
+%***********************************************************************************************
+
+\paragraph{Configuration of Extension Points}
+\label{sec:ConfigurationforExtensionPoints}
+
+The \COMPextensionManagement{} component has a single configuration that lists all available extension points of all \LibName{} components. Whenever a new component with new extension points is introduced in \LibName{}, or whenever the extension points of an existing component needs to point to another interface, that configuration needs to be changed accordingly.
+
+Whenever a component tries to get the list of extensions for a given extension point, \COMPextensionManagement{} checks whether this extension point is configured as such, if not, it throws an exception.
+
+Implementation notes:
+\begin{itemize}
+	\item Extension point configuration files are XML files with a corresponding XML schema
+	\item JAXB is used for validating and loading such a file into a Java object tree
+	\item For better testing possibilities, the extension points configuration is passed to a special interface method from the outside. It is an \texttt{InputStream} to ensure that it can also be a resource stored within a JAR file rather than only a file in the file system.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Rules for Extension Bundles}
+\label{sec:RulesforExtensionBundles}
+
+An extension bundle may include extensions that extend different \LibName{} components. As such, an extension bundle must specify which extension points it exactly has extensions for, and what extensions that are.
+
+For this, each extension bundle must have a configuration that contains this information. That configuration is loaded by the \COMPextensionManagement{} component.
+
+Implementation notes:
+\begin{itemize}
+	\item Extension bundle configuration files are XML files with a corresponding XML schema
+	\item Each file \emph{MUST} have the name \texttt{ExtensionBundle.xml} to be recognized by the internal search algorithm.
+	\item Extension bundle configuration files are search in every \emph{sub-folder} of the paths specified in the extension point configuration file as search paths. This means that the paths themselves are \emph{not} searched for an \texttt{ExtensionBundle.xml}. Furthermore, deeper sub-folders are also \emph{not} searched for an \texttt{ExtensionBundle.xml}, only those on level 1 below a specified search path.
+	\item For deployment purposes, an extension bundle can be located in a jar file that does not include the configuration file itself. This requires an additional entry in the configuration file that refers to the jar file with a path relative to the configuration file.
+	\item For development purposes, an extension bundle can be located in a project that may or may not include the configuration file itself. This requires an entry for each extension pointing to the path of the implementation class.
+	\item JAXB is used for validating and loading such a file into a Java object tree
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Dynamics of \COMPextensionManagement{}}
+\label{sec:DynamicsofCOMPextensionManagement}
+
+How does extension handling work at runtime? The following steps describe the functionality briefly in chronological order:
+
+\begin{enumerate}
+	\item The \ACTORuser{} instantiates the \COMPcontext{} component. \COMPcontext{} loads extensions initially. It instantiates the single instance of \COMPextensionManagement{}.
+	\item The detailed one-time loading of extension information is working the following way:
+	\begin{enumerate}
+		\item \COMPextensionManagement{} reads its extension point configuration. This contains all available extension points as well as the paths to the extension directories.
+		\item In the extension directories, \COMPextensionManagement{} tries to find all extension bundles and their corresponding extension bundle configuration. For every extension bundle, a single instance of the default \IFExtensionBundle{} implementation is instantiated.
+		\item \COMPextensionManagement{} reads each extension bundle configuration. It validates that each specified extension implementation is implementing a specified extension point. It immediately instantiates each extension. For every extension, there is only a single instance, instantiated dynamically through reflection using class loaders. It is cached internally by \COMPextensionManagement{} and returned whenever the extended component requests it.
+		\item If any technical or logical errors occur during loading, each error is logged and the whole extension bundle is ignored, i.e. not registered.
+		\item Otherwise the extension bundle is registered in \COMPextensionManagement{}.
+	\end{enumerate}
+	\item Whenever the component later requests the extensions from \COMPextensionManagement{}, \COMPextensionManagement{} validates that the requested extension point corresponds to one of the configured available extension points. If this is not the case, a runtime exception is thrown, otherwise the extensions for the extension point are returned.
+\end{enumerate}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Development and Deployment View on Extensions}
+\label{sec:DevelopmentandDeploymentViewonExtensions}
+
+The single unit of development and deployment is the extension bundle. For each extension bundle, there should be a single development project. The project depends on the interface and maybe export project of the \LibName{} core. The extension bundle contains a configuration file describing which extensions are offered. It is bundled in a single jar file that must be located in a special directory known to the \COMPextensionManagement{} when deployed. Of course this jar file depends upon the \LibName{} core jar file(s).
+
+Additionally, the extension bundle might offer an interface project that the \ACTORuser{} depends upon for using new enumerations. In deployment view, this will be bundled into a separate jar file.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Two Possible Implementation Scenarios}
+\label{sec:TwoPossibleImplementationScenarios}
+
+Two scenarios for implementing the \LibName{} extension concept were thought of before doing the design of the export and implementation layers. These two scenarios are described and compared here. The winner that has been chosen is \SectionLink{sec:Scenario2DecentralExtensionManagement} for reasons described in \SectionLink{sec:ComparisonoftheScenarios}.
+
+%***********************************************************************************************
+
+\paragraph{Scenario 1 - Central Extension Management}
+\label{sec:Scenario1CentralExtensionManagement}
+
+The idea of the central extension management is that the \COMPcontext{} component uses the \COMPextensionManagement{} component to load extensions first, then instantiates all other components, providing them with the previously loaded extensions. This scenario is called central as the \COMPcontext{} manages loading and instantiation of all elements.
+
+The following component diagram shows the required dependencies between the \LibName{} components for scenario 1:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ExtensionManagementScenario1.pdf}
+	\caption{Central Extension Management scenario for the \COMPextensionManagement{} component}
+	\label{fig:V_4_ExtensionManagementScenario1}
+\end{figure}
+
+%***********************************************************************************************
+
+\paragraph{Scenario 2 - Decentral Extension Management}
+\label{sec:Scenario2DecentralExtensionManagement}
+
+Decentral extension management means that \COMPcontext{} has no idea about extensions\footnote{Or, at least only loads them initially and does nothing else with them.}, while each specific component itself knows about its extension points. Therefore each specific component that can be extended uses the \COMPextensionManagement{} component to load its extensions. There is no longer any central entity that controls access to previously loaded extensions.
+
+The following component diagram shows the required dependencies between the \LibName{} components for scenario 2:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ExtensionManagementScenario2.pdf}
+	\caption{Decentral Extension Management scenario for the \COMPextensionManagement{} component}
+	\label{fig:V_4_ExtensionManagementScenario2}
+\end{figure}
+
+%***********************************************************************************************
+
+\paragraph{Comparison of the Scenarios}
+\label{sec:ComparisonoftheScenarios}
+
+The following table compares the two scenarios under several aspects:
+
+\begin{longtable}{|p{0.3\textwidth}|p{0.7\textwidth}|}
+	\hline
+	Aspect & Scenario 1 & Scenario 2 \\
+	\endhead
+	\hline
+	Coupling & \COMPcontext{} knows each single component, including the \COMPextensionManagement{}. It needs to pass the loaded extension points to each single extensible component. This either requires a specific public method on each component's interface that takes over the extension points (which confuses the \ACTORuser{}, as he must not use it, but is aware of it), or a direct dependency of \COMPcontext{} to each component's export or implementation layer (which is the baddest possible solution).& \COMPcontext{} knows each single component, except for the \COMPextensionManagement{} component. It can instantiate each component using standard mechanisms, e.g. the \ComponentRegistry{} facility to further reduce coupling. No specific methods are required.\\
+	\hline
+	Knowledge & \COMPcontext{} knows about each component available. Both \COMPcontext{} and \COMPextensionManagement{} know about extensions, and more specific they know about which component is extensible in what way. In turn, the components themselves accept what \COMPcontext{} feeds them without knowing where it comes from. & \COMPcontext{} knows about each component available. It does not know about extensions. Only each component itself (in its core implementation) knows that it is extensible and where. \COMPextensionManagement{} needs to offer a generic interface, as it is not allowed to know about the components in turn.\\
+	\hline
+	Central Control & \COMPcontext{} and \COMPextensionManagement{} share central control of extension loading, plausibility and error management in that process. & Each component itself decides when to get each extension. Conventions should be made as to when extensions are accessed and validated. \COMPextensionManagement{} is a central component for loading, logging and simple error management.\\
+	\hline
+	Genericity & Not very generic. Each component has to provide a method where it takes over its extensions. Additionally it must define an extension interface that \COMPextensionManagement{} knows about and returns. In worst case, \COMPextensionManagement{} has a method for each specific available extension point for all components. \COMPcontext{} has to call the correct method for each specific component, initializing it with each specific extension loaded from \COMPextensionManagement{}. & Offers highly generic possibilities with chances and risks. \COMPextensionManagement{} must be generic so it need not depend on each specific extensible component. This would include dynamic class loading.\\
+	\hline
+\end{longtable}
+
+Comparing the two scenarios, scenario 2 is the winner as it offers a more flexible way of extension handling:
+\begin{itemize}
+	\item Less coupling between and knowledge in the individual components.
+	\item More generic interfaces offer better changeability.
+	\item The weaknesses of scenario 2 can widely be eliminated using conventions.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+%		Test Cases
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Test Cases}
+\label{sec:TestCasesCOMPextensionManagement}
+
+Despite the usual jUnit test cases for each interface and class, the following specific aspects of this component should be tested:
+\begin{itemize}
+	\item Loading of the \COMPextensionManagement{} configuration
+	\item Loading of several extension bundle configuration files
+	\item Testing the behavior if an unknown extension point is specified
+	\item Testing behavior if the configurations have technical or logical errors
+	\item Testing if dynamic loading works over several development projects
+	\item Testing if dynamic loading works over several deployment units (jars)
+\end{itemize}
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

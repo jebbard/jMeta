@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="/EasyTag_Deployment/Deployment_Filesystem/jMeta_vX.X.X/jMeta.jar"/>
+	<classpathentry kind="lib" path="/CommonLibs/jUnit4.8.2/junit-4.8.2.jar"/>
+	<classpathentry kind="lib" path="/CommonLibs/logChecker/logChecker.jar"/>
+	<classpathentry kind="lib" path="/Utility/bin"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/EasyTag_Deployment/Deployment_Filesystem/jMeta_vX.X.X/ext/default/defaultBundle_IF.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

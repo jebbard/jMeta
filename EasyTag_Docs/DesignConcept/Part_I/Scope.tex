@@ -1,0 +1,310 @@
+%===============================================================================================
+%		Scope
+%===============================================================================================
+
+\chapter{Umfang}
+
+\LibName{} ist eine Java-Library zum Lesen und Schreiben von beschreibenden Daten (Metadaten). \LibName{} hat folgende Ziele:
+\begin{itemize}
+	\item Eine generische, erweiterbare Schnittstelle zum Lesen und Schreiben von Metadaten zu definieren
+	\item Zu einem Standard in Sachen Metadatenverarbeitung für Audio-, Video- und Bildformate zu werden
+\end{itemize}
+
+Damit visiert \LibName{} als Verwender Applikationen im Multimedia-Editing-Bereich an, beispielsweise Software zur Verwaltung einer Audio- und Videosammlung.
+
+Besondere Stärke der Library soll ihre Vielseitigkeit (im Sinne unterstützter Formate) und Erweiterbarkeit sein. Gleichzeitig soll sie Zugriff auf alle Features der unterstützten Formate gewähren.
+
+Eine Applikation soll wahlweise sehr generisch auf Metadaten zugreifen können, oder aber die Spezifika eines speziellen Formates sehr konkret nutzen können.
+
+Andere Arten von Metadaten, die nicht für Audio-, Video- oder Bildformate gedacht sind, sind nicht Ziel von \LibName{}, insbesondere gilt dies für spezielle XML-Metadatenformate.
+
+%-----------------------------------------------------------------------------------------------
+%		Features der Version \LibVersion{}
+%-----------------------------------------------------------------------------------------------
+
+\section{Features der Version \LibVersion{}}
+\label{sec:FeaturesLibVersion}
+
+Neben den noch zu besprechenden Ausschlüssen (\SectionLink{sec:Requirements}), die ganz klar sagen, was NICHT unterstützt wird, geben wir hier einen Überblick, welche Features 
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Metadatenformate}
+\label{sec:UnterstuetzteMetadatenformate}
+
+Die aktuelle Version unterstützt folgende Metadatenformate:
+
+\begin{itemize}
+	\item ID3v1 und ID3v1.1
+	\item ID3v2.3
+	\item APEv2
+	\item Lyrics3v2
+\end{itemize}
+
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Containerformate}
+\label{sec:UnterstuetzteContainerformate}
+
+\begin{itemize}
+	\item MPEG-1 Audio (MP3)
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Eingabemedien}
+\label{sec:UnterstuetzteEingabemedien}
+
+Die aktuelle Version unterstützt folgende Eingabemedien:
+\begin{itemize}
+	\item Datei
+	\item Java \texttt{InputStream}
+	\item Java byte-Array
+\end{itemize}
+
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Ausgabemedien}
+\label{sec:UnterstuetzteAusgabemedien}
+
+Die aktuelle Version unterstützt folgende Eingabemedien:
+\begin{itemize}
+	\item Datei
+	\item Java byte-Array
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+%		Features für spätere Versionen
+%-----------------------------------------------------------------------------------------------
+
+\section{Features für spätere Versionen}
+\label{sec:FuerSpaeter}
+
+Die folgenden Features werden für Version \LibVersion{} der Library noch nicht umgesetzt, sondern in späteren Versionen hinzugefügt:
+\begin{itemize}
+	\item Die format-spezifischen High-Level APIS
+	\item ...
+\end{itemize}
+
+
+%-----------------------------------------------------------------------------------------------
+%		Multimedia-Lizenzierung
+%-----------------------------------------------------------------------------------------------
+
+\section{Multimedia-Lizenzierung}
+\label{sec:MultimediaLicensing}
+
+\OpenIssue{Intro section MultimediaLicensing}{Intro section MultimediaLicensing}
+
+%-----------------------------------------------------------------------------------------------
+%		Related Libraries
+%-----------------------------------------------------------------------------------------------
+
+\section{Verwandte Libraries}
+\label{sec:RelatedLibraries}
+
+Hier werden Java libraries behandelt, die verwandt zu \LibName{} sind. Hierunter fallen existierende Java-Libraries im Umfeld Multimedia, die einerseits Konkurrenz darstellen, andererseits Anregungen liefern und ggf. Möglichkeiten für Integration und Adaption bieten.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Metadaten-Libraries}
+\label{sec:MetadataLibraries}
+
+Eine Auswahl von Libraries die Zugriff auf Multimedia-Metadaten ermöglichen - Eine Quelle dafür ist beispielsweise \url{http://id3.org/Implementations}:
+\begin{itemize}
+  \item \textbf{mp3agic (Java):} Lesen und Schreiben von ID3 Tags (1.0, 1.1, 2.3, 2.4), Lesen von ID3 v2.2, low-level Lesen von MP3-Dateien (inkl. VBR) - \url{https://github.com/mpatric/mp3agic}
+	\item \textbf{BeagleBuddy (Java):} Lesen und Schreiben von ID3 Tags (1.0, 1.1, 2.3, 2.4), Lyrics3v2, Lyrics3v1, APEv1, APEv2, Lesen von MP§-Dateien CBR und VBR, Xing, LAME, und VBRI Header - \url{http://www.beaglebuddy.com/}
+	\item \textbf{jaudiotagger (Java):} Audio-Metadaten - \url{http://www.jthink.net/jaudiotagger/}
+	\item \textbf{Entagged (Java):} Audio-Metadaten - \url{http://entagged.sourceforge.net/}
+	\item \textbf{MyID3 (Java):} Audio-Metadaten (ID3) - \url{http://www.fightingquaker.com/myid3/}
+	\item \textbf{JID3 (Java):} Audio-Metadaten (ID3) - \url{https://blinkenlights.org/jid3/}
+	\item \textbf{Javamusictag (Java):} Manchmal auch \textbf{jid3lib} für Audio-Metadaten (ID3) - \url{http://javamusictag.sourceforge.net/}, \url{https://java.net/projects/jid3lib}
+	\item \textbf{id3lib (C/C++):} Audio-Metadaten (ID3) - \url{http://id3lib.sourceforge.net/}
+	\item \textbf{Mutagen (Python):} Audio-Metadaten und -Container-Daten (ID3) - \url{http://pypi.python.org/pypi/mutagen/1.12}
+	\item \textbf{jFlac (Java):} Audiodaten und Metadaten des Flac-Formates - \url{http://jflac.sourceforge.net/apidocs/index.html?org/kc7bfi/jflac/metadata/VorbisComment.html}
+	\item \textbf{MPEG-7 Audio Encoder (Java):} Erzeugen von MPEG-7 Metadaten - \url{http://mpeg7audioenc.sourceforge.net/}
+	\item \textbf{JAI Image I/O (Java):} Kann EXIF-Tags aus unterschiedlichsten Formaten lesen und schreiben - \url{https://jai-imageio.dev.java.net/binary-builds.html}
+	\item \textbf{jmac (Java):} Library, die monkey audio codecs encoden und decoden kann, ebenso APE-Tags lesen unds schreiben - \url{http://sourceforge.net/projects/jmac/}
+	\item ... und einige andere
+\end{itemize}
+
+Als größte Konkurrenz werden derzeit mp3agic und BeagleBuddy betrachtet.
+
+%***********************************************************************************************
+
+\subsubsection{Nachteile existierender Metadaten-Libraries}
+\label{sec:DrawbacksofExistingMetadataLibraries}
+
+Jede der genannten Libraries spezialisiert sich auf nur wenige Formate. D.h. Applikationen wird das eben nur reichen, wenn sie auch nur auf diese Formate beschränkt sind. Ansonsten kann es sein, dass man mehrere völlig verschiedene Libraries nebeneinander nutzen muss.
+
+Die Architektur und Erweiterbarkeit einiger der existierenden Libraries ist nicht überzeugend.
+
+Die ID3 Libraries z.B. zeigen ihre Internas sehr offenherzig, was es für den Anwender unklar macht, was wirklich ``public API'' ist, und was nicht. Verwender der Library könnten daher versehentlich oder auch bewusst (um einen Fehler ``umschiffen'' oder eine Funktionalität besser nutzen zu können) Implementierungsklassen nutzen. Dies wiederum macht es für die Library-Entwickler potentiell gefährlich, die Implementierung der Libraries zu refaktorisieren oder gar auszutauschen, ohne die Anwender der Libraries mit solchen Migration zu belasten.
+
+Anwendungen, die viele unterschiedliche Formate benötigen, müssen eine generische Erweiterbarkeit selbst herstellen, da die Libraries dies nicht von Haus aus bieten.
+
+%***********************************************************************************************
+
+\subsubsection{Vorteile von \LibName{}}
+\label{sec:AdvantagesofLibName}
+
+Es gibt bereits so viele Libraries, die alle mehr oder weniger zu gebrauchen sind. Warum also \LibName{}?
+
+Hierfür gibt es mehrere Gründe:
+\begin{itemize}
+	\item Anwendungen, deren Kern-Eigenschaft die Erweiterbarkeit und Formatvielfalt ist, müssen nicht dutzende völlig verschiedenartige Libraries mit unterschiedlichen Programmiermodellen nutzen.
+	\item Zudem müssen solche Anwendungen kein eigenes Erweiterbarkeitsframework bauen, um die Formate zu unterstützen, sondern können sich auf das Framework von \LibName{} stützen.
+	\item \LibName{} bietet von Haus aus Implementierungen für eine Vielfalt an Multimedia-Formaten an, und ist nicht nur auf Audio-Formate wie MP3, oder Ogg oder FLAC oder WAV (Audio) beschränkt.
+  \item Dennoch ist es modular, es erfordert es nicht, dass Anwendungen, die lediglich Audio-Formate unterstützen wollen, Video- oder Bild-Formate der Library mitnutzen, sondern eine selektive AUswahl der benötigten Formate ist möglich.
+	\item \LibName{} bietet eine leicht erlernbare, bequeme aber gleichzeitig überschaubare Schnittstelle für verwendende Anwendungen an.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Multimedia Libraries}
+\label{sec:MultimediaLibraries}
+
+Kann \LibName{} mit einigen üblichen Java-Multimedia-Libraries kooperieren? Dies wird in den folgenden Abschnitten geklärt.
+
+%***********************************************************************************************
+
+\subsubsection{JMF}
+\label{sec:JMF}
+
+Das Java Media Framework ist eine offizielle Java library, die mit J2SE \emph{desktop} technology ausgeliefert wird. Die aktuelle Version 2.1.1e wurde 2001 veröffentlicht. JMF kann von Client- und Serveranwendungen verwendet werden. JMF wurde mit MP3 Decoder und Encoder bis 2002 geliefert, aber wegen Lizenzierungsproblemen wieder entfernt. Seit 2004 gibt es nur noch ein MP3 Playback-only Plug-in.\footnote{Siehe \cite{WikJMF}.}
+
+Inzwischen ist JMF aber arg in die Jahre gekommen und wird wegen der großen Konkurrenz (genannt werden Adobe Flex, Xuggler etc.) wohl nur noch selten verwendet. Allerdings gibt es FMJ als Open-Source-ALternative, die API kompatibel ist: \url{http://www.fmj-sf.net/}.
+
+JMF kommt in vier JAR-Dateien:\footnote{Siehe \cite{WikJMF}.}
+\begin{itemize}
+	\item JMStudio: Simple Multimedia-Player-Applikation
+	\item JMFRegistry: Eine Anwendung die das Verwalten verschiedenster JMF-Einstellungen und Plug-ins ermöglicht
+	\item JMFCustomizer: Erlaubt das Erzeugen einer einfacheren JMF-Jar-Datei, die nur diejenigen JMF-Klassen enthält, welche die Client-Applikation wirklich benötigt, deswegen die Auslieferungsgröße verringert
+	\item JMFInit: Inititialisiert eine JMF-Applikation
+\end{itemize}
+
+JMF enthält platform-spezifische \emph{performance packs}, d.h. optimierte Pakete füe Betriebssysteme wie Linux, Solaris oder Windows.
+
+%***********************************************************************************************
+
+\paragraph{Features:}
+\label{sec:Features}
+
+JMF kümmert sich um Zeit-basierte Medien. Die JMF features kann man wie folgt zusammenfassen:\footnote{Siehe \cite{JMFWeb}.}
+\begin{itemize}
+	\item Capture: Multimedia frame-Daten eines gegebenen Audio- oder Video-Signals lesen und es in einen spezifischen Codec in Echtzeit codieren.
+	\item Playback: Multimedia-Daten abspielen, d.h. deren Bytes auf dem Bildschirm darstellen oder an die Audio-Ausgabegeräte weitergeben.
+	\item Stream: Zugriff auf Stream-Inhalte
+	\item Transcode: Konvertieren von Medien-Daten eines gegebenen digitalen Codecs in einen anderen, ohne zuerst decodieren zu müssen.
+\end{itemize}
+
+%***********************************************************************************************
+
+\paragraph{Kritik:}
+\label{sec:Criticism}
+
+\cite{WikJMF} fasst einiges negatives Feedback zur JMF library zusammen:
+\begin{itemize}
+	\item Eine Menge Codecs wie MPEG-4, MPEG-2, RealAudio und WindowsMedia werden nicht unterstützt, MP3 nur über ein Plug-in
+	\item Keine Wartung und Weiterentwicklung der Library durch Sun oder Oracle
+	\item Keine Editing-Funktionalität\footnote{D.h. das Bearbeiten von Multimedia-Content.}
+	\item Performance packs nur für einige wenige Plattformen
+\end{itemize}
+
+%***********************************************************************************************
+
+\paragraph{Basiskonzepte der API}
+\label{sec:BasicAPIConcepts}
+
+Lesen der Multimediadaten wird in Form von \texttt{DataSources} abstrahiert, während Ausgaben in \texttt{DataSinks} geschrieben werden. Keine Spezifika unterstützter Formate werden bereitgestellt, vielmehr können unterstützte Formate abgespielt, verarbeitet und exportiert werden, wobei nicht alle Codecs Support für Verarbeitung und transcoding bieten. Eine \texttt{Manager}-Klasse ist die primäre API für JMF-Anwender.\footnote{Siehe \cite{WikJMF}.}
+
+Die API-Dokumentation zeigt, dass JMF sehr komplex und im Wesentlichen zeit- und event-basiert ist.\footnote{Siehe \cite{JMFDoc}.} Es gibt Möglichkeiten, rohe Bytedaten über die Methode \texttt{read} des interfaces \texttt{PullInputStream} zu lesen. Jedoch kontrolliert JMF die Verarbeitung ausgehend von der Quelle, z.B. entweder einer Datei oder einen Stream.
+
+%***********************************************************************************************
+
+\paragraph{Vergleich mit \LibName{}:}
+\label{sec:CooperationwithLibName1}
+
+Es scheint als gäbe es keine sinnvolle Kooperation zwischen \LibName{} und JMF. Es gibt Ähnlichkeiten und Unterschiede. Beide können Datenquellen und -Senken handhaben, also Mediendaten in verschiedensten Formaten lesen und schreiben. \LibName{} bringt zusätzlich weitgreifende Unterstützung für Metadaten-Formate und für nicht-audio-video Container-Formate mit. Jedoch ist sie im Vergleich zu JMF eher eine primitve Library, in dem SInne dass sie nur Zugriff auf die Daten liefert, ohne weiteres Framework für dessen Verarbeitung. \LibName{} liefert die raw bytes und Metadatn, die Anwendung kann sie verwenden wie gewünscht, z.B. diese abspielen, transcodieren oder was auch immer. JMF bietet diese Zusatzschritte und mag dafür holistischer erscheinen. \LibName{} ist mehr als Basisbilbiothek zu betrachten, die sich auf Metadaten spezialisiert, und man hätte \LibName{} zum Implementieren von JMF nutzen können.
+
+%***********************************************************************************************
+
+\subsubsection{JavaSound}
+\label{sec:JavaSound}
+
+JavaSound ist Oracle's Sound-Verarbeitungs-Library. Sie hat einige Gemeinsamkeiten mit JMF, kann aber als low-level betrachtet werden, da sie auch mehr Manipulations-Funktionalitäten für die Audio-Daten bietet. Sie unterstützt auch MIDI-Geräte.\footnote{Siehe \cite{WikJavaSound}.}
+
+%***********************************************************************************************
+
+\paragraph{Basiskonzepte:}
+\label{sec:BasicConcepts}
+
+JavaSound bietet im Wesentlichen die Klassen \texttt{Line}, die ein Element in der Audio-Pipeline repräsentiert, die abgeleiteten Klassen \texttt{Clip} für das Abspielen von Audio-Daten sowie \texttt{Mixer} für das Manipulieren der Audio-Daten an. Sie kann aus Streams ebenso wie aus Dateien oder rohen Bytes lesen. Sie unterstützt desgleichen Konvertierung zwischen verschiedenen Datei-Formaten.
+
+%***********************************************************************************************
+
+\paragraph{Vergleich mit \LibName{}:}
+\label{sec:CooperationwithLibName2}
+
+Wie JMF kümmert sich JavaSound um das Abspielen und Verarbeiten der Audio-Daten statt um das Lesen der verfügbaren Detailinformationen. Hier kommt \LibName{} ins Spiel. \LibName{} liest nahezu alle spetifischen Informationen, inklusive Metadaten. Jedoch liefert es lediglich rohe Audio-Nutzedaten, und überlässt es dem Nutzer, diese zu verarbeiten und abzuspielen. \LibName{} und JavaSound sind daher Wettbewerber im Sinne des Lesens und Schreibens von Audio-Daten. \LibName{} liefert deutlich mehr Detailinformationen aus den gelesenen Daten, inklusive jedweder eingebetteter Metadaten, während JavaSound die Medien abspielt - d.h. es fokussiert sich auf dessen eigentlichen Zweck. Jedoch gibt es einen Weg, über den beide kooperieren können - Das modell könnte so aussehen:
+\begin{itemize}
+	\item \LibName{} liest alle Informationen inklusive Audio-Frames und Metadaten.
+	\item Die Audio-Frames werden - wenn unterstützt - an JavaSound als Raw-Bytes gesendet, wie in Folgendem-Beispiel:\footnote{Das Beispiel ist aus \cite{JavaSoundSample} entnommen und leicht verkürzt worden.}
+
+\small
+\begin{lstlisting}[language=Java]
+<Read all tags here using jMeta>
+
+SourceDataLine	line = null;
+DataLine.Info	info = 
+   new DataLine.Info(SourceDataLine.class, audioFormat);
+
+try
+{
+   line = (SourceDataLine) AudioSystem.getLine(info);
+    
+   /*
+     The line is there, but it is not yet ready to
+     receive audio data. We have to open the line.
+   */
+   line.open(audioFormat);
+}
+catch (LineUnavailableException e)
+{
+   e.printStackTrace();
+   System.exit(1);
+}
+catch (Exception e)
+{
+   e.printStackTrace();
+   System.exit(1);
+}
+
+/*
+  Still not enough. The line now can receive data,
+  but will not pass them on to the audio output device
+  (which means to your sound card). This has to be
+  activated.
+*/
+line.start();
+
+while (<Read frames using jMeta>)
+{
+   int nBytesWritten = line.write(abData, 0, nBytesRead);
+}
+\end{lstlisting}
+\normalsize
+
+\end{itemize}
+
+Dieser Ansatz ist jedoch nicht sehr befriedigend, da er einen Performance-Overhead erzeugt, wenn es um das Abspielen oder transcoding von Multimedia-Inhalten geht. Daher scheinen JavaSound und \LibName{} nur entweder-oder einsetzbar zu sein.
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

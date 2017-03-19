@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extb:ExtensionBundle
+	name="invalidBundle004"
+	version="1.0"
+	xmlns:extb="www.easytag.de/XMLSchema_v1_0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="www.easytag.de/XMLSchema_v1_0 ExtensionBundleConfiguration.xsd">
+
+   <!-- The basic properties of the bundle -->
+	<BundleProperties>
+		<Name>My first bundle</Name>
+		<Description>My description</Description>
+		<Author>J. E.</Author>
+		<Date>2011-01-01</Date>
+		<Version>0.1</Version>
+		<Type>type</Type>
+	</BundleProperties>
+
+   <!-- List of all extensions in the bundle -->
+	<BundledExtensions>
+		<Extension id="B1">
+			<ExtensionPointId>x1</ExtensionPointId>
+			<Provider>de.je.jmeta.extmanager.impl.dummies1.a.TestImplCompA1</Provider>
+			<RelativePath>../../target/classes</RelativePath>
+		</Extension>
+		<Extension id="B2">
+			<ExtensionPointId>x3</ExtensionPointId>
+			<Provider>de.je.jmeta.extmanager.impl.dummies1.b.TestImplCompB1</Provider>
+			<RelativePath>../../target/classes</RelativePath>
+		</Extension>
+		<Extension id="B3">
+			<ExtensionPointId>x5</ExtensionPointId>
+			<Provider>de.je.jmeta.extmanager.impl.dummies1.d.XYZImpl</Provider>
+			<RelativePath>../../target/classes</RelativePath>
+		</Extension>
+	</BundledExtensions>
+
+</extb:ExtensionBundle>

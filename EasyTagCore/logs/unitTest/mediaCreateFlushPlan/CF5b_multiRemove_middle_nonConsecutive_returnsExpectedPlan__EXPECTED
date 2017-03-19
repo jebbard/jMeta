@@ -1,0 +1,16 @@
+READ at 45 with size 2 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 10 with size 2 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+REMOVE at 10 with size 35 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 397 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 12 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 597 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 212 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+REMOVE at 47 with size 350 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 997 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 412 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 1197 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 612 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 1397 with size 103 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 812 with size 103 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+REMOVE at 797 with size 200 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+TRUNCATE at 915 with size 585 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt

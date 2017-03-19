@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagrams:Diagrams xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.topcased.org/DI/1.0" xmlns:diagrams="http://www.topcased.org/Diagrams/1.0" xmi:id="_XhFLgYRAEeCQ-I3eigNVEg" activeDiagram="_XhOVcIRAEeCQ-I3eigNVEg">
+  <model href="JavaLogging.uml#_w8IxIM37EdqwVrslYOdUDA"/>
+  <diagrams xmi:id="_XhOVcIRAEeCQ-I3eigNVEg" position="0,0" size="100,100" name="JavaLogging" viewport="0,0">
+    <property xmi:id="_XyoOgIRAEeCQ-I3eigNVEg" key="pageFormatName" value="A4"/>
+    <property xmi:id="_XyoOgYRAEeCQ-I3eigNVEg" key="diagramWidth" value="840"/>
+    <property xmi:id="_XyoOgoRAEeCQ-I3eigNVEg" key="diagramHeight" value="1188"/>
+    <property xmi:id="_XyoOg4RAEeCQ-I3eigNVEg" key="pageMarginName" value="Small Margin"/>
+    <property xmi:id="_XyoOhIRAEeCQ-I3eigNVEg" key="diagramTopMargin" value="20"/>
+    <property xmi:id="_XyoOhYRAEeCQ-I3eigNVEg" key="diagramBottomMargin" value="20"/>
+    <property xmi:id="_XyoOhoRAEeCQ-I3eigNVEg" key="diagramLeftMargin" value="20"/>
+    <property xmi:id="_XyoOh4RAEeCQ-I3eigNVEg" key="diagramRightMargin" value="20"/>
+    <property xmi:id="_XyoOiIRAEeCQ-I3eigNVEg" key="orientation" value="portrait"/>
+    <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_XhOVcYRAEeCQ-I3eigNVEg" presentation="org.topcased.modeler.uml.classdiagram">
+      <element href="JavaLogging.uml#_w8IxIM37EdqwVrslYOdUDA"/>
+    </semanticModel>
+    <contained xsi:type="di:GraphNode" xmi:id="_Ygv4wIRAEeCQ-I3eigNVEg" position="85,173" size="100,-1">
+      <anchorage xmi:id="_l3J5MIRAEeCQ-I3eigNVEg" graphEdge="_l3wWIIRAEeCQ-I3eigNVEg"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Ygv4wYRAEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_YjSPYIRAEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_Ygv4woRAEeCQ-I3eigNVEg">
+        <property xmi:id="_Ygv4w4RAEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Ygv4xIRAEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_YjSPYIRAEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_Ygv4xYRAEeCQ-I3eigNVEg">
+        <property xmi:id="_Ygv4xoRAEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Ygv4x4RAEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_YjSPYIRAEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_jyTskIRAEeCQ-I3eigNVEg" position="33,351" size="203,-1">
+      <anchorage xmi:id="_l3J5MYRAEeCQ-I3eigNVEg" graphEdge="_l3wWIIRAEeCQ-I3eigNVEg _3h1yQYRAEeCQ-I3eigNVEg _gH1JcIRBEeCQ-I3eigNVEg _sJu1EYRBEeCQ-I3eigNVEg _0p8ioYRBEeCQ-I3eigNVEg _85pkcYRAEeCQ-I3eigNVEg _AZlHoIREEeCQ-I3eigNVEg"/>
+      <anchorage xmi:id="_85pkcIRAEeCQ-I3eigNVEg" graphEdge="_85pkcYRAEeCQ-I3eigNVEg"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_jyTskYRAEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_jyTsmIRAEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_jyTskoRAEeCQ-I3eigNVEg">
+        <property xmi:id="_jyTsk4RAEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_jyTslIRAEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_jyTsmIRAEeCQ-I3eigNVEg"/>
+        </semanticModel>
+        <contained xsi:type="di:GraphNode" xmi:id="_rpKUEIRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_rpKUEYRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_rpdPAIRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_T3fZMIRBEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_T3fZMYRBEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_T3fZMoRBEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_jyTslYRAEeCQ-I3eigNVEg">
+        <property xmi:id="_jyTsloRAEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_jyTsl4RAEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_jyTsmIRAEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_l3wWIIRAEeCQ-I3eigNVEg" anchor="_l3J5MIRAEeCQ-I3eigNVEg _l3J5MYRAEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_l3wWIYRAEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_l3wWKoRAEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_l3wWIoRAEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_l3wWI4RAEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_l3wWJIRAEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_l3wWJYRAEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="3" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_l3wWJoRAEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_l3wWJ4RAEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_l3wWKIRAEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_l3wWKYRAEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_u_18AIRAEeCQ-I3eigNVEg" position="525,435" size="108,-1">
+      <anchorage xmi:id="_3h1yQIRAEeCQ-I3eigNVEg" graphEdge="_3h1yQYRAEeCQ-I3eigNVEg _951kMYRCEeCQ-I3eigNVEg"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_u_18AYRAEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_u__F8IRAEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_u_18AoRAEeCQ-I3eigNVEg">
+        <property xmi:id="_u_18A4RAEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="39"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_u_18BIRAEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_u__F8IRAEeCQ-I3eigNVEg"/>
+        </semanticModel>
+        <contained xsi:type="di:GraphNode" xmi:id="_wqNzIIRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_wqNzIYRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_wqW9EIRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_yP0fAIRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_yP0fAYRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_yP-QAIRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_y32IUIRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_y32IUYRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_y32IUoRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_z9UioIRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_z9UioYRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_z9UiooRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_0heYkIRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_0heYkYRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_0heYkoRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_1DPo4IRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_1DPo4YRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_1DPo4oRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_1vbZcIRAEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_1vbZcYRAEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_1vbZcoRAEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_3h1yQYRAEeCQ-I3eigNVEg" anchor="_l3J5MYRAEeCQ-I3eigNVEg _3h1yQIRAEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_3h1yQoRAEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_3h-8MIRAEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_3h1yQ4RAEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_3h1yRIRAEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_3h1yRYRAEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="8"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_3h1yRoRAEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_3h1yR4RAEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_3h1ySIRAEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="8" vDistance="5"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_3h1ySYRAEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_3h1ySoRAEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_85pkcYRAEeCQ-I3eigNVEg" anchor="_l3J5MYRAEeCQ-I3eigNVEg _85pkcIRAEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_85pkcoRAEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_85zVcIRAEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_85pkc4RAEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_85pkdIRAEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_85pkdYRAEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_85pkdoRAEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_85pkd4RAEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_85pkeIRAEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="3" vDistance="-24"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_85pkeYRAEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="28,12"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_85pkeoRAEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+      <waypoints>[-114, 0, -114, 0]</waypoints>
+      <waypoints>[-114, 66, -114, 66]</waypoints>
+      <waypoints>[-88, 66, -88, 66]</waypoints>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_JphwYIRBEeCQ-I3eigNVEg" position="67,579" size="135,-1">
+      <anchorage xmi:id="_gHrYcIRBEeCQ-I3eigNVEg" graphEdge="_gH1JcIRBEeCQ-I3eigNVEg _lY1osIREEeCQ-I3eigNVEg"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_JphwYYRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_JphwaIRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_JphwYoRBEeCQ-I3eigNVEg">
+        <property xmi:id="_JphwY4RBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_JphwZIRBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_JphwaIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+        <contained xsi:type="di:GraphNode" xmi:id="_LY9GoIRBEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_LY9GoYRBEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_LY9GooRBEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_JphwZYRBEeCQ-I3eigNVEg">
+        <property xmi:id="_JphwZoRBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_JphwZ4RBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_JphwaIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_gH1JcIRBEeCQ-I3eigNVEg" anchor="_l3J5MYRAEeCQ-I3eigNVEg _gHrYcIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_gH1JcYRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_gH-TYIRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_gH1JcoRBEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_gH1Jc4RBEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_gH1JdIRBEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="8"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_gH1JdYRBEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_gH1JdoRBEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_gH1Jd4RBEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="10" vDistance="8"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_gH1JeIRBEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_gH1JeYRBEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_ornIYIRBEeCQ-I3eigNVEg" position="297,177" size="124,-1">
+      <anchorage xmi:id="_sJu1EIRBEeCQ-I3eigNVEg" graphEdge="_sJu1EYRBEeCQ-I3eigNVEg _xODqkIRBEeCQ-I3eigNVEg _HSiOYIRCEeCQ-I3eigNVEg _YcOTMYRCEeCQ-I3eigNVEg _DGc9kIREEeCQ-I3eigNVEg _erOG4IRUEeCraeEslaZP-w _fbRq0YRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_ornIYYRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_orw5YIRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_ornIYoRBEeCQ-I3eigNVEg">
+        <property xmi:id="_ornIY4RBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_ornIZIRBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_orw5YIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+        <contained xsi:type="di:GraphNode" xmi:id="_OGlVEIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_OGlVEYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_OGlVEoRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_ornIZYRBEeCQ-I3eigNVEg">
+        <property xmi:id="_ornIZoRBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_ornIZ4RBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_orw5YIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_pQNqQIRBEeCQ-I3eigNVEg" position="309,365" size="100,-1">
+      <anchorage xmi:id="_0p8ioIRBEeCQ-I3eigNVEg" graphEdge="_0p8ioYRBEeCQ-I3eigNVEg _HSiOYIRCEeCQ-I3eigNVEg _A3CfsIREEeCQ-I3eigNVEg"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_pQNqQYRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_pQW0MIRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_pQNqQoRBEeCQ-I3eigNVEg">
+        <property xmi:id="_pQNqQ4RBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_pQNqRIRBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_pQW0MIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_pQNqRYRBEeCQ-I3eigNVEg">
+        <property xmi:id="_pQNqRoRBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_pQNqR4RBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_pQW0MIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_qD-pgIRBEeCQ-I3eigNVEg" position="529,288" size="100,-1">
+      <anchorage xmi:id="_xN55kIRBEeCQ-I3eigNVEg" graphEdge="_xODqkIRBEeCQ-I3eigNVEg _CW_2kIREEeCQ-I3eigNVEg _76fdcIRUEeCraeEslaZP-w _8ctZsYRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_qD-pgYRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_qEIagIRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_qD-pgoRBEeCQ-I3eigNVEg">
+        <property xmi:id="_qD-pg4RBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_qD-phIRBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_qEIagIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_qD-phYRBEeCQ-I3eigNVEg">
+        <property xmi:id="_qD-phoRBEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_qD-ph4RBEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_qEIagIRBEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_sJu1EYRBEeCQ-I3eigNVEg" anchor="_l3J5MYRAEeCQ-I3eigNVEg _sJu1EIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_sJu1EoRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_sJ3_AIRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_sJu1E4RBEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_sJu1FIRBEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_sJu1FYRBEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="5" vDistance="-4"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_sJu1FoRBEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_sJu1F4RBEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_sJu1GIRBEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="1" vDistance="-22"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_sJu1GYRBEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_sJu1GoRBEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_xODqkIRBEeCQ-I3eigNVEg" anchor="_sJu1EIRBEeCQ-I3eigNVEg _xN55kIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_xODqkYRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_xODqmoRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_xODqkoRBEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_xODqk4RBEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_xODqlIRBEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="-10" vDistance="30"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_xODqlYRBEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_xODqloRBEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_xODql4RBEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="7"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_xODqmIRBEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_xODqmYRBEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_0p8ioYRBEeCQ-I3eigNVEg" anchor="_l3J5MYRAEeCQ-I3eigNVEg _0p8ioIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_0p8iooRBEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_0qFskIRBEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_0p8io4RBEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_0p8ipIRBEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_0p8ipYRBEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_0p8ipoRBEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_0p8ip4RBEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_0p8iqIRBEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_0p8iqYRBEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_0p8iqoRBEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_HSiOYIRCEeCQ-I3eigNVEg" anchor="_sJu1EIRBEeCQ-I3eigNVEg _0p8ioIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_HSiOYYRCEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_HSrYUIRCEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_HSiOYoRCEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="-5" vDistance="29"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_HSiOY4RCEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_HSiOZIRCEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_HSiOZYRCEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_HSiOZoRCEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_HSiOZ4RCEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_HSiOaIRCEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_HSiOaYRCEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_WVR00IRCEeCQ-I3eigNVEg" position="529,182" size="100,-1">
+      <anchorage xmi:id="_YcOTMIRCEeCQ-I3eigNVEg" graphEdge="_YcOTMYRCEeCQ-I3eigNVEg"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_WVR00YRCEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_WVbl0IRCEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_WVR00oRCEeCQ-I3eigNVEg">
+        <property xmi:id="_WVR004RCEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_WVR01IRCEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_WVbl0IRCEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_WVR01YRCEeCQ-I3eigNVEg">
+        <property xmi:id="_WVR01oRCEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_WVR014RCEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_WVbl0IRCEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_YcOTMYRCEeCQ-I3eigNVEg" anchor="_sJu1EIRBEeCQ-I3eigNVEg _YcOTMIRCEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_YcOTMoRCEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_YcXdIIRCEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_YcOTM4RCEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_YcOTNIRCEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_YcOTNYRCEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_YcOTNoRCEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_YcOTN4RCEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_YcOTOIRCEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_YcOTOYRCEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_YcOTOoRCEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_oGvEQIRCEeCQ-I3eigNVEg" position="263,525" size="191,-1">
+      <anchorage xmi:id="_951kMIRCEeCQ-I3eigNVEg" graphEdge="_951kMYRCEeCQ-I3eigNVEg _AZlHoIREEeCQ-I3eigNVEg _A3CfsIREEeCQ-I3eigNVEg _CW_2kIREEeCQ-I3eigNVEg _DGc9kIREEeCQ-I3eigNVEg _lY1osIREEeCQ-I3eigNVEg"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_oGvEQYRCEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_oG41QIRCEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_oGvEQoRCEeCQ-I3eigNVEg">
+        <property xmi:id="_oGvEQ4RCEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_oGvERIRCEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_oG41QIRCEeCQ-I3eigNVEg"/>
+        </semanticModel>
+        <contained xsi:type="di:GraphNode" xmi:id="_0ZWscIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_0ZWscYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_0ZWscoRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_uF38MIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_uF38MYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_uF38MoRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_vZ7lEIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_vZ7lEYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_vZ7lEoRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_wPpFEIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_wPpFEYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_wPpFEoRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_xcG4MIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_xcG4MYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_xcG4MoRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_zTuhIIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_zTuhIYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_zTuhIoRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+        <contained xsi:type="di:GraphNode" xmi:id="_4k_mcIRCEeCQ-I3eigNVEg" position="0,0" size="-1,-1">
+          <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_4k_mcYRCEeCQ-I3eigNVEg" presentation="default">
+            <element href="JavaLogging.uml#_4lJXcIRCEeCQ-I3eigNVEg"/>
+          </semanticModel>
+        </contained>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_oGvERYRCEeCQ-I3eigNVEg">
+        <property xmi:id="_oGvERoRCEeCQ-I3eigNVEg" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_oGvER4RCEeCQ-I3eigNVEg" presentation="default">
+          <element href="JavaLogging.uml#_oG41QIRCEeCQ-I3eigNVEg"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_951kMYRCEeCQ-I3eigNVEg" anchor="_951kMIRCEeCQ-I3eigNVEg _3h1yQIRAEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_951kMoRCEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_95-uIIRCEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_951kM4RCEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_951kNIRCEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_951kNYRCEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="11" vDistance="9"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_951kNoRCEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_951kN4RCEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_951kOIRCEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="6" vDistance="12"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_951kOYRCEeCQ-I3eigNVEg" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_951kOoRCEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_AZlHoIREEeCQ-I3eigNVEg" anchor="_l3J5MYRAEeCQ-I3eigNVEg _951kMIRCEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_AZlHoYREEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_AZuRkIREEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_AZlHooREEeCQ-I3eigNVEg" id="stereotypeEdgeObject"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_AZlHo4REEeCQ-I3eigNVEg" visible="false" id="middleNameEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_A3CfsIREEeCQ-I3eigNVEg" anchor="_0p8ioIRBEeCQ-I3eigNVEg _951kMIRCEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_A3CfsYREEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_A3VaoIREEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_A3CfsoREEeCQ-I3eigNVEg" id="stereotypeEdgeObject"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_A3Cfs4REEeCQ-I3eigNVEg" visible="false" id="middleNameEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_CW_2kIREEeCQ-I3eigNVEg" anchor="_xN55kIRBEeCQ-I3eigNVEg _951kMIRCEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_CW_2kYREEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_CXJAgIREEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_CW_2koREEeCQ-I3eigNVEg" id="stereotypeEdgeObject"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_CW_2k4REEeCQ-I3eigNVEg" visible="false" id="middleNameEdgeObject"/>
+      <waypoints>[-112, 53, 109, -243]</waypoints>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_DGc9kIREEeCQ-I3eigNVEg" anchor="_sJu1EIRBEeCQ-I3eigNVEg _951kMIRCEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_DGc9kYREEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_DGmukIREEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_DGc9koREEeCQ-I3eigNVEg" id="stereotypeEdgeObject"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_DGc9k4REEeCQ-I3eigNVEg" visible="false" id="middleNameEdgeObject"/>
+      <waypoints>[65, 180, 66, -222]</waypoints>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_lY1osIREEeCQ-I3eigNVEg" anchor="_gHrYcIRBEeCQ-I3eigNVEg _951kMIRCEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_lY1osYREEeCQ-I3eigNVEg" presentation="default">
+        <element href="JavaLogging.uml#_lY1ouoREEeCQ-I3eigNVEg"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_lY1osoREEeCQ-I3eigNVEg" visible="false" id="srcNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_lY1os4REEeCQ-I3eigNVEg" id="srcPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_lY1otIREEeCQ-I3eigNVEg" id="srcCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_lY1otYREEeCQ-I3eigNVEg" visible="false" id="targetNameEdgeObject" uDistance="10" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_lY1otoREEeCQ-I3eigNVEg" id="targetPropertiesEdgeObject" uDistance="25" vDistance="10"/>
+      <contained xsi:type="di:EdgeObjectUV" xmi:id="_lY1ot4REEeCQ-I3eigNVEg" id="targetCountEdgeObject" uDistance="10" vDistance="-10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_lY1ouIREEeCQ-I3eigNVEg" visible="false" id="middleNameEdgeObject" offset="0,10"/>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_lY1ouYREEeCQ-I3eigNVEg" id="stereotypeEdgeObject" offset="0,-10"/>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_Wx-5wIRUEeCraeEslaZP-w" position="301,84" size="115,-1">
+      <anchorage xmi:id="_erE88IRUEeCraeEslaZP-w" graphEdge="_erOG4IRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Wx-5wYRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_WyblsIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_Wx-5woRUEeCraeEslaZP-w">
+        <property xmi:id="_Wx-5w4RUEeCraeEslaZP-w" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Wx-5xIRUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_WyblsIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_Wx-5xYRUEeCraeEslaZP-w">
+        <property xmi:id="_Wx-5xoRUEeCraeEslaZP-w" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Wx-5x4RUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_WyblsIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_XcYhoIRUEeCraeEslaZP-w" position="445,84" size="100,-1">
+      <anchorage xmi:id="_fbRq0IRUEeCraeEslaZP-w" graphEdge="_fbRq0YRUEeCraeEslaZP-w _goym0YRUEeCraeEslaZP-w _g-gYIYRUEeCraeEslaZP-w _hY_UsYRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_XcYhoYRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_XciSoIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_XcYhooRUEeCraeEslaZP-w">
+        <property xmi:id="_XcYho4RUEeCraeEslaZP-w" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_XcYhpIRUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_XciSoIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_XcYhpYRUEeCraeEslaZP-w">
+        <property xmi:id="_XcYhpoRUEeCraeEslaZP-w" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_XcYhp4RUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_XciSoIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_YJKvIIRUEeCraeEslaZP-w" position="321,5" size="115,-1">
+      <anchorage xmi:id="_goym0IRUEeCraeEslaZP-w" graphEdge="_goym0YRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_YJKvIYRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_YJdqEIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_YJKvIoRUEeCraeEslaZP-w">
+        <property xmi:id="_YJKvI4RUEeCraeEslaZP-w" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_YJKvJIRUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_YJdqEIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_YJKvJYRUEeCraeEslaZP-w">
+        <property xmi:id="_YJKvJoRUEeCraeEslaZP-w" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_YJKvJ4RUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_YJdqEIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_Y0m40IRUEeCraeEslaZP-w" position="445,5" size="100,-1">
+      <anchorage xmi:id="_g-gYIIRUEeCraeEslaZP-w" graphEdge="_g-gYIYRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Y0m40YRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_Y06a0IRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_Y0m40oRUEeCraeEslaZP-w">
+        <property xmi:id="_Y0m404RUEeCraeEslaZP-w" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Y0m41IRUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_Y06a0IRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_Y0m41YRUEeCraeEslaZP-w">
+        <property xmi:id="_Y0m41oRUEeCraeEslaZP-w" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_Y0m414RUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_Y06a0IRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_ZhsBQIRUEeCraeEslaZP-w" position="552,5" size="100,-1">
+      <anchorage xmi:id="_hY_UsIRUEeCraeEslaZP-w" graphEdge="_hY_UsYRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_ZhsBQYRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_Zh1yQIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_ZhsBQoRUEeCraeEslaZP-w">
+        <property xmi:id="_ZhsBQ4RUEeCraeEslaZP-w" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_ZhsBRIRUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_Zh1yQIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_ZhsBRYRUEeCraeEslaZP-w">
+        <property xmi:id="_ZhsBRoRUEeCraeEslaZP-w" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_ZhsBR4RUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_Zh1yQIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_erOG4IRUEeCraeEslaZP-w" anchor="_erE88IRUEeCraeEslaZP-w _sJu1EIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_erOG4YRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_erX34IRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_erOG4oRUEeCraeEslaZP-w" id="stereotypeEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_fbRq0YRUEeCraeEslaZP-w" anchor="_fbRq0IRUEeCraeEslaZP-w _sJu1EIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_fbRq0oRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_fbklwIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_fbRq04RUEeCraeEslaZP-w" id="stereotypeEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_goym0YRUEeCraeEslaZP-w" anchor="_goym0IRUEeCraeEslaZP-w _fbRq0IRUEeCraeEslaZP-w">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_goym0oRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_go7wwIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_goym04RUEeCraeEslaZP-w" id="stereotypeEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_g-gYIYRUEeCraeEslaZP-w" anchor="_g-gYIIRUEeCraeEslaZP-w _fbRq0IRUEeCraeEslaZP-w">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_g-gYIoRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_g-qJIIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_g-gYI4RUEeCraeEslaZP-w" id="stereotypeEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_hY_UsYRUEeCraeEslaZP-w" anchor="_hY_UsIRUEeCraeEslaZP-w _fbRq0IRUEeCraeEslaZP-w">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_hY_UsoRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_hZJFsIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_hY_Us4RUEeCraeEslaZP-w" id="stereotypeEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_05Vu4IRUEeCraeEslaZP-w" position="628,365" size="121,-1">
+      <anchorage xmi:id="_8ctZsIRUEeCraeEslaZP-w" graphEdge="_8ctZsYRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_05Vu4YRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_05op0IRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_05Vu4oRUEeCraeEslaZP-w">
+        <property xmi:id="_05Vu44RUEeCraeEslaZP-w" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_05Vu5IRUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_05op0IRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_05Vu5YRUEeCraeEslaZP-w">
+        <property xmi:id="_05Vu5oRUEeCraeEslaZP-w" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_05Vu54RUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_05op0IRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphNode" xmi:id="_1lhfcIRUEeCraeEslaZP-w" position="498,365" size="100,-1">
+      <anchorage xmi:id="_76VscIRUEeCraeEslaZP-w" graphEdge="_76fdcIRUEeCraeEslaZP-w"/>
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_1lhfcYRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_1l0aYIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:GraphNode" xmi:id="_1lhfcoRUEeCraeEslaZP-w">
+        <property xmi:id="_1lhfc4RUEeCraeEslaZP-w" key="eStructuralFeatureID" value="37"/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_1lhfdIRUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_1l0aYIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+      <contained xsi:type="di:GraphNode" xmi:id="_1lhfdYRUEeCraeEslaZP-w">
+        <property xmi:id="_1lhfdoRUEeCraeEslaZP-w" key="eStructuralFeatureID" value="47 50 "/>
+        <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_1lhfd4RUEeCraeEslaZP-w" presentation="default">
+          <element href="JavaLogging.uml#_1l0aYIRUEeCraeEslaZP-w"/>
+        </semanticModel>
+      </contained>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_76fdcIRUEeCraeEslaZP-w" anchor="_76VscIRUEeCraeEslaZP-w _xN55kIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_76fdcYRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_76onYIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_76fdcoRUEeCraeEslaZP-w" id="stereotypeEdgeObject"/>
+    </contained>
+    <contained xsi:type="di:GraphEdge" xmi:id="_8ctZsYRUEeCraeEslaZP-w" anchor="_8ctZsIRUEeCraeEslaZP-w _xN55kIRBEeCQ-I3eigNVEg">
+      <semanticModel xsi:type="di:EMFSemanticModelBridge" xmi:id="_8ctZsoRUEeCraeEslaZP-w" presentation="default">
+        <element href="JavaLogging.uml#_8c2joIRUEeCraeEslaZP-w"/>
+      </semanticModel>
+      <contained xsi:type="di:EdgeObjectOffset" xmi:id="_8ctZs4RUEeCraeEslaZP-w" id="stereotypeEdgeObject"/>
+    </contained>
+  </diagrams>
+</diagrams:Diagrams>

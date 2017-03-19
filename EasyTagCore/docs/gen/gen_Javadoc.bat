@@ -1,0 +1,1 @@
+call E:\Programmieren\01_Java\03_Workspaces\01_General\02_Libraries\JavaUtils\Utility\docs\gen\gen_Javadoc.bat

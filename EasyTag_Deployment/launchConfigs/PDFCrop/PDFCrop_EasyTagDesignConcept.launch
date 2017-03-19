@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.python.pydev.debug.regularLaunchConfigurationType">
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:MiscDevelopmentTools/PDFCrop/src/PDFCropper.py}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_OTHER_WORKING_DIRECTORY" value=""/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="${workspace_loc:EasyTag_Docs/DesignConcept/Figures/} &#13;&#10;${workspace_loc:EasyTag_Docs/DesignConcept/Figures/Part_I/Figures_Part_I.pdf}&#13;&#10;${workspace_loc:EasyTag_Docs/DesignConcept/Figures/Part_II/Figures_Part_II.pdf}&#13;&#10;${workspace_loc:EasyTag_Docs/DesignConcept/Figures/Part_III/Figures_Part_III.pdf}"/>
+<stringAttribute key="org.python.pydev.debug.ATTR_INTERPRETER" value="C:\Python27\python.exe"/>
+<stringAttribute key="org.python.pydev.debug.ATTR_PROJECT" value="MiscDevelopmentTools/"/>
+<stringAttribute key="process_factory_id" value="org.python.pydev.debug.processfactory.PyProcessFactory"/>
+</launchConfiguration>

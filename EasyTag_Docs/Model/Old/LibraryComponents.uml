@@ -1,0 +1,973 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CommonStereotypes="http:///schemas/CommonStereotypes/_qjU74LLjEd-fJ-POBtm0jQ/13" xmlns:CommonStereotypes_1="http:///schemas/CommonStereotypes/_nUFjQLLkEd-fJ-POBtm0jQ/17" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xsi:schemaLocation="http:///schemas/CommonStereotypes/_qjU74LLjEd-fJ-POBtm0jQ/13 ../../GeneratorTemplates/models/CommonStereotypes.uml#_qjes4LLjEd-fJ-POBtm0jQ http:///schemas/CommonStereotypes/_nUFjQLLkEd-fJ-POBtm0jQ/17 ../../GeneratorTemplates/models/CommonStereotypes.uml#_nUOtMLLkEd-fJ-POBtm0jQ">
+  <uml:Model xmi:id="idModel" name="LibraryComponentsModel">
+    <packagedElement xmi:type="uml:Package" xmi:id="idPackage" name="Component Overview">
+      <packagedElement xmi:type="uml:Component" xmi:id="idComponent" name="Library Components">
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_1saY4LLSEd-fJ-POBtm0jQ" name="MediumAccess" visibility="private"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_OeDGgrLTEd-fJ-POBtm0jQ" name="ExtensionManagement" visibility="private" clientDependency="_4TNxI7LUEd-fJ-POBtm0jQ"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_hPrZgrLTEd-fJ-POBtm0jQ" name="TagConversion" clientDependency="_rFTv87LVEd-fJ-POBtm0jQ _dcV4g7LYEd-fJ-POBtm0jQ"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_piKNErLTEd-fJ-POBtm0jQ" name="Context" clientDependency="_V5knc7LUEd-fJ-POBtm0jQ _WQq41LLUEd-fJ-POBtm0jQ _WijTBLLUEd-fJ-POBtm0jQ _W-j5lLLUEd-fJ-POBtm0jQ _l965s9PiEd-1FrB1d8OXDw"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_r78H4rLTEd-fJ-POBtm0jQ" name="DataAccess" clientDependency="_fPGzdLLUEd-fJ-POBtm0jQ _flAyBLLUEd-fJ-POBtm0jQ _i5gBk7LUEd-fJ-POBtm0jQ" isAbstract="true">
+          <realization xmi:id="_i5gBk7LUEd-fJ-POBtm0jQ" name="ComponentRealization1" supplier="_cBBt4rLUEd-fJ-POBtm0jQ" client="_r78H4rLTEd-fJ-POBtm0jQ" realizingClassifier="_cBBt4rLUEd-fJ-POBtm0jQ"/>
+        </nestedClassifier>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_3gOqcrLTEd-fJ-POBtm0jQ" name="DataFormatManagement" visibility="private"/>
+        <nestedClassifier xmi:type="uml:Component" xmi:id="_cBBt4rLUEd-fJ-POBtm0jQ" name="ConcreteExtension" visibility="private" clientDependency="_MUH6s7LVEd-fJ-POBtm0jQ _hBsydLLUEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_V5knc7LUEd-fJ-POBtm0jQ" name="" supplier="_OeDGgrLTEd-fJ-POBtm0jQ" client="_piKNErLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_WQq41LLUEd-fJ-POBtm0jQ" name="" supplier="_r78H4rLTEd-fJ-POBtm0jQ" client="_piKNErLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_WijTBLLUEd-fJ-POBtm0jQ" name="" supplier="_hPrZgrLTEd-fJ-POBtm0jQ" client="_piKNErLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_W-j5lLLUEd-fJ-POBtm0jQ" name="" client="_piKNErLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_fPGzdLLUEd-fJ-POBtm0jQ" name="" supplier="_3gOqcrLTEd-fJ-POBtm0jQ" client="_r78H4rLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_flAyBLLUEd-fJ-POBtm0jQ" name="" supplier="_1saY4LLSEd-fJ-POBtm0jQ" client="_r78H4rLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_hBsydLLUEd-fJ-POBtm0jQ" name="" supplier="_1saY4LLSEd-fJ-POBtm0jQ" client="_cBBt4rLUEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_4TNxI7LUEd-fJ-POBtm0jQ" name="" supplier="_r78H4rLTEd-fJ-POBtm0jQ" client="_OeDGgrLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_MUH6s7LVEd-fJ-POBtm0jQ" name="" supplier="_3gOqcrLTEd-fJ-POBtm0jQ" client="_cBBt4rLUEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_rFTv87LVEd-fJ-POBtm0jQ" name="" supplier="_r78H4rLTEd-fJ-POBtm0jQ" client="_hPrZgrLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_raUWo7LVEd-fJ-POBtm0jQ" name="" supplier="_r78H4rLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_dCt3k7LYEd-fJ-POBtm0jQ" name="" supplier="_3gOqcrLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_dcV4g7LYEd-fJ-POBtm0jQ" name="" supplier="_3gOqcrLTEd-fJ-POBtm0jQ" client="_hPrZgrLTEd-fJ-POBtm0jQ"/>
+        <packagedElement xmi:type="uml:Dependency" xmi:id="_l965s9PiEd-1FrB1d8OXDw" name="" supplier="_3gOqcrLTEd-fJ-POBtm0jQ" client="_piKNErLTEd-fJ-POBtm0jQ"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_H6cFgLQFEd-0k7fyucCnpw" name="org.je.jmeta.context.export">
+      <packagedElement xmi:type="uml:Component" xmi:id="_SEuIMLQFEd-0k7fyucCnpw" name="Component Interface Usage"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_TURHuLQJEd-0k7fyucCnpw" name="Context" clientDependency="__ieR5r9xEd-DPPK8uMx4xA">
+        <ownedOperation xmi:id="_WV_MQrQJEd-0k7fyucCnpw" name="getConverter"/>
+        <ownedOperation xmi:id="_nzFokrRGEd-PgN3SAEMFUA" name="getDataAccessor">
+          <ownedParameter xmi:id="_67SkULRNEd-PgN3SAEMFUA" name="medium" type="_hAKP-LQJEd-0k7fyucCnpw"/>
+          <ownedParameter xmi:id="_CMM8ENPdEd-1FrB1d8OXDw" name="return" type="_p0V2uLWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_hAKP-LQJEd-0k7fyucCnpw" name="Medium">
+        <ownedOperation xmi:id="_sJJp4rRGEd-PgN3SAEMFUA" name="getName">
+          <ownedParameter xmi:id="_eifWAM8YEd-NZcvRTr-rhA" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_s-8CYLRGEd-PgN3SAEMFUA" name="getMedium">
+          <ownedParameter xmi:id="_gEPcoM8YEd-NZcvRTr-rhA" name="return" direction="return">
+            <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#CreateObjectAction"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_HiGjks8YEd-NZcvRTr-rhA" name="isReadOnly">
+          <ownedParameter xmi:id="_hF8xQM8YEd-NZcvRTr-rhA" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_a6eGcs8YEd-NZcvRTr-rhA" name="Medium">
+          <ownedParameter xmi:id="_cGd_gM8YEd-NZcvRTr-rhA" name="medium">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_MyNRctPdEd-1FrB1d8OXDw" name="setReadOnly">
+          <ownedParameter xmi:id="_TvArgNPdEd-1FrB1d8OXDw" name="readOnly">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_XgQIgtPdEd-1FrB1d8OXDw" name="Medium">
+          <ownedParameter xmi:id="_YzstYNPdEd-1FrB1d8OXDw" name="medium">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_aviH8NPdEd-1FrB1d8OXDw" name="dataFormatHints">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_tTADItPdEd-1FrB1d8OXDw" name="getDataFormatHints">
+          <ownedParameter xmi:id="_uK4tYNPdEd-1FrB1d8OXDw" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="__ieR5r9xEd-DPPK8uMx4xA" name="Dependency1" supplier="_hAKP-LQJEd-0k7fyucCnpw" client="_TURHuLQJEd-0k7fyucCnpw"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_6XQvaM8WEd-NZcvRTr-rhA" name="StreamMedium">
+        <generalization xmi:id="_Qfd8pM8XEd-NZcvRTr-rhA" general="_hAKP-LQJEd-0k7fyucCnpw"/>
+        <ownedOperation xmi:id="_9PvYYs8WEd-NZcvRTr-rhA" name="getTimeoutMillis">
+          <ownedParameter xmi:id="_qUayINPdEd-1FrB1d8OXDw" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_HGW4MM8XEd-NZcvRTr-rhA" name="StreamMedium">
+          <ownedParameter xmi:id="_Rti5UM8XEd-NZcvRTr-rhA" name="stream">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_dHGykM8XEd-NZcvRTr-rhA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_kKKloM8XEd-NZcvRTr-rhA" name="dataFormatHints">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_m3K-cM8XEd-NZcvRTr-rhA" name="timeoutMillis">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_sXbiAs8XEd-NZcvRTr-rhA" name="hasTimeout">
+          <ownedParameter xmi:id="_pUpXMNPdEd-1FrB1d8OXDw" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_aIOa4tPeEd-1FrB1d8OXDw" name="setTimeoutMillis">
+          <ownedParameter xmi:id="_bTCBINPeEd-1FrB1d8OXDw" name="timeoutMillis">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_kJASmM8YEd-NZcvRTr-rhA" name="FileMedium">
+        <generalization xmi:id="_ougBBNOMEd--6dePTKiVLQ" general="_hAKP-LQJEd-0k7fyucCnpw"/>
+        <ownedOperation xmi:id="_JVZ98tPeEd-1FrB1d8OXDw" name="FileMedium">
+          <ownedParameter xmi:id="_NpqocNPeEd-1FrB1d8OXDw" name="file">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_Q2RHUNPeEd-1FrB1d8OXDw" name="dataFormatHints">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_pTAcSNOMEd--6dePTKiVLQ" name="ByteMedium">
+        <generalization xmi:id="_qpcDtNOMEd--6dePTKiVLQ" general="_hAKP-LQJEd-0k7fyucCnpw"/>
+        <ownedOperation xmi:id="_y06MgtPdEd-1FrB1d8OXDw" name="ByteMedium">
+          <ownedParameter xmi:id="_0XG_ENPdEd-1FrB1d8OXDw" name="byteArray">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_3OPkQNPdEd-1FrB1d8OXDw" name="dataFormatHints">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_H9uQwLQKEd-0k7fyucCnpw" name="org.je.jmeta.dataaccess.export1">
+      <packagedElement xmi:type="uml:Interface" xmi:id="_bmB96LWbEd-mQrA0LCJ-JQ" name="IDataBlock" clientDependency="_Qhv0RbWfEd-mQrA0LCJ-JQ">
+        <ownedOperation xmi:id="_dEWWArWbEd-mQrA0LCJ-JQ" name="getId">
+          <ownedParameter xmi:id="_J8UbkLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_d7fZYrWbEd-mQrA0LCJ-JQ" name="getType">
+          <ownedParameter xmi:id="_LBdesLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_fNl6crWbEd-mQrA0LCJ-JQ" name="getTypeName">
+          <ownedParameter xmi:id="_MIZRkLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_gdKr8rWbEd-mQrA0LCJ-JQ" name="getDataFormat">
+          <ownedParameter xmi:id="_NHIKsLWjEd-mQrA0LCJ-JQ" name="return" type="_NOALmLWfEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_iCfrArWbEd-mQrA0LCJ-JQ" name="getTotalSize">
+          <ownedParameter xmi:id="_OLE7ALWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_jM_vQrWbEd-mQrA0LCJ-JQ" name="getBytes">
+          <ownedParameter xmi:id="_QMagoLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_kAtEIrWbEd-mQrA0LCJ-JQ" name="getFieldIterator">
+          <ownedParameter xmi:id="_RLAP0LWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_o7zK8HVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_lm7bErWbEd-mQrA0LCJ-JQ" name="getPayload">
+          <ownedParameter xmi:id="_SfWMkLWjEd-mQrA0LCJ-JQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_nww1YrWbEd-mQrA0LCJ-JQ" name="setSubBlock"/>
+        <ownedOperation xmi:id="_Ac6JkrWdEd-mQrA0LCJ-JQ" name="getParentBlock">
+          <ownedParameter xmi:id="_VhgWALWjEd-mQrA0LCJ-JQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_p0V2uLWbEd-mQrA0LCJ-JQ" name="IDataAccess" clientDependency="_dzWfJLWdEd-mQrA0LCJ-JQ _SCdZFbWfEd-mQrA0LCJ-JQ">
+        <ownedOperation xmi:id="_q4bw8rWbEd-mQrA0LCJ-JQ" name="getRootBlock">
+          <ownedParameter xmi:id="_Y2cRgLWjEd-mQrA0LCJ-JQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_sxSI8bWbEd-mQrA0LCJ-JQ" name="writeDataBlock"/>
+        <ownedOperation xmi:id="_xNAGUrWbEd-mQrA0LCJ-JQ" name="createDataBlock">
+          <ownedParameter xmi:id="_afM_ELWjEd-mQrA0LCJ-JQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_knEOorWdEd-mQrA0LCJ-JQ" name="getSupportedDataFormats">
+          <ownedParameter xmi:id="_cA9FsLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_44e8krWhEd-mQrA0LCJ-JQ" name="findDataBlock">
+          <ownedParameter xmi:id="_dmbOsLWjEd-mQrA0LCJ-JQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_zmfGOLWbEd-mQrA0LCJ-JQ" name="IMetadataAccess" clientDependency="_eIzxxLWdEd-mQrA0LCJ-JQ _SciF9LWfEd-mQrA0LCJ-JQ">
+        <generalization xmi:id="_nT42tbWcEd-mQrA0LCJ-JQ" general="_p0V2uLWbEd-mQrA0LCJ-JQ"/>
+        <ownedOperation xmi:id="_pHN1grWcEd-mQrA0LCJ-JQ" name="findAllTags"/>
+        <ownedOperation xmi:id="_p7X2UrWcEd-mQrA0LCJ-JQ" name="findTag"/>
+        <ownedOperation xmi:id="_rFSEsrWcEd-mQrA0LCJ-JQ" name="getSupportedMetadataFormats"/>
+        <ownedOperation xmi:id="_FeemArWdEd-mQrA0LCJ-JQ" name="removeTag"/>
+        <ownedOperation xmi:id="_GF-D0rWdEd-mQrA0LCJ-JQ" name="createTag"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_61UEaLWbEd-mQrA0LCJ-JQ" name="ITag">
+        <generalization xmi:id="_76T9k7WbEd-mQrA0LCJ-JQ" general="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+        <ownedOperation xmi:id="_HF_PArWgEd-mQrA0LCJ-JQ" name="getAllAttributes">
+          <ownedParameter xmi:id="_gtgUYLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_IkUOMrWgEd-mQrA0LCJ-JQ" name="setAttributesWithId"/>
+        <ownedOperation xmi:id="_LcfVMLWgEd-mQrA0LCJ-JQ" name="removeAttributesWithId"/>
+        <ownedOperation xmi:id="_cG0kgrWgEd-mQrA0LCJ-JQ" name="getAttributesWithId">
+          <ownedParameter xmi:id="_imgdYLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_ns5dgrWlEd-mQrA0LCJ-JQ" name="addAttribute"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_dzWfJLWdEd-mQrA0LCJ-JQ" name="Dependency1" supplier="_bmB96LWbEd-mQrA0LCJ-JQ" client="_p0V2uLWbEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_eIzxxLWdEd-mQrA0LCJ-JQ" name="Dependency2" supplier="_61UEaLWbEd-mQrA0LCJ-JQ" client="_zmfGOLWbEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_MOrckLWfEd-mQrA0LCJ-JQ" name="LocationHint"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_NOALmLWfEd-mQrA0LCJ-JQ" name="DataFormat">
+        <ownedOperation xmi:id="_65wisrWfEd-mQrA0LCJ-JQ" name="getName">
+          <ownedParameter xmi:id="_HT8EELWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7md3srWfEd-mQrA0LCJ-JQ" name="getVersion">
+          <ownedParameter xmi:id="_IwLYkLWjEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Qhv0RbWfEd-mQrA0LCJ-JQ" name="Dependency3" supplier="_NOALmLWfEd-mQrA0LCJ-JQ" client="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_SCdZFbWfEd-mQrA0LCJ-JQ" name="Dependency4" supplier="_MOrckLWfEd-mQrA0LCJ-JQ" client="_p0V2uLWbEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_SciF9LWfEd-mQrA0LCJ-JQ" name="Dependency5" supplier="_MOrckLWfEd-mQrA0LCJ-JQ" client="_zmfGOLWbEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_bv_OULWfEd-mQrA0LCJ-JQ" name="BinaryField">
+        <generalization xmi:id="_4QokVLWfEd-mQrA0LCJ-JQ" general="_uQeuCLWfEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_uQeuCLWfEd-mQrA0LCJ-JQ" name="AbstractField" clientDependency="_vOnxRLWfEd-mQrA0LCJ-JQ">
+        <interfaceRealization xmi:id="_vOnxRLWfEd-mQrA0LCJ-JQ" name="InterfaceRealization1" supplier="_bmB96LWbEd-mQrA0LCJ-JQ" client="_uQeuCLWfEd-mQrA0LCJ-JQ" contract="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_zJjVyLWfEd-mQrA0LCJ-JQ" name="StringField">
+        <generalization xmi:id="_4oeclLWfEd-mQrA0LCJ-JQ" general="_uQeuCLWfEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_0SRRWLWfEd-mQrA0LCJ-JQ" name="NumericField">
+        <generalization xmi:id="_4-OqJLWfEd-mQrA0LCJ-JQ" general="_uQeuCLWfEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_2oBnyLWfEd-mQrA0LCJ-JQ" name="FlagsField">
+        <generalization xmi:id="_5uXGlLWfEd-mQrA0LCJ-JQ" general="_uQeuCLWfEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_-HnT6LWhEd-mQrA0LCJ-JQ" name="ByteOffsetHint">
+        <generalization xmi:id="_-yIPBL49Ed-taPfflTxlCA" general="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        <ownedOperation xmi:id="_nPnXwrxMEd-N5btqKe4MlQ" name="getByteOffset"/>
+        <ownedOperation xmi:id="_orjKQrxMEd-N5btqKe4MlQ" name="getReverseByteOffset"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="__pXaiLWhEd-mQrA0LCJ-JQ" name="ByteIntervalHint">
+        <generalization xmi:id="__Hbwo749Ed-taPfflTxlCA" general="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_CWz4OLWiEd-mQrA0LCJ-JQ" name="DefaultLocation">
+        <generalization xmi:id="__bZ1hL49Ed-taPfflTxlCA" general="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_HYYUqLWiEd-mQrA0LCJ-JQ" name="SiblingsHint">
+        <generalization xmi:id="__xc-BL49Ed-taPfflTxlCA" general="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        <ownedOperation xmi:id="_tjvBMrxMEd-N5btqKe4MlQ" name="getPreviousDataPartId"/>
+        <ownedOperation xmi:id="_yxqeorxMEd-N5btqKe4MlQ" name="getNextDataPartId"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_TNOd4LWxEd-mQrA0LCJ-JQ" name="org.je.jmeta.dataaccess.export2">
+      <packagedElement xmi:type="uml:Interface" xmi:id="_7iaY8LWxEd-mQrA0LCJ-JQ" name="IDataBlock" clientDependency="_7iaZJrWxEd-mQrA0LCJ-JQ _O-RRhL9yEd-DPPK8uMx4xA">
+        <ownedOperation xmi:id="_7iaY8bWxEd-mQrA0LCJ-JQ" name="getId">
+          <ownedParameter xmi:id="_7iaY8rWxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaY97WxEd-mQrA0LCJ-JQ" name="getDataFormat">
+          <ownedParameter xmi:id="_7iaY-LWxEd-mQrA0LCJ-JQ" name="return" type="_7iaZIbWxEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaY-bWxEd-mQrA0LCJ-JQ" name="getTotalSize">
+          <ownedParameter xmi:id="_7iaY-rWxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaY-7WxEd-mQrA0LCJ-JQ" name="getBytes">
+          <ownedParameter xmi:id="_7iaY_LWxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaY_bWxEd-mQrA0LCJ-JQ" name="getSubBlockIterator">
+          <ownedParameter xmi:id="_7iaY_rWxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_o7zK8HVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaY_7WxEd-mQrA0LCJ-JQ" name="getPayload">
+          <ownedParameter xmi:id="_7iaZALWxEd-mQrA0LCJ-JQ" name="return" type="_7iaY8LWxEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZAbWxEd-mQrA0LCJ-JQ" name="setSubBlock">
+          <ownedParameter xmi:id="_lh_mgL5IEd-taPfflTxlCA" name="subBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_o7i8QL5IEd-taPfflTxlCA" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZArWxEd-mQrA0LCJ-JQ" name="getParentBlock">
+          <ownedParameter xmi:id="_7iaZA7WxEd-mQrA0LCJ-JQ" name="return" type="_7iaY8LWxEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_pGigwr5HEd-taPfflTxlCA" name="getSubBlockIterator">
+          <ownedParameter xmi:id="_VyrN8L5IEd-taPfflTxlCA" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_jTr74L5IEd-taPfflTxlCA" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_o7zK8HVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_yx-rUr5HEd-taPfflTxlCA" name="setPayload">
+          <ownedParameter xmi:id="_OmOOUL5IEd-taPfflTxlCA" name="payload" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_j5WEoL9vEd-DPPK8uMx4xA" name="getLocationHint">
+          <ownedParameter xmi:id="_ldxr0L9vEd-DPPK8uMx4xA" name="return" type="_MOrckLWfEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_7iaZBLWxEd-mQrA0LCJ-JQ" name="IDataAccess" clientDependency="_7iaZHrWxEd-mQrA0LCJ-JQ _7iaZJ7WxEd-mQrA0LCJ-JQ _rx_-pb6NEd-pCZJ04A4MqQ">
+        <ownedOperation xmi:id="_7iaZBbWxEd-mQrA0LCJ-JQ" name="getRootBlock">
+          <ownedParameter xmi:id="_7iaZBrWxEd-mQrA0LCJ-JQ" name="return" type="_7iaY8LWxEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZB7WxEd-mQrA0LCJ-JQ" name="writeDataBlock">
+          <ownedParameter xmi:id="_1w5eEL5IEd-taPfflTxlCA" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_3zSMkL5IEd-taPfflTxlCA" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Asr3kL6IEd-pCZJ04A4MqQ" name="usePadding">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZCLWxEd-mQrA0LCJ-JQ" name="createDataBlock">
+          <ownedParameter xmi:id="_7iaZCbWxEd-mQrA0LCJ-JQ" name="return" type="_7iaY8LWxEd-mQrA0LCJ-JQ" direction="return"/>
+          <ownedParameter xmi:id="_AlzLEL5JEd-taPfflTxlCA" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_C4IaEL5JEd-taPfflTxlCA" name="childBlocks" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_fJhikL6KEd-pCZJ04A4MqQ" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZCrWxEd-mQrA0LCJ-JQ" name="getSupportedContainerFormats">
+          <ownedParameter xmi:id="_7iaZC7WxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_arz5wr6NEd-pCZJ04A4MqQ" name="registerTransformationHandler">
+          <ownedParameter xmi:id="_vOZNAL6NEd-pCZJ04A4MqQ" name="transformationHandler" type="_cIpEKL6NEd-pCZJ04A4MqQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_yhiYwr6NEd-pCZJ04A4MqQ" name="unregisterTransformationHandler">
+          <ownedParameter xmi:id="_zy56AL6NEd-pCZJ04A4MqQ" name="transformationHandler" type="_cIpEKL6NEd-pCZJ04A4MqQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_-ZNKUr6NEd-pCZJ04A4MqQ" name="getRegisteredTransformationHandlers">
+          <ownedParameter xmi:id="_AlbKQL6OEd-pCZJ04A4MqQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_eFzRUr9yEd-DPPK8uMx4xA" name="removeDataBlock">
+          <ownedParameter xmi:id="_fzLZIL9yEd-DPPK8uMx4xA" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_lHE7sL9yEd-DPPK8uMx4xA" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_mbHWcL9yEd-DPPK8uMx4xA" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_7iaZDrWxEd-mQrA0LCJ-JQ" name="IMetadataAccess" clientDependency="_7iaZH7WxEd-mQrA0LCJ-JQ _7iaZKLWxEd-mQrA0LCJ-JQ">
+        <generalization xmi:id="_7iaZD7WxEd-mQrA0LCJ-JQ" general="_7iaZBLWxEd-mQrA0LCJ-JQ"/>
+        <ownedOperation xmi:id="_7iaZELWxEd-mQrA0LCJ-JQ" name="findAllTags">
+          <ownedParameter xmi:id="_Ny_lIL5JEd-taPfflTxlCA" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZEbWxEd-mQrA0LCJ-JQ" name="findTag">
+          <ownedParameter xmi:id="_PdPgcL5JEd-taPfflTxlCA" name="return" type="_61UEaLWbEd-mQrA0LCJ-JQ" direction="return"/>
+          <ownedParameter xmi:id="_R2kvUL5JEd-taPfflTxlCA" name="format" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_UsOGwL5JEd-taPfflTxlCA" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZErWxEd-mQrA0LCJ-JQ" name="getSupportedMetadataFormats">
+          <ownedParameter xmi:id="_LSqWYL5JEd-taPfflTxlCA" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZFLWxEd-mQrA0LCJ-JQ" name="createTag">
+          <ownedParameter xmi:id="_tCcDsL5JEd-taPfflTxlCA" name="format" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_4FMrEr6MEd-pCZJ04A4MqQ" name="removeTag">
+          <ownedParameter xmi:id="_6X-mAL6MEd-pCZJ04A4MqQ" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_8NGUkL6MEd-pCZJ04A4MqQ" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_7iaZFbWxEd-mQrA0LCJ-JQ" name="ITag">
+        <generalization xmi:id="_7iaZFrWxEd-mQrA0LCJ-JQ" general="_7iaY8LWxEd-mQrA0LCJ-JQ"/>
+        <ownedOperation xmi:id="_7iaZF7WxEd-mQrA0LCJ-JQ" name="getAllAttributes">
+          <ownedParameter xmi:id="_7iaZGLWxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZGbWxEd-mQrA0LCJ-JQ" name="setAttributesWithId">
+          <ownedParameter xmi:id="_XbMZAL5KEd-taPfflTxlCA" name="attributeList">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZGrWxEd-mQrA0LCJ-JQ" name="removeAttributesWithId">
+          <ownedParameter xmi:id="_akqEUL5KEd-taPfflTxlCA" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZG7WxEd-mQrA0LCJ-JQ" name="getAttributesWithId">
+          <ownedParameter xmi:id="_7iaZHLWxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_eDuMML5KEd-taPfflTxlCA" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZHbWxEd-mQrA0LCJ-JQ" name="addAttribute">
+          <ownedParameter xmi:id="_k9ijsL5KEd-taPfflTxlCA" name="attribute" type="_uQeuCLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7CP2sr9rEd-DPPK8uMx4xA" name="getSubject">
+          <ownedParameter xmi:id="_8vUcgL9rEd-DPPK8uMx4xA" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_7iaZHrWxEd-mQrA0LCJ-JQ" name="Dependency1" supplier="_7iaY8LWxEd-mQrA0LCJ-JQ" client="_7iaZBLWxEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_7iaZH7WxEd-mQrA0LCJ-JQ" name="Dependency2" supplier="_7iaZFbWxEd-mQrA0LCJ-JQ" client="_7iaZDrWxEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_7iaZILWxEd-mQrA0LCJ-JQ" name="LocationHint" isAbstract="true">
+        <ownedOperation xmi:id="_8l-qEr5JEd-taPfflTxlCA" name="getDistance"/>
+        <ownedOperation xmi:id="_FgixUr5KEd-taPfflTxlCA" name="getNextDataBlockId">
+          <ownedParameter xmi:id="_HQAj0L5KEd-taPfflTxlCA" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Id8Wkr5KEd-taPfflTxlCA" name="getPreviousDataBlockId">
+          <ownedParameter xmi:id="_Mkf8QL5KEd-taPfflTxlCA" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_9dyvQr9vEd-DPPK8uMx4xA" name="isDefault">
+          <ownedParameter xmi:id="_EPtvAL9wEd-DPPK8uMx4xA" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_7iaZIbWxEd-mQrA0LCJ-JQ" name="DataFormat">
+        <ownedOperation xmi:id="_7iaZIrWxEd-mQrA0LCJ-JQ" name="getName">
+          <ownedParameter xmi:id="_7iaZI7WxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_7iaZJLWxEd-mQrA0LCJ-JQ" name="getVersion">
+          <ownedParameter xmi:id="_7iaZJbWxEd-mQrA0LCJ-JQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_7iaZJrWxEd-mQrA0LCJ-JQ" name="Dependency3" supplier="_7iaZIbWxEd-mQrA0LCJ-JQ" client="_7iaY8LWxEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_7iaZJ7WxEd-mQrA0LCJ-JQ" name="Dependency4" supplier="_7iaZILWxEd-mQrA0LCJ-JQ" client="_7iaZBLWxEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_7iaZKLWxEd-mQrA0LCJ-JQ" name="Dependency5" supplier="_7iaZILWxEd-mQrA0LCJ-JQ" client="_7iaZDrWxEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_7iaZKbWxEd-mQrA0LCJ-JQ" name="BinaryField">
+        <generalization xmi:id="_7iaZKrWxEd-mQrA0LCJ-JQ" general="_7iaZK7WxEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_7iaZK7WxEd-mQrA0LCJ-JQ" name="AbstractField" clientDependency="_7iaZLLWxEd-mQrA0LCJ-JQ">
+        <interfaceRealization xmi:id="_7iaZLLWxEd-mQrA0LCJ-JQ" name="InterfaceRealization1" supplier="_7iaY8LWxEd-mQrA0LCJ-JQ" client="_7iaZK7WxEd-mQrA0LCJ-JQ" contract="_7iaY8LWxEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_7iaZLbWxEd-mQrA0LCJ-JQ" name="StringField">
+        <generalization xmi:id="_7iaZLrWxEd-mQrA0LCJ-JQ" general="_7iaZK7WxEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_7iaZL7WxEd-mQrA0LCJ-JQ" name="NumericField">
+        <generalization xmi:id="_7iaZMLWxEd-mQrA0LCJ-JQ" general="_7iaZK7WxEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_7iaZMbWxEd-mQrA0LCJ-JQ" name="FlagsField">
+        <generalization xmi:id="_7iaZMrWxEd-mQrA0LCJ-JQ" general="_7iaZK7WxEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_cIpEKL6NEd-pCZJ04A4MqQ" name="ITransformationHandler">
+        <ownedOperation xmi:id="_d96jsr6NEd-pCZJ04A4MqQ" name="transform">
+          <ownedParameter xmi:id="_kL7lIL6NEd-pCZJ04A4MqQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_lAYg4L6NEd-pCZJ04A4MqQ" name="bytes">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_eyEkgr6NEd-pCZJ04A4MqQ" name="untransform">
+          <ownedParameter xmi:id="_m8DjYL6NEd-pCZJ04A4MqQ" name="bytes">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_oSCe4L6NEd-pCZJ04A4MqQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_ggMTMr6NEd-pCZJ04A4MqQ" name="getTransformationName">
+          <ownedParameter xmi:id="_iZ7cAL6NEd-pCZJ04A4MqQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_INSTgr6OEd-pCZJ04A4MqQ" name="getId">
+          <ownedParameter xmi:id="_I1qiIL6OEd-pCZJ04A4MqQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_rx_-pb6NEd-pCZJ04A4MqQ" name="Dependency6" supplier="_cIpEKL6NEd-pCZJ04A4MqQ" client="_7iaZBLWxEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_O-RRhL9yEd-DPPK8uMx4xA" name="Dependency7" supplier="_7iaZILWxEd-mQrA0LCJ-JQ" client="_7iaY8LWxEd-mQrA0LCJ-JQ"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_bcrS-L9yEd-DPPK8uMx4xA" name="DefaultLocation">
+        <generalization xmi:id="_c_BPdL9yEd-DPPK8uMx4xA" general="_7iaZILWxEd-mQrA0LCJ-JQ"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_Y-3KYMDrEd-JkNR-YH5BOQ" name="org.je.jmeta.dataaccess.export3">
+      <packagedElement xmi:type="uml:Interface" xmi:id="_Y-3KYcDrEd-JkNR-YH5BOQ" name="IDataBlock" clientDependency="_Y-3Kv8DrEd-JkNR-YH5BOQ _Y-3K2MDrEd-JkNR-YH5BOQ _bDzVhdPiEd-1FrB1d8OXDw">
+        <ownedOperation xmi:id="_Y-3KYsDrEd-JkNR-YH5BOQ" name="getId">
+          <ownedParameter xmi:id="_Y-3KY8DrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KZMDrEd-JkNR-YH5BOQ" name="getDataFormat">
+          <ownedParameter xmi:id="_Y-3KZcDrEd-JkNR-YH5BOQ" name="return" type="_Y-3KusDrEd-JkNR-YH5BOQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KZsDrEd-JkNR-YH5BOQ" name="getTotalSize">
+          <ownedParameter xmi:id="_Y-3KZ8DrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KaMDrEd-JkNR-YH5BOQ" name="getBytes">
+          <ownedParameter xmi:id="_Y-3KacDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_Ik_eYNPCEd-FxcA9sSCJjQ" name="byteOffset">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_O4Xg8NPCEd-FxcA9sSCJjQ" name="length">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KasDrEd-JkNR-YH5BOQ" name="getSubBlockIterator">
+          <ownedParameter xmi:id="_Y-3Ka8DrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_o7zK8HVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KbMDrEd-JkNR-YH5BOQ" name="getPayload">
+          <ownedParameter xmi:id="_Y-3KbcDrEd-JkNR-YH5BOQ" name="return" type="_Y-3KYcDrEd-JkNR-YH5BOQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KbsDrEd-JkNR-YH5BOQ" name="setSubBlock">
+          <ownedParameter xmi:id="_Y-3Kb8DrEd-JkNR-YH5BOQ" name="subBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3KcMDrEd-JkNR-YH5BOQ" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KccDrEd-JkNR-YH5BOQ" name="getParentBlock">
+          <ownedParameter xmi:id="_Y-3KcsDrEd-JkNR-YH5BOQ" name="return" type="_Y-3KYcDrEd-JkNR-YH5BOQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3Kc8DrEd-JkNR-YH5BOQ" name="getFirstSubBlockWithId">
+          <ownedParameter xmi:id="_Y-3KdMDrEd-JkNR-YH5BOQ" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_Y-3KdcDrEd-JkNR-YH5BOQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KdsDrEd-JkNR-YH5BOQ" name="setPayload">
+          <ownedParameter xmi:id="_Y-3Kd8DrEd-JkNR-YH5BOQ" name="payload" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KeMDrEd-JkNR-YH5BOQ" name="getLocationHint">
+          <ownedParameter xmi:id="_Y-3KecDrEd-JkNR-YH5BOQ" name="return" type="_MOrckLWfEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_WyamYNPCEd-FxcA9sSCJjQ" name="getBytes">
+          <ownedParameter xmi:id="_ZgTwANPCEd-FxcA9sSCJjQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_enDCEtRLEd-hoc5K2oPe5w" name="isPersistent">
+          <ownedParameter xmi:id="_gxLXUNRLEd-hoc5K2oPe5w" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_Y-3KesDrEd-JkNR-YH5BOQ" name="IDataAccess" clientDependency="_Y-3KsMDrEd-JkNR-YH5BOQ _Y-3KwMDrEd-JkNR-YH5BOQ _YqeGpdPiEd-1FrB1d8OXDw _f4e_ZemBEd-njsSnifC-kg _bwC4demDEd-njsSnifC-kg">
+        <ownedOperation xmi:id="_Y-3Ke8DrEd-JkNR-YH5BOQ" name="getRootBlock">
+          <ownedParameter xmi:id="_Y-3KfMDrEd-JkNR-YH5BOQ" name="return" type="_Y-3KYcDrEd-JkNR-YH5BOQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KfcDrEd-JkNR-YH5BOQ" name="writeDataBlock">
+          <ownedParameter xmi:id="_Y-3KfsDrEd-JkNR-YH5BOQ" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3Kf8DrEd-JkNR-YH5BOQ" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3KgMDrEd-JkNR-YH5BOQ" name="usePadding">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KgcDrEd-JkNR-YH5BOQ" name="createDataBlock">
+          <ownedParameter xmi:id="_Y-3KgsDrEd-JkNR-YH5BOQ" name="return" type="_Y-3KYcDrEd-JkNR-YH5BOQ" direction="return"/>
+          <ownedParameter xmi:id="_Y-3Kg8DrEd-JkNR-YH5BOQ" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_Y-3KhMDrEd-JkNR-YH5BOQ" name="childBlocks" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3KhcDrEd-JkNR-YH5BOQ" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KhsDrEd-JkNR-YH5BOQ" name="getSupportedDataFormats">
+          <ownedParameter xmi:id="_Y-3Kh8DrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KjsDrEd-JkNR-YH5BOQ" name="removeDataBlock">
+          <ownedParameter xmi:id="_Y-3Kj8DrEd-JkNR-YH5BOQ" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3KkMDrEd-JkNR-YH5BOQ" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_Y-3KkcDrEd-JkNR-YH5BOQ" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_9EsJEsDrEd-JkNR-YH5BOQ" name="getDataFormatSpecification">
+          <ownedParameter xmi:id="__MSuwMDrEd-JkNR-YH5BOQ" name="return" type="_wBNXyL6SEd-pCZJ04A4MqQ" direction="return"/>
+          <ownedParameter xmi:id="_BYW9sMDsEd-JkNR-YH5BOQ" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_H1XvMumCEd-njsSnifC-kg" name="getActiveTransformations">
+          <ownedParameter xmi:id="_MNqlIOmCEd-njsSnifC-kg" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_OMK5MOmCEd-njsSnifC-kg" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_XE83wumCEd-njsSnifC-kg" name="addTransformationHandler">
+          <ownedParameter xmi:id="_ancuIOmCEd-njsSnifC-kg" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_cqlDgOmCEd-njsSnifC-kg" name="handler" type="_cIpEKL6NEd-pCZJ04A4MqQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_fOfxwumCEd-njsSnifC-kg" name="removeTransformationHandler">
+          <ownedParameter xmi:id="_lMG_sOmCEd-njsSnifC-kg" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_oXD4wOmCEd-njsSnifC-kg" name="handler" type="_cIpEKL6NEd-pCZJ04A4MqQ"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_Y-3KksDrEd-JkNR-YH5BOQ" name="IMetadataAccess" clientDependency="_Y-3KscDrEd-JkNR-YH5BOQ _Y-3KwcDrEd-JkNR-YH5BOQ _ZCT-5NPiEd-1FrB1d8OXDw">
+        <generalization xmi:id="_Y-3Kk8DrEd-JkNR-YH5BOQ" general="_Y-3KesDrEd-JkNR-YH5BOQ"/>
+        <ownedOperation xmi:id="_Y-3KlMDrEd-JkNR-YH5BOQ" name="findAllTags">
+          <ownedParameter xmi:id="_Y-3KlcDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KlsDrEd-JkNR-YH5BOQ" name="findTag">
+          <ownedParameter xmi:id="_Y-3Kl8DrEd-JkNR-YH5BOQ" name="return" type="_61UEaLWbEd-mQrA0LCJ-JQ" direction="return"/>
+          <ownedParameter xmi:id="_Y-3KmMDrEd-JkNR-YH5BOQ" name="format" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3KmcDrEd-JkNR-YH5BOQ" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KmsDrEd-JkNR-YH5BOQ" name="getSupportedMetadataFormats">
+          <ownedParameter xmi:id="_Y-3Km8DrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KnMDrEd-JkNR-YH5BOQ" name="createTag">
+          <ownedParameter xmi:id="_Y-3KncDrEd-JkNR-YH5BOQ" name="format" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KnsDrEd-JkNR-YH5BOQ" name="removeTag">
+          <ownedParameter xmi:id="_Y-3Kn8DrEd-JkNR-YH5BOQ" name="dataFormat" type="_NOALmLWfEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3KoMDrEd-JkNR-YH5BOQ" name="location" type="_MOrckLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_Y-3KocDrEd-JkNR-YH5BOQ" name="ITag">
+        <generalization xmi:id="_Y-3KosDrEd-JkNR-YH5BOQ" general="_Y-3KYcDrEd-JkNR-YH5BOQ"/>
+        <ownedOperation xmi:id="_Y-3Ko8DrEd-JkNR-YH5BOQ" name="getAllAttributes">
+          <ownedParameter xmi:id="_Y-3KpMDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KpcDrEd-JkNR-YH5BOQ" name="setAttributesWithId">
+          <ownedParameter xmi:id="_Y-3KpsDrEd-JkNR-YH5BOQ" name="attributeList">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3Kp8DrEd-JkNR-YH5BOQ" name="removeAttributesWithId">
+          <ownedParameter xmi:id="_Y-3KqMDrEd-JkNR-YH5BOQ" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KqcDrEd-JkNR-YH5BOQ" name="getAttributesWithId">
+          <ownedParameter xmi:id="_Y-3KqsDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_Y-3Kq8DrEd-JkNR-YH5BOQ" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KrMDrEd-JkNR-YH5BOQ" name="addAttribute">
+          <ownedParameter xmi:id="_Y-3KrcDrEd-JkNR-YH5BOQ" name="attribute" type="_uQeuCLWfEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KrsDrEd-JkNR-YH5BOQ" name="getSubject">
+          <ownedParameter xmi:id="_Y-3Kr8DrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Y-3KsMDrEd-JkNR-YH5BOQ" name="Dependency1" supplier="_Y-3KYcDrEd-JkNR-YH5BOQ" client="_Y-3KesDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Y-3KscDrEd-JkNR-YH5BOQ" name="Dependency2" supplier="_Y-3KocDrEd-JkNR-YH5BOQ" client="_Y-3KksDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_Y-3KssDrEd-JkNR-YH5BOQ" name="LocationHint" isAbstract="true">
+        <ownedOperation xmi:id="_Y-3Ks8DrEd-JkNR-YH5BOQ" name="getByteInterval">
+          <ownedParameter xmi:id="_W51N0NRCEd-hoc5K2oPe5w" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KtMDrEd-JkNR-YH5BOQ" name="getNextDataBlockId">
+          <ownedParameter xmi:id="_Y-3KtcDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KtsDrEd-JkNR-YH5BOQ" name="getPreviousDataBlockId">
+          <ownedParameter xmi:id="_Y-3Kt8DrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KuMDrEd-JkNR-YH5BOQ" name="isDefault">
+          <ownedParameter xmi:id="_Y-3KucDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_ZWSpMtRCEd-hoc5K2oPe5w" name="getDirectParentBlockId">
+          <ownedParameter xmi:id="_arh90NRCEd-hoc5K2oPe5w" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_METAMODELS/UML.metamodel.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_fCev8tRCEd-hoc5K2oPe5w" name="atEndOfFile">
+          <ownedParameter xmi:id="_irYwUNRCEd-hoc5K2oPe5w" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_j3O4YtRCEd-hoc5K2oPe5w" name="atBeginningOfFile">
+          <ownedParameter xmi:id="_krr0INRCEd-hoc5K2oPe5w" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Y-3Kv8DrEd-JkNR-YH5BOQ" name="Dependency3" supplier="_Y-3KusDrEd-JkNR-YH5BOQ" client="_Y-3KYcDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Y-3KwMDrEd-JkNR-YH5BOQ" name="Dependency4" supplier="_Y-3KssDrEd-JkNR-YH5BOQ" client="_Y-3KesDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Y-3KwcDrEd-JkNR-YH5BOQ" name="Dependency5" supplier="_Y-3KssDrEd-JkNR-YH5BOQ" client="_Y-3KksDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_Y-3KwsDrEd-JkNR-YH5BOQ" name="BinaryField">
+        <generalization xmi:id="_Y-3Kw8DrEd-JkNR-YH5BOQ" general="_Y-3KxMDrEd-JkNR-YH5BOQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_Y-3KxMDrEd-JkNR-YH5BOQ" name="AbstractField" clientDependency="_Y-3KxcDrEd-JkNR-YH5BOQ">
+        <interfaceRealization xmi:id="_Y-3KxcDrEd-JkNR-YH5BOQ" name="InterfaceRealization1" supplier="_Y-3KYcDrEd-JkNR-YH5BOQ" client="_Y-3KxMDrEd-JkNR-YH5BOQ" contract="_Y-3KYcDrEd-JkNR-YH5BOQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_Y-3KxsDrEd-JkNR-YH5BOQ" name="StringField">
+        <generalization xmi:id="_Y-3Kx8DrEd-JkNR-YH5BOQ" general="_Y-3KxMDrEd-JkNR-YH5BOQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_Y-3KyMDrEd-JkNR-YH5BOQ" name="NumericField">
+        <generalization xmi:id="_Y-3KycDrEd-JkNR-YH5BOQ" general="_Y-3KxMDrEd-JkNR-YH5BOQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_Y-3KysDrEd-JkNR-YH5BOQ" name="FlagsField">
+        <generalization xmi:id="_Y-3Ky8DrEd-JkNR-YH5BOQ" general="_Y-3KxMDrEd-JkNR-YH5BOQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Y-3K2MDrEd-JkNR-YH5BOQ" name="Dependency7" supplier="_Y-3KssDrEd-JkNR-YH5BOQ" client="_Y-3KYcDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_Y-3K2cDrEd-JkNR-YH5BOQ" name="DefaultLocation">
+        <generalization xmi:id="_Y-3K2sDrEd-JkNR-YH5BOQ" general="_Y-3KssDrEd-JkNR-YH5BOQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_F5-G-NPgEd-1FrB1d8OXDw" name="UnrecognizedDataFormatException">
+        <ownedOperation xmi:id="_HnfYstPgEd-1FrB1d8OXDw" name="getMessage">
+          <ownedParameter xmi:id="_Vp48cNPgEd-1FrB1d8OXDw" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_RuW7AtPgEd-1FrB1d8OXDw" name="getMedium">
+          <ownedParameter xmi:id="_Wsfo8NPgEd-1FrB1d8OXDw" name="return" type="_hAKP-LQJEd-0k7fyucCnpw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_TIpuwtPgEd-1FrB1d8OXDw" name="getByteOffset">
+          <ownedParameter xmi:id="_Xv18UNPgEd-1FrB1d8OXDw" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_NJ6NiNPiEd-1FrB1d8OXDw" name="ReadOnlyMediumException">
+        <ownedOperation xmi:id="_VEPm0tPiEd-1FrB1d8OXDw" name="getMedium">
+          <ownedParameter xmi:id="_WKI34NPiEd-1FrB1d8OXDw" name="return" type="_hAKP-LQJEd-0k7fyucCnpw" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_YqeGpdPiEd-1FrB1d8OXDw" name="Dependency6" supplier="_NJ6NiNPiEd-1FrB1d8OXDw" client="_Y-3KesDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_ZCT-5NPiEd-1FrB1d8OXDw" name="Dependency8" supplier="_NJ6NiNPiEd-1FrB1d8OXDw" client="_Y-3KksDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_bDzVhdPiEd-1FrB1d8OXDw" name="Dependency9" supplier="_F5-G-NPgEd-1FrB1d8OXDw" client="_Y-3KYcDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_Y-3KzMDrEd-JkNR-YH5BOQ" name="ITransformationHandler">
+        <ownedOperation xmi:id="_Y-3KzcDrEd-JkNR-YH5BOQ" name="transform">
+          <ownedParameter xmi:id="_Y-3KzsDrEd-JkNR-YH5BOQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+          <ownedParameter xmi:id="_Y-3Kz8DrEd-JkNR-YH5BOQ" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3K0MDrEd-JkNR-YH5BOQ" name="untransform">
+          <ownedParameter xmi:id="_Y-3K0cDrEd-JkNR-YH5BOQ" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_Y-3K0sDrEd-JkNR-YH5BOQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3K08DrEd-JkNR-YH5BOQ" name="getType">
+          <ownedParameter xmi:id="_Y-3K1MDrEd-JkNR-YH5BOQ" name="return" type="_tnneWOmAEd-njsSnifC-kg" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3K1cDrEd-JkNR-YH5BOQ" name="getId">
+          <ownedParameter xmi:id="_Y-3K1sDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_3gnjwumAEd-njsSnifC-kg" name="needsTransform">
+          <ownedParameter xmi:id="_4tzvoOmAEd-njsSnifC-kg" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_6JwJMOmAEd-njsSnifC-kg" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_9XFn4umAEd-njsSnifC-kg" name="needsUntransform">
+          <ownedParameter xmi:id="_-VX1EOmAEd-njsSnifC-kg" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_A70S4OmBEd-njsSnifC-kg" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_uIK7wumCEd-njsSnifC-kg" name="getTriggeringBlockIds">
+          <ownedParameter xmi:id="_2JNaAOmCEd-njsSnifC-kg" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_3cp-4umCEd-njsSnifC-kg" name="getDataFormat">
+          <ownedParameter xmi:id="_4Q9wsOmCEd-njsSnifC-kg" name="return" type="_NOALmLWfEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_f4e_ZemBEd-njsSnifC-kg" name="Dependency10" supplier="_Y-3KzMDrEd-JkNR-YH5BOQ" client="_Y-3KesDrEd-JkNR-YH5BOQ"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_7Xv7eOmCEd-njsSnifC-kg" name="AbstractTransformationHandler" clientDependency="_BXvvBOmDEd-njsSnifC-kg" isAbstract="true">
+        <interfaceRealization xmi:id="_BXvvBOmDEd-njsSnifC-kg" name="InterfaceRealization1" supplier="_Y-3KzMDrEd-JkNR-YH5BOQ" client="_7Xv7eOmCEd-njsSnifC-kg" contract="_Y-3KzMDrEd-JkNR-YH5BOQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_UcADGOmDEd-njsSnifC-kg" name="InvalidTransformationException"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_bwC4demDEd-njsSnifC-kg" name="Dependency11" supplier="_UcADGOmDEd-njsSnifC-kg" client="_Y-3KesDrEd-JkNR-YH5BOQ"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_pRq9oL6SEd-pCZJ04A4MqQ" name="org.je.jmeta.dataformat.export3">
+      <packagedElement xmi:type="uml:Interface" xmi:id="_wBNXyL6SEd-pCZJ04A4MqQ" name="IDataFormatSpecification" clientDependency="_LETztcDuEd-JkNR-YH5BOQ _O9oxZdOUEd-dNbThiqFLaw _x9-alemAEd-njsSnifC-kg">
+        <ownedOperation xmi:id="_yWOHUr6SEd-pCZJ04A4MqQ" name="getDataFormat">
+          <ownedParameter xmi:id="_lZcw4MDtEd-JkNR-YH5BOQ" name="return" type="_NOALmLWfEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_zJL1Ur6SEd-pCZJ04A4MqQ" name="getSupportedByteOrders">
+          <ownedParameter xmi:id="_mmWB0MDtEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_10PtYr6SEd-pCZJ04A4MqQ" name="getSupportedCharacterEncodings">
+          <ownedParameter xmi:id="_qAMSgMDtEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_3jtf4r6SEd-pCZJ04A4MqQ" name="getDefaultByteOrder">
+          <ownedParameter xmi:id="_q2JDEMDtEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_4Y6CgL6SEd-pCZJ04A4MqQ" name="getDefaultCharacterEncoding">
+          <ownedParameter xmi:id="_sFHXoMDtEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_9Wmrkr6SEd-pCZJ04A4MqQ" name="getTopLevelBlockIds">
+          <ownedParameter xmi:id="_xFfhQMDtEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_GwwR0r6TEd-pCZJ04A4MqQ" name="getBlockDefinition">
+          <ownedParameter xmi:id="_z87BYMDtEd-JkNR-YH5BOQ" name="return" type="_J9y1mL6TEd-pCZJ04A4MqQ" direction="return"/>
+          <ownedParameter xmi:id="_ChlksMDuEd-JkNR-YH5BOQ" name="blockId">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_MYd_ssDtEd-JkNR-YH5BOQ" name="getTransformationTypes">
+          <ownedParameter xmi:id="_61s3EMDtEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_iK6_YsDtEd-JkNR-YH5BOQ" name="definesBlock">
+          <ownedParameter xmi:id="_-DCVwMDtEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="__bZ24MDtEd-JkNR-YH5BOQ" name="blockId">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_id-E0tOREd--6dePTKiVLQ" name="getViolations">
+          <ownedParameter xmi:id="_mjLmsNOREd--6dePTKiVLQ" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+          <ownedParameter xmi:id="_BTBtcNOSEd--6dePTKiVLQ" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_0Z2o0uXrEd-5gNnOP9gpoA" name="validate">
+          <ownedParameter xmi:id="_1KSAMOXrEd-5gNnOP9gpoA" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+          <ownedParameter xmi:id="_2lxGwOXrEd-5gNnOP9gpoA" name="dataBlock" type="_bmB96LWbEd-mQrA0LCJ-JQ"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_J9y1mL6TEd-pCZJ04A4MqQ" name="BlockDefinition">
+        <ownedOperation xmi:id="_MlIrQr6TEd-pCZJ04A4MqQ" name="getBlockId"/>
+        <ownedOperation xmi:id="_NRieQr6TEd-pCZJ04A4MqQ" name="getBlockType"/>
+        <ownedOperation xmi:id="_Oi5_gr6TEd-pCZJ04A4MqQ" name="getBlockTypeName"/>
+        <ownedOperation xmi:id="_Xao1Mr6TEd-pCZJ04A4MqQ" name="getSubBlockIds"/>
+        <ownedOperation xmi:id="_kPirEr6TEd-pCZJ04A4MqQ" name="isPayloadBlock"/>
+        <ownedOperation xmi:id="_dmrNksDsEd-JkNR-YH5BOQ" name="getBlockName"/>
+        <ownedOperation xmi:id="_UP-ugsDtEd-JkNR-YH5BOQ" name="getLocations"/>
+        <ownedOperation xmi:id="_ZG0hosDtEd-JkNR-YH5BOQ" name="isFlagsField"/>
+        <ownedOperation xmi:id="_Z3sk8sDtEd-JkNR-YH5BOQ" name="getFlagNames"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_Y-3KusDrEd-JkNR-YH5BOQ" name="DataFormat">
+        <ownedOperation xmi:id="_Y-3Ku8DrEd-JkNR-YH5BOQ" name="getName">
+          <ownedParameter xmi:id="_Y-3KvMDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Y-3KvcDrEd-JkNR-YH5BOQ" name="getVersion">
+          <ownedParameter xmi:id="_Y-3KvsDrEd-JkNR-YH5BOQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_LETztcDuEd-JkNR-YH5BOQ" name="Dependency1" supplier="_J9y1mL6TEd-pCZJ04A4MqQ" client="_wBNXyL6SEd-pCZJ04A4MqQ"/>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_JT7ByNOSEd--6dePTKiVLQ" name="SpecificationViolation">
+        <ownedOperation xmi:id="_TUOpEtOSEd--6dePTKiVLQ" name="getContainingDataBlock">
+          <ownedParameter xmi:id="_dwZtANOSEd--6dePTKiVLQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_Z1TwctOSEd--6dePTKiVLQ" name="getViolationDescription">
+          <ownedParameter xmi:id="_b5CiwNOSEd--6dePTKiVLQ" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_05RtEtOSEd--6dePTKiVLQ" name="getAffectedDataBlock">
+          <ownedParameter xmi:id="_4eKJENOSEd--6dePTKiVLQ" name="return" type="_bmB96LWbEd-mQrA0LCJ-JQ" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_O9oxZdOUEd-dNbThiqFLaw" name="Dependency2" supplier="_JT7ByNOSEd--6dePTKiVLQ" client="_wBNXyL6SEd-pCZJ04A4MqQ"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_sMKe0NRJEd-hoc5K2oPe5w" name="InvalidDataBockIdException">
+        <ownedOperation xmi:id="_waBmYtRJEd-hoc5K2oPe5w" name="getMessage">
+          <ownedParameter xmi:id="_xUu7INRJEd-hoc5K2oPe5w" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:id="_y5w_QtRJEd-hoc5K2oPe5w" name="getDataBlockId">
+          <ownedParameter xmi:id="_0H_s8NRJEd-hoc5K2oPe5w" name="return" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_tnneWOmAEd-njsSnifC-kg" name="TransformationType">
+        <ownedOperation xmi:id="_BHAc8umGEd-njsSnifC-kg" name="getAffectedBlockIds">
+          <ownedParameter xmi:id="_DCOzgOmGEd-njsSnifC-kg" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_x9-alemAEd-njsSnifC-kg" name="Dependency4" supplier="_tnneWOmAEd-njsSnifC-kg" client="_wBNXyL6SEd-pCZJ04A4MqQ"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_Mqk70MWtEd-HdPjSWcNqCA" name="org.je.jmeta.extensions.export">
+      <packagedElement xmi:type="uml:Interface" xmi:id="_WroKCMWtEd-HdPjSWcNqCA" name="IExtensionManager" clientDependency="_vGTwNMWtEd-HdPjSWcNqCA">
+        <ownedOperation xmi:id="_tEheosWtEd-HdPjSWcNqCA" name="getExtensions">
+          <ownedParameter xmi:id="_uAk3MMWtEd-HdPjSWcNqCA" name="return" direction="return">
+            <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_XuhxeMWtEd-HdPjSWcNqCA" name="IExtension">
+        <ownedOperation xmi:id="__C5IssWtEd-HdPjSWcNqCA" name="getId"/>
+        <ownedOperation xmi:id="_AD22csWuEd-HdPjSWcNqCA" name="getAuthor"/>
+        <ownedOperation xmi:id="_AvOHosWuEd-HdPjSWcNqCA" name="getVersion"/>
+        <ownedOperation xmi:id="_BbxrosWuEd-HdPjSWcNqCA" name="getDescription"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_vGTwNMWtEd-HdPjSWcNqCA" name="Dependency1" supplier="_XuhxeMWtEd-HdPjSWcNqCA" client="_WroKCMWtEd-HdPjSWcNqCA"/>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_kyhWyMWuEd-HdPjSWcNqCA" name="DataFormatExtension">
+        <generalization xmi:id="_tXoLZMWuEd-HdPjSWcNqCA" general="_XuhxeMWtEd-HdPjSWcNqCA"/>
+        <ownedOperation xmi:id="_t0iJ0MWuEd-HdPjSWcNqCA" name="getDataFormatSpecification"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_pDW52MWuEd-HdPjSWcNqCA" name="SimpleDataFormatExtension">
+        <generalization xmi:id="_tHrq48WuEd-HdPjSWcNqCA" general="_XuhxeMWtEd-HdPjSWcNqCA"/>
+        <ownedOperation xmi:id="_wJ_lUsWuEd-HdPjSWcNqCA" name="getDataFormat"/>
+        <ownedOperation xmi:id="_G4WMksWvEd-HdPjSWcNqCA" name="getDefinedBlockIds"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_1ahY4MWwEd-HdPjSWcNqCA" name="MediumExtension">
+        <generalization xmi:id="_3NQh08WwEd-HdPjSWcNqCA" general="_XuhxeMWtEd-HdPjSWcNqCA"/>
+      </packagedElement>
+    </packagedElement>
+    <profileApplication xmi:id="_qnOvALLkEd-fJ-POBtm0jQ">
+      <eAnnotations xmi:id="_qnOvAbLkEd-fJ-POBtm0jQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../../GeneratorTemplates/models/CommonStereotypes.uml#_nUOtMLLkEd-fJ-POBtm0jQ"/>
+      </eAnnotations>
+      <appliedProfile href="../../GeneratorTemplates/models/CommonStereotypes.uml#_d0ndU3L_Ed6ZZvimjx0tAA"/>
+    </profileApplication>
+  </uml:Model>
+  <CommonStereotypes:ComponentImplementation xmi:id="_-7UvwLLjEd-fJ-POBtm0jQ"/>
+  <CommonStereotypes:ComponentImplementation xmi:id="_Clt94LLkEd-fJ-POBtm0jQ"/>
+  <CommonStereotypes:ComponentImplementation xmi:id="_F2MQILLkEd-fJ-POBtm0jQ"/>
+  <CommonStereotypes:ComponentImplementation xmi:id="_VcRNILLkEd-fJ-POBtm0jQ"/>
+  <CommonStereotypes:ComponentImplementation xmi:id="_fKF9ULLkEd-fJ-POBtm0jQ"/>
+  <CommonStereotypes_1:ComponentImplementation xmi:id="_rhf-4LLkEd-fJ-POBtm0jQ" base_Component="_cBBt4rLUEd-fJ-POBtm0jQ"/>
+  <CommonStereotypes_1:Exception xmi:id="_Rfz2wNPiEd-1FrB1d8OXDw" base_Class="_NJ6NiNPiEd-1FrB1d8OXDw"/>
+  <CommonStereotypes_1:RuntimeException xmi:id="_TYXT0NPiEd-1FrB1d8OXDw" base_Class="_F5-G-NPgEd-1FrB1d8OXDw"/>
+  <CommonStereotypes_1:Exception xmi:id="_v3AY4NRJEd-hoc5K2oPe5w" base_Class="_sMKe0NRJEd-hoc5K2oPe5w"/>
+  <CommonStereotypes_1:Exception xmi:id="_0I-wsOXqEd-5gNnOP9gpoA"/>
+  <CommonStereotypes_1:extendableEnum xmi:id="_uNd9YOmAEd-njsSnifC-kg" base_Class="_tnneWOmAEd-njsSnifC-kg"/>
+  <CommonStereotypes_1:Exception xmi:id="_VXdlwOmDEd-njsSnifC-kg" base_Class="_UcADGOmDEd-njsSnifC-kg"/>
+</xmi:XMI>

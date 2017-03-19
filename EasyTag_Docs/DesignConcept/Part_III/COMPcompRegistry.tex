@@ -1,0 +1,134 @@
+%-----------------------------------------------------------------------------------------------
+%		\COMPcomponentRegistry{} Design
+%-----------------------------------------------------------------------------------------------
+
+\section{\COMPcomponentRegistry{} Design}
+\label{sec:COMPcomponentRegistryDesign}
+
+In diesem Abschnitt wird das Design der Komponente \COMPcomponentRegistry{} beschrieben. Grundaufgabe der Komponente ist die Implementierung der Designentscheidungen \DesLink{dd:004} und \DesLink{dd:005}.
+
+Wir geben hier lediglich einen kurzen Abriss des Basisdesigns in Form mehrere aufeinanderfolgender Designentscheidungen.
+
+%%%% DD --> %%%%
+\DD{dd:220}
+{% Titel
+Eine Komponente bietet genau ein Komponenten-Java-Interface
+}
+{% Kurzbeschreibung
+Jede Komponente im Sinne von \COMPcomponentRegistry{} bietet genau ein Java-Interface, das \IComponentInterface{} implementiert.
+}
+{% Begründung
+Damit ist der Implementierung klar, wie eine Komponente seine Funktionalität nach Außen anbieten muss, und es ist dem Anwender klar, wie die Funktionalität der Komponente insgesamt aussieht. Zudem werden Komponenteninterfaces klar dadurch markiert, dass sie \IComponentInterface{} implementieren. Dies bringt nicht etwa den Nachteil mit sich, dass die Schnittstelle nicht frei nach OO-Aspekten designt werden könnte. Denn jede Methode des Komponenten-Interfaces kann wiederum beliebige Datentypen und weitere Interfaces liefern, so dass dem Design dadurch keine Grenzen gesetzt sind.
+}
+{% Nachteile
+Keine bekannten Nachteile
+}
+%%%% <-- DD %%%%
+
+Gemäß \DesLink{dd:005} ist eine Komponente ein ``Singleton''. Dennoch muss zusätzlich klar definiert werden, wie der Lebenszyklus einer Komponente aussieht:
+%%%% DD --> %%%%
+\DD{dd:221}
+{% Titel
+Der Komponentenlebenszyklus besteht aus Initialisierung und Nutzung
+}
+{% Kurzbeschreibung
+Eine Komponente (und damit die Einzel-Implementierung des Komponenteninterfaces gemäß \DesLink{dd:220}) hat folgende Lebensabschnitte und -ereignisse:
+\begin{itemize}
+\item \emph{Initialisierung:} Die Implementierung registriert sich als Implementierung eines Komponenteninterfaces bei \COMPcomponentRegistry{}, holt sich Instanzen anderer Komponenten nach bedarf, und initialisiert sich. Dieser letztere Teilschritt ist komponentenspezifisch und kann beispielsweise das Laden von komponenten-spezifischen Konfigurationsdateien o.ä. beinhalten. Die Initialisierung wird direkt im Konstruktor der Implementierung des Komponenteninterfaces durchgeführt.
+\item \emph{Nutzung:} Die Komponente kann danach über ihr Interface von anderen Komponenten oder Anwendern der Library genutzt werden.
+\end{itemize}
+
+Diese simple Zweiteilung impliziert direkt, dass die Initialisierung in der notwendigen Reihenfolge erfolgen muss, erst die benötigten Komponenten, dann die abhängigen Komponenten.
+}
+{% Begründung
+Die Komponenten können so einfach wie möglich gestaltet werden, es ist nicht nötig, manuell bestimmte Methoden in der richtigen Reihenfolge aufzurufen, bis auf die Initialisierung, die in der richtigen Reihenfolge erfolgen muss. Auf diese simple Art wird auch direkt jede Art der zyklischen Abhängigkeiten unterbunden, denn eine Komponente muss erst vollständig und erfolgreich registriert worden sein, bevor eine abhängige Komponente ihre Implementierung abfragen kann.
+}
+{% Nachteile
+Keine Nachteile bekannt
+}
+%%%% <-- DD %%%%
+
+%%%% DD --> %%%%
+\DD{dd:222}
+{% Titel
+Komponentenbeschreibung
+}
+{% Kurzbeschreibung
+Jede Komponente besitzt eine Komponentenbeschreibung als Instanz der Klasse \ComponentDescription{}. Diese beinhaltet: Eine id, das Komponenten-Interface, die Autoren, die Version sowie eine Beschreibung der Komponente. Die \ComponentDescription{} kann sowohl über das Interface \ISimpleComponentRegistry{} abgefragt werden also auch über eine Methode des implementierten Interfaces \IComponentInterface{}.
+}
+{% Begründung
+Metadaten über eine Komponente lassen sich einfach angeben und zur Laufzeit loggen. Damit stehen alle Informationen für Fehleranalysen auch zur Laufzeit zur Verfügung.
+}
+{% Nachteile
+Keine bekannten Nachteile
+}
+%%%% <-- DD %%%%
+
+Nun zu einigen notwendigen Limitierungen bezüglich der Eindeutigkeit von Komponenten:
+%%%% DD --> %%%%
+\DD{dd:223}
+{% Titel
+Ids und Interfaces müssen eindeutig sein, parallele Versionen derselben Komponente sind nicht zulässig
+}
+{% Kurzbeschreibung
+Im Rahmen derselben \ISimpleComponentRegistry{}-Instanz darf dieselbe Komponenten-Id gemäß \DesLink{dd:222} nur einmalig verwendet werden. Auch dasselbe Komponenten-Interface darf nur einmalig in einer solchen Instanz verwendet werden. Auch wenn die Komponentenbeschreibung gemäß \DesLink{dd:222} ein Versionsattribut enthält, heißt dies nicht, dass mehrere unterschiedliche Versionen derselben Komponente zur gleichen Zeit aktiv sein können.
+}
+{% Begründung
+Alles andere würde einerseits \DesLink{dd:005} verletzen, hätte andererseits i.d.R. gar keinen sinnvollen Anwendungsfall und würde somit nur die Komplexität unnötig vergrößern.
+}
+{% Nachteile
+Keine bekannten Nachteile
+}
+%%%% <-- DD %%%%
+
+Nun zusammenfassend noch die Schnittstelle des Interfaces \ISimpleComponentRegistry{}:
+%%%% DD --> %%%%
+\DD{dd:224}
+{% Titel
+\ISimpleComponentRegistry{} bietet folgende Methoden
+}
+{% Kurzbeschreibung
+\begin{itemize}
+\item \texttt{getAllRegisteredComponentInterfaces()}: Liefert alle aktuell registrierten Komponenten-Interfaces
+\item \texttt{getAllRegisteredComponents()}: Liefert alle aktuell registrierten Komponenten in Form von \ComponentDescription{}s
+\item \texttt{getComponentDescription()}: Liefert zu einer gegebenen id die zugehörige \ComponentDescription{}, für unbekannte Id eine Exception
+\item \texttt{hasComponent()}: Liefert zu einer gegebenen id, ob für diese aktuell eine Komponente registriert ist, oder nicht
+\item \texttt{hasComponentInterface()}: Liefert zu einem gegebenen Interface, ob für dieses aktuell eine Komponente registriert ist, oder nicht
+\item \texttt{registerComponent()}: Registriert die angegebene Komponentenimplementierung mit der gegebenen \ComponentDescription{}
+\item \texttt{getComponentImplementation()}: Liefert für ein verwaltetes Interface die Implementierungs-Instanz zurück
+\end{itemize}
+}
+{% Begründung
+Die Registry kann nach ihrer aktuellen Komponentenbestückung ausgelesen werden, so kann z.B. durch vorherige Prüfung eine Exception bei nicht vorhandener oder doppelter Id umgangen werden.
+}
+{% Nachteile
+Keine bekannten Nachteile
+}
+%%%% <-- DD %%%%
+
+Schließlich noch ein Schlusswort zum Interface \IComponentInterface{}:
+%%%% DD --> %%%%
+\DD{dd:225}
+{% Titel
+\IComponentInterface{} ist im Wesentlichen ein Tagging-Interface mit einer abstrakten Implementierung, von der alle Komponentenimplementierungen ableiten sollten
+}
+{% Kurzbeschreibung
+\IComponentInterface{} hat lediglich eine Methode zum Abfragen der \ComponentDescription{} gemäß \DesLink{dd:222}. Die abstrakte Implementierung übernimmt automatisch die Registrierung seiner selbst bei der übergebenen \ISimpleComponentRegistry{}-Instanz.
+}
+{% Begründung
+Weitere Methoden für Komponenten sind nicht notwendig bzw. liefern keinen Mehrwert. Die Selbstregistrierung erspart es ableitenden Klassen, diese selbst vorzunehmen und eliminiert dabei das Risiko, dies zu vergessen. Sie muss ohnehin im Rahmen der Initialisierung im Konstruktor erfolgen, sodass ein separater Aufruf auch nicht notwendig ist.
+}
+{% Nachteile
+Keine bekannten Nachteile
+}
+%%%% <-- DD %%%%
+
+
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

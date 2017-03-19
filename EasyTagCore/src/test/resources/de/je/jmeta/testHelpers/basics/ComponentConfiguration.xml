@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cconf:ComponentConfiguration
+	xmlns:cconf="www.easytag.de/XMLSchema_v1_0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="www.easytag.de/XMLSchema_v1_0 ComponentConfiguration.xsd"
+>
+
+	<!-- The context component -->
+	<ComponentDescriptor id="jMetaContext">
+		<ProviderPath>../EasyTagCore/target/classes</ProviderPath>
+		<Service>
+			<Interface>de.je.jmeta.context.IJMetaContext</Interface>
+			<Provider>de.je.jmeta.context.impl.StandardJMetaContext</Provider>
+		</Service>
+	</ComponentDescriptor>
+
+	<!-- The extension management component -->
+	<ComponentDescriptor id="ExtensionManagement">
+		<ProviderPath>../EasyTagCore/target/classes</ProviderPath>
+		<Service>
+			<Interface>de.je.jmeta.extmanager.export.IExtensionManager</Interface>
+			<Provider>de.je.jmeta.extmanager.impl.StandardExtensionManager</Provider>
+		</Service>
+	</ComponentDescriptor>
+
+	<!-- The configuration component -->
+	<ComponentDescriptor id="Configuration">
+		<ProviderPath>../EasyTagCore/target/classes</ProviderPath>
+		<Service>
+			<Interface>de.je.jmeta.config.export.IUserConfigAccessor</Interface>
+			<Provider>de.je.jmeta.config.impl.StandardUserConfigAccessor</Provider>
+		</Service>
+	</ComponentDescriptor>
+
+	<!-- The logging component -->
+	<ComponentDescriptor id="Logging">
+		<ProviderPath>../EasyTagCore/target/classes</ProviderPath>
+		<Service>
+			<Interface>de.je.jmeta.logging.ILogging</Interface>
+			<Provider>de.je.jmeta.logging.impl.StandardLogging</Provider>
+		</Service>
+	</ComponentDescriptor>
+
+	<!-- The media component -->
+	<ComponentDescriptor id="Media">
+		<ProviderPath>../EasyTagCore/target/classes</ProviderPath>
+		<Service>
+			<Interface>de.je.jmeta.media.api.IMediaAPI</Interface>
+			<Provider>de.je.jmeta.media.impl.MediaAPI</Provider>
+		</Service>
+	</ComponentDescriptor>
+
+	<!-- The data formats component -->
+	<ComponentDescriptor id="DataFormats">
+		<ProviderPath>../EasyTagCore/target/classes</ProviderPath>
+		<Service>
+			<Interface>de.je.jmeta.dataformats.IDataFormatRepository</Interface>
+			<Provider>de.je.jmeta.dataformats.impl.StandardDataFormatRepository</Provider>
+		</Service>
+	</ComponentDescriptor>
+
+	<!-- The data blocks component -->
+	<ComponentDescriptor id="DataBlocks">
+		<ProviderPath>../EasyTagCore/target/classes</ProviderPath>
+		<Service>
+			<Interface>de.je.jmeta.datablocks.IDataBlockAccessor</Interface>
+			<Provider>de.je.jmeta.datablocks.impl.StandardDataBlockAccessor</Provider>
+		</Service>
+	</ComponentDescriptor>
+</cconf:ComponentConfiguration>

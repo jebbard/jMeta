@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="idModel" name="DeploymentModelModel">
+  <packagedElement xmi:type="uml:Package" xmi:id="idPackage" name="DeploymentModelPackage">
+    <packagedElement xmi:type="uml:Component" xmi:id="_Y7mKYMS6EeC2AsdtkZIZHA" name="Project Interdependencies">
+      <packagedElement xmi:type="uml:Package" xmi:id="_bE_f0MS6EeC2AsdtkZIZHA" name="EasyTagCore" clientDependency="_lMTHBcS6EeC2AsdtkZIZHA _lqZYQMS6EeC2AsdtkZIZHA _maFIxMS6EeC2AsdtkZIZHA _nGCP0MS6EeC2AsdtkZIZHA _nxsb8MS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Package" xmi:id="_cfl1kMS6EeC2AsdtkZIZHA" name="EasyTagCore_Interface" clientDependency="_BwNzc8S7EeC2AsdtkZIZHA _CeaWM8S7EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Package" xmi:id="_dbonEsS6EeC2AsdtkZIZHA" name="EasyTagCore_Export" clientDependency="_-1qG08S6EeC2AsdtkZIZHA __VsRwMS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Package" xmi:id="_eSU-gsS6EeC2AsdtkZIZHA" name="EasyTagExt_DefaultBundle" clientDependency="_LSuEcMS7EeC2AsdtkZIZHA _Ljj808S7EeC2AsdtkZIZHA _MQQqw8S7EeC2AsdtkZIZHA _NAZHMMS7EeC2AsdtkZIZHA _NTUDMMS7EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Package" xmi:id="_fuQxAsS6EeC2AsdtkZIZHA" name="EasyTagExt_DefaultBundleInterface" clientDependency="_PlMmQMS7EeC2AsdtkZIZHA _P7tBwMS7EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Package" xmi:id="_hDgFosS6EeC2AsdtkZIZHA" name="ComponentRegistry" clientDependency="_FlWR88S7EeC2AsdtkZIZHA _GGR0wMS7EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Package" xmi:id="_jJ6YgsS6EeC2AsdtkZIZHA" name="Utility" clientDependency="_HQVNE8S7EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Package" xmi:id="_kBybssS6EeC2AsdtkZIZHA" name="CommonLibs"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_lMTHBcS6EeC2AsdtkZIZHA" name="" supplier="_hDgFosS6EeC2AsdtkZIZHA" client="_bE_f0MS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_lqZYQMS6EeC2AsdtkZIZHA" name="" supplier="_kBybssS6EeC2AsdtkZIZHA" client="_bE_f0MS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_maFIxMS6EeC2AsdtkZIZHA" name="" supplier="_jJ6YgsS6EeC2AsdtkZIZHA" client="_bE_f0MS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_nGCP0MS6EeC2AsdtkZIZHA" name="" supplier="_dbonEsS6EeC2AsdtkZIZHA" client="_bE_f0MS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_nxsb8MS6EeC2AsdtkZIZHA" name="" supplier="_cfl1kMS6EeC2AsdtkZIZHA" client="_bE_f0MS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_-1qG08S6EeC2AsdtkZIZHA" name="" supplier="_cfl1kMS6EeC2AsdtkZIZHA" client="_dbonEsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="__VsRwMS6EeC2AsdtkZIZHA" name="" supplier="_jJ6YgsS6EeC2AsdtkZIZHA" client="_dbonEsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_BwNzc8S7EeC2AsdtkZIZHA" name="" supplier="_hDgFosS6EeC2AsdtkZIZHA" client="_cfl1kMS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_CeaWM8S7EeC2AsdtkZIZHA" name="" supplier="_jJ6YgsS6EeC2AsdtkZIZHA" client="_cfl1kMS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_FlWR88S7EeC2AsdtkZIZHA" name="" supplier="_jJ6YgsS6EeC2AsdtkZIZHA" client="_hDgFosS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_GGR0wMS7EeC2AsdtkZIZHA" name="" supplier="_kBybssS6EeC2AsdtkZIZHA" client="_hDgFosS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_HQVNE8S7EeC2AsdtkZIZHA" name="" supplier="_kBybssS6EeC2AsdtkZIZHA" client="_jJ6YgsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_LSuEcMS7EeC2AsdtkZIZHA" name="" supplier="_dbonEsS6EeC2AsdtkZIZHA" client="_eSU-gsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Ljj808S7EeC2AsdtkZIZHA" name="" supplier="_cfl1kMS6EeC2AsdtkZIZHA" client="_eSU-gsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_MQQqw8S7EeC2AsdtkZIZHA" name="" supplier="_bE_f0MS6EeC2AsdtkZIZHA" client="_eSU-gsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_NAZHMMS7EeC2AsdtkZIZHA" name="" supplier="_fuQxAsS6EeC2AsdtkZIZHA" client="_eSU-gsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_NTUDMMS7EeC2AsdtkZIZHA" name="" supplier="_jJ6YgsS6EeC2AsdtkZIZHA" client="_eSU-gsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_PlMmQMS7EeC2AsdtkZIZHA" name="" supplier="_cfl1kMS6EeC2AsdtkZIZHA" client="_fuQxAsS6EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_P7tBwMS7EeC2AsdtkZIZHA" name="" supplier="_jJ6YgsS6EeC2AsdtkZIZHA" client="_fuQxAsS6EeC2AsdtkZIZHA"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_c8nzAMS-EeC2AsdtkZIZHA" name="Deployment Interdependencies">
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_fwBuwsS-EeC2AsdtkZIZHA" name="Common.jar"/>
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_hA8kEMS-EeC2AsdtkZIZHA" name="jMeta.jar" clientDependency="_ry3OhcS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_jDLhksS-EeC2AsdtkZIZHA" name="jMeta_DefaultBundle_Core.jar" clientDependency="_sZKZhMS-EeC2AsdtkZIZHA _wf3wM8S-EeC2AsdtkZIZHA _J83H88S_EeC2AsdtkZIZHA _KtmBUMS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_l-L6IsS-EeC2AsdtkZIZHA" name="jMeta_DefaultBundle.jar" clientDependency="_sFpAlMS-EeC2AsdtkZIZHA _tOEBMMS-EeC2AsdtkZIZHA _t53-U8S-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_ry3OhcS-EeC2AsdtkZIZHA" name="" supplier="_fwBuwsS-EeC2AsdtkZIZHA" client="_hA8kEMS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_sFpAlMS-EeC2AsdtkZIZHA" name="" supplier="_fwBuwsS-EeC2AsdtkZIZHA" client="_l-L6IsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_sZKZhMS-EeC2AsdtkZIZHA" name="" supplier="_fwBuwsS-EeC2AsdtkZIZHA" client="_jDLhksS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_tOEBMMS-EeC2AsdtkZIZHA" name="" supplier="_jDLhksS-EeC2AsdtkZIZHA" client="_l-L6IsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_t53-U8S-EeC2AsdtkZIZHA" name="" supplier="_hA8kEMS-EeC2AsdtkZIZHA" client="_l-L6IsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_wf3wM8S-EeC2AsdtkZIZHA" name="" supplier="_hA8kEMS-EeC2AsdtkZIZHA" client="_jDLhksS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_6hEIUsS-EeC2AsdtkZIZHA" name="jMeta_Export.jar" clientDependency="_BRf6UMS_EeC2AsdtkZIZHA _Dqr_Q8S_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_9QTVwsS-EeC2AsdtkZIZHA" name="jMeta_Core.jar" clientDependency="_BpVylMS_EeC2AsdtkZIZHA _CHS54MS_EeC2AsdtkZIZHA _D-8_E8S_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_BRf6UMS_EeC2AsdtkZIZHA" name="" supplier="_hA8kEMS-EeC2AsdtkZIZHA" client="_6hEIUsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_BpVylMS_EeC2AsdtkZIZHA" name="" supplier="_6hEIUsS-EeC2AsdtkZIZHA" client="_9QTVwsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_CHS54MS_EeC2AsdtkZIZHA" name="" supplier="_hA8kEMS-EeC2AsdtkZIZHA" client="_9QTVwsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_Dqr_Q8S_EeC2AsdtkZIZHA" name="" supplier="_fwBuwsS-EeC2AsdtkZIZHA" client="_6hEIUsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_D-8_E8S_EeC2AsdtkZIZHA" name="" supplier="_fwBuwsS-EeC2AsdtkZIZHA" client="_9QTVwsS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_J83H88S_EeC2AsdtkZIZHA" name="" supplier="_6hEIUsS-EeC2AsdtkZIZHA" client="_jDLhksS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_KtmBUMS_EeC2AsdtkZIZHA" name="" supplier="_9QTVwsS-EeC2AsdtkZIZHA" client="_jDLhksS-EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_R3D-YsS_EeC2AsdtkZIZHA" name="extensionA_Core.jar" clientDependency="_dY97UMS_EeC2AsdtkZIZHA _gzQ38MS_EeC2AsdtkZIZHA _ziXbYMS_EeC2AsdtkZIZHA _32VK8MS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Artifact" xmi:id="_WRSG8MS_EeC2AsdtkZIZHA" name="extensionA.jar" clientDependency="_fXBjc8S_EeC2AsdtkZIZHA _4b4vEMS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_dY97UMS_EeC2AsdtkZIZHA" name="" supplier="_WRSG8MS_EeC2AsdtkZIZHA" client="_R3D-YsS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_fXBjc8S_EeC2AsdtkZIZHA" name="" supplier="_hA8kEMS-EeC2AsdtkZIZHA" client="_WRSG8MS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_gzQ38MS_EeC2AsdtkZIZHA" name="" supplier="_hA8kEMS-EeC2AsdtkZIZHA" client="_R3D-YsS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_ziXbYMS_EeC2AsdtkZIZHA" name="" supplier="_6hEIUsS-EeC2AsdtkZIZHA" client="_R3D-YsS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_32VK8MS_EeC2AsdtkZIZHA" name="" supplier="_fwBuwsS-EeC2AsdtkZIZHA" client="_R3D-YsS_EeC2AsdtkZIZHA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_4b4vEMS_EeC2AsdtkZIZHA" name="" supplier="_fwBuwsS-EeC2AsdtkZIZHA" client="_WRSG8MS_EeC2AsdtkZIZHA"/>
+    </packagedElement>
+    <profileApplication xmi:id="_6ZpOgMS6EeC2AsdtkZIZHA">
+      <eAnnotations xmi:id="_6ZpOgcS6EeC2AsdtkZIZHA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../../CommonUMLModels/models/CommonStereotypes.uml#_101mkMS6EeC2AsdtkZIZHA"/>
+      </eAnnotations>
+      <appliedProfile href="../../CommonUMLModels/models/CommonStereotypes.uml#_d0ndU3L_Ed6ZZvimjx0tAA"/>
+    </profileApplication>
+  </packagedElement>
+</uml:Model>

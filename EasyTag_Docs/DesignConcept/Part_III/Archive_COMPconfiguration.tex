@@ -1,0 +1,184 @@
+%===============================================================================================
+%		\COMPconfiguration{} Design
+%===============================================================================================
+
+\section{\COMPconfiguration{} Design}
+\label{sec:COMPconfigurationDesign}
+
+In \LibName{}, configuration summarizes settings that can be changed in external files and are loaded once at \LibName{} startup. It is important to state that configuration cannot be changed at \LibName{} runtime. Currently, there is only \emph{user configuration}, which summarizes parameters the user of \LibName{} can change himself.
+
+Currently, there are two special configuration files that can be considered internal, as the user cannot directly see or change them:
+\begin{itemize}
+	\item The component configuration provides a mapping between a component interface and its implementation, for each \LibName{} component.
+	\item The extension point configuration lists all possible \LibName{} extension points and the paths to the corresponding extension bundles.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+%		Interface Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Interface Layer Design}
+\label{sec:InterfaceDesignCOMPconfiguration}
+
+There is no interface layer for the \COMPconfiguration component.
+
+%-----------------------------------------------------------------------------------------------
+%		Export Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Export Layer Design}
+\label{sec:ExportDesignCOMPconfiguration}
+
+The following figure shows the static class diagram of the export layer of the component \COMPconfiguration{}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ExportCOMPconfiguration.pdf}
+	\caption{Export class diagram of the component \COMPconfiguration{}}
+	\label{fig:V_4_ExportCOMPconfiguration}
+\end{figure}
+
+The export layer contains the user configuration parameters and interfaces to access them read-only. There is no possibility for the user to see the user configuration parameters except of course in the configuration file.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Configuration Requirements}
+\label{sec:ConfigurationRequirements}
+
+\newcommand{\REQUconfigUserConfig}{\texttt{REQU\_CONFIG\_CENTRAL\_USER\_CONFIG}}
+\newcommand{\REQUconfigErrors}{\texttt{REQU\_CONFIG\_ERRORS}}
+\newcommand{\REQUconfigTestCaseChanges}{\texttt{REQU\_CONFIG\_TEST\_CASE\_CHANGES}}
+
+The following requirements for \LibName{} configuration must be fulfilled:
+\begin{itemize}
+	\item \REQUconfigUserConfig{}: \LibName{} users can configure central parameters for \LibName{} in a single configuration file. \LibName{} components can read these parameters. Parameters cannot be changed at runtime. Instead, parameters stay constant at runtime, they can only be changed in external configuration files. Changes are first applied at the next start of the runtime environment \LibName{} runs in.
+	\item \REQUconfigErrors{}: In case of errors in the configuration, \LibName{} \emph{must not} fail-fast. Instead, the error condition must be logged and default values for the invalid configuration parameter or all parameters (depending on the kind of error) must be taken.
+	\item \REQUconfigTestCaseChanges{}: Configuration parameters must be changeable by test cases in order to test special cases.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Configuration Parameters}
+\label{sec:ConfigurationParameters}
+
+The following table lists all \LibName{} configuration parameters and whether they are user parameters or internal parameters:
+
+\OpenIssue{Check default values and value ranges again}{}
+
+\begin{longtable}{|p{0.2\textwidth}|p{0.2\textwidth}|p{0.2\textwidth}|p{0.2\textwidth}|p{0.2\textwidth}|}
+	\hline
+	Configuration Parameter & Purpose & Default & Value range & User or Internal\\
+	\endhead
+	\hline
+	Log file folder path & Relative or absolute path to the folder of the central \LibName{} log file(s). Configurable because of operational requirements. If relative, it is relative to the \LibName{} base directory. & \texttt{./logs} & Arbitrary & User\\
+	\hline
+	Log level & Central \LibName{} log level between \texttt{FINEST} and \texttt{SEVERE}. The user may specify how much should be logged.& \texttt{FINEST} & \texttt{SEVERE}, \texttt{WARNING}, \texttt{INFO}, \texttt{CONFIG}, \texttt{FINE}, \texttt{FINER}, \texttt{FINEST} & User\\
+	\hline
+\end{longtable}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUconfigUserConfig{}}
+\label{sec:REQUconfigUserConfig}
+
+\COMPconfiguration{} provides a central interface for accessing the user configuration, available on export layer. It loads the configuration parameters once instantiated and provides getters for retrieving their values.
+
+The path to the configuration files must be specified before the implementation of this interface can load its user parameters.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Error Conditions: Meeting \REQUconfigErrors{}}
+\label{sec:ErrorConditionsREQUconfigErrors}
+
+The following table summarizes error conditions and corresponding exceptions:
+
+\begin{longtable}{|p{0.3\textwidth}|p{0.7\textwidth}|}
+	\hline
+	Error Condition & Description \\
+	\endhead
+	\hline
+	Configuration file not found & A configuration file has not been found. For every configuration parameter expected to be configured in the file, its default value is taken and a warning is logged.\\
+	\hline
+	Error when reading configuration file & An arbitrary I/O error occurred during accessing a configuration file. For every configuration parameter expected to be configured in the file and not yet loaded, its default value is taken and a warning is logged.\\
+	\hline
+	Missing configuration parameter & A configuration parameter expected in a specific configuration file is missing. Its default value is taken and a warning is logged.\\
+	\hline
+	Invalid value in configuration file & A configuration parameter value in a configuration file is invalid, e.g. out of range. Its default value is taken and a warning is logged.\\
+	\hline
+	Invalid configuration parameter & The configuration parameter specified when getting a configuration parameter at runtime is invalid, e.g. it is an unknown parameter. A runtime exception is thrown in that case.\\
+\end{longtable}
+
+As can be seen in the table, \REQUconfigErrors{} is met because no runtime exceptions are thrown except for the case that components provide wrong parameter keys at runtime.
+
+At load-time, errors as well as missing or invalid configuration parameter values are corrected by taking default values. However, at run-time, such errors are not tolerated and lead to a runtime exception.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUconfigTestCaseChanges{}}
+\label{sec:REQUconfigTestCaseChanges}
+
+For user configuration parameters, there is no means of changing a parameter's value at runtime. Instead, parameters must be changed in external files.
+
+To allow test cases to provide different configuration files, \COMPconfiguration{} must allow for specifying the configuration file path to one of its methods.
+
+%-----------------------------------------------------------------------------------------------
+%		Implementation Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Implementation Layer Design}
+\label{sec:ImplementationDesignCOMPconfiguration}
+
+The following figure shows the static class diagram of the implementation layer of component \COMPconfiguration{}:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ImplementationCOMPconfiguration.pdf}
+	\caption{Implementation class diagram of the component \COMPconfiguration{}}
+	\label{fig:V_4_ImplementationCOMPconfiguration}
+\end{figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Central vs. Decentral Configuration}
+\label{sec:CentralVsDecentralConfiguration}
+
+How to implement the configuration? The first deeper question to ask is: Should the configuration be implemented as central or as decentral? Central means there is a single component that can load and maybe even change configuration values. Decentral means that each \LibName{} component has its own specific configuration that it loads and maybe changes by itself.
+
+Looking at the configuration parameters in \SectionLink{sec:ConfigurationParameters}, each current parameter belongs to exactly one component. However, several or even all components might need a new configuration parameter in the future.
+
+The centralized configuration implementation would have the following properties:
+\begin{itemize}
+	\item All components depend upon the centralized configuration component
+	\item Only this component loads (and possibly changes) configuration parameters
+	\item There can be one file for user configuration which naturally works with this approach.
+\end{itemize}
+
+The decentralized configuration implementation would have the following properties:
+\begin{itemize}
+	\item No additional component and no additional dependencies
+	\item All components requiring a configuration implement their own way of storing, loading and changing it.
+	\item The user might need to configure in several files (per each component) or every component must know the central configuration file which duplicates knowledge.
+\end{itemize}
+
+The centralized configuration approach is the winner. It provides a clearer user interface while avoiding duplication.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{\ComponentRegistry{} Component vs. Singleton}
+\label{sec:ImplementationConsiderations}
+
+There are at least two ways to implement the \COMPconfiguration{} component:
+\begin{itemize}
+	\item As a traditional \ComponentRegistry{} component. Its life-cycle is managed by \ComponentRegistry{}. Its implementation can be hidden comfortably from the user and other components.
+	\item As a public singleton. There are no real implementation secrets, i.e. other components directly depend upon its implementation and users can possibly directly see the loading approach and the path to user configuration file.
+\end{itemize}
+
+The \ComponentRegistry{} approach wins due to better information hiding.
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

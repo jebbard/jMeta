@@ -1,0 +1,52 @@
+General
+-------
+
+[DONE] - Data block id
+[DONE] - Human readable name
+[DONE] - Specification (description)
+[DONE] - Data Block Type (Field, Tag, Attribute, Container, Payload....)
+
+Positional information
+----------------------
+
+[DONE] - Static offset within parent (in characters or bytes)
+[DONE] - Static length (in characters or bytes)
+[DONE] - Maximum length (in characters or bytes)
+[DONE] - Minimum length (in characters or bytes)
+[DONE] - Termination bytes
+[DONE] - Termination characters
+- Possible locations within parent
+
+Value Range
+-----------
+
+[DONE] - Data Type (numeric, string, binary, flags, complex)
+[DONE] - Fixed single value or enumerated multiple values
+[DONE] - Regular expression
+[DONE] - Minimum value
+[DONE] - Maximum value
+[DONE] - Flag names
+[DONE] - default value
+
+Multiplicity
+------------
+
+[DONE] - Mandatory and Unique within parent [1..1]
+[DONE] - Optional within parent [0..n]
+[DONE] - Minimum occurrences within parent
+[DONE] - Maximum occurrences within parent
+
+Within the hierarchy
+--------------------
+
+- Possible parents
+- Possible children
+
+Functions
+---------
+
+[DONE] - sizeOf()
+[DONE] - countOf()
+[DONE] - charsetOf()
+[DONE] - byteOrderOf()
+[DONE] - crcOf()

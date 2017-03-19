@@ -1,0 +1,196 @@
+%===============================================================================================
+%		\COMPmedia{} Design
+%===============================================================================================
+
+\section{\COMPlogging{} Design}
+\label{sec:COMPloggingDesign}
+
+As an additional measure to support tracking errors, especially in productive use, \LibName{} uses logging. \COMPlogging{} is the central component that provides classes for logging purposes.
+
+%-----------------------------------------------------------------------------------------------
+%		Interface Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Interface Layer Design}
+\label{sec:InterfaceDesignCOMPlogging}
+
+The following figure shows the static class diagram of the component \COMPlogging{}. The dynamics are shown in \SectionLink{sec:ImplementationDesignCOMPlogging}:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_InterfaceCOMPlogging.pdf}
+	\caption{Interface class diagram of the component \COMPlogging{}}
+	\label{fig:V_4_InterfaceCOMPlogging}
+\end{figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Logging Requirements}
+\label{sec:ComponentFeatures}
+
+\newcommand{\REQUlogLevelConfig}{REQU\_LOG\_LEVEL\_CONFIG}
+\newcommand{\REQUlogFilePathConfig}{REQU\_LOG\_FILE\_PATH\_CONFIG}
+\newcommand{\REQUlogForcedLogging}{REQU\_LOG\_FORCED\_LOGGING}
+\newcommand{\REQUlogNoMissedRecords}{REQU\_NO\_MISSED\_RECORDS}
+\newcommand{\REQUlogOneLogfile}{REQU\_LOG\_ONE\_LOGFILE}
+\newcommand{\REQUlogUniLayout}{REQU\_LOG\_UNIFORM\_LAYOUT}
+\newcommand{\REQUlogSearchPatterns}{REQU\_LOG\_SEARCH\_PATTERNS}
+\newcommand{\REQUlogAnalysisInformation}{REQU\_LOG\_ANALYSIS\_INFORMATION}
+\newcommand{\REQUlogPreparedLocalisation}{REQU\_LOG\_LOCALISATION}
+\newcommand{\REQUlogTestability}{REQU\_LOG\_TESTABILITY}
+
+The following requirements exist for logging:
+\begin{itemize}
+	\item \REQUlogLevelConfig{}: The user may configure the actual log level to control the granularity of log messages appearing in the final log file, and, in a very small degree, control the performance loss introduced by logging.
+	\item \REQUlogFilePathConfig{}: The user may configure the path where the log file is actually stored. This is useful for operational use of \LibName{} that may want to store the log file in a specific place.
+	\item \REQUlogForcedLogging{}: Some messages must always be logged, irrespective of the log level, because they are very important (for examples, see \SectionLink{sec:COMPcontextDesign}). 
+	\item \REQUlogNoMissedRecords{}: No log records must be missed to get logged.
+	\item \REQUlogOneLogfile{}: There is exactly one log file that contains all data logged. The user is not required to search log files in different places. All errors that might have occurred must be stored in the single log, and nowhere else.
+	\item \REQUlogUniLayout{}: Log messages should appear in a uniform layout that provides for easy readability and equal text structures for comparable messages.
+	\item \REQUlogSearchPatterns{}: Specific errors or warnings must be logged by a searchable pattern. This is important for bug analysis or monitoring tools that search the log files for specific contents. 
+	\item \REQUlogAnalysisInformation{}: Any environmental information needs to be written to the log file (where, when, by whom a message has been logged).
+	\item \REQUlogPreparedLocalisation{}: It should be easily possible to later provide localized messages for every logged content. Currently, messages must be logged in U.S. English.
+	\item \REQUlogTestability{}: A tool must be provided that allows for automated log checks.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogLevelConfig{} and \REQUlogFilePathConfig{}}
+\label{sec:MeetingREQUlogLevelConfig}
+
+There are seven levels of logging defined that can be configured by the user: SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST. The user may change the log level and the log file path (absolute or relative to \LibName{} home directory) in an external log file that is loaded and accessed by the \COMPconfiguration{} component. This data is static in a sense that it is only loaded once at startup. Runtime changes in the configuration file are not applied. However, the user may change the minimum log level at any time using a corresponding method.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogForcedLogging{}}
+\label{sec:MeetingREQUREQUlogForcedLogging}
+
+Forced logging is implemented by setting the log level temporarily to log all records instead to be limited to a given level only, and resetting it afterwards again. Corresponding methods enable or disable forced logging, which can also be done by the user himself.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogNoMissedRecords{}}
+\label{sec:MeetingREQUlogNoMissedRecords}
+
+Records may be missed due to out-of-memory conditions. They may also be missed by using a badly configured file handler. If the file handler is configured for a maximum size, the last record logged that exceeds the maximum size will apparently not be logged. This is not desirable. Therefore the file handler is configured in the following way:
+\begin{itemize}
+	\item No maximum log file size
+	\item Only exactly one log file (limit = 1)
+	\item No appending of log data. At every new startup of \LibName{}, the contents of the previous log file is deleted.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogOneLogfile{}}
+\label{sec:MeetingREQUlogOneLogfile}
+
+To meet this requirement, the logger's file handler is configured to create only one file and not cycle through several files.
+
+\LibName{} uses one central logger. All \LibName{} internal or utility components log using the same logger, i.e. by using the \COMPlogging{} component. Utility components used by any \LibName{} components provide the possibility to specify the logger to use or are used in combination with a recording mechanism. For this purpose, the class \CLASSrecordingHandler{} as a special handler can be used. An instance of this class is registered with a simple \texttt{Logger} which is then passed to the utility component. The utility component uses this \texttt{Logger} to log its messages. After the utility component has finished, the \texttt{Logger} has only written messages into the \CLASSrecordingHandler{} instance. This instance is then (possibly at a later point in time) passed to the \COMPlogging{} component which redirects the previously recorded logging output to its own log file. This can even be done using specific triggers, so the point in time when the recorded messages are written can be exactly chosen. This is extensively used during \LibName{} startup, because \COMPlogging{} is not yet initialized at the very beginning, see \SectionLink{sec:REQUcontextStartupTasks} for details.
+
+If ever there should be the case that \LibName{} uses a third-party library that itself does logging, this requirement needs to be checked again.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogUniLayout{} and \REQUlogSearchPatterns{}}
+\label{sec:MeetingREQUlogUniLayout}
+
+The uniform layout requirement is tried to be met by using the following mechanisms:
+\begin{itemize}
+	\item A custom \texttt{Formatter} is defined that specifies the specific log record format
+	\item A special public interface defining string constants for special purpose messages is defined. All \LibName{} components use the corresponding constants to log semantically similar messages uniformly.
+\end{itemize}
+
+The mentioned public interface also provides for the common search patterns.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogAnalysisInformation{}}
+\label{sec:MeetingREQUlogAnalysisInformation}
+
+For any ``normal'' message, the following information in addition to the message itself is logged:
+\begin{itemize}
+	\item Date and time (up to seconds) of the log record
+	\item Class and method that has logged the message. When \COMPlogging{} uses the \texttt{log()} method of the \texttt{Logger} class, this would lead to the fact that always the \COMPlogging{} method itself is logged as the causing class and method. This is of course not as intended. Therefore \COMPlogging{} itself implements a way to determine the class and method that has called it, in the same fashion as the \texttt{Logger} class does, using a special Sun reflection class.
+	\item The name of the logger that has logged the message
+	\item The thread id that has logged the message
+	\item The name of the logging level
+\end{itemize}
+
+\OpenIssue{Finding caller class and method when logging (TODO logging001)}{The use of this special SUN classes might lead to problems when porting this to another VM later...}
+
+For an exception, the following information is additionally logged:
+\begin{itemize}
+	\item Name of the exception class
+	\item Stack trace of the exception
+	\item Message passed to the exception
+\end{itemize}
+
+Exceptions are always logged with level WARNING.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogPreparedLocalisation{}}
+\label{sec:MeetingREQUlogPreparedLocalisation}
+
+For this to work, all message use the formatting provided by the Java \emph{Formatter} class This way, message parameters can be specified as separate parameters rather than being concatenated to the actual string with ``+''. This allows to later externalize such parameterized strings.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Meeting \REQUlogTestability{}}
+\label{sec:MeetingREQUlogTestability}
+
+Logs need to be checked automatically for specific search patterns in order to recognize errors after arbitrary test runs. Therefore, a jUnit-like class is provided that just searches for a regular expression pattern in a given log file (or its absence).
+
+Based on that class, a specialized tool can be written that checks a log file for containing or not containing a specific text as expected after an arbitrary test run.
+
+This class can also be used to test the \COMPlogging{} component itself.
+
+%-----------------------------------------------------------------------------------------------
+%		Export Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Export Layer Design}
+\label{sec:ExportDesignCOMPlogging}
+
+\COMPlogging{} has no export layer.
+
+%-----------------------------------------------------------------------------------------------
+%		Implementation Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Implementation Layer Design}
+\label{sec:ImplementationDesignCOMPlogging}
+
+The following figure shows the static class diagram of the component \COMPlogging{} on its implementation layer:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_4_ImplementationCOMPlogging.pdf}
+	\caption{Implementation class diagram of the component \COMPlogging{}}
+	\label{fig:V_4_ImplementationCOMPlogging}
+\end{figure}
+
+The \CLASSloggingFormatter{} class implements all of the logging format requirements stated by \REQUlogAnalysisInformation{}.
+
+%-----------------------------------------------------------------------------------------------
+%		Test Cases
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Test Cases}
+\label{sec:TestCasesCOMPlogging}
+
+The following test cases need to be written for testing \COMPlogging{}:
+\begin{itemize}
+	\item \REQUlogForcedLogging{} is fulfilled for required log records, for arbitrary log levels.
+	\item \REQUlogLevelConfig{} and \REQUlogFilePathConfig{} are fulfilled, i.e. only specified log levels (except for forced records) and the log file is only present at the configured path.
+	\item The use of \CLASSrecordingHandler{} works as specified.
+\end{itemize}
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################
