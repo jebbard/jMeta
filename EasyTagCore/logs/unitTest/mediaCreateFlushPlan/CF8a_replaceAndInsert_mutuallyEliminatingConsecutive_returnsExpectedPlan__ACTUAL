@@ -1,4 +1,4 @@
-WRITE at 0 with size 100 with bytes java.nio.HeapByteBuffer[pos=0 lim=100 cap=100] on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
-REPLACE at 0 with size 300 with bytes java.nio.HeapByteBuffer[pos=0 lim=100 cap=100] on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 100 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
-INSERT at 300 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 0 with size 100 with bytes java.nio.HeapByteBuffer[pos=0 lim=100 cap=100] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+REPLACE at 0 with size 300 with bytes java.nio.HeapByteBuffer[pos=0 lim=100 cap=100] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 100 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+INSERT at 300 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt

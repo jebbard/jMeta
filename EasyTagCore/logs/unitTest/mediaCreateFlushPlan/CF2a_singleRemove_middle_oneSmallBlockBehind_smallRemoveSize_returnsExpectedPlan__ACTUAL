@@ -1,4 +1,4 @@
-READ at 47 with size 103 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 12 with size 103 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
-REMOVE at 12 with size 35 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
-TRUNCATE at 115 with size 35 on medium E:\Programmieren\01_Java\03_Workspaces\02_CurrentProjects\EasyTag\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 47 with size 103 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 12 with size 103 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+REMOVE at 12 with size 35 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+TRUNCATE at 115 with size 35 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
