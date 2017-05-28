@@ -1347,155 +1347,151 @@ Close coupling between \IMediumReference{} and \MediumReferenceRepository{}, as 
 
 %-----------------------------------------------------------------------------------------------
 
-\subsubsection{Internal Datenstrukturen for das Caching}
+\subsubsection{Internal Data Structures  for Caching}
 \label{sec:Datenstrukturen}
 
-Der Cache verwaltet zunächst einmal Datenbytes pro Offset, immer unter der Annahme, dass die im Cache gehalteten Daten exakt identisch with den media-Daten sind, according to \DesLink{dd:404}. Es wurde bereits definiert, dass es eine explizite Methode \texttt{cache()} zum Einlesen von Cache-Inhalten and eine Methode \texttt{getCachedByteCount()} zum Abfragen zusammenhängender Byte-Zahlen gibt (see Tabelle \hyperref[tab:MediaOps]{\ref{tab:MediaOps}} sowie \DesLink{dd:409} and \DesLink{dd:412b}).
+The cache on first sight matintains data bytes per offset, always assuming that the data in cache is exactly identical to the data on the external medium, according to \DesLink{dd:404}. It was already defined, that there is an explicit \texttt{cache()} method for eading data into the cache and a method \texttt{getCachedByteCount()} for querying connected bytes from cache (see table \hyperref[tab:MediaOps]{\ref{tab:MediaOps}}, as well as \DesLink{dd:409} and \DesLink{dd:412b}). Query data from the cache is done using \texttt{getData()}, which can on the one hand skip the cache, on the other hand it automatically updates the cache with missing data (\DesLink{dd:412c} and \DesLink{dd:412d}). Finally, cache contents can be freed using \texttt{discard()}, or caching can even be entirely inactive (see \DesLink{dd:411c}).
 
-Das Abfragen der Daten erfolgt dann über \texttt{getData()}, welche den Cache einerseits überspringen kann, andererseits jedoch diesen auch automatisch with fehlenden Daten aktualisiert (\DesLink{dd:412c} and \DesLink{dd:412d}).
-
-Schließlich kann man Cache-Inhalte with \texttt{discard()} gezielt freigeben or das Caching komplett deaktivieren (see \DesLink{dd:411c}).
-
-In vielen Fällen wollen wir abfragen, welche Anteile von zu lesenden, zu schreibenden or auch zu löschenden Daten im Cache sind. Der Cache kann durch mehrfache Fülloperationen beliebig fragmentiert sein. Daher benötigen wir eine Klasse dafür:
+In most cases we want to query which parts of data to read, write or remove is within the cache. The cache might be fragmented arbitrarily due to multiple fill operations. Thus we need a class for this:
 %%%% DD --> %%%%
 \DD{dd:435}
 {% Titel
-Klasse \MediumRegion{} for zusammenhängende Abschnitte eines Mediums, insbesondere for Cache-Abschnitte
+Class \MediumRegion{} for consecutive regions of a mediums, especially also for cache areas
 }
 {% Kurzbeschreibung
-Die Klasse \MediumRegion{} repräsentiert Bereiche eines Mediums, die unter Umständen gecacht sind. Dafor  bietet sie folgende Methoden:
+The class \MediumRegion{} represents regions of a mediums, that are cached under some circumstances. For this, it offers the following methods:
 \begin{itemize}
-\item \texttt{getStartReference()}: Start-\IMediumReference{} des Bereiches abfragen
-\item \texttt{getSize()}: Länge des Bereiches abfragen
-\item \texttt{getbytes()}: Liefert null, falls nicht im Cache, sonst den \texttt{ByteBuffer} with den gecachten Daten der Region
-\item \texttt{isCached()}: Liefert true, falls der Bereich gecacht ist, sonst false
-\item \texttt{isContained()}: Liefert true, falls die angegebene \IMediumReference{} im Bereich enthalten ist, sonst false
-\item \texttt{discardbytesAtFront()}: Ermöglich Verkleinerung des Bereiches durch Verwerfen von bytes an dessen Anfang
-\item \texttt{discardbytesAtEnd()}: Ermöglich Verkleinerung des Bereiches durch Verwerfen von bytes an dessen Ende
+\item \texttt{getStartReference()}: Query start \IMediumReference{} of the region
+\item \texttt{getSize()}: Query length of the region
+\item \texttt{isCached()}: Returns true if cached, false otherwise
+\item \texttt{getBytes()}: Returns null if the region is not cached, otherwise the \texttt{ByteBuffer} with the cached region data
+\item \texttt{isContained()}: Returns true if the given \IMediumReference{} is contained within the region, false otherwise
+\item \texttt{discardbytesAtFront()}: Allows to trim the region at its beginning by discarding a given number of bytes
+\item \texttt{discardbytesAtEnd()}: Allows to trim the region at its back by discarding a given number of bytes
 \end{itemize}
 }
 {% Begründung
-Die Cache-Bereiche and die nicht-gecachten Bereiche können einheitlich behandelt werden. 
+The cache regions and the non-cached regions can be treated in the same way
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Die Verwaltung der Cache-Inhalte wird von einer Hilfsklasse erledigt:
+Maintenance of cache content is done by a helper class:
 %%%% DD --> %%%%
 \DD{dd:436}
 {% Titel
-Cache-Verwaltung durch die Klasse \MediumCache{}
+Cache maintenance by \MediumCache{}
 }
 {% Kurzbeschreibung
-Die Cache-Verwaltung erfolgt durch die Klasse \MediumCache{}, with folgenden Methoden:
+Cache maintenance is done by the class \MediumCache{}, with following methods:
 \begin{itemize}
-\item \texttt{getCachedByteCountAt()}: Liefert die Anzahl der am Offset $x$ zusammenhängend gecachten Daten zurück
-\item \texttt{getData()}: Liefert for den Offsetbereich $[x,x+n]$ eine Liste von \MediumRegion{}-Instanzen, zurück, welche die gecachten and nicht gecachten Bereiche im Offset-Bereich angeben.
-\item \texttt{getCachedRegions()}: Liefert eine Liste aller aktuell gecachten \MediumRegion{}-Instanzen zurück.
-\item \texttt{addData()}: Fügt am Offset $x$ Daten in den Cache ein. Vorher dort gecachte Daten werden überschrieben.
-\item \texttt{discardData()}: Gibt am Offset $x$ bis zu $n$ bytes aus dem Cache frei
-\item \texttt{clearAll()}: Gibt alle Daten des Caches frei
-\item \texttt{setMaxRegionSize()}: Setzt die maximal verwendete Größe einer Region. Default ist \texttt{Integer.MAX\_VALUE}. Die erzeugten Regionen werden nach Änderung maximal diese Größe erreichen. Die bestehenden Regionen bleiben unverändert.
-\item \texttt{getMaxRegionSize()}: liefert die maximal verwendete Größe einer Region
-\item \texttt{enableCaching()}: Aktiviert or deaktiviert das Caching
-\item \texttt{isCachingEnabled()}: Frag ab, ob  das Caching aktiviert or deaktiviert ist
+\item \texttt{getCachedByteCountAt()}: Returns the number of bytes cached consecutively starting from offset $x$
+\item \texttt{getData()}: Returns a list of \MediumRegion{} instances for the offset range $[x,x+n]$, which represent the cached and non-cached ranges within the offset range. I.e. whenever there is a gap in the cache, this gap is also represented by a single \MediumRegion{} instance without data
+\item \texttt{getCachedRegions()}: Returns a list of all cached \MediumRegion{} instances 
+\item \texttt{addData()}: Adds data to the cache at offset $x$. Previously cached data is overridden.
+\item \texttt{discardData()}: Frees up to $n$ bytes at offset $x$ from the cache
+\item \texttt{clearAll()}: Frees all data in the cache
+\item \texttt{setMaxRegionSize()}: Stes the maximum region size. Default is \texttt{Integer.MAX\_VALUE}. The created regions will have at most the given size. Any already existing regions remain unchanged.
+\item \texttt{getMaxRegionSize()}: Returns the maximum size of a region
+\item \texttt{enableCaching()}: Enables or disables caching
+\item \texttt{isCachingEnabled()}: Queries if caching is enabled or disabled
 \end{itemize}
 }
 {% Begründung
-Verringerung der Komplexität von \IMediumStore{}
+Reducing complexity of \IMediumStore{}
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Wie werden die Cache-Regionen nun intern verwaltet?
+How are these regions internally managed?
 
 %%%% DD --> %%%%
 \DD{dd:437}
 {% Titel
-Es wird eine \texttt{TreeMap} for die Verwaltung der Cache-Inhalte verwendet
+A \texttt{TreeMap} is used for managing the cache contents
 }
 {% Kurzbeschreibung
-Es wird eine \texttt{TreeMap<}\IMediumReference{}, \MediumRegion{}\texttt{>} for die Verwaltung der Cache-Inhalte verwendet.
+A \texttt{TreeMap<}\IMediumReference{}, \MediumRegion{}\texttt{>} is used for managing the cache contents.
 }
 {% Begründung
-Die Inhalte müssen basierend of Offsets ausgelesen werden. Daher ist eine nach Offset sortierte Datenstruktur notwendig. Sie ermöglicht das effiziente Auslesen aller \MediumRegion{}s größer or kleiner einem bestimmten Offset. Diese Operation sollte statt $O(n)$ (vermutlich) sogar eine Laufzeitkomplexität von $O(log(n))$ haben.
+Content must be read based on offsets. Thus a data structure sorted by offset is necessary. It allows the efficient retrieval of all \MediumRegion{}s bigger or smaller than a given offest. This operation should most probably need a runtime complexity of only $O(log(n))$ instead of $O(n)$.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Aus Performance-Gründen haben wir bereits die Möglichkeit for das Freigeben von Daten vorgesehen. Es zeichnet sich allerdings ab, dass man auch die Maximalgröße des Caches durch einen Automatismus regeln können muss:
+Due to performance reasons, we already considered a possibility to free up data from the cache. It, however, shows, that the maximum size of the cache could additionally be managed by an automatic mechanism:
 %%%% DD --> %%%%
 \DD{dd:437b}
 {% Titel
-Der Anwender kann die Maximalgröße des Caches einstellen
+The user is able to set the maximum cache size
 }
 {% Kurzbeschreibung
-Die Maximalgröße kann for \MediumCache{} über \texttt{setMaxCacheSize()} gesetzt and with \texttt{getMaxCacheSize()} abgefragt werden. Darüber hinaus kann die aktuelle Cache-Größe über \texttt{getCurrentCacheSize()} abgefragt werden. Standardmäßig ist die maximale Cache-Größe nicht limitiert, was durch eine Konstante \texttt{UNLIMITED} repräsentiert wird. Das Setzen der maximalen Cache-Größe führt zum Freigeben bzw. Verkleinern von vorhandenen Cache-Regionen, wird also sofort angewandt. Welche Cache-Regionen freigegeben werden, ist andefiniert.
+The maximum size for the \MediumCache{} can be set via \texttt{setMaxCacheSize()} and retrieved via \texttt{getMaxCacheSize()}. Furthermore the current cache size can be retrieved using \texttt{getCurrentCacheSize()}. By default, the maximum cache size is not limited, which is represented by the constant \texttt{UNLIMITED}. Setting a maximum cache size leads to freeing up or shrinking of existing cache regions, i.e. it will be directly applied. Which cache regions get freed, is undefined.
 
-\texttt{addData()} prüft, ob die aktuelle Cache-Größe plus die neu hinzuzufügenden bytes die maximale Cache-Größe überschreiten. Falls dem so ist, werden nur soviele bytes ab Beginn des zu cachenden \texttt{ByteBuffer}s hinzugefügt, bis die maximale Cache-Größe erreicht ist, unter Umständen also keine bytes. \texttt{addData()} liefert dann eine \MediumRegion{} zurück, welche die tatsächliche Regions-Größe angibt.
+\texttt{addData()} checks wheter the current cache size plus the bytes to add exceed the maximum cache size. If so, only as much bytes starting from begin of the \texttt{ByteBuffer}s  to cache are added up to the maximum size, which might probably be 0 bytes in total. \texttt{addData()} retzrns a \MediumRegion{} which reflects the actual region size cached.
 }
 {% Begründung
-Dies ermöglicht dem Anwender aktiv, die Cache-Größe zu beeinflussen and \texttt{OutOfMemoryError}s vorzubeugen
+This allows the caller to actively influence the cache size and avoid \texttt{OutOfMemoryError}sn
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Wir sollten uns noch über Fragementierungen des Caches Gedanken machen. Angenommen, durch aufeinanderfolgende Aufrufe von \texttt{addData()} würde 20 mal jeweils genau 1 Byte in einem zusammenhängenden Offset-Bereich der Länge 20 gecached werden. Entstehen dadurch 20 verschiedene \MediumRegion{}s with einer Länge von 1? Die analoge Fragestellung ergibt sich for einen Aufruf von \texttt{getData()}, der sich über einen Offsetbereich with Lücken in der Cache-Abdeckung ergibt. Nehmen wir beispielsweise an, der Cache enthält ab Offset $x$ 20 bytes, ab Offset $y:=x+30$ weitere 50 bytes, hat also eine Lücke von 10 bytes. Erfolgt nun ein Aufruf von \texttt{getData()} for den Bereich $x-10$ with Länge 100, dann haben wir fünf Regionen:
+We should also think about cache fragementation. Let us assume that, by subsequent calls to \texttt{addData()}, we would add a single byte to the cache 20 times for a consecutive offset range. Will this result in 20 different \MediumRegion{}s with a length of one byte each? The same question arieses for calls to \texttt{getData()}, which spans over an offset range with gaps in the cache coverage. Assume we have a cache that contains 20 bytes starting at offset $x$, further 50 bytes at offset $y:=x+30$, i.e. it has a gap of 10 bytes between the two regions. If there is a now a call to \texttt{getData()} for range $x-10$ with length of 100, we would result in five regions:
 \begin{itemize}
-\item Region 1: $[x-10,x)$ befindet sich nicht im Cache
-\item Region 2: $[x,x+20)$ befindet sich im Cache
-\item Region 3: $[x+20,y)$ befindet sich nicht im Cache
-\item Region 4: $[y,y+50)$ befindet sich im Cache
-\item Region 5: $[y+50,y+60)$ befindet sich nicht im Cache
+\item Region 1: $[x-10,x)$ not in the cache
+\item Region 2: $[x,x+20)$ in the cache
+\item Region 3: $[x+20,y)$ not in the cache
+\item Region 4: $[y,y+50)$ in the cache
+\item Region 5: $[y+50,y+60)$ not in the cache
 \end{itemize}
 
-\texttt{getData()} wird nun die Regionen 1, 3 and 5 according to \DesLink{dd:412d} im Cache ergänzen. Haben wir nach dem Aufruf dann also 5 \MediumRegion{}s im Cache?
+\texttt{getData()} will then add regions 1, 3 and 5 to the cache, according to \DesLink{dd:412d}. So, do we have 5 \MediumRegion{}s in the cache after the call?
 
-Wir legen fest:
+We decide:
 %%%% DD --> %%%%
 \DD{dd:437c}
 {% Titel
-Fragmentierung zusammenhängender Cache-Bereiche wird vermieden
+Fragmentation of subsequent cache regions is avoided
 }
 {% Kurzbeschreibung
-Bei aufeinanderfolgenden Aufrufen von \texttt{addData()}, bei denen Aufruf 1 den Offsetbereich $[x,x+n)$ and Aufruf 2 den Offsetbereich $[x+n,x+n+m)$ abdeckt \-- die beiden Bereiche also direkt ohne Lücke aneinander grenzen \-- ist das Endergebnis eine \MediumRegion{}, die den Offsetbereich von $[x,x+n+m)$ abdeckt.
+For subsequent calls of \texttt{addData()}, for which the first call covers offset range $[x,x+n)$ and the second call covers offset range $[x+n,x+n+m)$ \-- i.e. both ranges are directly connected without gaps \-- the result is a single \MediumRegion{}, covering offset range $[x,x+n+m)$.
 
-Bei einem Aufruf von \texttt{getData()}, dessen Offset-Bereich sich über mehrere durch Lücken getrennte gecachte \MediumRegion{}s erstreckt, werden die vom Medium gelesenen Lücken with den bereits im Cache befindlichen, bisher getrennten \MediumRegion{}s zu einer \MediumRegion{} verschmolzen.
+A call to \texttt{getData()}, whose offset range is covering multiple cached \MediumRegion{}s divided by gaps, creates a new single \MediumRegion{}s, joining the previously separate \MediumRegion{}.
 
-In beiden Fällen setzen wir voraus, dass die Gesamtlänge des neuen Bereiches kleiner als die konfigurierte maximale Regionsgröße according to \DesLink{dd:436} ist. Wird diese überschritten, gilt: Sei die Gesamtlänge $n$ with konfigurierter maximaler Blockgröße $m$, also $n>m$. Ist dann $n$ durch $m$ teilbar, so entstehen $\frac{n}{m}$ verschiedene \MediumRegion{}s. Ist $n$ nicht durch $m$ teilbar, so entstehen $\lfloor\frac{n}{m}\rfloor+1$ \MediumRegion{}s.
+In both cases we assume that the total length of the new region is smaller than the maximum configurable region size according to \DesLink{dd:436}. If this size is exceeded: Let $n$ be the total size with configurable maximum region size $m$, and let $n>m$. If $n$ is divided by $m$ without remained, then the result will be $\frac{n}{m}$ different \MediumRegion{}s. If $n$ cannot be divided by $m$ without remaineder, we have $\lfloor\frac{n}{m}\rfloor+1$ \MediumRegion{}s.
 
-Eine Fragmentierung von zusammenhängenden \MediumRegion{}s im Cache passiert also nur beim Überschreiten der maximalen Regionsgröße.
+A fragmentation of consecutive \MediumRegion{}s thus only happens when the maximum region size is exceeded.
 }
 {% Begründung
-Mehr Objekte benötigen mehr Speicher and erfordern einen höheren Verwaltungsaufwand. Die Fragmentierung bietet keinerlei Vorteile.
+More objects need more memory and cause a higher management effort. Fragmentation does not offer any benefits.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Eine verwandte Frage ist der Umgang with Lücken, auch bereits bei aufeinanderfolgenden Aufrufen von \texttt{addData()}: Wie im eingehenden Beispiel werden 20 bytes durch 20 Aufrufe von \texttt{addData()} in den Cache geladen. Jedoch befinde sich zwischen je zwei aufeinanderfolgenden bytes eine ``Lücke'' von einem Byte, das nicht im Cache enthalten ist. Auch hier darf man die Frage stellen: Entstehen dennoch 20 \MediumRegion{}s?
+A related question is how to treat gaps in general, even for multiple subseqhent calls of \texttt{addData()}: AS shown in the initial example, we load 20 bytes with 20 calls to \texttt{addData()} into the cache. However, there is a gap of ine Byte between each of them, and this gap is not contained in the cache. Even here you have to ask: Will this create 20 \MediumRegion{}s?
 
 %%%% DD --> %%%%
 \DD{dd:437d}
 {% Titel
-Fragmentierung unzusammenhängender Cache-Bereiche wird nicht unterbanden
+Fragmentation of unconnected cache areas is not actively avoided
 }
 {% Kurzbeschreibung
-Die wie im oberen Abschnitt beschreibene Situation ``eng benachbarter'', aber unzusammenhängender Cache-Bereiche geringer Länge wird nicht vermieden.
+\COMPmedia{} does not try to mitigate or avoid the situation of ``nearby'' but unconnected cache regions of small sizes.
 }
 {% Begründung
-Dies würde zu noch höherer Komplexität in der implementation von \texttt{addData()} führen. Heuristiken, nach denen Zusammenfassungen erfolgen, müssten erst definiert werden. Denkbar wäre beispielsweise, dass ein Aufruf von \texttt{addData()} erkennt, dass es andere Offset-Bereiche gibt, die sich im Radius $[x-k,x+k]$ befinden, with einem zu definierenden $k$. In diesem Fall könnten auch die ``Lückenbytes'' zusätzlich gecacht werden. Hier muss allerdings einerseits sichergestellt werden, dass ebenso die maximale Größe einer Region wie die maximale Größe des Caches nicht überschritten wird. For \texttt{InputStream}s ist dieses ``Lückenfüllen'' nicht möglich and muss daher ohnehin unterbleiben. Zudem muss dieser Weg den Sonderfall des Endes des Mediums berücksichtigen.
+It would lead to even higher complexity of the implementation of \texttt{addData()}. Heuristics that tell how to join those unconnected regions must be defined first. It could e.g. be possible for a call to \texttt{addData()} to detect that there are other offset ranges in a given radius $[x-k,x+k]$, with a to-be-defined constant $k$. In that case, the gap bytes could be additionally cached. However, it still must be ensured that the maximum region size and maximum cache size is not exceeded. For \texttt{InputStream}s, this ``gap filling'' is not possible and thus must anyway not be done. Last but not least, the functionality must respec the end of medium.
 
-Stattdessen ist der Anwender selbst in der Pflicht, for sinnvolle, d.h. zusammenhängende Cache-Bereiche durch entsprechende Verwendung der Methode zu sorgen.
+In contrast to that high complexity, we can ask the caller to ensure the he only adds data for reasonably connected offset ranges.
 }
 {% Nachteile
 No disadvantages known
@@ -1504,112 +1500,112 @@ No disadvantages known
 
 %-----------------------------------------------------------------------------------------------
 
-\subsubsection{Internal Datenstrukturen for die Verwaltung schwebender Änderungen}
+\subsubsection{Internal Data Structures for Managing Pending Changes}
 \label{sec:DatenstrukturenZweist}
 
-For das zweistufige Schreiben müssen die durch \texttt{insertData()}, \texttt{removeData()} and \texttt{replaceData()} angemeldeten Änderungen sinnvoll verwaltet werden, dawith sie später durch \texttt{flush()} verarbeitet werden können. Eine Änderung wird dabei durch eine \MediumAction{} repräsentiert.
+For the two-stage write protocol, changes scheduled via \texttt{insertData()}, \texttt{removeData()} and \texttt{replaceData()} must be managed in a reasonable way, such that they later can be processed during \texttt{flush()}. Any change is represented as a \MediumAction{}.
 
-Halten wir zunächst Folgendes fest:
+We first state the following:
 
 %%%% DD --> %%%%
 \DD{dd:434}
 {% Titel
-\MediumAction{} hat eine Sequenznummer zur Unterscheidung von Aktionen at the same offset
+\MediumAction{} has a sequence number for distinguishing actions at the same offset
 }
 {% Kurzbeschreibung
-\MediumAction{} definiert eine Sequenznummer (beginnend bei 0) zur Unterscheidung von Aktionen at the same offset. Diese wird bei consecutiven Aktionen (egal welchen Typs) at the same offset um 1 inkrementiert. Diese Sequenznummer wird also nicht nur for \texttt{insert}s at the same offset verwendet, sondern auch for alle anderen Aktions-Arten.
+\MediumAction{} defines a sequence number (starting at 0) for distinguishing actions at the same offset. It is incremented by consecutive actions (no matter which type) at the same offset by 1. This sequence number is not thus only used for \texttt{insert}s at the same offset, but also for all other types of actions.
 }
 {% Begründung
-Zwei unterschiedliche \MediumAction{}-Instanzen, die sich auf dasselbe Offset beziehen, können als solche sonst nicht in eine Reihenfolge gebracht werden. Die Reihenfolge müsste lediglich in externen Strukturen gehalten werden. Eine Unterscheidung and Sortierung ist dann schwieriger möglich. Dies ist natürlich insbesondere for \texttt{insert}s wichtig, die sich auf dasselbe Offset beziehen dürfen (see \DesLink{dd:422}). Darüber hinaus ist dies aber auch for unterschiedliche Typen wichtig, denn auch \texttt{insert} lässt auch ein \texttt{remove} or \texttt{replace} at the same offset als gültig zu (see \DesLink{dd:422}).
+Two distinct \MediumAction{} instances referring to the same offset cannot be sorted without this mechanism. However, this is especially important for \texttt{insert}s that are allowed to refer to the same offset (see \DesLink{dd:422}). Furthermore, it is also important for other types, as \texttt{insert} allows a later \texttt{remove} or \texttt{replace} at the same offset (see \DesLink{dd:422}).
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Es ist nun wichtig, Vergleiche zwischen zwei \MediumAction{}s sauber zu definieren, dawith entsprechende sortierte Datenstrukturen for effiziente Suche and Iteration in Reihenfolge genutzt werden können:
+We now have to define comparisons between two \MediumAction{}s in a reasonable way, as sorted data structures for efficient retrieval and iteration in order can be used correspondingly:
 
 %%%% DD --> %%%%
 \DD{dd:434a}
 {% Titel
-Vergleiche von \MediumAction{}s finden auf Basis der \IMediumReference{} and der Sequenznummer statt
+Comparisons of \MediumAction{}s is done based on \IMediumReference{} and the sequence number
 }
 {% Kurzbeschreibung
-Eine \MediumAction{} \texttt{a} ist genau dann kleiner als eine \MediumAction{} \texttt{b} bezogen auf Javas \texttt{compareTo}, wenn eine der folgenden Bedingungen gilt:
+A \MediumAction{} \texttt{a} is smaller than another \MediumAction{} \texttt{b} according to Javas \texttt{compareTo}, if and only if one of the following criteria are met:
 \begin{itemize}
-\item Die \IMediumReference{} von \texttt{a} kleiner als die \IMediumReference{} von \texttt{b} ist,
-\item Or die \IMediumReference{} von \texttt{a} gleich der \IMediumReference{} von \texttt{b} ist, and die Sequenznummer von \texttt{a} kleiner der Sequenznummer von \texttt{b} ist
+\item The \IMediumReference{} of \texttt{a} is smaller than the \IMediumReference{} of \texttt{b},
+\item Or the \IMediumReference{} of \texttt{a} is equal to the \IMediumReference{} of \texttt{b}, and the sequence number of \texttt{a} is smaller than the sequence number of \texttt{b}
 \end{itemize}
 
-Eine \MediumAction{} \texttt{a} ist genau dann gleich einer \MediumAction{} \texttt{b} bezogen auf Javas \texttt{equals} and \texttt{compareTo}, wenn eine der folgenden gilt: Alle Attribute von \texttt{a} gleichen allen Attributen von \texttt{b} (im Sinne von \texttt{equals}).
+A \MediumAction{} \texttt{a} is equal to a \MediumAction{} \texttt{b} according to Javas \texttt{equals} and \texttt{compareTo}, if all attributes of \texttt{a} are equal to all attributes of \texttt{b} (in terms of \texttt{equals}).
 
-Eine \MediumAction{} \texttt{a} ist genau dann größer als eine \MediumAction{} \texttt{b} bezogen auf Javas \texttt{compareTo}, wenn \texttt{a} weder kleiner als \texttt{b} noch gleich \texttt{b} ist. Insbesondere natürlich dann, wenn das \IMediumReference{} größer ist, or bie gleichen \IMediumReference{}s, wenn die Sequenznummer größer ist. Zudem gilt aber: Sind \IMediumReference{}s and Sequenznummer identisch, dann ist \texttt{a} dennoch größer als \texttt{b}, falls eines der anderen Attribute der \MediumAction{}s unterschiedlich ist.
+A \MediumAction{} \texttt{a} is bigger than a \MediumAction{} \texttt{b} according to Javas \texttt{compareTo}, if \texttt{a} is neither smaller than \texttt{b} nor equals \texttt{b}. This is especially true if the \IMediumReference{} is bigger, or for equal \IMediumReference{}s, if the sequence number is bigger. Furthermore it is defined: If \IMediumReference{}s and sequence numbers are identical, then \texttt{a} is still bigger than \texttt{b} in the case that any of the other attribute of the \MediumAction{}s differs.
 }
 {% Begründung
-Die Sortierung der \MediumAction{}s soll anhand ihrer Reihenfolge auf dem Medium (also ihrer \IMediumReference{}s) and ihrer Erzeugungsreihenfolge (also ihrer Sequenznummer) erfolgen, denn das Verhalten aufeinanderfolgender Operationen ist according to \DesLink{dd:422}, \DesLink{dd:424} and \DesLink{dd:424a} auf Basis der Aufrufreihenfolge festgelegt. Zudem müssen die \MediumAction{}s anhand einer klaren Reihenfolge beim \texttt{flush} abgearbeitet werden. \texttt{equals} muss genau dann true ergeben, wenn \texttt{compareTo} gleich 0 liefert.
+Sorting of \MediumAction{}s should be done according to their order on the medium (i.e. their \IMediumReference{}s) and creation order (i.e. their sequence number), because behaviour of consecutive operations is based on call order, according to \DesLink{dd:422}, \DesLink{dd:424} and \DesLink{dd:424a}. In addition, the \MediumAction{}s must be processesed in a defined order during \texttt{flush}. \texttt{equals} must return true exactly in the case that \texttt{compareTo} returns 0.
 }
 {% Nachteile
-Ggf. Verwirrung, weil kleiner and größer nicht symmetrisch sind. Die implementation muss daher dafor sorgen, dass \MediumAction{}s with gleichem Offset immer unterschiedliche Sequenznummern erhalten, die with Erzeugungsreihenfolge strikt steigen.
+Might cause confusion, as smaller and bigger are not symmetric. The implementation must thus ensure that  \MediumAction{}s with same offset always get different sequence numbers that strictly increase with creation order.
 }
 %%%% <-- DD %%%%
 
-Nun können wir festlegen, in welcher Form die \MediumAction{}s gespeichert werden:
+Now we can define in which way the \MediumAction{}s are stored:
 
 %%%% DD --> %%%%
 \DD{dd:435b}
 {% Titel
-\MediumAction{}s werden in einer sortierten Datenstruktur ohne Duplikate vorgehalten
+\MediumAction{}s are stored in a sorted data structure without duplicates
 }
 {% Kurzbeschreibung
-Die vor einem \texttt{flush()} erzeugten \MediumAction{}s werden in einer nach Offset and Sequenznummer (according to \DesLink{dd:434}) sortierten Datenstruktur vorgehalten, die keine Duplikate zulässt (z.B. \texttt{TreeSet}).
+The \MediumAction{}s created before a \texttt{flush()} are held in a datastructure sorted by offset and sequence number (according to \DesLink{dd:434}), which does not allow duplicates (e.g. \texttt{TreeSet}).
 }
 {% Begründung
-Die Sortierung ist for die Abarbeitung in Reihenfolge durch \texttt{flush()} nötig, zwei \MediumAction{}s with gleichem Offset, gleicher Sequenznummer and desselben Typs sollen nicht als Duplikat auftauchen können.
+The sort order is necessary for in-order-processing via \texttt{flush()}, two \MediumAction{}s with same offset, same sequence number and same type should not show up twice.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Nun zur Verwaltung der \MediumAction{}s:
+Now regarding management of \MediumAction{}s:
 %%%% DD --> %%%%
 \DD{dd:436a}
 {% Titel
-Zur Verwaltung dient die Klasse \MediumChangeManager{}
+For managing \MediumAction{}s, the class \MediumChangeManager{} is responsible
 }
 {% Kurzbeschreibung
-Zur Verwaltung dient die Klasse \MediumChangeManager{}, die intern \DesLink{dd:435b} implementiert, with folgenden Methoden:
+For managing \MediumAction{}s, the class \MediumChangeManager{} is defined, which internally implements \DesLink{dd:435b}, with following methods:
 \begin{itemize}
-\item \texttt{scheduleInsert()} zum Anmelden eines \emph{insert}, implementiert \DesLink{dd:422}, erhält als Eingabe eine \MediumRegion{} and liefert eine \MediumAction{} des entsprechenden Typs and with passender Sequenznummer zurück, d.h. sollte es andere Aktionen at the same offset geben, hat die Aktion garantiert eine Sequenznummer höher als die Aktion with der größen Sequenznummer am angegebenen Offset.
-\item \texttt{scheduleRemove()} zum Anmelden eines \emph{remove}, implementiert \DesLink{dd:424}, erhält als Eingabe eine \MediumRegion{} and liefert eine \MediumAction{} des entsprechenden Typs and with passender Sequenznummer zurück, d.h. sollte es andere Aktionen at the same offset geben, hat die Aktion garantiert eine Sequenznummer höher als die Aktion with der größen Sequenznummer am angegebenen Offset.
-\item \texttt{scheduleReplace()} zum Anmelden eines \emph{replace}, implementiert \DesLink{dd:424a}, erhält als Eingabe eine \MediumRegion{} and die Länge des zu ersetzenden Bereiches, liefert eine \MediumAction{} des entsprechenden Typs and with passender Sequenznummer zurück, d.h. sollte es andere Aktionen at the same offset geben, hat die Aktion garantiert eine Sequenznummer höher als die Aktion with der größen Sequenznummer am angegebenen Offset.
-\item \texttt{undo()} zum Rückgängigmachen, implementiert \DesLink{dd:420}
-\item \texttt{iterator()} liefert einen \texttt{Iterator<}\MediumAction{}\texttt{>} zum lesenden Iterieren der Änderungen in der korrekten Reihenfolge, \texttt{remove()} wird nicht implementiert
-\item \texttt{clearAll()} löscht alle Änderungen
+\item \texttt{scheduleInsert()} for scheduling an \emph{insert}, implements \DesLink{dd:422}, gets a \MediumRegion{} as parameter and returns a \MediumAction{} of the given type and with correct sequence number, i.e. should there be other actions at the same offset, the new action is guaranteed to have a sequence number higher than the action with the biggest sequence number already present for the same offset.
+\item \texttt{scheduleRemove()} for scheduling an \emph{remove}, implements \DesLink{dd:424}, gets a \MediumRegion{} as parameter and returns a \MediumAction{} of the given type and with correct sequence number, i.e. should there be other actions at the same offset, the new action is guaranteed to have a sequence number higher than the action with the biggest sequence number already present for the same offset.
+\item \texttt{scheduleReplace()} for scheduling an \emph{replace}, implements \DesLink{dd:424a}, gets a \MediumRegion{} and the length of the range to replace as parameter, returns a \MediumAction{} of the given type and with correct sequence number, i.e. should there be other actions at the same offset, the new action is guaranteed to have a sequence number higher than the action with the biggest sequence number already present for the same offset.
+\item \texttt{undo()} for undoing actions, implements \DesLink{dd:420}
+\item \texttt{iterator()} returns an \texttt{Iterator<}\MediumAction{}\texttt{>} for reading traversation of the changes in correct order, \texttt{Iterator.remove()} is not implemented
+\item \texttt{clearAll()} removes all changes
 \end{itemize}
-Dabei erzeugen die drei \texttt{schedule}-Methoden \MediumAction{}s according to \DesLink{dd:424b} and \DesLink{dd:434}.
+Here, the three \texttt{schedule} methods create \MediumAction{}s according to \DesLink{dd:424b} and \DesLink{dd:434}.
 }
 {% Begründung
-Verringerung der Gesamtkomplexität von \IMediumStore{}.
+Reduction of overall complexity of \IMediumStore{}.
 
-Der Iterator erlaubt das Lesen der Änderungen in Reihenfolge, wird aber for die Abarbeitung nicht benötigt, wie wir später sehen werden. \texttt{remove} auf dem Iterator ist unnötig, da \texttt{undo()} eine Aktion rückgängig macht.
+The iterator allows reading of changes in order, but is not needed for processing, as we see later. \texttt{remove} on this iterator is not necessary, as \texttt{undo()} can undo an action.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Zuletzt stellen wir noch einige Gemeinsamkeiten zwischen \MediumAction{}s and \MediumRegion{}s fest, and definieren daher:
+At the end, we highlight some commonalities between \MediumAction{}s and \MediumRegion{}s, and define:
 %%%% DD --> %%%%
 \DD{dd:436b}
 {% Titel
-\MediumAction{} aggregiert eine \MediumRegion{}-Instanz
+\MediumAction{} aggregates a \MediumRegion{} instance
 }
 {% Kurzbeschreibung
-\MediumAction{} aggregiert eine \MediumRegion{}-Instanz, welche Start and Länge der Aktion enthält, NICHT jedoch die dawith verknüpften bytes selbst, die als separates Attribut in \MediumAction{} gehalten werden müssen.
+\MediumAction{} aggregate a \MediumRegion{} instance which holds that offset and length of the action, BUT NOT the bytes related to the action itself, which are held in a separate attribute of the \MediumAction{}.
 }
 {% Begründung
-\MediumAction{} benötigt eine Start-\IMediumReference{}, eine Länge der Änderung sowie ggf. die Änderungsbytes, falls vorhanden. Allerdings werden wir nur Start and Länge in Form einer \MediumRegion{}-Instanz implementieren. Man kann sie daher als Klasse interpretieren, die sich auf eine \MediumRegion{} bezieht. Dies ist eher eine ``hat ein''- statt eine ``ist ein''-Beziehung. Daher ist Aggregation hier angebrachter als Vererbung. Der Grand dafür, die bytes der Änderung (z.B. die einzufügenden, zu schreibenden or zu ersetzenden bytes) selbst nicht with in die \MediumRegion{} zu nehmen \-- obwohl diese ja bytes aufnehmen könnte \-- liegt in der speziellen Form der \texttt{replace}-Operation begründet. Bei dieser sind for die Detektion unerlaubter Überlappungen (see \DesLink{dd:424} and \DesLink{dd:424a}) in keinster Weise die Ersetzungsbytes wichtig, sondern ausschließlich die Anzahl zu ersetzender bytes. Um daher eine einheitliche implementation for alle Typen von \MediumAction{} zu ermöglichen, enthält deren \MediumRegion{} daher nur die Länge der Änderung (z.B. die Anzahl der zu ersetzenden bytes), and die dawith im Zusammenhang stehenden bytes werden als separates Attribut verwaltet.
+\MediumAction{} needs a start \IMediumReference{}, a length of the change as well as possibly the bytes to change, if any. However, we only implement start and length in form of a \MediumRegion{} instance. You can interpret \MediumAction{} as a class that refers to a \MediumRegion{}. It is a classical ``has a'' instead of an ``is a'' relationship, which requires aggregation instead of inheritance. The reason to not keep the bytes in the aggregated \MediumRegion{} but in the \MediumAction{} itself lies in the special form of the  \texttt{replace} operation. For detecting non-allowed overlaps, only the number of bytes to replace is important (see \DesLink{dd:424} and \DesLink{dd:424a}) and not the replacement bytes themselves. In that way, we can get a common implementation of overlap detection.
 }
 {% Nachteile
 No disadvantages known
@@ -1618,144 +1614,143 @@ No disadvantages known
 
 %-----------------------------------------------------------------------------------------------
 
-\subsubsection{implementation von flush}
+\subsubsection{Implementation of flush}
 \label{sec:flushing}
 
-Die wohl komplexeste Funktionalität von \IMediumStore{} ist \texttt{flush()}, denn:
+The most complex functionality of \IMediumStore{} is \texttt{flush()}, because:
 \begin{itemize}
-\item \texttt{flush()} muss alle bisher angemeldeten Änderungen durchgehen,
-\item with den aktuellen Cache-Inhalten abgleichen,
-\item sinnvolle Blöcke der zu schreibenden Daten bilden,
-\item bei Einfügungen or Löschungen Daten hinter der Einfügestelle lesen and erneut schreiben,
-\item die \IMediumReference{}- and \MediumAction{}-Instanzen aktualisieren,
-\item den Cache aktualisieren
+\item \texttt{flush()} must iterate all pending changes,
+\item align them with the current cache content,
+\item cut reasonable blocks of the data bytes to write,
+\item update all \IMediumReference{} and \MediumAction{} instances,
+\item update the cache
 \end{itemize}
 
-Dann kommt noch hinzu, dass die schreibenden Operationen einige Eigenarten haben:
+We can add that the writing operations have some additional oddities:
 \begin{itemize}
-\item \texttt{insertData()} and \texttt{removeData()} erfordern, die Daten hinter der Einfügung or Löschung zu lesen, and dann wieder zu schreiben
-\item \texttt{replaceData()} ist ebensowenig harmlos, denn je nachdem, wieviele alte bytes durch wieviele neue ersetzt werden, kann es entweder keinerlei Verschiebung (Anzahl alte bytes gleich Anzahl neuer bytes), ein \texttt{insert} (Anzahl alte bytes kleiner Anzahl neuer bytes) or ein \texttt{remove} (Anzahl alte bytes größer Anzahl neuer bytes) bedeuten
-\item Erfolgen diese Operationen bei großen Dateien am Beginn, dann ist das Lesen einer großen Speichermenge bis zum Ende der Datei möglicherweise nicht möglich, ohne einen \texttt{OutOfMemoryError} zu erzeugen
-\item Dawith muss blockweise gelesen and geschreiben werden
-\item Hierbei unterscheiden sich die Operationen:
+\item \texttt{insertData()} and \texttt{removeData()} require that data behind the insertion or removal offset is read and written again
+\item \texttt{replaceData()} should also not be underestimated, as depending on the number of existing bytes to replaces with a different number of new bytes, it can either lead to no shifts at all (number of bytes to replace equal to number of replacement bytes), to an \texttt{insert} (number of bytes to replace smaller than number of replacement bytes) or a \texttt{remove} (number of bytes to replace bigger than number of replacement bytes)
+\item If these operations are done at the beginning of files, reading data up to the end of file is possibly not possible in one large chung, as it could lead to \texttt{OutOfMemoryError} for large files
+\item Thus blockwise reading is necessary
+\item At this point, the writing operations differ from each other:
 \begin{itemize}
-\item Bei \texttt{insertData()} von $n$ bytes at offset $x$ müssen die Daten vom Ende des Mediums blockweise bis zum Offset $x$ gelesen and geschrieben werden. Zuerst werden also die letzten $k$ bytes at offset $r$ gelesen, and dann ab Offset $r+k$ geschrieben, dann wiederum $k$ bytes at offset $r-k$ gelesen, um dann bei $r$ geschrieben zu werden usw. bis zum Offset $x$. Ein anderer Weg funktioniert nicht, wenn man keine bytes der Datei verlieren möchte.
-\item Hingegen bei \texttt{removeData()} von $n$ bytes at offset $x$ müssen die Daten beginnend vom Offset $x+n$ blockweise bis zum Ende des Mediums gelesen and geschrieben werden. Zuerst werden also die letzten $k$ bytes at offset $x+n$ gelesen, and dann ab Offset $x$ geschrieben, dann wiederum $k$ bytes at offset $x+n+k$ gelesen, um dann bei $x+n$ geschrieben zu werden usw. bis zum letzten Offset im Medium. Ein anderer Weg funktioniert nicht, wenn man keine bytes der Datei verlieren möchte.
-\item Bei \texttt{replaceData()} verhält sich entsprechend der oben genannten Fälle entweder wie \texttt{insert} or wie \texttt{remove}, or es werden keinerlei nachfolgende Lese- and Schreibaktionen nötig, letzteres genau dann, wenn die Anzahl der Ersetzungsbytes gleich der Anzahl der zu ersetzenden bytes ist.
+\item For an \texttt{insertData()} of $n$ bytes at offset $x$, data must be read and written block-wise starting from the end of medium down to offset $x$. I.e. first the last $k$ bytes of the medium at offset $r$ are read and then written to offset $r+k$, then $k$ bytes at offset $r-k$ are read, to be written at $r$ and so on until offset $x$. Another way is not working if you do not want to overwrite and thus lose existing bytes.
+\item For \texttt{removeData()} of $n$ bytes at offset $x$, we must read and write data starting at offset $x+n$ block-wise until the end of mediums. First, $k$ bytes at offset $x+n$ are read and then written at $x$, then $k$ bytes at offset $x+n+k$ are read to be written to $x+n$ and so on, until the last offset on the medium.
+\item For \texttt{replaceData()} we have to distinguish corresponding cases, it could either behave like \texttt{insert} or \texttt{remove}, or a simple overwrite (if number of bytes to replace equals number of replacement bytes).
 \end{itemize}
 \end{itemize}
 
-Fest steht dawith zunächst, dass wir die Konfiguration einer maximalen Block-Größe for das Schreiben benötigen:
+We can first confirm that the configuration of a maximum block size for writing is necessary:
 %%%% DD --> %%%%
 \DD{dd:438}
 {% Titel
-Eine maximale Schreibe-Block-Größe muss for den Anwender konfigurierbar sein
+A maximum write block size must be configurable for the user
 }
 {% Kurzbeschreibung
-Diese muss zwischen 1 and N bytes liegen
+It must be between 1 and N (any integer) bytes
 }
 {% Begründung
-Benötigt aufgrand der notwendigen Operationen beim Einfügen and Entfernen. Durch die Konfigurierbarkeit kann der Anwender selbst entscheiden, wie viele bytes in einem Rutsch gelesen and geschrieben werden sollen.
+Necessary due to the block-wise reading and writing operations behind affected regions caused by inserts and removes. By making it configurable, the user can himself decide how much bytes should be processed in a single pass.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Das Herausfinden, welche Operationen durchgeführt werden müssen, ist also eine komplexe Aufgabe. Diese komplexe Aufgabe können wir in eine Methode gießen:
+Finding out wich operations must be executed during a flush is a complex task. We need to perform this complex task within a method:
 %%%% DD --> %%%%
 \DD{dd:439}
 {% Titel
-\texttt{createFlushPlan()} erzeugt einen Schreib-Lese-Plan for ein flush in Form einer \texttt{List<}\MediumAction{}\texttt{>}
+\texttt{createFlushPlan()} creates a read-write-plan for a flush in form of a \texttt{List<}\MediumAction{}\texttt{>}
 }
 {% Kurzbeschreibung
-\texttt{createFlushPlan()} erzeugt einen Schreib-Lese-Plan for ein flush and liefert eine \texttt{List<}\MediumAction{}\texttt{>}.  Der Schreib-Lese-Plan enthält die in gegebener Reihenfolge auszuführenden Aktionen. Die Liste der möglichen Aktionen wird um \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE} erweitert. Dabei ist:
+\texttt{createFlushPlan()} creates a read-write-plan for a flush and returns a \texttt{List<}\MediumAction{}\texttt{>}.  The read-write-plan contains the actions to be executed in the given order. The list of possible actions is extended by \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE}. Which are defined as:
 \begin{itemize}
-\item READ primitives Lesen von $n$ bytes ab einem Offset
-\item WRITE primitives Schreiben von $n$ bytes ab einem Offset
-\item TRUNCATE das explizite Kürzen der Datei, was insbesondere bei Löschungen notwendig ist
+\item READ primitive reading of $n$ bytes starting at offset $x$
+\item WRITE primitive writing (i.e. overwriting) of $n$ bytes starting at offset $x$
+\item TRUNCATE explicit shortening of a file, which is especially necessary for removing data
 \end{itemize}
 
-Jeder gelieferten \texttt{READ}-Aktion muss eine \texttt{WRITE}-Aktion folgen, sonst ist der Plan ungültig. \texttt{INSERT}- and \texttt{REPLACE}-Operationen (falls mehr Ersetzungsbytes als ersetzte bytes) führen zu \texttt{WRITE}-Aktionen. For alle \texttt{READ} and \texttt{WRITE}-Aktionen gilt: die Anzahl der bytes liegt zwischen 0 and der maximalen Schreibblockgröße. \texttt{createFlushPlan()} liefert auch die ursprünglichen \texttt{REMOVE}-, \texttt{REPLACE}- and \texttt{INSERT}-Aktionen explizit, obwohl diese implizit durch \texttt{READ}-\texttt{WRITE}-Aktionen implementiert werden.
+Each returned \texttt{READ} action must be followd by a \texttt{WRITE} action, otherwise the plan is invalid. \texttt{INSERT} and \texttt{REPLACE} operations (if more replacement bytes than bytes to replace) lead to \texttt{WRITE} actions. For all \texttt{READ} and \texttt{WRITE} actions: the number of bytes is between 0 and the (configured) maximum write block size. \texttt{createFlushPlan()} also returns the original \texttt{REMOVE}, \texttt{REPLACE} and \texttt{INSERT} actions explicitly in the plan, although they are implemented implicitly by \texttt{READ} and \texttt{WRITE} actions.
 
-Der Schreib-Lese-Plan enthält dawith zusätzlich zu den bereits durch den Anwender hinzugefügten Aktionen neue \MediumAction{}s. Diese werden allerdings nicht in der internaln Datenstruktur des \MediumChangeManager{} eingefügt.
+The read-write-plan thus contains \MediumAction{}s in addtion to those caused by scheduling actions by a user. These additional actions are, however, not added to the internal data structures of the \MediumChangeManager{}.
 
-Der erzeugte Plan kann dann im Nachgang abgearbeitet werden.
+The created plan can be processed afterwards.
 }
 {% Begründung
-Die Ermittelung der notwendigen Operationen ist ein komplexer Vorgang, der separat erfolgen sollte. Ein sofortiges Ausführen einer Aktion wäre alternativ möglich, aber würde das Testen des entsprechenden Codes erschweren.
+Determining the necessary operations is a complex process, which should be done separately. A direct execution of the plan would be an alternative, but testability of the code would heavily suffer.
 
-\MediumChangeManager{} ist der richtige Ort for diese Operation, da hier ohnehin alle \MediumAction{}s verwaltet werden. Die im Plan zusätzlich enthaltenen \MediumAction{}s werden nicht in die internal Datenstruktur eingefügt, weil die Operation so ideal wiederholbar and ``zustandslos'' ist. 
+\MediumChangeManager{} is the correct place for this operation, as here all \MediumAction{}s are managed anyways. The additional \MediumAction{}s in the plan are not added to any internal data structures to ensure the operation is stateless and ideally repeatable. 
 
-Die Erweiterung um \texttt{WRITE} scheint unnötig, da es bereits eine Operation \texttt{REPLACE} gibt. Jedoch unterscheidet sich \texttt{WRITE} insofern, dass die zu schreibenden bytes beim Erzeugen der Aktion noch nicht bekannt sind, im Gegensatz zu \texttt{REPLACE}.
+Adding another \texttt{WRITE} primitive seems unnecessary, as there is already an operation named \texttt{REPLACE}. However, \texttt{WRITE} differs insofar as the bytes to write are not yet known when the action is created, in contrast to \texttt{REPLACE}.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Nun hätten wir alle Zutaten beisammen, um das Schreiben via \texttt{flush()} zu implementieren:
+Now we have all credentials to imnplement writing in \texttt{flush()}:
 \begin{enumerate}
-\item Erzeuge den Schreib-Lese-Plan according to \DesLink{dd:439}
-\item Iteriere alle Einträge des Schreib-Lese-Plans, die folgenden Schritte gelten for jeden einzelnen Eintrag:
-\item Führe die Aktion an der durch die \MediumAction{} angegebenen Stelle durch:
+\item Create the read-write-plan according to \DesLink{dd:439}
+\item Iterate all entries of the read-write-plan, the following steps are done per each entry:
+\item Execute the \MediumAction{} at the indicated offset by the following steps:
 \begin{itemize}
-\item Falls Aktion = \texttt{READ}: Lies $n$ bytes, die in der derauffolgenden Aktion geschrieben werden, wobei $n$ kleiner gleich der maximalen Schreibblockgröße and größer als 0 ist. Dazu werden zuerst via \MediumCache{}\texttt{.getData()} die Regionen ermittelt. Diejenigen, die nicht gecached sind, werden durch direkten Zugriff auf das Medium via \IMediumAccessor{} gelesen. Dann wird ein entsprechender \texttt{ByteBuffer} schrittweise aufgebaut.
-\item Falls Aktion = \texttt{WRITE}: Schreibe die bytes, welche die vorherige \texttt{READ}-Operation geliefert hat, durch direkten Zugriff auf das Medium via \IMediumAccessor{} 
-\item Falls Aktion = \texttt{REPLACE}: Schreibe die bytes in der \MediumAction{} durch direkten Zugriff auf das Medium via \IMediumAccessor{} 
-\item Falls Aktion = \texttt{INSERT}: Schreibe die bytes in der \MediumAction{} durch direkten Zugriff auf das Medium via \IMediumAccessor{} 
-\item Falls Aktion = \texttt{REMOVE}: Ignoriere die Aktion, weil sie implizit durch \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE} durchgeführt wird
-\item Falls Aktion = \texttt{TRUNCATE}: Führe ein explizites Verkürzen des Mediums durch.
+\item If action = \texttt{READ}: Read $n$ bytes \-- that are written in the subsequent action \-- where $n$ is smaller than the maximum write block size and bigger than 0. For that, first all regions are determined using \MediumCache{}\texttt{.getData()}. Those that are not cached are read by direct access to the medium via \IMediumAccessor{}. Then a corresponding \texttt{ByteBuffer} is built up step-wise.
+\item If action = \texttt{WRITE}: Write the bytes which where read by the previous \texttt{READ} operation with direct access to the medium via \IMediumAccessor{}
+\item If action = \texttt{REPLACE}: Write the bytes in the \MediumAction{} with direct access to the medium via \IMediumAccessor{}
+\item If action = \texttt{INSERT}: Write the bytes in the \MediumAction{} with direct access to the medium via \IMediumAccessor{}
+\item If action = \texttt{REMOVE}: Ignore the action, as it implicitly gets implemented by \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE}
+\item If action = \texttt{TRUNCATE}: Execute an explicit truncation of the medium.
 \end{itemize}
-\item Aktualisiere den Cache (Teil 1): Falls Aktion = \texttt{REMOVE}, dann rufe \MediumCache{}\texttt{.discardData()} auf, um die bytes aus dem Cache zu entfernen.
-\item Nur wenn die Aktion = \texttt{INSERT} or Aktion = \texttt{REMOVE}: Rufe \MediumReferenceRepository{}\texttt{.updateReferences()} for den Bereich auf, sodass alle dahinter liegenden \IMediumReference{} instances aktualisiert werden
-\item Aktualisiere den Cache (Teil 2): Falls Aktion = \texttt{WRITE}, \texttt{INSERT} or \texttt{REPLACE}, dann rufe \MediumCache{}\texttt{.addData()} auf, um die bytes in den Cache aufzunehmen.
-\item Falls Aktion = \texttt{INSERT}, \texttt{REMOVE} or \texttt{REPLACE}: Rufe \MediumChangeManager{}\texttt{.undo()} auf, um die Aktion zu entfernen
+\item Update the cache (part 1): If action = \texttt{REMOVE}, then call \MediumCache{}\texttt{.discardData()} to remove the bytes from the cache.
+\item Only if action = \texttt{INSERT} or if action = \texttt{REMOVE}: Call \MediumReferenceRepository{}\texttt{.updateReferences()} for the region, such that all consecutive  \IMediumReference{} instances are updated.
+\item Update the cache (part 2): If action = \texttt{WRITE}, \texttt{INSERT} or \texttt{REPLACE}, then call \MediumCache{}\texttt{.addData()} to add the bytes to the cache.
+\item If action = \texttt{INSERT}, \texttt{REMOVE} or \texttt{REPLACE}: Call \MediumChangeManager{}\texttt{.undo()} to remove the action
 \end{enumerate}
 
 %%%% DD --> %%%%
 \DD{dd:440}
 {% Titel
-\texttt{flush()} wird according to des oben angegebenen Ablaufs implementiert
+\texttt{flush()} is implemented according to the process defined above
 }
 {% Kurzbeschreibung
-\texttt{flush()} wird according to des oben angegebenen Ablaufs implementiert
+\texttt{flush()} is implemented according to the process defined above
 }
 {% Begründung
-Der Schreib-Lese-Plan muss explizit alle Operationen enthalten, also auch die vom User ausgelösten Operationen \texttt{REPLACE}, \texttt{INSERT} and \texttt{REMOVE}, selbst wenn eigentlich \texttt{READ} and \texttt{WRITE} for deren implementation ausreichen würden. Grand dafor ist einerseits, dass bei einem \texttt{WRITE} nicht klar ist, ob die bytes der vorherigen \texttt{READ}-Aktion verwendet werden sollen, or vorgegebene bytes. Darüber hinaus müssen die Aktionen des Anwenders explizit aus dem \MediumChangeManager{} entfernt, and deren Einfluss auf \IMediumReference{} instances explizit ausgeführt werden. Dazu benötigt man ihre konkreten Typen, \texttt{WRITE} reicht nicht aus.
+The read-write-plan must contain all operations explicitly, i.e. including those triggered by the user - \texttt{REPLACE}, \texttt{INSERT} and \texttt{REMOVE}, even if \texttt{READ} and \texttt{WRITE} would be sufficient for their implementation. The reason for that is that the actions of the user must explicitly be removed from the \MediumChangeManager{} and their influence on \IMediumReference{} instances behind must explicitly be executed. For this, you need the concrete types, \texttt{WRITE} is not sufficient.
 
-\texttt{undo()} wird nur bei den Anwender-Operationen ausgeführt, weil nur diese according to \DesLink{dd:439} in den internaln Datenstrukturen von \MediumChangeManager{} verwaltet werden.
+\texttt{undo()} is only executed for user operations, as only those are maintained in the internal data structures of \MediumChangeManager{}, according to \DesLink{dd:439}.
 
-Die Cache-Aktualisierung ist zweigeteilt: Im Falle von \texttt{REMOVE} wird \emph{zuerst} der Cache aktualisiert, um \emph{danach} die \IMediumReference{} instances anzupassen. Dies liegt darin begründet, dass ansonsten at the same offset unter Umständen mehrere Cache-Regionen liegen würden. Dies würde den Cache also in einen inkonsistenten and fehlerhaften Zustand bringen. With der gleichen Begründung werden die anderen schreibenden Operationen erst \emph{nach} dem Aktualisieren der \IMediumReference{} instances angepasst.
+The cache update is divided into two parts: In case of a \texttt{REMOVE}, \emph{first} the cache is updated, and \emph{then} the \IMediumReference{} instances are updated. The reaseon for that is that otherwise, at the same offset, there could be multiple cache regions \--- for example, if you have a remove of 10 bytes at offset 0 and an insert at offset 10, if you update the medium references first, the cache would contain the previous (to be removed) region from 0 to 10, and a new region from 0 to 10 (the newly inserted one, as the offsets were updated). This would bring the cache into an inconsistent state. With the same reason, the other writing operations are only updated in the cache (part 2) \emph{after} the update of the \IMediumReference{} instances.
 
-Die Cache-Verwaltung wird komplett \MediumCache{}\texttt{.addData()} überlassen, sodass darin Maximalgröße, zusammenhängende Bereiche etc. optimiert werden können.
+The cache management is completely done within \MediumCache{}\texttt{.addData()}, such that maximum size and consecutive reagions can be optimized there.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Denken wir über die Fehlerbehandlung dieser Abfolge nach:
+Let us think about the error handling of this process:
 \begin{itemize}
-\item Geht beim Erzeugen des Schreib-Lese-Plans (Step 1) etwas schief, dann kann der Anwender es nochmal versuchen, da alle Änderungen noch vorhanden and auf dem externen Medium noch nichts geändert worden ist
-\item Geht beim Zugriff auf das externe Medium (Step 3) etwas schief, dann sind ggf. vorher bereits Aktionen des Schreib-Lese-Plans erfolgreich durchgeführt worden, das externe Medium also bereits geändert worden. Dies entspricht den Aussagen in \DesLink{dd:410b}. Da die vorherigen Operationen bereits entfernt wurden, haben wir aber einen sauberen ``Wieder-Aufsetz-Stand'', d.h. der Anwender könnte das Ganze auch hier erneut versuchen.
-\item Geht beim Aktualisieren des Caches in Step 4 or 6 etwas schief, dann wird weder die Aktion entfernt noch werden die Medium-Referenzen aktualisiert. Analog, wenn ewas im Step 5 schiefgeht. In diesen Fällen ist entweder \MediumCache{} or \MediumReferenceRepository{} in einem inkonistenten Zustand. Die Frage ist, ob dann noch etwas zu retten ist. Das klärt die folgende Designentscheidung
+\item Is there a failure during creation of the read-write-plan (step 1), the user can try again, as all changes are still existing and nothing was changed yet (at least nothing by the current OS process and using \LibName{})
+\item Is there a failure during access to the external medium (step 3), then previously, some actions of the read-write-plan might already have been executed successfully, the external medium thus was already changed. This corresponds to what \DesLink{dd:410b} says. As the previous operations were already removed from the plan and other data structures, we have a clean ``recovery point'', at least, i.e. the user can retry the flush.
+\item Is there a failure in updating the cache in steps 4 or 6, neither the action is removed, nor the medium references are updated. Similar things happen if something goes wrong in step 5. In these cases, either the \MediumCache{} or the \MediumReferenceRepository{} is in an inconsistent state, basically it is out-of-sync with reality. The question is: Is there anything left to be saved? This is clarified by the following design decision.
 \end{itemize}
 
 %%%% DD --> %%%%
 \DD{dd:441}
 {% Titel
-Rückgängig-Machen der Änderungen erfolgt immer, Cache wird bei Update-Fehlern geleert
+Undo of changes always happens, cache is emptied in case of update failures
 }
 {% Kurzbeschreibung
-Sollte beim \texttt{flush()} in den Schritten 4 bis 6 eine \texttt{Exception} geworfen werden, dann soll die Aktion dennoch rückgängig gemacht werden.
+Should a failure of the \texttt{flush()} occur during steps 4 to 6, i.e. any \texttt{Exception} is thrown, the action must nevertheless be undone.
 
-Weitere Maßnahmen werden nicht eingeleitet, denn das Fehlschlagen der Schritte 4 bis 6 tritt nur im Falle von Programmierfehlern or schweren Systemfehlern ein. In diesen Situationen ist Recovery ohne schwierig bis unmöglich.
+Further measures are not taken, because faulure in steps 4 to 6 might only happen in case of programming errors or system failures. In these situations, recovery is anyway quite hard or even impossible.
 }
 {% Begründung
-\texttt{flush()} ist eine sensible Operation, die zwar kein ACID erfüllen mag, aber zumindest im Fehlerfall das Gesamtsystem in einen halbwegs konsistenten Zustand belassen soll. Dazu gehört, dass bereits auf dem Medium erfolgte fehlerfreie Operationen auch nicht nochmals ausgeführt werden dürfen. Dawith muss die entsprechende Aktion auch entfernt werden.
+\texttt{flush()} is a reasonable operation, that does however not support ACID, but at least the whole system is left in as sane state as possible. This includes that actions already executed successfully are removed such that they are not executed again by mistake.
 
-Der Versuch, auch Fehler bei Cache-Verwaltung or \MediumReferenceRepository{}-Zugriffen zu behandeln, führt zu einer hohen Komplexität, die im Sinne der Wahrscheinlichkeit dieser Ereignisse unnötig ist. Zudem ist auch dann das System i.d.R. nach wie vor in einem inkonsistenten Zustand. Solche Fehlerbehandlungen, die glauben etwas retten zu können, machen die Dinge dann ggf. auch nur noch schlimmer.
+The attempt to also handle failures during cache management or \MediumReferenceRepository{} accesses has a very high complexity that is not justifiable compared to the scarcity of such events. Even then the system is actually not in a consistent state. Such error handling that believes it can rescue the overall system from failure probably makes things even worse.
 }
 {% Nachteile
 No disadvantages known
@@ -1801,70 +1796,68 @@ CF3 & Single \texttt{replace} &\begin{enumerate}\item[a.] At start, intermediate
 \end{enumerate}
 & No read/write operations before remove offset; If $m>n$: Behaves like a \emph{remove} of $m-n$ bytes; If $m<n$: Behaves like an \emph{insert} of $n-m$ bytes; If $m=n$: No read/write pairs for bytes behind; In every case there, there are $X$ corresponding write operations (one per starting block) for the replacement bytes with increasing offsets starting at the replacement offset; The \texttt{replace} action follows after these actions in the plan \\
 	\hline
-CF4 & Multiple \texttt{insert}s &\begin{enumerate}\item[a.] All inserts direkt aneinandergrenzend, or with Lücken dazwischen
-\item[b.] bytes dazwischen/dahinter: Keine, ganzzahliges Vielfaches der maximalen Schreibblockgröße, kein ganzzahliges Vielfaches, weniger bytes als maximale Schreibblockgröße
-\item[c.] Löschbytes: Keine, ganzzahliges Vielfaches der maximalen Schreibblockgröße, kein ganzzahliges Vielfaches, weniger bytes als maximale Schreibblockgröße
+CF4 & Multiple \texttt{insert}s &\begin{enumerate}\item[a.] All inserts directly subsequent, or with gaps between
+\item[b.] bytes in-between/behind: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
+\item[c.] Bytes to remove: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
 \end{enumerate}
-& Keine Lese/schreiboperationen vor der ersten Einfügung; bytes hinter der letzten Einfügung: Sie bleiben unverändert and werden um $k$ bytes nach hinten verschoben, sodass sich die medialänge um genau $k$ bytes vergrößert; bytes zwischen Einfügungen: bleiben unverändert and werden um die Anzahl der bis dahin eingefügten bytes nach hinten verschoben; Es werden for diese bytes $N$ Lese-/Schreiboperationen geliefert, wobei $N$ der Anzahl der angebrochenen Blöcke der maximalen Schreibblockgröße entspricht, die sich hinter or zwischen den Einfügeoperationen auf dem Medium befinden; die \texttt{insert}-Aktion folgt nach diesen Aktionen im Plan \\
+& No read/write operations before the first insertion; bytes behind the last insertion: They remain unchanged and are shifted by $k$ bytes to the back, such that the overall length of the medium increases by $k$ bytes; bytes in between insertions: remain unchanged and are shifted to the back by the number of up-to-then inserted bytes; For these bytes, $N$ read/write operations are returned, where $N$ is the number of at least started blocks of maximum write block size, that are behind or between the insert operation on the medium; the \texttt{insert} action follows after these actions in the plan \\
 	\hline
-CF5 & Multiple \texttt{remove}s &\begin{enumerate}\item[a.] All removes at the same offset or an unterschiedlichen
-\item[b.] bytes dazwischen/dahinter: Keine, ganzzahliges Vielfaches der maximalen Schreibblockgröße, kein ganzzahliges Vielfaches, weniger bytes als maximale Schreibblockgröße
-\item[c.] Einfügebytes: Keine, ganzzahliges Vielfaches der maximalen Schreibblockgröße, kein ganzzahliges Vielfaches, weniger bytes als maximale Schreibblockgröße
+CF5 & Multiple \texttt{remove}s &\begin{enumerate}\item[a.] All removes at the same offset or at different offsets
+\item[b.] bytes in-between/behind: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
+\item[c.] Bytes to insert: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
 \end{enumerate}
-& Keine Lese/schreiboperationen vor der Löschung; bytes dahinter: Sie bleiben unverändert and werden um $k$ bytes nach vorne verschoben, sodass sich die medialänge um genau $k$ bytes verkleinert; Es werden for diese bytes $N$ Lese-/Schreiboperationen geliefert, wobei $N$ der Anzahl der angebrochenen Blöcke der maximalen Schreibblockgröße entspricht, die sich hinter der Löschoperation auf dem Medium befinden; es folgt eine \texttt{truncate}-Operation \\
+& No read/write operations before the first remove; bytes behind: Remain unchanged and are shifted to the front by $k$ bytes, such that the overall medium length decreases by exactly $k$ bytes; $N$ read/write operations are returned for these operations, where $N$ is the number of at least started blocks of maximum write block size, that are behind the remove operation on the medium; a \texttt{truncate} operation follows in the plan \\
 	\hline
-\caption{Testfälle for die Prüfung von \texttt{createFlushPlan}}
+\caption{Test cases for checking \texttt{createFlushPlan}}
 \label{tab:createFlushPlan}
 \end{longtable}
 \end{landscape}
 
-
-
 % -------------------------------------------------------------------------------------------------------
-\subsubsection{Konfigurationsparameter}%
+\subsubsection{Configuration Parameters}%
 \label{sec:Konfigurationsparameter}%
 
-Auch wenn die durch den Anwender konfigurierbaren Parameter zur öffentlichen Schnittstelle gehören, so können sie erst hier aufgeführt werden, da erst nach Design der implementation klar geworden ist, was von Außen konfigurierbar sein muss.
+Even if the the parameters configurable by users belong to the public interface, they are only listed first here, as it was only clear after the implementation design, which of those parameters need to be exposed to the users.
 
-Zunächst legen wir folgendes fest:
+We first define:
 %%%% DD --> %%%%
 \DD{dd:441b}
 {% Titel
-Die Konfiguration von \COMPmedia{} erfolgt auf einer \IMedium{}-Instanz
+The configuration of \COMPmedia{} is done per \IMedium{} instance
 }
 {% Kurzbeschreibung
-Die Konfiguration von \COMPmedia{} erfolgt auf einer \IMedium{}-Instanz. Dawith haben alle Konfigurations-Parameter den Scope eines \IMedium{}s, beziehen sich also nur auf dieses. Es gibt entsprechend eine \texttt{setProperty()}- and eine \texttt{getProperty()}-Methode auf einem \IMedium{}.
+The configuration of \COMPmedia{} is done per \IMedium{} instance. By doing this, all configuration parameters correlate to an \IMedium{}, have the same lifetime and scope. Thus, there are \texttt{setProperty()} and \texttt{getProperty()} methods for a \IMedium{}.
 }
 {% Begründung
-Die gesamte internal implementation der wesentlichen Klassen, also \IMediumStore{}, \IMediumAccessor{}, \MediumCache{} usw. arbeitet auf genau einem Medium. Der Anwender kann \IMedium{}-Instanzen direkt erzeugen and nach Belieben konfigurieren, unabhängig von anderen \IMedium{}-Instanzen.
+The whole internal implementation of the most important classes, i.e. \IMediumStore{}, \IMediumAccessor{}, \MediumCache{} and so on works on exactly one medium. The user can create \IMedium{} instances directly himself and configure them as needed, independent of other \IMedium{} instances.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Nun ist die Frage, welche Konfigurationsparameter wir benötigen. Diese sind in Tabelle \hyperref[tab:ConfigMedia]{\ref{tab:ConfigMedia}} aufgeführt.
+Now the question arises: Which configuration parameters are needed? Those listed in table \hyperref[tab:ConfigMedia]{\ref{tab:ConfigMedia}}.
 
 
 \begin{landscape}
 \begin{longtable}{|p{0.1\linewidth}|p{0.24\linewidth}|p{0.07\linewidth}|p{0.1\linewidth}|p{0.4\linewidth}|}
 	\hline
-	\rowcolor[gray]{.9}\textbf{Medium} & \textbf{Parameter-Name} & \textbf{Typ} & \textbf{Default-Wert} & \textbf{Beschreibung} \\
+	\rowcolor[gray]{.9}\textbf{Medium} & \textbf{Parameter Name} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\
 	\endhead
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{ENABLE\_CACHING} & boolean & \texttt{true} & Aktiviert or deaktiviert das Caching for das Medium according to \DesLink{dd:411c}. Der Cacheinhalt wird beim Setzen auf \texttt{false} sofort geleert. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{ENABLE\_CACHING} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. The cache content is directly cleared if setting this to \texttt{false}. \\
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_REGION\_SIZE} & int $> 0$ & \texttt{Integer} \texttt{.MAX\_VALUE} & Setzt die maximale Größe einer Cache-Region according to \DesLink{dd:436}. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_REGION\_SIZE} & int $> 0$ & \texttt{Integer} \texttt{.MAX\_VALUE} & Sets the maximum size of a cache region according to \DesLink{dd:436}. \\
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_SIZE} & long $> 0$ & Long \texttt{.MAX\_VALUE} & Setzt die maximale Cache-Größe according to \DesLink{dd:437b}. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_SIZE} & long $> 0$ & Long \texttt{.MAX\_VALUE} & Sets the maximum cache size according to \DesLink{dd:437b}. \\
 	\hline
-	\texttt{File}, \texttt{byte}-Array & \texttt{MAX\_WRITE\_BLOCK\_SIZE} & int $> 0$ & 8192 & Die maximale Größe einer Lese-Schreib-Aktion in bytes, die durch \texttt{INSERT}s or \texttt{REMOVE}s beim \texttt{flush()} veranlasst wird, see \DesLink{dd:440}. \\
+	\texttt{File}, \texttt{byte}-Array & \texttt{MAX\_WRITE\_BLOCK\_SIZE} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
 	\hline
-	\texttt{InputStream} & \texttt{SKIP\_ON\_FORWARD\_READ} & boolean & \texttt{false} & Bei einem Aufruf von \IMediumStore{}\texttt{.cache()} for einen \texttt{InputStream} with einem bisher noch nicht gelesenen Offset werden bei einem Wert von \texttt{false} immer alle Daten zwischen aktuellem and angegebenem Offset in den Cache gelesene. Bei Angabe von \texttt{true} wird zukünftig stattdessen \IMediumStore{}\texttt{.skip()} verwendet. Vergleiche \DesLink{dd:411d} and die Beschreibung von cache() in \hyperref[tab:MediaOps]{\ref{tab:MediaOps}}. \\
+	\texttt{InputStream} & \texttt{SKIP\_ON\_FORWARD\_READ} & boolean & \texttt{false} & When calling \IMediumStore{}\texttt{.cache()} for an \texttt{InputStream} with a previously not read offset, a value of \texttt{false} means that all in-between bytes, i.e. the bytes between current and given offset, are read into the cache. If \texttt{true}, \IMediumStore{}\texttt{.skip()} is used in contrast, i.e. those bytes will be discarded and not be reachable anymore. Compare \DesLink{dd:411d} and the description of cache() in \hyperref[tab:MediaOps]{\ref{tab:MediaOps}}. \\
 	\hline
-	\texttt{InputStream} & \texttt{READ\_TIMEOUT\_MILLIS} & int $> 0$ & Integer \texttt{.MAX\_VALUE} & Der maximale Lese-Timeout for \texttt{InputStream}s according to \DesLink{dd:426}, in Millisekanden. \\
+	\texttt{InputStream} & \texttt{READ\_TIMEOUT\_MILLIS} & int $> 0$ & Integer \texttt{.MAX\_VALUE} & The maximum read timeout for \texttt{InputStream}s according to \DesLink{dd:426}, in milliseconds. \\
 	\hline
-\caption{Konfigurationsparameter der component \COMPmedia{}}
+\caption{Configuration parameters of the component \COMPmedia{}}
 \label{tab:ConfigMedia}
 \end{longtable}
 \end{landscape}
