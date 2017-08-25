@@ -2,7 +2,7 @@
 %		Basic Terms and Domain Model
 %===============================================================================================
 
-\chapter{Grundlegende Begriffe}
+\chapter{Basic Terms}
 \label{sec:BasicTerms}
 
 %-----------------------------------------------------------------------------------------------
@@ -12,23 +12,23 @@
 \newcommand{\TERMtag}{\SpecialTermBasic{Tag}}
 \newcommand{\TERMattribute}{\SpecialTermBasic{At\-tri\-but}}
 \newcommand{\TERMmedium}{\SpecialTermBasic{Me\-di\-um}}
-\newcommand{\TERMmedia}{\SpecialTermBasic{Me\-di\-en}}
-\newcommand{\TERMdataBlock}{\SpecialTermBasic{Da\-ten\-block}}
-\newcommand{\TERMdataBlocks}{\SpecialTermBasic{Da\-ten\-blöcke}}
+\newcommand{\TERMmedia}{\SpecialTermBasic{Me\-dia}}
+\newcommand{\TERMdataBlock}{\SpecialTermBasic{Da\-ta\-block}}
+\newcommand{\TERMdataBlocks}{\SpecialTermBasic{Da\-ta\-blocks}}
 \newcommand{\TERMcontainer}{\SpecialTermBasic{Con\-tai\-ner}}
-\newcommand{\TERMdataFormat}{\SpecialTermBasic{Da\-ten-\-For\-mat}}
-\newcommand{\TERMmetadataFormat}{\SpecialTermBasic{Meta\-da\-ten-\-For\-mat}}
+\newcommand{\TERMdataFormat}{\SpecialTermBasic{Da\-ta-\-For\-mat}}
+\newcommand{\TERMmetadataFormat}{\SpecialTermBasic{Meta\-da\-ta-\-For\-mat}}
 \newcommand{\TERMcontainerFormat}{\SpecialTermBasic{Con\-tai\-ner-\-For\-mat}}
-\newcommand{\TERMfield}{\SpecialTermBasic{Feld}}
-\newcommand{\TERMfields}{\SpecialTermBasic{Felder}}
+\newcommand{\TERMfield}{\SpecialTermBasic{Field}}
+\newcommand{\TERMfields}{\SpecialTermBasic{Fields}}
 \newcommand{\TERMtransformation}{\SpecialTermBasic{Trans\-for\-mation}}
-\newcommand{\TERMsubject}{\SpecialTermBasic{Sub\-jekt}}
+\newcommand{\TERMsubject}{\SpecialTermBasic{Sub\-ject}}
 \newcommand{\TERMheader}{\SpecialTermBasic{Header}}
 \newcommand{\TERMfooter}{\SpecialTermBasic{Footer}}
 \newcommand{\TERMpayload}{\SpecialTermBasic{Payload}}
 \newcommand{\TERMpadding}{\SpecialTermBasic{Pad\-ding}}
 
-\newcommand{\TERMmediaStream}{\SpecialTermBasic{Medien-Stream}}
+\newcommand{\TERMmediaStream}{\SpecialTermBasic{Media Stream}}
 \newcommand{\TERMstreamingMedia}{\SpecialTermBasic{Strea\-ming Me\-dia}}
 
 %-----------------------------------------------------------------------------------------------
@@ -128,9 +128,9 @@
 %		Eigentlicher Start des Kapitels
 %===============================================================================================
 
-Hier definieren wir einige grundlegende Begriffe, die im gesamten Design-Konzept verwendet werden. Viele davon stammen aus \cite{MetaComp}, Seiten 19 bis 29, wo noch deutlich mehr Begriffe definiert werden.
+Here we define basic terms used throughout the whole design concept. Most of them come from \cite{MetaComp}, pages 19 to 29, where even more terms are defined.
 
-Alle Begriffe basieren im Wesentlichen auf einem Domänenmodell für Container- und Metadaten, wie es in \cite{MetaComp} definiert ist. Ein für unsere Zwecke erweitertes Domänenmodell ist in folgender Abbildung dargestellt - sie stellt alle relevanten Begriffe und ihre Beziehungen zueinander als Überblick dar:
+All terms are based on a a domain model for container and metadata, as defined in \cite{MetaComp}. A domain model extended for our needs is shown in the following figure - it shows all relevant terms and their relations as an overview:
 \OpenIssue{Add domain model figure}
 
 %-----------------------------------------------------------------------------------------------
@@ -138,19 +138,20 @@ Alle Begriffe basieren im Wesentlichen auf einem Domänenmodell für Container- un
 \section{Metadaten}
 \label{sec:Metadata}
 
-In diesem Dokumen verstehen wir mit dem Begriff \emph{Metadaten} in erster Linie beschreibende Daten, die aber nicht für das Parsen notwendig sind.  Metadaten beschreiben andere Daten semantisch und strukturell. Das Ziel von \LibName{} ist insbesondere das Auslesen von Metadaten zu Audio- und Video-Datensätzen, beispielsweise Titel, Komponist etc. Die Struktur solcher Metadatenformate wird durch \TERMmetadataFormat{}e definiert.
+Metadata in this document is short for digital metadata that are not necessary to parse the actual described (audio, video or image) data. Metadata semantically and structurally describes other data. The goal of \LibName{} is especially reading of metadata for audio and video data sets, e.g. title, artist etc. The structure of metadata is defined by a \TERMmetadataFormat{}.
 
-Geht es um speziell um (technische) Metadaten, die zum Parsen einer Datenstruktur beispielsweise in einem Container-Header notwendig sind, reden wir von \emph{Parsing-Metadaten}.
+If it is specifically about technical metadata needed to parse a data structure, e.g. in the container header,  we call it \emph{Parsing Metadata}.
 
 %-----------------------------------------------------------------------------------------------
 
 \section{\TERMdataFormat{}e, \TERMmetadataFormat{}e und \TERMcontainerFormat{}e}
 \label{sec:DataFormats}
 
-Ein \TERMdataFormat{} definiert Struktur und Interpretation von binären oder textuellen Daten: Welche Zeichen oder Bytes mit welchen Werten in welcher Reihenfolge haben welche Bedeutung?
-Üblicherweise beschreiben diese Formate in ihren Spezifikationen wie anhand von Blöcken aufeinanderfolgender Bits und Bytes das Datenformat erkannt werden kann, und wie diese Blöcke in einzelne Felder mit bestimmter Bedeutung und Wertemenge zerfallen. Dabei besteht ein solcher Block von Bytes für uns aus (später definierten) \TERMdataBlocks{} und \TERMfields{}.
+A \TERMdataFormat{} specifies the structure and interpretation
+of data: Which bytes of which value and order have what kind of meaning?
+Usually, a data format describes how a consecutive block of bytes (i.e. a \TERMdataBlock{}) is built up by a number of so-called \TERMfield{} or child \TERMdataBlock{}.
 
-\TERMmetadataFormat{}e sind Datenformate, die die Struktur digitaler Metadaten definieren. Beispiele sind:
+\TERMmetadataFormat{}s are data formats that define the structure of digital metadata. Examples include:
 \begin{itemize}
 	\item ID3v1
 	\item ID3v2.3
@@ -158,10 +159,10 @@ Ein \TERMdataFormat{} definiert Struktur und Interpretation von binären oder tex
 	\item MPEG-7
 	\item RDF/XML
 	\item VorbisComment
-	\item und andere ...
+	\item and others ...
 \end{itemize}
 
-\TERMcontainerFormat{}e sind \TERMdataFormat{}e, die für das Speichern, Transportieren, Editieren, Suchen und anderweitige Verarbeiten von \TERMpayload{} Daten (zumeist Multimedia-Inhalte, also Audio, Video, Bilder oder Text) optimiert sind. Beispiele sind:
+\TERMcontainerFormat{}s are special \TERMdataFormat{}s optimized for storing, transporting, editing and seeking multimedia \TERMpayload{} data. Examples are:
 \begin{itemize}
 	\item MP3
 	\item Ogg
@@ -169,62 +170,62 @@ Ein \TERMdataFormat{} definiert Struktur und Interpretation von binären oder tex
 	\item QuickTime
 	\item JPEG 2000
 	\item PDF
-	\item und andere ...
+	\item and others...
 \end{itemize}
 
-Ein Beispiel für ein \TERMdataFormat{}, das weder als \TERMmetadataFormat{} noch als \TERMcontainerFormat{} betrachtet werden kann, ist HTML. XML ist ein  \TERMdataFormat{} das wiederum selbst benutzt werden kann, um andere XML \TERMdataFormat{}e zu definieren. Einige XML \TERMdataFormat{}e sind auch \TERMmetadataFormat{}e, z.B. MPEG-7, MPEG-21 oder P\_Meta.
+An example for other \TERMdataFormat{}s is HTML. It is neither called a \TERMmetadataFormat{} nor a \TERMcontainerFormat{}. XML is a \TERMdataFormat{} that itself can be used to define further XML \TERMdataFormat{}s. Some XML \TERMdataFormat{}s are \TERMmetadataFormat{}s, e.g. MPEG-7, MPEG-21 or P\_Meta.
 
 %-----------------------------------------------------------------------------------------------
 
 \section{\TERMtransformation{}en}
 \label{sec:DataTransformations}
 
-Ein \TERMdataFormat{} kann sogenannte \TERMtransformation{}en definieren. Eine \TERMtransformation{} beschreibt eine Methode, wie gelesene oder zu schreibende Daten transformiert werden müssen, um bestimmte Ziele zu erfüllen. Man kann sich dies also als eine Art Codierung der Daten vorstellen. Im Gegensatz zur festen Datenformat-Spezifikation, die genau beschreibt, wie binäre Daten codiert und zu interpretieren sind, sind \TERMtransformation{}en optionale Features, die dynamisch für bestimmte Bereiche der Daten angewendet werden können oder auch nicht. Teilweise können \TERMtransformation{}en auch durch Anwender definiert werden. Beispiele sind die durch ID3v2 definierten Transformationen: Unsynchronization, Verschlüsselung und Kompression.
+A \TERMdataFormat{} may define \TERMtransformation{}s. A \TERMtransformation{} describes a way how read or to be written data needs to be transformed to fulfill specific needs. You can envision this as kind of encoding of the data. In contrast to the fixed data format specification which describes in detail how binary data is coded and needs to be interpreted, \TERMtransformation{}s are optional features that are dynamically applied to certain areas of the data. Partly, \TERMtransformation{}s can also be defined by users of the data. Examples are the \TERMtransformation{}s defined by ID3v2: Unsynchronization, Encryption and Compression.
 
 %-----------------------------------------------------------------------------------------------
 
 \section{\TERMdataBlocks{}}
 \label{sec:DataBlocks}
 
-Als \TERMdataBlock{} wird hier eine Folge von Bytes verstanden, die gemeinsam eine logische Einheit im Sinne des unterliegenden \TERMdataFormat{}s bilden. Jeder \TERMdataBlock{} gehört also zu genau einem \TERMdataFormat{}. Er hat eine Länge in Bytes. Wir unterscheiden verschiedenste konkrete Typen von \TERMdataBlocks{} die in den folgenden Abschnitten beschrieben werden.
+A \TERMdataBlock{} is a sequence of bytes that together form a logical unit in terms of the underlying \TERMdataFormat{}. Each \TERMdataBlock{} belongs to exactly one \TERMdataFormat{}. It can be assigned a current length in bytes. There are several concrete types of \TERMdataBlock{}s that are described in the following sections.
 
 %***********************************************************************************************
 
 \subsection{\TERMcontainer{}: \TERMpayload{}, \TERMheader{}, \TERMfooter{}}
 \label{sec:Containers}
 
-Der wichtigste Typ von \TERMdataBlock{} ist der \TERMcontainer{}: Er besteht aus einem oder mehreren optionalen \TERMheader{}n, genau einer \TERMpayload{} und einem oder mehreren optionalen \TERMfooter{}n. \TERMheader{}, \TERMpayload{} und \TERMfooter{} sind ebenso Typen von \TERMdataBlocks{}n, in dem Fall also Kind-\TERMdataBlocks{} eines \TERMcontainer{}-\TERMdataBlock{}s.
+An important type of \TERMdataBlock{} is a \TERMcontainer{}: It consists of an optional \TERMheader{}, exactly one \TERMpayload{} and maybe an optional \TERMfooter{}. All of these are \emph{child} \TERMdataBlock{}s, meaning that a \TERMcontainer{} is built-up by these three blocks.
 
-\TERMcontainer{} sind ein verbreitetes Konzept zum Speichern von Multimedia- und Metadaten: Der \TERMheader{} beschreibt wichtige Eigenschaften des \TERMcontainer{}s, wie dessen Typ, Größe und viele andere Eigenschaften (die sogenannten Parsing-Metadaten). Die \TERMpayload{} (dt. Nutzdaten) enthält die interessanten Daten, beispielsweise Multimedia-Daten, die abgespielt werden können. Ein \TERMfooter{} erlaubt Rückwärts-Lesen. Die meisten \TERMcontainerFormat{}s spezifizieren die allgemeine Struktur eines \TERMcontainer{}s. Manche Formate erlauben dann auch das Hinzufügen benutzerdefinierter \TERMcontainer{}, die dem definierten Grundformat entsprechen, d.h. das Format ist dann erweiterbar.
+\TERMcontainer{}s are a common concept for container and metadata formats: The \TERMheader{} describes the \TERMcontainer{} in terms of its length, size and other properties. The \TERMpayload{} contains the interesting data, e.g. the multimedia data to be played. A \TERMfooter{} allows for backwards or reverse reading. Most of the time, a \TERMcontainer{} is typed with its id, i.e. the id defines the kind and structure of data block. Furthermore, most of \TERMdataFormat{}s specify a general structure of a \TERMcontainer{} so that user-defined new \TERMcontainer{}s can be added, i.e. the format is extensible.
 
 %***********************************************************************************************
 
 \subsection{\TERMtag{}}
 \label{sec:Tag}
 
-Ein \TERMtag{} ist ein spezieller \TERMcontainer{}, dessen Zweck darin besteht, beschreibende digitale Metadaten zu speichern. Das \TERMtag{} kann entweder zu einem eigens definierten \TERMmetadataFormat{} gehören, oder aber im Rahmen eines \TERMcontainerFormat{}s definiert sein. Speziell bei Audio-Metadaten wird dieser Begriff häufig benutzt, Beispiele sind hier die ID3 oder APE-\TERMtag{}s.
+A \TERMtag{} is a special \TERMcontainer{} whose purpose is to store metadata. It can either belong to a standalone \TERMmetadataFormat{} ore to a more general \TERMcontainerFormat{}. Especially audio metadata formats use this term when talking about such a \TERMdataBlock{} in a file or \TERMmediaStream{}, e.g. the ID3 or APE \TERMtag{}s.
 
-Die folgende Abbildung zeigt die Basisstruktur eines \TERMtag{}s, inklusive weiterer Begriffe:
+The following figure shows the basic structure of a \TERMtag{}, showing other basic terms:
 
 \begin{figure}[H]
 	\centering
 		\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_3_TagStructure.pdf}
-		\caption{Struktur eines \TERMtag{}s}
+		\caption{Structure of a \TERMtag{}}
 	\label{fig:5_3_SCH_Tag}
 \end{figure}
 
-Die wichtigsten Teile eines \TERMtag{}s bilden die \TERMattribute{}e.
+The most important parts of a \TERMtag{} are the \TERMattribute{}s.
 
 %***********************************************************************************************
 
 \subsection{\TERMattribute{}}
 \label{sec:Attribute}
 
-Ein \TERMattribute{} ist ein Teil eines \TERMtag{}s, das die wertvollen Metadaten enthält als key-value-Paar enthält. Bekannte Beispiele sind Künstler, Titel, Album, Komponist etc. eines Musikstücks. Häufig ist ein \TERMattribute{} auch ein \TERMcontainer{}, hat also ggf. einen \TERMheader{}, \TERMfooter{} und Nutzdaten. Der \TERMheader{} hilft meist dabei, den Typen (Künstler, Title, oder Album) des \TERMattribute{} sowie die Größe von dessen Werte zu speichern. Die \TERMpayload{} enthält die jeweilige Information in einer kodierten Form, z.B. den Namen des Künstlers oder Titels des Musikstücks.
+An \TERMattribute{} is a part of a \TERMtag{} that contains the valuable metadata information in a key-value manner. Common examples are artist, title, album, composer etc. of a piece of audio. Often, an \TERMattribute{} is also a \TERMcontainer{} in a sense that it has a \TERMheader{}. The \TERMheader{} may help to define the type (artist, title, album) of the \TERMattribute{} as well as the size of the payload. The \TERMpayload{} contains the actual information in an encoded way, e.g. the name of the artist or title of the piece of audio.
 
-Die meisten \TERMattribute{}e haben nur einen unstrukturierten einfachen Wert. In manchen Fällen gibt es aber auch komplexer strukturierte \TERMattribute{}-Werte die aus mehreren Teilen in Form von Kind-\TERMfield{}ern oder gar \TERMdataBlocks{} bestehen.
+Most of the \TERMattribute{}s have a simple main value that can be given. However, there are also more complex \TERMattribute{}s that consists of many values in form of child \TERMdataBlock{}s or \TERMfield{}s.
 
-In jedem Metadaten-Format hat ein \TERMattribute{} einen speziellen Namen, hier einige Beispiele:
+In each metadata format, an \TERMattribute{} has a specific name, e.g.:
 \begin{itemize}
 	\item ID3v1, Lyrics3: Field
 	\item ID3v2: Frame
@@ -233,28 +234,29 @@ In jedem Metadaten-Format hat ein \TERMattribute{} einen speziellen Namen, hier 
 	\item VorbisComment: User Comment
 \end{itemize}
 
-In \TERMcontainerFormat{}en sind die \TERMattribute{}e häufig \TERMcontainer{} die im jeweiligen \TERMcontainerFormat{} definiert sind.
+In \TERMcontainerFormat{}s, the \TERMattribute{}s are often \TERMcontainer{}s defined by the \TERMcontainerFormat{}.
 
 %***********************************************************************************************
 
-\subsection{\TERMfield{}er}
+\subsection{\TERMfield{}s}
 \label{sec:Fields}
 
-Ein \TERMfield{} ist eine Sequenz von Bits, die zusammen eine spezielle Bedeutung in einem gegebenen \TERMdataFormat{} haben. Das \TERMdataFormat{} beschreibt, wie ein spezieller \TERMdataBlock{} durch eine Folge von \TERMfield{}ern aufgebaut ist. Ein \TERMfield{} hat einen Wertebereich und es wird auch definiert, wie diese Werte jeweils zu interpretieren sind. Oft wird ein Teil des Wertebereiches als ``reserviert'' definiert, um eine gewisse Erweiterbarkeit des Datenformats sicherzustellen.
+A \TERMfield{} is a sequence of bits that together have a specific meaning in a given \TERMdataFormat{}. The \TERMdataFormat{} describes how a specific \TERMdataBlock{} is built up by a specific sequence of \TERMfield{}s. A \TERMfield{} has a range of possible values and
+interpretations of these values. Often, one part of the value range is defined as ``reserved'' to ensure a bit of flexibility in extending the data format.
 
 %-----------------------------------------------------------------------------------------------
 
 \subsection{\TERMsubject{}}
 \label{sec:Subject}
 
-Ein \TERMsubject{} bezeichnet das Ding, das durch ein \TERMtag{} beschrieben wird, d.h. einen Teil einer Datei, oder eines Musikstückes, oder einer Web-Ressource or sogar eines real existierenden Objektes. Häufig enthält ein \TERMtag{} Metadaten, die sich auf das aktuelle \TERMmedium{} als \TERMsubject{} beziehen, es wird nicht explizit auf ein spezielleres \TERMsubject{} referenziert.
+A \TERMsubject{} represents a thing a \TERMtag{} describes, i.e. a part of a file, a piece of audio, a web resource or even a thing existing in reality. Often, a \TERMtag{} contains metadata for the current \TERMmedium{}, not explicitly referring to a more specific \TERMsubject{}.
 
 %-----------------------------------------------------------------------------------------------
 
 \section{\TERMmedium{}}
 \label{sec:Medium}
 
-Ein \TERMmedium{} bezeichnet Speichermedium der \TERMdataBlocks{}. Es kann sich dabei beispielsweise um eine Datei oder einen \TERMmediaStream{}, oder gar den Hauptspeicher selbst handeln.
+A medium is the place where data \TERMdataBlock{}s are physically persisted and accessible. This may be a file, a \TERMmediaStream{} or even plain memory.
 
 %###############################################################################################
 %###############################################################################################

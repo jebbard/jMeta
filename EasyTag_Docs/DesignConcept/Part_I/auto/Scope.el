@@ -8,7 +8,6 @@
     "sec:UnterstuetzteEingabemedien"
     "sec:UnterstuetzteAusgabemedien"
     "sec:FuerSpaeter"
-    "sec:MultimediaLicensing"
     "sec:RelatedLibraries"
     "sec:MetadataLibraries"
     "sec:DrawbacksofExistingMetadataLibraries"
