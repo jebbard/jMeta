@@ -69,7 +69,7 @@ public class StandardMediumReference implements IMediumReference {
    public boolean before(IMediumReference other) {
 
       Reject.ifNull(other, "other");
-      IMediumReference.checkSameMedium(this, other);
+      IMediumReference.validateSameMedium(this, other.getMedium());
 
       return getAbsoluteMediumOffset() < other.getAbsoluteMediumOffset();
    }
@@ -81,7 +81,7 @@ public class StandardMediumReference implements IMediumReference {
    public boolean behindOrEqual(IMediumReference other) {
 
       Reject.ifNull(other, "other");
-      IMediumReference.checkSameMedium(this, other);
+      IMediumReference.validateSameMedium(this, other.getMedium());
 
       return getAbsoluteMediumOffset() >= other.getAbsoluteMediumOffset();
    }
@@ -93,7 +93,7 @@ public class StandardMediumReference implements IMediumReference {
    public long distanceTo(IMediumReference other) {
 
       Reject.ifNull(other, "other");
-      IMediumReference.checkSameMedium(this, other);
+      IMediumReference.validateSameMedium(this, other.getMedium());
 
       return getAbsoluteMediumOffset() - other.getAbsoluteMediumOffset();
    }

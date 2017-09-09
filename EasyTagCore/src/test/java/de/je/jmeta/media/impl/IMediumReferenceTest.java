@@ -252,7 +252,6 @@ public class IMediumReferenceTest {
    /**
     * Tests {@link IMediumReference#before(IMediumReference)}.
     */
-   @SuppressWarnings("unused")
    @Test(expected = PreconditionException.class)
    public void constructor_forNegativeOffset_throwsException() {
 
@@ -352,7 +351,7 @@ public class IMediumReferenceTest {
    }
 
    /**
-    * Tests {@link IMediumReference#checkSameMedium(IMediumReference, IMediumReference)}.
+    * Tests {@link IMediumReference#validateSameMedium(IMediumReference, IMediumReference)}.
     */
    @Test
    public void checkSameMedium_forSameMedium_doesNotThrowException() {
@@ -360,34 +359,20 @@ public class IMediumReferenceTest {
       StandardMediumReference firstReference = new StandardMediumReference(dummyMedium, 0);
       StandardMediumReference secondReference = new StandardMediumReference(dummyMedium, 0);
 
-      IMediumReference.checkSameMedium(firstReference, secondReference);
-      IMediumReference.checkSameMedium(firstReference, firstReference);
-      IMediumReference.checkSameMedium(secondReference, secondReference);
+      IMediumReference.validateSameMedium(firstReference, dummyMedium);
+      IMediumReference.validateSameMedium(firstReference, dummyMedium);
+      IMediumReference.validateSameMedium(secondReference, dummyMedium);
    }
 
    /**
-    * Tests {@link IMediumReference#checkSameMedium(IMediumReference, IMediumReference)}.
+    * Tests {@link IMediumReference#validateSameMedium(IMediumReference, IMediumReference)}.
     */
-   @Test
+   @Test(expected = PreconditionException.class)
    public void checkSameMedium_forDifferentMedia_throwsException() {
 
       StandardMediumReference firstReference = new StandardMediumReference(dummyMedium, 0);
-      StandardMediumReference secondReference = new StandardMediumReference(
-         DummyMediumCreator.createDefaultDummyInMemoryMedium(), 0);
 
-      try {
-         IMediumReference.checkSameMedium(firstReference, secondReference);
-         Assert.fail("Expected exception");
-      } catch (PreconditionException e) {
-         Assert.assertNotNull("Exception as expected: " + e);
-      }
-
-      try {
-         IMediumReference.checkSameMedium(secondReference, firstReference);
-         Assert.fail("Expected exception");
-      } catch (PreconditionException e) {
-         Assert.assertNotNull("Exception as expected: " + e);
-      }
+      IMediumReference.validateSameMedium(firstReference, DummyMediumCreator.createDefaultDummyInMemoryMedium());
    }
 
 }

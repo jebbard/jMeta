@@ -118,6 +118,19 @@ public class MediumRegion {
    }
 
    /**
+    * Splits this {@link MediumRegion} at the given {@link IMediumReference} and returns two new {@link MediumRegion}
+    * instances in any case. This existing {@link MediumRegion} instance is kept unchanged.
+    * 
+    * @param at
+    *           The {@link IMediumReference} to split this {@link MediumRegion}. Must be behind the start reference of
+    *           this region, and must be smaller than the end reference of this {@link MediumRegion}.
+    */
+   public MediumRegion[] split(IMediumReference at) {
+      // TODO implement
+      return null;
+   }
+
+   /**
     * Returns whether the given {@link IMediumReference} is contained in the {@link MediumRegion}, i.e. is between
     * {@link #getStartReference()} inclusive and {@link #calculateEndReference()} exclusive.
     * 
@@ -128,7 +141,7 @@ public class MediumRegion {
    public boolean contains(IMediumReference reference) {
 
       Reject.ifNull(reference, "reference");
-      IMediumReference.checkSameMedium(this.getStartReference(), reference);
+      IMediumReference.validateSameMedium(this.getStartReference(), reference.getMedium());
 
       return reference.behindOrEqual(getStartReference()) && reference.before(calculateEndReference());
    }
@@ -266,7 +279,7 @@ public class MediumRegion {
     */
    public boolean overlapsOtherRegionAtBack(MediumRegion other) {
       Reject.ifNull(other, "other");
-      IMediumReference.checkSameMedium(this.getStartReference(), other.getStartReference());
+      IMediumReference.validateSameMedium(this.getStartReference(), other.getStartReference().getMedium());
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();
@@ -339,7 +352,7 @@ public class MediumRegion {
     */
    public boolean overlapsOtherRegionAtFront(MediumRegion other) {
       Reject.ifNull(other, "other");
-      IMediumReference.checkSameMedium(this.getStartReference(), other.getStartReference());
+      IMediumReference.validateSameMedium(this.getStartReference(), other.getStartReference().getMedium());
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();
@@ -359,7 +372,7 @@ public class MediumRegion {
     */
    public int getOverlappingByteCount(MediumRegion other) {
       Reject.ifNull(other, "other");
-      IMediumReference.checkSameMedium(this.getStartReference(), other.getStartReference());
+      IMediumReference.validateSameMedium(this.getStartReference(), other.getStartReference().getMedium());
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();

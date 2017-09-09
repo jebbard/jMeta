@@ -111,7 +111,7 @@ public class MediumReferenceFactory {
 
       IMediumReference startReference = action.getRegion().getStartReference();
 
-      IMediumReference.checkSameMedium(new StandardMediumReference(medium, 0), startReference);
+      IMediumReference.validateSameMedium(startReference, getMedium());
 
       boolean insertingReplace = false;
       boolean removingReplace = false;
@@ -163,7 +163,7 @@ public class MediumReferenceFactory {
    /**
     * Clears the entire factory of all contained references already created.
     */
-   public void clearAll() {
+   public void clear() {
 
       references.clear();
    }
@@ -190,7 +190,7 @@ public class MediumReferenceFactory {
    public List<IMediumReference> getAllReferencesInRegion(MediumRegion region) {
 
       Reject.ifNull(region, "region");
-      IMediumReference.checkSameMedium(new StandardMediumReference(medium, 0), region.getStartReference());
+      IMediumReference.validateSameMedium(region.getStartReference(), getMedium());
 
       List<IMediumReference> allReferencesInRegion = new ArrayList<>();
 
@@ -215,7 +215,7 @@ public class MediumReferenceFactory {
    public List<IMediumReference> getAllReferencesBehindOrEqual(IMediumReference reference) {
 
       Reject.ifNull(reference, "reference");
-      IMediumReference.checkSameMedium(new StandardMediumReference(medium, 0), reference);
+      IMediumReference.validateSameMedium(reference, getMedium());
 
       List<IMediumReference> allReferencesBehindOrEqual = new ArrayList<>();
 

@@ -165,29 +165,29 @@ public class MediumReferenceFactoryTest {
    }
 
    /**
-    * Tests {@link MediumReferenceFactory#clearAll()} and {@link MediumReferenceFactory#getAllReferences()}.
+    * Tests {@link MediumReferenceFactory#clear()} and {@link MediumReferenceFactory#getAllReferences()}.
     */
    @Test
-   public void clearAll_forEmptyFactory_getAllReferences_returnsEmptyList() {
+   public void clear_forEmptyFactory_getAllReferences_returnsEmptyList() {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
 
-      testling.clearAll();
+      testling.clear();
 
       checkAllEmpty(testling);
    }
 
    /**
-    * Tests {@link MediumReferenceFactory#clearAll()} and {@link MediumReferenceFactory#getAllReferences()}.
+    * Tests {@link MediumReferenceFactory#clear()} and {@link MediumReferenceFactory#getAllReferences()}.
     */
    @Test
-   public void clearAll_getAllReferences_returnsEmptyList() {
+   public void clear_getAllReferences_returnsEmptyList() {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
 
       createAndAddDefaultReferences(testling);
 
-      testling.clearAll();
+      testling.clear();
 
       checkAllEmpty(testling);
    }

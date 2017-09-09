@@ -100,18 +100,17 @@ public interface IMediumReference {
    /**
     * Often, implementations of the media component require that two {@link IMediumReference}s refer to the same
     * {@link IMedium} to be valid. This method provides this standard argument check. It throws a
-    * {@link PreconditionException} if the two references do not refer to the same {@link IMedium}, otherwise it simply
-    * does nothing.
+    * {@link PreconditionException} if the given {@link IMediumReference} does not refer to the given {@link IMedium}
+    * instance, otherwise it simply does nothing.
     * 
-    * @param firstReference
-    *           The first reference
-    * @param secondReference
-    *           The second reference
+    * @param referenceToCheck
+    *           The {@link IMediumReference} to check for having the expected {@link IMedium}.
+    * @param expectedMedium
+    *           The expected {@link IMedium}.
     */
-   public static void checkSameMedium(IMediumReference firstReference, IMediumReference secondReference) {
-      Contract.checkPrecondition(firstReference.getMedium().equals(secondReference.getMedium()),
-         "The given first reference <" + firstReference + "> must refer to the same medium as the second reference <"
-            + secondReference + ">.");
+   public static void validateSameMedium(IMediumReference referenceToCheck, IMedium<?> expectedMedium) {
+      Contract.checkPrecondition(referenceToCheck.getMedium().equals(expectedMedium),
+         "The given reference <" + referenceToCheck + "> must refer to the expected medium <" + expectedMedium + ">.");
    }
 
 }

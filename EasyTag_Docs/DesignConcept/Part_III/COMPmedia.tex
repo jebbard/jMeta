@@ -321,7 +321,7 @@ No disadvantages known
 
 The component \COMPmedia{} takes over I/O tasks with potentially slow input and output media. Thus, it is here where the basic performance problems of the whole library need to be solved. We will approach these topics with some motivation and deductions.
 
-In \cite{PWikIO}, basic stuff regarding performance with file access is discussed. The ground rule for performant I/O is minimizing accesses to the external, potentially slow medium. For writing, we already introduced \DesLink{dd:410}. The question is, how you can make reading perform better, too.
+In \cite{PWikIO}, basic stuff regarding performance with file access is discussed. The ground rule for performant I/O is minimizing accesses to the external, potentially slow medium. For writing, we already introduced \DesLink{dd:410}. A similar important question is: How can you make reading perform better?
 
 At first it is quite clear that for reading, you should help yourself with buffering to improve performance:
 
@@ -331,28 +331,28 @@ At first it is quite clear that for reading, you should help yourself with buffe
 Reading access can be done using a buffering mechanism, controlled by the component's user
 }
 {% Kurzbeschreibung
-For each reading access, the calling code can specify the number of bytes to read, which corresponds to a buffering. The code controls the size of the buffer by itself. It potentially can also read only 1 byte. It lies in the responsibility of the calling code to read an amount of bytes that makes sense and minimizes read accesses.
+For each reading access, the calling code can specify the number of bytes to read, which corresponds to a buffering. The code controls the size of the buffer by itself. It potentially can also read only one byte. It lies in the responsibility of the calling code to read an amount of bytes that makes sense and minimizes read accesses.
 }
 {% Begründung
-A hardcoded fixed length buffering would rather lead to performance disadvantages, as there might be read too much bytes, more than usually necessary in average. Furthermore, reading two or severeal times, depending on the size of this fixed length, would be necessary. According to \cite{PWikIO}, there is no ``one size fits all'' for buffer sizes in file I/O. The logical consequence is to let the user decide.
+A hardcoded fixed length buffering would rather lead to performance disadvantages, as there might be read too much bytes, more than necessary in average. Furthermore, depending on the fixed size, it would be necessary to read two or even several times when a bigger chunk of data is needed. According to \cite{PWikIO}, there is no ``one size fits all'' for buffer sizes in file I/O. The logical consequence is to let the user decide.
 }
 {% Nachteile
 No disadvantages known.
 }
 %%%% <-- DD %%%%
 
-A further important aspect is caching: With \emph{Caching}, we understand the possibly persistent storage of \TERMmedium{} contents in RAM to support faster access to the data. Buffering differs from caching in a sense that buffering is only a short-lived temporary storage without the necessity of synchronisation.
+A further important aspect is caching: With \emph{Caching}, we refer to the possibly persistent storage of \TERMmedium{} contents in RAM to support faster access to the data. Buffering differs from caching in a sense that buffering is only a short-lived temporary storage without the necessity of synchronisation.
 
 To start with, we can see - besides the already mentioned buffering - different kinds of ``Caching'' in an application that is based on \LibName{}:
 \begin{itemize}
 	\item During file access there are caches on hardware level, in the OS and file system.
-	\item Java supports temporary buffering via the \texttt{BufferedInputStream}, and Caching explicitly via \texttt{MappedByteBuffer}s.
-	\item Applications that mostly are interested in human-readaable metadata read these, convert them via \LibName{} in a clear-text representation and show this representation in their GUI. The GUI model represents in this cases a kind of caching, as in case of changes of the attributes via this GUI, it is not necessary to re-read again from the medium. This is surely not a hardware-related caching of raw data.
+	\item Java supports temporary buffering via the \texttt{BufferedInputStream}, and caching explicitly via \texttt{MappedByteBuffer}s.
+	\item Applications that mostly are interested in human-readable metadata read it, convert it via \LibName{} into a clear-text representation and show this representation in their GUI. In this case the GUI model represents a kind of caching that also allows changes to this metadata in the GUI, it is not necessary to re-read again from the medium.
 \end{itemize}
 
-If we look at all these alternatives, the question arises why at all an additional built-in caching in \LibName{} would be needed? For answering this question, we should look at some use case szenarios for the library: One scenario is the already mentioned reading of metadata from a file to display it in a GUI. For such a case, caching would usually not be very useful. You read once, and maybe twice, if the user wishes to update the screen. It would be an acceptable performance without caching. Another use case is the arbitrary jumping between parts of a container format file using a low-level API to process specific contents. This is true ``random access''. The question is: Do you want to read the same place twice? Possibly yes. Instead, would you want a direct medium access again? Possibly yes or no.
+If we look at all these alternatives, the question arises why at all an additional built-in caching in \LibName{} would be needed? For answering this question, we should look at some use case scenarios for the library: One scenario is the already mentioned reading of metadata from a file to display it in a GUI. For such a case, caching would usually not be very useful. You read once, and maybe twice, if the user wishes to update the screen. It would be an acceptable performance without caching. Another use case is the arbitrary jumping between parts of a container format file using a low-level API to process specific contents. This is true ``random access''. The question is: Do you want to read the same place twice? Sometimes possibly yes. Instead, would you want a direct medium access again? Possibly yes or no.
 
-The last question brings up a general problem with caching: The problem of synchronizity with the external medium. If the medium has been changed in between, the cache content is probably aged and invalid. Code that accesses the cache can usually not recognize this.
+The last question brings up a general problem with caching: The problem of synchronicity with the external medium. If the medium has been changed in between, the cache content is probably aged and invalid. Code that accesses the cache can usually not recognize this.
 
 We first sum up the determined advantages and disadvantages:
 
@@ -361,13 +361,13 @@ We first sum up the determined advantages and disadvantages:
 	\rowcolor[gray]{.9}\textbf{Advantages} & \textbf{Disadvantages} \\
 	\endhead
 	\hline
-	$+$ Performance improvement when reading the same offset multiple times, as cache access is much faster than the access to the external medium & $-$ When only accessing once there is of course no performance improvement \\
+	$+$ Performance improvement when reading the same data multiple times, as cache access is much faster than the access to the external medium & $-$ When only accessing once there is of course no performance improvement \\
 	\hline
   $+$ In a cache you are - in principle - more flexible to reorganize data than on an external medium, making it easier to correct, undo or bundle changes. & $-$ Changes on the \TERMmedium{} cannot be recognized and lead to invalid cache content that might lead to erroneous behaviour or data corruption in follow-up write actions. \\
 	\hline
-	 & $-$ There is additional code necessary for caching, e.g. questions such as ``when is the data freed?'' must be answered. For consistency topics, even more complex code is necessary.\\
+	 & $-$ There is additional code necessary for caching, e.g. questions such as ``when is the allocated memory freed?'' must be answered. For consistency topics, even more complex code is necessary.\\
 	\hline
-	 & $-$ Move heap space required\\
+	 & $-$ More heap space required\\
 	\hline
 \caption{Advantages and disadvantages of caching in \LibName{}}
 \label{tab:CachingProCon}
@@ -375,9 +375,9 @@ We first sum up the determined advantages and disadvantages:
 
 The disadvantages outweight the advantages. Why should you then use caching in \LibName{}? Some of the previous design decisions combine well with a caching approach:
 \begin{itemize}
-\item \DesLink{dd:410} may or may not be easier to implement using a cache. In this case the cache would be used to store the registered changes before a flush. However, if it would only be this, a cache would be greatly too complex, Easier solutions are possible for holding the not-yet-flushed data.
-\item \DesLink{dd:409} can be merged with a cache, i.e. anything that has been buffered should directly go into the cache for upcoming read actions
 \item \DesLink{dd:407} can be achieved using a cache, as we see just a little later
+\item \DesLink{dd:409} can be implemented with a cache, i.e. anything that has been buffered should directly go into the cache for subsequent read actions
+\item \DesLink{dd:410} may or may not be easier to implement using a cache. In this case the cache would be used to store the registered changes before a flush. However, if it would only be this, a cache would be greatly too complex, Easier solutions are possible for holding the not-yet-flushed data.
 \end{itemize}
 
 Thus we decide:
@@ -385,16 +385,16 @@ Thus we decide:
 %%%% DD --> %%%%
 \DD{dd:411}
 {% Titel
-\COMPmedia{} uses permanent fast storage (Caching) for read medium data
+\COMPmedia{} keeps medium data read in a cache
 }
 {% Kurzbeschreibung
-\COMPmedia{} uses a RAM based, permanent fast storage (Cache) to store already read content of the \TERMmedium{}. Upcoming read accesses access the cache content (if present) only.
+\COMPmedia{} uses a RAM based, permanent fast storage (Cache) to store already read content of the \TERMmedium{}. Subsequent read accesses request the cache content (if present) only.
 }
 {% Begründung
 \begin{itemize}
 \item We provide faster repeated read access to already read data to the end-user
 \item This can be used for direct implementation of \DesLink{dd:409} in a sense of buffering when reading. The cache works as the buffer for \DesLink{dd:409}.
-\item To achieve \DesLink{dd:407} is possible using a cache
+\item Implementation of \DesLink{dd:407} can be done using a cache
 \end{itemize}
 }
 {% Nachteile
@@ -416,7 +416,7 @@ How to use caching to better achieve \DesLink{dd:407}?
 Caching is used to better mitigate the differences between \texttt{InputStream}s and files according to \DesLink{dd:407}.
 }
 {% Kurzbeschreibung
-The data that has been read from an \texttt{InputStream} are always put into a cache. Reading actions are therefore allowed to ``go back'' to already read data, by not issuing another direct access (which is anyway not possible using an \texttt{InputStream}), but by taking the data from the cache. ``Read ahead'' for areas that have not yet been reached on the \texttt{InputStream} lead to the behaviour tha all data up to the future offset us read and cached.
+The data that has been read from an \texttt{InputStream} is always put into a cache. Reading actions are therefore allowed to ``go back'' to already read data, by not issuing another direct access (which is anyway not possible using an \texttt{InputStream}), but by taking the data from the cache. ``Read ahead'' for areas that have not yet been reached on the \texttt{InputStream} lead to the behaviour that all data up to the given higher offset is read and cached.
 }
 {% Begründung
 This implements \DesLink{dd:407} nearly entirely, ``transparent'' to the user.
@@ -426,41 +426,40 @@ Even more heap space is necessary for \texttt{InputStream}s, as in extreme cases
 }
 %%%% <-- DD %%%%
 
-Of course, the disadvantages mentioned in \DesLink{dd:411b} are heavy-weigth. If you wouldn't do anything about it to mitigate this disadvantage, then \DesLink{dd:411b} would be nonsense, as the advantages of this approach would be dramatically overshadowed by its disadvantages.
+Of course, the disadvantages mentioned in \DesLink{dd:411b} are heavy-weigth. If you wouldn't do anything about it to mitigate these disadvantages, then \DesLink{dd:411b} would be nonsense, as the advantages of this approach would be dramatically overshadowed by its disadvantages.
 
 As a first step, the following three design decisions are necessary:
 %%%% DD --> %%%%
 \DD{dd:411c}
 {% Titel
-The user can release cache content explicitly and can even disable caching entirely
+The user can disable caching entirely
 }
 {% Kurzbeschreibung
-Releasing cache data can be done fine-grained for a specified offset range.
-
-Thus the user himself can control the size of the cache, whereas it must be clear that any follow-up random-access reading will lead to repeated slow read access to the external medium (in case of a random-access medium) or to an exception (in case of an \texttt{InputStream}), respectively. The behaviour for \texttt{InputStream}s cannot be different as there is no data to return, and it cannot simple be read again, the stream has already progressed, there is no turning back in that case.
-
-Moreover the user can disable caching entirely. Here, too, access to previously cached offsets is not possible for \texttt{InputStream}s and will be acquitted by an exception.
+The user can disable caching entirely. Here, too, access to previously cached offsets is not possible for \texttt{InputStream}s and will be acquitted with an exception.
 }
 {% Begründung
-The user is responsible to decide about the memory footprint: E.g. if the medium is comparatively small, caching can be tolerated. If it is a big medium, the user has two possibilities: Cleaning up the cache regularly (e.g. data first read starting at a size threshold), or he can even disable caching, however demanding a step-wise processing of the data.
+The user is responsible to decide about the memory footprint: E.g. if the medium is comparatively small, caching can be tolerated. If it is a big medium, the user has the possibility to disable caching, however demanding a step-wise processing of the data.
 }
 {% Nachteile
 The implementation of \COMPmedia{} gets more complex due to corresponding case decisions.
 }
 %%%% <-- DD %%%%
 
+
 %%%% DD --> %%%%
 \DD{dd:411d}
 {% Titel
-The \COMPmedia{} API allows the skipping of bytes for \texttt{InputStream}s
+The \COMPmedia{} API allows the skipping of bytes for \texttt{InputStream}s. Skipping can be explicitly enabled for read-ahead.
 }
 {% Kurzbeschreibung
-Bytes must not necessarily be read and delivered to the user. Instead, skipping is possible via  (\texttt{skip}). For \texttt{InputStream}s skipping is a built-in functionality. For random-access skipping is not needed.
+Bytes needs not necessarily be read and delivered to the user. Instead, skipping is possible via \texttt{skip}. For \texttt{InputStream}s, skipping is a built-in functionality. For random-access media, skipping is not needed. Skipped data will not be read into a cache, but actually discarded.
+
+Secondly, the user can enable that whenever a higher offset is read on an \texttt{InputStream}, all bytes between the last read byte and the requested offset are either read into the cache or skipped, i.e. not read into the cache.
 }
 {% Begründung
 The user can explicitly skip data that is not needed and can be ignored.
 
-Second motivation is that \DesLink{dd:411b} in case of \texttt{InputStream}s makes it necessary to read a big number of bytes in case of reading data from higher offsets (i.e. areas that were not read yet) to finally get to the demanded offset were actually reading is to start. That of course might bloat the cache: E.g. assume current offset is 0, and the user wants to read 100 bytes starting from offset 1000. What to be done with the bytes between offsets 0 and 1000? Accorind to \DesLink{dd:411b}, these bytes must be read into the cache. However, with skipping there would be a second possible alternative.
+Second motivation is that \DesLink{dd:411b} in case of \texttt{InputStream}s makes it necessary to read a big number of bytes in case of reading data from higher offsets (i.e. areas that were not read yet) to finally get to the demanded offset were actual reading is to start. That of course might bloat the cache: E.g. assume current offset is 0, and the user wants to read 100 bytes starting from offset 1000. What to be done with the bytes between offsets 0 and 1000? According to \DesLink{dd:411b}, these bytes must be read into the cache. However, with skipping, there would be a second possible alternative.
 }
 {% Nachteile
 No disadvantages known
@@ -470,10 +469,26 @@ No disadvantages known
 %%%% DD --> %%%%
 \DD{dd:411e}
 {% Titel
+The user can set the maximum size of the cache per medium, the cache keeps only the newest added data
+}
+{% Kurzbeschreibung
+The user is allowed to limit the maximum size of the cache per medium by configuring it before creating the cache. The cache implementation ensures that at any time, the cache does not contain more bytes than which correspond to the maximum size. This is done using a FIFO (first in, first out) mechanism. I.e. the bytes added first are first discarded whenever trying to add new bytes to a cache.
+}
+{% Begründung
+This way, the user can influence the maximum heap size required for caching of a single medium. At the same time, he needs not control the cache size himself, but it is internally managed by \COMPmedia{}
+}.
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+%%%% DD --> %%%%
+\DD{dd:411f}
+{% Titel
 Performance drawbacks of \texttt{InputStream}s are explicitly documented
 }
 {% Kurzbeschreibung
-Reducing differences between \texttt{InputStream}s and files by caching in accordance to \DesLink{dd:411b} means: You must deal with the fact that you cannot store virtually unlimited \texttt{InputStream}s in a cache. For file access, the user can also choose between \texttt{FileInputStream} and more direct access via \texttt{RandomAccessFile}s. The performance drawbacks induced by using \texttt{FileInputStream} compared to  random-access \-- which are introduced by a unified API according to \DesLink{dd:411b} \-- are explicity described in the \LibName{} documentation. The mitigation mechanisms (skipping of bytes, releasing cache data, disabling caching) are explicitly described with their corresponding consequences.
+Reducing differences between \texttt{InputStream}s and files by caching in accordance to \DesLink{dd:411b} means: You must deal with the fact that you cannot store virtually unlimited \texttt{InputStream}s in a cache. For file access, the user can also choose between \texttt{FileInputStream} and more direct access via \texttt{RandomAccessFile}s. The performance drawbacks induced by using \texttt{FileInputStream} compared to  random-access \-- which are introduced by a unified API according to \DesLink{dd:411b} \-- are explicity described in the \LibName{} documentation. The mitigation mechanisms (skipping of bytes, setting maximum cache size, disabling caching) are explicitly described with their corresponding consequences.
 }
 {% Begründung
 There are no wrong expectations by providing the unified API. The contract is described clearly enoughto the user. He must choose the medium best suited for his purpose.
@@ -483,11 +498,27 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+%%%% DD --> %%%%
+\DD{dd:411g}
+{% Titel
+The user cannot free up cache data in a fine-grained way
+}
+{% Kurzbeschreibung
+\COMPmedia{} will not provide any mechanisms for the user to free up cached data himself in a fine-grained way (e.g. range-based).
+}
+{% Begründung
+This functionality needs to be implemented and tested (additional effort). It is quite unlikely that it is actually needed when having implemented \DesLink{dd:411e}. Furthermore, when should the user free the data? A monitoring by the using code is necessary which also makes the using code more complex.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 After these results, the disadvantages previously listed in table \hyperref[tab:CachingProCon]{\ref{tab:CachingProCon}} and in \DesLink{dd:411} need a closing look:
 \begin{itemize}
 \item Code Complexity: The higher code complexity cannot be disregarded. You have to accept it when implementing a permanent caching. It implies you need very good unit and integration tests to ensure it works as expected.
-\item More Heap Memory: It is usual to achieve a better runtime performance by increasing the memory footprint. So it it shere. To nevertheless avoid \texttt{OutOfMemoryError}s, we have defined \DesLink{dd:411c}, \DesLink{dd:411d} and \DesLink{dd:411e} and thus give enough room for the user to avoid these situations.
-\item Data Corruption due to Out-Of-Synch Medium: That the cache receives updates that are not yet persisted on the external medium is allowed according to \DesLink{dd:410}. A problem might arise due to changes by other processes or threads. These cannot be handeled in a general way by \LibName{}. Thus we have introduced the locking of media in \DesLink{dd:404}. Even this cannot give a full protection for some OSs. The user is in any case informed about irresolvabe inconsistencies by a runtime exception.
+\item More Heap Memory: It is usual to achieve a better runtime performance by increasing the memory footprint. So it is here. To nevertheless avoid \texttt{OutOfMemoryError}s, we have defined \DesLink{dd:411c}, \DesLink{dd:411d} and \DesLink{dd:411e} and thus give enough room for the user to avoid these situations.
+\item Data Corruption due to Out-Of-Synch Medium: The cache might receive updates that are not yet persisted on the external medium, as explicitly allowed by  \DesLink{dd:410}. A problem might arise due to changes by other processes or threads. These cannot be handeled in a general way by \LibName{}. Thus we have introduced the locking of media in \DesLink{dd:404}. Even this cannot give a full protection for some OSs. The user is in any case informed about irresolvabe inconsistencies by a runtime exception.
 \end{itemize}
 
 Implementing the discussed caching mechanisms is a big challenge. It will be more detailed in the implementation part of this component. Here, we can only exclude one way of implementing it:
@@ -501,7 +532,7 @@ Implementing the discussed caching mechanisms is a big challenge. It will be mor
 You could come with the idea to use the Java NIO class \texttt{MappedByteBuffer} for implementing the caching of \DesLink{dd:411}. However, we do not use it and implement another solution ``by hand''.
 }
 {% Begründung
-It is not guaranteed, that the any OS supported by Java also supports a \texttt{MappedByteBuffer}. It is also not guaranteed that the data ``cached'' is really in RAM. For each concecutive region of a medium a new \texttt{MappedByteBuffer} instance including new OS call would need to be created. Thus this approach is unpredictable and might not in any case yield the wished for results.
+It is not guaranteed, that each OS supporting Java also supports a \texttt{MappedByteBuffer}. It is also not guaranteed that the data ``cached'' is really present in RAM and thus accessible faster. Furthermore, it is indicated that for each concecutive region of a medium a new \texttt{MappedByteBuffer} instance including new OS call would need to be created. Thus this approach is unpredictable and might lack the desired benefits.
 }
 {% Nachteile
 The ``by hand'' caching is harder to implement.
@@ -1073,33 +1104,35 @@ No disadvantages known
 	\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} & \textbf{Features and motivation random-access} & \textbf{Features and motivation \texttt{InputStream}} \\
 	\endhead
 	\hline
-	\texttt{cache()} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. Has effect if caching is enabled. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is smaller than the current highest read offset, a \texttt{InvalidMediumReferenceException} is thrown. Additionally: Is it bigger than the current highest read offset, the bytes up to the new offset are read or \emph{skip}ped (depending on current configuration). Afterwards the actually requested bytes are read. This ensures that all bytes are available in principle. The last read offset is advanced correspondingly. \\
+	\texttt{cache(x, n)} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. If caching is disabled, this call is ignored. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is smaller than the current highest read offset, a \texttt{InvalidMediumReferenceException} is thrown. Additionally: Is it bigger than the current highest read offset, the bytes up to the new offset are read or \emph{skip}ped (depending on current configuration). Afterwards the actually requested bytes are read. This ensures that all bytes are available in principle. The last read offset is advanced correspondingly. \\
 	\hline
-	\texttt{getCachedByteCountAt()} & According to \DesLink{dd:409} and \DesLink{dd:412b}, it provides the nuimber of bytes that are consecutively cached at offset $x$. & See \texttt{cache()}. User code must be able to additionally check whether enough data is already buffered or not. & See random-access.\\
+	\texttt{getCachedByteCountAt(x)} & According to \DesLink{dd:409} and \DesLink{dd:412b}, it provides the number of bytes that are consecutively cached at offset $x$. & See \texttt{cache()}. User code must be able to additionally check whether enough data is already buffered or not. & See random-access.\\
 	\hline
-    	\texttt{getData()} & Reads $n$ bytes at offset $x$ with the given mode (\texttt{forceMediumAccess} = \texttt{true} or \texttt{false}) according to \DesLink{dd:410c}, \DesLink{dd:412c}, \DesLink{dd:412d} & With \texttt{forceMediumAccess} = \texttt{false}: It first tries to read the data from the cache, are they (partly) not available, the missing data is directly read from external medium. With \texttt{forceMediumAccess} = \texttt{true}: Data is always directly read from external medium, cache is ignored. In both cases, the cache will be updated with data newly read from external medium. Furthermore, only when caching is active, the method actually accesses the cache, in both cases. & \texttt{forceMediumAccess} is ignored. If there is data for the given offset in the cache, the data is returned. If it is not, a \texttt{InvalidMediumReferenceException} is thrown. Thus, for \texttt{InputStream}s, a call to \texttt{cache()} is mandatory before reading can actually start. \\
+	\texttt{getMedium()} & Returns the \IMedium{} instance this \IMediumStore{} is associated with. &  & \\
 	\hline
-	\texttt{isAtEndOfMedium()} & Checks if offset $x$ is at the end of the \TERMmedium{}. & Based on this knowledge, the user code can skip further reading and does not need to check for exceptions. & The provided offset is ignored, it is tried to read bytes from current offset. Is this resulting in return code -1, we are at the end of the stream, otherwise the byte is added to the cache. \\
+    	\texttt{getData(x, n, forceMediumAccess)} & Reads $n$ bytes at offset $x$ with the given mode (\texttt{forceMediumAccess} = \texttt{true} or \texttt{false}) according to \DesLink{dd:410c}, \DesLink{dd:412c}, \DesLink{dd:412d} & With \texttt{forceMediumAccess} = \texttt{false}: It first tries to read the data from the cache. If (partly) not available, the missing data is directly read from external medium. With \texttt{forceMediumAccess} = \texttt{true}: Data is always directly read from external medium, cache is ignored. In both cases, the cache will be updated with data newly read from external medium. Furthermore, only when caching is enabled, the method actually accesses the cache, in both cases. & \texttt{forceMediumAccess} is ignored. If there is data for the given offset with the given size in the cache, the data is returned. If it is not, a \texttt{InvalidMediumReferenceException} is thrown. Thus, for \texttt{InputStream}s, a call to \texttt{cache()} is mandatory before reading can actually start. \\
 	\hline
-	\texttt{skip()} & Skips $n$ bytes according to \DesLink{dd:411d} & Simply does nothing, as skipping does not give any advantages here. & Skips $n$ bytes by calling \texttt{InputStream.skip(n)}. It allows users to ignore unimportant bytes explicitly, to e.g. save memory when caching is active. The last read offset is advanced correspondingly. \\	
+	\texttt{isAtEndOfMedium(x)} & Checks if offset $x$ is at the end of the \TERMmedium{}. & Based on this knowledge, the user code can skip further reading and does not need to check for exceptions. & The provided offset is ignored, it is tried to read bytes from current offset. Is this resulting in return code -1, we are at the end of the stream, otherwise the byte is added to the cache. \\
 	\hline
-	\texttt{discard()} & Removes up to $n$ bytes from the cache starting at offset $x$ according to \DesLink{dd:411c}. Allows user code to free up memory to avoid unnecessarily allocated heap. & Buffering and reading data again with \texttt{getData()} is always possible. & After freeing up memory with \texttt{discard()}, the attempt to access freed offset ranges for an \texttt{InputStream} using \texttt{getData()} leads to an \texttt{InvalidMediumReferenceException}.\\
+	\texttt{skip(n)} & Skips $n$ bytes according to \DesLink{dd:411d} & Simply does nothing, as skipping does not give any advantages here. & Skips $n$ bytes by calling \texttt{InputStream.skip(n)}. It allows users to ignore unimportant bytes explicitly, to e.g. save memory when caching is active. The last read offset is advanced correspondingly. \\	
 	\hline
-	\texttt{insertData()} & Implements the writing operation \emph{insert} according to \DesLink{dd:410}, \DesLink{dd:410d} and  \DesLink{dd:422}: Adds data at the given offset, consecutive bytes are shifted ``to the back'', the changes first get written only with \texttt{flush()}. & The insertion of new metadata is a common case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
+	\texttt{insertData(x, data)} & Implements the writing operation \emph{insert} according to \DesLink{dd:410}, \DesLink{dd:410d} and  \DesLink{dd:422}: Adds data at the given offset $x$, consecutive bytes are shifted ``to the back'', the changes first get written only with \texttt{flush()}. & The insertion of new metadata is a common case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
 	\hline
-	\texttt{removeData()} & Implements the writing operation \emph{remove} according to \DesLink{dd:410}, \DesLink{dd:410d} and \DesLink{dd:424}: Removes $n$ bytes at offset $x$. Consecutive bytes are shifted ``to front'', the changes first get written only with \texttt{flush()} & Removing existing metadata is a standard case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
+	\texttt{removeData(x, n)} & Implements the writing operation \emph{remove} according to \DesLink{dd:410}, \DesLink{dd:410d} and \DesLink{dd:424}: Removes $n$ bytes at offset $x$. Consecutive bytes are shifted ``to front'', the changes first get written only with \texttt{flush()} & Removing existing metadata is a standard case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
 	\hline
-	\texttt{replaceData()} & Implements the writing operation \emph{replace} according to \DesLink{dd:410}, \DesLink{dd:410d} and  \DesLink{dd:422}: Replaces $n$ bytes at offset $x$ with new bytes of length $m$. The changes first get written only with \texttt{flush()} & It often happens that \--- instead of entirely removing or newly inserting data \--- existing data must be overwritten. This is - especially at the beginning of a file - a much more efficient operation than insertion and deletion and must thus directly be supported. & \texttt{ReadOnlyMediumException}\\
+	\texttt{replaceData(x, n, data)} & Implements the writing operation \emph{replace} according to \DesLink{dd:410}, \DesLink{dd:410d} and  \DesLink{dd:422}: Replaces $n$ bytes at offset $x$ with new bytes of length $m$. The changes first get written only with \texttt{flush()} & It often happens that \--- instead of entirely removing or newly inserting data \--- existing data must be overwritten. This is - especially at the beginning of a file - a much more efficient operation than insertion and deletion and must thus directly be supported. & \texttt{ReadOnlyMediumException}\\
 	\hline
 	\texttt{flush()} & Implements the writing operation \emph{flush} according to \DesLink{dd:410}: All \emph{changed} data currently in the temporary buffer are written in a suitable way to the external medium. It cannot be guaranteed that this operation is atomic. & This is a practical implementation of \DesLink{dd:410}: While \texttt{insertData()}, \texttt{removeData()} and \texttt{replaceData()} only write into a temporary buffer, this call directly writes to the external medium. & \texttt{ReadOnlyMediumException} \\
 	\hline
-	\texttt{createMediumReference()} & Creates a new \IMediumReference{} instance for the given offset $x$ according to \DesLink{dd:419} & Is needed for random-access & Is needed for \texttt{InputStream}s \\
+	\texttt{createMediumReference(x)} & Creates a new \IMediumReference{} instance for the given offset $x$ according to \DesLink{dd:419} & Is needed for random-access & Is needed for \texttt{InputStream}s \\
 	\hline
-	\texttt{undo()} & Undoes the changes of the given \MediumAction{} according to \DesLink{dd:420}, as far as it is still pending. & Is needed for random-access & \texttt{InvalidMediumActionException} \\
+	\texttt{undo(mediumAction)} & Undoes the changes of the given \MediumAction{} according to \DesLink{dd:420}, as far as it is still pending. & Is needed for random-access & \texttt{InvalidMediumActionException} \\
 	\hline
 	\texttt{close()} & Closes all internal resources according to \DesLink{dd:419ac}, clears the complete cache contents and other internal data structures & See \DesLink{dd:419ac} & See \DesLink{dd:419ac} \\
 	\hline
-\caption{Operationen der \COMPmedia{} API}
+	\texttt{isClosed()} & Allows users to check if the medium is already closed and thus cannot be accessed anymore (returns true), or it is still accessible (returns false). & See \DesLink{dd:419ac} & See \DesLink{dd:419ac} \\
+	\hline
+\caption{Operations of the \COMPmedia{} API}
 \label{tab:MediaOps}
 \end{longtable}
 \end{landscape}
@@ -1159,9 +1192,9 @@ The following table summarizes all further error situations when working with \C
 	\hline
 	Invalid cache offset & With \texttt{cache()} it is tried for an \texttt{InputStream} to cache an offset that is smaller than the last read offset. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException} runtime exception. & \IMediumStore{} \texttt{.cache()} \\
 	\hline
-	Stream data not available & Data requested with \texttt{getData()} for a given offset are not any more available in the cache, and the underlying medium is an \texttt{InputStream}. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException}, a runtime exception. & \IMediumStore{} \texttt{.getData()} \\
+	Stream data not available & Data requested with \texttt{getData()} for a given offset is not available (anymore) in the cache, and the underlying medium is an \texttt{InputStream}. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException}, a runtime exception. & \IMediumStore{} \texttt{.getData()} \\
 	\hline
-	Unknown or invalid \MediumAction{} & The user passes an unknwon or invalid \MediumAction{} to any operation & This is an abnormal situation and is acquitted with the runtime exception \texttt{InvalidMediumActionException}  & \IMediumStore{}\texttt{.undo()} \\
+	Unknown or invalid \MediumAction{} & The user passes an unknown or invalid \MediumAction{} to any operation & This is an abnormal situation and is acquitted with the runtime exception \texttt{InvalidMediumActionException}  & \IMediumStore{}\texttt{.undo()} \\
 	\hline
 	\texttt{IOException} in the implementation & The Java implementation use throws an \texttt{IOException}, at any place where none of the already presented error situations are involved. & It is an abnormal situation, thus a \texttt{MediumAccessException} runtime exception is thrown. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()}, \IMediumStore{} \texttt{.isAtEndOfMedium()}, \IMediumStore{} \texttt{.flush()} \\
 	\hline
@@ -1196,7 +1229,7 @@ No disadvantages known
 %		Implementation Layer Design
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Implementation Desing}
+\subsection{Implementation Design}
 \label{sec:ImplementationDesignCOMPmedia}
 
 %-----------------------------------------------------------------------------------------------
@@ -1313,7 +1346,7 @@ The class \MediumReferenceRepository{} is used for maintaining \IMediumReference
 \item \texttt{getAllReferences()} returns all maintained instances
 \item \texttt{getAllReferencesInRegion()} returns all maintained instances with given offset range
 \item \texttt{getAllReferencesBehindOrEqual()} returns all maintained instances with offsets bigger than the given offset
-\item \texttt{clearAll()} removes all maintained instances
+\item \texttt{clear()} removes all maintained instances
 \end{itemize}
 
 }
@@ -1343,35 +1376,37 @@ Close coupling between \IMediumReference{} and \MediumReferenceRepository{}, as 
 }
 %%%% <-- DD %%%%
 
-\OpenIssue{Check: Use Weak References?}{Check: Use Weak References?}
-
 %-----------------------------------------------------------------------------------------------
 
 \subsubsection{Internal Data Structures  for Caching}
 \label{sec:Datenstrukturen}
 
-The cache on first sight matintains data bytes per offset, always assuming that the data in cache is exactly identical to the data on the external medium, according to \DesLink{dd:404}. It was already defined, that there is an explicit \texttt{cache()} method for eading data into the cache and a method \texttt{getCachedByteCount()} for querying connected bytes from cache (see table \hyperref[tab:MediaOps]{\ref{tab:MediaOps}}, as well as \DesLink{dd:409} and \DesLink{dd:412b}). Query data from the cache is done using \texttt{getData()}, which can on the one hand skip the cache, on the other hand it automatically updates the cache with missing data (\DesLink{dd:412c} and \DesLink{dd:412d}). Finally, cache contents can be freed using \texttt{discard()}, or caching can even be entirely inactive (see \DesLink{dd:411c}).
+The cache on first sight maintains data bytes per offset, always assuming that the data in cache is exactly identical to the data on the external medium, according to \DesLink{dd:404}. It was already defined that there is an explicit \IMediumStore{}.\texttt{cache()} method for reading data into the cache and a method \IMediumStore{}.\texttt{getCachedByteCount()} for querying connected bytes from the cache (see table \hyperref[tab:MediaOps]{\ref{tab:MediaOps}}, as well as \DesLink{dd:409} and \DesLink{dd:412b}). Querying data from the cache is done using \IMediumStore{}.\texttt{getData()}, which can on the one hand skip the cache, on the other hand it can automatically update the cache with missing data (\DesLink{dd:412c} and \DesLink{dd:412d}). Finally, the maximum cache size can be set or caching can even be entirely inactive (see \DesLink{dd:411c} and \DesLink{dd:411e}).
 
-In most cases we want to query which parts of data to read, write or remove is within the cache. The cache might be fragmented arbitrarily due to multiple fill operations. Thus we need a class for this:
+In most cases we want to query which parts of data to read, write or remove is within the cache. The cache might be fragmented arbitrarily due to multiple fill operations. The make the code easier to understand and maintain, we create a specific class for representing the so called regions, i.e. added cache fragments:
 %%%% DD --> %%%%
 \DD{dd:435}
 {% Titel
-Class \MediumRegion{} for consecutive regions of a mediums, especially also for cache areas
+Class \MediumRegion{} for consecutive regions of a medium, especially also for cache regions
 }
 {% Kurzbeschreibung
-The class \MediumRegion{} represents regions of a mediums, that are cached under some circumstances. For this, it offers the following methods:
+The class \MediumRegion{} represents a consecutive byte range with start offset, size and contained bytes of a medium, that may or may not be cached. It offers the following methods:
 \begin{itemize}
 \item \texttt{getStartReference()}: Query start \IMediumReference{} of the region
 \item \texttt{getSize()}: Query length of the region
 \item \texttt{isCached()}: Returns true if cached, false otherwise
 \item \texttt{getBytes()}: Returns null if the region is not cached, otherwise the \texttt{ByteBuffer} with the cached region data
 \item \texttt{isContained()}: Returns true if the given \IMediumReference{} is contained within the region, false otherwise
-\item \texttt{discardbytesAtFront()}: Allows to trim the region at its beginning by discarding a given number of bytes
-\item \texttt{discardbytesAtEnd()}: Allows to trim the region at its back by discarding a given number of bytes
+\item \texttt{overlapsOtherRegionAtBack()}: Returns true if the this region overlaps the other region at its back, i.e. shares bytes with it at its end, otherwise returns false.
+\item \texttt{overlapsOtherRegionAtFront()}: Returns true if the this region overlaps the other region at its front, i.e. shares bytes with it at its front, otherwise returns false.
+\item \texttt{getOverlappingByteCount()}: Returns the number of bytes that this region shares with another region or zero if it does not share any bytes with it.
+\item \texttt{split()}: Splits this region into two regions at the given offset
+% \item \texttt{discardbytesAtFront()}: Allows to trim the region at its beginning by discarding a given number of bytes
+% \item \texttt{discardbytesAtEnd()}: Allows to trim the region at its back by discarding a given number of bytes
 \end{itemize}
 }
 {% Begründung
-The cache regions and the non-cached regions can be treated in the same way
+The cache regions and the non-cached regions of the medium can be treated in the same way. Implementing caching is easier when not based on primitive types (e.g. byte[]) only, but using this helper class.
 }
 {% Nachteile
 No disadvantages known
@@ -1382,21 +1417,26 @@ Maintenance of cache content is done by a helper class:
 %%%% DD --> %%%%
 \DD{dd:436}
 {% Titel
-Cache maintenance by \MediumCache{}
+Cache maintenance by \MediumCache{}, ensuring maximum cache size and no overlapping regions
 }
 {% Kurzbeschreibung
-Cache maintenance is done by the class \MediumCache{}, with following methods:
+Cache maintenance is done by the class \MediumCache{}. This class has the following invariants at any point in time before and after public method calls:
 \begin{itemize}
+\item The \MediumRegion{}s stored in the cache do never overlap
+\item The maximum cache size is never exceeded
+\item The maximum size of a cache region is never exceeded by any region
+\end{itemize}
+
+It offers the following methods:
+\begin{itemize}
+\item \texttt{getAllCachedRegions()}: Returns a list of all cached \MediumRegion{} instances currently contained in this cache, ordered by offset ascending
 \item \texttt{getCachedByteCountAt()}: Returns the number of bytes cached consecutively starting from offset $x$
-\item \texttt{getData()}: Returns a list of \MediumRegion{} instances for the offset range $[x,x+n]$, which represent the cached and non-cached ranges within the offset range. I.e. whenever there is a gap in the cache, this gap is also represented by a single \MediumRegion{} instance without data
-\item \texttt{getCachedRegions()}: Returns a list of all cached \MediumRegion{} instances 
-\item \texttt{addData()}: Adds data to the cache at offset $x$. Previously cached data is overridden.
-\item \texttt{discardData()}: Frees up to $n$ bytes at offset $x$ from the cache
-\item \texttt{clearAll()}: Frees all data in the cache
-\item \texttt{setMaxRegionSize()}: Stes the maximum region size. Default is \texttt{Integer.MAX\_VALUE}. The created regions will have at most the given size. Any already existing regions remain unchanged.
-\item \texttt{getMaxRegionSize()}: Returns the maximum size of a region
-\item \texttt{enableCaching()}: Enables or disables caching
-\item \texttt{isCachingEnabled()}: Queries if caching is enabled or disabled
+\item \texttt{getRegionsInRange()}: Returns a list of \MediumRegion{} instances overlapping the offset range $[x,x+n]$, which represent the cached and non-cached ranges within the offset range. I.e. whenever there is a gap in the cache, this gap is also represented by a single \MediumRegion{} instance without data
+\item \texttt{addRegion()}: Adds a \MediumRegion{} to the cache. Previously cached data is overridden.
+\item \texttt{clear()}: Frees all data in the cache
+\item \texttt{getMaxRegionSizeInBytes()}: Returns the maximum size of a region in bytes. Default is \texttt{Integer.MAX\_VALUE}, which is represented by a constant named \texttt{UNLIMITED\_CACHE\_REGION\_SIZE}. The cached regions will have at most the given size.
+\item \texttt{getMaxCacheSizeInBytes()}: Returns the maximum size of the cache in bytes. Default is \texttt{Long.MAX\_VALUE}, which is represented by a constant named \texttt{UNLIMITED\_CACHE\_SIZE}. The cache size will at no time exceed this number of bytes.
+\item \texttt{getCurrentCacheSizeInBytes()}: Returns the current size of the cache in bytes.
 \end{itemize}
 }
 {% Begründung
@@ -1407,44 +1447,45 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-How are these regions internally managed?
+For the cache sizes, we saw already that we can query the maximum and current cache size as well as the maximum region size. However, why can we not change the maximum sizes dynamically?
+
+%%%% DD --> %%%%
+\DD{dd:436b}
+{% Titel
+The maximum cache and maximum region size of a cache instance can never be changed throughout its life time.
+}
+{% Kurzbeschreibung
+The maximum cache size and the maximum region size are passed to the constructor of the \MediumCache{} class and they must not be changed later.
+}
+{% Begründung
+Otherwise complex methods for reorganizing the cache are necessary, splitting and discarding existing regions. It is very unlikely that the user needs to change the cache size during accessing the medium. It if fully sufficient that he can configure the maximum size of the cache and its regions before the first access to the medium.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+How are the cache regions internally managed?
 
 %%%% DD --> %%%%
 \DD{dd:437}
 {% Titel
-A \texttt{TreeMap} is used for managing the cache contents
+A \texttt{TreeMap} is used for managing the cache contents, an additional \texttt{LinkedList} for freeing up according to FIFO
 }
 {% Kurzbeschreibung
-A \texttt{TreeMap<}\IMediumReference{}, \MediumRegion{}\texttt{>} is used for managing the cache contents.
+A \texttt{TreeMap<}\IMediumReference{}, \MediumRegion{}\texttt{>} is used for managing the cache contents. An additional \texttt{LinkedList} is used for freeing up cache data according to FIFO.
 }
 {% Begründung
 Content must be read based on offsets. Thus a data structure sorted by offset is necessary. It allows the efficient retrieval of all \MediumRegion{}s bigger or smaller than a given offest. This operation should most probably need a runtime complexity of only $O(log(n))$ instead of $O(n)$.
+
+The \texttt{LinkedList} is necessary to efficiently remove the first added cache regions when freeing up is necessary due to max cache size reached, see \DesLink{dd:411e}.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Due to performance reasons, we already considered a possibility to free up data from the cache. It, however, shows, that the maximum size of the cache could additionally be managed by an automatic mechanism:
-%%%% DD --> %%%%
-\DD{dd:437b}
-{% Titel
-The user is able to set the maximum cache size
-}
-{% Kurzbeschreibung
-The maximum size for the \MediumCache{} can be set via \texttt{setMaxCacheSize()} and retrieved via \texttt{getMaxCacheSize()}. Furthermore the current cache size can be retrieved using \texttt{getCurrentCacheSize()}. By default, the maximum cache size is not limited, which is represented by the constant \texttt{UNLIMITED}. Setting a maximum cache size leads to freeing up or shrinking of existing cache regions, i.e. it will be directly applied. Which cache regions get freed, is undefined.
-
-\texttt{addData()} checks wheter the current cache size plus the bytes to add exceed the maximum cache size. If so, only as much bytes starting from begin of the \texttt{ByteBuffer}s  to cache are added up to the maximum size, which might probably be 0 bytes in total. \texttt{addData()} retzrns a \MediumRegion{} which reflects the actual region size cached.
-}
-{% Begründung
-This allows the caller to actively influence the cache size and avoid \texttt{OutOfMemoryError}sn
-}
-{% Nachteile
-No disadvantages known
-}
-%%%% <-- DD %%%%
-
-We should also think about cache fragementation. Let us assume that, by subsequent calls to \texttt{addData()}, we would add a single byte to the cache 20 times for a consecutive offset range. Will this result in 20 different \MediumRegion{}s with a length of one byte each? The same question arieses for calls to \texttt{getData()}, which spans over an offset range with gaps in the cache coverage. Assume we have a cache that contains 20 bytes starting at offset $x$, further 50 bytes at offset $y:=x+30$, i.e. it has a gap of 10 bytes between the two regions. If there is a now a call to \texttt{getData()} for range $x-10$ with length of 100, we would result in five regions:
+We should also think about cache fragementation. Let us assume that, by subsequent calls to \texttt{addRegion()}, we would add a single byte to the cache 20 times for a consecutive offset range. Will this result in 20 different \MediumRegion{}s with a length of one byte each? The same question arises for calls to \IMediumStore{}.\texttt{getData()}, which spans over an offset range with gaps in the cache coverage. Assume we have a cache that contains 20 bytes starting at offset $x$, further 50 bytes at offset $y:=x+30$, i.e. it has a gap of 10 bytes between the two regions. If there is a now a call to \IMediumStore{}.\texttt{getData()} for range $x-10$ with length of 100, we would result in five regions:
 \begin{itemize}
 \item Region 1: $[x-10,x)$ not in the cache
 \item Region 2: $[x,x+20)$ in the cache
@@ -1453,45 +1494,26 @@ We should also think about cache fragementation. Let us assume that, by subseque
 \item Region 5: $[y+50,y+60)$ not in the cache
 \end{itemize}
 
-\texttt{getData()} will then add regions 1, 3 and 5 to the cache, according to \DesLink{dd:412d}. So, do we have 5 \MediumRegion{}s in the cache after the call?
+\IMediumStore{}.\texttt{getData()} will then add regions 1, 3 and 5 to the cache, according to \DesLink{dd:412d}. So, do we have 5 \MediumRegion{}s in the cache after the call? Another extreme case is that the user reads 20 single bytes each with an offset gap of just one byte to the next one. This would result in 20 cache regions each with a size of one byte.
 
-We decide:
-%%%% DD --> %%%%
-\DD{dd:437c}
-{% Titel
-Fragmentation of subsequent cache regions is avoided
-}
-{% Kurzbeschreibung
-For subsequent calls of \texttt{addData()}, for which the first call covers offset range $[x,x+n)$ and the second call covers offset range $[x+n,x+n+m)$ \-- i.e. both ranges are directly connected without gaps \-- the result is a single \MediumRegion{}, covering offset range $[x,x+n+m)$.
-
-A call to \texttt{getData()}, whose offset range is covering multiple cached \MediumRegion{}s divided by gaps, creates a new single \MediumRegion{}s, joining the previously separate \MediumRegion{}.
-
-In both cases we assume that the total length of the new region is smaller than the maximum configurable region size according to \DesLink{dd:436}. If this size is exceeded: Let $n$ be the total size with configurable maximum region size $m$, and let $n>m$. If $n$ is divided by $m$ without remained, then the result will be $\frac{n}{m}$ different \MediumRegion{}s. If $n$ cannot be divided by $m$ without remaineder, we have $\lfloor\frac{n}{m}\rfloor+1$ \MediumRegion{}s.
-
-A fragmentation of consecutive \MediumRegion{}s thus only happens when the maximum region size is exceeded.
-}
-{% Begründung
-More objects need more memory and cause a higher management effort. Fragmentation does not offer any benefits.
-}
-{% Nachteile
-No disadvantages known
-}
-%%%% <-- DD %%%%
-
-A related question is how to treat gaps in general, even for multiple subseqhent calls of \texttt{addData()}: AS shown in the initial example, we load 20 bytes with 20 calls to \texttt{addData()} into the cache. However, there is a gap of ine Byte between each of them, and this gap is not contained in the cache. Even here you have to ask: Will this create 20 \MediumRegion{}s?
+To ease the implementation complexity, we nevertheless decide:
 
 %%%% DD --> %%%%
 \DD{dd:437d}
 {% Titel
-Fragmentation of unconnected cache areas is not actively avoided
+Fragmentation of cache regions is not actively avoided
 }
 {% Kurzbeschreibung
-\COMPmedia{} does not try to mitigate or avoid the situation of ``nearby'' but unconnected cache regions of small sizes.
+\COMPmedia{} does not try to mitigate or avoid the following situations:
+\begin{itemize}
+\item Direct consecutive cache regions are not joined, even if their total size is smaller than the maximum allowed region size
+\item ``Nearby'' but unconnected (i.e. non-consective) cache regions of small sizes are not handled in any special way.
+\end{itemize}
 }
 {% Begründung
-It would lead to even higher complexity of the implementation of \texttt{addData()}. Heuristics that tell how to join those unconnected regions must be defined first. It could e.g. be possible for a call to \texttt{addData()} to detect that there are other offset ranges in a given radius $[x-k,x+k]$, with a to-be-defined constant $k$. In that case, the gap bytes could be additionally cached. However, it still must be ensured that the maximum region size and maximum cache size is not exceeded. For \texttt{InputStream}s, this ``gap filling'' is not possible and thus must anyway not be done. Last but not least, the functionality must respec the end of medium.
+It would lead to even higher complexity of the implementation of \texttt{addRegion()}.
 
-In contrast to that high complexity, we can ask the caller to ensure the he only adds data for reasonably connected offset ranges.
+In contrast to that high complexity, we can ask the caller to ensure that he only adds data for reasonably connected offset ranges.
 }
 {% Nachteile
 No disadvantages known
@@ -1817,7 +1839,7 @@ CF5 & Multiple \texttt{remove}s &\begin{enumerate}\item[a.] All removes at the s
 \subsubsection{Configuration Parameters}%
 \label{sec:Konfigurationsparameter}%
 
-Even if the the parameters configurable by users belong to the public interface, they are only listed first here, as it was only clear after the implementation design, which of those parameters need to be exposed to the users.
+Even if the parameters configurable by users belong to the public interface, they are only listed first here, as it was only clear after the implementation design, which of those parameters need to be exposed to the users.
 
 We first define:
 %%%% DD --> %%%%
@@ -1838,18 +1860,17 @@ No disadvantages known
 
 Now the question arises: Which configuration parameters are needed? Those listed in table \hyperref[tab:ConfigMedia]{\ref{tab:ConfigMedia}}.
 
-
 \begin{landscape}
 \begin{longtable}{|p{0.1\linewidth}|p{0.24\linewidth}|p{0.07\linewidth}|p{0.1\linewidth}|p{0.4\linewidth}|}
 	\hline
 	\rowcolor[gray]{.9}\textbf{Medium} & \textbf{Parameter Name} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\
 	\endhead
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{ENABLE\_CACHING} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. The cache content is directly cleared if setting this to \texttt{false}. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{ENABLE\_CACHING} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. Setting this to \texttt{false} after creation of the \IMediumStore{} will clear the cache content directly. \\
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_REGION\_SIZE} & int $> 0$ & \texttt{Integer} \texttt{.MAX\_VALUE} & Sets the maximum size of a cache region according to \DesLink{dd:436}. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_REGION\_SIZE} & int $> 0$ & \texttt{Integer} \texttt{.MAX\_VALUE} & Sets the maximum size of a cache region according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_SIZE} & long $> 0$ & Long \texttt{.MAX\_VALUE} & Sets the maximum cache size according to \DesLink{dd:437b}. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_SIZE} & long $> 0$ & Long \texttt{.MAX\_VALUE} & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
 	\texttt{File}, \texttt{byte}-Array & \texttt{MAX\_WRITE\_BLOCK\_SIZE} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
 	\hline

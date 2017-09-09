@@ -46,7 +46,7 @@ public class MediumActionComparator implements Comparator<MediumAction> {
       IMediumReference leftStartReference = left.getRegion().getStartReference();
       IMediumReference rightStartReference = right.getRegion().getStartReference();
 
-      IMediumReference.checkSameMedium(leftStartReference, rightStartReference);
+      IMediumReference.validateSameMedium(leftStartReference, rightStartReference.getMedium());
 
       // Ensure contract of compare is fulfilled
       if (left.equals(right)) {

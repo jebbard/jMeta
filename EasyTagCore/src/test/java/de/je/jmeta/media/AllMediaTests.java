@@ -27,6 +27,7 @@ import de.je.jmeta.media.impl.FileMediumAccessorTest;
 import de.je.jmeta.media.impl.FileMediumCacheTest;
 import de.je.jmeta.media.impl.IMediumReferenceEqualityTest;
 import de.je.jmeta.media.impl.IMediumReferenceTest;
+import de.je.jmeta.media.impl.MediumChangeManagerCreateFlushPlanTest;
 import de.je.jmeta.media.impl.MediumChangeManagerTest;
 import de.je.jmeta.media.impl.MediumReferenceFactoryTest;
 import de.je.jmeta.media.impl.MediumRegionTest;
@@ -38,17 +39,14 @@ import de.je.jmeta.media.impl.timeout.StreamingMediumAccessorTimeoutTest;
  * {@link AllMediaTests} is used for running all test cases of the media component.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ BlockWiseFileMediumCacheTest.class, FileMediumCacheTest.class,
-   FileMediumAccessorTest.class, MemoryMediumAccessorTest.class,
-   StreamingMediumAccessorTest.class, MediumRegionTest.class,
-   IMediumEqualityTest.class, IMediumReferenceTest.class,
-   IMediumReferenceEqualityTest.class, DummyFileMediumTest.class,
-   ExistingFileMediumTest.class, InMemoryMediumTest.class,
-   InputStreamMediumTest.class, StreamingMediumAccessorTimeoutTest.class,
-   InputStreamMediumConfigurableTest.class,
-   InMemoryMediumConfigurableTest.class, FileMediumConfigurableTest.class,
-   MediumActionTest.class, MediumActionEqualityTest.class,
-   MediumReferenceFactoryTest.class, MediumChangeManagerTest.class })
+@SuiteClasses({ BlockWiseFileMediumCacheTest.class, FileMediumCacheTest.class, FileMediumAccessorTest.class,
+   MemoryMediumAccessorTest.class, StreamingMediumAccessorTest.class, MediumRegionTest.class, IMediumEqualityTest.class,
+   IMediumReferenceTest.class, IMediumReferenceEqualityTest.class, DummyFileMediumTest.class,
+   ExistingFileMediumTest.class, InMemoryMediumTest.class, InputStreamMediumTest.class,
+   StreamingMediumAccessorTimeoutTest.class, InputStreamMediumConfigurableTest.class,
+   InMemoryMediumConfigurableTest.class, FileMediumConfigurableTest.class, MediumActionTest.class,
+   MediumActionEqualityTest.class, MediumReferenceFactoryTest.class, MediumChangeManagerTest.class,
+   MediumChangeManagerCreateFlushPlanTest.class })
 public class AllMediaTests {
    // Nothing necessary here
 }
