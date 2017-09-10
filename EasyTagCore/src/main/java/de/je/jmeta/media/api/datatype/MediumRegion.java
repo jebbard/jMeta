@@ -126,8 +126,41 @@ public class MediumRegion {
     *           this region, and must be smaller than the end reference of this {@link MediumRegion}.
     */
    public MediumRegion[] split(IMediumReference at) {
-      // TODO implement
-      return null;
+      Reject.ifNull(at, "at");
+      IMediumReference.validateSameMedium(at, getStartReference().getMedium());
+      Contract.checkPrecondition(contains(at), "split reference must be contained in this region");
+      Contract.checkPrecondition(getStartReference().before(at),
+         "split reference must not be equal to the start reference of this region");
+
+      MediumRegion[] returnedSplitRegions = new MediumRegion[2];
+
+      int firstRegionSize = (int) at.distanceTo(getStartReference());
+      int secondRegionSize = (int) calculateEndReference().distanceTo(at);
+
+      if (isCached()) {
+         // NOTE: It is important here to NOT call getBytes() multiple times for each region, but just once,
+         // because it always returns a new read only ByteBuffer copy with its own new position and limit
+         // This has, however, the advantage, that we do not change the original ByteBuffer of this region
+         // unintentionally.
+         ByteBuffer originalBytes = getBytes();
+
+         byte[] firstRegionBytes = new byte[firstRegionSize];
+         byte[] secondRegionBytes = new byte[secondRegionSize];
+
+         originalBytes.get(firstRegionBytes);
+         originalBytes.get(secondRegionBytes);
+
+         ByteBuffer firstRegionBuffer = ByteBuffer.wrap(firstRegionBytes);
+         ByteBuffer secondRegionBuffer = ByteBuffer.wrap(secondRegionBytes);
+
+         returnedSplitRegions[0] = new MediumRegion(getStartReference(), firstRegionBuffer);
+         returnedSplitRegions[1] = new MediumRegion(at, secondRegionBuffer);
+      } else {
+         returnedSplitRegions[0] = new MediumRegion(getStartReference(), firstRegionSize);
+         returnedSplitRegions[1] = new MediumRegion(at, secondRegionSize);
+      }
+
+      return returnedSplitRegions;
    }
 
    /**
@@ -157,7 +190,7 @@ public class MediumRegion {
    public void discardBytesAtEnd(IMediumReference newEndReference) {
 
       Reject.ifNull(newEndReference, "newEndReference");
-      Contract.checkPrecondition(contains(newEndReference), "new end reference must be contained in region");
+      Contract.checkPrecondition(contains(newEndReference), "new end reference must be contained in this region");
       Contract.checkPrecondition(isCached(), "the medium region must be a cached region");
 
       if (newEndReference.equals(calculateEndReference()))
@@ -430,17 +463,17 @@ public class MediumRegion {
       if (getClass() != obj.getClass())
          return false;
       MediumRegion other = (MediumRegion) obj;
-      if (buffer == null) {
-         if (other.buffer != null)
-            return false;
-      } else if (!buffer.equals(other.buffer))
-         return false;
       if (size != other.size)
          return false;
       if (startReference == null) {
          if (other.startReference != null)
             return false;
       } else if (!startReference.equals(other.startReference))
+         return false;
+      if (buffer == null) {
+         if (other.buffer != null)
+            return false;
+      } else if (!buffer.equals(other.buffer))
          return false;
       return true;
    }
