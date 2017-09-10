@@ -6,7 +6,7 @@
  *
  * @date 08.04.2011
  */
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.impl.OLD;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -22,6 +22,8 @@ import org.junit.Test;
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
+import de.je.jmeta.media.impl.StandardMediumReference;
+import de.je.jmeta.media.impl.OLD.IMediumCache;
 import junit.framework.Assert;
 
 /**

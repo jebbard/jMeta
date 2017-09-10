@@ -12,12 +12,12 @@ package de.je.jmeta.media.api.datatype;
 import java.nio.ByteBuffer;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link MediumAction} represents an action performed on a given {@link IMedium}, either a reading or a writing action.
- * A {@link MediumAction} belonging to an {@link IMediumStore} gets invalid as soon as the store is flushed or it is
+ * A {@link MediumAction} belonging to an {@link IMediumStore_OLD} gets invalid as soon as the store is flushed or it is
  * undone. The validity of a {@link MediumAction} is represented by its {@link MediumAction#isPending} method. See the
  * methods description for more details.
  * 

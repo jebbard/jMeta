@@ -6,7 +6,7 @@
  *
  * @date 04.04.2011
  */
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.impl.OLD;
 
 import java.util.Comparator;
 

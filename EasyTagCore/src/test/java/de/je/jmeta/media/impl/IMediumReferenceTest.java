@@ -19,6 +19,7 @@ import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.DummyMediumCreator;
 import de.je.jmeta.media.api.datatype.FileMedium;
+import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.err.PreconditionException;
 
 /**

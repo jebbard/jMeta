@@ -14,7 +14,7 @@ import de.je.jmeta.dataformats.DataBlockId;
 import de.je.jmeta.dataformats.DataTransformationType;
 import de.je.jmeta.dataformats.IDataFormatSpecification;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.AbstractMedium;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 
@@ -149,7 +149,7 @@ public interface IDataBlockReader {
    /**
     * @param cache
     */
-   public void setMediumCache(IMediumStore cache);
+   public void setMediumCache(IMediumStore_OLD cache);
 
    /**
     * @param payloadId

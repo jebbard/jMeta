@@ -6,7 +6,7 @@
  *
  * @date 17.04.2011
  */
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.api.datatype;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -20,6 +20,7 @@ import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.InMemoryMedium;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.err.PreconditionException;
 import junit.framework.Assert;
 

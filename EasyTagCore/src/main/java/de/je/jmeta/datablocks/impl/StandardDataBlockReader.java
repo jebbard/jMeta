@@ -49,7 +49,7 @@ import de.je.jmeta.dataformats.LocationProperties;
 import de.je.jmeta.dataformats.MagicKey;
 import de.je.jmeta.dataformats.PhysicalDataBlockType;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.AbstractMedium;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.util.javautil.common.charset.Charsets;
@@ -608,10 +608,10 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#setMediumCache(de.je.jmeta.media.api.IMediumStore)
+    * @see de.je.jmeta.datablocks.export.IDataBlockReader#setMediumCache(de.je.jmeta.media.api.OLD.IMediumStore_OLD)
     */
    @Override
-   public void setMediumCache(IMediumStore cache) {
+   public void setMediumCache(IMediumStore_OLD cache) {
 
       Reject.ifNull(cache, "cache");
 
@@ -1241,7 +1241,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       m_cache.buffer(reference, size);
    }
 
-   private IMediumStore m_cache;
+   private IMediumStore_OLD m_cache;
 
    private int m_maxFieldBlockSize;
 

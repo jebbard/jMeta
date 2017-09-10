@@ -16,23 +16,23 @@ import de.je.jmeta.media.api.datatype.DummyFileMediumTest;
 import de.je.jmeta.media.api.datatype.ExistingFileMediumTest;
 import de.je.jmeta.media.api.datatype.FileMediumConfigurableTest;
 import de.je.jmeta.media.api.datatype.IMediumEqualityTest;
+import de.je.jmeta.media.api.datatype.IMediumReferenceEqualityTest;
 import de.je.jmeta.media.api.datatype.InMemoryMediumConfigurableTest;
 import de.je.jmeta.media.api.datatype.InMemoryMediumTest;
 import de.je.jmeta.media.api.datatype.InputStreamMediumConfigurableTest;
 import de.je.jmeta.media.api.datatype.InputStreamMediumTest;
 import de.je.jmeta.media.api.datatype.MediumActionEqualityTest;
 import de.je.jmeta.media.api.datatype.MediumActionTest;
-import de.je.jmeta.media.impl.BlockWiseFileMediumCacheTest;
+import de.je.jmeta.media.api.datatype.MediumRegionTest;
 import de.je.jmeta.media.impl.FileMediumAccessorTest;
-import de.je.jmeta.media.impl.FileMediumCacheTest;
-import de.je.jmeta.media.impl.IMediumReferenceEqualityTest;
 import de.je.jmeta.media.impl.IMediumReferenceTest;
 import de.je.jmeta.media.impl.MediumChangeManagerCreateFlushPlanTest;
 import de.je.jmeta.media.impl.MediumChangeManagerTest;
 import de.je.jmeta.media.impl.MediumReferenceFactoryTest;
-import de.je.jmeta.media.impl.MediumRegionTest;
 import de.je.jmeta.media.impl.MemoryMediumAccessorTest;
 import de.je.jmeta.media.impl.StreamingMediumAccessorTest;
+import de.je.jmeta.media.impl.OLD.BlockWiseFileMediumCacheTest;
+import de.je.jmeta.media.impl.OLD.FileMediumCacheTest;
 import de.je.jmeta.media.impl.timeout.StreamingMediumAccessorTimeoutTest;
 
 /**

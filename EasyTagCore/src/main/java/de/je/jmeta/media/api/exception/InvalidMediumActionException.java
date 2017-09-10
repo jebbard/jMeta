@@ -9,12 +9,12 @@
  */
 package de.je.jmeta.media.api.exception;
 
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.MediumAction;
 
 /**
  * {@link InvalidMediumActionException} is thrown whenever an unknown {@link MediumAction} is passed to
- * {@link IMediumStore#undo(MediumAction)}.
+ * {@link IMediumStore_OLD#undo(MediumAction)}.
  */
 public class InvalidMediumActionException extends RuntimeException {
 

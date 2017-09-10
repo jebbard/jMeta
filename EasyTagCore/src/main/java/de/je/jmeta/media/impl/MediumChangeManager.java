@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
@@ -30,15 +30,15 @@ import de.je.util.javautil.common.err.Reject;
 /**
  * {@link MediumChangeManager} performs all tasks of handling and consolidating {@link MediumAction}s.
  * {@link MediumAction}s are created by the methods
- * {@link IMediumStore#insertData(de.je.jmeta.media.api.IMediumReference, ByteBuffer)},
- * {@link IMediumStore#removeData(de.je.jmeta.media.api.IMediumReference, int)} and
- * {@link IMediumStore#replaceData(de.je.jmeta.media.api.IMediumReference, int, ByteBuffer)} by calling one of the
+ * {@link IMediumStore_OLD#insertData(de.je.jmeta.media.api.IMediumReference, ByteBuffer)},
+ * {@link IMediumStore_OLD#removeData(de.je.jmeta.media.api.IMediumReference, int)} and
+ * {@link IMediumStore_OLD#replaceData(de.je.jmeta.media.api.IMediumReference, int, ByteBuffer)} by calling one of the
  * corresponding schedule methods of {@link MediumChangeManager}.
  * 
- * {@link MediumAction}s represent an open action that is still to be performed before a {@link IMediumStore#flush()}.
+ * {@link MediumAction}s represent an open action that is still to be performed before a {@link IMediumStore_OLD#flush()}.
  * 
  * {@link MediumChangeManager} ensures that these {@link MediumAction}s are created consistently and maintains them in a
- * specific order such that later {@link IMediumStore#flush()} can be more easier implemented. It does this by using a
+ * specific order such that later {@link IMediumStore_OLD#flush()} can be more easier implemented. It does this by using a
  * {@link TreeSet} as internal data structure and the {@link MediumActionComparator} as sorting criterion.
  */
 public class MediumChangeManager {

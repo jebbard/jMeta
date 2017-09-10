@@ -27,7 +27,7 @@ import de.je.jmeta.dataformats.PhysicalDataBlockType;
 import de.je.jmeta.media.api.IMediaAPI;
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
@@ -223,7 +223,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
 
    private MagicKey m_theMagicKey;
 
-   private IMediumStore m_mediumStore;
+   private IMediumStore_OLD m_mediumStore;
 
    private final Map<DataFormat, IDataBlockReader> m_readerMap = new LinkedHashMap<>();
 }

@@ -1,5 +1,6 @@
 package de.je.jmeta.media.impl;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,8 @@ import java.util.TreeMap;
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.util.javautil.common.err.Contract;
+import de.je.util.javautil.common.err.Reject;
 
 /**
  * Represents a permanent in-memory cache for an {@link IMedium}. It provides methods for adding and retrieving cache
@@ -61,7 +64,11 @@ public class MediumCache {
     */
    public MediumCache(IMedium<?> medium, long maximumCacheSizeInBytes, int maximumCacheRegionSizeInBytes) {
 
-      // TODO implement
+      Reject.ifNull(medium, "medium");
+
+      Contract.checkPrecondition(maximumCacheSizeInBytes >= maximumCacheRegionSizeInBytes,
+         "Maximum cache size in bytes must be equal to or bigger than the maximum cache region size in bytes");
+
       this.medium = medium;
       this.maximumCacheSizeInBytes = maximumCacheSizeInBytes;
       this.maximumCacheRegionSizeInBytes = maximumCacheRegionSizeInBytes;
@@ -101,8 +108,7 @@ public class MediumCache {
     *         {@link IMediumReference} ascending. If there are none currently, returns an empty {@link List}.
     */
    public List<MediumRegion> getAllCachedRegions() {
-      // TODO implement
-      return null;
+      return new ArrayList<>(cachedRegionsInInsertOrder);
    }
 
    /**
@@ -139,7 +145,7 @@ public class MediumCache {
     */
    public List<MediumRegion> getRegionsInRange(IMediumReference startReference, int rangeSizeInBytes) {
       // TODO implement
-      return null;
+      return getAllCachedRegions();
    }
 
    /**
@@ -179,6 +185,7 @@ public class MediumCache {
     */
    public void addRegion(MediumRegion region) {
       // TODO implement
+      cachedRegionsInInsertOrder.add(region);
    }
 
    /**
@@ -187,5 +194,6 @@ public class MediumCache {
     */
    public void clear() {
       // TODO implement
+      cachedRegionsInInsertOrder.clear();
    }
 }

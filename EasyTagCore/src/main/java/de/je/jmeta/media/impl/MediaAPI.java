@@ -16,11 +16,13 @@ import java.util.Set;
 
 import de.je.jmeta.media.api.IMediaAPI;
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.InMemoryMedium;
 import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.jmeta.media.api.exception.MediumAccessException;
+import de.je.jmeta.media.impl.OLD.IMediumCache;
+import de.je.jmeta.media.impl.OLD.StandardMediumCache;
 import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.simpleregistry.AbstractComponentImplementation;
@@ -61,7 +63,7 @@ public class MediaAPI extends AbstractComponentImplementation<IMediaAPI>
     * @see de.je.jmeta.media.api.IMediaAPI#getMediumStore(de.je.jmeta.media.api.IMedium)
     */
    @Override
-   public IMediumStore getMediumStore(IMedium<?> medium) {
+   public IMediumStore_OLD getMediumStore(IMedium<?> medium) {
 
       Reject.ifNull(medium, "medium");
 

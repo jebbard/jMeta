@@ -6,7 +6,7 @@
  *
  * @date 10.04.2011
  */
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.api.datatype;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -15,8 +15,9 @@ import java.util.List;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.datatype.DummyMediumCreator;
 import de.je.jmeta.media.api.datatype.InputStreamMedium;
+import de.je.jmeta.media.impl.IMediumReferenceTest;
+import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;
 
 /**

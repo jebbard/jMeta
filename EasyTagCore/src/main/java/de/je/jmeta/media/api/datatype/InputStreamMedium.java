@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
 import de.je.util.javautil.common.configparams.AbstractConfigParam;
 import de.je.util.javautil.common.configparams.BooleanConfigParam;
@@ -130,7 +130,7 @@ public class InputStreamMedium extends AbstractMedium<InputStream> {
 
    /**
     * Sets the timeout value in milliseconds used for blocking read operations. If set to a positive value other than
-    * {@link #NO_TIMEOUT}, the {@link IMediumStore} read operations will throw an {@link ReadTimedOutException} during
+    * {@link #NO_TIMEOUT}, the {@link IMediumStore_OLD} read operations will throw an {@link ReadTimedOutException} during
     * reading, if if the set timeout has expired and the full number of bytes requested for reading has not yet been
     * read. In case of an expired timeout, the {@link ByteBuffer} given to the operation contains all the bytes read
     * already as the remaining bytes until the timeout has expired.

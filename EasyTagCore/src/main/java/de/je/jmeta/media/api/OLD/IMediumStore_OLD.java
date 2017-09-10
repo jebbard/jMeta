@@ -1,26 +1,28 @@
-package de.je.jmeta.media.api;
+package de.je.jmeta.media.api.OLD;
 
 import java.nio.ByteBuffer;
 
+import de.je.jmeta.media.api.IMedium;
+import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
 
 /**
- * {@link IMediumStore} defines primitives to work with a {@link IMedium}. The implementation might or might not be
+ * {@link IMediumStore_OLD} defines primitives to work with a {@link IMedium}. The implementation might or might not be
  * backed by a caching mechanism. This is transparent to the caller. Only guarantee is: a call to
  * {@link #buffer(IMediumReference, long)} will load data into memory that can later be obtained using
  * {@link #getData(IMediumReference, int)}. This memory is called the pre-load store, and could also be referred to as
  * some basic cache already.
  * 
- * Clients should be sure to call {@link #close()} as soon they do not need the {@link IMediumStore} anymore, thus
+ * Clients should be sure to call {@link #close()} as soon they do not need the {@link IMediumStore_OLD} anymore, thus
  * avoiding memory leakage.
  */
-public interface IMediumStore {
+public interface IMediumStore_OLD {
 
    /**
-    * Closes this {@link IMediumStore}. All access methods cannot be used if the {@link IMediumStore} is closed.
+    * Closes this {@link IMediumStore_OLD}. All access methods cannot be used if the {@link IMediumStore_OLD} is closed.
     * 
     * @throws MediumAccessException
     *            In case of any errors during accessing the underlying {@link IMedium}.
@@ -86,7 +88,7 @@ public interface IMediumStore {
    public void flush();
 
    /**
-    * Returns data from this {@link IMediumStore}. The data is taken from the internal store, if the
+    * Returns data from this {@link IMediumStore_OLD}. The data is taken from the internal store, if the
     * {@link IMediumReference} up to the given byte count has already been pre-loaded using
     * {@link #buffer(IMediumReference, long)} before. Otherwise it is read from the {@link IMedium} directly. If the end
     * of the {@link IMedium} is hit during reading, a {@link EndOfMediumException} is thrown. However, all bytes already
@@ -103,7 +105,7 @@ public interface IMediumStore {
     * 
     * @param reference
     *           The {@link IMediumReference} from which to retrieve the data. Must point to the {@link IMedium} this
-    *           {@link IMediumStore} works on. Must not exceed the {@link IMedium}'s length as returned by
+    *           {@link IMediumStore_OLD} works on. Must not exceed the {@link IMedium}'s length as returned by
     *           {@link IMedium#getCurrentLength()}.
     * @param byteCount
     *           The number of bytes to be retrieved. Must be bigger than 0.
@@ -131,9 +133,9 @@ public interface IMediumStore {
       throws EndOfMediumException;
 
    /**
-    * Returns the {@link IMedium} this {@link IMediumStore} is using.
+    * Returns the {@link IMedium} this {@link IMediumStore_OLD} is using.
     * 
-    * @return the {@link IMedium} this {@link IMediumStore} is using.
+    * @return the {@link IMedium} this {@link IMediumStore_OLD} is using.
     */
    public IMedium<?> getMedium();
 
@@ -141,7 +143,7 @@ public interface IMediumStore {
     * Returns the number of bytes currently buffered at the given {@link IMediumReference}.
     * 
     * @param reference
-    *           The {@link IMediumReference}. Must point to the {@link IMedium} this {@link IMediumStore} works on.
+    *           The {@link IMediumReference}. Must point to the {@link IMedium} this {@link IMediumStore_OLD} works on.
     * @return the number of bytes currently buffered at the given {@link IMediumReference}. 0 if no bytes are buffered
     *         at that {@link IMediumReference}.
     * 
@@ -169,7 +171,7 @@ public interface IMediumStore {
     * 
     * @param reference
     *           The {@link IMediumReference} at which to insert the data. Must point to the {@link IMedium} this
-    *           {@link IMediumStore} works on. Must not exceed the {@link IMedium}'s length as returned by
+    *           {@link IMediumStore_OLD} works on. Must not exceed the {@link IMedium}'s length as returned by
     *           {@link IMedium#getCurrentLength()}.
     * @param bytes
     *           The bytes to insert at the location. Only the remaining bytes in the given {@link ByteBuffer} are
@@ -191,7 +193,7 @@ public interface IMediumStore {
     * 
     * @param reference
     *           The {@link IMediumReference} to check for end of medium. Must refer to the same {@link IMedium} as this
-    *           {@link IMediumStore} uses.
+    *           {@link IMediumStore_OLD} uses.
     * 
     * @return Returns whether the given {@link IMediumReference} is at end of the {@link IMedium}.
     * @throws MediumAccessException
@@ -203,10 +205,10 @@ public interface IMediumStore {
    public boolean isAtEndOfMedium(IMediumReference reference);
 
    /**
-    * Returns whether this {@link IMediumStore} is currently opened or closed. A newly created instance of an
+    * Returns whether this {@link IMediumStore_OLD} is currently opened or closed. A newly created instance of an
     * implementing class must be initially open.
     * 
-    * @return Returns whether this {@link IMediumStore} is currently opened (true) or closed (false).
+    * @return Returns whether this {@link IMediumStore_OLD} is currently opened (true) or closed (false).
     */
    public boolean isOpened();
 
@@ -239,7 +241,7 @@ public interface IMediumStore {
     * 
     * @param reference
     *           The {@link IMediumReference} where to start buffering data. Must point to the {@link IMedium} this
-    *           {@link IMediumStore} works on. Must not exceed the {@link IMedium}'s length as returned by
+    *           {@link IMediumStore_OLD} works on. Must not exceed the {@link IMedium}'s length as returned by
     *           {@link IMedium#getCurrentLength()}.
     * @param size
     *           The size to be cached. Must be bigger than 0. Buffering too much data might lead to an out-of-memory
@@ -291,7 +293,7 @@ public interface IMediumStore {
     * 
     * @param reference
     *           The {@link IMediumReference} at which to remove the data. Must point to the {@link IMedium} this
-    *           {@link IMediumStore} works on. Must not exceed the {@link IMedium}'s length as returned by
+    *           {@link IMediumStore_OLD} works on. Must not exceed the {@link IMedium}'s length as returned by
     *           {@link IMedium#getCurrentLength()}.
     * @param byteCountToRemove
     *           The number of bytes to remove at the given {@link IMediumReference}. Must be bigger than 0.
@@ -327,7 +329,7 @@ public interface IMediumStore {
     * 
     * @param reference
     *           The {@link IMediumReference} at which to replace the data. Must point to the {@link IMedium} this
-    *           {@link IMediumStore} works on. Must not exceed the {@link IMedium}'s length as returned by
+    *           {@link IMediumStore_OLD} works on. Must not exceed the {@link IMedium}'s length as returned by
     *           {@link IMedium#getCurrentLength()}.
     * @param byteCountToReplace
     *           The number of bytes to replace at the given {@link IMediumReference}. Must be bigger than 0.

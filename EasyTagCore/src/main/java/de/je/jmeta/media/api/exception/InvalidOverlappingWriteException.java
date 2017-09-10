@@ -9,7 +9,7 @@
  */
 package de.je.jmeta.media.api.exception;
 
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
@@ -17,9 +17,9 @@ import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link InvalidOverlappingWriteException} is thrown whenever one of the operations
- * {@link IMediumStore#replaceData(de.je.jmeta.media.api.IMediumReference, int, java.nio.ByteBuffer)} or
- * {@link IMediumStore#removeData(de.je.jmeta.media.api.IMediumReference, int)} is invoked before a
- * {@link IMediumStore#flush()}, and the operation overlaps with a previous remove or replace operation.
+ * {@link IMediumStore_OLD#replaceData(de.je.jmeta.media.api.IMediumReference, int, java.nio.ByteBuffer)} or
+ * {@link IMediumStore_OLD#removeData(de.je.jmeta.media.api.IMediumReference, int)} is invoked before a
+ * {@link IMediumStore_OLD#flush()}, and the operation overlaps with a previous remove or replace operation.
  */
 public class InvalidOverlappingWriteException extends RuntimeException {
 

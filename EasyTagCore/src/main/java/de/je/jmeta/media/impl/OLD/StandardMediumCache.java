@@ -7,7 +7,7 @@
  * @date 17.01.2011
  */
 
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.impl.OLD;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -21,6 +21,8 @@ import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumRegion;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
+import de.je.jmeta.media.impl.IMediumAccessor;
+import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
@@ -64,7 +66,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#close()
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#close()
     */
    @Override
    public void close() {
@@ -75,7 +77,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#createMediumReference(long)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#createMediumReference(long)
     */
    @Override
    public IMediumReference createMediumReference(long absoluteMediumOffset) {
@@ -85,7 +87,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#discard(IMediumReference, long)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#discard(IMediumReference, long)
     */
    @Override
    public void discard(IMediumReference startReference, long size) {
@@ -144,7 +146,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#flush()
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#flush()
     */
    @Override
    public void flush() {
@@ -153,7 +155,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#getData(de.je.jmeta.media.api.IMediumReference, int)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#getData(de.je.jmeta.media.api.IMediumReference, int)
     */
    @Override
    public synchronized ByteBuffer getData(IMediumReference reference,
@@ -213,7 +215,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#getMedium()
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#getMedium()
     */
    @Override
    public IMedium<?> getMedium() {
@@ -222,7 +224,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#getBufferedByteCountAt(IMediumReference)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#getBufferedByteCountAt(IMediumReference)
     */
    @Override
    public synchronized long getBufferedByteCountAt(IMediumReference reference) {
@@ -253,7 +255,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.impl.IMediumCache#getBufferedRegions()
+    * @see de.je.jmeta.media.impl.OLD.IMediumCache#getBufferedRegions()
     */
    @Override
    public Map<IMediumReference, Integer> getBufferedRegions() {
@@ -272,7 +274,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#insertData(de.je.jmeta.media.api.IMediumReference, java.nio.ByteBuffer)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#insertData(de.je.jmeta.media.api.IMediumReference, java.nio.ByteBuffer)
     */
    @Override
    public MediumAction insertData(IMediumReference reference,
@@ -284,7 +286,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#isAtEndOfMedium(de.je.jmeta.media.api.IMediumReference)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#isAtEndOfMedium(de.je.jmeta.media.api.IMediumReference)
     */
    @Override
    public boolean isAtEndOfMedium(IMediumReference reference) {
@@ -293,7 +295,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#isOpened()
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#isOpened()
     */
    @Override
    public boolean isOpened() {
@@ -302,7 +304,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#buffer(IMediumReference, long)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#buffer(IMediumReference, long)
     */
    @Override
    public synchronized void buffer(IMediumReference cacheReference, long size)
@@ -398,7 +400,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#removeData(de.je.jmeta.media.api.IMediumReference, int)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#removeData(de.je.jmeta.media.api.IMediumReference, int)
     */
    @Override
    public MediumAction removeData(IMediumReference reference,
@@ -409,7 +411,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#replaceData(de.je.jmeta.media.api.IMediumReference, int,
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#replaceData(de.je.jmeta.media.api.IMediumReference, int,
     *      java.nio.ByteBuffer)
     */
    @Override
@@ -421,7 +423,7 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.IMediumStore#undo(de.je.jmeta.media.api.datatype.MediumAction)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#undo(de.je.jmeta.media.api.datatype.MediumAction)
     */
    @Override
    public void undo(MediumAction handle) {

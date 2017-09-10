@@ -9,13 +9,13 @@
 package de.je.jmeta.media.api.exception;
 
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.IMediumStore;
+import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
- * {@link ReadTimedOutException} is thrown whenever a call to {@link IMediumStore#buffer(IMediumReference, long)} or
- * {@link IMediumStore#getData(IMediumReference, int)} has prematurely timed out.
+ * {@link ReadTimedOutException} is thrown whenever a call to {@link IMediumStore_OLD#buffer(IMediumReference, long)} or
+ * {@link IMediumStore_OLD#getData(IMediumReference, int)} has prematurely timed out.
  */
 public class ReadTimedOutException extends MediumAccessException {
 
