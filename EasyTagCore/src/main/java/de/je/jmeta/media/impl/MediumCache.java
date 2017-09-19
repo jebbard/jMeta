@@ -1,14 +1,17 @@
 package de.je.jmeta.media.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.impl.OLD.MediumReferenceComparator;
 import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
@@ -35,8 +38,10 @@ public class MediumCache {
    private final int maximumCacheRegionSizeInBytes;
    private final IMedium<?> medium;
 
-   private final Map<IMediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>();
+   private final TreeMap<IMediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(new MediumReferenceComparator());
    private final List<MediumRegion> cachedRegionsInInsertOrder = new LinkedList<>();
+   
+   private long currentCacheSizeInBytes = 0L;
 
    /**
     * This constructor initializes the cache with {@link #UNLIMITED_CACHE_SIZE} as maximum cache size and
@@ -99,8 +104,7 @@ public class MediumCache {
     * @return the current cache size in bytes
     */
    public long getCurrentCacheSizeInBytes() {
-      // TODO implement
-      return 0L;
+      return currentCacheSizeInBytes;
    }
 
    /**
@@ -108,7 +112,7 @@ public class MediumCache {
     *         {@link IMediumReference} ascending. If there are none currently, returns an empty {@link List}.
     */
    public List<MediumRegion> getAllCachedRegions() {
-      return new ArrayList<>(cachedRegionsInInsertOrder);
+      return new ArrayList<>(cachedRegionsInOffsetOrder.values());
    }
 
    /**
@@ -139,11 +143,16 @@ public class MediumCache {
     *           The starting {@link IMediumReference} of the range. Must refer to the same {@link IMedium} as returned
     *           by {@link #getMedium()}.
     * @param rangeSizeInBytes
-    *           The size of the range in bytes. Must not be negative.
+    *           The size of the range in bytes. Must not be negative and must not be zero.
     * @return {@link MediumRegion}s covering the whole range specified as input parameters. For details see the method
     *         description above.
     */
    public List<MediumRegion> getRegionsInRange(IMediumReference startReference, int rangeSizeInBytes) {
+
+	      Reject.ifNull(startReference, "startReference");
+	      IMediumReference.validateSameMedium(startReference, getMedium());
+	      Reject.ifTrue(rangeSizeInBytes <= 0, "The range size must be strictly bigger than zero");
+	   
       // TODO implement
       return getAllCachedRegions();
    }
@@ -160,8 +169,41 @@ public class MediumCache {
     *         details see the method description above.
     */
    public long getCachedByteCountAt(IMediumReference startReference) {
-      // TODO implement
-      return 0L;
+
+	      Reject.ifNull(startReference, "startReference");
+	      IMediumReference.validateSameMedium(startReference, getMedium());
+	   
+		   long totalCachedByteCount = 0L;
+		   
+	   IMediumReference previousOrEqualReference = cachedRegionsInOffsetOrder.floorKey(startReference);
+	   
+	   if (previousOrEqualReference != null) {
+		   MediumRegion previousRegion = cachedRegionsInOffsetOrder.get(previousOrEqualReference);
+		   
+		   if (previousRegion.contains(startReference)) {
+			   totalCachedByteCount += previousRegion.getSize() - startReference.distanceTo(previousRegion.getStartReference());
+			   
+			    Map<IMediumReference, MediumRegion> tailRegions = cachedRegionsInOffsetOrder.tailMap(startReference, false);
+			    
+			    for (Iterator<IMediumReference> iterator = tailRegions.keySet().iterator(); iterator
+						.hasNext();) {
+			    	IMediumReference nextReference = iterator.next();
+			    	
+			    	MediumRegion nextRegion = tailRegions.get(nextReference);
+			    	
+			    	// Consecutive region
+			    	if (nextRegion.getStartReference().equals(previousRegion.calculateEndReference())) {
+			    		totalCachedByteCount += nextRegion.getSize();
+			    	} else {
+			    		break;
+			    	}
+					
+			    	previousRegion = nextRegion;
+				}
+		   }
+	   }
+
+	   return totalCachedByteCount;
    }
 
    /**
@@ -186,6 +228,8 @@ public class MediumCache {
    public void addRegion(MediumRegion region) {
       // TODO implement
       cachedRegionsInInsertOrder.add(region);
+      cachedRegionsInOffsetOrder.put(region.getStartReference(), region);
+      currentCacheSizeInBytes += region.getSize();
    }
 
    /**
@@ -193,7 +237,8 @@ public class MediumCache {
     * emptying the cache.
     */
    public void clear() {
-      // TODO implement
       cachedRegionsInInsertOrder.clear();
+      cachedRegionsInOffsetOrder.clear();
+      currentCacheSizeInBytes = 0;
    }
 }
