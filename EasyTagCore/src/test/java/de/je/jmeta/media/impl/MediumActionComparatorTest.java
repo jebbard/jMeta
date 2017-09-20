@@ -20,7 +20,7 @@ import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
-import de.je.util.javautil.common.err.PreconditionException;
+import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 
 /**
  * {@link MediumActionComparatorTest} tests the class {@link MediumActionComparator}.
@@ -135,7 +135,7 @@ public class MediumActionComparatorTest {
    /**
     * Tests {@link MediumActionComparator#compare(MediumAction, MediumAction)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void compare_forMediumActionsWithDifferentMedium_throwsException() {
 
       MediumActionComparator comparator = new MediumActionComparator();

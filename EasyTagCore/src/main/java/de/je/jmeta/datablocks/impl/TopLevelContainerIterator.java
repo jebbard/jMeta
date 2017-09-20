@@ -29,7 +29,6 @@ import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 // TODO stage2_002: Implement timeout when reading from stream-based medium
@@ -84,7 +83,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
    @Override
    public IContainer next() {
 
-      Contract.checkPrecondition(hasNext(), "hasNext() must return true to be able to call this" + "method");
+	   Reject.ifFalse(hasNext(), "hasNext()");
 
       DataFormat dataFormat = identifyDataFormat(m_currentReference);
 

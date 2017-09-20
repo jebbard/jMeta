@@ -11,6 +11,7 @@ package de.je.jmeta.defext.datablocks.impl.mp3;
 import java.io.File;
 
 import de.je.jmeta.defext.datablocks.impl.AbstractDataBlockAccessorDefaultExtensionTest;
+import de.je.jmeta.defext.datablocks.impl.ogg.OggSingleFileTest_01;
 import de.je.util.javautil.testUtil.resource.TestResourceHelper;
 
 /**

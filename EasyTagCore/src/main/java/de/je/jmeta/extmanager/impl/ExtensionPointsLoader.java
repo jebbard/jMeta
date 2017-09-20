@@ -14,7 +14,7 @@ import java.util.List;
 
 import de.je.jmeta.extmanager.impl.jaxb.extpoints.ExtensionPointType;
 import de.je.jmeta.extmanager.impl.jaxb.extpoints.ExtensionPointsConfigurationType;
-import de.je.util.javautil.common.err.Contract;
+import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.xml.jaxbloader.AbstractJAXBLoader;
 
 /**
@@ -41,7 +41,7 @@ public class ExtensionPointsLoader
     */
    public List<String> getExtensionBundleSearchPaths() {
 
-      Contract.checkPrecondition(isLoaded(), "isLoaded() was false");
+	  Reject.ifFalse(isLoaded(), "isLoaded()");
 
       return getRootObject().getExtensionBundleSearchPath().getPath();
    }
@@ -55,7 +55,7 @@ public class ExtensionPointsLoader
     */
    public List<ExtensionPointType> getExtensionPointDescriptions() {
 
-      Contract.checkPrecondition(isLoaded(), "isLoaded() was false");
+	  Reject.ifFalse(isLoaded(), "isLoaded()");
 
       return getRootObject().getExtensionPoints().getExtensionPoint();
    }

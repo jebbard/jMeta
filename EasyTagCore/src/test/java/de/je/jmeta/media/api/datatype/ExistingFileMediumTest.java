@@ -13,7 +13,6 @@ import java.io.File;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.MediaTestCaseConstants;
-import de.je.jmeta.media.api.datatype.FileMedium;
 
 /**
  * {@link ExistingFileMediumTest} tests the {@link FileMedium} class with an existing file.

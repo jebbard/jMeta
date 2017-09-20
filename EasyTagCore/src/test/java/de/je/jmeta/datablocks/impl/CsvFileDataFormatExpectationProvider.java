@@ -36,7 +36,6 @@ import de.je.jmeta.dataformats.PhysicalDataBlockType;
 import de.je.util.javautil.common.array.EnhancedArrays;
 import de.je.util.javautil.common.array.InvalidArrayStringFormatException;
 import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.FlagSpecification;
 import de.je.util.javautil.common.flags.Flags;
@@ -122,10 +121,10 @@ public class CsvFileDataFormatExpectationProvider
       super(repository, testFile);
 
       Reject.ifNull(expectedDataCsvFile, "csvFile");
-      Contract.checkPrecondition(expectedDataCsvFile.exists(),
-         "csvFile.exists() was false");
-      Contract.checkPrecondition(expectedDataCsvFile.isFile(),
-         "csvFile.isFile() was false");
+      Reject.ifFalse(expectedDataCsvFile.exists(),
+         "expectedDataCsvFile.exists()");
+      Reject.ifFalse(expectedDataCsvFile.isFile(),
+         "expectedDataCsvFile.isFile()");
 
       try {
          List<Map<String, String>> csvRows = loadCsvFileContents(

@@ -11,7 +11,6 @@ package de.je.jmeta.dataformats;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -49,7 +48,7 @@ public class BinaryValue {
 
    private int getFragmentIndexForOffset(long absoluteOffset) {
 
-      Contract.checkPrecondition(absoluteOffset < getTotalSize(),
+	  Reject.ifFalse(absoluteOffset < getTotalSize(),
          "absoluteOffset < getTotalSize()");
 
       return (int) absoluteOffset / m_maxFragmentSize;
@@ -61,7 +60,7 @@ public class BinaryValue {
     */
    public byte[] getFragment(int fragmentNr) {
 
-      Contract.checkPrecondition(fragmentNr < getFragmentCount(),
+	  Reject.ifFalse(fragmentNr < getFragmentCount(),
          "fragmentNr < getFragmentCount()");
 
       return m_buffer[fragmentNr];
@@ -240,8 +239,8 @@ public class BinaryValue {
     */
    public byte[] getBytes(long offset, int size) {
 
-      Contract.checkPrecondition(offset + size <= getTotalSize(),
-         "offset + size <= getTotalSize() was false");
+      Reject.ifFalse(offset + size <= getTotalSize(),
+         "offset + size <= getTotalSize()");
 
       byte[] returnedBytes = new byte[size];
 

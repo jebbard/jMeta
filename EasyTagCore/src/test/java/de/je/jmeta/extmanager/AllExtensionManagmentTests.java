@@ -17,6 +17,7 @@ import de.je.jmeta.extmanager.impl.ExtensionBundleJarAndFileWithBasePathTest;
 import de.je.jmeta.extmanager.impl.ExtensionBundleJarNoBasePathTest;
 import de.je.jmeta.extmanager.impl.ExtensionBundleNegativeTest;
 import de.je.jmeta.extmanager.impl.ExtensionManagerNegativeTest;
+import de.je.util.javautil.AllUtilityTests;
 
 /**
  * {@link AllExtensionManagmentTests} is used for running all test cases of the extension management component.

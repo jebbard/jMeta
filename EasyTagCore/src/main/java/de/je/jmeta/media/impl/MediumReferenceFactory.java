@@ -18,7 +18,6 @@ import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -100,18 +99,15 @@ public class MediumReferenceFactory {
 
       Reject.ifNull(action, "action");
 
-      Contract.checkPrecondition(
-         action.getActionType() == MediumActionType.INSERT || action.getActionType() == MediumActionType.REMOVE
-            || action.getActionType() == MediumActionType.REPLACE,
-         "Only " + MediumActionType.class.getSimpleName() + MediumActionType.REMOVE.toString() + ", "
-            + MediumActionType.class.getSimpleName() + MediumActionType.REPLACE.toString() + " and "
-            + MediumActionType.class.getSimpleName() + MediumActionType.INSERT.toString() + " are allowed"
-
-      );
+      Reject.ifTrue(
+         action.getActionType() != MediumActionType.INSERT && action.getActionType() != MediumActionType.REMOVE
+            && action.getActionType() != MediumActionType.REPLACE,
+         "action.getActionType() != MediumActionType.INSERT && action.getActionType() != MediumActionType.REMOVE && action.getActionType() != MediumActionType.REPLACE");
 
       IMediumReference startReference = action.getRegion().getStartReference();
 
-      IMediumReference.validateSameMedium(startReference, getMedium());
+      Reject.ifFalse(startReference.getMedium().equals(getMedium()),
+	   	         "startReference.getMedium().equals(getMedium())");
 
       boolean insertingReplace = false;
       boolean removingReplace = false;
@@ -190,7 +186,8 @@ public class MediumReferenceFactory {
    public List<IMediumReference> getAllReferencesInRegion(MediumRegion region) {
 
       Reject.ifNull(region, "region");
-      IMediumReference.validateSameMedium(region.getStartReference(), getMedium());
+      Reject.ifFalse(region.getStartReference().getMedium().equals(getMedium()),
+	   	         "region.getStartReference().getMedium().equals(getMedium())");
 
       List<IMediumReference> allReferencesInRegion = new ArrayList<>();
 
@@ -215,7 +212,8 @@ public class MediumReferenceFactory {
    public List<IMediumReference> getAllReferencesBehindOrEqual(IMediumReference reference) {
 
       Reject.ifNull(reference, "reference");
-      IMediumReference.validateSameMedium(reference, getMedium());
+      Reject.ifFalse(reference.getMedium().equals(getMedium()),
+	   	         "reference.getMedium().equals(getMedium())");
 
       List<IMediumReference> allReferencesBehindOrEqual = new ArrayList<>();
 

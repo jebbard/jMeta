@@ -28,7 +28,6 @@ import de.je.jmeta.extmanager.export.BundleType;
 import de.je.jmeta.extmanager.export.IExtensionBundle;
 import de.je.jmeta.extmanager.export.IExtensionManager;
 import de.je.jmeta.extmanager.export.InvalidExtensionException;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.simpleregistry.AbstractComponentImplementation;
 import de.je.util.javautil.simpleregistry.ComponentDescription;
@@ -169,7 +168,7 @@ public class StandardDataFormatRepository extends AbstractComponentImplementatio
    public IDataFormatSpecification getDataFormatSpecification(DataFormat dataFormat) {
 
       Reject.ifNull(dataFormat, "dataFormat");
-      Contract.checkPrecondition(getSupportedDataFormats().contains(dataFormat),
+      Reject.ifFalse(getSupportedDataFormats().contains(dataFormat),
          "getSupportedDataFormats().contains(dataFormat)");
 
       return m_dataFormatMap.get(dataFormat);

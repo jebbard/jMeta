@@ -28,7 +28,6 @@ import de.je.jmeta.dataformats.DataFormat;
 import de.je.jmeta.dataformats.DataTransformationType;
 import de.je.jmeta.dataformats.IDataFormatSpecification;
 import de.je.jmeta.dataformats.LocationProperties;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -88,8 +87,8 @@ public class StandardDataFormatSpecification
    public DataBlockDescription getDataBlockDescription(DataBlockId id) {
 
       Reject.ifNull(id, "id");
-      Contract.checkPrecondition(specifiesBlockWithId(id),
-         "specifiesBlockWithId(id) for " + id);
+      Reject.ifFalse(specifiesBlockWithId(id),
+         "specifiesBlockWithId(id)");
 
       // The requested id is an unspecified id that must match a generic id
       if (!m_dataBlockDescriptions.containsKey(id)) {
@@ -230,8 +229,8 @@ public class StandardDataFormatSpecification
    @Override
    public boolean isGeneric(DataBlockId id) {
 
-      Contract.checkPrecondition(specifiesBlockWithId(id),
-         "Given id must be specified by this specification");
+	  Reject.ifFalse(specifiesBlockWithId(id),
+         "specifiesBlockWithId(id)");
 
       return m_genericDataBlocks.containsKey(id);
    }

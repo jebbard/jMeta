@@ -11,6 +11,7 @@ package de.je.jmeta.defext.datablocks.impl.lyrics3v2;
 import java.io.File;
 
 import de.je.jmeta.defext.datablocks.impl.AbstractDataBlockAccessorDefaultExtensionTest;
+import de.je.jmeta.defext.datablocks.impl.multi.MultiFileTest_01_TypicalMP3;
 import de.je.util.javautil.testUtil.resource.TestResourceHelper;
 
 /**

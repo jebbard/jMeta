@@ -18,7 +18,7 @@ import de.je.jmeta.extmanager.export.IExtensionBundle;
 import de.je.jmeta.extmanager.impl.jaxb.extbundles.BundlePropertiesType;
 import de.je.jmeta.extmanager.impl.jaxb.extbundles.ExtensionBundleType;
 import de.je.jmeta.extmanager.impl.jaxb.extbundles.ExtensionType;
-import de.je.util.javautil.common.err.Contract;
+import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.xml.jaxbloader.AbstractJAXBLoader;
 
 /**
@@ -45,7 +45,7 @@ public class ExtensionBundleLoader
     */
    public String getBundleName() {
 
-      Contract.checkPrecondition(isLoaded(), "isLoaded() was false");
+	  Reject.ifFalse(isLoaded(), "isLoaded()");
 
       return getRootObject().getName();
    }
@@ -59,7 +59,7 @@ public class ExtensionBundleLoader
     */
    public ExtensionBundleDescription getBundleDescription() {
 
-      Contract.checkPrecondition(isLoaded(), "isLoaded() was false");
+	  Reject.ifFalse(isLoaded(), "isLoaded()");
 
       return convertToBundleDescription(getRootObject().getBundleProperties());
    }
@@ -73,7 +73,7 @@ public class ExtensionBundleLoader
     */
    public List<ExtensionType> getExtensionDescriptions() {
 
-      Contract.checkPrecondition(isLoaded(), "isLoaded() was false");
+	  Reject.ifFalse(isLoaded(), "isLoaded()");
 
       return getRootObject().getBundledExtensions().getExtension();
    }

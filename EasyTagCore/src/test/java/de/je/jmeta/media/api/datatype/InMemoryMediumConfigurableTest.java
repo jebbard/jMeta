@@ -12,7 +12,6 @@ package de.je.jmeta.media.api.datatype;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.je.jmeta.media.api.datatype.InMemoryMedium;
 import de.je.util.javautil.common.configparams.AbstractConfigParam;
 import de.je.util.javautil.common.configparams.AbstractConfigurableTest;
 import de.je.util.javautil.common.configparams.EmptyEnum;

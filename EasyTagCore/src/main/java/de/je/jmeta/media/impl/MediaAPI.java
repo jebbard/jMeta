@@ -23,7 +23,6 @@ import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.jmeta.media.api.exception.MediumAccessException;
 import de.je.jmeta.media.impl.OLD.IMediumCache;
 import de.je.jmeta.media.impl.OLD.StandardMediumCache;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.simpleregistry.AbstractComponentImplementation;
 import de.je.util.javautil.simpleregistry.ComponentDescription;
@@ -67,11 +66,9 @@ public class MediaAPI extends AbstractComponentImplementation<IMediaAPI>
 
       Reject.ifNull(medium, "medium");
 
-      Contract.checkPrecondition(
+      Reject.ifFalse(
          SUPORTED_MEDIA_CLASSES.contains(medium.getClass()),
-         "The given medium <" + medium
-            + "> does not have one of the supported media types: <"
-            + SUPORTED_MEDIA_CLASSES + ">.");
+         "SUPORTED_MEDIA_CLASSES.contains(medium.getClass())");
 
       if (!medium.exists())
          throw new MediumAccessException(

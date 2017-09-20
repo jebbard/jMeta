@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +25,6 @@ import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.impl.StandardMediumReference;
-import de.je.jmeta.media.impl.OLD.IMediumCache;
-import junit.framework.Assert;
 
 /**
  * {@link IMediumCacheTest} tests the {@link IMediumCache} interface.

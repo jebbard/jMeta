@@ -9,7 +9,6 @@ package de.je.jmeta.dataformats;
 
 import java.nio.ByteBuffer;
 
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -48,12 +47,12 @@ public class MagicKey {
       Reject.ifNull(headerBlockId, "headerBlockId");
       Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0,
          "The offset from start of header or footer must be >= 0.");
-      Contract.checkPrecondition(bitLength > 0,
-         "The bit length must be bigger than 0.");
-      Contract.checkPrecondition(bitLength <= magicKeyBytes.length * Byte.SIZE,
-         "The bit length must not be bigger than length of the magic key bytes * sizeof(Byte)");
-      Contract.checkPrecondition(offsetForBackwardReading <= 0,
-         "The backward reading offset must be <= 0.");
+      Reject.ifNegativeOrZero(bitLength,
+         "bitLength");
+      Reject.ifFalse(bitLength <= magicKeyBytes.length * Byte.SIZE,
+         "bitLength <= magicKeyBytes.length * Byte.SIZE");
+      Reject.ifFalse(offsetForBackwardReading <= 0,
+         "offsetForBackwardReading <= 0");
 
       m_magicKeyBytes = magicKeyBytes.clone();
       m_bitLength = bitLength;
@@ -87,8 +86,8 @@ public class MagicKey {
       Reject.ifTrue(bitLength < 1, "The bit length must be bigger than 0.");
       Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0,
          "The offset from start of header or footer must be >= 0.");
-      Contract.checkPrecondition(bitLength <= exclusionBytes.length * Byte.SIZE,
-         "The bit length must not be bigger than length of the exclusion bytes * sizeof(Byte)");
+      Reject.ifFalse(bitLength <= exclusionBytes.length * Byte.SIZE,
+         "bitLength <= exclusionBytes.length * Byte.SIZE");
 
       m_magicKeyBytes = null;
       m_bitLength = bitLength;
@@ -104,8 +103,8 @@ public class MagicKey {
     */
    public byte[] getMagicKeyBytes() {
 
-      Contract.checkPrecondition(!isExclusionKey(),
-         "isExclusionKey() was true");
+	  Reject.ifTrue(isExclusionKey(),
+         "isExclusionKey()");
 
       return m_magicKeyBytes.clone();
    }
@@ -117,8 +116,8 @@ public class MagicKey {
     */
    public byte[] getExclusionBytes() {
 
-      Contract.checkPrecondition(isExclusionKey(),
-         "isExclusionKey() was false");
+	   Reject.ifFalse(isExclusionKey(),
+         "isExclusionKey()");
 
       return m_exclusionBytes.clone();
    }

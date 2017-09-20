@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.After;
 import org.junit.Before;
 
@@ -30,7 +32,6 @@ import de.je.util.javautil.io.stream.NamedInputStream;
 import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
 import de.je.util.javautil.simpleregistry.SimpleComponentRegistry;
 import de.je.util.javautil.testUtil.setup.TestDataException;
-import junit.framework.AssertionFailedError;
 
 /**
  * {@link JMetaTestBasics} provides static methods to be used by most of the jMeta integration test cases for

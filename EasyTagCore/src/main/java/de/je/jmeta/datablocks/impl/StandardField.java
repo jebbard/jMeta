@@ -19,7 +19,6 @@ import de.je.jmeta.dataformats.DataBlockDescription;
 import de.je.jmeta.dataformats.DataBlockId;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.AbstractMedium;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 // TODO writeTests001: Test failing conversion when Enum interpr. value is unknown
@@ -69,8 +68,8 @@ public class StandardField<T> implements IField<T> {
    public void initByteOrder(ByteOrder byteOrder) {
 
       Reject.ifNull(byteOrder, "byteOrder");
-      Contract.checkPrecondition(m_byteOrder == null,
-         "Byte order was already inited.");
+      Reject.ifFalse(m_byteOrder == null,
+         "m_byteOrder == null");
 
       m_byteOrder = byteOrder;
    }
@@ -81,8 +80,8 @@ public class StandardField<T> implements IField<T> {
    public void initCharacterEncoding(Charset characterEncoding) {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
-      Contract.checkPrecondition(m_characterEncoding == null,
-         "Character encoding was already inited.");
+      Reject.ifFalse(m_characterEncoding == null,
+    	         "m_characterEncoding == null");
 
       m_characterEncoding = characterEncoding;
    }
@@ -135,11 +134,10 @@ public class StandardField<T> implements IField<T> {
     */
    @Override
    public byte[] getBytes(long offset, int size) {
-
-      Contract.checkPrecondition(offset >= 0, "offset >= 0");
-      Contract.checkPrecondition(size >= 0, "size >= 0");
-      Contract.checkPrecondition(offset + size <= getTotalSize(),
-         "offset + size <= getTotalSize()");
+      Reject.ifNegative(offset, "offset");
+      Reject.ifNegative(size, "size");
+   	  Reject.ifFalse(offset + size <= getTotalSize(),
+            "offset + size <= getTotalSize()");
 
       byte[] byteValue = new byte[size];
 
@@ -210,8 +208,7 @@ public class StandardField<T> implements IField<T> {
    public void initParent(IDataBlock parent) {
 
       Reject.ifNull(parent, "parent");
-      Contract.checkPrecondition(getParent() == null,
-         "The data block already has a parent");
+      Reject.ifFalse(getParent() == null, "getParent() == null");
 
       m_parent = parent;
    }

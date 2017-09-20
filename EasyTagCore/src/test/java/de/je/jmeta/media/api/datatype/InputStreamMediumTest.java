@@ -13,7 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.datatype.InputStreamMedium;
 
 /**
  * {@link InputStreamMediumTest} tests the {@link InputStreamMedium} class.

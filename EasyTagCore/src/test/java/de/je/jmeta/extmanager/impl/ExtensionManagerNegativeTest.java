@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.je.jmeta.extmanager.export.AbstractExtensionManagementTest;
@@ -22,7 +24,6 @@ import de.je.jmeta.extmanager.export.IExtensionManager;
 import de.je.jmeta.extmanager.export.IExtensionPoint;
 import de.je.util.javautil.io.stream.NamedInputStream;
 import de.je.util.javautil.testUtil.resource.TestResourceHelper;
-import junit.framework.Assert;
 
 /**
  * {@link ExtensionManagerNegativeTest} tests the {@link StandardExtensionManager} class for behavior in case of wrong

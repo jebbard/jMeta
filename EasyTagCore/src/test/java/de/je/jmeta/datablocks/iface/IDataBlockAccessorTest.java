@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +30,6 @@ import de.je.jmeta.media.api.datatype.AbstractMedium;
 import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
 import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
 import de.je.util.javautil.testUtil.setup.TestDataException;
-import junit.framework.Assert;
 
 // TODO doItFirst005: write test case for "out of order" reading
 // TODO doItFirst004: make ogg test case

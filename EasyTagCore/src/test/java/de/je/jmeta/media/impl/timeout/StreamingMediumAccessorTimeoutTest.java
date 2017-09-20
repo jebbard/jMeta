@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.je.jmeta.media.api.datatype.InputStreamMedium;
@@ -21,7 +23,6 @@ import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.jmeta.media.impl.StreamMediumAccessor;
-import junit.framework.Assert;
 
 /**
  * {@link StreamingMediumAccessorTimeoutTest} tests the {@link StreamMediumAccessor} class regarding timeout aspects.

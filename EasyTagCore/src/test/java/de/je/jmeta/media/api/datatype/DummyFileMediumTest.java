@@ -12,7 +12,6 @@ package de.je.jmeta.media.api.datatype;
 import java.io.File;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.datatype.FileMedium;
 
 /**
  * {@link DummyFileMediumTest} tests the {@link FileMedium} class with a non-existing dummy file.

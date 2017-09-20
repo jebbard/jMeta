@@ -34,6 +34,7 @@ import de.je.jmeta.media.impl.StreamingMediumAccessorTest;
 import de.je.jmeta.media.impl.OLD.BlockWiseFileMediumCacheTest;
 import de.je.jmeta.media.impl.OLD.FileMediumCacheTest;
 import de.je.jmeta.media.impl.timeout.StreamingMediumAccessorTimeoutTest;
+import de.je.util.javautil.AllUtilityTests;
 
 /**
  * {@link AllMediaTests} is used for running all test cases of the media component.

@@ -14,11 +14,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import junit.framework.AssertionFailedError;
 import de.je.jmeta.common.ILoggingMessageConstants;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.testUtil.setup.TestDataException;
-import junit.framework.AssertionFailedError;
 
 /**
  * {@link LogUnitTest} provides methods to check a log file for specific contents.
@@ -34,10 +33,10 @@ public class LogUnitTest {
    public void load(File logFile) {
 
       Reject.ifNull(logFile, "logFile");
-      Contract.checkPrecondition(logFile.exists(),
-         "logFile.exists() was false");
-      Contract.checkPrecondition(logFile.isFile(),
-         "logFile.isFile() was false");
+      Reject.ifFalse(logFile.exists(),
+         "logFile.exists()");
+      Reject.ifFalse(logFile.isFile(),
+         "logFile.isFile()");
 
       m_logFileContent = null;
 
@@ -115,7 +114,7 @@ public class LogUnitTest {
    private boolean contains(String pattern) {
 
       Reject.ifNull(pattern, "pattern");
-      Contract.checkPrecondition(isLoaded(), "isLoaded() was false");
+      Reject.ifFalse(isLoaded(), "isLoaded()");
 
       Pattern regexPattern = Pattern.compile(Pattern.quote(pattern));
 

@@ -15,7 +15,6 @@ import java.util.List;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.jmeta.media.impl.IMediumReferenceTest;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;

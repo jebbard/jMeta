@@ -12,8 +12,6 @@ package de.je.jmeta.media.api.datatype;
 import java.io.File;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.datatype.FileMedium;
-import de.je.jmeta.media.api.datatype.InMemoryMedium;
 
 /**
  * {@link DummyMediumCreator}

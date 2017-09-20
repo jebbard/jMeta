@@ -18,7 +18,6 @@ import de.je.jmeta.dataformats.DataBlockDescription;
 import de.je.jmeta.dataformats.PhysicalDataBlockType;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -109,7 +108,7 @@ public class PayloadContainerIterator
    @Override
    public IContainer next() {
 
-      Contract.checkPrecondition(hasNext(), "hasNext() was false");
+	   Reject.ifFalse(hasNext(), "hasNext()");
 
       if (m_parent.getId().getGlobalId().equals("ogg.payload")) {
          System.out.println("OGG payload");

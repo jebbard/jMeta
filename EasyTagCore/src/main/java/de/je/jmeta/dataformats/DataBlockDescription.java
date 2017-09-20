@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.je.jmeta.datablocks.IDataBlock;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -56,8 +55,8 @@ public class DataBlockDescription {
 
       if (minimumByteLength != DataBlockDescription.UNKNOWN_SIZE
          && maximumByteLength != DataBlockDescription.UNKNOWN_SIZE)
-         Contract.checkPrecondition(minimumByteLength <= maximumByteLength,
-            "Minimum byte length must be smaller than or equal to maximum byte length");
+    	  Reject.ifFalse(minimumByteLength <= maximumByteLength,
+            "minimumByteLength <= maximumByteLength");
 
       m_id = id;
       m_name = name;
@@ -149,9 +148,9 @@ public class DataBlockDescription {
    public LocationProperties getLocationPropertiesForParent(
       DataBlockId parentId) {
 
-      Contract.checkPrecondition(
+	  Reject.ifFalse(
          getAllParentsForLocationProperties().contains(parentId),
-         "Must define LocationProperties for parent: " + parentId);
+         "getAllParentsForLocationProperties().contains(parentId)");
 
       return m_locationProperties.get(parentId);
    }

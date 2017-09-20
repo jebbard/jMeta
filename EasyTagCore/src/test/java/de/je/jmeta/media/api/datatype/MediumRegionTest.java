@@ -13,16 +13,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.MediaTestCaseConstants;
-import de.je.jmeta.media.api.datatype.FileMedium;
-import de.je.jmeta.media.api.datatype.InMemoryMedium;
-import de.je.jmeta.media.api.datatype.MediumRegion;
 import de.je.jmeta.media.impl.StandardMediumReference;
-import de.je.util.javautil.common.err.PreconditionException;
-import junit.framework.Assert;
+import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 
 /**
  * {@link MediumRegionTest} tests the {@link MediumRegion} class.
@@ -261,7 +259,7 @@ public class MediumRegionTest {
    /**
     * Tests {@link MediumRegion#discardBytesAtEnd(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void discardBytesAtEnd_forUncachedRegion_throwsException() {
 
       MediumRegion region = createUncachedMediumRegion();
@@ -271,7 +269,7 @@ public class MediumRegionTest {
    /**
     * Tests {@link MediumRegion#discardBytesAtFront(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void discardBytesAtFront_forUncachedRegion_throwsException() {
 
       MediumRegion region = createUncachedMediumRegion();
@@ -281,7 +279,7 @@ public class MediumRegionTest {
    /**
     * Tests {@link MediumRegion#discardBytesAtEnd(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void discardBytesAtEnd_endReference_throwsException() {
 
       final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
@@ -583,7 +581,7 @@ public class MediumRegionTest {
    /**
     * Tests {@link MediumRegion#split(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void split_atInvalidOffsetBefore_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 
@@ -595,7 +593,7 @@ public class MediumRegionTest {
    /**
     * Tests {@link MediumRegion#split(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void split_atInvalidOffsetBehind_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 
@@ -607,7 +605,7 @@ public class MediumRegionTest {
    /**
     * Tests {@link MediumRegion#split(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void split_atStartOffsetOfRegion_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 
@@ -619,7 +617,7 @@ public class MediumRegionTest {
    /**
     * Tests {@link MediumRegion#split(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void split_forInvalidMediumReference_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 

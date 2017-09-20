@@ -53,7 +53,6 @@ import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.AbstractMedium;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 // TODO document001: MagicKey inclusion and exclusion key mechanism
@@ -117,7 +116,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    public void initDataBlockFactory(IExtendedDataBlockFactory dataBlockFactory) {
 
       Reject.ifNull(dataBlockFactory, "dataBlockFactory");
-      Contract.checkPrecondition(m_dataBlockFactory == null, "The data block factory may only be initiated once");
+      Reject.ifFalse(m_dataBlockFactory == null, "m_dataBlockFactory");
 
       m_dataBlockFactory = dataBlockFactory;
 
@@ -187,8 +186,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
-      Contract.checkPrecondition(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount),
-         "hasContainerWithId() must return true in order to call this method");
+      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount),
+         "hasContainerWithId(reference, id, parent, remainingDirectParentByteCount)");
 
       // TODO the actual current charset and byte order must be known here!
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
@@ -288,8 +287,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
-      Contract.checkPrecondition(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount),
-         "hasContainerWithId() must return true in order to call this method");
+      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount),
+         "hasContainerWithId(reference, id, parent, remainingDirectParentByteCount)");
 
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
          m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding());
@@ -439,8 +438,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
       Reject.ifNull(previousHeaders, "previousHeaders");
       Reject.ifNull(headerId, "headerId");
       Reject.ifNull(reference, "reference");
-      Contract.checkPrecondition(m_spec.specifiesBlockWithId(headerId),
-         "Header id " + headerId + " is not specified by the data format " + m_spec.getDataFormat());
+      Reject.ifFalse(m_spec.specifiesBlockWithId(headerId),
+         "m_spec.specifiesBlockWithId(headerId)");
 
       DataBlockDescription headerDesc = m_spec.getDataBlockDescription(headerId);
 
@@ -470,8 +469,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
       Reject.ifNull(previousFooters, "previousFooters");
       Reject.ifNull(footerId, "footerId");
       Reject.ifNull(reference, "reference");
-      Contract.checkPrecondition(m_spec.specifiesBlockWithId(footerId),
-         "Footer id " + footerId + " is not specified by the data format " + m_spec.getDataFormat());
+      Reject.ifFalse(m_spec.specifiesBlockWithId(footerId),
+         "m_spec.specifiesBlockWithId(footerId)");
 
       DataBlockDescription footerDesc = m_spec.getDataBlockDescription(footerId);
 
@@ -720,14 +719,12 @@ public class StandardDataBlockReader implements IDataBlockReader {
    @Override
    public void setTransformationHandler(DataTransformationType transformationType, ITransformationHandler handler) {
 
-      Contract.checkPrecondition(m_transformationsReadOrder.containsKey(transformationType),
-         "Given transformation type " + transformationType + " is not defined by the data format "
-            + m_spec.getDataFormat());
+	   Reject.ifFalse(m_transformationsReadOrder.containsKey(transformationType),
+         "m_transformationsReadOrder.containsKey(transformationType)");
 
       if (handler != null)
-         Contract.checkPrecondition(transformationType.equals(handler.getTransformationType()),
-            "The given data transformation type " + transformationType
-               + " must be equal to the handlers data transformation type " + handler.getTransformationType());
+    	  Reject.ifFalse(transformationType.equals(handler.getTransformationType()),
+            "transformationType.equals(handler.getTransformationType())");
 
       // Set the handler
       if (handler != null)

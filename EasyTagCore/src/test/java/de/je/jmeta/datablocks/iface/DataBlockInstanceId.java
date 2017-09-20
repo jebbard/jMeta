@@ -4,7 +4,6 @@ import de.je.jmeta.datablocks.IDataBlock;
 import de.je.jmeta.dataformats.DataBlockId;
 import de.je.jmeta.dataformats.PhysicalDataBlockType;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -32,9 +31,8 @@ public class DataBlockInstanceId {
    public DataBlockInstanceId(DataBlockId id,
       DataBlockInstanceId parentInstanceId, int sequenceNumber) {
       Reject.ifNull(id, "id");
-      Contract.checkPrecondition(sequenceNumber >= 0,
-         "Sequence numbers must be positive. Given sequence number: "
-            + sequenceNumber);
+      Reject.ifNegative(sequenceNumber,
+         "sequenceNumber");
 
       m_id = id;
       m_parentInstanceId = parentInstanceId;

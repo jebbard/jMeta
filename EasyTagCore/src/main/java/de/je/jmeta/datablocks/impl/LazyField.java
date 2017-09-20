@@ -22,7 +22,6 @@ import de.je.jmeta.dataformats.BinaryValue;
 import de.je.jmeta.dataformats.DataBlockDescription;
 import de.je.jmeta.dataformats.IDataFormatSpecification;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -58,7 +57,7 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
 
       Reject.ifNull(factory, "factory");
       Reject.ifNull(fieldDesc, "fieldDesc");
-      Contract.checkPrecondition(totalSize >= 0, "totalSize >= 0");
+      Reject.ifNegative(totalSize, "totalSize");
 
       m_totalSize = totalSize;
       m_dbFactory = factory;

@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMedium;
@@ -12,10 +14,8 @@ import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.InMemoryMedium;
 import de.je.jmeta.media.api.datatype.MediumRegion;
-import de.je.util.javautil.common.err.Contract;
-import de.je.util.javautil.common.err.PreconditionException;
+import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.common.err.Reject;
-import junit.framework.Assert;
 
 class TestCacheLayout {
 
@@ -33,7 +33,7 @@ class TestCacheLayout {
 
 public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheSize, int maxCacheRegionSize) {
       Reject.ifNull(regionMedium, "regionMedium");
-      Contract.checkPrecondition(startOffset >= 0, "startOffset >= 0 was false");
+      Reject.ifNegative(startOffset, "startOffset");
 
       this.startOffset = startOffset;
       this.regionMedium = regionMedium;
@@ -42,8 +42,8 @@ public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheS
    }
 
    public void addNextRegionInfo(int regionSize, int gapAfterRegion) {
-      Contract.checkPrecondition(regionSize > 0, "regionSize > 0 was false");
-      Contract.checkPrecondition(gapAfterRegion >= 0, "gapAfterRegion >= 0 was false");
+	   Reject.ifNegativeOrZero(regionSize, "regionSize");
+	   Reject.ifNegative(gapAfterRegion, "gapAfterRegion");
 
       regionSizes.add(regionSize);
       gapsAfterRegion.add(gapAfterRegion);
@@ -255,7 +255,7 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     * Tests {@link MediumCache#MediumCache(de.je.jmeta.media.api.IMedium)}, {@link MediumCache#getMedium()},
     * {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void constructor_forMaxCacheSizeSmallerThanMaxRegionSize_throwsException() {
       long maximumCacheSizeInBytes = 10L;
       int maximumCacheRegionSizeInBytes = 20;
@@ -356,7 +356,7 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
    /**
     * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void getCachedByteCountAt_forInvalidReference_throwsException() {
       MediumCache emptyCache = new MediumCache(MEDIUM);
       emptyCache.getCachedByteCountAt(new StandardMediumReference(UNRELATED_MEDIUM, 0L));
@@ -513,7 +513,7 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
    /**
     * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void getRegionsInRange_forInvalidReference_throwsException() {
       MediumCache emptyCache = new MediumCache(MEDIUM);
       emptyCache.getRegionsInRange(new StandardMediumReference(UNRELATED_MEDIUM, 0L), 10);
@@ -522,7 +522,7 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
    /**
     * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
     */
-   @Test(expected = IllegalArgumentException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void getRegionsInRange_forInvalidRangeSize_throwsException() {
       MediumCache emptyCache = new MediumCache(MEDIUM);
       emptyCache.getRegionsInRange(new StandardMediumReference(MEDIUM, 0L), -10);

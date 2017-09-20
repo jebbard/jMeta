@@ -15,7 +15,6 @@ import de.je.jmeta.datablocks.IDataBlock;
 import de.je.jmeta.dataformats.DataBlockDescription;
 import de.je.jmeta.dataformats.DataBlockId;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -58,16 +57,13 @@ public abstract class AbstractDataBlock implements IDataBlock {
    @Override
    public byte[] getBytes(long offset, int size) {
 
-      Contract.checkPrecondition(offset >= 0, "offset must be bigger than 0");
-      Contract.checkPrecondition(size >= 0, "size must be bigger than 0");
-      Contract.checkPrecondition(getMediumReference() != null,
-         "there must be a medium data reference set");
+      Reject.ifNegative(offset, "offset");
+      Reject.ifNegative(size, "size");
+      Reject.ifNull(getMediumReference(), "getMediumReference()");
 
       if (getTotalSize() != DataBlockDescription.UNKNOWN_SIZE)
-         Contract.checkPrecondition(offset + size <= getTotalSize(),
-            "offset + size = <" + (offset + size)
-               + "> must be smaller than getTotalSize() = <" + getTotalSize()
-               + ">.");
+    	  Reject.ifFalse(offset + size <= getTotalSize(),
+            "offset + size <= getTotalSize()");
 
       ByteBuffer readBuffer = getDataBlockReader()
          .readBytes(m_mediumReference.advance(offset), size);
@@ -113,8 +109,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    public void initParent(IDataBlock parent) {
 
       Reject.ifNull(parent, "parent");
-      Contract.checkPrecondition(getParent() == null,
-         "The data block already has a parent");
+      Reject.ifFalse(getParent() == null, "getParent() == null");
 
       m_parent = parent;
    }

@@ -27,7 +27,6 @@ import de.je.jmeta.dataformats.FieldFunction;
 import de.je.jmeta.dataformats.FieldFunctionType;
 import de.je.jmeta.dataformats.FieldProperties;
 import de.je.jmeta.dataformats.PhysicalDataBlockType;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.Flags;
 
@@ -48,8 +47,8 @@ public class FieldFunctionStack {
 
       Reject.ifNull(field, "field");
       Reject.ifNull(desc, "desc");
-      Contract.checkPrecondition(desc.getId().equals(field.getId()),
-         "The given DataBlockDescription must refer to the given field");
+      Reject.ifFalse(desc.getId().equals(field.getId()),
+         "desc.getId().equals(field.getId())");
 
       // CONFIG_CHECK felder müssen immer typ feld haben
       if (!desc.getPhysicalType().equals(PhysicalDataBlockType.FIELD))
@@ -138,7 +137,7 @@ public class FieldFunctionStack {
 
       Reject.ifNull(id, "id");
       Reject.ifNull(functionType, "functionType");
-      Contract.checkPrecondition(hasFieldFunction(id, functionType), "Stack must contain field function");
+      Reject.ifFalse(hasFieldFunction(id, functionType), "hasFieldFunction(id, functionType)");
 
       // Might throw ClassCastException!!
       List<Object> fieldValues = m_fieldFunctionStack.get(id).get(functionType);

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;
 
 /**

@@ -19,7 +19,6 @@ import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
 import de.je.jmeta.media.api.exception.ReadOnlyMediumException;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -141,16 +140,16 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
    public void read(IMediumReference reference, ByteBuffer buffer)
       throws EndOfMediumException {
 
-      Contract.checkPrecondition(isOpened(),
-         MEDIUM_IS_NOT_OPENED + getMedium());
+	  Reject.ifFalse(isOpened(),
+         "isOpened()");
       Reject.ifNull(buffer, "buffer");
       Reject.ifNull(reference, "reference");
-      Contract.checkPrecondition(reference.getMedium().equals(getMedium()),
-         INVALID_REFERENCE);
+      Reject.ifFalse(reference.getMedium().equals(getMedium()),
+    		  "reference.getMedium().equals(getMedium())");
       if (getMedium().isRandomAccess())
-         Contract.checkPrecondition(
+    	  Reject.ifFalse(
             reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
-            "Offset must not exceed current medium length");
+            "reference.getAbsoluteMediumOffset() < medium.getCurrentLength()");
 
       if (buffer.remaining() == 0)
          return;
@@ -175,18 +174,17 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
    @Override
    public void write(IMediumReference reference, ByteBuffer buffer) {
 
-      Contract.checkPrecondition(isOpened(),
-         MEDIUM_IS_NOT_OPENED + getMedium());
+      Reject.ifFalse(isOpened(),
+			         "isOpened()");
       Reject.ifNull(buffer, "buffer");
       Reject.ifNull(reference, "reference");
-      Contract.checkPrecondition(reference.getMedium().equals(getMedium()),
-         INVALID_REFERENCE);
+      Reject.ifFalse(reference.getMedium().equals(getMedium()),
+    		  "reference.getMedium().equals(getMedium())");
+
       if (getMedium().isRandomAccess())
-         Contract.checkPrecondition(
+    	  Reject.ifFalse(
             reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
-            "Given reference " + reference
-               + " points behind current medium length "
-               + medium.getCurrentLength());
+            "reference.getAbsoluteMediumOffset() < medium.getCurrentLength()");
 
       if (medium.isReadOnly())
          throw new ReadOnlyMediumException(medium, null);

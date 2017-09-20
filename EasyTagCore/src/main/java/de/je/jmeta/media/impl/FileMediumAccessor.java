@@ -20,7 +20,7 @@ import de.je.jmeta.media.api.datatype.AbstractMedium;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
-import de.je.util.javautil.common.err.Contract;
+import de.je.util.javautil.common.err.Reject;
 
 /**
  * Represents an {@link IMediumAccessor} that is a physical file with random access.
@@ -80,7 +80,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
       // Check if the file really exists. Because in rw mode RandomAccessFile
       // does simply
       // create a new file, which is not what we want.
-      Contract.checkPrecondition(wrappedfile.exists(), "The given file must exist");
+      Reject.ifFalse(wrappedfile.exists(), "wrappedfile.exists()");
 
       this.file = wrappedfile;
 

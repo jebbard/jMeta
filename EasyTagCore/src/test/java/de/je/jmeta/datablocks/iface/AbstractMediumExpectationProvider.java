@@ -20,7 +20,6 @@ import de.je.jmeta.dataformats.DataFormat;
 import de.je.jmeta.dataformats.IDataFormatRepository;
 import de.je.jmeta.dataformats.IDataFormatSpecification;
 import de.je.jmeta.dataformats.PhysicalDataBlockType;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.io.file.FileUtility;
 import de.je.util.javautil.testUtil.setup.TestDataException;
@@ -51,10 +50,10 @@ public abstract class AbstractMediumExpectationProvider {
 
       Reject.ifNull(testFile, "testFile");
       Reject.ifNull(dataFormatRepository, "dataFormatRepository");
-      Contract.checkPrecondition(testFile.exists(),
-         "testFile.exists() was false");
-      Contract.checkPrecondition(testFile.isFile(),
-         "testFile.isFile() was false");
+      Reject.ifFalse(testFile.exists(),
+         "testFile.exists()");
+      Reject.ifFalse(testFile.isFile(),
+         "testFile.isFile()");
 
       this.dataFormatRepository = dataFormatRepository;
 

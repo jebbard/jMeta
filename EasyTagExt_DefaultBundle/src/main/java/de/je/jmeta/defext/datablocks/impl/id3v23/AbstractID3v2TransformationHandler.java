@@ -6,7 +6,6 @@ import de.je.jmeta.datablocks.IDataBlockFactory;
 import de.je.jmeta.datablocks.IPayload;
 import de.je.jmeta.datablocks.export.AbstractTransformationHandler;
 import de.je.jmeta.dataformats.DataTransformationType;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -36,7 +35,7 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
    public IContainer transform(IContainer container) {
 
       Reject.ifNull(container, "container");
-      Contract.checkPrecondition(requiresTransform(container), "requiresTransform(container)");
+      Reject.ifFalse(requiresTransform(container), "requiresTransform(container)");
 
       IPayload payload = container.getPayload();
 
@@ -62,7 +61,7 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
    public IContainer untransform(IContainer container) {
 
       Reject.ifNull(container, "container");
-      Contract.checkPrecondition(requiresUntransform(container), "requiresUntransform(container)");
+      Reject.ifFalse(requiresUntransform(container), "requiresUntransform(container)");
 
       IPayload payload = container.getPayload();
 

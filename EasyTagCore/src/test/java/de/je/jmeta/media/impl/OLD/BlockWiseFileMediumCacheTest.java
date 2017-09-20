@@ -10,8 +10,6 @@ package de.je.jmeta.media.impl.OLD;
 
 import de.je.jmeta.media.api.datatype.AbstractMedium;
 import de.je.jmeta.media.impl.FileMediumAccessor;
-import de.je.jmeta.media.impl.OLD.IMediumCache;
-import de.je.jmeta.media.impl.OLD.StandardMediumCache;
 
 /**
  * {@link BlockWiseFileMediumCacheTest} tests the {@link StandardMediumCache} with a {@link AbstractMedium}, thereby

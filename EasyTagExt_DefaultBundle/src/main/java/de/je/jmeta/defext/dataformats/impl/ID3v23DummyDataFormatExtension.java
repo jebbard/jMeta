@@ -37,7 +37,6 @@ import de.je.jmeta.dataformats.export.IDataFormatsExtension;
 import de.je.jmeta.dataformats.export.StandardDataFormatSpecification;
 import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
 import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.BitAddress;
 import de.je.util.javautil.common.flags.FlagDescription;
@@ -1085,8 +1084,8 @@ public class ID3v23DummyDataFormatExtension implements IDataFormatsExtension {
       Reject.ifNull(genericId, "genericId");
       Reject.ifNull(descMap, "descMap");
 
-      Contract.checkPrecondition(descMap.containsKey(genericId),
-         "Generic id " + genericId + " must be specified");
+      Reject.ifFalse(descMap.containsKey(genericId),
+         "descMap.containsKey(genericId)");
 
       // Get generic block description
       DataBlockDescription genericDesc = descMap.get(genericId);

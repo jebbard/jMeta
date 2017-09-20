@@ -19,7 +19,7 @@ import de.je.jmeta.media.api.exception.ReadTimedOutException;
 import de.je.jmeta.media.impl.IMediumAccessor;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.jmeta.media.impl.StreamMediumAccessor;
-import de.je.util.javautil.common.err.Contract;
+import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link ManualTimeoutTest} is a manual test for proofing that the timeout facility works, based on {@link System#in}.
@@ -38,10 +38,10 @@ public class ManualTimeoutTest {
    private ManualTimeoutTest(InputStream stream, int timeoutMillis,
       int byteCountToProvide) {
 
-      Contract.checkPrecondition(timeoutMillis > 0, "timeoutMillis > 0");
-      Contract.checkPrecondition(byteCountToProvide > 0,
-         "byteCountToProvide > 0");
-      Contract.checkPrecondition(byteCountToProvide <= 50,
+	  Reject.ifNegativeOrZero(timeoutMillis, "timeoutMillis");
+	  Reject.ifNegativeOrZero(byteCountToProvide,
+         "byteCountToProvide");
+      Reject.ifFalse(byteCountToProvide <= 50,
          "byteCountToProvide <= 50");
 
       m_timeoutMillis = timeoutMillis;

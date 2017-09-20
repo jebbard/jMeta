@@ -1,4 +1,4 @@
-REMOVE at 0 with size 58 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-REMOVE at 58 with size 400 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-REMOVE at 458 with size 1042 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-TRUNCATE at 0 with size 1500 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+REMOVE at 0 with size 58 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+REMOVE at 58 with size 400 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+REMOVE at 458 with size 1042 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+TRUNCATE at 0 with size 1500 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt

@@ -8,10 +8,11 @@
  */
 package de.je.jmeta.media.api.datatype;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMedium;
-import junit.framework.Assert;
 
 /**
  * {@link AbstractIMediumTest} tests the {@link IMedium} interface. It basically only checks that the constructors are

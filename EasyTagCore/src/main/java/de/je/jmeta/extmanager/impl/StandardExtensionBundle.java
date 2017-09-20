@@ -28,7 +28,6 @@ import de.je.jmeta.extmanager.export.InvalidExtensionBundleException;
 import de.je.jmeta.extmanager.export.UnknownExtensionPointException;
 import de.je.jmeta.extmanager.impl.jaxb.extbundles.BundleJarType;
 import de.je.jmeta.extmanager.impl.jaxb.extbundles.ExtensionType;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -60,8 +59,8 @@ public class StandardExtensionBundle implements IExtensionBundle {
       Map<String, Class<? extends IExtensionPoint>> availableExtensionPoints) throws InvalidExtensionBundleException {
       Reject.ifNull(configFile, "configFile");
       Reject.ifNull(availableExtensionPoints, "availableExtensionPoints");
-      Contract.checkPrecondition(configFile.exists(), "configFile.exists()");
-      Contract.checkPrecondition(configFile.isFile(), "configFile.isFile()");
+      Reject.ifFalse(configFile.exists(), "configFile.exists()");
+      Reject.ifFalse(configFile.isFile(), "configFile.isFile()");
 
       m_loader = new ExtensionBundleLoader();
 

@@ -23,7 +23,6 @@ import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
 import de.je.jmeta.media.impl.IMediumAccessor;
 import de.je.jmeta.media.impl.StandardMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -56,10 +55,10 @@ public class StandardMediumCache implements IMediumCache {
       int maxCacheRegionSize) {
 
       Reject.ifNull(accessor, "accessor");
-      Contract.checkPrecondition(maxCacheRegionSize > 0,
-         "maxCacheRegionSize > 0 was false");
-      Contract.checkPrecondition(accessor.isOpened(),
-         "The given accessor must be opened");
+      Reject.ifNegativeOrZero(maxCacheRegionSize,
+         "maxCacheRegionSize");
+      Reject.ifFalse(accessor.isOpened(),
+         "accessor.isOpened()");
 
       m_accessor = accessor;
       m_maxCacheRegionSize = maxCacheRegionSize;
@@ -93,7 +92,7 @@ public class StandardMediumCache implements IMediumCache {
    public void discard(IMediumReference startReference, long size) {
 
       Reject.ifNull(startReference, "startReference");
-      Contract.checkPrecondition(size >= 0, "size must be >= 0");
+      Reject.ifNegative(size, "size");
 
       MediumRegion firstRegion = findContainingRegion(startReference);
 
@@ -162,7 +161,7 @@ public class StandardMediumCache implements IMediumCache {
       int byteCount) {
 
       Reject.ifNull(reference, "reference");
-      Contract.checkPrecondition(byteCount >= 0, "size must be >= 0");
+      Reject.ifNegative(byteCount, "size");
 
       ByteBuffer returnedBuffer = ByteBuffer.allocate(byteCount);
 
@@ -230,8 +229,8 @@ public class StandardMediumCache implements IMediumCache {
    public synchronized long getBufferedByteCountAt(IMediumReference reference) {
 
       Reject.ifNull(reference, "reference");
-      Contract.checkPrecondition(reference.getMedium().equals(getMedium()),
-         "The given reference must refer to the same medium as the start reference specified to the constructor");
+      Reject.ifFalse(reference.getMedium().equals(getMedium()),
+         "reference.getMedium().equals(getMedium())");
 
       MediumRegion region = findContainingRegion(reference);
 
@@ -311,7 +310,7 @@ public class StandardMediumCache implements IMediumCache {
       throws EndOfMediumException {
 
       Reject.ifNull(cacheReference, "reference");
-      Contract.checkPrecondition(size > 0, "size must be > 0");
+      Reject.ifNegativeOrZero(size, "size");
 
       // Return without action if the region is already cached as such
       if (getBufferedByteCountAt(cacheReference) >= size)

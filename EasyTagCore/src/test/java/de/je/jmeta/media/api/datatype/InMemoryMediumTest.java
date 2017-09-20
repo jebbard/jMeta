@@ -10,7 +10,6 @@
 package de.je.jmeta.media.api.datatype;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.datatype.InMemoryMedium;
 
 /**
  * {@link InMemoryMediumTest} tests the {@link InMemoryMedium} class.

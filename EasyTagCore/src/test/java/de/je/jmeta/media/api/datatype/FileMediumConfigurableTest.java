@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.util.javautil.common.configparams.AbstractConfigParam;
 import de.je.util.javautil.common.configparams.AbstractConfigurableTest;
 import de.je.util.javautil.common.configparams.EmptyEnum;

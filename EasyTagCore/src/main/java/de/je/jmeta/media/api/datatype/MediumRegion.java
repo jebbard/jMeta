@@ -12,7 +12,6 @@ import java.nio.ByteBuffer;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -127,10 +126,11 @@ public class MediumRegion {
     */
    public MediumRegion[] split(IMediumReference at) {
       Reject.ifNull(at, "at");
-      IMediumReference.validateSameMedium(at, getStartReference().getMedium());
-      Contract.checkPrecondition(contains(at), "split reference must be contained in this region");
-      Contract.checkPrecondition(getStartReference().before(at),
-         "split reference must not be equal to the start reference of this region");
+      Reject.ifFalse(at.getMedium().equals(getStartReference().getMedium()),
+    	         "at.getMedium().equals(getStartReference().getMedium())");
+      Reject.ifFalse(contains(at), "contains(at)");
+      Reject.ifFalse(getStartReference().before(at),
+         "getStartReference().before(at)");
 
       MediumRegion[] returnedSplitRegions = new MediumRegion[2];
 
@@ -174,7 +174,8 @@ public class MediumRegion {
    public boolean contains(IMediumReference reference) {
 
       Reject.ifNull(reference, "reference");
-      IMediumReference.validateSameMedium(this.getStartReference(), reference.getMedium());
+      Reject.ifFalse(reference.getMedium().equals(getStartReference().getMedium()),
+ 	         "reference.getMedium().equals(getStartReference().getMedium())");
 
       return reference.behindOrEqual(getStartReference()) && reference.before(calculateEndReference());
    }
@@ -190,8 +191,8 @@ public class MediumRegion {
    public void discardBytesAtEnd(IMediumReference newEndReference) {
 
       Reject.ifNull(newEndReference, "newEndReference");
-      Contract.checkPrecondition(contains(newEndReference), "new end reference must be contained in this region");
-      Contract.checkPrecondition(isCached(), "the medium region must be a cached region");
+      Reject.ifFalse(contains(newEndReference), "contains(newEndReference)");
+      Reject.ifFalse(isCached(), "isCached()");
 
       if (newEndReference.equals(calculateEndReference()))
          return;
@@ -218,8 +219,8 @@ public class MediumRegion {
    public void discardBytesAtFront(IMediumReference newStartReference) {
 
       Reject.ifNull(newStartReference, "newStartReference");
-      Contract.checkPrecondition(contains(newStartReference), "new start reference must be contained in region");
-      Contract.checkPrecondition(isCached(), "the medium region must be a cached region");
+      Reject.ifFalse(contains(newStartReference), "contains(newStartReference)");
+      Reject.ifFalse(isCached(), "isCached()");
 
       if (newStartReference.equals(getStartReference()))
          return;
@@ -312,7 +313,8 @@ public class MediumRegion {
     */
    public boolean overlapsOtherRegionAtBack(MediumRegion other) {
       Reject.ifNull(other, "other");
-      IMediumReference.validateSameMedium(this.getStartReference(), other.getStartReference().getMedium());
+      Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
+  	         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();
@@ -385,7 +387,8 @@ public class MediumRegion {
     */
    public boolean overlapsOtherRegionAtFront(MediumRegion other) {
       Reject.ifNull(other, "other");
-      IMediumReference.validateSameMedium(this.getStartReference(), other.getStartReference().getMedium());
+      Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
+   	         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();
@@ -405,7 +408,8 @@ public class MediumRegion {
     */
    public int getOverlappingByteCount(MediumRegion other) {
       Reject.ifNull(other, "other");
-      IMediumReference.validateSameMedium(this.getStartReference(), other.getStartReference().getMedium());
+      Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
+   	         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();

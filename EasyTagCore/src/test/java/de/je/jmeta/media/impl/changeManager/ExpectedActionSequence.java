@@ -14,6 +14,8 @@ import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.Assert;
 
 import de.je.jmeta.media.api.IMediumReference;
@@ -22,7 +24,6 @@ import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
 import de.je.jmeta.media.impl.MediumChangeManager;
 import de.je.util.javautil.common.err.Reject;
-import junit.framework.AssertionFailedError;
 
 /**
  * {@link ExpectedActionSequence} represents a sequence (i.e. possibly multiple ordered) {@link MediumAction}s that are

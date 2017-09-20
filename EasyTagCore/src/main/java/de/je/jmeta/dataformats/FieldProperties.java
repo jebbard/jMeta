@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.je.util.javautil.common.err.Contract;
+import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.FlagSpecification;
 
 /**
@@ -52,9 +52,9 @@ public class FieldProperties<T> {
       // TODO writeConcept001: Is default value a mandatory property for a FieldProperties<> instance?
       // Reject.ifNull(defaultValue, "defaultValue");
 
-      Contract.checkPrecondition(
+	  Reject.ifFalse(
          minimumCharacterLength <= maximumCharacterLength,
-         "Minimum character length must be smaller than or equal to maximum character length");
+         "minimumCharacterLength <= maximumCharacterLength");
 
       m_fieldType = fieldType;
       m_defaultValue = defaultValue;

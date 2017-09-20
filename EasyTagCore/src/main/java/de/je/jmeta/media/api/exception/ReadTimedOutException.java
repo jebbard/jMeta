@@ -10,7 +10,6 @@ package de.je.jmeta.media.api.exception;
 
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -52,10 +51,10 @@ public class ReadTimedOutException extends MediumAccessException {
       super("Read timed out", null);
 
       Reject.ifNull(mediumReference, "mediumReference");
-      Contract.checkPrecondition(bytesRead >= 0, "bytesRead >= 0");
-      Contract.checkPrecondition(byteCountTriedToRead > 0,
-         "byteCountTriedToRead > 0");
-      Contract.checkPrecondition(timeoutMillis >= 0, "timeoutMillis >= 0");
+      Reject.ifNegative(bytesRead, "bytesRead");
+      Reject.ifNegativeOrZero(byteCountTriedToRead,
+         "byteCountTriedToRead");
+      Reject.ifNegative(timeoutMillis, "timeoutMillis");
 
       m_timeoutMillis = timeoutMillis;
       m_bytesReallyRead = bytesRead;

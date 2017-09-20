@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -52,8 +51,8 @@ public class DataBlockId {
     */
    public DataBlockId(DataFormat dataFormat, List<String> segments) {
       Reject.ifNull(segments, "segments");
-      Contract.checkPrecondition(!segments.isEmpty(),
-         "List of segments must at least contain one segment");
+      Reject.ifTrue(segments.isEmpty(),
+         "segments.isEmpty()");
 
       m_idSegments.addAll(segments);
       m_globalId = computeGlobalId(m_idSegments);

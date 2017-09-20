@@ -6,7 +6,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 import de.je.jmeta.media.impl.IMediumAccessor;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -63,7 +62,7 @@ public class BlockedInputStreamSimulator {
          Reject.ifNull(data, "data");
          Reject.ifNull(writeMode, "writeMode");
          Reject.ifNull(outputStream, "outputStream");
-         Contract.checkPrecondition(timeoutMillis > 0, "timeoutMillis > 0");
+         Reject.ifNegativeOrZero(timeoutMillis, "timeoutMillis");
 
          m_data = data;
          m_outputStream = outputStream;
@@ -147,7 +146,7 @@ public class BlockedInputStreamSimulator {
       WriteMode writeMode) {
 
       Reject.ifNull(data, "data");
-      Contract.checkPrecondition(timeoutMillis > 0, "timeoutMillis > 0");
+      Reject.ifNegativeOrZero(timeoutMillis, "timeoutMillis");
 
       m_inputStream = new PipedInputStream();
 

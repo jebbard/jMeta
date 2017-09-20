@@ -28,7 +28,6 @@ import de.je.jmeta.dataformats.FieldType;
 import de.je.jmeta.dataformats.IDataFormatSpecification;
 import de.je.jmeta.media.api.IMediaAPI;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -67,8 +66,8 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
 
       Reject.ifNull(id, "fieldDesc");
       Reject.ifNull(reference, "reference");
-      Contract.checkPrecondition(fieldBytes.getTotalSize() >= 0,
-         "fieldBytes.length() >= 0");
+      Reject.ifNegative(fieldBytes.getTotalSize(),
+         "fieldBytes.getTotalSize()");
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 

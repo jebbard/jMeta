@@ -10,8 +10,8 @@
 
 package de.je.jmeta.media.api;
 
-import de.je.util.javautil.common.err.Contract;
-import de.je.util.javautil.common.err.PreconditionException;
+import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
+import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link IMediumReference} refers to a specific offset on a {@link IMedium}.
@@ -96,21 +96,4 @@ public interface IMediumReference {
     * @return the {@link IMedium} this {@link IMediumReference} refers to.
     */
    public IMedium<?> getMedium();
-
-   /**
-    * Often, implementations of the media component require that two {@link IMediumReference}s refer to the same
-    * {@link IMedium} to be valid. This method provides this standard argument check. It throws a
-    * {@link PreconditionException} if the given {@link IMediumReference} does not refer to the given {@link IMedium}
-    * instance, otherwise it simply does nothing.
-    * 
-    * @param referenceToCheck
-    *           The {@link IMediumReference} to check for having the expected {@link IMedium}.
-    * @param expectedMedium
-    *           The expected {@link IMedium}.
-    */
-   public static void validateSameMedium(IMediumReference referenceToCheck, IMedium<?> expectedMedium) {
-      Contract.checkPrecondition(referenceToCheck.getMedium().equals(expectedMedium),
-         "The given reference <" + referenceToCheck + "> must refer to the expected medium <" + expectedMedium + ">.");
-   }
-
 }

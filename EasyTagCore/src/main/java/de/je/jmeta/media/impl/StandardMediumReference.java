@@ -10,7 +10,6 @@ package de.je.jmeta.media.impl;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -51,7 +50,7 @@ public class StandardMediumReference implements IMediumReference {
    @Override
    public IMediumReference advance(long count) {
 
-      Contract.checkPrecondition(getAbsoluteMediumOffset() >= -count, "getAbsoluteMediumOffset() >= -count was false");
+      Reject.ifFalse(getAbsoluteMediumOffset() >= -count, "getAbsoluteMediumOffset() >= -count");
 
       long advancedMediumOffset = getAbsoluteMediumOffset() + count;
 
@@ -69,7 +68,8 @@ public class StandardMediumReference implements IMediumReference {
    public boolean before(IMediumReference other) {
 
       Reject.ifNull(other, "other");
-      IMediumReference.validateSameMedium(this, other.getMedium());
+      Reject.ifFalse(getMedium().equals(other.getMedium()),
+	   	         "getMedium().equals(other.getMedium())");
 
       return getAbsoluteMediumOffset() < other.getAbsoluteMediumOffset();
    }
@@ -81,7 +81,8 @@ public class StandardMediumReference implements IMediumReference {
    public boolean behindOrEqual(IMediumReference other) {
 
       Reject.ifNull(other, "other");
-      IMediumReference.validateSameMedium(this, other.getMedium());
+      Reject.ifFalse(getMedium().equals(other.getMedium()),
+	   	         "getMedium().equals(other.getMedium())");
 
       return getAbsoluteMediumOffset() >= other.getAbsoluteMediumOffset();
    }
@@ -93,7 +94,8 @@ public class StandardMediumReference implements IMediumReference {
    public long distanceTo(IMediumReference other) {
 
       Reject.ifNull(other, "other");
-      IMediumReference.validateSameMedium(this, other.getMedium());
+      Reject.ifFalse(getMedium().equals(other.getMedium()),
+	   	         "getMedium().equals(other.getMedium())");
 
       return getAbsoluteMediumOffset() - other.getAbsoluteMediumOffset();
    }
@@ -192,7 +194,7 @@ public class StandardMediumReference implements IMediumReference {
     */
    void setAbsoluteMediumOffset(long absoluteMediumOffset) {
 
-      Contract.checkPrecondition(absoluteMediumOffset >= 0, "absoluteMediumOffset must not be negative");
+	   Reject.ifNegative(absoluteMediumOffset, "absoluteMediumOffset");
 
       this.absoluteMediumOffset = absoluteMediumOffset;
    }

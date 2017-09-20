@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.je.jmeta.extmanager.export.AbstractExtensionManagementTest;
@@ -30,7 +32,6 @@ import de.je.jmeta.extmanager.export.IExtensionManagerBundleTest;
 import de.je.jmeta.extmanager.export.InvalidExtensionBundleException;
 import de.je.util.javautil.io.stream.NamedInputStream;
 import de.je.util.javautil.testUtil.resource.TestResourceHelper;
-import junit.framework.Assert;
 
 /**
  * {@link ExtensionBundleNegativeTest} tests the {@link StandardExtensionBundle} class for behavior in case of wrong

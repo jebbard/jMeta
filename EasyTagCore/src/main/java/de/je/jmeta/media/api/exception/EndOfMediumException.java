@@ -11,7 +11,6 @@ package de.je.jmeta.media.api.exception;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -44,9 +43,9 @@ public class EndOfMediumException extends Exception {
       long byteCountTriedToRead) {
 
       Reject.ifNull(mediumReference, "mediumReference");
-      Contract.checkPrecondition(bytesRead >= 0, "bytesRead >= 0");
-      Contract.checkPrecondition(byteCountTriedToRead > 0,
-         "byteCountTriedToRead > 0");
+      Reject.ifNegative(bytesRead, "bytesRead");
+      Reject.ifNegativeOrZero(byteCountTriedToRead,
+         "byteCountTriedToRead");
 
       m_bytesReallyRead = bytesRead;
       m_byteCountTriedToRead = byteCountTriedToRead;

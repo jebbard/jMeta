@@ -5,14 +5,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumRegion;
 import de.je.jmeta.media.impl.OLD.MediumReferenceComparator;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -71,8 +69,8 @@ public class MediumCache {
 
       Reject.ifNull(medium, "medium");
 
-      Contract.checkPrecondition(maximumCacheSizeInBytes >= maximumCacheRegionSizeInBytes,
-         "Maximum cache size in bytes must be equal to or bigger than the maximum cache region size in bytes");
+      Reject.ifFalse(maximumCacheSizeInBytes >= maximumCacheRegionSizeInBytes,
+         "maximumCacheSizeInBytes >= maximumCacheRegionSizeInBytes");
 
       this.medium = medium;
       this.maximumCacheSizeInBytes = maximumCacheSizeInBytes;
@@ -150,7 +148,8 @@ public class MediumCache {
    public List<MediumRegion> getRegionsInRange(IMediumReference startReference, int rangeSizeInBytes) {
 
 	      Reject.ifNull(startReference, "startReference");
-	      IMediumReference.validateSameMedium(startReference, getMedium());
+	      Reject.ifFalse(startReference.getMedium().equals(getMedium()),
+	   	         "startReference.getMedium().equals(getMedium())");
 	      Reject.ifTrue(rangeSizeInBytes <= 0, "The range size must be strictly bigger than zero");
 	   
       // TODO implement
@@ -171,7 +170,8 @@ public class MediumCache {
    public long getCachedByteCountAt(IMediumReference startReference) {
 
 	      Reject.ifNull(startReference, "startReference");
-	      IMediumReference.validateSameMedium(startReference, getMedium());
+	      Reject.ifFalse(startReference.getMedium().equals(getMedium()),
+		   	         "startReference.getMedium().equals(getMedium())");
 	   
 		   long totalCachedByteCount = 0L;
 		   

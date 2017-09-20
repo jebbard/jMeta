@@ -15,13 +15,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import de.je.jmeta.config.export.AbstractConfigAccessor;
 import de.je.jmeta.config.export.IUserConfigAccessor;
 import de.je.jmeta.config.export.UserConfigParam;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
-import junit.framework.Assert;
 
 /**
  * {@link IUserConfigAccessorTest} tests the {@link IUserConfigAccessor} interface in a very coarse way, as the detailed

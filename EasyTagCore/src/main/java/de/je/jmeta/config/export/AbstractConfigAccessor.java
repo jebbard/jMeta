@@ -12,7 +12,6 @@ import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.PropertiesConfigLoader;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 import de.je.util.javautil.common.config.issue.ConfigIssueType;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -96,8 +95,8 @@ public abstract class AbstractConfigAccessor {
    protected <T> T getConfigParam(AbstractConfigParam<T> configParam) {
 
       Reject.ifNull(configParam, "configParam");
-      Contract.checkPrecondition(m_paramLoader.hasConfigParam(configParam),
-         "m_paramLoader.hasConfigParam(configParam) was false");
+      Reject.ifFalse(m_paramLoader.hasConfigParam(configParam),
+         "m_paramLoader.hasConfigParam(configParam)");
 
       return m_paramLoader.getConfigParamValue(configParam);
    }

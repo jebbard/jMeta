@@ -1,8 +1,8 @@
-READ at 250 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 310 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 290 with size 20 with bytes java.nio.HeapByteBuffer[pos=0 lim=20 cap=20] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-INSERT at 250 with size 20 with bytes java.nio.HeapByteBuffer[pos=0 lim=20 cap=20] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-READ at 200 with size 50 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 240 with size 50 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 200 with size 40 with bytes java.nio.HeapByteBuffer[pos=0 lim=40 cap=40] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-INSERT at 200 with size 40 with bytes java.nio.HeapByteBuffer[pos=0 lim=40 cap=40] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 250 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 310 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 290 with size 20 with bytes java.nio.HeapByteBuffer[pos=0 lim=20 cap=20] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+INSERT at 250 with size 20 with bytes java.nio.HeapByteBuffer[pos=0 lim=20 cap=20] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 200 with size 50 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 240 with size 50 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 200 with size 40 with bytes java.nio.HeapByteBuffer[pos=0 lim=40 cap=40] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+INSERT at 200 with size 40 with bytes java.nio.HeapByteBuffer[pos=0 lim=40 cap=40] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt

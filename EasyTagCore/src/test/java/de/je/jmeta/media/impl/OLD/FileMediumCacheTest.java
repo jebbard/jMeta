@@ -18,8 +18,6 @@ import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.impl.FileMediumAccessor;
 import de.je.jmeta.media.impl.StandardMediumReference;
-import de.je.jmeta.media.impl.OLD.IMediumCache;
-import de.je.jmeta.media.impl.OLD.StandardMediumCache;
 
 /**
  * {@link FileMediumCacheTest} tests the {@link StandardMediumCache} implementation with a {@link FileMediumAccessor}.

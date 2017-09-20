@@ -11,6 +11,7 @@ package de.je.jmeta.defext.datablocks.impl.lyrics3v2;
 import de.je.jmeta.datablocks.impl.IFieldConverter;
 import de.je.jmeta.datablocks.impl.StandardDataBlockFactory;
 import de.je.jmeta.dataformats.DataBlockId;
+import de.je.jmeta.defext.datablocks.impl.id3v23.ID3v23DataBlockFactory;
 
 // TODO primeRefactor009: There must be a better approach to implement setting other field converters (the same for
 // ID3v23)

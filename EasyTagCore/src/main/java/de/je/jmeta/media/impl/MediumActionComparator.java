@@ -14,6 +14,7 @@ import java.util.Comparator;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
+import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link MediumActionComparator} compares two {@link MediumAction} objects.
@@ -45,8 +46,8 @@ public class MediumActionComparator implements Comparator<MediumAction> {
 
       IMediumReference leftStartReference = left.getRegion().getStartReference();
       IMediumReference rightStartReference = right.getRegion().getStartReference();
-
-      IMediumReference.validateSameMedium(leftStartReference, rightStartReference.getMedium());
+      Reject.ifFalse(leftStartReference.getMedium().equals(rightStartReference.getMedium()),
+         "leftStartReference.getMedium().equals(rightStartReference.getMedium())");
 
       // Ensure contract of compare is fulfilled
       if (left.equals(right)) {

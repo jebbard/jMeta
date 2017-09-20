@@ -19,8 +19,7 @@ import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.DummyMediumCreator;
 import de.je.jmeta.media.api.datatype.FileMedium;
-import de.je.jmeta.media.impl.StandardMediumReference;
-import de.je.util.javautil.common.err.PreconditionException;
+import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 
 /**
  * {@link IMediumReferenceTest} tests the {@link StandardMediumReference} class and its interface
@@ -106,7 +105,7 @@ public class IMediumReferenceTest {
    /**
     * Tests {@link IMediumReference#advance}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void advance_forNegativeCountBiggerThanOffset_throwsException() {
 
       final IMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
@@ -172,7 +171,7 @@ public class IMediumReferenceTest {
    /**
     * Tests {@link IMediumReference#before(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void before_forDifferentMedium_throwsException() {
 
       final IMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
@@ -240,7 +239,7 @@ public class IMediumReferenceTest {
    /**
     * Tests {@link IMediumReference#behindOrEqual(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void behindOrEqual_forDifferentMedium_throwsException() {
 
       final IMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
@@ -253,7 +252,7 @@ public class IMediumReferenceTest {
    /**
     * Tests {@link IMediumReference#before(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void constructor_forNegativeOffset_throwsException() {
 
       new StandardMediumReference(dummyMedium, -1);
@@ -315,7 +314,7 @@ public class IMediumReferenceTest {
    /**
     * Tests {@link IMediumReference#distanceTo(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void distanceTo_forDifferentMedium_throwsException() {
 
       final IMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
@@ -343,37 +342,11 @@ public class IMediumReferenceTest {
    /**
     * Tests {@link IMediumReference#before(IMediumReference)}.
     */
-   @Test(expected = PreconditionException.class)
+   @Test(expected = PreconditionUnfullfilledException.class)
    public void setAbsoluteMediumOffset_forNegativeOffset_throwsException() {
 
       StandardMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
 
       referenceToTest.setAbsoluteMediumOffset(-11);
    }
-
-   /**
-    * Tests {@link IMediumReference#validateSameMedium(IMediumReference, IMediumReference)}.
-    */
-   @Test
-   public void checkSameMedium_forSameMedium_doesNotThrowException() {
-
-      StandardMediumReference firstReference = new StandardMediumReference(dummyMedium, 0);
-      StandardMediumReference secondReference = new StandardMediumReference(dummyMedium, 0);
-
-      IMediumReference.validateSameMedium(firstReference, dummyMedium);
-      IMediumReference.validateSameMedium(firstReference, dummyMedium);
-      IMediumReference.validateSameMedium(secondReference, dummyMedium);
-   }
-
-   /**
-    * Tests {@link IMediumReference#validateSameMedium(IMediumReference, IMediumReference)}.
-    */
-   @Test(expected = PreconditionException.class)
-   public void checkSameMedium_forDifferentMedia_throwsException() {
-
-      StandardMediumReference firstReference = new StandardMediumReference(dummyMedium, 0);
-
-      IMediumReference.validateSameMedium(firstReference, DummyMediumCreator.createDefaultDummyInMemoryMedium());
-   }
-
 }

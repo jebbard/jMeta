@@ -15,7 +15,6 @@ import java.util.List;
 
 import de.je.jmeta.datablocks.impl.CsvFileDataFormatExpectationProvider;
 import de.je.jmeta.datablocks.impl.InvalidTestDataCsvFormatException;
-import de.je.util.javautil.common.err.Contract;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -92,7 +91,7 @@ public abstract class AbstractDataBlockAccessorTest
    private static void checkFile(File file) {
 
       Reject.ifNull(file, "file");
-      Contract.checkPrecondition(file.exists(), "converted.exists() was false");
-      Contract.checkPrecondition(file.isFile(), "converted.exists() was false");
+      Reject.ifFalse(file.exists(), "file.exists()");
+      Reject.ifFalse(file.isFile(), "file.isFile()");
    }
 }
