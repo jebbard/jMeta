@@ -1,19 +1,19 @@
-READ at 1300 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 1415 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-READ at 1100 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 1215 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-READ at 900 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 1015 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-READ at 700 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 815 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-READ at 500 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 615 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-READ at 300 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 415 with size 200 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-READ at 185 with size 115 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 300 with size 115 on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 50 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=250] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 250 with size 50 with bytes java.nio.HeapByteBuffer[pos=0 lim=50 cap=250] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-REPLACE at 35 with size 150 with bytes java.nio.HeapByteBuffer[pos=0 lim=250 cap=250] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-WRITE at 0 with size 50 with bytes java.nio.HeapByteBuffer[pos=0 lim=50 cap=50] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-REPLACE at 0 with size 35 with bytes java.nio.HeapByteBuffer[pos=0 lim=50 cap=50] on medium C:\PRIVAT\01_Java\projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 1300 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 1415 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 1100 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 1215 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 900 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 1015 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 700 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 815 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 500 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 615 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 300 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 415 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+READ at 185 with size 115 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 300 with size 115 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 50 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=250] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 250 with size 50 with bytes java.nio.HeapByteBuffer[pos=0 lim=50 cap=250] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+REPLACE at 35 with size 150 with bytes java.nio.HeapByteBuffer[pos=0 lim=250 cap=250] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 0 with size 50 with bytes java.nio.HeapByteBuffer[pos=0 lim=50 cap=50] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+REPLACE at 0 with size 35 with bytes java.nio.HeapByteBuffer[pos=0 lim=50 cap=50] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt

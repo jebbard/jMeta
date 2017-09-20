@@ -10,7 +10,6 @@ import java.util.TreeMap;
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumRegion;
-import de.je.jmeta.media.impl.OLD.MediumReferenceComparator;
 import de.je.util.javautil.common.err.Reject;
 
 /**

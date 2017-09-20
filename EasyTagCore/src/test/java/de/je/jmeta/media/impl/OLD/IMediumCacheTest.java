@@ -24,6 +24,7 @@ import org.junit.Test;
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
+import de.je.jmeta.media.impl.MediumReferenceComparator;
 import de.je.jmeta.media.impl.StandardMediumReference;
 
 /**
