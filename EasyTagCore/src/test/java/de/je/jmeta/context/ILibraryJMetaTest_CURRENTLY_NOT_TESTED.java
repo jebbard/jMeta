@@ -17,10 +17,10 @@ import org.junit.Test;
 import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
 
 /**
- * {@link ILibraryJMetaTest}
+ * {@link ILibraryJMetaTest_CURRENTLY_NOT_TESTED}
  *
  */
-public class ILibraryJMetaTest {
+public class ILibraryJMetaTest_CURRENTLY_NOT_TESTED {
 
    /**
     * Sets up the test fixtures.

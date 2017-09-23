@@ -31,35 +31,23 @@ import de.je.jmeta.extmanager.export.IExtensionPoint;
 import de.je.jmeta.extmanager.export.InvalidExtensionBundleException;
 import de.je.jmeta.extmanager.impl.jaxb.extpoints.ExtensionPointType;
 import de.je.util.javautil.common.err.Reject;
-import de.je.util.javautil.compregistry.ComponentRegistry;
 import de.je.util.javautil.io.stream.NamedInputStream;
-import de.je.util.javautil.simpleregistry.AbstractComponentImplementation;
-import de.je.util.javautil.simpleregistry.ComponentDescription;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
 import de.je.util.javautil.xml.jaxbloader.JAXBLoaderException;
 
 /**
  * {@link StandardExtensionManager} is a default implementation of the {@link IExtensionManager} interface that loads
  * several {@link IExtensionBundle}s based on XML configuration files.
  */
-public class StandardExtensionManager extends AbstractComponentImplementation<IExtensionManager>
-   implements IExtensionManager {
+public class StandardExtensionManager implements IExtensionManager {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardExtensionManager.class);
-
-   private static final ComponentDescription<IExtensionManager> COMPONENT_DESCRIPTION = new ComponentDescription<>(
-      "ExtensionManagement", IExtensionManager.class, "Jens Ebert", "v0.1",
-      "Component for managing library extensions");
 
    /**
     * Creates a new {@link StandardExtensionManager}. No parameters must be added as this class may be dynamically
     * instantiated by reflection by a component loader.
-    *
-    * @param registry
-    *           The {@link ComponentRegistry} for accessing other components.
     */
-   public StandardExtensionManager(ISimpleComponentRegistry registry) {
-      super(COMPONENT_DESCRIPTION, IExtensionManager.class, registry);
+   public StandardExtensionManager() {
+
       m_loader = new ExtensionPointsLoader();
    }
 

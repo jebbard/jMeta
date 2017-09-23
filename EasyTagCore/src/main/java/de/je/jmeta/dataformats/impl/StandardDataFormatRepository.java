@@ -29,31 +29,22 @@ import de.je.jmeta.extmanager.export.IExtensionBundle;
 import de.je.jmeta.extmanager.export.IExtensionManager;
 import de.je.jmeta.extmanager.export.InvalidExtensionException;
 import de.je.util.javautil.common.err.Reject;
-import de.je.util.javautil.simpleregistry.AbstractComponentImplementation;
-import de.je.util.javautil.simpleregistry.ComponentDescription;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
+import de.je.util.javautil.common.registry.ComponentRegistry;
 
 /**
  * {@link StandardDataFormatRepository}
  *
  */
-public class StandardDataFormatRepository extends AbstractComponentImplementation<IDataFormatRepository>
-   implements IDataFormatRepository {
+public class StandardDataFormatRepository implements IDataFormatRepository {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataFormatRepository.class);
 
-   private static final ComponentDescription<IDataFormatRepository> COMPONENT_DESCRIPTION = new ComponentDescription<>(
-      "DataFormatRepository", IDataFormatRepository.class, "Jens Ebert", "v0.1",
-      "Component for managing data format properties");
-
    /**
-    * Creates a new {@link StandardDataFormatRepository}.
-    * 
-    * @param registry
+    * Creates a new {@link StandardDataFormatRepository}. No parameters must be added as this class may be dynamically
+    * instantiated by reflection by a component loader.
     */
-   public StandardDataFormatRepository(ISimpleComponentRegistry registry) {
-      super(COMPONENT_DESCRIPTION, IDataFormatRepository.class, registry);
-      extManager = registry.getComponentImplementation(IExtensionManager.class);
+   public StandardDataFormatRepository() {
+      extManager = ComponentRegistry.lookupService(IExtensionManager.class);
 
       List<IExtensionBundle> extBundles = extManager.getRegisteredExtensionBundles();
 
@@ -168,8 +159,7 @@ public class StandardDataFormatRepository extends AbstractComponentImplementatio
    public IDataFormatSpecification getDataFormatSpecification(DataFormat dataFormat) {
 
       Reject.ifNull(dataFormat, "dataFormat");
-      Reject.ifFalse(getSupportedDataFormats().contains(dataFormat),
-         "getSupportedDataFormats().contains(dataFormat)");
+      Reject.ifFalse(getSupportedDataFormats().contains(dataFormat), "getSupportedDataFormats().contains(dataFormat)");
 
       return m_dataFormatMap.get(dataFormat);
    }

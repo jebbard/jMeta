@@ -24,21 +24,13 @@ import de.je.jmeta.media.api.exception.MediumAccessException;
 import de.je.jmeta.media.impl.OLD.IMediumCache;
 import de.je.jmeta.media.impl.OLD.StandardMediumCache;
 import de.je.util.javautil.common.err.Reject;
-import de.je.util.javautil.simpleregistry.AbstractComponentImplementation;
-import de.je.util.javautil.simpleregistry.ComponentDescription;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
 
 /**
  * {@link MediaAPI} is the default implementation of the {@link IMediaAPI} interface.
  */
-public class MediaAPI extends AbstractComponentImplementation<IMediaAPI>
-   implements IMediaAPI {
+public class MediaAPI implements IMediaAPI {
 
    private static final Set<Class<? extends IMedium<?>>> SUPORTED_MEDIA_CLASSES = new HashSet<>();
-
-   private static final ComponentDescription<IMediaAPI> COMPONENT_DESCRIPTION = new ComponentDescription<>(
-      "Media", IMediaAPI.class, "Jens Ebert", "v0.1",
-      "Component for low-level access to physical media");
 
    static {
       SUPORTED_MEDIA_CLASSES.add(FileMedium.class);
@@ -49,16 +41,6 @@ public class MediaAPI extends AbstractComponentImplementation<IMediaAPI>
    private final Map<IMedium<?>, IMediumCache> m_alreadyCreatedCaches = new HashMap<>();
 
    /**
-    * Creates a new {@link MediaAPI}.
-    * 
-    * @param registry
-    *           The {@link ISimpleComponentRegistry} instance
-    */
-   public MediaAPI(ISimpleComponentRegistry registry) {
-      super(COMPONENT_DESCRIPTION, IMediaAPI.class, registry);
-   }
-
-   /**
     * @see de.je.jmeta.media.api.IMediaAPI#getMediumStore(de.je.jmeta.media.api.IMedium)
     */
    @Override
@@ -66,13 +48,11 @@ public class MediaAPI extends AbstractComponentImplementation<IMediaAPI>
 
       Reject.ifNull(medium, "medium");
 
-      Reject.ifFalse(
-         SUPORTED_MEDIA_CLASSES.contains(medium.getClass()),
+      Reject.ifFalse(SUPORTED_MEDIA_CLASSES.contains(medium.getClass()),
          "SUPORTED_MEDIA_CLASSES.contains(medium.getClass())");
 
       if (!medium.exists())
-         throw new MediumAccessException(
-            "Medium <" + medium + "> does not exist.", null);
+         throw new MediumAccessException("Medium <" + medium + "> does not exist.", null);
 
       if (!m_alreadyCreatedCaches.containsKey(medium)) {
          int maxCacheRegionSize = Integer.MAX_VALUE;
@@ -86,11 +66,9 @@ public class MediaAPI extends AbstractComponentImplementation<IMediaAPI>
             mediumAccessor = new MemoryMediumAccessor((InMemoryMedium) medium);
 
          else if (medium.getClass() == InputStreamMedium.class)
-            mediumAccessor = new StreamMediumAccessor(
-               (InputStreamMedium) medium);
+            mediumAccessor = new StreamMediumAccessor((InputStreamMedium) medium);
 
-         m_alreadyCreatedCaches.put(medium,
-            new StandardMediumCache(mediumAccessor, maxCacheRegionSize));
+         m_alreadyCreatedCaches.put(medium, new StandardMediumCache(mediumAccessor, maxCacheRegionSize));
       }
 
       return m_alreadyCreatedCaches.get(medium);

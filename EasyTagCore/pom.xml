@@ -38,18 +38,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>ComponentRegistry</artifactId>
-			<version>0.5</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>SimpleComponentRegistry</artifactId>
-			<version>0.5</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>

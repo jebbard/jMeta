@@ -12,26 +12,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.After;
 import org.junit.Before;
 
 import de.je.jmeta.context.impl.LibraryJMeta;
-import de.je.jmeta.datablocks.IDataBlockAccessor;
-import de.je.jmeta.datablocks.impl.StandardDataBlockAccessor;
-import de.je.jmeta.dataformats.IDataFormatRepository;
-import de.je.jmeta.dataformats.impl.StandardDataFormatRepository;
 import de.je.jmeta.extmanager.export.IExtensionManager;
-import de.je.jmeta.extmanager.impl.StandardExtensionManager;
-import de.je.jmeta.media.api.IMediaAPI;
-import de.je.jmeta.media.impl.MediaAPI;
 import de.je.jmeta.testHelpers.logChecker.LogChecker;
+import de.je.util.javautil.common.registry.ComponentRegistry;
 import de.je.util.javautil.io.file.FileUtility;
 import de.je.util.javautil.io.stream.NamedInputStream;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
-import de.je.util.javautil.simpleregistry.SimpleComponentRegistry;
 import de.je.util.javautil.testUtil.setup.TestDataException;
+import junit.framework.AssertionFailedError;
 
 /**
  * {@link JMetaTestBasics} provides static methods to be used by most of the jMeta integration test cases for
@@ -86,33 +77,6 @@ public class JMetaTestBasics {
    private static final LogChecker LOG_CHECKER = new LogChecker();
 
    /**
-    * Creates and returns the {@link ISimpleComponentRegistry} to use for testing. Initializes all components of jMeta
-    * and loads all extensions. To be used for full integration testing only.
-    *
-    * @return the {@link ISimpleComponentRegistry} to use for testing.
-    */
-   public static ISimpleComponentRegistry setupComponents() {
-
-      ISimpleComponentRegistry registry = new SimpleComponentRegistry();
-
-      IExtensionManager extensionManager = new StandardExtensionManager(registry);
-
-      // Must be done BEFORE initializing any of the other components
-      setupExtensions(extensionManager);
-
-      IMediaAPI mediaAPI = new MediaAPI(registry);
-      IDataFormatRepository repository = new StandardDataFormatRepository(registry);
-      IDataBlockAccessor dataBlockAccessor = new StandardDataBlockAccessor(registry);
-
-      // To avoid unused warnings
-      assert(mediaAPI != null);
-      assert(repository != null);
-      assert(dataBlockAccessor != null);
-
-      return registry;
-   }
-
-   /**
     * Does an additional, generic log check after test case execution. If the log check fails, the method copies the log
     * file with the failures inside, so that the user may check it after the test run.
     * 
@@ -155,11 +119,10 @@ public class JMetaTestBasics {
    /**
     * Initially loads the extensions into the {@link IExtensionManager} from the central test extension point
     * configuration file.
-    * 
-    * @param extensionManager
-    *           The {@link IExtensionManager} to use
     */
-   private static void setupExtensions(IExtensionManager extensionManager) {
+   public static void setupExtensions() {
+
+      IExtensionManager extensionManager = ComponentRegistry.lookupService(IExtensionManager.class);
 
       // Load all extensions BEFORE initializing any other component
       try {

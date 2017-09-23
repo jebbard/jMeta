@@ -15,14 +15,13 @@ import de.je.jmeta.dataformats.DataFormat;
 import de.je.jmeta.dataformats.DataTransformationType;
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.datatype.AbstractMedium;
-import de.je.util.javautil.simpleregistry.IComponentInterface;
 
 /**
  * This interface is the starting point when accessing the {@link IDataBlock}s of a {@link AbstractMedium}. For any
  * existing {@link AbstractMedium}, it returns an {@link Iterator} that allows to iterate the top-level
  * {@link IDataBlock}s of that {@link AbstractMedium}.
  */
-public interface IDataBlockAccessor extends IComponentInterface {
+public interface IDataBlockAccessor {
 
    /**
     * Returns the {@link Iterator} for retrieving all the top-level {@link IDataBlock}s in the given
@@ -40,9 +39,8 @@ public interface IDataBlockAccessor extends IComponentInterface {
     *           false if the default behavior should be chosen.
     * @return the {@link Iterator} for iterating all the top-level {@link IDataBlock}s of the {@link AbstractMedium}.
     */
-   public AbstractDataBlockIterator<IContainer> getContainerIterator(
-      IMedium<?> medium, List<DataFormat> dataFormatHints,
-      boolean forceMediumReadOnly);
+   public AbstractDataBlockIterator<IContainer> getContainerIterator(IMedium<?> medium,
+      List<DataFormat> dataFormatHints, boolean forceMediumReadOnly);
 
    /**
     * @param medium
@@ -50,9 +48,8 @@ public interface IDataBlockAccessor extends IComponentInterface {
     * @param forceMediumReadOnly
     * @return a reverse {@link AbstractDataBlockIterator}
     */
-   public AbstractDataBlockIterator<IContainer> getReverseContainerIterator(
-      IMedium<?> medium, List<DataFormat> dataFormatHints,
-      boolean forceMediumReadOnly);
+   public AbstractDataBlockIterator<IContainer> getReverseContainerIterator(IMedium<?> medium,
+      List<DataFormat> dataFormatHints, boolean forceMediumReadOnly);
 
    /**
     * Returns an {@link IDataBlockFactory} that is used for creating {@link IDataBlock} instances.
@@ -79,8 +76,7 @@ public interface IDataBlockAccessor extends IComponentInterface {
     * @param dataFormat
     * @return TODO
     */
-   public Map<DataTransformationType, ITransformationHandler> getTransformationHandlers(
-      DataFormat dataFormat);
+   public Map<DataTransformationType, ITransformationHandler> getTransformationHandlers(DataFormat dataFormat);
 
    /**
     *
@@ -90,8 +86,7 @@ public interface IDataBlockAccessor extends IComponentInterface {
     * @param handler
     * @pre {@link DataTransformationType#isBuiltIn()} == false
     */
-   public void setTransformationHandler(DataFormat dataFormat,
-      DataTransformationType transformationType,
+   public void setTransformationHandler(DataFormat dataFormat, DataTransformationType transformationType,
       ITransformationHandler handler);
 
 }

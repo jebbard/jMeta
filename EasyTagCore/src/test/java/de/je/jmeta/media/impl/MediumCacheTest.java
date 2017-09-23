@@ -4,8 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMedium;
@@ -16,6 +14,7 @@ import de.je.jmeta.media.api.datatype.InMemoryMedium;
 import de.je.jmeta.media.api.datatype.MediumRegion;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.common.err.Reject;
+import junit.framework.Assert;
 
 class TestCacheLayout {
 
@@ -28,10 +27,10 @@ class TestCacheLayout {
    private final int maxCacheRegionSize;
 
    public long getStartOffset() {
-	return startOffset;
-}
+      return startOffset;
+   }
 
-public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheSize, int maxCacheRegionSize) {
+   public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheSize, int maxCacheRegionSize) {
       Reject.ifNull(regionMedium, "regionMedium");
       Reject.ifNegative(startOffset, "startOffset");
 
@@ -42,8 +41,8 @@ public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheS
    }
 
    public void addNextRegionInfo(int regionSize, int gapAfterRegion) {
-	   Reject.ifNegativeOrZero(regionSize, "regionSize");
-	   Reject.ifNegative(gapAfterRegion, "gapAfterRegion");
+      Reject.ifNegativeOrZero(regionSize, "regionSize");
+      Reject.ifNegative(gapAfterRegion, "gapAfterRegion");
 
       regionSizes.add(regionSize);
       gapsAfterRegion.add(gapAfterRegion);
@@ -57,82 +56,83 @@ public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheS
    public List<MediumRegion> getExpectedCacheRegions() {
       return buildRegionList(false);
    }
-   
+
    public List<MediumRegion> getGapRegions() {
-	   List<MediumRegion> regionListWithGaps = getExpectedCacheRegionsWithGapRegions();
-	   List<MediumRegion> gapRegions = new ArrayList<MediumRegion>();
-	      
-	      if (startOffset > 0) {
-	    	  gapRegions.add(createUnCachedMediumRegion(0L, (int) getStartOffset()));
-	      }
-	   
-	   for (MediumRegion mediumRegion : regionListWithGaps) {
-		if (!mediumRegion.isCached()) {
-			gapRegions.add(mediumRegion);
-		}
-	}
-	   
-	   return gapRegions;
+      List<MediumRegion> regionListWithGaps = getExpectedCacheRegionsWithGapRegions();
+      List<MediumRegion> gapRegions = new ArrayList<MediumRegion>();
+
+      if (startOffset > 0) {
+         gapRegions.add(createUnCachedMediumRegion(0L, (int) getStartOffset()));
+      }
+
+      for (MediumRegion mediumRegion : regionListWithGaps) {
+         if (!mediumRegion.isCached()) {
+            gapRegions.add(mediumRegion);
+         }
+      }
+
+      return gapRegions;
    }
-   
+
    public List<MediumRegion> getConsecutiveRegions() {
-	   List<MediumRegion> regionListWithGaps = getExpectedCacheRegionsWithGapRegions();
-	   List<MediumRegion> consecutiveRegions = new ArrayList<MediumRegion>();
-	   
-	   boolean consecutiveRegionStarted = false;
-	   int currentConsecutiveRegionSize = 0;
-	   long currentConsecutiveRegionStartOffset = 0L;
-	   
-	   for (MediumRegion mediumRegion : regionListWithGaps) {
-		if (mediumRegion.isCached()) {
-			if (!consecutiveRegionStarted) {
-				currentConsecutiveRegionStartOffset = mediumRegion.getStartReference().getAbsoluteMediumOffset();
-				consecutiveRegionStarted = true;
-			}
-			currentConsecutiveRegionSize += mediumRegion.getSize();
-		} else {
-			if (consecutiveRegionStarted) {
-				consecutiveRegionStarted = false;
-				currentConsecutiveRegionSize = 0;
-				consecutiveRegions.add(createUnCachedMediumRegion(currentConsecutiveRegionStartOffset, currentConsecutiveRegionSize));
-			}
-			
-		}
-	}
-	   
-	   return consecutiveRegions;
+      List<MediumRegion> regionListWithGaps = getExpectedCacheRegionsWithGapRegions();
+      List<MediumRegion> consecutiveRegions = new ArrayList<MediumRegion>();
+
+      boolean consecutiveRegionStarted = false;
+      int currentConsecutiveRegionSize = 0;
+      long currentConsecutiveRegionStartOffset = 0L;
+
+      for (MediumRegion mediumRegion : regionListWithGaps) {
+         if (mediumRegion.isCached()) {
+            if (!consecutiveRegionStarted) {
+               currentConsecutiveRegionStartOffset = mediumRegion.getStartReference().getAbsoluteMediumOffset();
+               consecutiveRegionStarted = true;
+            }
+            currentConsecutiveRegionSize += mediumRegion.getSize();
+         } else {
+            if (consecutiveRegionStarted) {
+               consecutiveRegionStarted = false;
+               currentConsecutiveRegionSize = 0;
+               consecutiveRegions
+                  .add(createUnCachedMediumRegion(currentConsecutiveRegionStartOffset, currentConsecutiveRegionSize));
+            }
+
+         }
+      }
+
+      return consecutiveRegions;
    }
-   
-//   public Long getOffsetOfFirstGapBiggerThan(int minSize) {
-//	   List<MediumRegion> regionListWithGaps = getExpectedCacheRegionListWithGapRegions();
-//	   for (MediumRegion mediumRegion : regionListWithGaps) {
-//		if (mediumRegion.isCached() && mediumRegion.getSize() > minSize) {
-//			return mediumRegion.getStartReference().getAbsoluteMediumOffset();
-//		}
-//	}
-//	   return null;
-//   }
-//   
-//   public List<MediumRegion> getFirstConsecutiveRegions() {
-//	   List<MediumRegion> regionListWithGaps = getExpectedCacheRegionListWithGapRegions();
-//	   List<MediumRegion> firstConsecutiveRegions = new ArrayList<MediumRegion>();
-//	   
-//	   boolean cacheRegionsStarted = false;
-//	   for (MediumRegion mediumRegion : regionListWithGaps) {
-//		if (mediumRegion.isCached()) {
-//			if (cacheRegionsStarted) {
-//				firstConsecutiveRegions.add(mediumRegion);
-//			} else {
-//				cacheRegionsStarted = true;
-//			}
-//		} else {
-//			if (cacheRegionsStarted) {
-//				break;
-//			}
-//		}
-//	}
-//	   return firstConsecutiveRegions;
-//   }
+
+   // public Long getOffsetOfFirstGapBiggerThan(int minSize) {
+   // List<MediumRegion> regionListWithGaps = getExpectedCacheRegionListWithGapRegions();
+   // for (MediumRegion mediumRegion : regionListWithGaps) {
+   // if (mediumRegion.isCached() && mediumRegion.getSize() > minSize) {
+   // return mediumRegion.getStartReference().getAbsoluteMediumOffset();
+   // }
+   // }
+   // return null;
+   // }
+   //
+   // public List<MediumRegion> getFirstConsecutiveRegions() {
+   // List<MediumRegion> regionListWithGaps = getExpectedCacheRegionListWithGapRegions();
+   // List<MediumRegion> firstConsecutiveRegions = new ArrayList<MediumRegion>();
+   //
+   // boolean cacheRegionsStarted = false;
+   // for (MediumRegion mediumRegion : regionListWithGaps) {
+   // if (mediumRegion.isCached()) {
+   // if (cacheRegionsStarted) {
+   // firstConsecutiveRegions.add(mediumRegion);
+   // } else {
+   // cacheRegionsStarted = true;
+   // }
+   // } else {
+   // if (cacheRegionsStarted) {
+   // break;
+   // }
+   // }
+   // }
+   // return firstConsecutiveRegions;
+   // }
 
    private List<MediumRegion> buildRegionList(boolean withGaps) {
       List<MediumRegion> resultList = new ArrayList<>(regionSizes.size());
@@ -144,11 +144,10 @@ public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheS
          Integer currentGapAfterRegion = gapsAfterRegion.get(i);
 
          resultList.add(createCachedMediumRegion(currentOffset, currentRegionSize));
-         
+
          if (withGaps && currentGapAfterRegion > 0) {
-        	 // Also build a non-cached gap region
-             resultList.add(createUnCachedMediumRegion(currentOffset + currentRegionSize,
-                     currentGapAfterRegion));
+            // Also build a non-cached gap region
+            resultList.add(createUnCachedMediumRegion(currentOffset + currentRegionSize, currentGapAfterRegion));
          }
 
          currentOffset += currentRegionSize + currentGapAfterRegion;
@@ -157,15 +156,13 @@ public TestCacheLayout(long startOffset, IMedium<?> regionMedium, long maxCacheS
       return resultList;
    }
 
-private MediumRegion createCachedMediumRegion(long offset, Integer size) {
-	return new MediumRegion(new StandardMediumReference(regionMedium, offset),
-	    createRegionContent(offset, size));
-}
+   private MediumRegion createCachedMediumRegion(long offset, Integer size) {
+      return new MediumRegion(new StandardMediumReference(regionMedium, offset), createRegionContent(offset, size));
+   }
 
-private MediumRegion createUnCachedMediumRegion(long offset, Integer size) {
-	return new MediumRegion(new StandardMediumReference(regionMedium, offset),
-	    size);
-}
+   private MediumRegion createUnCachedMediumRegion(long offset, Integer size) {
+      return new MediumRegion(new StandardMediumReference(regionMedium, offset), size);
+   }
 
    public MediumCache buildCache() {
       List<MediumRegion> regionList = getExpectedCacheRegions();
@@ -203,25 +200,25 @@ public class MediumCacheTest {
 
    private static final InMemoryMedium UNRELATED_MEDIUM = new InMemoryMedium(new byte[] {}, "Fake", false);
 
-/**
- * This is a list index into the list of {@link MediumRegion}s built by the {@link TestCacheLayout} which
- * is created from {@link #createDefaultLayoutHavingSubsequentAndScatteredRegions()}. It refers to the 
- * first {@link MediumRegion} in the default {@link TestCacheLayout} having direct consecutive follow-up {@link MediumRegion}s in the cache.
- */
-private final static int DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS = 0;
-private final static int DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE = 160;
+   /**
+    * This is a list index into the list of {@link MediumRegion}s built by the {@link TestCacheLayout} which is created
+    * from {@link #createDefaultLayoutHavingSubsequentAndScatteredRegions()}. It refers to the first
+    * {@link MediumRegion} in the default {@link TestCacheLayout} having direct consecutive follow-up
+    * {@link MediumRegion}s in the cache.
+    */
+   private final static int DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS = 0;
+   private final static int DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE = 160;
 
-/**
- * This is a medium offset before the first cached {@link MediumRegion} in the default {@link TestCacheLayout}, which
- * is created from {@link #createDefaultLayoutHavingSubsequentAndScatteredRegions()}.
- */
-private final static long DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION = 2L;
-/**
- * This is a medium offset within the first gap in the default {@link TestCacheLayout}, which
- * is created from {@link #createDefaultLayoutHavingSubsequentAndScatteredRegions()}.
- */
-private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
-
+   /**
+    * This is a medium offset before the first cached {@link MediumRegion} in the default {@link TestCacheLayout}, which
+    * is created from {@link #createDefaultLayoutHavingSubsequentAndScatteredRegions()}.
+    */
+   private final static long DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION = 2L;
+   /**
+    * This is a medium offset within the first gap in the default {@link TestCacheLayout}, which is created from
+    * {@link #createDefaultLayoutHavingSubsequentAndScatteredRegions()}.
+    */
+   private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
 
    /**
     * Tests {@link MediumCache#MediumCache(de.je.jmeta.media.api.IMedium)}, {@link MediumCache#getMedium()},
@@ -312,7 +309,7 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
    @Test
    public void getAllCachedRegions_forEmptyCache_returnsEmptyList() {
       MediumCache emptyCache = new MediumCache(MEDIUM);
-      
+
       Assert.assertEquals(0, emptyCache.getAllCachedRegions().size());
    }
 
@@ -321,14 +318,14 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getAllCachedRegions_forFilledCache_returnsExpectedRegionsInCorrectOrder() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		assertCacheInvariantsAreFulfilled(cache);
-		
-		Assert.assertEquals(cacheLayout.getExpectedCacheRegions().size(), cache.getAllCachedRegions().size());
-		Assert.assertEquals(cacheLayout.getExpectedCacheRegions(), cache.getAllCachedRegions());
+      MediumCache cache = cacheLayout.buildCache();
+
+      assertCacheInvariantsAreFulfilled(cache);
+
+      Assert.assertEquals(cacheLayout.getExpectedCacheRegions().size(), cache.getAllCachedRegions().size());
+      Assert.assertEquals(cacheLayout.getExpectedCacheRegions(), cache.getAllCachedRegions());
    }
 
    /**
@@ -337,7 +334,7 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
    @Test
    public void getCurrentCacheSizeInBytes_forEmptyCache_returnsZero() {
       MediumCache emptyCache = new MediumCache(MEDIUM);
-      
+
       Assert.assertEquals(0, emptyCache.getCurrentCacheSizeInBytes());
    }
 
@@ -346,11 +343,11 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getCurrentCacheSizeInBytes_forFilledCache_returnsExpectedTotalSize() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		Assert.assertEquals(cacheLayout.getTotalRegionSizeInBytes(), cache.getCurrentCacheSizeInBytes());
+      MediumCache cache = cacheLayout.buildCache();
+
+      Assert.assertEquals(cacheLayout.getTotalRegionSizeInBytes(), cache.getCurrentCacheSizeInBytes());
    }
 
    /**
@@ -368,9 +365,11 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
    @Test
    public void getCachedByteCountAt_forEmptyCache_returnsZero() {
       MediumCache emptyCache = new MediumCache(MEDIUM);
-      
-      Assert.assertEquals(0, emptyCache.getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION)));
-      Assert.assertEquals(0, emptyCache.getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_GAP_OFFSET)));
+
+      Assert.assertEquals(0, emptyCache
+         .getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION)));
+      Assert.assertEquals(0,
+         emptyCache.getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_GAP_OFFSET)));
    }
 
    /**
@@ -378,12 +377,14 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getCachedByteCountAt_forFilledCacheButWithOffsetOutsideRegions_returnsZero() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
+      MediumCache cache = cacheLayout.buildCache();
 
-	      Assert.assertEquals(0, cache.getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION)));
-	      Assert.assertEquals(0, cache.getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_GAP_OFFSET)));
+      Assert.assertEquals(0, cache
+         .getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION)));
+      Assert.assertEquals(0,
+         cache.getCachedByteCountAt(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_GAP_OFFSET)));
    }
 
    /**
@@ -391,14 +392,14 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getCachedByteCountAt_endOfLastConsecutiveRegion_returnsZero() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
-		
-		MediumRegion lastConsecutiveRegion = firstConsecutiveRegions.get(firstConsecutiveRegions.size() - 1);
-		Assert.assertEquals(0, cache.getCachedByteCountAt(lastConsecutiveRegion.calculateEndReference()));
+      MediumCache cache = cacheLayout.buildCache();
+
+      List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
+
+      MediumRegion lastConsecutiveRegion = firstConsecutiveRegions.get(firstConsecutiveRegions.size() - 1);
+      Assert.assertEquals(0, cache.getCachedByteCountAt(lastConsecutiveRegion.calculateEndReference()));
    }
 
    /**
@@ -406,14 +407,15 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getCachedByteCountAt_startOfRegionWithConsecutiveRegions_returnsTotalSizeOfAllConsecutiveRegions() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
-		
-		MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
-		Assert.assertEquals(DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE, cache.getCachedByteCountAt(firstConsecutiveRegion.getStartReference()));
+      MediumCache cache = cacheLayout.buildCache();
+
+      List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
+
+      MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
+      Assert.assertEquals(DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE,
+         cache.getCachedByteCountAt(firstConsecutiveRegion.getStartReference()));
    }
 
    /**
@@ -421,14 +423,15 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getCachedByteCountAt_endOfRegionWithConsecutiveRegions_returnsTotalSizeOfSubsequentRegions() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
-		
-		MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
-		Assert.assertEquals(DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE - firstConsecutiveRegion.getSize(), cache.getCachedByteCountAt(firstConsecutiveRegion.calculateEndReference()));
+      MediumCache cache = cacheLayout.buildCache();
+
+      List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
+
+      MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
+      Assert.assertEquals(DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE - firstConsecutiveRegion.getSize(),
+         cache.getCachedByteCountAt(firstConsecutiveRegion.calculateEndReference()));
    }
 
    /**
@@ -436,15 +439,16 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getCachedByteCountAt_middleOfRegionWithConsecutiveRegions_returnsCorrectTotalConsecutiveByteCount() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
-		
-		MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
-		int middleOffset = firstConsecutiveRegion.getSize() / 2;
-		Assert.assertEquals(DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE - middleOffset, cache.getCachedByteCountAt(firstConsecutiveRegion.getStartReference().advance(middleOffset)));
+      MediumCache cache = cacheLayout.buildCache();
+
+      List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
+
+      MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
+      int middleOffset = firstConsecutiveRegion.getSize() / 2;
+      Assert.assertEquals(DEFAULT_CACHE_INDEX_FIRST_CONSECUTIVE_REGIONS_SIZE - middleOffset,
+         cache.getCachedByteCountAt(firstConsecutiveRegion.getStartReference().advance(middleOffset)));
    }
 
    /**
@@ -452,15 +456,16 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
     */
    @Test
    public void getCachedByteCountAt_middleOfLastConsecutiveRegion_returnsRemainingLastRegionSize() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+      TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
-		
-		MediumRegion lastConsecutiveRegion = firstConsecutiveRegions.get(firstConsecutiveRegions.size() - 1);
-		int middleOffset = lastConsecutiveRegion.getSize() / 2;
-		Assert.assertEquals(lastConsecutiveRegion.getSize() - middleOffset, cache.getCachedByteCountAt(lastConsecutiveRegion.getStartReference().advance(middleOffset)));
+      MediumCache cache = cacheLayout.buildCache();
+
+      List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
+
+      MediumRegion lastConsecutiveRegion = firstConsecutiveRegions.get(firstConsecutiveRegions.size() - 1);
+      int middleOffset = lastConsecutiveRegion.getSize() / 2;
+      Assert.assertEquals(lastConsecutiveRegion.getSize() - middleOffset,
+         cache.getCachedByteCountAt(lastConsecutiveRegion.getStartReference().advance(middleOffset)));
    }
 
    /**
@@ -469,46 +474,53 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
    @Test
    public void getRegionsInRange_forEmptyCache_returnsEmptyList() {
       MediumCache emptyCache = new MediumCache(MEDIUM);
-      
-      Assert.assertEquals(0, emptyCache.getRegionsInRange(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION), 10).size());
-      Assert.assertEquals(0, emptyCache.getRegionsInRange(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_GAP_OFFSET), 10).size());
+
+      Assert.assertEquals(0,
+         emptyCache
+            .getRegionsInRange(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_OFFSET_BEFORE_FIRST_REGION), 10)
+            .size());
+      Assert.assertEquals(0,
+         emptyCache.getRegionsInRange(new StandardMediumReference(MEDIUM, DEFAULT_CACHE_LAYOUT_GAP_OFFSET), 10).size());
    }
 
-   /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
-    */
-   @Test
-   public void getRegionsInRange_rangeCoveringFullCachedRegion_returnsSingleRegion() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+   // /**
+   // * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+   // */
+   // @Test
+   // public void getRegionsInRange_rangeCoveringFullCachedRegion_returnsSingleRegion() {
+   // TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+   //
+   // MediumCache cache = cacheLayout.buildCache();
+   //
+   // List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
+   //
+   // MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
+   //
+   // List<MediumRegion> actualRegionsInRange = cache.getRegionsInRange(firstConsecutiveRegion.getStartReference(),
+   // firstConsecutiveRegion.getSize());
+   // Assert.assertEquals(1, actualRegionsInRange.size());
+   // Assert.assertEquals(firstConsecutiveRegion, actualRegionsInRange.get(0));
+   // }
 
-		MediumCache cache = cacheLayout.buildCache();
-		
-		List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
-		
-		MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
-
-		List<MediumRegion> actualRegionsInRange = cache.getRegionsInRange(firstConsecutiveRegion.getStartReference(), firstConsecutiveRegion.getSize());
-		Assert.assertEquals(1, actualRegionsInRange.size());
-		Assert.assertEquals(firstConsecutiveRegion, actualRegionsInRange.get(0));
-   }
-
-   /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
-    */
-   @Test
-   public void getRegionsInRange_rangeWithinCachedRegion_returnsEnclosingRegion() {
-		TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
-
-		MediumCache cache = cacheLayout.buildCache();
-		
-		List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
-		
-		MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
-
-		List<MediumRegion> actualRegionsInRange = cache.getRegionsInRange(firstConsecutiveRegion.getStartReference().advance(1L), firstConsecutiveRegion.getSize() - 1);
-		Assert.assertEquals(1, actualRegionsInRange.size());
-		Assert.assertEquals(firstConsecutiveRegion, actualRegionsInRange.get(0));
-   }
+   // /**
+   // * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+   // */
+   // @Test
+   // public void getRegionsInRange_rangeWithinCachedRegion_returnsEnclosingRegion() {
+   // TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions();
+   //
+   // MediumCache cache = cacheLayout.buildCache();
+   //
+   // List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
+   //
+   // MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
+   //
+   // List<MediumRegion> actualRegionsInRange =
+   // cache.getRegionsInRange(firstConsecutiveRegion.getStartReference().advance(1L), firstConsecutiveRegion.getSize() -
+   // 1);
+   // Assert.assertEquals(1, actualRegionsInRange.size());
+   // Assert.assertEquals(firstConsecutiveRegion, actualRegionsInRange.get(0));
+   // }
 
    /**
     * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
@@ -528,51 +540,63 @@ private final static long DEFAULT_CACHE_LAYOUT_GAP_OFFSET = 200L;
       emptyCache.getRegionsInRange(new StandardMediumReference(MEDIUM, 0L), -10);
    }
 
-private List<MediumRegion> getFirstConsecutiveRegionsFromDefaultCache(
-		TestCacheLayout cacheLayout) {
-	List<MediumRegion> allRegions = cacheLayout.getExpectedCacheRegions();
-	
+   private List<MediumRegion> getFirstConsecutiveRegionsFromDefaultCache(TestCacheLayout cacheLayout) {
+      List<MediumRegion> allRegions = cacheLayout.getExpectedCacheRegions();
 
-	List<MediumRegion> firstConsecutiveRegions = new ArrayList<MediumRegion>();
-	
-	firstConsecutiveRegions.add(allRegions.get(DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS));
-	firstConsecutiveRegions.add(allRegions.get(DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS+1));
-	firstConsecutiveRegions.add(allRegions.get(DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS+2));
-	return firstConsecutiveRegions;
-}
-   
-   /**
-    * Verifies that all invariants of the {@link MediumCache} class are fulfilled.	
- * @param cache The {@link MediumCache} instance to check.
- */
-private void assertCacheInvariantsAreFulfilled(MediumCache cache) {
-	   List<MediumRegion> actualRegions = cache.getAllCachedRegions();
-	   
-	   long actualCacheSize = 0;
-	   IMediumReference previousEndReference = null;
-	   for (MediumRegion mediumRegion : actualRegions) {
-		actualCacheSize += mediumRegion.getSize();
-		
-		if (previousEndReference != null) {
-			Assert.assertTrue("The current medium region <"+mediumRegion+"> overlaps the previous region which violates the class invariant of " + MediumCache.class.getSimpleName(), mediumRegion.getStartReference().behindOrEqual(previousEndReference));
-		}
-		
-		Assert.assertTrue("The current medium regions size <"+mediumRegion.getSize()+"> must be smaller or equal to the configured maximum cache region size of <"+cache.getMaximumCacheRegionSizeInBytes()	+">", mediumRegion.getSize() <= cache.getMaximumCacheRegionSizeInBytes());
-	}
-	   
-	   Assert.assertTrue("The current total medium region size of <"+actualCacheSize+"> must be smaller or equal to the configured maximum cache size of <"+cache.getMaximumCacheSizeInBytes()	+">", actualCacheSize <= cache.getMaximumCacheSizeInBytes());
+      List<MediumRegion> firstConsecutiveRegions = new ArrayList<MediumRegion>();
+
+      firstConsecutiveRegions.add(allRegions.get(DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS));
+      firstConsecutiveRegions.add(allRegions.get(DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS + 1));
+      firstConsecutiveRegions.add(allRegions.get(DEFAULT_CACHE_INDEX_FIRST_REGION_WITH_CONSECUTIVE_REGIONS + 2));
+      return firstConsecutiveRegions;
    }
 
    /**
-    * Verifies that the given {@link MediumCache} instance is indeed empty.	
- * @param cache The cache instance to check.
- */
-private void assertCacheIsEmpty(MediumCache cache) {
+    * Verifies that all invariants of the {@link MediumCache} class are fulfilled.
+    * 
+    * @param cache
+    *           The {@link MediumCache} instance to check.
+    */
+   private void assertCacheInvariantsAreFulfilled(MediumCache cache) {
+      List<MediumRegion> actualRegions = cache.getAllCachedRegions();
+
+      long actualCacheSize = 0;
+      IMediumReference previousEndReference = null;
+      for (MediumRegion mediumRegion : actualRegions) {
+         actualCacheSize += mediumRegion.getSize();
+
+         if (previousEndReference != null) {
+            Assert.assertTrue(
+               "The current medium region <" + mediumRegion
+                  + "> overlaps the previous region which violates the class invariant of "
+                  + MediumCache.class.getSimpleName(),
+               mediumRegion.getStartReference().behindOrEqual(previousEndReference));
+         }
+
+         Assert.assertTrue(
+            "The current medium regions size <" + mediumRegion.getSize()
+               + "> must be smaller or equal to the configured maximum cache region size of <"
+               + cache.getMaximumCacheRegionSizeInBytes() + ">",
+            mediumRegion.getSize() <= cache.getMaximumCacheRegionSizeInBytes());
+      }
+
+      Assert.assertTrue("The current total medium region size of <" + actualCacheSize
+         + "> must be smaller or equal to the configured maximum cache size of <" + cache.getMaximumCacheSizeInBytes()
+         + ">", actualCacheSize <= cache.getMaximumCacheSizeInBytes());
+   }
+
+   /**
+    * Verifies that the given {@link MediumCache} instance is indeed empty.
+    * 
+    * @param cache
+    *           The cache instance to check.
+    */
+   private void assertCacheIsEmpty(MediumCache cache) {
 
       Assert.assertEquals(0L, cache.getCurrentCacheSizeInBytes());
       Assert.assertEquals(0, cache.getAllCachedRegions().size());
-      Assert.assertEquals(0, cache
-         .getRegionsInRange(new StandardMediumReference(MEDIUM, 0L), (int) Math.min(cache.getMaximumCacheSizeInBytes(), Integer.MAX_VALUE)).size());
+      Assert.assertEquals(0, cache.getRegionsInRange(new StandardMediumReference(MEDIUM, 0L),
+         (int) Math.min(cache.getMaximumCacheSizeInBytes(), Integer.MAX_VALUE)).size());
    }
 
    /**

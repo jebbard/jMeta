@@ -10,12 +10,10 @@ package de.je.jmeta.dataformats;
 import java.util.List;
 import java.util.Set;
 
-import de.je.util.javautil.simpleregistry.IComponentInterface;
-
 /**
  *
  */
-public interface IDataFormatRepository extends IComponentInterface {
+public interface IDataFormatRepository {
 
    /**
     * @return the supported {@link DataFormat}s
@@ -27,7 +25,6 @@ public interface IDataFormatRepository extends IComponentInterface {
     * @return the {@link IDataFormatSpecification} for the given {@link DataFormat}
     * @pre {@link #getSupportedDataFormats()} {@link List#contains(Object)} dataFormat
     */
-   public IDataFormatSpecification getDataFormatSpecification(
-      DataFormat dataFormat);
+   public IDataFormatSpecification getDataFormatSpecification(DataFormat dataFormat);
 
 }

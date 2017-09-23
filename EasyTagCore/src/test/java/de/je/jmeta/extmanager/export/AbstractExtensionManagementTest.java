@@ -13,8 +13,6 @@ import org.junit.Before;
 
 import de.je.jmeta.extmanager.impl.StandardExtensionManager;
 import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
-import de.je.util.javautil.simpleregistry.SimpleComponentRegistry;
 
 /**
  * {@link AbstractExtensionManagementTest} sets up the environment for extension management testing.
@@ -23,8 +21,6 @@ public abstract class AbstractExtensionManagementTest {
 
    private IExtensionManager testling;
 
-   private ISimpleComponentRegistry registry;
-
    /**
     * Sets up the test fixtures.
     */
@@ -32,8 +28,7 @@ public abstract class AbstractExtensionManagementTest {
    public void setUp() {
 
       JMetaTestBasics.emptyLogFile(JMetaTestBasics.DEFAULT_LOG_FILE);
-      registry = createExtensionManager();
-      testling = registry.getComponentImplementation(IExtensionManager.class);
+      testling = new StandardExtensionManager();
    }
 
    /**
@@ -45,29 +40,4 @@ public abstract class AbstractExtensionManagementTest {
 
       return testling;
    }
-
-   /**
-    * Returns the {@link ISimpleComponentRegistry} to use.
-    * 
-    * @return the {@link ISimpleComponentRegistry} to use.
-    */
-   protected ISimpleComponentRegistry getComponentRegistry() {
-
-      return registry;
-   }
-
-   /**
-    * Creates the {@link ISimpleComponentRegistry} instance for testing {@link IExtensionManager}.
-    */
-   private static ISimpleComponentRegistry createExtensionManager() {
-
-      ISimpleComponentRegistry newRegistry = new SimpleComponentRegistry();
-      IExtensionManager extensionManager = new StandardExtensionManager(newRegistry);
-
-      // To avoid unused warnings
-      assert(extensionManager != null);
-
-      return newRegistry;
-   }
-
 }

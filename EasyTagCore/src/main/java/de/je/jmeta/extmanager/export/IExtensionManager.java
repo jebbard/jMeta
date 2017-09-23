@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.je.util.javautil.io.stream.NamedInputStream;
-import de.je.util.javautil.simpleregistry.IComponentInterface;
 
 /**
  * {@link IExtensionManager} is responsible for loading and returning all extensions that are available for jMeta. An
@@ -22,7 +21,7 @@ import de.je.util.javautil.simpleregistry.IComponentInterface;
  * Extensions are bundled in so called extension bundles, represented by the interface {@link IExtensionBundle}. A
  * single extension bundle may contain an arbitrary number of extensions for any number of available extension points.
  */
-public interface IExtensionManager extends IComponentInterface {
+public interface IExtensionManager {
 
    /**
     * Loads a new extension points configuration. Extension information determined from a previous file are discarded.
@@ -39,8 +38,7 @@ public interface IExtensionManager extends IComponentInterface {
     *
     * @post {@link #isLoaded()}
     */
-   public BundleLoadExceptions load(NamedInputStream extensionPointStream,
-      File basePath);
+   public BundleLoadExceptions load(NamedInputStream extensionPointStream, File basePath);
 
    /**
     * Returns true if a extension points configuration file is currently loaded, false otherwise.

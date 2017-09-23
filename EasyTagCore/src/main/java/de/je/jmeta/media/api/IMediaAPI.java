@@ -10,12 +10,11 @@
 package de.je.jmeta.media.api;
 
 import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
-import de.je.util.javautil.simpleregistry.IComponentInterface;
 
 /**
  * {@link IMediaAPI} provides access to all functionality of the component Media.
  */
-public interface IMediaAPI extends IComponentInterface {
+public interface IMediaAPI {
 
    /**
     * Returns a suitable {@link IMediumStore_OLD} for the given readable {@link IMedium}.

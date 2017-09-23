@@ -30,9 +30,8 @@ import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 import de.je.util.javautil.common.config.issue.ConfigIssueType;
 import de.je.util.javautil.common.extenum.AbstractExtensibleEnum;
+import de.je.util.javautil.common.registry.ComponentRegistry;
 import de.je.util.javautil.io.stream.NamedInputStream;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
-import de.je.util.javautil.simpleregistry.SimpleComponentRegistry;
 
 /**
  * {@link LibraryJMeta}
@@ -69,7 +68,6 @@ public class LibraryJMeta implements ILibraryJMeta {
    private static final String MSG_RESET_DEFAULT = " - value has been reset to default";
    private final static String USER_CONFIG_FILE = "." + System.getProperty("file.separator") + "config"
       + System.getProperty("file.separator") + "userConfig.properties";
-   private ISimpleComponentRegistry m_componentRegistry;
    // TODO stage2_014: hide this field
    /**
     * Internally used logging trigger.
@@ -159,8 +157,6 @@ public class LibraryJMeta implements ILibraryJMeta {
    public LibraryJMeta() {
       String loadComponents = "Loading components initially" + ILoggingMessageConstants.SUFFIX_TASK;
 
-      m_componentRegistry = new SimpleComponentRegistry();
-
       IUserConfigAccessor userConfigAccessor = null;
 
       String jMetaIntro = ILoggingMessageConstants.LINE_SEPARATOR + LIBRARY_NAME + " is about to start..."
@@ -174,7 +170,7 @@ public class LibraryJMeta implements ILibraryJMeta {
       try {
          LOGGER.info(jMetaIntro);
 
-         userConfigAccessor = m_componentRegistry.getComponentImplementation(IUserConfigAccessor.class);
+         userConfigAccessor = ComponentRegistry.lookupService(IUserConfigAccessor.class);
 
          logJMetaStartup();
       }
@@ -242,7 +238,7 @@ public class LibraryJMeta implements ILibraryJMeta {
 
       try (NamedInputStream extensionPointsStream = NamedInputStream.createFromResource(LibraryJMeta.class,
          EXTENSION_POINTS_CONFIG)) {
-         IExtensionManager extManager = m_componentRegistry.getComponentImplementation(IExtensionManager.class);
+         IExtensionManager extManager = ComponentRegistry.lookupService(IExtensionManager.class);
 
          extManager.load(extensionPointsStream, jMetaHomeDir);
 
@@ -261,8 +257,8 @@ public class LibraryJMeta implements ILibraryJMeta {
       LOGGER.info(startingTask(loadComponents));
 
       try {
-         m_componentRegistry.getComponentImplementation(IDataBlockAccessor.class);
-         m_componentRegistry.getComponentImplementation(IDataFormatRepository.class);
+         ComponentRegistry.lookupService(IDataBlockAccessor.class);
+         ComponentRegistry.lookupService(IDataFormatRepository.class);
       }
 
       catch (Throwable e) {
@@ -286,7 +282,7 @@ public class LibraryJMeta implements ILibraryJMeta {
    @Override
    public IDataBlockAccessor getDataBlockAccessor() {
 
-      return m_componentRegistry.getComponentImplementation(IDataBlockAccessor.class);
+      return ComponentRegistry.lookupService(IDataBlockAccessor.class);
    }
 
    /**
@@ -295,7 +291,7 @@ public class LibraryJMeta implements ILibraryJMeta {
    @Override
    public IDataFormatRepository getDataFormatRepository() {
 
-      return m_componentRegistry.getComponentImplementation(IDataFormatRepository.class);
+      return ComponentRegistry.lookupService(IDataFormatRepository.class);
    }
 
    /**

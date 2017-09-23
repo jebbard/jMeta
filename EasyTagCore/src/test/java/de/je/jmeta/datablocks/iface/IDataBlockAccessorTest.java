@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +26,9 @@ import de.je.jmeta.dataformats.PhysicalDataBlockType;
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.datatype.AbstractMedium;
 import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
+import de.je.util.javautil.common.registry.ComponentRegistry;
 import de.je.util.javautil.testUtil.setup.TestDataException;
+import junit.framework.Assert;
 
 // TODO doItFirst005: write test case for "out of order" reading
 // TODO doItFirst004: make ogg test case
@@ -41,8 +40,6 @@ import de.je.util.javautil.testUtil.setup.TestDataException;
  * data to read. Using the file contents, the three media types file, memory and stream are tested.
  */
 public abstract class IDataBlockAccessorTest {
-
-   private ISimpleComponentRegistry registryToUse;
 
    private final List<IMedium<?>> testedMedia = new ArrayList<>();
 
@@ -60,9 +57,9 @@ public abstract class IDataBlockAccessorTest {
 
       JMetaTestBasics.emptyLogFile(JMetaTestBasics.DEFAULT_LOG_FILE);
 
-      registryToUse = JMetaTestBasics.setupComponents();
+      JMetaTestBasics.setupExtensions();
 
-      dataFormatRepository = registryToUse.getComponentImplementation(IDataFormatRepository.class);
+      dataFormatRepository = ComponentRegistry.lookupService(IDataFormatRepository.class);
 
       prepareTestedMedia();
 
@@ -72,7 +69,7 @@ public abstract class IDataBlockAccessorTest {
          throw new TestDataException("Could not read test data.", e);
       }
 
-      testling = registryToUse.getComponentImplementation(IDataBlockAccessor.class);
+      testling = ComponentRegistry.lookupService(IDataBlockAccessor.class);
 
       if (testling == null)
          throw new TestDataException("Testdata must not be null", null);
@@ -94,6 +91,8 @@ public abstract class IDataBlockAccessorTest {
 
       // Check log files
       JMetaTestBasics.performGeneralLogCheck(JMetaTestBasics.DEFAULT_LOG_FILE);
+
+      ComponentRegistry.clearServiceCache();
    }
 
    /**

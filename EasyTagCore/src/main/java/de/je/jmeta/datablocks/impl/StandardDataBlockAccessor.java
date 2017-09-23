@@ -35,24 +35,17 @@ import de.je.jmeta.extmanager.export.InvalidExtensionException;
 import de.je.jmeta.media.api.IMediaAPI;
 import de.je.jmeta.media.api.IMedium;
 import de.je.util.javautil.common.err.Reject;
-import de.je.util.javautil.simpleregistry.AbstractComponentImplementation;
-import de.je.util.javautil.simpleregistry.ComponentDescription;
-import de.je.util.javautil.simpleregistry.ISimpleComponentRegistry;
+import de.je.util.javautil.common.registry.ComponentRegistry;
 
 /**
  *
  */
-public class StandardDataBlockAccessor extends AbstractComponentImplementation<IDataBlockAccessor>
-   implements IDataBlockAccessor {
+public class StandardDataBlockAccessor implements IDataBlockAccessor {
    // TODO stage2_013: Provide means to set timeouts (read block timeout + identify timeout)
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
 
    private static final int DEFAULT_LAZY_FIELD_SIZE = 8192;
-
-   private static final ComponentDescription<IDataBlockAccessor> COMPONENT_DESCRIPTION = new ComponentDescription<>(
-      "DataBlockAccessor", IDataBlockAccessor.class, "Jens Ebert", "v0.1",
-      "Component for low-level access to binary data");
 
    @Override
    public void setLazyFieldSize(int lazyFieldSize) {
@@ -72,13 +65,12 @@ public class StandardDataBlockAccessor extends AbstractComponentImplementation<I
     * 
     * @param registry
     */
-   public StandardDataBlockAccessor(ISimpleComponentRegistry registry) {
-      super(COMPONENT_DESCRIPTION, IDataBlockAccessor.class, registry);
+   public StandardDataBlockAccessor() {
 
-      extManager = registry.getComponentImplementation(IExtensionManager.class);
+      extManager = ComponentRegistry.lookupService(IExtensionManager.class);
 
-      m_repository = registry.getComponentImplementation(IDataFormatRepository.class);
-      m_mediumFactory = registry.getComponentImplementation(IMediaAPI.class);
+      m_repository = ComponentRegistry.lookupService(IDataFormatRepository.class);
+      m_mediumFactory = ComponentRegistry.lookupService(IMediaAPI.class);
 
       List<IExtensionBundle> extBundles = extManager.getRegisteredExtensionBundles();
 

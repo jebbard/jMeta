@@ -5,12 +5,11 @@ import java.io.InputStream;
 import java.util.List;
 
 import de.je.util.javautil.common.config.issue.ConfigIssue;
-import de.je.util.javautil.simpleregistry.IComponentInterface;
 
 /**
  * {@link IUserConfigAccessor} provides read access to user configuration.
  */
-public interface IUserConfigAccessor extends IComponentInterface {
+public interface IUserConfigAccessor {
 
    /**
     * Loads data from a configuration {@link InputStream}, thereby discarding previously loaded configuration data.
