@@ -465,7 +465,7 @@ public class MediumCacheTest {
     * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
     */
    @Test
-   public void getRegionsInRange_rangeFullyCoveringMultipleCachedRegion_returnsAllCoveredRegions() {
+   public void getRegionsInRange_rangeFullyCoveringMultipleCachedRegions_returnsAllCoveredRegions() {
       TestCacheLayout cacheLayout = createDefaultLayoutHavingSubsequentAndScatteredRegions(
          MediumCache.UNLIMITED_CACHE_SIZE, MediumCache.UNLIMITED_CACHE_REGION_SIZE);
 
@@ -598,19 +598,17 @@ public class MediumCacheTest {
       List<MediumRegion> firstConsecutiveRegions = getFirstConsecutiveRegionsFromDefaultCache(cacheLayout);
 
       MediumRegion firstConsecutiveRegion = firstConsecutiveRegions.get(0);
-      MediumRegion secondConsecutiveRegion = firstConsecutiveRegions.get(1);
 
-      long regionStartOffset = DEFAULT_CACHE_START_OFFSET - 3;
-      int expectedFirstUncachedRegionSize = (int) regionStartOffset;
+      int expectedFirstUncachedRegionSize = 3;
+      long regionStartOffset = DEFAULT_CACHE_START_OFFSET - expectedFirstUncachedRegionSize;
       IMediumReference startReference = new StandardMediumReference(MEDIUM, regionStartOffset);
 
       List<MediumRegion> expectedRegions = new ArrayList<>();
       expectedRegions.add(new MediumRegion(startReference, expectedFirstUncachedRegionSize));
       expectedRegions.add(firstConsecutiveRegion);
-      expectedRegions.add(secondConsecutiveRegion);
 
       List<MediumRegion> actualRegionsInRange = cache.getRegionsInRange(startReference,
-         secondConsecutiveRegion.getSize() - 1);
+         firstConsecutiveRegion.getSize() - 1);
 
       Assert.assertEquals(expectedRegions, actualRegionsInRange);
    }
@@ -653,13 +651,17 @@ public class MediumCacheTest {
 
       MediumCache cache = cacheLayout.buildCache();
 
-      List<MediumRegion> allCachedRegionsWithGap = cacheLayout.getAllCachedRegionsWithGaps();
+      List<MediumRegion> allCachedRegionsWithGaps = cacheLayout.getAllCachedRegionsWithGaps();
 
-      MediumRegion lastRegion = allCachedRegionsWithGap.get(allCachedRegionsWithGap.size() - 1);
+      MediumRegion firstRegion = allCachedRegionsWithGaps.get(0);
+      MediumRegion lastRegion = allCachedRegionsWithGaps.get(allCachedRegionsWithGaps.size() - 1);
 
-      long regionStartOffset = DEFAULT_CACHE_START_OFFSET - 3;
+      long totalRangeSizeCoveredByCachedRegions = lastRegion.calculateEndReference()
+         .distanceTo(firstRegion.getStartReference());
 
-      int expectedFirstUncachedRegionSize = (int) regionStartOffset;
+      int expectedFirstUncachedRegionSize = 3;
+      long regionStartOffset = DEFAULT_CACHE_START_OFFSET - expectedFirstUncachedRegionSize;
+
       int expectedLastUncachedRegionSize = 20;
 
       IMediumReference startReference = new StandardMediumReference(MEDIUM, regionStartOffset);
@@ -669,14 +671,15 @@ public class MediumCacheTest {
       // Gap at front
       expectedRegions.add(new MediumRegion(startReference, expectedFirstUncachedRegionSize));
 
-      expectedRegions.addAll(allCachedRegionsWithGap);
+      expectedRegions.addAll(allCachedRegionsWithGaps);
 
       // Gap at back
       expectedRegions.add(new MediumRegion(lastRegion.calculateEndReference(), expectedLastUncachedRegionSize));
 
-      List<MediumRegion> actualRegionsInRange = cache.getRegionsInRange(startReference,
-         (int) (cacheLayout.getTotalRegionSizeInBytes() + expectedFirstUncachedRegionSize
-            + expectedLastUncachedRegionSize));
+      int totalRangeSize = (int) (expectedFirstUncachedRegionSize + totalRangeSizeCoveredByCachedRegions
+         + expectedLastUncachedRegionSize);
+
+      List<MediumRegion> actualRegionsInRange = cache.getRegionsInRange(startReference, totalRangeSize);
 
       Assert.assertEquals(expectedRegions, actualRegionsInRange);
    }
@@ -775,12 +778,12 @@ public class MediumCacheTest {
       TestCacheLayout cacheLayout = new TestCacheLayout(DEFAULT_CACHE_START_OFFSET, MEDIUM, maxCacheSize,
          maxCacheRegionSize);
 
-      cacheLayout.addNextRegionInfo(40, 0);
-      cacheLayout.addNextRegionInfo(20, 0);
-      cacheLayout.addNextRegionInfo(100, 200);
-      cacheLayout.addNextRegionInfo(5, 0);
-      cacheLayout.addNextRegionInfo(27, 1);
-      cacheLayout.addNextRegionInfo(150, 0);
+      cacheLayout.addNextRegionInfo(40, 0);        // Region 1: [5, 45)
+      cacheLayout.addNextRegionInfo(20, 0);        // Region 2: [45, 65)
+      cacheLayout.addNextRegionInfo(100, 200);     // Region 3: [65, 165), Gap Region 4: [165, 365)
+      cacheLayout.addNextRegionInfo(5, 0);         // Region 5: [365, 370)
+      cacheLayout.addNextRegionInfo(27, 1);        // Region 6: [370, 397), Gap Region 7: [397, 398)
+      cacheLayout.addNextRegionInfo(150, 0);       // Region 5: [398, 548)
 
       return cacheLayout;
    }

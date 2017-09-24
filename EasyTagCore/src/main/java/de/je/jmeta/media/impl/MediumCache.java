@@ -151,8 +151,88 @@ public class MediumCache {
       Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
       Reject.ifTrue(rangeSizeInBytes <= 0, "The range size must be strictly bigger than zero");
 
-      // TODO implement
-      return getAllCachedRegions();
+      List<MediumRegion> regionsInRange = new ArrayList<>();
+
+      if (cachedRegionsInOffsetOrder.isEmpty()) {
+         return regionsInRange;
+      }
+
+      MediumRegion virtualRangeRegion = new MediumRegion(startReference, rangeSizeInBytes);
+
+      IMediumReference firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder
+         .floorKey(startReference);
+
+      if (firstCachedRegionReferenceNearToStartReference == null) {
+         firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder.ceilingKey(startReference);
+
+         if (firstCachedRegionReferenceNearToStartReference == null) {
+            throw new IllegalStateException("The cache is not empty, but no " + IMediumReference.class.getSimpleName()
+               + " was found that is smaller, equal or bigger than the given start reference <" + startReference
+               + ">. This must never happen.");
+         }
+      }
+
+      MediumRegion firstCachedRegionNearToStartReference = cachedRegionsInOffsetOrder
+         .get(firstCachedRegionReferenceNearToStartReference);
+
+      if (firstCachedRegionNearToStartReference.contains(startReference) && firstCachedRegionNearToStartReference
+         .calculateEndReference().behindOrEqual(virtualRangeRegion.calculateEndReference())) {
+         regionsInRange.add(firstCachedRegionNearToStartReference);
+         return regionsInRange;
+      }
+
+      Map<IMediumReference, MediumRegion> cachedRegionsStartingWithFirstNearRangeStart = cachedRegionsInOffsetOrder
+         .tailMap(firstCachedRegionReferenceNearToStartReference);
+
+      IMediumReference previousRegionEndReference = startReference;
+
+      for (Iterator<IMediumReference> iterator = cachedRegionsStartingWithFirstNearRangeStart.keySet()
+         .iterator(); iterator.hasNext();) {
+         IMediumReference nextCandidateReference = iterator.next();
+         MediumRegion nextCandidateRegion = cachedRegionsStartingWithFirstNearRangeStart.get(nextCandidateReference);
+         IMediumReference currentRegionEndReference = nextCandidateRegion.calculateEndReference();
+
+         // Cached region does not overlap with range - So we need to stop
+         if (!virtualRangeRegion.contains(nextCandidateReference)
+            && !virtualRangeRegion.contains(currentRegionEndReference.advance(-1))) {
+            break;
+         }
+
+         // Gap detected! - Add uncached region(s) for gap
+         if (previousRegionEndReference.before(nextCandidateReference)) {
+            // TODO test case required here
+            regionsInRange.add(new MediumRegion(previousRegionEndReference,
+               (int) nextCandidateReference.distanceTo(previousRegionEndReference)));
+         }
+
+         regionsInRange.add(nextCandidateRegion);
+
+         previousRegionEndReference = currentRegionEndReference;
+      }
+
+      // There is a remaining gap behind the last covered cached region until the end of the range
+      if (virtualRangeRegion.contains(previousRegionEndReference)) {
+         // TODO Is this condition really covering all possible cases?
+         int gapSizeInBytes = (int) virtualRangeRegion.calculateEndReference().distanceTo(previousRegionEndReference);
+
+         int countOfUncachedRegions = gapSizeInBytes / getMaximumCacheRegionSizeInBytes();
+
+         IMediumReference currentRegionStartReference = previousRegionEndReference;
+
+         for (int i = 0; i < countOfUncachedRegions; i++) {
+            regionsInRange.add(new MediumRegion(currentRegionStartReference, getMaximumCacheRegionSizeInBytes()));
+
+            currentRegionStartReference = currentRegionStartReference.advance(getMaximumCacheRegionSizeInBytes());
+         }
+
+         int remainderGapRegionSize = gapSizeInBytes % getMaximumCacheRegionSizeInBytes();
+
+         if (remainderGapRegionSize > 0) {
+            regionsInRange.add(new MediumRegion(currentRegionStartReference, remainderGapRegionSize));
+         }
+      }
+
+      return regionsInRange;
    }
 
    /**
