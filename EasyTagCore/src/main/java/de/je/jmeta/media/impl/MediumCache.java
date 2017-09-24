@@ -35,9 +35,10 @@ public class MediumCache {
    private final int maximumCacheRegionSizeInBytes;
    private final IMedium<?> medium;
 
-   private final TreeMap<IMediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(new MediumReferenceComparator());
+   private final TreeMap<IMediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(
+      (leftRef, rightRef) -> new Long(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset()));
    private final List<MediumRegion> cachedRegionsInInsertOrder = new LinkedList<>();
-   
+
    private long currentCacheSizeInBytes = 0L;
 
    /**
@@ -146,11 +147,10 @@ public class MediumCache {
     */
    public List<MediumRegion> getRegionsInRange(IMediumReference startReference, int rangeSizeInBytes) {
 
-	      Reject.ifNull(startReference, "startReference");
-	      Reject.ifFalse(startReference.getMedium().equals(getMedium()),
-	   	         "startReference.getMedium().equals(getMedium())");
-	      Reject.ifTrue(rangeSizeInBytes <= 0, "The range size must be strictly bigger than zero");
-	   
+      Reject.ifNull(startReference, "startReference");
+      Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
+      Reject.ifTrue(rangeSizeInBytes <= 0, "The range size must be strictly bigger than zero");
+
       // TODO implement
       return getAllCachedRegions();
    }
@@ -168,41 +168,40 @@ public class MediumCache {
     */
    public long getCachedByteCountAt(IMediumReference startReference) {
 
-	      Reject.ifNull(startReference, "startReference");
-	      Reject.ifFalse(startReference.getMedium().equals(getMedium()),
-		   	         "startReference.getMedium().equals(getMedium())");
-	   
-		   long totalCachedByteCount = 0L;
-		   
-	   IMediumReference previousOrEqualReference = cachedRegionsInOffsetOrder.floorKey(startReference);
-	   
-	   if (previousOrEqualReference != null) {
-		   MediumRegion previousRegion = cachedRegionsInOffsetOrder.get(previousOrEqualReference);
-		   
-		   if (previousRegion.contains(startReference)) {
-			   totalCachedByteCount += previousRegion.getSize() - startReference.distanceTo(previousRegion.getStartReference());
-			   
-			    Map<IMediumReference, MediumRegion> tailRegions = cachedRegionsInOffsetOrder.tailMap(startReference, false);
-			    
-			    for (Iterator<IMediumReference> iterator = tailRegions.keySet().iterator(); iterator
-						.hasNext();) {
-			    	IMediumReference nextReference = iterator.next();
-			    	
-			    	MediumRegion nextRegion = tailRegions.get(nextReference);
-			    	
-			    	// Consecutive region
-			    	if (nextRegion.getStartReference().equals(previousRegion.calculateEndReference())) {
-			    		totalCachedByteCount += nextRegion.getSize();
-			    	} else {
-			    		break;
-			    	}
-					
-			    	previousRegion = nextRegion;
-				}
-		   }
-	   }
+      Reject.ifNull(startReference, "startReference");
+      Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
 
-	   return totalCachedByteCount;
+      long totalCachedByteCount = 0L;
+
+      IMediumReference previousOrEqualReference = cachedRegionsInOffsetOrder.floorKey(startReference);
+
+      if (previousOrEqualReference != null) {
+         MediumRegion previousRegion = cachedRegionsInOffsetOrder.get(previousOrEqualReference);
+
+         if (previousRegion.contains(startReference)) {
+            totalCachedByteCount += previousRegion.getSize()
+               - startReference.distanceTo(previousRegion.getStartReference());
+
+            Map<IMediumReference, MediumRegion> tailRegions = cachedRegionsInOffsetOrder.tailMap(startReference, false);
+
+            for (Iterator<IMediumReference> iterator = tailRegions.keySet().iterator(); iterator.hasNext();) {
+               IMediumReference nextReference = iterator.next();
+
+               MediumRegion nextRegion = tailRegions.get(nextReference);
+
+               // Consecutive region
+               if (nextRegion.getStartReference().equals(previousRegion.calculateEndReference())) {
+                  totalCachedByteCount += nextRegion.getSize();
+               } else {
+                  break;
+               }
+
+               previousRegion = nextRegion;
+            }
+         }
+      }
+
+      return totalCachedByteCount;
    }
 
    /**
