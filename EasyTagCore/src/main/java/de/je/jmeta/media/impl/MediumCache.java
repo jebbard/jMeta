@@ -200,9 +200,23 @@ public class MediumCache {
 
          // Gap detected! - Add uncached region(s) for gap
          if (previousRegionEndReference.before(nextCandidateReference)) {
-            // TODO test case required here
-            regionsInRange.add(new MediumRegion(previousRegionEndReference,
-               (int) nextCandidateReference.distanceTo(previousRegionEndReference)));
+            int gapSizeInBytes = (int) nextCandidateReference.distanceTo(previousRegionEndReference);
+
+            int countOfUncachedRegions = gapSizeInBytes / getMaximumCacheRegionSizeInBytes();
+
+            IMediumReference currentRegionStartReference = previousRegionEndReference;
+
+            for (int i = 0; i < countOfUncachedRegions; i++) {
+               regionsInRange.add(new MediumRegion(currentRegionStartReference, getMaximumCacheRegionSizeInBytes()));
+
+               currentRegionStartReference = currentRegionStartReference.advance(getMaximumCacheRegionSizeInBytes());
+            }
+
+            int remainderGapRegionSize = gapSizeInBytes % getMaximumCacheRegionSizeInBytes();
+
+            if (remainderGapRegionSize > 0) {
+               regionsInRange.add(new MediumRegion(currentRegionStartReference, remainderGapRegionSize));
+            }
          }
 
          regionsInRange.add(nextCandidateRegion);
@@ -212,7 +226,6 @@ public class MediumCache {
 
       // There is a remaining gap behind the last covered cached region until the end of the range
       if (virtualRangeRegion.contains(previousRegionEndReference)) {
-         // TODO Is this condition really covering all possible cases?
          int gapSizeInBytes = (int) virtualRangeRegion.calculateEndReference().distanceTo(previousRegionEndReference);
 
          int countOfUncachedRegions = gapSizeInBytes / getMaximumCacheRegionSizeInBytes();
