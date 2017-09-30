@@ -1,6 +1,8 @@
 package de.je.jmeta.media.impl;
 
-import java.nio.ByteBuffer;
+import static de.je.jmeta.media.impl.TestMediumUtility.createCachedMediumRegion;
+import static de.je.jmeta.media.impl.TestMediumUtility.createUnCachedMediumRegion;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +57,13 @@ class TestCacheLayout {
 
    public MediumCache buildCache() {
       List<MediumRegion> regionList = getAllCachedRegions();
-   
+
       MediumCache resultingCache = new MediumCache(regionMedium, maxCacheSize, maxCacheRegionSize);
-   
+
       for (MediumRegion mediumRegion : regionList) {
          resultingCache.addRegion(mediumRegion);
       }
-   
+
       return resultingCache;
    }
 
@@ -74,34 +76,17 @@ class TestCacheLayout {
          Integer currentRegionSize = regionSizes.get(i);
          Integer currentGapAfterRegion = gapsAfterRegion.get(i);
 
-         resultList.add(createCachedMediumRegion(currentOffset, currentRegionSize));
+         resultList.add(createCachedMediumRegion(regionMedium, currentOffset, currentRegionSize));
 
          if (withGaps && currentGapAfterRegion > 0) {
             // Also build a non-cached gap region
-            resultList.add(createUnCachedMediumRegion(currentOffset + currentRegionSize, currentGapAfterRegion));
+            resultList
+               .add(createUnCachedMediumRegion(regionMedium, currentOffset + currentRegionSize, currentGapAfterRegion));
          }
 
          currentOffset += currentRegionSize + currentGapAfterRegion;
       }
 
       return resultList;
-   }
-
-   private MediumRegion createCachedMediumRegion(long offset, Integer size) {
-      return new MediumRegion(new StandardMediumReference(regionMedium, offset), createRegionContent(offset, size));
-   }
-
-   private MediumRegion createUnCachedMediumRegion(long offset, Integer size) {
-      return new MediumRegion(new StandardMediumReference(regionMedium, offset), size);
-   }
-
-   private static ByteBuffer createRegionContent(long offset, int size) {
-      byte[] content = new byte[size];
-
-      for (int i = 0; i < content.length; i++) {
-         content[i] = (byte) ((offset + i) % Byte.MAX_VALUE);
-      }
-
-      return ByteBuffer.wrap(content);
    }
 }

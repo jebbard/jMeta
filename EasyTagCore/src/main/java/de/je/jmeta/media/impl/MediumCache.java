@@ -302,9 +302,9 @@ public class MediumCache {
     * Adds a region of fresh data to this {@link MediumCache}. If the region is bigger than the configured
     * {@link #getMaximumCacheRegionSizeInBytes()} it is split correspondingly. Any already existing cache regions are
     * split (if partly overlapped by the new {@link MediumRegion}) or removed (if entirely covered by the new
-    * {@link MediumRegion}) to ensure there are no overlapping region and the new data replaces existing old data in the
-    * cache. If the cache size would grow beyond the configured {@link #getMaximumCacheSizeInBytes()}, previously added
-    * {@link MediumRegion}s are automatically removed from the cache according to a FIFO approach: The
+    * {@link MediumRegion}) to ensure there are no overlapping regions and the new data replaces existing old data in
+    * the cache. If the cache size would grow beyond the configured {@link #getMaximumCacheSizeInBytes()}, previously
+    * added {@link MediumRegion}s are automatically removed from the cache according to a FIFO approach: The
     * {@link MediumRegion}s added first to the {@link MediumCache} are removed first, until the cache is again smaller
     * than the maximum cache size, including the new {@link MediumRegion}. If the new region by itself is already bigger
     * than the configured {@link #getMaximumCacheSizeInBytes()}, it is split such that each resulting
@@ -313,14 +313,112 @@ public class MediumCache {
     * it might occur for {@link MediumRegion}s bigger than the maximum cache size that their starting bytes are not
     * added to the cache.
     * 
-    * @param region
+    * @param regionToAdd
     *           The new {@link MediumRegion} to add. Must contain data and must refer to the same {@link IMedium} as
     *           returned by {@link #getMedium()}.
     */
-   public void addRegion(MediumRegion region) {
-      // TODO implement
+   public void addRegion(MediumRegion regionToAdd) {
+      Reject.ifNull(regionToAdd, "regionToAdd");
+      Reject.ifFalse(regionToAdd.getStartReference().getMedium().equals(getMedium()),
+         "region.getStartReference().getMedium().equals(getMedium())");
+
+      // First we existing regions overlapped by the new region
+      List<MediumRegion> regionsInRange = getRegionsInRange(regionToAdd.getStartReference(), regionToAdd.getSize());
+
+      regionsInRange.stream().filter(regionInRange -> regionInRange.isCached())
+         .forEach(existingRegion -> handleExistingRegionOverlappedByRegionToAdd(existingRegion, regionToAdd));
+
+      // Remove any existing regions if the new cache size would be bigger than allowed
+      long newCacheSize = calculateCurrentCacheSizeInBytes() + regionToAdd.getSize();
+
+      for (int i = 0; i < cachedRegionsInInsertOrder.size() && newCacheSize > getMaximumCacheSizeInBytes(); ++i) {
+         MediumRegion nextRegion = cachedRegionsInInsertOrder.get(i);
+
+         removeRegionFromCache(nextRegion);
+
+         newCacheSize -= nextRegion.getSize();
+      }
+
+      // Then we ensure the new region is divided into subregions with max region size, if necessary
+      List<MediumRegion> consolidatedRegionsToAdd = new ArrayList<>();
+
+      int maxCacheRegionsCovered = regionToAdd.getSize() / getMaximumCacheRegionSizeInBytes();
+
+      IMediumReference currentReference = regionToAdd.getStartReference();
+
+      MediumRegion remainderRegion = regionToAdd;
+
+      if (regionToAdd.getSize() % getMaximumCacheRegionSizeInBytes() == 0) {
+         maxCacheRegionsCovered -= 1;
+      }
+
+      for (int i = 0; i < maxCacheRegionsCovered; i++) {
+         currentReference = currentReference.advance(getMaximumCacheRegionSizeInBytes());
+
+         MediumRegion[] splitRegions = remainderRegion.split(currentReference);
+
+         if (newCacheSize <= getMaximumCacheSizeInBytes()) {
+            consolidatedRegionsToAdd.add(splitRegions[0]);
+         } else {
+            newCacheSize -= splitRegions[0].getSize();
+         }
+
+         remainderRegion = splitRegions[1];
+      }
+
+      consolidatedRegionsToAdd.add(remainderRegion);
+
+      for (MediumRegion consolidatedRegionToAdd : consolidatedRegionsToAdd) {
+
+         addRegionToCache(consolidatedRegionToAdd);
+      }
+   }
+
+   private void handleExistingRegionOverlappedByRegionToAdd(MediumRegion existingRegion, MediumRegion regionToAdd) {
+      if ((regionToAdd.contains(existingRegion.getStartReference())
+         && regionToAdd.contains(existingRegion.calculateEndReference().advance(-1)))
+         || (regionToAdd.getStartReference().equals(existingRegion.getStartReference())
+            && regionToAdd.calculateEndReference().equals(existingRegion.calculateEndReference()))) {
+         removeRegionFromCache(regionToAdd);
+      } else if (existingRegion.contains(regionToAdd.getStartReference())
+         && existingRegion.contains(regionToAdd.calculateEndReference().advance(-1))) {
+         removeRegionFromCache(existingRegion);
+         MediumRegion survivingPartOne = existingRegion.split(regionToAdd.getStartReference())[0];
+         addRegionToCache(survivingPartOne);
+         MediumRegion survivingPartTwo = existingRegion.split(regionToAdd.calculateEndReference())[1];
+         addRegionToCache(survivingPartTwo);
+      } else if (regionToAdd.overlapsOtherRegionAtBack(existingRegion)) {
+         removeRegionFromCache(existingRegion);
+         MediumRegion survivingPart = existingRegion.split(regionToAdd.getStartReference())[0];
+         addRegionToCache(survivingPart);
+      } else if (regionToAdd.overlapsOtherRegionAtFront(existingRegion)) {
+         removeRegionFromCache(existingRegion);
+         MediumRegion survivingPart = existingRegion.split(regionToAdd.calculateEndReference())[1];
+         addRegionToCache(survivingPart);
+      }
+   }
+
+   /**
+    * Adds the given region to the internal data structures representing the cache.
+    * 
+    * @param region
+    *           The {@link MediumRegion} to add.
+    */
+   private void addRegionToCache(MediumRegion region) {
       cachedRegionsInInsertOrder.add(region);
       cachedRegionsInOffsetOrder.put(region.getStartReference(), region);
+   }
+
+   /**
+    * Removes the given region from internal data structures representing the cache. It assumes that the region is
+    * really contained in the cache, so calling methods have to ensure they only pass such regions to this method.
+    * 
+    * @param region
+    *           The {@link MediumRegion} to remove.
+    */
+   private void removeRegionFromCache(MediumRegion region) {
+      cachedRegionsInInsertOrder.remove(region);
+      cachedRegionsInOffsetOrder.remove(region.getStartReference());
    }
 
    /**
