@@ -61,7 +61,7 @@ public class MediumRegion {
     */
    public MediumRegion(IMediumReference startReference, int size) {
 
-      Reject.ifTrue(size < 0, "size < 0");
+      Reject.ifNegative(size, "size");
       Reject.ifNull(startReference, "startReference");
 
       this.buffer = null;
@@ -127,10 +127,9 @@ public class MediumRegion {
    public MediumRegion[] split(IMediumReference at) {
       Reject.ifNull(at, "at");
       Reject.ifFalse(at.getMedium().equals(getStartReference().getMedium()),
-    	         "at.getMedium().equals(getStartReference().getMedium())");
+         "at.getMedium().equals(getStartReference().getMedium())");
       Reject.ifFalse(contains(at), "contains(at)");
-      Reject.ifFalse(getStartReference().before(at),
-         "getStartReference().before(at)");
+      Reject.ifFalse(getStartReference().before(at), "getStartReference().before(at)");
 
       MediumRegion[] returnedSplitRegions = new MediumRegion[2];
 
@@ -175,7 +174,7 @@ public class MediumRegion {
 
       Reject.ifNull(reference, "reference");
       Reject.ifFalse(reference.getMedium().equals(getStartReference().getMedium()),
- 	         "reference.getMedium().equals(getStartReference().getMedium())");
+         "reference.getMedium().equals(getStartReference().getMedium())");
 
       return reference.behindOrEqual(getStartReference()) && reference.before(calculateEndReference());
    }
@@ -314,7 +313,7 @@ public class MediumRegion {
    public boolean overlapsOtherRegionAtBack(MediumRegion other) {
       Reject.ifNull(other, "other");
       Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
-  	         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
+         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();
@@ -388,7 +387,7 @@ public class MediumRegion {
    public boolean overlapsOtherRegionAtFront(MediumRegion other) {
       Reject.ifNull(other, "other");
       Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
-   	         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
+         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();
@@ -409,7 +408,7 @@ public class MediumRegion {
    public int getOverlappingByteCount(MediumRegion other) {
       Reject.ifNull(other, "other");
       Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
-   	         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
+         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
       IMediumReference startRef = getStartReference();
       IMediumReference otherStartRef = other.getStartReference();
