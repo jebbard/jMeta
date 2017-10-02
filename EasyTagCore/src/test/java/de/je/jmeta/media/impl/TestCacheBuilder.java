@@ -5,12 +5,12 @@ import static de.je.jmeta.media.impl.TestMediumUtility.createUnCachedMediumRegio
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -35,22 +35,7 @@ class TestCacheBuilder {
    public static class TestCacheRegionInfo {
 
       private final long regionStartOffset;
-      private final int regionSize;
       private final byte[] regionBytes;
-
-      /**
-       * Creates a new instance, thereby generating the region bytes using
-       * {@link TestMediumUtility#createRegionContent(long, int)}.
-       * 
-       * @param regionStartOffset
-       *           The start offset to use, must not be negative and must be smaller than the end offset.
-       * @param regionEndOffset
-       *           The end offset to use, must not be negative and must be bigger than the start offset
-       */
-      public TestCacheRegionInfo(long regionStartOffset, long regionEndOffset) {
-         this(regionStartOffset,
-            TestMediumUtility.createRegionContent(regionStartOffset, (int) (regionEndOffset - regionStartOffset)));
-      }
 
       /**
        * Creates a new instance using the given region bytes.
@@ -65,8 +50,36 @@ class TestCacheBuilder {
          Reject.ifNull(regionBytes, "regionBytes");
 
          this.regionStartOffset = regionStartOffset;
-         this.regionSize = regionBytes.length;
          this.regionBytes = regionBytes;
+      }
+
+      /**
+       * Converts this {@link TestCacheRegionInfo} to a cached {@link MediumRegion}.
+       * 
+       * @param medium
+       *           The {@link IMedium} to use.
+       * @return this {@link TestCacheRegionInfo} converted to a cached {@link MediumRegion}
+       */
+      public MediumRegion asMediumRegion(IMedium<?> medium) {
+         return createCachedMediumRegion(medium, getRegionStartOffset(), getRegionSize());
+      }
+
+      /**
+       * Converts a {@link MediumRegion} to a new {@link TestCacheRegionInfo}.
+       * 
+       * @param region
+       *           The {@link MediumRegion} to convert
+       * @return the {@link TestCacheRegionInfo} converted from the {@link MediumRegion}
+       */
+      public static TestCacheRegionInfo fromMediumRegion(MediumRegion region) {
+         ByteBuffer bytes = region.getBytes();
+         byte[] regionBytes = new byte[bytes.remaining()];
+
+         bytes.get(regionBytes);
+
+         TestCacheRegionInfo testCacheRegionInfoToAdd = new TestCacheRegionInfo(
+            region.getStartReference().getAbsoluteMediumOffset(), regionBytes);
+         return testCacheRegionInfoToAdd;
       }
 
       /**
@@ -80,14 +93,14 @@ class TestCacheBuilder {
        * @return the region's end offset
        */
       public long getRegionEndOffset() {
-         return regionStartOffset + regionSize;
+         return regionStartOffset + getRegionSize();
       }
 
       /**
        * @return the region's size
        */
       public int getRegionSize() {
-         return regionSize;
+         return regionBytes.length;
       }
 
       /**
@@ -104,7 +117,7 @@ class TestCacheBuilder {
 
    /**
     * Creates a new empty {@link TestCacheBuilder} for the given {@link IMedium}. After this, it can be populated using
-    * {@link #addNextRegionInfo(long, long)}.
+    * {@link #appendRegionInfo(long, long)}.
     * 
     * @param regionMedium
     *           The {@link IMedium} to use.
@@ -169,7 +182,7 @@ class TestCacheBuilder {
    }
 
    /**
-    * Adds the necessary information for a new cached {@link MediumRegion}s to be contained in the {@link MediumCache}
+    * Appends the necessary information for a new cached {@link MediumRegion} to be contained in the {@link MediumCache}
     * to build. You specify the region based on its start and end offset. Where are the region bytes? You cannot pass
     * them here, but they are automatically generated in a reproducible way. The byte at offset x has the value
     * "x MOD Byte.MAX_VALUE". This way, on the one hand you can detect any problems with wrong bytes in the cache (as
@@ -185,158 +198,142 @@ class TestCacheBuilder {
     * @param regionEndOffset
     *           The end offset to use, must be bigger than the start offset
     */
-   public void addNextRegionInfo(long regionStartOffset, long regionEndOffset) {
-      addNextRegionInfo(new TestCacheRegionInfo(regionStartOffset, regionEndOffset));
+   public void appendRegionInfo(long regionStartOffset, long regionEndOffset) {
+      int regionSize = (int) (regionEndOffset - regionStartOffset);
+
+      appendRegionInfo(new TestCacheRegionInfo(regionStartOffset,
+         TestMediumUtility.regionBytesFromDistinctOffsetSequence(regionEndOffset, regionSize)));
    }
 
    /**
-    * Adds a a region information based on an existing {@link MediumRegion} to this {@link TestCacheBuilder}. Basically
-    * it takes the offset, size and byte information from the existing {@link MediumRegion}. This will lead to the equal
-    * {@link MediumRegion} created later by {@link #buildCache(long, int)}.
+    * Appends a new {@link TestCacheRegionInfo} based on the given {@link MediumRegion}.
+    * 
+    * This method is incremental in a sense that you have to build the cache step by step from lower offset regions to
+    * higher offset regions. You cannot add a region with offset 10 after you have already added a region with offset
+    * 1000.
     * 
     * @param region
-    *           The {@link MediumRegion} to for which to add a region info. The {@link MediumRegion} must not overlap
-    *           any previously added region info and its offset must be behind any existing region infos.
+    *           The {@link MediumRegion} to add.
     */
-   public void addNextRegionInfoFromRegion(MediumRegion region) {
+   public void appendRegionInfo(MediumRegion region) {
       Reject.ifNull(region, "region");
 
-      addNextRegionInfo(regionInfoFromMediumRegion(region));
-   }
-
-   private TestCacheRegionInfo regionInfoFromMediumRegion(MediumRegion region) {
-      ByteBuffer bytes = region.getBytes();
-      byte[] regionBytes = new byte[bytes.remaining()];
-
-      bytes.get(regionBytes);
-
-      TestCacheRegionInfo testCacheRegionInfoToAdd = new TestCacheRegionInfo(
-         region.getStartReference().getAbsoluteMediumOffset(), regionBytes);
-      return testCacheRegionInfoToAdd;
+      appendRegionInfo(new TestCacheRegionInfo(region.getStartReference().getAbsoluteMediumOffset(),
+         TestMediumUtility.regionBytesFromMediumRegion(region)));
    }
 
    /**
-    * Adds a a region information based on an existing {@link MediumRegion} to this {@link TestCacheBuilder}. Basically
-    * it takes the offset, size and byte information from the existing {@link MediumRegion}. This will lead to the equal
-    * {@link MediumRegion} created later by {@link #buildCache(long, int)}.
+    * Appends multiple new {@link TestCacheRegionInfo}s filled with the given default fill byte starting at the given
+    * start offset. The number and size of {@link TestCacheRegionInfo}s to add is determined by totalSize / maxSize. If
+    * there is a remainder, also a {@link TestCacheRegionInfo} for the remainder is added.
     * 
-    * @param regionIndex
-    *           Identifies the region before which to insert the hew region information.
-    * @param region
-    *           The {@link MediumRegion} to for which to add a region info. The {@link MediumRegion} must not overlap
-    *           any previously added region info and its offset must be behind any existing region infos.
-    */
-   public void insertRegionInfoFromRegion(int regionIndex, MediumRegion region) {
-      Reject.ifNotInInterval(regionIndex, 0, regionInfos.size() - 1, "regionIndex");
-      Reject.ifNull(region, "region");
-
-      regionInfos.add(regionIndex, regionInfoFromMediumRegion(region));
-   }
-
-   /**
-    * Actually adds the given {@link TestCacheRegionInfo} to the internal data structures after validating it.
+    * This method is incremental in a sense that you have to build the cache step by step from lower offset regions to
+    * higher offset regions. You cannot add a region with offset 10 after you have already added a region with offset
+    * 1000.
     * 
-    * @param testCacheRegionInfoToAdd
-    *           the {@link TestCacheRegionInfo} to add.
+    * @param startOffset
+    *           The start offset to use, must be bigger or equal to the last added region end offset.
+    * @param totalSize
+    *           The total size of the {@link TestCacheRegionInfo}s to add, must be bigger than the maximum size
+    * @param maxSize
+    *           The maximum size of each {@link TestCacheRegionInfo} to add
+    * @param fillByte
+    *           The fill byte to use
     */
-   private void addNextRegionInfo(TestCacheRegionInfo testCacheRegionInfoToAdd) {
-      if (!regionInfos.isEmpty()) {
-         long lastAddedRegionInfoEndOffset = regionInfos.get(regionInfos.size() - 1).getRegionEndOffset();
+   public void appendMultipleRegionInfos(long startOffset, int totalSize, int maxSize, byte fillByte) {
+      Reject.ifNegativeOrZero(totalSize, "totalSize");
+      Reject.ifFalse(maxSize <= totalSize, "maxSize <= totalSize");
 
-         Reject.ifFalse(testCacheRegionInfoToAdd.getRegionStartOffset() >= lastAddedRegionInfoEndOffset,
-            "regionStartOffset >= lastAddedRegionEndOffset");
+      int times = totalSize / maxSize;
+      int remainder = totalSize % maxSize;
+
+      for (int i = 0; i < times; i++) {
+         appendRegionInfo(
+            new TestCacheRegionInfo(startOffset, TestMediumUtility.regionBytesFromFillByte(fillByte, maxSize)));
+
+         startOffset += maxSize;
       }
 
-      regionInfos.add(testCacheRegionInfoToAdd);
+      if (remainder > 0) {
+         appendRegionInfo(
+            new TestCacheRegionInfo(startOffset, TestMediumUtility.regionBytesFromFillByte(fillByte, remainder)));
+      }
    }
 
    /**
-    * Trims the region info identified by the given index at its front, effectively making it smaller and removing bytes
-    * at its front, shifting also its start offset by the corresponding number of trimmed bytes.
+    * Inserts a {@link TestCacheRegionInfo} based on an existing {@link MediumRegion} to this {@link TestCacheBuilder}
+    * before the given index. Basically it takes the offset, size and byte information from the existing
+    * {@link MediumRegion} to create the new {@link TestCacheRegionInfo}. This will lead to the equal
+    * {@link MediumRegion} created later by {@link #buildCache(long, int)}.
     * 
     * @param regionIndex
-    *           Identifies the region to be modified, must be a valid index in the existing region infos.
-    * @param removeBytesFromStart
-    *           Number of bytes to trim away at the start of the original existing region, must not be negative or zero.
-    *           Must not be bigger than the original region info's size minus 1.
+    *           Identifies the region before which to insert the hew region information. Must be a valid index
+    * @param region
+    *           The {@link MediumRegion} to for which to add a {@link TestCacheRegionInfo}. The {@link MediumRegion}
+    *           must neither overlap the previous {@link TestCacheRegionInfo} before the given index nor the one after
+    *           it (if any).
     */
-   public void trimRegionInfoAtFront(int regionIndex, int removeBytesFromStart) {
-      Reject.ifNotInInterval(regionIndex, 0, regionInfos.size() - 1, "regionIndex");
+   public void insertRegionInfoBefore(int regionIndex, MediumRegion region) {
+      Reject.ifNull(region, "region");
+      validateRegionIndex(regionIndex);
 
-      TestCacheRegionInfo originalRegionInfo = regionInfos.get(regionIndex);
+      TestCacheRegionInfo testCacheRegionInfoToInsert = TestCacheRegionInfo.fromMediumRegion(region);
 
-      Reject.ifNotInInterval(removeBytesFromStart, 1, originalRegionInfo.getRegionSize() - 1, "removeBytesFromStart");
+      if (!regionInfos.isEmpty()) {
+         long regionAtIndexStartOffset = regionInfos.get(regionIndex).getRegionStartOffset();
 
-      byte[] remainingRegionBytes = new byte[originalRegionInfo.getRegionSize() - removeBytesFromStart];
+         Reject.ifFalse(testCacheRegionInfoToInsert.getRegionEndOffset() <= regionAtIndexStartOffset,
+            "testCacheRegionInfoToInsert.getRegionEndOffset() <= regionAtIndexStartOffset");
+      }
 
-      System.arraycopy(originalRegionInfo.getRegionBytes(), removeBytesFromStart, remainingRegionBytes, 0,
-         remainingRegionBytes.length);
-
-      TestCacheRegionInfo newRegionInfo = new TestCacheRegionInfo(
-         originalRegionInfo.getRegionStartOffset() + removeBytesFromStart, remainingRegionBytes);
-
-      regionInfos.set(regionIndex, newRegionInfo);
+      regionInfos.add(regionIndex, testCacheRegionInfoToInsert);
    }
 
    /**
-    * Trims the region info identified by the given index at its front, effectively making it smaller and removing bytes
-    * at its front, shifting also its start offset by the corresponding number of trimmed bytes.
+    * Removes the {@link TestCacheRegionInfo} at the given index
     * 
     * @param regionIndex
-    *           Identifies the region to be modified, must be a valid index in the existing region infos.
-    * @param removeBytesFromEnd
-    *           Number of bytes to trim away at the end of the original existing region, must not be negative or zero.
-    *           Must not be bigger than the original region info's size minus 1.
+    *           Identifies the {@link TestCacheRegionInfo} to remove. Must be a valid index
     */
-   public void trimRegionInfoAtBack(int regionIndex, int removeBytesFromEnd) {
-      Reject.ifNotInInterval(regionIndex, 0, regionInfos.size() - 1, "regionIndex");
-
-      TestCacheRegionInfo originalRegionInfo = regionInfos.get(regionIndex);
-
-      Reject.ifNotInInterval(removeBytesFromEnd, 1, originalRegionInfo.getRegionSize() - 1, "removeBytesFromEnd");
-
-      byte[] remainingRegionBytes = new byte[originalRegionInfo.getRegionSize() - removeBytesFromEnd];
-
-      System.arraycopy(originalRegionInfo.getRegionBytes(), 0, remainingRegionBytes, 0, remainingRegionBytes.length);
-
-      TestCacheRegionInfo newRegionInfo = new TestCacheRegionInfo(originalRegionInfo.getRegionStartOffset(),
-         remainingRegionBytes);
-
-      regionInfos.set(regionIndex, newRegionInfo);
-   }
-
-   /**
-    * Replaces the content of the region identified by the given index with new region bytes. Essentially only a single
-    * fill byte is used.
-    * 
-    * @param regionIndex
-    *           Identifies the region to be modified, must be a valid index in the existing region infos.
-    * @param newRegionFillByte
-    *           This byte is used as the content of the replacement region, replacing the original region bytes.
-    */
-   public void replaceRegion(int regionIndex, byte newRegionFillByte) {
-      Reject.ifNotInInterval(regionIndex, 0, regionInfos.size() - 1, "regionIndex");
-
-      TestCacheRegionInfo originalRegion = regionInfos.get(regionIndex);
-
-      byte[] replacementRegionBytes = new byte[originalRegion.getRegionSize()];
-
-      Arrays.fill(replacementRegionBytes, newRegionFillByte);
-
-      regionInfos.set(regionIndex,
-         new TestCacheRegionInfo(originalRegion.getRegionStartOffset(), replacementRegionBytes));
-   }
-
-   /**
-    * Removes the region identified by the given index.
-    * 
-    * @param regionIndex
-    *           Identifies the region to be removed, must be a valid index in the existing region infos.
-    */
-   public void removeRegion(int regionIndex) {
-      Reject.ifNotInInterval(regionIndex, 0, regionInfos.size() - 1, "regionIndex");
+   public void removeRegionInfo(int regionIndex) {
+      validateRegionIndex(regionIndex);
 
       regionInfos.remove(regionIndex);
+   }
+
+   /**
+    * Performs a clipping of all currently contained {@link TestCacheRegionInfo}s against the given clip
+    * {@link MediumRegion}. Clipping means the following:
+    * <ul>
+    * <li>If an existing {@link TestCacheRegionInfo} is fully contained inside the clip {@link MediumRegion}, it is
+    * removed. This includes the case where the clip {@link MediumRegion} covers the same range as the
+    * {@link TestCacheRegionInfo}.</li>
+    * <li>If an existing {@link TestCacheRegionInfo} is overlapped at its front by the clip {@link MediumRegion}, it is
+    * clipped at its front correspondingly.</li>
+    * <li>If an existing {@link TestCacheRegionInfo} is overlapped at its back by the clip {@link MediumRegion}, it is
+    * clipped at its back correspondingly.</li>
+    * <li>If an existing {@link TestCacheRegionInfo} fully contains the {@link MediumRegion}, it is broken apart into
+    * two parts and its middle part covered by the clip {@link MediumRegion} is removed.</li>
+    * <li>If there is no overlap, the existing {@link TestCacheRegionInfo} is left untouched.</li>
+    * </ul>
+    * 
+    * Note that this method does not add any new {@link TestCacheRegionInfo} for the clip {@link MediumRegion}. This
+    * must be done after the clipping by the test code itself, e.g. by using {@link #appendRegionInfo(MediumRegion)} or
+    * {@link #appendMultipleRegionInfos(long, int, int, byte)}.
+    * 
+    * @param clipRegion
+    *           The {@link MediumRegion} to use for clipping
+    */
+   public void clipAllRegionsAgainstMediumRegion(MediumRegion clipRegion) {
+      Reject.ifNull(clipRegion, "clipRegion");
+
+      List<TestCacheRegionInfo> survivedClippingList = new ArrayList<>();
+
+      regionInfos.stream()
+         .forEach(regionInfo -> clipRegionInfoAgainstMediumRegion(regionInfo, clipRegion, survivedClippingList));
+
+      regionInfos.clear();
+      regionInfos.addAll(survivedClippingList);
    }
 
    /**
@@ -364,6 +361,109 @@ class TestCacheBuilder {
    }
 
    /**
+    * Validates the given index against the internal region data structure. Throws a
+    * {@link PreconditionUnfullfilledException} in case it is invalid. Otherwise it does nothing.
+    * 
+    * @param regionIndex
+    *           The region index to verify
+    */
+   private void validateRegionIndex(int regionIndex) {
+      Reject.ifNegative(regionIndex, "regionIndex");
+      Reject.ifTrue(regionInfos.size() == 0 && regionIndex > 0, "regionInfos.size() == 0 && regionIndex > 0");
+      Reject.ifTrue(regionInfos.size() > 0 && regionIndex >= regionInfos.size(),
+         "regionInfos.size() > 0 && regionIndex >= regionInfos.size()");
+   }
+
+   /**
+    * Appends the given {@link TestCacheRegionInfo} to the internal data structures after validating it.
+    * 
+    * @param testCacheRegionInfoToAdd
+    *           the {@link TestCacheRegionInfo} to add. Must not overlap the last existing {@link TestCacheRegionInfo}.
+    */
+   private void appendRegionInfo(TestCacheRegionInfo testCacheRegionInfoToAdd) {
+      if (!regionInfos.isEmpty()) {
+         long lastAddedRegionInfoEndOffset = regionInfos.get(regionInfos.size() - 1).getRegionEndOffset();
+
+         Reject.ifFalse(testCacheRegionInfoToAdd.getRegionStartOffset() >= lastAddedRegionInfoEndOffset,
+            "testCacheRegionInfoToAdd.getRegionStartOffset() >= lastAddedRegionEndOffset");
+      }
+
+      regionInfos.add(testCacheRegionInfoToAdd);
+   }
+
+   /**
+    * Performs the actual trimming of a region info.
+    * 
+    * @param originalRegionInfo
+    *           The {@link TestCacheRegionInfo} to trim.
+    * 
+    * @param bytesToRemoveFromEnd
+    *           Number of bytes to trim away at the front or end of the original existing region, must not be negative
+    *           or zero. Must not be bigger than the original region info's size minus 1.
+    * @param originalByteCopyStartIndex
+    *           The byte array index in the original region info bytes to start copying. This influences if trimming
+    *           happens at front or back of the region.
+    */
+   private TestCacheRegionInfo trimRegionInfo(TestCacheRegionInfo originalRegionInfo, int bytesToRemove,
+      int originalByteCopyStartIndex) {
+      Reject.ifNotInInterval(bytesToRemove, 1, originalRegionInfo.getRegionSize() - 1, "bytesToRemove");
+
+      byte[] remainingRegionBytes = new byte[originalRegionInfo.getRegionSize() - bytesToRemove];
+
+      System.arraycopy(originalRegionInfo.getRegionBytes(), originalByteCopyStartIndex, remainingRegionBytes, 0,
+         remainingRegionBytes.length);
+
+      return new TestCacheRegionInfo(originalRegionInfo.getRegionStartOffset() + originalByteCopyStartIndex,
+         remainingRegionBytes);
+   }
+
+   /**
+    * Performs the clipping of the given {@link TestCacheRegionInfo} against the given clip {@link MediumRegion}. See
+    * {@link #clipAllRegionsAgainstMediumRegion(MediumRegion)} for more details.
+    * 
+    * @param testCacheRegionInfo
+    *           The {@link TestCacheRegionInfo} to clip.
+    * @param clipRegion
+    *           The clip {@link MediumRegion}.
+    * @param survivedClippingList
+    *           This list is updated wit all {@link TestCacheRegionInfo} that survived the clipping, this includes also
+    *           {@link TestCacheRegionInfo}s broken into two parts. Note that no new {@link TestCacheRegionInfo} is
+    *           added for the clip {@link MediumRegion}.
+    */
+   private void clipRegionInfoAgainstMediumRegion(TestCacheRegionInfo testCacheRegionInfo, MediumRegion clipRegion,
+      List<TestCacheRegionInfo> survivedClippingList) {
+
+      MediumRegion regionInfoAsRegion = testCacheRegionInfo.asMediumRegion(regionMedium);
+
+      int overlappingByteCount = regionInfoAsRegion.getOverlappingByteCount(clipRegion);
+
+      if (overlappingByteCount == 0) {
+         survivedClippingList.add(testCacheRegionInfo);
+      } else if (overlappingByteCount == regionInfoAsRegion.getSize()) {
+         // Ignore the region, it does not survive as it is fully covered by the clip region
+      } else if (overlappingByteCount == clipRegion.getSize()) {
+         // Need to divide the region info as the clip region is fully enclosed in it
+         int keepBytesAtStart = (int) clipRegion.getStartReference().distanceTo(regionInfoAsRegion.getStartReference());
+         int keepBytesAtEnd = (int) regionInfoAsRegion.calculateEndReference()
+            .distanceTo(clipRegion.calculateEndReference());
+
+         TestCacheRegionInfo trimmedRegionInfo = trimRegionInfo(testCacheRegionInfo,
+            testCacheRegionInfo.getRegionSize() - keepBytesAtStart, 0);
+         survivedClippingList.add(trimmedRegionInfo);
+         int bytesToRemoveFromStart = testCacheRegionInfo.getRegionSize() - keepBytesAtEnd;
+         trimmedRegionInfo = trimRegionInfo(testCacheRegionInfo, bytesToRemoveFromStart, bytesToRemoveFromStart);
+         survivedClippingList.add(trimmedRegionInfo);
+      } else if (clipRegion.overlapsOtherRegionAtBack(regionInfoAsRegion)) {
+         TestCacheRegionInfo trimmedRegionInfo = trimRegionInfo(testCacheRegionInfo, overlappingByteCount, 0);
+         survivedClippingList.add(trimmedRegionInfo);
+      } else if (clipRegion.overlapsOtherRegionAtFront(regionInfoAsRegion)) {
+         TestCacheRegionInfo trimmedRegionInfo = trimRegionInfo(testCacheRegionInfo, overlappingByteCount,
+            overlappingByteCount);
+         survivedClippingList.add(trimmedRegionInfo);
+      }
+   }
+
+   /**
     * Builds the list of all {@link MediumRegion}s in this {@link TestCacheBuilder} with or without uncached gap
     * {@link MediumRegion}s.
     * 
@@ -388,8 +488,7 @@ class TestCacheBuilder {
                (int) (currentRegionStartOffset - lastRegionEndOffset)));
          }
 
-         resultList
-            .add(createCachedMediumRegion(regionMedium, currentRegionStartOffset, testCacheRegionInfo.getRegionSize()));
+         resultList.add(testCacheRegionInfo.asMediumRegion(regionMedium));
 
          lastRegionEndOffset = currentRegionEndOffset;
       }

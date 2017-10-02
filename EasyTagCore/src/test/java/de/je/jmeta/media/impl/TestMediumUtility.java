@@ -40,7 +40,8 @@ public class TestMediumUtility {
    }
 
    public static MediumRegion createCachedMediumRegion(IMedium<?> medium, long offset, Integer size) {
-      return new MediumRegion(createReference(medium, offset), ByteBuffer.wrap(createRegionContent(offset, size)));
+      return new MediumRegion(createReference(medium, offset),
+         ByteBuffer.wrap(regionBytesFromDistinctOffsetSequence(offset, size)));
    }
 
    public static IMediumReference createReference(IMedium<?> medium, long offset) {
@@ -75,7 +76,24 @@ public class TestMediumUtility {
       return dividedRegionByteBufferPartOne;
    }
 
-   public static byte[] createRegionContent(long offset, int size) {
+   public static byte[] regionBytesFromFillByte(byte fillByte, int size) {
+      byte[] content = new byte[size];
+
+      Arrays.fill(content, fillByte);
+
+      return content;
+   }
+
+   public static byte[] regionBytesFromMediumRegion(MediumRegion region) {
+      ByteBuffer bytes = region.getBytes();
+      byte[] content = new byte[bytes.remaining()];
+
+      bytes.get(content);
+
+      return content;
+   }
+
+   public static byte[] regionBytesFromDistinctOffsetSequence(long offset, int size) {
       byte[] content = new byte[size];
 
       for (int i = 0; i < content.length; i++) {

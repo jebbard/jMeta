@@ -331,13 +331,17 @@ public class MediumCache {
       // Remove any existing regions if the new cache size would be bigger than allowed
       long newCacheSize = calculateCurrentCacheSizeInBytes() + regionToAdd.getSize();
 
+      List<MediumRegion> regionsToRemove = new ArrayList<>();
+
       for (int i = 0; i < cachedRegionsInInsertOrder.size() && newCacheSize > getMaximumCacheSizeInBytes(); ++i) {
          MediumRegion nextRegion = cachedRegionsInInsertOrder.get(i);
 
-         removeRegionFromCache(nextRegion);
+         regionsToRemove.add(nextRegion);
 
          newCacheSize -= nextRegion.getSize();
       }
+
+      regionsToRemove.stream().forEach(this::removeRegionFromCache);
 
       // Then we ensure the new region is divided into subregions with max region size, if necessary
       List<MediumRegion> consolidatedRegionsToAdd = new ArrayList<>();
@@ -379,7 +383,7 @@ public class MediumCache {
          && regionToAdd.contains(existingRegion.calculateEndReference().advance(-1)))
          || (regionToAdd.getStartReference().equals(existingRegion.getStartReference())
             && regionToAdd.calculateEndReference().equals(existingRegion.calculateEndReference()))) {
-         removeRegionFromCache(regionToAdd);
+         removeRegionFromCache(existingRegion);
       } else if (existingRegion.contains(regionToAdd.getStartReference())
          && existingRegion.contains(regionToAdd.calculateEndReference().advance(-1))) {
          removeRegionFromCache(existingRegion);
