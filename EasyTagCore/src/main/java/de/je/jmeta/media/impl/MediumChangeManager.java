@@ -23,6 +23,7 @@ import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.api.datatype.MediumRegion.MediumRegionOverlapType;
 import de.je.jmeta.media.api.exception.InvalidMediumActionException;
 import de.je.jmeta.media.api.exception.InvalidOverlappingWriteException;
 import de.je.util.javautil.common.err.Reject;
@@ -35,11 +36,12 @@ import de.je.util.javautil.common.err.Reject;
  * {@link IMediumStore_OLD#replaceData(de.je.jmeta.media.api.IMediumReference, int, ByteBuffer)} by calling one of the
  * corresponding schedule methods of {@link MediumChangeManager}.
  * 
- * {@link MediumAction}s represent an open action that is still to be performed before a {@link IMediumStore_OLD#flush()}.
+ * {@link MediumAction}s represent an open action that is still to be performed before a
+ * {@link IMediumStore_OLD#flush()}.
  * 
  * {@link MediumChangeManager} ensures that these {@link MediumAction}s are created consistently and maintains them in a
- * specific order such that later {@link IMediumStore_OLD#flush()} can be more easier implemented. It does this by using a
- * {@link TreeSet} as internal data structure and the {@link MediumActionComparator} as sorting criterion.
+ * specific order such that later {@link IMediumStore_OLD#flush()} can be more easier implemented. It does this by using
+ * a {@link TreeSet} as internal data structure and the {@link MediumActionComparator} as sorting criterion.
  */
 public class MediumChangeManager {
 
@@ -393,16 +395,22 @@ public class MediumChangeManager {
       MediumAction previousAction = getPreviousAction(newRegion);
 
       while (previousAction != null && actionTypesToHandle.contains(previousAction.getActionType())) {
-         if (newRegion.getOverlappingByteCount(previousAction.getRegion()) == previousAction.getRegion().getSize()) {
+
+         MediumRegion previousRegion = previousAction.getRegion();
+
+         MediumRegionOverlapType overlapType = MediumRegion.determineOverlapWithOtherRegion(newRegion, previousRegion);
+
+         if (overlapType == MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT
+            || overlapType == MediumRegionOverlapType.SAME_RANGE) {
             // Case 1: Existing region is fully contained in the removed or replaced region (second part of this case
             // see in block of next action)
             undo(previousAction);
 
             previousAction = getPreviousAction(newRegion);
-         } else if (previousAction.getRegion().getOverlappingByteCount(newRegion) == newRegion.getSize()) {
+         } else if (overlapType == MediumRegionOverlapType.LEFT_FULLY_INSIDE_RIGHT) {
             // Case 2: New region is fully contained in an existing region
             throw new InvalidOverlappingWriteException(previousAction, newActionType, newRegion);
-         } else if (newRegion.overlapsOtherRegionAtBack(previousAction.getRegion())) {
+         } else if (overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK) {
             // Case 3: New region overlaps an existing region at its back
             throw new InvalidOverlappingWriteException(previousAction, newActionType, newRegion);
          } else {
@@ -415,13 +423,19 @@ public class MediumChangeManager {
 
       while (nextAction != null && actionTypesToHandle.contains(nextAction.getActionType())
          && !nextAction.equals(previousAction)) {
-         if (newRegion.getOverlappingByteCount(nextAction.getRegion()) == nextAction.getRegion().getSize()) {
+
+         MediumRegion nextRegion = nextAction.getRegion();
+
+         MediumRegionOverlapType overlapType = MediumRegion.determineOverlapWithOtherRegion(newRegion, nextRegion);
+
+         if (overlapType == MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT
+            || overlapType == MediumRegionOverlapType.SAME_RANGE) {
             // Case 1: Existing region is fully contained in the new region (first part of this case see
             // in block of previous action)
             undo(nextAction);
 
             nextAction = getNextAction(newRegion);
-         } else if (newRegion.overlapsOtherRegionAtFront(nextAction.getRegion())) {
+         } else if (overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_FRONT) {
             // Case 4: New region overlaps an existing region at its front
             throw new InvalidOverlappingWriteException(nextAction, newActionType, newRegion);
          } else {

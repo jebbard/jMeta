@@ -10,9 +10,6 @@
 
 package de.je.jmeta.media.api;
 
-import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
-import de.je.util.javautil.common.err.Reject;
-
 /**
  * {@link IMediumReference} refers to a specific offset on a {@link IMedium}.
  * 

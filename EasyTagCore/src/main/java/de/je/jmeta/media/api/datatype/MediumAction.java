@@ -52,7 +52,6 @@ public class MediumAction {
     *           The bytes associated to this {@link MediumAction}. Depending in the type of the action, this can be
     *           replacement bytes, bytes to write or bytes to insert. For all other types, it must be null.
     */
-   @SuppressWarnings("null")
    public MediumAction(MediumActionType actionType, MediumRegion region, int sequenceNumber, ByteBuffer actionBytes) {
       Reject.ifNull(region, "region");
       Reject.ifNull(actionType, "actionType");

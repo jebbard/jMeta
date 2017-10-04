@@ -26,6 +26,53 @@ import de.je.util.javautil.common.err.Reject;
  */
 public class MediumRegion {
 
+   /**
+    * Summarizes all relevant cases for types of overlaps between two {@link MediumRegion}s located on the same
+    * {@link IMedium}.
+    */
+   public enum MediumRegionOverlapType {
+      /**
+       * The regions do not overlap with each other, e.g. the left region starts and ends before the right region.
+       */
+      NO_OVERLAP,
+      /**
+       * The regions exactly cover the same offset range.
+       */
+      SAME_RANGE,
+      /**
+       * The left region is contained inside the right region. This does not include regions having
+       * {@link MediumRegionOverlapType#SAME_RANGE}, but it covers also the cases that both regions start or end at the
+       * same offset and the right region is bigger than the left on, i.e. cases where also
+       * {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)} would return true. In the case that the left
+       * {@link MediumRegion} starts or ends at the same offset as the right {@link MediumRegion},
+       * {@link MediumRegion#determineOverlapWithOtherRegion(MediumRegion, MediumRegion)} returns
+       * {@link #LEFT_FULLY_INSIDE_RIGHT}, and not {@link #LEFT_OVERLAPS_RIGHT_AT_FRONT} or
+       * {@link #LEFT_OVERLAPS_RIGHT_AT_BACK}.
+       */
+      LEFT_FULLY_INSIDE_RIGHT,
+      /**
+       * The right region is contained inside the left region. This does not include regions having
+       * {@link MediumRegionOverlapType#SAME_RANGE}, but it covers also the cases that both regions start or end at the
+       * same offset and the left region is bigger than the right on, i.e. cases where also
+       * {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)} would return true.
+       */
+      RIGHT_FULLY_INSIDE_LEFT,
+      /**
+       * Represents the case that the left region overlaps the right region at its front, but it neither has the same
+       * range, nor is it fully inside the right region, nor does it enclose the right region.
+       * {@link #LEFT_OVERLAPS_RIGHT_AT_FRONT} represents a real overlap at front, i.e. the left region starts early as
+       * the right region, overlaps it at its front by at least one byte and ends earlier as the right region.
+       */
+      LEFT_OVERLAPS_RIGHT_AT_FRONT,
+      /**
+       * Represents the case that the left region overlaps the right region at its back, but it neither has the same
+       * range, nor is it fully inside the right region, nor does it enclose the right region.
+       * {@link #LEFT_OVERLAPS_RIGHT_AT_BACK} represents a real overlap at back, i.e. the left region starts after the
+       * right region, overlaps it at its back by at least one byte and ends after the right region.
+       */
+      LEFT_OVERLAPS_RIGHT_AT_BACK,
+   }
+
    private IMediumReference startReference;
 
    private ByteBuffer buffer;
@@ -67,6 +114,42 @@ public class MediumRegion {
       this.buffer = null;
       this.size = size;
       this.startReference = startReference;
+   }
+
+   /**
+    * Allows for readable code that uses the overlapping relations between two {@link MediumRegion}s. Two regions can in
+    * principle have all the overlap behaviors as described in the class {@link MediumRegionOverlapType}.
+    * 
+    * @param left
+    *           The left {@link MediumRegion}, must refer to the same {@link IMedium} as the right {@link MediumRegion}
+    * @param right
+    *           The right {@link MediumRegion}, must refer to the same {@link IMedium} as the left {@link MediumRegion}
+    * @return The determined {@link MediumRegionOverlapType} of the two regions
+    */
+   public static MediumRegionOverlapType determineOverlapWithOtherRegion(MediumRegion left, MediumRegion right) {
+      Reject.ifNull(right, "right");
+      Reject.ifNull(left, "left");
+      Reject.ifFalse(left.getStartReference().getMedium().equals(right.getStartReference().getMedium()),
+         "left.getStartReference().getMedium().equals(right.getStartReference().getMedium()");
+
+      int overlappingByteCount = left.getOverlappingByteCount(right);
+
+      if (overlappingByteCount == 0) {
+         return MediumRegionOverlapType.NO_OVERLAP;
+      } else if (overlappingByteCount == left.getSize() && overlappingByteCount == right.getSize()) {
+         return MediumRegionOverlapType.SAME_RANGE;
+      } else if (overlappingByteCount == left.getSize()) {
+         return MediumRegionOverlapType.LEFT_FULLY_INSIDE_RIGHT;
+      } else if (overlappingByteCount == right.getSize()) {
+         return MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT;
+      } else if (left.overlapsOtherRegionAtFront(right)) {
+         return MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_FRONT;
+      } else if (left.overlapsOtherRegionAtBack(right)) {
+         return MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK;
+      } else {
+         throw new IllegalStateException(
+            "Impossible overlap of two regions detected: left=" + left + ", right=" + right);
+      }
    }
 
    /**
