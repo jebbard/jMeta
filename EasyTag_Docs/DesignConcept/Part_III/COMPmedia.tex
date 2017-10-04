@@ -1242,21 +1242,23 @@ Access to the \TERMmedium{} is implemented in own classes, as the following desi
 %%%% DD --> %%%%
 \DD{dd:429}
 {% Titel
-Interface \IMediumAccessor{} with implementationen for \TERMmedia{} access
+Interface \IMediumAccessor{} with implementations for each \TERMmedia{} type access
 }
 {% Kurzbeschreibung
-Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{} with following primitives:
-
+Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing a great deal of ensuring \DesLink{dd:407}. It offest the following primitives:
 \begin{itemize}
-	\item Open: Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404})
-	\item Check if opened
-	\item Close
-	\item Read from offset $x$: Read $n$ bytes from external medium by explicit access, return the bytes in a \texttt{ByteBuffer}, the offset $x$ is ignored for non-random-access media
-	\item Write to offset $x$: Schreibt $n$ bytes, die in einem \texttt{ByteBuffer} übergeben werden, nicht implementiert bei byte-Stream-media (der Aufruf wird ignoriert)
-        \item Truncate to length $n$: Truncates the medium to a new length $n$; not implemented for byte-Stream media (call is ignored)
-	\item Check if current offset is at end of \TERMmedium{}s, $x$ is ignored for non-random-access media
-	\item Skipping bytes: Skips $n$ bytes, for random-access media, it does not do anything
+	\item \texttt{GetMedium}: Returns the medium this instance is working on.
+	\item \texttt{Open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}).
+	\item \texttt{IsOpened}: Check if the medium is opened.
+	\item \texttt{Close}: Close the medium for access. A closed medium cannot be used anymore.
+	\item \texttt{Read} from offset $x$: Read $n$ bytes from external medium by explicit access, return the bytes in a \texttt{ByteBuffer}, the offset $x$ is ignored for non-random-access media. For byte stream media, the timeout mechanism according to \DesLink{dd:426} is implemented here.
+	\item \texttt{Write} to offset $x$: Writes $n$ bytes to the external medium at a given offset $x$, passed in a \texttt{ByteBuffer}. Not implemented for \texttt{InputStream} media (the call is ignored)
+        \item \texttt{Truncate} to length $n$: Truncates the medium to a new length $n$. Not implemented for \texttt{InputStream} media (the call is ignored).
+	\item \texttt{IsAtEndOfMedium}: Check given offset $x$ is at end of the \TERMmedium{}. $x$ is ignored for non-random-access media.
+	\item \texttt{Skip} $n$ bytes: Skips $n$ bytes according to \DesLink{dd:411d}. For random-access media, it does not do anything, the call is ignored.
 \end{itemize}
+
+There is one implementation of this interface for each distinct \TERMmedium{} type.
 
 \IMediumStore{} exclusively accesses the \TERMmedium{} only via this interface.
 }
