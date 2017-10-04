@@ -22,118 +22,28 @@ import de.je.util.javautil.io.file.FileUtility;
 /**
  * Tests the class {@FileMediumAccessor}.
  */
-public class FileMediumAccessorTest extends IMediumAccessorTest {
+public class FileMediumAccessorTest extends AbstractRandomAccessMediumAccessorTest {
 
    private static final String TEMP_FOLDER_NAME = "temp/";
 
    private static int TEST_FILE_COUNTER = 0;
 
-   private File m_copiedTestFile = new File(MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR + TEMP_FOLDER_NAME
+   private File copiedTestFile = new File(MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR + TEMP_FOLDER_NAME
       + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
-
-   private Map<Integer, Integer> m_readOffsetsAndSizes;
-
-   private FileMediumAccessor m_testling;
-
-   private FileMediumAccessor m_readOnlyTestling;
-
-   /**
-    * @see IMediumAccessorTest#cleanUpMediumData()
-    */
-   @Override
-   protected void cleanUpMediumData() {
-
-      // Do nothing as deletion is done only when starting a new test run
-      // This ensures that the written data can be looked at after test
-      // execution
-   }
-
-   /**
-    * @see IMediumAccessorTest#getFileOffsetsToCheckReading()
-    */
-   @Override
-   protected Map<Integer, Integer> getFileOffsetsToCheckReading() {
-
-      if (m_readOffsetsAndSizes == null) {
-         m_readOffsetsAndSizes = new HashMap<>();
-
-         m_readOffsetsAndSizes.put(16, 7);
-         m_readOffsetsAndSizes.put(93, 157);
-         m_readOffsetsAndSizes.put(610, 133);
-         m_readOffsetsAndSizes.put(0, 17);
-         m_readOffsetsAndSizes.put(211, 45);
-      }
-
-      return m_readOffsetsAndSizes;
-   }
-
-   /**
-    * @see IMediumAccessorTest#getReadOnlyTestling()
-    */
-   @Override
-   protected IMediumAccessor<?> getReadOnlyTestling() {
-
-      if (m_readOnlyTestling == null) {
-         m_readOnlyTestling = new FileMediumAccessor(new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true));
-      }
-
-      return m_readOnlyTestling;
-   }
-
-   /**
-    * @see IMediumAccessorTest#getTestling()
-    */
-   @Override
-   protected IMediumAccessor<?> getTestling() {
-
-      if (m_testling == null) {
-         m_testling = new FileMediumAccessor(new FileMedium(m_copiedTestFile, false));
-      }
-
-      return m_testling;
-   }
-
-   /**
-    * @see IMediumAccessorTest#prepareMediumData()
-    */
-   @Override
-   protected void prepareMediumData() {
-
-      m_copiedTestFile = new File(MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR,
-         TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
-
-      TEST_FILE_COUNTER++;
-
-      // If the copied file still exists (from a recent test run), delete it
-      if (m_copiedTestFile.exists())
-         if (!m_copiedTestFile.delete())
-            throw new RuntimeException(
-               "Could not delete copied test file " + m_copiedTestFile + ". Manuel deletion is necessary.");
-
-      final String message = "Could not copy the test file " + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE
-         + " to " + m_copiedTestFile;
-      try {
-         if (!FileUtility.copyFile(MediaTestCaseConstants.STANDARD_TEST_FILE, m_copiedTestFile))
-            throw new RuntimeException(message);
-      } catch (IOException e) {
-         throw new RuntimeException(message, e);
-      }
-   }
 
    /**
     * Tests whether the creation of a new {@link FileMediumAccessor} on an already locked medium throws an exception.
     * 
     * Will probably only succeed on Windows platforms.
     */
-   @SuppressWarnings("unused")
    @Test(expected = MediumAccessException.class)
    public void test_lockAlreadyLockedMedium() {
 
       // Make sure the first instance is created
-      getTestling();
+      getMediumAccessorImplementationToTest();
 
       // Create second instance on the same medium
-      new FileMediumAccessor(new FileMedium(m_copiedTestFile, false));
+      new FileMediumAccessor(new FileMedium(copiedTestFile, false));
    }
 
    /**
@@ -184,6 +94,66 @@ public class FileMediumAccessorTest extends IMediumAccessorTest {
       // } catch (InterruptedException e) {
       // Assert.fail("Unexpected thread interruption");
       // }
+   }
+
+   /**
+    * @see AbstractIMediumAccessorTest#getFileOffsetsToCheckReading()
+    */
+   @Override
+   protected Map<Integer, Integer> getFileOffsetsToCheckReading() {
+
+      Map<Integer, Integer> readOffsetsAndSizes = new HashMap<>();
+
+      readOffsetsAndSizes.put(16, 7);
+      readOffsetsAndSizes.put(93, 157);
+      readOffsetsAndSizes.put(610, 133);
+      readOffsetsAndSizes.put(0, 17);
+      readOffsetsAndSizes.put(211, 45);
+
+      return readOffsetsAndSizes;
+   }
+
+   /**
+    * @see AbstractIMediumAccessorTest#createReadOnlyMediumAccessorImplementationToTest()
+    */
+   @Override
+   protected IMediumAccessor<?> createReadOnlyMediumAccessorImplementationToTest() {
+      return new FileMediumAccessor(new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true));
+   }
+
+   /**
+    * @see AbstractIMediumAccessorTest#getMediumAccessorImplementationToTest()
+    */
+   @Override
+   protected IMediumAccessor<?> createMediumAccessorImplementationToTest() {
+      return new FileMediumAccessor(new FileMedium(copiedTestFile, false));
+   }
+
+   /**
+    * @see AbstractIMediumAccessorTest#prepareMediumData(byte[])
+    */
+   @Override
+   protected void prepareMediumData(byte[] testFileContents) {
+
+      copiedTestFile = new File(MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR,
+         TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
+
+      TEST_FILE_COUNTER++;
+
+      // If the copied file still exists (from a recent test run), delete it
+      if (copiedTestFile.exists())
+         if (!copiedTestFile.delete())
+            throw new RuntimeException(
+               "Could not delete copied test file " + copiedTestFile + ". Manuel deletion is necessary.");
+
+      final String message = "Could not copy the test file " + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE
+         + " to " + copiedTestFile;
+      try {
+         if (!FileUtility.copyFile(MediaTestCaseConstants.STANDARD_TEST_FILE, copiedTestFile))
+            throw new RuntimeException(message);
+      } catch (IOException e) {
+         throw new RuntimeException(message, e);
+      }
    }
 
 }

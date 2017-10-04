@@ -7,131 +7,59 @@
 
 package de.je.jmeta.media.impl;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.InMemoryMedium;
 
 /**
  * Tests the class {@MemoryMediumAccessor}.
  */
-public class MemoryMediumAccessorTest extends IMediumAccessorTest {
+public class MemoryMediumAccessorTest extends AbstractRandomAccessMediumAccessorTest {
 
-   private AbstractMediumAccessor<?> m_testling;
-
-   private AbstractMediumAccessor<?> m_readOnlyTestling;
-
-   private byte[] m_memory = new byte[10000];
-
-   private RandomAccessFile m_reader;
-
-   private FileChannel m_channel;
-
-   private Map<Integer, Integer> m_readOffsetsAndSizes;
+   private byte[] memory;
 
    /**
-    * @see IMediumAccessorTest#cleanUpMediumData()
-    */
-   @Override
-   protected void cleanUpMediumData() {
-
-      if (m_reader != null)
-         try {
-            if (m_channel != null)
-               m_channel.close();
-
-            m_reader.close();
-
-            m_reader = null;
-            m_channel = null;
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
-
-   }
-
-   /**
-    * @see IMediumAccessorTest#getFileOffsetsToCheckReading()
+    * @see AbstractIMediumAccessorTest#getFileOffsetsToCheckReading()
     */
    @Override
    protected Map<Integer, Integer> getFileOffsetsToCheckReading() {
 
-      if (m_readOffsetsAndSizes == null) {
-         m_readOffsetsAndSizes = new HashMap<>();
+      Map<Integer, Integer> readOffsetsAndSizes = new HashMap<>();
 
-         m_readOffsetsAndSizes.put(16, 7);
-         m_readOffsetsAndSizes.put(93, 157);
-         m_readOffsetsAndSizes.put(610, 133);
-         m_readOffsetsAndSizes.put(0, 17);
-         m_readOffsetsAndSizes.put(211, 45);
-      }
+      readOffsetsAndSizes.put(16, 7);
+      readOffsetsAndSizes.put(93, 157);
+      readOffsetsAndSizes.put(610, 133);
+      readOffsetsAndSizes.put(0, 17);
+      readOffsetsAndSizes.put(211, 45);
 
-      return m_readOffsetsAndSizes;
+      return readOffsetsAndSizes;
    }
 
    /**
-    * @see IMediumAccessorTest#getReadOnlyTestling()
+    * @see AbstractIMediumAccessorTest#createReadOnlyMediumAccessorImplementationToTest()
     */
    @Override
-   protected IMediumAccessor<?> getReadOnlyTestling() {
-
-      if (m_readOnlyTestling == null) {
-         m_readOnlyTestling = new MemoryMediumAccessor(
-            new InMemoryMedium(m_memory, null, true));
-      }
-
-      return m_readOnlyTestling;
+   protected IMediumAccessor<?> createReadOnlyMediumAccessorImplementationToTest() {
+      return new MemoryMediumAccessor(new InMemoryMedium(memory, null, true));
    }
 
    /**
-    * @see IMediumAccessorTest#getTestling()
+    * @see AbstractIMediumAccessorTest#getMediumAccessorImplementationToTest()
     */
    @Override
-   protected IMediumAccessor<?> getTestling() {
-
-      if (m_testling == null) {
-         m_testling = new MemoryMediumAccessor(
-            new InMemoryMedium(m_memory, null, true));
-      }
-
-      return m_testling;
+   protected IMediumAccessor<?> createMediumAccessorImplementationToTest() {
+      return new MemoryMediumAccessor(new InMemoryMedium(memory, null, true));
    }
 
    /**
-    * @see IMediumAccessorTest#prepareMediumData()
+    * @see AbstractIMediumAccessorTest#prepareMediumData(byte[])
     */
    @Override
-   protected void prepareMediumData() {
+   protected void prepareMediumData(byte[] testFileContents) {
 
-      try {
-         m_reader = new RandomAccessFile(
-            MediaTestCaseConstants.STANDARD_TEST_FILE, "r");
+      memory = new byte[testFileContents.length];
 
-         ByteBuffer bb = ByteBuffer.wrap(m_memory);
-
-         m_channel = m_reader.getChannel();
-         m_channel.read(bb);
-      }
-
-      catch (FileNotFoundException e) {
-         throw new RuntimeException(
-            "Could not find test file. Make sure it exists"
-               + "on the hard drive: "
-               + MediaTestCaseConstants.STANDARD_TEST_FILE.getAbsolutePath(),
-            e);
-      }
-
-      catch (IOException e) {
-         throw new RuntimeException(
-            "Could not read from test file: "
-               + MediaTestCaseConstants.STANDARD_TEST_FILE.getAbsolutePath(),
-            e);
-      }
+      System.arraycopy(testFileContents, 0, memory, 0, testFileContents.length);
    }
 }
