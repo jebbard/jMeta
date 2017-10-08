@@ -86,7 +86,7 @@ public abstract class IMediumCacheTest {
          IMediumReference reference = iterator.next();
          long size = testCacheSizes.get(reference);
 
-         testling.buffer(reference, size);
+         testling.buffer(reference, (int) size);
 
          Assert.assertTrue(testling.getBufferedByteCountAt(reference) >= size);
 
@@ -933,7 +933,7 @@ public abstract class IMediumCacheTest {
          long size = distancesToEOM.get(reference);
 
          try {
-            cache.buffer(reference, size * 2);
+            cache.buffer(reference, (int) size * 2);
             Assert.fail("End of medium is expected here!");
          }
 
@@ -963,7 +963,7 @@ public abstract class IMediumCacheTest {
             IMediumReference reference = iterator.next();
             long size = testCacheSizes.get(reference);
 
-            testling.buffer(reference, size);
+            testling.buffer(reference, (int) size);
          }
 
          final Map<IMediumReference, Integer> overlappingRegions = getOverlappingRegions();
@@ -975,7 +975,7 @@ public abstract class IMediumCacheTest {
 
             Assert.assertEquals(composedSize, testling.getBufferedByteCountAt(composedReference));
             // Cache the composed region again
-            testling.buffer(composedReference, composedSize);
+            testling.buffer(composedReference, (int) composedSize);
             Assert.assertEquals(composedSize, testling.getBufferedByteCountAt(composedReference));
          }
 
@@ -1344,7 +1344,7 @@ public abstract class IMediumCacheTest {
             IMediumReference reference = iterator.next();
             long size = testCacheSizes.get(reference);
 
-            testling.buffer(reference, size);
+            testling.buffer(reference, (int) size);
          }
       } catch (EndOfMediumException e) {
          Assert.fail(UNEXPECTED_END_OF_MEDIUM + e);

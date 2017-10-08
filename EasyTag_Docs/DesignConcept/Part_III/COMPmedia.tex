@@ -1178,7 +1178,7 @@ The following table summarizes all further error situations when working with \C
 	\hline
 	Medium does not exist & The medium does not exist, in \LibName{} however it must be an existing medium. & It is an abnormal situation, thus a \texttt{MediumAccessException}runtime exception is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
 	\hline
-	Medium is already locked & The medium is already locked by another process. \LibName{} cannot work with the medium. It is the burden of the caller to ensure, that the medium is not used in parallel. & It is an abnormal situation, thus a\texttt{MediumAccessException}runtime exception is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
+	Medium is already locked & The medium is already locked by another process. \LibName{} cannot work with the medium. It is the burden of the caller to ensure, that the medium is not used in parallel. & It is an abnormal situation, thus a \texttt{MediumAccessException} runtime exception is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
 	\hline
 	Unknowm media type & A \IMedium{} implementation is specified by the caller which is unsupported. & This is an abnormal situation violating the interface contract, thus the same exception as for contract violations is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
 	\hline
@@ -1248,7 +1248,7 @@ Interface \IMediumAccessor{} with implementations for each \TERMmedia{} type acc
 Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing a great deal of ensuring \DesLink{dd:407}. It offest the following primitives:
 \begin{itemize}
 	\item \texttt{GetMedium}: Returns the medium this instance is working on.
-	\item \texttt{Open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}).
+	\item \texttt{Open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}). It is an implicit operation directly executed with the constructor call.
 	\item \texttt{IsOpened}: Check if the medium is opened.
 	\item \texttt{Close}: Close the medium for access. A closed medium cannot be used anymore.
 	\item \texttt{Read} from offset $x$: Read $n$ bytes from external medium by explicit access, return the bytes in a \texttt{ByteBuffer}, the offset $x$ is ignored for non-random-access media. For byte stream media, the timeout mechanism according to \DesLink{dd:426} is implemented here.

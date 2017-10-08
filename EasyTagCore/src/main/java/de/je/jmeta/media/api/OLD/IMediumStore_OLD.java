@@ -77,8 +77,8 @@ public interface IMediumStore_OLD {
     * only be done using {@link #insertData(IMediumReference, ByteBuffer)}, {@link #removeData(IMediumReference, int)}
     * or {@link #replaceData(IMediumReference, int, ByteBuffer)}.
     * 
-    * All {@link MediumAction} instances returned by these instances will be invalid after this call and must not
-    * be used anymore.
+    * All {@link MediumAction} instances returned by these instances will be invalid after this call and must not be
+    * used anymore.
     * 
     * @throws MediumAccessException
     *            In case of any errors during accessing the underlying {@link IMedium}.
@@ -129,8 +129,7 @@ public interface IMediumStore_OLD {
     * @pre {@link #getMedium()}.getCurrentLength() > reference.getAbsoluteByteOffset()
     * @pre byteCount > 0
     */
-   public ByteBuffer getData(IMediumReference reference, int byteCount)
-      throws EndOfMediumException;
+   public ByteBuffer getData(IMediumReference reference, int byteCount) throws EndOfMediumException;
 
    /**
     * Returns the {@link IMedium} this {@link IMediumStore_OLD} is using.
@@ -183,8 +182,7 @@ public interface IMediumStore_OLD {
     * @pre {@link #getMedium()}.getCurrentLength() > reference.getAbsoluteByteOffset()
     * @pre {@link #getMedium()}.equals(reference.getMedium())
     */
-   public MediumAction insertData(IMediumReference reference,
-      ByteBuffer bytes);
+   public MediumAction insertData(IMediumReference reference, ByteBuffer bytes);
 
    /**
     * Returns whether the given {@link IMediumReference} is at end of the {@link IMedium} used for reading. The method
@@ -269,8 +267,7 @@ public interface IMediumStore_OLD {
     *       {@link #getBufferedByteCountAt(IMediumReference)} == true for the given {@link IMediumReference} and
     *       {@link EndOfMediumException#getBytesReallyRead()}
     */
-   public void buffer(IMediumReference reference, long size)
-      throws EndOfMediumException;
+   public void buffer(IMediumReference reference, int size) throws EndOfMediumException;
 
    /**
     * Removes the given number of bytes at the given {@link IMediumReference}. This method does not actually write data
@@ -305,8 +302,7 @@ public interface IMediumStore_OLD {
     * @pre {@link #getMedium()}.equals(reference.getMedium())
     * @pre byteCountToRemove > 0
     */
-   public MediumAction removeData(IMediumReference reference,
-      int byteCountToRemove);
+   public MediumAction removeData(IMediumReference reference, int byteCountToRemove);
 
    /**
     * Replaces the given number of bytes at the given {@link IMediumReference} with the given {@link ByteBuffer}
@@ -343,8 +339,7 @@ public interface IMediumStore_OLD {
     * @pre {@link #getMedium()}.equals(reference.getMedium())
     * @pre byteCountToReplace > 0
     */
-   public MediumAction replaceData(IMediumReference reference,
-      int byteCountToReplace, ByteBuffer bytes);
+   public MediumAction replaceData(IMediumReference reference, int byteCountToReplace, ByteBuffer bytes);
 
    /**
     * Undoes changes made using {@link #insertData(IMediumReference, ByteBuffer)},

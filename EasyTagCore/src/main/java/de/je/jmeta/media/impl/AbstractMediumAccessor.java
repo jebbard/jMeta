@@ -27,8 +27,7 @@ import de.je.util.javautil.common.err.Reject;
  * @param <T>
  *           The type of {@link IMedium}
  */
-public abstract class AbstractMediumAccessor<T extends IMedium<?>>
-   implements IMediumAccessor<T> {
+public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IMediumAccessor<T> {
 
    private final T medium;
 
@@ -57,13 +56,14 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
          doOpen();
          isOpened = true;
       } catch (Exception e) {
-         throw new MediumAccessException(
-            "Could not open medium due to exception", e);
+         throw new MediumAccessException("Could not open medium due to exception", e);
       }
    }
 
    @Override
    public void close() {
+
+      Reject.ifFalse(isOpened(), "isOpened()");
 
       try {
          doClose();
@@ -71,8 +71,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
       }
 
       catch (Exception e) {
-         throw new MediumAccessException(
-            "Could not close medium due to exception", e);
+         throw new MediumAccessException("Could not close medium due to exception", e);
       }
 
    }
@@ -121,8 +120,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
     * 
     * @throws Exception
     */
-   protected abstract void doWrite(IMediumReference reference,
-      ByteBuffer buffer) throws Exception;
+   protected abstract void doWrite(IMediumReference reference, ByteBuffer buffer) throws Exception;
 
    @Override
    public T getMedium() {
@@ -137,18 +135,14 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
    }
 
    @Override
-   public void read(IMediumReference reference, ByteBuffer buffer)
-      throws EndOfMediumException {
+   public void read(IMediumReference reference, ByteBuffer buffer) throws EndOfMediumException {
 
-	  Reject.ifFalse(isOpened(),
-         "isOpened()");
+      Reject.ifFalse(isOpened(), "isOpened()");
       Reject.ifNull(buffer, "buffer");
       Reject.ifNull(reference, "reference");
-      Reject.ifFalse(reference.getMedium().equals(getMedium()),
-    		  "reference.getMedium().equals(getMedium())");
+      Reject.ifFalse(reference.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
       if (getMedium().isRandomAccess())
-    	  Reject.ifFalse(
-            reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
+         Reject.ifFalse(reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
             "reference.getAbsoluteMediumOffset() < medium.getCurrentLength()");
 
       if (buffer.remaining() == 0)
@@ -161,8 +155,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
       }
 
       catch (IOException e) {
-         throw new MediumAccessException(COULD_NOT_ACCESS_MEDIUM + getMedium(),
-            e);
+         throw new MediumAccessException(COULD_NOT_ACCESS_MEDIUM + getMedium(), e);
       }
 
       finally {
@@ -174,16 +167,13 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
    @Override
    public void write(IMediumReference reference, ByteBuffer buffer) {
 
-      Reject.ifFalse(isOpened(),
-			         "isOpened()");
+      Reject.ifFalse(isOpened(), "isOpened()");
       Reject.ifNull(buffer, "buffer");
       Reject.ifNull(reference, "reference");
-      Reject.ifFalse(reference.getMedium().equals(getMedium()),
-    		  "reference.getMedium().equals(getMedium())");
+      Reject.ifFalse(reference.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
 
       if (getMedium().isRandomAccess())
-    	  Reject.ifFalse(
-            reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
+         Reject.ifFalse(reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
             "reference.getAbsoluteMediumOffset() < medium.getCurrentLength()");
 
       if (medium.isReadOnly())
@@ -194,8 +184,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>>
       }
 
       catch (Exception e) {
-         throw new MediumAccessException(COULD_NOT_ACCESS_MEDIUM + getMedium(),
-            e);
+         throw new MediumAccessException(COULD_NOT_ACCESS_MEDIUM + getMedium(), e);
       }
    }
 }

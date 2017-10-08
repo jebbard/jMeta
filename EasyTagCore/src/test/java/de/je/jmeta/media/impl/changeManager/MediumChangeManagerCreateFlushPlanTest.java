@@ -7,7 +7,7 @@
  * @date 16.10.2016
  *
  */
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.impl.changeManager;
 
 import static de.je.jmeta.media.api.MediaTestHelper.at;
 
@@ -30,11 +30,9 @@ import de.je.jmeta.media.api.MediaTestHelper;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
-import de.je.jmeta.media.impl.changeManager.ExpectedActionSequence;
-import de.je.jmeta.media.impl.changeManager.ReadWriteActionSequence;
+import de.je.jmeta.media.impl.MediumChangeManager;
+import de.je.jmeta.media.impl.MediumReferenceFactory;
 import de.je.jmeta.media.impl.changeManager.ReadWriteActionSequence.ActionOrder;
-import de.je.jmeta.media.impl.changeManager.SingleActionSequence;
-import de.je.jmeta.media.impl.changeManager.WriteActionSequence;
 import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
 import de.je.util.javautil.testUtil.setup.TestDataException;
 

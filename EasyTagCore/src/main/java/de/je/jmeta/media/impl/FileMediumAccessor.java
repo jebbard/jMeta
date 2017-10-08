@@ -52,9 +52,9 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     */
    @Override
    public boolean isAtEndOfMedium(IMediumReference reference) {
+      Reject.ifFalse(isOpened(), "isOpened()");
 
-      return reference.getAbsoluteMediumOffset() >= getMedium()
-         .getCurrentLength();
+      return reference.getAbsoluteMediumOffset() >= getMedium().getCurrentLength();
    }
 
    /**
@@ -94,16 +94,14 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doRead(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doRead(IMediumReference reference, ByteBuffer buffer)
-      throws IOException, EndOfMediumException {
+   protected void doRead(IMediumReference reference, ByteBuffer buffer) throws IOException, EndOfMediumException {
 
       int bytesRead = 0;
       int size = buffer.remaining();
       int initialPosition = buffer.position();
 
       while (bytesRead < size) {
-         final long readOffset = reference.getAbsoluteMediumOffset()
-            + bytesRead;
+         final long readOffset = reference.getAbsoluteMediumOffset() + bytesRead;
          int returnCode = fileChannel.read(buffer, readOffset);
 
          if (returnCode == -1) {
@@ -120,14 +118,12 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doWrite(IMediumReference reference, ByteBuffer buffer)
-      throws Exception {
+   protected void doWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
 
       int bytesWritten = 0;
 
       while (bytesWritten < buffer.capacity()) {
-         bytesWritten += fileChannel.write(buffer,
-            reference.getAbsoluteMediumOffset() + bytesWritten);
+         bytesWritten += fileChannel.write(buffer, reference.getAbsoluteMediumOffset() + bytesWritten);
       }
    }
 
@@ -141,17 +137,14 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
          try {
             lock = fileChannel.tryLock();
          } catch (IOException e) {
-            throw new MediumAccessException(
-               "Could not lock medium due to exception", e);
+            throw new MediumAccessException("Could not lock medium due to exception", e);
          } catch (OverlappingFileLockException e) {
-            throw new MediumAccessException(
-               "File is already locked in this JVM", e);
+            throw new MediumAccessException("File is already locked in this JVM", e);
          }
 
          // Another process has locked the file already
          if (lock == null)
-            throw new MediumAccessException(
-               "File is already locked by another process", null);
+            throw new MediumAccessException("File is already locked by another process", null);
       }
    }
 
@@ -164,8 +157,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
          try {
             lock.release();
          } catch (IOException e) {
-            throw new MediumAccessException(
-               "Could not unlock medium due to exception", e);
+            throw new MediumAccessException("Could not unlock medium due to exception", e);
          }
    }
 }

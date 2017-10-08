@@ -18,11 +18,11 @@ import de.je.util.javautil.common.err.Reject;
  */
 public class EndOfMediumException extends Exception {
 
-   private final long m_bytesReallyRead;
+   private final int bytesReallyRead;
 
-   private final long m_byteCountTriedToRead;
+   private final int byteCountTriedToRead;
 
-   private final IMediumReference m_mediumReference;
+   private final IMediumReference mediumReference;
 
    private static final long serialVersionUID = 1L;
 
@@ -39,17 +39,15 @@ public class EndOfMediumException extends Exception {
     * @pre bytesRead >= 0
     * @pre byteCountTriedToRead > 0
     */
-   public EndOfMediumException(long bytesRead, IMediumReference mediumReference,
-      long byteCountTriedToRead) {
+   public EndOfMediumException(int bytesRead, IMediumReference mediumReference, int byteCountTriedToRead) {
 
       Reject.ifNull(mediumReference, "mediumReference");
       Reject.ifNegative(bytesRead, "bytesRead");
-      Reject.ifNegativeOrZero(byteCountTriedToRead,
-         "byteCountTriedToRead");
+      Reject.ifNegativeOrZero(byteCountTriedToRead, "byteCountTriedToRead");
 
-      m_bytesReallyRead = bytesRead;
-      m_byteCountTriedToRead = byteCountTriedToRead;
-      m_mediumReference = mediumReference;
+      this.bytesReallyRead = bytesRead;
+      this.byteCountTriedToRead = byteCountTriedToRead;
+      this.mediumReference = mediumReference;
    }
 
    /**
@@ -57,9 +55,9 @@ public class EndOfMediumException extends Exception {
     * 
     * @return the number of bytes tried to read in the read attempt that caused the exception.
     */
-   public long getByteCountTriedToRead() {
+   public int getByteCountTriedToRead() {
 
-      return m_byteCountTriedToRead;
+      return byteCountTriedToRead;
    }
 
    /**
@@ -67,9 +65,9 @@ public class EndOfMediumException extends Exception {
     * 
     * @return the number of bytes successfully read until the exception was thrown.
     */
-   public long getBytesReallyRead() {
+   public int getBytesReallyRead() {
 
-      return m_bytesReallyRead;
+      return bytesReallyRead;
    }
 
    /**
@@ -79,7 +77,7 @@ public class EndOfMediumException extends Exception {
     */
    public IMediumReference getMediumReference() {
 
-      return m_mediumReference;
+      return mediumReference;
    }
 
    /**
@@ -88,8 +86,7 @@ public class EndOfMediumException extends Exception {
    @Override
    public String toString() {
 
-      return getClass().getName() + "[m_mediumReference=" + m_mediumReference
-         + ", m_byteCountTriedToRead=" + m_byteCountTriedToRead
-         + ", m_bytesReallyRead=" + m_bytesReallyRead + "]";
+      return getClass().getName() + "[m_mediumReference=" + mediumReference + ", m_byteCountTriedToRead="
+         + byteCountTriedToRead + ", m_bytesReallyRead=" + bytesReallyRead + "]";
    }
 }

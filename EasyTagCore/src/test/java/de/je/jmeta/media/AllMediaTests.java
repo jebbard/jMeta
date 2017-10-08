@@ -24,15 +24,15 @@ import de.je.jmeta.media.api.datatype.InputStreamMediumTest;
 import de.je.jmeta.media.api.datatype.MediumActionEqualityTest;
 import de.je.jmeta.media.api.datatype.MediumActionTest;
 import de.je.jmeta.media.api.datatype.MediumRegionTest;
-import de.je.jmeta.media.impl.FileMediumAccessorTest;
 import de.je.jmeta.media.impl.IMediumReferenceTest;
-import de.je.jmeta.media.impl.MediumChangeManagerCreateFlushPlanTest;
-import de.je.jmeta.media.impl.MediumChangeManagerTest;
 import de.je.jmeta.media.impl.MediumReferenceFactoryTest;
-import de.je.jmeta.media.impl.MemoryMediumAccessorTest;
-import de.je.jmeta.media.impl.StreamingMediumAccessorTest;
 import de.je.jmeta.media.impl.OLD.BlockWiseFileMediumCacheTest;
 import de.je.jmeta.media.impl.OLD.FileMediumCacheTest;
+import de.je.jmeta.media.impl.changeManager.MediumChangeManagerCreateFlushPlanTest;
+import de.je.jmeta.media.impl.changeManager.MediumChangeManagerTest;
+import de.je.jmeta.media.impl.mediumAccessor.StreamMediumAccessorTest;
+import de.je.jmeta.media.impl.mediumAccessor.WritableFileMediumAccessorTest;
+import de.je.jmeta.media.impl.mediumAccessor.WritableMemoryMediumAccessorTest;
 import de.je.jmeta.media.impl.timeout.StreamingMediumAccessorTimeoutTest;
 import de.je.util.javautil.AllUtilityTests;
 
@@ -40,8 +40,8 @@ import de.je.util.javautil.AllUtilityTests;
  * {@link AllMediaTests} is used for running all test cases of the media component.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ BlockWiseFileMediumCacheTest.class, FileMediumCacheTest.class, FileMediumAccessorTest.class,
-   MemoryMediumAccessorTest.class, StreamingMediumAccessorTest.class, MediumRegionTest.class, IMediumEqualityTest.class,
+@SuiteClasses({ BlockWiseFileMediumCacheTest.class, FileMediumCacheTest.class, WritableFileMediumAccessorTest.class,
+   WritableMemoryMediumAccessorTest.class, StreamMediumAccessorTest.class, MediumRegionTest.class, IMediumEqualityTest.class,
    IMediumReferenceTest.class, IMediumReferenceEqualityTest.class, DummyFileMediumTest.class,
    ExistingFileMediumTest.class, InMemoryMediumTest.class, InputStreamMediumTest.class,
    StreamingMediumAccessorTimeoutTest.class, InputStreamMediumConfigurableTest.class,

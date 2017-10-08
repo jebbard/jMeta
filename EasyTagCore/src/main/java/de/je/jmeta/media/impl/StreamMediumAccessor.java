@@ -21,8 +21,7 @@ import de.je.util.javautil.common.err.Reject;
 /**
  * Represents a read-only streaming media {@link IMediumAccessor} that may block when reading.
  */
-public class StreamMediumAccessor
-   extends AbstractMediumAccessor<InputStreamMedium> {
+public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedium> {
 
    // /**
    // * The default timeout value used for this {@link StreamMediumAccessor} in milliseconds.
@@ -51,6 +50,7 @@ public class StreamMediumAccessor
     */
    @Override
    public boolean isAtEndOfMedium(IMediumReference reference) {
+      Reject.ifFalse(isOpened(), "isOpened()");
 
       Reject.ifNull(reference, "reference");
 
@@ -60,8 +60,7 @@ public class StreamMediumAccessor
          assert e != null;
          return true;
       } catch (IOException e) {
-         throw new MediumAccessException(
-            "IOException when trying to determine end of medium", e);
+         throw new MediumAccessException("IOException when trying to determine end of medium", e);
       }
 
       finally {
@@ -77,8 +76,7 @@ public class StreamMediumAccessor
             if (SINGLE_BYTE_BUFFER.limit() == SINGLE_BYTE_BUFFER.capacity())
                inputStream.unread(SINGLE_BYTE_BUFFER.get(0));
          } catch (IOException e) {
-            throw new MediumAccessException(
-               "IOException when calling PushbackInputStream.unread()", e);
+            throw new MediumAccessException("IOException when calling PushbackInputStream.unread()", e);
          }
 
          finally {
@@ -112,8 +110,7 @@ public class StreamMediumAccessor
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doRead(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doRead(IMediumReference reference, ByteBuffer buffer)
-      throws IOException, EndOfMediumException {
+   protected void doRead(IMediumReference reference, ByteBuffer buffer) throws IOException, EndOfMediumException {
 
       if (getMedium().getReadTimeout() == InputStreamMedium.NO_TIMEOUT)
          readWithoutTimeout(reference, buffer);
@@ -126,8 +123,7 @@ public class StreamMediumAccessor
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doWrite(IMediumReference reference, ByteBuffer buffer)
-      throws Exception {
+   protected void doWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
 
       // do nothing as this is a read-only class
    }
@@ -145,8 +141,8 @@ public class StreamMediumAccessor
     * @throws EndOfMediumException
     *            If end of medium was hit during reading.
     */
-   private void readWithoutTimeout(IMediumReference reference,
-      ByteBuffer buffer) throws IOException, EndOfMediumException {
+   private void readWithoutTimeout(IMediumReference reference, ByteBuffer buffer)
+      throws IOException, EndOfMediumException {
 
       int bytesRead = 0;
       int size = buffer.remaining();
@@ -155,8 +151,7 @@ public class StreamMediumAccessor
       byte[] byteBuffer = new byte[size];
 
       while (bytesRead < size) {
-         int returnCode = inputStream.read(byteBuffer, bytesRead,
-            size - bytesRead);
+         int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
 
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
@@ -183,8 +178,7 @@ public class StreamMediumAccessor
     * @throws ReadTimedOutException
     *            If reading timed out.
     */
-   private void timedOutRead(IMediumReference reference, ByteBuffer buffer)
-      throws IOException {
+   private void timedOutRead(IMediumReference reference, ByteBuffer buffer) throws IOException {
 
       final int byteCount = buffer.remaining();
       final int readTimeout = getMedium().getReadTimeout();
@@ -203,11 +197,9 @@ public class StreamMediumAccessor
 
          if (availableBytes > 0) {
             int bytesLeftForReading = byteCount - bytesRead;
-            int bytesToRead = availableBytes > bytesLeftForReading
-               ? bytesLeftForReading : availableBytes;
+            int bytesToRead = availableBytes > bytesLeftForReading ? bytesLeftForReading : availableBytes;
 
-            int currentBytesRead = inputStream.read(dataBuffer, bytesRead,
-               bytesToRead);
+            int currentBytesRead = inputStream.read(dataBuffer, bytesRead, bytesToRead);
 
             buffer.put(dataBuffer, bytesRead, currentBytesRead);
 
@@ -238,8 +230,7 @@ public class StreamMediumAccessor
       // Loop terminated due to reached timeout
       if (bytesRead < byteCount) {
          buffer.limit(initialPosition + bytesRead);
-         throw new ReadTimedOutException(readTimeout, bytesRead, reference,
-            byteCount);
+         throw new ReadTimedOutException(readTimeout, bytesRead, reference, byteCount);
       }
    }
 }

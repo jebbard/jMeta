@@ -438,8 +438,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       Reject.ifNull(previousHeaders, "previousHeaders");
       Reject.ifNull(headerId, "headerId");
       Reject.ifNull(reference, "reference");
-      Reject.ifFalse(m_spec.specifiesBlockWithId(headerId),
-         "m_spec.specifiesBlockWithId(headerId)");
+      Reject.ifFalse(m_spec.specifiesBlockWithId(headerId), "m_spec.specifiesBlockWithId(headerId)");
 
       DataBlockDescription headerDesc = m_spec.getDataBlockDescription(headerId);
 
@@ -469,8 +468,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       Reject.ifNull(previousFooters, "previousFooters");
       Reject.ifNull(footerId, "footerId");
       Reject.ifNull(reference, "reference");
-      Reject.ifFalse(m_spec.specifiesBlockWithId(footerId),
-         "m_spec.specifiesBlockWithId(footerId)");
+      Reject.ifFalse(m_spec.specifiesBlockWithId(footerId), "m_spec.specifiesBlockWithId(footerId)");
 
       DataBlockDescription footerDesc = m_spec.getDataBlockDescription(footerId);
 
@@ -719,11 +717,11 @@ public class StandardDataBlockReader implements IDataBlockReader {
    @Override
    public void setTransformationHandler(DataTransformationType transformationType, ITransformationHandler handler) {
 
-	   Reject.ifFalse(m_transformationsReadOrder.containsKey(transformationType),
+      Reject.ifFalse(m_transformationsReadOrder.containsKey(transformationType),
          "m_transformationsReadOrder.containsKey(transformationType)");
 
       if (handler != null)
-    	  Reject.ifFalse(transformationType.equals(handler.getTransformationType()),
+         Reject.ifFalse(transformationType.equals(handler.getTransformationType()),
             "transformationType.equals(handler.getTransformationType())");
 
       // Set the handler
@@ -816,7 +814,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
             if (m_cache.getBufferedByteCountAt(transformedContainer.getMediumReference()) < transformedContainer
                .getTotalSize())
                try {
-                  m_cache.buffer(transformedContainer.getMediumReference(), transformedContainer.getTotalSize());
+                  m_cache.buffer(transformedContainer.getMediumReference(), (int) transformedContainer.getTotalSize());
                } catch (EndOfMediumException e) {
                   throw new IllegalStateException("Unexpected end of medium", e);
                }
@@ -1235,7 +1233,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    @Override
    public void cache(IMediumReference reference, long size) throws EndOfMediumException {
 
-      m_cache.buffer(reference, size);
+      m_cache.buffer(reference, (int) size);
    }
 
    private IMediumStore_OLD m_cache;

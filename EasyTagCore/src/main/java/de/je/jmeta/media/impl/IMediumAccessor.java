@@ -16,6 +16,7 @@ import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
+import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 
 /**
  * This class represents an object that reads from and stores data on a {@link IMedium}. The {@link IMediumAccessor} can
@@ -51,6 +52,7 @@ public interface IMediumAccessor<T extends IMedium<?>> {
 
    /**
     * Closes this {@link IMediumAccessor}. All access methods cannot be used if the {@link IMediumAccessor} is closed.
+    * They will throw a {@link PreconditionUnfullfilledException} in this case.
     * 
     * @post #isOpened() == false
     */
@@ -117,8 +119,7 @@ public interface IMediumAccessor<T extends IMedium<?>> {
     * @pre {@link #isOpened()}
     * @pre {@link #getMedium()}.equals(reference.getMedium())
     */
-   public void read(IMediumReference reference, ByteBuffer buffer)
-      throws EndOfMediumException;
+   public void read(IMediumReference reference, ByteBuffer buffer) throws EndOfMediumException;
 
    /**
     * Writes bytes to the {@link IMediumAccessor} at the given {@link IMediumReference}. This operation is only possible

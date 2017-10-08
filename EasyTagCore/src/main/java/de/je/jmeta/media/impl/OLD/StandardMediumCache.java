@@ -51,14 +51,11 @@ public class StandardMediumCache implements IMediumCache {
     * @pre maxCacheRegionSize > 0
     * @pre accessor.isOpened()
     */
-   public StandardMediumCache(IMediumAccessor<?> accessor,
-      int maxCacheRegionSize) {
+   public StandardMediumCache(IMediumAccessor<?> accessor, int maxCacheRegionSize) {
 
       Reject.ifNull(accessor, "accessor");
-      Reject.ifNegativeOrZero(maxCacheRegionSize,
-         "maxCacheRegionSize");
-      Reject.ifFalse(accessor.isOpened(),
-         "accessor.isOpened()");
+      Reject.ifNegativeOrZero(maxCacheRegionSize, "maxCacheRegionSize");
+      Reject.ifFalse(accessor.isOpened(), "accessor.isOpened()");
 
       m_accessor = accessor;
       m_maxCacheRegionSize = maxCacheRegionSize;
@@ -106,8 +103,7 @@ public class StandardMediumCache implements IMediumCache {
       // The portion to free overlaps the end of an existing region
       if (firstRegion.getStartReference().before(startReference)) {
          long originalSize = firstRegion.getSize();
-         long distance = startReference
-            .distanceTo(firstRegion.getStartReference());
+         long distance = startReference.distanceTo(firstRegion.getStartReference());
 
          // Set to end reference berfore trimming
          currentReference = firstRegion.calculateEndReference();
@@ -128,8 +124,7 @@ public class StandardMediumCache implements IMediumCache {
          m_cache.remove(currentReference);
 
          if (originalSize > remainingSize) {
-            currentRegion
-               .discardBytesAtFront(currentReference.advance(remainingSize));
+            currentRegion.discardBytesAtFront(currentReference.advance(remainingSize));
 
             m_cache.put(currentRegion.getStartReference(), currentRegion);
 
@@ -157,8 +152,7 @@ public class StandardMediumCache implements IMediumCache {
     * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#getData(de.je.jmeta.media.api.IMediumReference, int)
     */
    @Override
-   public synchronized ByteBuffer getData(IMediumReference reference,
-      int byteCount) {
+   public synchronized ByteBuffer getData(IMediumReference reference, int byteCount) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNegative(byteCount, "size");
@@ -176,8 +170,7 @@ public class StandardMediumCache implements IMediumCache {
       else {
          MediumRegion nextRegion = findContainingRegion(reference);
 
-         int startPosition = (int) (reference
-            .distanceTo(nextRegion.getStartReference()));
+         int startPosition = (int) (reference.distanceTo(nextRegion.getStartReference()));
 
          ByteBuffer bytes = nextRegion.getBytes();
 
@@ -229,8 +222,7 @@ public class StandardMediumCache implements IMediumCache {
    public synchronized long getBufferedByteCountAt(IMediumReference reference) {
 
       Reject.ifNull(reference, "reference");
-      Reject.ifFalse(reference.getMedium().equals(getMedium()),
-         "reference.getMedium().equals(getMedium())");
+      Reject.ifFalse(reference.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
 
       MediumRegion region = findContainingRegion(reference);
 
@@ -261,8 +253,7 @@ public class StandardMediumCache implements IMediumCache {
 
       Map<IMediumReference, Integer> returnedMap = new HashMap<>();
 
-      for (Iterator<IMediumReference> iterator = m_cache.keySet()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<IMediumReference> iterator = m_cache.keySet().iterator(); iterator.hasNext();) {
          IMediumReference nextReference = iterator.next();
          MediumRegion nextRegion = m_cache.get(nextReference);
 
@@ -273,11 +264,11 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#insertData(de.je.jmeta.media.api.IMediumReference, java.nio.ByteBuffer)
+    * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#insertData(de.je.jmeta.media.api.IMediumReference,
+    *      java.nio.ByteBuffer)
     */
    @Override
-   public MediumAction insertData(IMediumReference reference,
-      ByteBuffer bytes) {
+   public MediumAction insertData(IMediumReference reference, ByteBuffer bytes) {
 
       // TODO implement for writing
 
@@ -306,8 +297,7 @@ public class StandardMediumCache implements IMediumCache {
     * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#buffer(IMediumReference, long)
     */
    @Override
-   public synchronized void buffer(IMediumReference cacheReference, long size)
-      throws EndOfMediumException {
+   public synchronized void buffer(IMediumReference cacheReference, int size) throws EndOfMediumException {
 
       Reject.ifNull(cacheReference, "reference");
       Reject.ifNegativeOrZero(size, "size");
@@ -320,21 +310,17 @@ public class StandardMediumCache implements IMediumCache {
       // Reference to the last byte before end of region
       IMediumReference newEndReference = cacheReference.advance(size);
 
-      for (Iterator<IMediumReference> iterator = m_cache.keySet()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<IMediumReference> iterator = m_cache.keySet().iterator(); iterator.hasNext();) {
          final IMediumReference existingStartReference = iterator.next();
-         final MediumRegion existingCacheRegion = m_cache
-            .get(existingStartReference);
+         final MediumRegion existingCacheRegion = m_cache.get(existingStartReference);
 
-         final IMediumReference existingEndReference = existingCacheRegion
-            .calculateEndReference();
+         final IMediumReference existingEndReference = existingCacheRegion.calculateEndReference();
 
          /*
           * If the new region incorporates one or several complete existing regions, the existing regions are dropped
           * and the new region is then cached as such.
           */
-         if ((newStartReference.before(existingStartReference)
-            || newStartReference.equals(existingStartReference))
+         if ((newStartReference.before(existingStartReference) || newStartReference.equals(existingStartReference))
             && newEndReference.behindOrEqual(existingEndReference))
             iterator.remove();
 
@@ -364,9 +350,7 @@ public class StandardMediumCache implements IMediumCache {
       // when reading
       // later
       if (getMedium().isRandomAccess())
-         if (newStartReference
-            .equals(new StandardMediumReference(getMedium(),
-               getMedium().getCurrentLength()))
+         if (newStartReference.equals(new StandardMediumReference(getMedium(), getMedium().getCurrentLength()))
             && newStartReference.getAbsoluteMediumOffset() != 0) {
             newStartReference = new StandardMediumReference(getMedium(),
                newStartReference.getAbsoluteMediumOffset() - 1);
@@ -383,16 +367,13 @@ public class StandardMediumCache implements IMediumCache {
          }
 
          if (actualSize % m_maxCacheRegionSize > 0)
-            readIntoCache(nextReference,
-               (int) actualSize % m_maxCacheRegionSize);
+            readIntoCache(nextReference, (int) actualSize % m_maxCacheRegionSize);
       } catch (EndOfMediumException e) {
          if (getMedium().isRandomAccess())
-            if (!e.getMediumReference().equals(cacheReference)
-               || e.getByteCountTriedToRead() != size)
+            if (!e.getMediumReference().equals(cacheReference) || e.getByteCountTriedToRead() != size)
                throw new EndOfMediumException(
-                  getMedium().getCurrentLength()
-                     - cacheReference.getAbsoluteMediumOffset(),
-                  cacheReference, size);
+                  (int) (getMedium().getCurrentLength() - cacheReference.getAbsoluteMediumOffset()), cacheReference,
+                  size);
 
          throw e;
       }
@@ -402,8 +383,7 @@ public class StandardMediumCache implements IMediumCache {
     * @see de.je.jmeta.media.api.OLD.IMediumStore_OLD#removeData(de.je.jmeta.media.api.IMediumReference, int)
     */
    @Override
-   public MediumAction removeData(IMediumReference reference,
-      int byteCountToRemove) {
+   public MediumAction removeData(IMediumReference reference, int byteCountToRemove) {
 
       // TODO implement for writing
       return null;
@@ -414,8 +394,7 @@ public class StandardMediumCache implements IMediumCache {
     *      java.nio.ByteBuffer)
     */
    @Override
-   public MediumAction replaceData(IMediumReference reference,
-      int byteCountToReplace, ByteBuffer bytes) {
+   public MediumAction replaceData(IMediumReference reference, int byteCountToReplace, ByteBuffer bytes) {
 
       // TODO implement for writing
       return null;
@@ -467,8 +446,7 @@ public class StandardMediumCache implements IMediumCache {
     * @throws EndOfMediumException
     *            If end of medium occurs during read.
     */
-   private void readIntoCache(IMediumReference reference, int size)
-      throws EndOfMediumException {
+   private void readIntoCache(IMediumReference reference, int size) throws EndOfMediumException {
 
       ByteBuffer newBuffer = ByteBuffer.allocate(size);
 
@@ -492,14 +470,12 @@ public class StandardMediumCache implements IMediumCache {
     * @param returnedBuffer
     *           The {@link ByteBuffer} to read bytes into, its remaining size is attempted to be read.
     */
-   private void uncheckedReadFromMedium(IMediumReference reference,
-      ByteBuffer returnedBuffer) {
+   private void uncheckedReadFromMedium(IMediumReference reference, ByteBuffer returnedBuffer) {
 
       try {
          m_accessor.read(reference, returnedBuffer);
       } catch (EndOfMediumException e) {
-         throw new MediumAccessException(
-            "Unexpected end of medium occurred during read", e);
+         throw new MediumAccessException("Unexpected end of medium occurred during read", e);
       }
    }
 }

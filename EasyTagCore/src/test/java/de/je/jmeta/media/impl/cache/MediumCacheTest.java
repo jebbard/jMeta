@@ -1,4 +1,4 @@
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.impl.cache;
 
 import static de.je.jmeta.media.impl.TestMediumUtility.DUMMY_DEFAULT_TEST_MEDIUM;
 import static de.je.jmeta.media.impl.TestMediumUtility.DUMMY_UNRELATED_MEDIUM;
@@ -15,6 +15,8 @@ import org.junit.Test;
 
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.impl.MediumCache;
+import de.je.jmeta.media.impl.TestMediumUtility;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.common.err.Reject;
 import junit.framework.Assert;

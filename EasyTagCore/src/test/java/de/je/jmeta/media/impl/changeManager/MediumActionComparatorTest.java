@@ -7,7 +7,7 @@
  * @date 23.05.2016
  *
  */
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.impl.changeManager;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -20,6 +20,8 @@ import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.impl.MediumActionComparator;
+import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 
 /**
