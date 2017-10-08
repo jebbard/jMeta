@@ -6,9 +6,10 @@
  *
  * @date 17.04.2011
  */
-package de.je.jmeta.media.api;
+package de.je.jmeta.media.api.helper;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * {@link MediaTestCaseConstants} provides some globally available constants for the test cases of the media component.
@@ -18,7 +19,7 @@ public interface MediaTestCaseConstants {
    /**
     * Path for test output files.
     */
-   public static final File TEST_FILE_OUTPUT_DIR = new File("./data/media/");
+   public static final Path TEST_FILE_OUTPUT_DIR = Paths.get("./data/media/");
 
    /**
     * Name of the global test file who's contents can be used by all concrete tests.
@@ -33,12 +34,10 @@ public interface MediaTestCaseConstants {
    /**
     * Path to the standard global test file.
     */
-   public static final File STANDARD_TEST_FILE = new File(TEST_FILE_OUTPUT_DIR,
-      STANDARD_TEST_FILE_RESOURCE);
+   public static final Path STANDARD_TEST_FILE = TEST_FILE_OUTPUT_DIR.resolve(STANDARD_TEST_FILE_RESOURCE);
 
    /**
     * Path to another global test file.
     */
-   public static final File SECOND_TEST_FILE = new File(TEST_FILE_OUTPUT_DIR,
-      SECOND_TEST_FILE_RESOURCE);
+   public static final Path SECOND_TEST_FILE = TEST_FILE_OUTPUT_DIR.resolve(SECOND_TEST_FILE_RESOURCE);
 }

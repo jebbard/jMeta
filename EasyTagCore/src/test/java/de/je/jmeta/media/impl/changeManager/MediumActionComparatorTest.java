@@ -9,17 +9,17 @@
  */
 package de.je.jmeta.media.impl.changeManager;
 
-import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.MediumActionComparator;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
@@ -142,7 +142,7 @@ public class MediumActionComparatorTest {
 
       MediumActionComparator comparator = new MediumActionComparator();
 
-      FileMedium otherMedium = new FileMedium(new File("."), true);
+      FileMedium otherMedium = new FileMedium(Paths.get("."), true);
 
       MediumAction actionA1 = new MediumAction(MediumActionType.INSERT,
          new MediumRegion(new StandardMediumReference(MEDIUM, 0), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES);

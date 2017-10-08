@@ -1,10 +1,10 @@
 package de.je.jmeta.media.impl.cache;
 
-import static de.je.jmeta.media.impl.TestMediumUtility.DUMMY_DEFAULT_TEST_MEDIUM;
-import static de.je.jmeta.media.impl.TestMediumUtility.DUMMY_UNRELATED_MEDIUM;
-import static de.je.jmeta.media.impl.TestMediumUtility.createReference;
-import static de.je.jmeta.media.impl.TestMediumUtility.createReferenceToDefaultMedium;
-import static de.je.jmeta.media.impl.TestMediumUtility.createUnCachedMediumRegionOnDefaultMedium;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.DUMMY_DEFAULT_TEST_MEDIUM;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.DUMMY_UNRELATED_MEDIUM;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createReference;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createReferenceToDefaultMedium;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createUnCachedMediumRegionOnDefaultMedium;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,8 +15,8 @@ import org.junit.Test;
 
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.api.helper.TestMediumUtility;
 import de.je.jmeta.media.impl.MediumCache;
-import de.je.jmeta.media.impl.TestMediumUtility;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.common.err.Reject;
 import junit.framework.Assert;

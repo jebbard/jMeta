@@ -9,17 +9,19 @@
  */
 package de.je.jmeta.media.api.datatype;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.MediaTestCaseConstants;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 
 /**
  * {@link ExistingFileMediumTest} tests the {@link FileMedium} class with an existing file.
  */
-public class ExistingFileMediumTest extends AbstractIMediumTest<File> {
+public class ExistingFileMediumTest extends AbstractIMediumTest<Path> {
 
-   private static final File WRAPPED_MEDIUM = MediaTestCaseConstants.STANDARD_TEST_FILE;
+   private static final Path WRAPPED_MEDIUM = MediaTestCaseConstants.STANDARD_TEST_FILE;
 
    private static final boolean READ_ONLY = false;
 
@@ -27,7 +29,7 @@ public class ExistingFileMediumTest extends AbstractIMediumTest<File> {
     * @see de.je.jmeta.media.api.datatype.AbstractIMediumTest#getMediumToTest()
     */
    @Override
-   protected IMedium<File> getMediumToTest() {
+   protected IMedium<Path> getMediumToTest() {
 
       return new FileMedium(WRAPPED_MEDIUM, READ_ONLY);
    }
@@ -54,7 +56,7 @@ public class ExistingFileMediumTest extends AbstractIMediumTest<File> {
     * @see de.je.jmeta.media.api.datatype.AbstractIMediumTest#getExpectedWrappedMedium()
     */
    @Override
-   protected File getExpectedWrappedMedium() {
+   protected Path getExpectedWrappedMedium() {
 
       return WRAPPED_MEDIUM;
    }
@@ -65,7 +67,7 @@ public class ExistingFileMediumTest extends AbstractIMediumTest<File> {
    @Override
    protected String getExpectedExternalName() {
 
-      return WRAPPED_MEDIUM.getAbsolutePath();
+      return WRAPPED_MEDIUM.toAbsolutePath().toString();
    }
 
    /**
@@ -83,7 +85,11 @@ public class ExistingFileMediumTest extends AbstractIMediumTest<File> {
    @Override
    protected long getExpectedLength() {
 
-      return WRAPPED_MEDIUM.length();
+      try {
+         return Files.size(WRAPPED_MEDIUM);
+      } catch (IOException e) {
+         throw new RuntimeException(e);
+      }
    }
 
 }

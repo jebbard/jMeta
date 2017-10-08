@@ -9,16 +9,17 @@
  */
 package de.je.jmeta.media.api.datatype;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.je.jmeta.media.api.IMedium;
 
 /**
  * {@link DummyFileMediumTest} tests the {@link FileMedium} class with a non-existing dummy file.
  */
-public class DummyFileMediumTest extends AbstractIMediumTest<File> {
+public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
 
-   private static final File WRAPPED_MEDIUM = new File("./testFile.tst");
+   private static final Path WRAPPED_MEDIUM = Paths.get("./testFile.tst");
 
    private static final boolean READ_ONLY = false;
 
@@ -28,14 +29,14 @@ public class DummyFileMediumTest extends AbstractIMediumTest<File> {
    @Override
    protected long getExpectedLength() {
 
-      return 0;
+      return IMedium.UNKNOWN_LENGTH;
    }
 
    /**
     * @see de.je.jmeta.media.api.datatype.AbstractIMediumTest#getMediumToTest()
     */
    @Override
-   protected IMedium<File> getMediumToTest() {
+   protected IMedium<Path> getMediumToTest() {
 
       return new FileMedium(WRAPPED_MEDIUM, READ_ONLY);
    }
@@ -62,7 +63,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<File> {
     * @see de.je.jmeta.media.api.datatype.AbstractIMediumTest#getExpectedWrappedMedium()
     */
    @Override
-   protected File getExpectedWrappedMedium() {
+   protected Path getExpectedWrappedMedium() {
 
       return WRAPPED_MEDIUM;
    }
@@ -73,7 +74,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<File> {
    @Override
    protected String getExpectedExternalName() {
 
-      return WRAPPED_MEDIUM.getAbsolutePath();
+      return WRAPPED_MEDIUM.toAbsolutePath().toString();
    }
 
    /**

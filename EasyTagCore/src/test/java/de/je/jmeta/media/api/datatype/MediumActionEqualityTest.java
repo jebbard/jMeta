@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.je.jmeta.media.api.MediaTestCaseConstants;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;
 

@@ -7,37 +7,42 @@
 
 package de.je.jmeta.media.impl.mediumAccessor;
 
-import static de.je.jmeta.media.impl.TestMediumUtility.createReference;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createReference;
 
-import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.IMediumAccessor;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.testUtil.setup.TestDataException;
 
 /*
- * TODO 1.) Testdaten / Datei-Lesen Lebenszyklus optimieren (nur einmal vor Klasse) 4.) Timeout tests in
- * StreamMediumAccessorTest verschieben 5.) Javadocs der Testfälle aktualisieren 7.) ReadOnly Testklassen für File und
- * InMemoryMedium
+ * TODO 4.) Timeout tests bewerten und refactoren
  */
 
 /**
- * Tests the interface {@IMediumAccessor}.
+ * Tests the interface {@IMediumAccessor}. Basic idea is to work on the
+ * {@link MediaTestCaseConstants#STANDARD_TEST_FILE}. Its contents is just ASCII bytes that are read once at the
+ * beginning of test execution and determined as expected content. Then reading and writing is tested based on this.
  */
 public abstract class AbstractIMediumAccessorTest {
 
+   /**
+    * {@link ReadTestData} summarizes offset and size of test data for tests of reading and writing.
+    */
    protected static class ReadTestData {
 
       /**
@@ -66,7 +71,16 @@ public abstract class AbstractIMediumAccessorTest {
 
    private IMediumAccessor<?> mediumAccessor;
 
-   private byte[] expectedFileContents;
+   protected static byte[] EXPECTED_FILE_CONTENTS;
+
+   /**
+    * Reads the contents of the {@link MediaTestCaseConstants#STANDARD_TEST_FILE} into memory to make it available for
+    * expectation testing.
+    */
+   @BeforeClass
+   public static void determineExpectedFileContents() {
+      EXPECTED_FILE_CONTENTS = readTestFileContents();
+   }
 
    /**
     * Sets up the test case.
@@ -74,9 +88,7 @@ public abstract class AbstractIMediumAccessorTest {
    @Before
    public void setUp() {
 
-      expectedFileContents = readTestFileContents();
-
-      prepareMediumData(expectedFileContents);
+      prepareMediumData(EXPECTED_FILE_CONTENTS);
 
       mediumAccessor = createImplementationToTest();
 
@@ -96,8 +108,6 @@ public abstract class AbstractIMediumAccessorTest {
       if (mediumAccessor.isOpened()) {
          mediumAccessor.close();
       }
-
-      cleanUpMediumData();
    }
 
    /**
@@ -204,7 +214,7 @@ public abstract class AbstractIMediumAccessorTest {
       catch (EndOfMediumException e) {
          Assert.assertEquals(readReference, e.getMediumReference());
          Assert.assertEquals(readSize, e.getByteCountTriedToRead());
-         Assert.assertEquals(getExpectedFileContents().length - readOffset, e.getBytesReallyRead());
+         Assert.assertEquals(EXPECTED_FILE_CONTENTS.length - readOffset, e.getBytesReallyRead());
       }
    }
 
@@ -277,12 +287,22 @@ public abstract class AbstractIMediumAccessorTest {
       mediumAccessor.isAtEndOfMedium(createReference(mediumAccessor.getMedium(), 0));
    }
 
-   protected static ByteBuffer performReadNoEOFExpected(IMediumAccessor<?> mediumAccessor,
-      ReadTestData readOverEndOfMedium) {
-      ByteBuffer readContent = ByteBuffer.allocate(readOverEndOfMedium.sizeToRead);
+   /**
+    * Encapsulates test calls to {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}, without expecting an end of
+    * medium during read, i.e. if it occurs, a test failure is generated.
+    * 
+    * @param mediumAccessor
+    *           The {@link IMediumAccessor} to use.
+    * @param readTestData
+    *           The {@link ReadTestData} to use.
+    * @return The {@link ByteBuffer} of data read, returned by
+    *         {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}
+    */
+   protected static ByteBuffer performReadNoEOFExpected(IMediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
+      ByteBuffer readContent = ByteBuffer.allocate(readTestData.sizeToRead);
 
       try {
-         mediumAccessor.read(createReference(mediumAccessor.getMedium(), (long) readOverEndOfMedium.offsetToRead),
+         mediumAccessor.read(createReference(mediumAccessor.getMedium(), (long) readTestData.offsetToRead),
             readContent);
       }
 
@@ -293,12 +313,11 @@ public abstract class AbstractIMediumAccessorTest {
       return readContent;
    }
 
+   /**
+    * @return The concrete {@link IMediumAccessor} currently tested.
+    */
    protected IMediumAccessor<?> getImplementationToTest() {
       return mediumAccessor;
-   }
-
-   protected byte[] getExpectedFileContents() {
-      return expectedFileContents;
    }
 
    /**
@@ -335,15 +354,10 @@ public abstract class AbstractIMediumAccessorTest {
     */
    protected abstract void prepareMediumData(byte[] testFileContents);
 
-   protected abstract IMedium<?> getExpectedMedium();
-
    /**
-    * This method is called during {@link #tearDown()} to dispose the medium data to be tested in a sufficient way. E.g.
-    * in case of a file a prototypical test file copied on {@link #setUp()} might be deleted again.
+    * @return the {@link IMedium} of the current {@link IMediumAccessor} tested
     */
-   protected void cleanUpMediumData() {
-      // Default implementation: empty - to be overridden only if necessary
-   }
+   protected abstract IMedium<?> getExpectedMedium();
 
    /**
     * Asserts whether the given bytes read previously in a test case at the given zero based test file offset equal the
@@ -360,10 +374,10 @@ public abstract class AbstractIMediumAccessorTest {
 
       int index = 0;
 
-      Assert.assertTrue(bytesRead.remaining() + fileOffset <= expectedFileContents.length);
+      Assert.assertTrue(bytesRead.remaining() + fileOffset <= EXPECTED_FILE_CONTENTS.length);
 
       while (bytesRead.hasRemaining()) {
-         Assert.assertEquals(expectedFileContents[fileOffset + index], bytesRead.get());
+         Assert.assertEquals(EXPECTED_FILE_CONTENTS[fileOffset + index], bytesRead.get());
 
          index++;
       }
@@ -386,12 +400,12 @@ public abstract class AbstractIMediumAccessorTest {
     */
    private static byte[] readTestFileContents() {
 
-      File testFile = MediaTestCaseConstants.STANDARD_TEST_FILE;
+      Path testFile = MediaTestCaseConstants.STANDARD_TEST_FILE;
 
-      int size = (int) testFile.length();
-      byte[] bytesReadBuffer = new byte[size];
+      try (RandomAccessFile raf = new RandomAccessFile(testFile.toFile(), "r")) {
+         int size = (int) Files.size(testFile);
+         byte[] bytesReadBuffer = new byte[size];
 
-      try (RandomAccessFile raf = new RandomAccessFile(testFile, "r")) {
          int bytesRead = 0;
          while (bytesRead < size) {
             int readReturn = raf.read(bytesReadBuffer, bytesRead, size - bytesRead);
@@ -401,10 +415,10 @@ public abstract class AbstractIMediumAccessorTest {
 
             bytesRead += readReturn;
          }
+
+         return bytesReadBuffer;
       } catch (Exception e) {
          throw new RuntimeException("Unexpected exception during reading of test file", e);
       }
-
-      return bytesReadBuffer;
    }
 }

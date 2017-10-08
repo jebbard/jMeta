@@ -44,11 +44,9 @@ public interface IMedium<T> {
    public boolean isReadOnly();
 
    /**
-    * Returns the current length of this {@link IMedium}, if it is a random-access medium, or {@link #UNKNOWN_LENGTH} if
-    * it is not.
-    * 
     * @return the current length of this {@link IMedium}, if it is a random-access medium, or {@link #UNKNOWN_LENGTH} if
-    *         it is not.
+    *         it is not. Also returns {@link #UNKNOWN_LENGTH} if the medium does not exist or its length cannot be
+    *         determined due to any other reason.
     */
    public long getCurrentLength();
 

@@ -9,7 +9,7 @@
  */
 package de.je.jmeta.media.api.datatype;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,8 +21,7 @@ import de.je.util.javautil.common.configparams.IConfigurable;
 /**
  * {@link FileMediumConfigurableTest} checks the configuration of {@link FileMedium}s.
  */
-public class FileMediumConfigurableTest
-   extends AbstractConfigurableTest<EmptyEnum, EmptyEnum> {
+public class FileMediumConfigurableTest extends AbstractConfigurableTest<EmptyEnum, EmptyEnum> {
 
    /**
     * @see de.je.util.javautil.common.configparams.AbstractConfigurableTest#getConfigurableInstance()
@@ -30,7 +29,7 @@ public class FileMediumConfigurableTest
    @Override
    protected IConfigurable getConfigurableInstance() {
 
-      return new FileMedium(new File("."), true);
+      return new FileMedium(Paths.get("."), true);
    }
 
    /**
@@ -38,8 +37,7 @@ public class FileMediumConfigurableTest
     */
    @SuppressWarnings("unchecked")
    @Override
-   protected <T extends Comparable<T>> T[] getValidValues(
-      AbstractConfigParam<T> param) {
+   protected <T extends Comparable<T>> T[] getValidValues(AbstractConfigParam<T> param) {
 
       if (param == FileMedium.MAX_CACHE_REGION_SIZE) {
          return (T[]) new Integer[] { 8192, 1, Integer.MAX_VALUE, 10 };
@@ -60,8 +58,7 @@ public class FileMediumConfigurableTest
     */
    @SuppressWarnings("unchecked")
    @Override
-   protected <T extends Comparable<T>> T[] getInvalidValues(
-      AbstractConfigParam<T> param) {
+   protected <T extends Comparable<T>> T[] getInvalidValues(AbstractConfigParam<T> param) {
 
       if (param == FileMedium.MAX_CACHE_REGION_SIZE) {
          return (T[]) new Integer[] { 0, -1, null };

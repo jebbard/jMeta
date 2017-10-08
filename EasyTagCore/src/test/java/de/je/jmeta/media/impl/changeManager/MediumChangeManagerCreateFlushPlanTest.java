@@ -9,7 +9,7 @@
  */
 package de.je.jmeta.media.impl.changeManager;
 
-import static de.je.jmeta.media.api.MediaTestHelper.at;
+import static de.je.jmeta.media.api.helper.MediaTestHelper.at;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,10 +26,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import de.je.jmeta.media.api.MediaTestHelper;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.api.helper.MediaTestHelper;
 import de.je.jmeta.media.impl.MediumChangeManager;
 import de.je.jmeta.media.impl.MediumReferenceFactory;
 import de.je.jmeta.media.impl.changeManager.ReadWriteActionSequence.ActionOrder;

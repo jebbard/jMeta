@@ -52,6 +52,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
       this.isOpened = false;
       this.medium = medium;
 
+      Reject.ifFalse(medium.exists(), "medium.exists()");
       try {
          doOpen();
          isOpened = true;

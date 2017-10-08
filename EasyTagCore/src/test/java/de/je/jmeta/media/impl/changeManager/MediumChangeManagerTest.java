@@ -1,7 +1,7 @@
 /**** MediumChangeManagerTest.java**@author Jens**@date 22.05.2016 **/
 package de.je.jmeta.media.impl.changeManager;
 
-import static de.je.jmeta.media.api.MediaTestHelper.at;
+import static de.je.jmeta.media.api.helper.MediaTestHelper.at;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -12,12 +12,12 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.je.jmeta.media.api.MediaTestHelper;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
 import de.je.jmeta.media.api.exception.InvalidMediumActionException;
 import de.je.jmeta.media.api.exception.InvalidOverlappingWriteException;
+import de.je.jmeta.media.api.helper.MediaTestHelper;
 import de.je.jmeta.media.impl.MediumChangeManager;
 import de.je.jmeta.media.impl.MediumReferenceFactory;
 

@@ -1,6 +1,13 @@
+/**
+ * {@link AbstractWritableRandomAccessMediumAccessorTest}.java
+ *
+ * @author Jens Ebert
+ * @date 08.10.17 21:22:53 (October 8, 2017)
+ */
+
 package de.je.jmeta.media.impl.mediumAccessor;
 
-import static de.je.jmeta.media.impl.TestMediumUtility.createReference;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createReference;
 
 import java.nio.ByteBuffer;
 
@@ -14,6 +21,14 @@ import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.testUtil.setup.TestDataException;
 import junit.framework.Assert;
 
+/**
+ * {@link AbstractWritableRandomAccessMediumAccessorTest} is the base class for testing {@link IMediumAccessor}
+ * instances that are random-access media and thus can also be modified by writing. All {@link IMediumAccessor}
+ * instances returned by {@link #createImplementationToTest()} must be thus enabled for writing.
+ * 
+ * This class contains all test cases specific to those {@link IMediumAccessor} instances, specifically the tests of
+ * {@link IMediumAccessor#write(IMediumReference, ByteBuffer)}.
+ */
 public abstract class AbstractWritableRandomAccessMediumAccessorTest extends AbstractIMediumAccessorTest {
 
    /**
@@ -23,7 +38,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    public void isAtEndOfMedium_forRandomAccessWithoutPriorReadIfAtEndOfMedium_returnsTrue() {
 
       IMediumAccessor<?> mediumAccessor = getImplementationToTest();
-      int readOffset = getExpectedFileContents().length;
+      int readOffset = EXPECTED_FILE_CONTENTS.length;
 
       IMediumReference readReference = createReference(mediumAccessor.getMedium(), readOffset);
 
@@ -39,8 +54,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    public void write_endOfWriteBeforeEndOfFile_overwritesWithExpectedBytesAndLeavesOtherBytesUnchanged() {
       IMediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      IMediumReference writeReference = createReference(mediumAccessor.getMedium(),
-         getExpectedFileContents().length / 2);
+      IMediumReference writeReference = createReference(mediumAccessor.getMedium(), EXPECTED_FILE_CONTENTS.length / 2);
 
       ByteBuffer dataToWrite = ByteBuffer
          .wrap(new byte[] { 'T', 'E', 'S', 'T', ' ', 'B', 'U', 'F', ' ', '0', '0', '0', '0', '0', '0', '3' });
@@ -69,7 +83,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       int startBeforeEndOfMedium = 5;
       IMediumReference writeReference = createReference(mediumAccessor.getMedium(),
-         getExpectedFileContents().length - startBeforeEndOfMedium);
+         EXPECTED_FILE_CONTENTS.length - startBeforeEndOfMedium);
 
       ByteBuffer dataToWrite = ByteBuffer
          .wrap(new byte[] { 'T', 'E', 'S', 'T', ' ', 'B', 'U', 'F', ' ', '1', '0', '0', '0', '0', '0', '3' });
@@ -135,7 +149,6 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       // Reset position to zero
       dataWritten.rewind();
 
-      // The content recently written is re-read again as is
       Assert.assertEquals(dataWritten, reread);
    }
 
@@ -157,7 +170,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       byte[] expectedBytes = new byte[sizeToRead];
 
-      System.arraycopy(getExpectedFileContents(), (int) rangeStartReference.getAbsoluteMediumOffset(), expectedBytes, 0,
+      System.arraycopy(EXPECTED_FILE_CONTENTS, (int) rangeStartReference.getAbsoluteMediumOffset(), expectedBytes, 0,
          sizeToRead);
 
       ByteBuffer bytesExpected = ByteBuffer.wrap(expectedBytes);

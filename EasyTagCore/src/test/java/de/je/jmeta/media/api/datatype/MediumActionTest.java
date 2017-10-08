@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.je.jmeta.media.api.MediaTestCaseConstants;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.StandardMediumReference;
 
 /**

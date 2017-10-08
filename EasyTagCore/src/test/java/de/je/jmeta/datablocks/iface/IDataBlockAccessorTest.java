@@ -1,6 +1,7 @@
 package de.je.jmeta.datablocks.iface;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -206,16 +207,16 @@ public abstract class IDataBlockAccessorTest {
     * @throws Exception
     *            If an exception occurs during medium creation.
     */
-   protected abstract List<IMedium<?>> createMediaToCheck(File baseFile) throws Exception;
+   protected abstract List<IMedium<?>> createMediaToCheck(Path baseFile) throws Exception;
 
    /**
-    * Returns a single {@link File} object that contains the relevant base data from which the data blocks are read. The
-    * data from the {@link File} is taken by this class and converted to several {@link AbstractMedium} instances
+    * Returns a single {@link Path} object that contains the relevant base data from which the data blocks are read. The
+    * data from the {@link Path} is taken by this class and converted to several {@link AbstractMedium} instances
     * finally tested.
     *
-    * @return a single {@link File} object that contains the relevant base data from which the data blocks are read.
+    * @return a single {@link Path} object that contains the relevant base data from which the data blocks are read.
     */
-   protected abstract File getFileForMediaContents();
+   protected abstract Path getFileForMediaContents();
 
    /**
     * Creates an {@link AbstractMediumExpectationProvider} instance for the given {@link DataFormat}.
@@ -528,9 +529,9 @@ public abstract class IDataBlockAccessorTest {
     */
    private void prepareTestedMedia() {
 
-      File theFile = getFileForMediaContents();
+      Path theFile = getFileForMediaContents();
 
-      if (theFile == null || !theFile.exists())
+      if (theFile == null || !Files.exists(theFile))
          throw new TestDataException("Invalid file returned by method getFileForMediaContents", null);
 
       try {

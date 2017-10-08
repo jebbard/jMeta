@@ -10,16 +10,15 @@ package de.je.jmeta.media.impl;
 
 import static org.hamcrest.CoreMatchers.is;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.datatype.DummyMediumCreator;
 import de.je.jmeta.media.api.datatype.FileMedium;
-import de.je.jmeta.media.impl.StandardMediumReference;
+import de.je.jmeta.media.api.helper.DummyMediumCreator;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 
 /**
@@ -177,7 +176,7 @@ public class IMediumReferenceTest {
 
       final IMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
       final IMediumReference referenceForOtherMedium = new StandardMediumReference(
-         new FileMedium(new File("other"), false), 5);
+         new FileMedium(Paths.get("other"), false), 5);
 
       referenceToTest.before(referenceForOtherMedium);
    }
@@ -245,7 +244,7 @@ public class IMediumReferenceTest {
 
       final IMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
       final IMediumReference referenceForOtherMedium = new StandardMediumReference(
-         new FileMedium(new File("other"), false), 5);
+         new FileMedium(Paths.get("other"), false), 5);
 
       referenceToTest.behindOrEqual(referenceForOtherMedium);
    }
@@ -320,7 +319,7 @@ public class IMediumReferenceTest {
 
       final IMediumReference referenceToTest = new StandardMediumReference(dummyMedium, 4);
       final IMediumReference referenceForOtherMedium = new StandardMediumReference(
-         new FileMedium(new File("other"), false), 5);
+         new FileMedium(Paths.get("other"), false), 5);
 
       referenceToTest.distanceTo(referenceForOtherMedium);
    }

@@ -14,8 +14,8 @@ import java.util.Map;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.FileMediumAccessor;
 import de.je.jmeta.media.impl.StandardMediumReference;
 

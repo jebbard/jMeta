@@ -8,7 +8,8 @@
  */
 package de.je.jmeta.datablocks.iface;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,12 +21,11 @@ import de.je.util.javautil.common.err.Reject;
 /**
  * {@link AbstractDataBlockAccessorTest} is a convenience class for derived classes of {@link IDataBlockAccessorTest}.
  */
-public abstract class AbstractDataBlockAccessorTest
-   extends IDataBlockAccessorTest {
+public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTest {
 
-   private final File testFile;
+   private final Path testFile;
 
-   private final File csvFile;
+   private final Path csvFile;
 
    private final List<Integer> fieldSizes = new ArrayList<>();
 
@@ -33,16 +33,15 @@ public abstract class AbstractDataBlockAccessorTest
     * Creates a new {@AbstractSingleBlockDataBlockAccessorTest}.
     * 
     * @param testFile
-    *           The test {@link File}.
+    *           The test {@link Path}.
     * @param csvFile
-    *           The csv {@link File}.
+    *           The csv {@link Path}.
     * @param fieldSizes
     *           The sizes of some selected fields in bytes. This is for testing the lazy field facility. The values
     *           should equal the size of a single field in the data and should be smaller than the size of one or
     *           several other fields in the data.
     */
-   public AbstractDataBlockAccessorTest(File testFile, File csvFile,
-      Integer[] fieldSizes) {
+   public AbstractDataBlockAccessorTest(Path testFile, Path csvFile, Integer[] fieldSizes) {
 
       Reject.ifNull(fieldSizes, "fieldSizes");
       checkFile(testFile);
@@ -66,7 +65,7 @@ public abstract class AbstractDataBlockAccessorTest
     * @see de.je.jmeta.datablocks.iface.IDataBlockAccessorTest#getFileForMediaContents()
     */
    @Override
-   protected File getFileForMediaContents() {
+   protected Path getFileForMediaContents() {
 
       return testFile;
    }
@@ -75,23 +74,21 @@ public abstract class AbstractDataBlockAccessorTest
     * @see de.je.jmeta.datablocks.iface.IDataBlockAccessorTest#createExpectationProvider()
     */
    @Override
-   protected AbstractMediumExpectationProvider createExpectationProvider()
-      throws InvalidTestDataCsvFormatException {
+   protected AbstractMediumExpectationProvider createExpectationProvider() throws InvalidTestDataCsvFormatException {
 
-      return new CsvFileDataFormatExpectationProvider(getDataFormatRepository(), testFile,
-         csvFile);
+      return new CsvFileDataFormatExpectationProvider(getDataFormatRepository(), testFile, csvFile);
    }
 
    /**
-    * Checks the given {@link File} for plausibility.
+    * Checks the given {@link Path} for plausibility.
     * 
     * @param file
     *           The file to check
     */
-   private static void checkFile(File file) {
+   private static void checkFile(Path file) {
 
       Reject.ifNull(file, "file");
-      Reject.ifFalse(file.exists(), "file.exists()");
-      Reject.ifFalse(file.isFile(), "file.isFile()");
+      Reject.ifFalse(Files.exists(file), "Files.exists(");
+      Reject.ifFalse(Files.isRegularFile(file), "Files.isRegularFile(file)");
    }
 }

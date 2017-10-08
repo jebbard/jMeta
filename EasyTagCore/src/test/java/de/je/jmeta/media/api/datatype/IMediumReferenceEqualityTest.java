@@ -9,12 +9,13 @@
 package de.je.jmeta.media.api.datatype;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
+import de.je.jmeta.media.api.helper.DummyMediumCreator;
 import de.je.jmeta.media.impl.IMediumReferenceTest;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;
@@ -23,13 +24,11 @@ import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;
  * {@link IMediumReferenceEqualityTest} tests the {@link StandardMediumReference} class (and its interface
  * {@link IMediumReference} for its implementation of {@link #equals(Object)} and {@link #hashCode()}.
  */
-public class IMediumReferenceEqualityTest
-   extends AbstractEqualsTest<IMediumReference> {
+public class IMediumReferenceEqualityTest extends AbstractEqualsTest<IMediumReference> {
 
    private static final byte[] BYTES = new byte[] { 1, 2, 3 };
 
-   private static final ByteArrayInputStream STREAM_MEDIUM = new ByteArrayInputStream(
-      BYTES);
+   private static final ByteArrayInputStream STREAM_MEDIUM = new ByteArrayInputStream(BYTES);
 
    /**
     * @see AbstractEqualsTest#getObjects()
@@ -75,8 +74,7 @@ public class IMediumReferenceEqualityTest
     * 
     * @return a {@link List} of {@link IMediumReference}s for the given {@link List} of {@link IMedium} instances.
     */
-   private List<IMediumReference> createMediumReferences(List<IMedium<?>> media,
-      long baseOffset) {
+   private List<IMediumReference> createMediumReferences(List<IMedium<?>> media, long baseOffset) {
 
       List<IMediumReference> mediumReferences = new ArrayList<>();
 
@@ -89,9 +87,8 @@ public class IMediumReferenceEqualityTest
 
       // Create some more references with equal medium, using the passed offset
       for (int i = 0; i < 3; ++i) {
-         mediumReferences.add(new StandardMediumReference(
-            DummyMediumCreator.createDefaultDummyFileMedium(),
-            baseOffset + i * 10));
+         mediumReferences
+            .add(new StandardMediumReference(DummyMediumCreator.createDefaultDummyFileMedium(), baseOffset + i * 10));
       }
 
       return mediumReferences;
@@ -106,10 +103,9 @@ public class IMediumReferenceEqualityTest
 
       // We must actually pass the IDENTICAL byte arrays and streams, because
       // they are compared bases on object identity
-      media.add(
-         DummyMediumCreator.createDummyInMemoryMedium(BYTES, "Hallo4", true));
+      media.add(DummyMediumCreator.createDummyInMemoryMedium(BYTES, "Hallo4", true));
       media.add(new InputStreamMedium(STREAM_MEDIUM, "Hallo"));
-      media.add(DummyMediumCreator.createDummyFileMedium(new File("."), false));
+      media.add(DummyMediumCreator.createDefaultDummyFileMedium());
 
       return media;
    }
@@ -121,13 +117,10 @@ public class IMediumReferenceEqualityTest
 
       List<IMedium<?>> media = new ArrayList<>();
 
-      media.add(DummyMediumCreator.createDummyInMemoryMedium(new byte[] { 1 },
-         "Hallo4", true));
+      media.add(DummyMediumCreator.createDummyInMemoryMedium(new byte[] { 1 }, "Hallo4", true));
       // We must create a new input stream here to achieve it is different
-      media
-         .add(new InputStreamMedium(new ByteArrayInputStream(BYTES), "Hallo"));
-      media.add(
-         DummyMediumCreator.createDummyFileMedium(new File("../test"), false));
+      media.add(new InputStreamMedium(new ByteArrayInputStream(BYTES), "Hallo"));
+      media.add(DummyMediumCreator.createDummyFileMedium(Paths.get("../test"), false));
 
       return media;
    }

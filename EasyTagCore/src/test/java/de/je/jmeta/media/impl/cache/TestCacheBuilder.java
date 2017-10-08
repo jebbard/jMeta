@@ -1,7 +1,7 @@
 package de.je.jmeta.media.impl.cache;
 
-import static de.je.jmeta.media.impl.TestMediumUtility.createCachedMediumRegion;
-import static de.je.jmeta.media.impl.TestMediumUtility.createUnCachedMediumRegion;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createCachedMediumRegion;
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createUnCachedMediumRegion;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.api.helper.TestMediumUtility;
 import de.je.jmeta.media.impl.MediumCache;
-import de.je.jmeta.media.impl.TestMediumUtility;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.common.err.Reject;
 

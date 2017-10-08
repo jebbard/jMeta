@@ -8,10 +8,12 @@
  */
 package de.je.jmeta.datablocks.iface;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +23,6 @@ import de.je.jmeta.dataformats.IDataFormatRepository;
 import de.je.jmeta.dataformats.IDataFormatSpecification;
 import de.je.jmeta.dataformats.PhysicalDataBlockType;
 import de.je.util.javautil.common.err.Reject;
-import de.je.util.javautil.io.file.FileUtility;
 import de.je.util.javautil.testUtil.setup.TestDataException;
 
 /**
@@ -45,38 +46,24 @@ public abstract class AbstractMediumExpectationProvider {
     * @param testFile
     *           The test data file.
     */
-   public AbstractMediumExpectationProvider(
-      IDataFormatRepository dataFormatRepository, File testFile) {
+   public AbstractMediumExpectationProvider(IDataFormatRepository dataFormatRepository, Path testFile) {
 
       Reject.ifNull(testFile, "testFile");
       Reject.ifNull(dataFormatRepository, "dataFormatRepository");
-      Reject.ifFalse(testFile.exists(),
-         "testFile.exists()");
-      Reject.ifFalse(testFile.isFile(),
-         "testFile.isFile()");
+      Reject.ifFalse(Files.isRegularFile(testFile), "Files.isRegularFile(testFile)");
 
       this.dataFormatRepository = dataFormatRepository;
 
-      File tempCopyFile = new File(testFile.getParentFile(),
-         testFile.getName() + "_TEMP");
-
-      if (tempCopyFile.exists())
-         tempCopyFile.delete();
+      Path tempCopyFile = testFile.getParent().resolve(testFile.getFileName() + "_TEMP");
 
       try {
-         boolean copySuccessful = FileUtility.copyFile(testFile, tempCopyFile);
+         Files.copy(testFile, tempCopyFile, StandardCopyOption.REPLACE_EXISTING);
 
-         if (!copySuccessful)
-            throw new IOException("Copy returned false");
-
-         m_raf = new RandomAccessFile(tempCopyFile, "r");
-         m_file = tempCopyFile;
+         raf = new RandomAccessFile(tempCopyFile.toFile(), "r");
+         file = tempCopyFile;
       } catch (IOException e) {
-         throw new TestDataException(
-            "Could not create or open copy of test file <"
-               + testFile.getAbsolutePath() + "> in destination file <"
-               + tempCopyFile + ">.",
-            e);
+         throw new TestDataException("Could not create or open copy of test file <"
+            + testFile.toAbsolutePath().toString() + "> in destination file <" + tempCopyFile + ">.", e);
       }
    }
 
@@ -89,8 +76,7 @@ public abstract class AbstractMediumExpectationProvider {
     * @return The field's expected interpreted value or null if there is no entry for the given
     *         {@link DataBlockInstanceId}.
     */
-   public abstract Object getExpectedFieldInterpretedValue(
-      DataBlockInstanceId fieldInstanceId);
+   public abstract Object getExpectedFieldInterpretedValue(DataBlockInstanceId fieldInstanceId);
 
    /**
     * Returns a {@link List} of {@link DataBlockInstanceId} that represents the expected children of the given parent
@@ -103,8 +89,8 @@ public abstract class AbstractMediumExpectationProvider {
     * @return a {@link List} of {@link DataBlockInstanceId} that represents the expected children of the given parent
     *         {@link DataBlockInstanceId} of the given {@link PhysicalDataBlockType} in their expected order.
     */
-   public abstract List<DataBlockInstanceId> getExpectedChildBlocksOfType(
-      DataBlockInstanceId parentInstanceId, PhysicalDataBlockType blockType);
+   public abstract List<DataBlockInstanceId> getExpectedChildBlocksOfType(DataBlockInstanceId parentInstanceId,
+      PhysicalDataBlockType blockType);
 
    /**
     * Returns the expected block size for the given {@link DataBlockInstanceId}.
@@ -113,8 +99,7 @@ public abstract class AbstractMediumExpectationProvider {
     *           The {@link DataBlockInstanceId}.
     * @return the expected block size for the given {@link DataBlockInstanceId}.
     */
-   public abstract long getExpectedDataBlockSize(
-      DataBlockInstanceId instanceId);
+   public abstract long getExpectedDataBlockSize(DataBlockInstanceId instanceId);
 
    /**
     * Returns the field {@link DataBlockInstanceId}s, for which a failing conversion from binary to interpreted value is
@@ -160,13 +145,10 @@ public abstract class AbstractMediumExpectationProvider {
       ByteBuffer result = ByteBuffer.wrap(returnedExpectedBytes);
 
       try {
-         m_raf.getChannel().read(result, absoluteOffset);
+         raf.getChannel().read(result, absoluteOffset);
       } catch (IOException e) {
-         throw new TestDataException(
-            "Could not read <" + size + "> expected block "
-               + "bytes from file <" + m_file.getAbsolutePath()
-               + "> at offset <" + absoluteOffset + ">.",
-            e);
+         throw new TestDataException("Could not read <" + size + "> expected block " + "bytes from file <"
+            + file.toAbsolutePath().toString() + "> at offset <" + absoluteOffset + ">.", e);
       }
 
       return returnedExpectedBytes;
@@ -178,17 +160,20 @@ public abstract class AbstractMediumExpectationProvider {
     */
    public void cleanUp() {
 
-      if (m_raf != null)
+      if (raf != null)
          try {
-            m_raf.close();
+            raf.close();
          } catch (IOException e) {
-            throw new TestDataException(
-               "Could not close file <" + m_file.getAbsolutePath() + ">.", e);
+            throw new TestDataException("Could not close file <" + file.toAbsolutePath().toString() + ">.", e);
          }
 
-      if (!m_file.delete())
-         throw new TestDataException(
-            "Could not delete file <" + m_file.getAbsolutePath() + ">.", null);
+      String message = "Could not delete file <" + file.toAbsolutePath().toString() + ">.";
+      try {
+         if (!Files.deleteIfExists(file))
+            throw new TestDataException(message, null);
+      } catch (IOException e) {
+         throw new TestDataException(message, null);
+      }
    }
 
    /**
@@ -199,8 +184,7 @@ public abstract class AbstractMediumExpectationProvider {
     *
     * @return the {@link IDataFormatSpecification} corresponding to the given {@link DataFormat}.
     */
-   protected IDataFormatSpecification getDataFormatSpecification(
-      DataFormat format) {
+   protected IDataFormatSpecification getDataFormatSpecification(DataFormat format) {
 
       return dataFormatRepository.getDataFormatSpecification(format);
    }
@@ -215,7 +199,7 @@ public abstract class AbstractMediumExpectationProvider {
       return dataFormatRepository.getSupportedDataFormats();
    }
 
-   private final File m_file;
+   private final Path file;
 
-   private final RandomAccessFile m_raf;
+   private final RandomAccessFile raf;
 }

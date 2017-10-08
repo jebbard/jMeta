@@ -7,13 +7,12 @@
 
 package de.je.jmeta.media.impl;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.StandardOpenOption;
 
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.AbstractMedium;
@@ -26,10 +25,6 @@ import de.je.util.javautil.common.err.Reject;
  * Represents an {@link IMediumAccessor} that is a physical file with random access.
  */
 public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
-
-   private File file;
-
-   private RandomAccessFile raf;
 
    private FileChannel fileChannel;
 
@@ -66,7 +61,6 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
       unlockMedium();
 
       fileChannel.close();
-      raf.close();
    }
 
    /**
@@ -74,20 +68,12 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     */
    @Override
    protected void doOpen() throws Exception {
-
-      File wrappedfile = getMedium().getWrappedMedium();
-
-      // Check if the file really exists. Because in rw mode RandomAccessFile
-      // does simply
-      // create a new file, which is not what we want.
-      Reject.ifFalse(wrappedfile.exists(), "wrappedfile.exists()");
-
-      this.file = wrappedfile;
-
-      String mode = getMedium().isReadOnly() ? "r" : "rw";
-
-      raf = new RandomAccessFile(wrappedfile, mode);
-      fileChannel = raf.getChannel();
+      if (getMedium().isReadOnly()) {
+         fileChannel = FileChannel.open(getMedium().getWrappedMedium(), StandardOpenOption.READ);
+      } else {
+         fileChannel = FileChannel.open(getMedium().getWrappedMedium(), StandardOpenOption.READ,
+            StandardOpenOption.WRITE);
+      }
    }
 
    /**

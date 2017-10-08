@@ -17,11 +17,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.MediumAction;
 import de.je.jmeta.media.api.datatype.MediumActionType;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.util.javautil.common.err.Reject;
 
 /**

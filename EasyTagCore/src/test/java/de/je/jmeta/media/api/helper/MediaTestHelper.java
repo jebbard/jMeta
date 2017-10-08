@@ -7,7 +7,7 @@
  * @date 16.10.2016
  *
  */
-package de.je.jmeta.media.api;
+package de.je.jmeta.media.api.helper;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -15,11 +15,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import de.je.jmeta.media.api.IMedium;
+import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.array.EnhancedArrays;
 import de.je.util.javautil.common.err.Reject;
 
+// TODO dissolve this class, use TestMediumHelper
 /**
  * {@link MediaTestHelper}
  *

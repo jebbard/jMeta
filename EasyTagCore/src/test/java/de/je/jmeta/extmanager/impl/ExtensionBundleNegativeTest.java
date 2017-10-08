@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import de.je.jmeta.extmanager.export.AbstractExtensionManagementTest;
@@ -32,6 +30,7 @@ import de.je.jmeta.extmanager.export.IExtensionManagerBundleTest;
 import de.je.jmeta.extmanager.export.InvalidExtensionBundleException;
 import de.je.util.javautil.io.stream.NamedInputStream;
 import de.je.util.javautil.testUtil.resource.TestResourceHelper;
+import junit.framework.Assert;
 
 /**
  * {@link ExtensionBundleNegativeTest} tests the {@link StandardExtensionBundle} class for behavior in case of wrong
@@ -40,8 +39,7 @@ import de.je.util.javautil.testUtil.resource.TestResourceHelper;
  * Each test case includes several correct extension bundle XML files and a single XML extension bundle file with a
  * single error. Then, the {@link IExtensionManager} implementation must register the correct extension bundles only.
  */
-public class ExtensionBundleNegativeTest
-   extends AbstractExtensionManagementTest {
+public class ExtensionBundleNegativeTest extends AbstractExtensionManagementTest {
 
    /**
     * Tests the {@link StandardExtensionBundle} when loading extension bundle files with invalid bundle jar file.
@@ -52,14 +50,13 @@ public class ExtensionBundleNegativeTest
    public void test_negativeInvalidBundleJar() {
 
       Map<String, ExtLoadExceptionReason> expectedReasons = new HashMap<>();
-      expectedReasons.put("invalidBundle001",
-         ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
-      expectedReasons.put("invalidBundle002",
-         ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
+      expectedReasons.put("invalidBundle001", ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
+      expectedReasons.put("invalidBundle002", ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
 
       checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS,
-         TestResourceHelper.resourceToFile(ExtensionBundleNegativeTest.class,
-            "negativeBundles/ExtensionPointsInvalidBundleJAR.xml"),
+         TestResourceHelper
+            .resourceToFile(ExtensionBundleNegativeTest.class, "negativeBundles/ExtensionPointsInvalidBundleJAR.xml")
+            .toFile(),
          expectedReasons, false);
    }
 
@@ -72,16 +69,14 @@ public class ExtensionBundleNegativeTest
    public void test_negativeInvalidBundleType() {
 
       Map<String, ExtLoadExceptionReason> expectedReasons = new HashMap<>();
-      expectedReasons.put("invalidBundle003",
-         ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
-      expectedReasons.put("invalidBundle004",
-         ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
-      expectedReasons.put("invalidBundle005",
-         ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
+      expectedReasons.put("invalidBundle003", ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
+      expectedReasons.put("invalidBundle004", ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
+      expectedReasons.put("invalidBundle005", ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
 
       checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS,
-         TestResourceHelper.resourceToFile(ExtensionBundleNegativeTest.class,
-            "negativeBundles/ExtensionPointsInvalidBundleType.xml"),
+         TestResourceHelper
+            .resourceToFile(ExtensionBundleNegativeTest.class, "negativeBundles/ExtensionPointsInvalidBundleType.xml")
+            .toFile(),
          expectedReasons, true);
    }
 
@@ -94,13 +89,11 @@ public class ExtensionBundleNegativeTest
    public void test_negativeInvalidVersion() {
 
       Map<String, ExtLoadExceptionReason> expectedReasons = new HashMap<>();
-      expectedReasons.put("invalidBundle006",
-         ExtLoadExceptionReason.STREAM_INCOMPATIBLE_VERSION);
+      expectedReasons.put("invalidBundle006", ExtLoadExceptionReason.STREAM_INCOMPATIBLE_VERSION);
 
-      checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS,
-         TestResourceHelper.resourceToFile(ExtensionBundleNegativeTest.class,
-            "negativeBundles/ExtensionPointsInvalidBundleVersion.xml"),
-         expectedReasons, false);
+      checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS, TestResourceHelper
+         .resourceToFile(ExtensionBundleNegativeTest.class, "negativeBundles/ExtensionPointsInvalidBundleVersion.xml")
+         .toFile(), expectedReasons, false);
    }
 
    /**
@@ -113,14 +106,12 @@ public class ExtensionBundleNegativeTest
    public void test_negativeInvalidPointIds() {
 
       Map<String, ExtLoadExceptionReason> expectedReasons = new HashMap<>();
-      expectedReasons.put("invalidBundle007",
-         ExtLoadExceptionReason.UNKNOWN_EXTENSION_POINT);
-      expectedReasons.put("invalidBundle008",
-         ExtLoadExceptionReason.UNKNOWN_EXTENSION_POINT);
+      expectedReasons.put("invalidBundle007", ExtLoadExceptionReason.UNKNOWN_EXTENSION_POINT);
+      expectedReasons.put("invalidBundle008", ExtLoadExceptionReason.UNKNOWN_EXTENSION_POINT);
 
       checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS,
          TestResourceHelper.resourceToFile(ExtensionBundleNegativeTest.class,
-            "negativeBundles/ExtensionPointsInvalidBundleExtPointIds.xml"),
+            "negativeBundles/ExtensionPointsInvalidBundleExtPointIds.xml").toFile(),
          expectedReasons, false);
    }
 
@@ -134,23 +125,16 @@ public class ExtensionBundleNegativeTest
    public void test_negativeInvalidProvider() {
 
       Map<String, ExtLoadExceptionReason> expectedReasons = new HashMap<>();
-      expectedReasons.put("invalidBundle009",
-         ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
-      expectedReasons.put("invalidBundle010",
-         ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
-      expectedReasons.put("invalidBundle011",
-         ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
-      expectedReasons.put("invalidBundle012",
-         ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
-      expectedReasons.put("invalidBundle013",
-         ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
-      expectedReasons.put("invalidBundle014",
-         ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
+      expectedReasons.put("invalidBundle009", ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
+      expectedReasons.put("invalidBundle010", ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
+      expectedReasons.put("invalidBundle011", ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
+      expectedReasons.put("invalidBundle012", ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
+      expectedReasons.put("invalidBundle013", ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
+      expectedReasons.put("invalidBundle014", ExtLoadExceptionReason.INVALID_EXTENSION_PROVIDER);
 
-      checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS,
-         TestResourceHelper.resourceToFile(ExtensionBundleNegativeTest.class,
-            "negativeBundles/ExtensionPointsInvalidBundleProvider.xml"),
-         expectedReasons, false);
+      checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS, TestResourceHelper
+         .resourceToFile(ExtensionBundleNegativeTest.class, "negativeBundles/ExtensionPointsInvalidBundleProvider.xml")
+         .toFile(), expectedReasons, false);
    }
 
    /**
@@ -164,14 +148,12 @@ public class ExtensionBundleNegativeTest
    public void test_negativeInvalidProviderPath() {
 
       Map<String, ExtLoadExceptionReason> expectedReasons = new HashMap<>();
-      expectedReasons.put("invalidBundle016",
-         ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
-      expectedReasons.put("invalidBundle017",
-         ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
+      expectedReasons.put("invalidBundle016", ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
+      expectedReasons.put("invalidBundle017", ExtLoadExceptionReason.INVALID_PROVIDER_PATH);
 
       checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS,
          TestResourceHelper.resourceToFile(ExtensionBundleNegativeTest.class,
-            "negativeBundles/ExtensionPointsInvalidBundleProviderPath.xml"),
+            "negativeBundles/ExtensionPointsInvalidBundleProviderPath.xml").toFile(),
          expectedReasons, false);
    }
 
@@ -185,16 +167,14 @@ public class ExtensionBundleNegativeTest
    public void test_negativeInvalidXML() {
 
       Map<String, ExtLoadExceptionReason> expectedReasons = new HashMap<>();
-      expectedReasons.put("invalidBundle018",
-         ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
-      expectedReasons.put("invalidBundle019",
-         ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
-      expectedReasons.put("invalidBundle020",
-         ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
+      expectedReasons.put("invalidBundle018", ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
+      expectedReasons.put("invalidBundle019", ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
+      expectedReasons.put("invalidBundle020", ExtLoadExceptionReason.STREAM_FORMAT_ERROR);
 
       checkRegisteredExtensionBundles(CORRECT_BUNDLE_IDS,
-         TestResourceHelper.resourceToFile(ExtensionBundleNegativeTest.class,
-            "negativeBundles/ExtensionPointsInvalidBundleXML.xml"),
+         TestResourceHelper
+            .resourceToFile(ExtensionBundleNegativeTest.class, "negativeBundles/ExtensionPointsInvalidBundleXML.xml")
+            .toFile(),
          expectedReasons, true);
    }
 
@@ -211,48 +191,37 @@ public class ExtensionBundleNegativeTest
     *           Determines whether the call is only expecting stream format errors (=true) or only other errors
     *           (=false).
     */
-   private void checkRegisteredExtensionBundles(Set<String> expectedBundleIds,
-      File configFile,
-      Map<String, ExtLoadExceptionReason> expectedExceptionLoadReasons,
-      boolean expectingOnlyStreamFormatErrors) {
+   private void checkRegisteredExtensionBundles(Set<String> expectedBundleIds, File configFile,
+      Map<String, ExtLoadExceptionReason> expectedExceptionLoadReasons, boolean expectingOnlyStreamFormatErrors) {
 
       IExtensionManager manager = getTestling();
 
       try {
-         BundleLoadExceptions loadExceptions = manager
-            .load(NamedInputStream.createFromFile(configFile), null);
+         BundleLoadExceptions loadExceptions = manager.load(NamedInputStream.createFromFile(configFile), null);
 
-         Map<File, InvalidExtensionBundleException> exceptions = loadExceptions
-            .getExceptions();
+         Map<File, InvalidExtensionBundleException> exceptions = loadExceptions.getExceptions();
 
-         Assert.assertEquals(expectedExceptionLoadReasons.size(),
-            exceptions.size());
+         Assert.assertEquals(expectedExceptionLoadReasons.size(), exceptions.size());
 
-         for (Iterator<File> iterator = exceptions.keySet().iterator(); iterator
-            .hasNext();) {
+         for (Iterator<File> iterator = exceptions.keySet().iterator(); iterator.hasNext();) {
             File nextFile = iterator.next();
-            InvalidExtensionBundleException exception = exceptions
-               .get(nextFile);
+            InvalidExtensionBundleException exception = exceptions.get(nextFile);
             ExtensionBundleDescription nextDesc = exception.getBundleDesc();
 
             if (expectingOnlyStreamFormatErrors) {
-               Assert.assertEquals(ExtLoadExceptionReason.STREAM_FORMAT_ERROR,
-                  exception.getReason());
+               Assert.assertEquals(ExtLoadExceptionReason.STREAM_FORMAT_ERROR, exception.getReason());
             }
 
             else {
                Assert.assertNotNull(nextDesc);
 
-               ExtLoadExceptionReason expectedReason = expectedExceptionLoadReasons
-                  .get(nextDesc.getName());
-               Assert.assertTrue(
-                  expectedExceptionLoadReasons.containsKey(nextDesc.getName()));
+               ExtLoadExceptionReason expectedReason = expectedExceptionLoadReasons.get(nextDesc.getName());
+               Assert.assertTrue(expectedExceptionLoadReasons.containsKey(nextDesc.getName()));
                Assert.assertEquals(expectedReason, exception.getReason());
             }
          }
       } catch (IOException e) {
-         IExtensionManagerBundleTest.throwExceptionForLoadFailure(configFile,
-            e);
+         IExtensionManagerBundleTest.throwExceptionForLoadFailure(configFile, e);
       }
 
       Assert.assertTrue(manager.isLoaded());

@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +24,7 @@ import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
 import de.je.util.javautil.io.stream.NamedInputStream;
 import de.je.util.javautil.testUtil.resource.TestResourceHelper;
 import de.je.util.javautil.testUtil.setup.TestDataException;
+import junit.framework.Assert;
 
 /**
  * {@link IExtensionManagerBundleTest} tests the {@link IExtensionManager} and {@link IExtensionBundle} interfaces.
@@ -46,8 +45,8 @@ public abstract class IExtensionManagerBundleTest extends AbstractExtensionManag
 
       super.setUp();
 
-      final File configFile = TestResourceHelper.resourceToFile(ExtensionBundleFileNoBasePathTest.class,
-         getConfigFileResourcePath());
+      final File configFile = TestResourceHelper
+         .resourceToFile(ExtensionBundleFileNoBasePathTest.class, getConfigFileResourcePath()).toFile();
       try {
          BundleLoadExceptions loadExceptions = getTestling().load(NamedInputStream.createFromFile(configFile),
             getFileBasePath());

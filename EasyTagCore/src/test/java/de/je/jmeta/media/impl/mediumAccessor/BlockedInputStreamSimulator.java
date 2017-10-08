@@ -1,4 +1,4 @@
-package de.je.jmeta.media.impl.timeout;
+package de.je.jmeta.media.impl.mediumAccessor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +13,26 @@ import de.je.util.javautil.common.err.Reject;
  * {@link PipedOutputStream}. This class is used for testing the {@link IMediumAccessor} timed-out read facility.
  */
 public class BlockedInputStreamSimulator {
+
+   /**
+    * {@link WriteMode} defines write modes for the {@link BlockedInputStreamSimulator} test class.
+    */
+   public enum WriteMode {
+      /**
+       * All content is written at once.
+       */
+      WM_AT_ONCE,
+      /**
+       * Content is written piece-wise with a sleep delay within each write. Writing is nevertheless finished before
+       * expiration of the timeout.
+       */
+      WM_BEFORE_TIMEOUT,
+      /**
+       * Content is written piece-wise with a sleep delay within each write. Writing is not finished until expiration of
+       * the timeout.
+       */
+      WM_EXPIRE_TIMEOUT,
+   }
 
    private static final String UNEXPECTED_THREAD_INTERRUPTION = "Unexpected thread interruption";
 
@@ -56,8 +76,7 @@ public class BlockedInputStreamSimulator {
        * @param writeMode
        *           The {@link WriteMode} to use.
        */
-      public WriterThread(PipedOutputStream outputStream, byte[] data,
-         int timeoutMillis, WriteMode writeMode) {
+      public WriterThread(PipedOutputStream outputStream, byte[] data, int timeoutMillis, WriteMode writeMode) {
 
          Reject.ifNull(data, "data");
          Reject.ifNull(writeMode, "writeMode");
@@ -80,8 +99,7 @@ public class BlockedInputStreamSimulator {
             // reached, so the write completes
             // before the timeout expires
             case WM_BEFORE_TIMEOUT:
-               m_sleepTime = (timeoutMillis - (timeoutMillis / 5))
-                  / WRITE_COUNT;
+               m_sleepTime = (timeoutMillis - (timeoutMillis / 5)) / WRITE_COUNT;
                m_byteCountWrittenAtOnce = data.length / WRITE_COUNT;
                break;
 
@@ -114,8 +132,7 @@ public class BlockedInputStreamSimulator {
             try {
                final int bytesLeftToBeWritten = m_data.length - bytesWritten;
                m_outputStream.write(m_data, bytesWritten,
-                  (m_byteCountWrittenAtOnce < bytesLeftToBeWritten
-                     ? m_byteCountWrittenAtOnce : bytesLeftToBeWritten));
+                  (m_byteCountWrittenAtOnce < bytesLeftToBeWritten ? m_byteCountWrittenAtOnce : bytesLeftToBeWritten));
 
                bytesWritten += m_byteCountWrittenAtOnce;
             } catch (IOException e) {
@@ -142,8 +159,7 @@ public class BlockedInputStreamSimulator {
     *           The {@link WriteMode} to use.
     */
    @SuppressWarnings("resource")
-   public BlockedInputStreamSimulator(byte[] data, int timeoutMillis,
-      WriteMode writeMode) {
+   public BlockedInputStreamSimulator(byte[] data, int timeoutMillis, WriteMode writeMode) {
 
       Reject.ifNull(data, "data");
       Reject.ifNegativeOrZero(timeoutMillis, "timeoutMillis");
@@ -152,9 +168,7 @@ public class BlockedInputStreamSimulator {
 
       try {
 
-         WriterThread thread = new WriterThread(
-            new PipedOutputStream(m_inputStream), data, timeoutMillis,
-            writeMode);
+         WriterThread thread = new WriterThread(new PipedOutputStream(m_inputStream), data, timeoutMillis, writeMode);
 
          Thread runner = new Thread(thread);
 

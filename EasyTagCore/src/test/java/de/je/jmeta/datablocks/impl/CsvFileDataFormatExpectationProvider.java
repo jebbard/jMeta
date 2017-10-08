@@ -8,10 +8,11 @@
  */
 package de.je.jmeta.datablocks.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,8 +47,7 @@ import de.je.util.javautil.io.stream.NamedReader;
 /**
  * {@link CsvFileDataFormatExpectationProvider} reads test data from a single csv file and returns it accordingly.
  */
-public class CsvFileDataFormatExpectationProvider
-   extends AbstractMediumExpectationProvider {
+public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectationProvider {
 
    private static final String FLAG_SEPARATOR = "&&";
 
@@ -98,8 +98,7 @@ public class CsvFileDataFormatExpectationProvider
       CSV_READER_COLUMNS.add(COL_COMMENT);
    }
 
-   private static final CsvReader CSV_READER = new CsvReader(
-      CSV_READER_COLUMNS);
+   private static final CsvReader CSV_READER = new CsvReader(CSV_READER_COLUMNS);
 
    private Map<DataBlockId, ICustomFieldValueParser> customFieldValueParsers = new HashMap<>();
 
@@ -115,45 +114,37 @@ public class CsvFileDataFormatExpectationProvider
     * @throws InvalidTestDataCsvFormatException
     *            if the csv file is incorrect.
     */
-   public CsvFileDataFormatExpectationProvider(IDataFormatRepository repository,
-      File testFile, File expectedDataCsvFile)
-         throws InvalidTestDataCsvFormatException {
+   public CsvFileDataFormatExpectationProvider(IDataFormatRepository repository, Path testFile,
+      Path expectedDataCsvFile) throws InvalidTestDataCsvFormatException {
       super(repository, testFile);
 
       Reject.ifNull(expectedDataCsvFile, "csvFile");
-      Reject.ifFalse(expectedDataCsvFile.exists(),
-         "expectedDataCsvFile.exists()");
-      Reject.ifFalse(expectedDataCsvFile.isFile(),
-         "expectedDataCsvFile.isFile()");
+      Reject.ifFalse(Files.isRegularFile(expectedDataCsvFile), "Files.isRegularFile(expectedDataCsvFile)");
 
+      String absolutePath = expectedDataCsvFile.toAbsolutePath().toString();
       try {
-         List<Map<String, String>> csvRows = loadCsvFileContents(
-            expectedDataCsvFile);
+         List<Map<String, String>> csvRows = loadCsvFileContents(expectedDataCsvFile);
 
          processCsvData(csvRows);
       }
 
       catch (InvalidArrayStringFormatException e) {
-         throw new InvalidTestDataCsvFormatException(
-            "Invalid array string format detected in csv file <"
-               + expectedDataCsvFile.getAbsolutePath() + ">.",
-            e);
+         throw new InvalidTestDataCsvFormatException("Invalid array string format detected in csv file <"
+            + absolutePath + ">.", e);
       } catch (CsvRowFormatException e) {
          throw new InvalidTestDataCsvFormatException(
-            "Invalid row format detected in csv file <"
-               + expectedDataCsvFile.getAbsolutePath() + ">.",
-            e);
+            "Invalid row format detected in csv file <" + absolutePath + ">.", e);
       } catch (IOException e) {
-         throw new RuntimeException("Could not read csv file <"
-            + expectedDataCsvFile.getAbsolutePath() + ">.", e);
+         throw new RuntimeException(
+            "Could not read csv file <" + absolutePath + ">.", e);
       }
 
       finally {
          try {
             CSV_READER.closeCurrentCsvResource();
          } catch (IOException e) {
-            throw new RuntimeException("Could not close csv reader for file <"
-               + expectedDataCsvFile.getAbsolutePath() + ">.", e);
+            throw new RuntimeException(
+               "Could not close csv reader for file <" + absolutePath + ">.", e);
          }
       }
    }
@@ -169,8 +160,7 @@ public class CsvFileDataFormatExpectationProvider
 
       Reject.ifNull(parser, "parser");
 
-      for (Iterator<DataBlockId> iterator = parser.getFieldIds()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<DataBlockId> iterator = parser.getFieldIds().iterator(); iterator.hasNext();) {
          DataBlockId nextId = iterator.next();
 
          customFieldValueParsers.put(nextId, parser);
@@ -181,8 +171,7 @@ public class CsvFileDataFormatExpectationProvider
     * @see de.je.jmeta.datablocks.iface.AbstractMediumExpectationProvider#getExpectedFieldInterpretedValue(de.je.jmeta.datablocks.iface.DataBlockInstanceId)
     */
    @Override
-   public Object getExpectedFieldInterpretedValue(
-      DataBlockInstanceId fieldInstanceId) {
+   public Object getExpectedFieldInterpretedValue(DataBlockInstanceId fieldInstanceId) {
 
       return expectedFieldInterpretedValues.get(fieldInstanceId);
    }
@@ -192,8 +181,8 @@ public class CsvFileDataFormatExpectationProvider
     *      de.je.jmeta.dataformats.PhysicalDataBlockType)
     */
    @Override
-   public List<DataBlockInstanceId> getExpectedChildBlocksOfType(
-      DataBlockInstanceId parentBlock, PhysicalDataBlockType blockType) {
+   public List<DataBlockInstanceId> getExpectedChildBlocksOfType(DataBlockInstanceId parentBlock,
+      PhysicalDataBlockType blockType) {
 
       if (!expectedParentChildMap.containsKey(parentBlock))
          return new ArrayList<>();
@@ -217,8 +206,7 @@ public class CsvFileDataFormatExpectationProvider
     * @see de.je.jmeta.datablocks.iface.AbstractMediumExpectationProvider#getExpectedFailingFieldConversions(de.je.jmeta.datablocks.iface.DataBlockInstanceId)
     */
    @Override
-   public ExpectedFailedFieldConversionData getExpectedFailingFieldConversions(
-      DataBlockInstanceId fieldInstance) {
+   public ExpectedFailedFieldConversionData getExpectedFailingFieldConversions(DataBlockInstanceId fieldInstance) {
 
       return expectedFailedFieldConversionData.get(fieldInstance);
    }
@@ -252,11 +240,10 @@ public class CsvFileDataFormatExpectationProvider
     * @throws CsvRowFormatException
     *            If the csv format of the file is invalid.
     */
-   private static List<Map<String, String>> loadCsvFileContents(File csvFile)
+   private static List<Map<String, String>> loadCsvFileContents(Path csvFile)
       throws IOException, CsvRowFormatException {
 
-      CSV_READER.setNewResource(
-         NamedReader.createFromFile(csvFile, Charsets.CHARSET_ASCII));
+      CSV_READER.setNewResource(NamedReader.createFromFile(csvFile.toFile(), Charsets.CHARSET_ASCII));
 
       List<Map<String, String>> csvRows = new ArrayList<>();
       Map<String, String> row = null;
@@ -282,8 +269,7 @@ public class CsvFileDataFormatExpectationProvider
     *            If the format of an array string expression in the csv file is invalid.
     */
    private void processCsvData(List<Map<String, String>> csvRows)
-      throws InvalidTestDataCsvFormatException,
-      InvalidArrayStringFormatException {
+      throws InvalidTestDataCsvFormatException, InvalidArrayStringFormatException {
 
       List<DataBlockInstanceId> instanceIds = new ArrayList<>();
 
@@ -296,8 +282,7 @@ public class CsvFileDataFormatExpectationProvider
       for (int rowCounter = 0; rowCounter < csvRows.size(); ++rowCounter) {
          Map<String, String> nextRow = csvRows.get(rowCounter);
 
-         String rowPrefix = "[ROW " + (rowCounter + rowOffset)
-            + " of csv resource <"
+         String rowPrefix = "[ROW " + (rowCounter + rowOffset) + " of csv resource <"
             + CSV_READER.getCurrentCsvResource().getName() + ">] - ";
 
          DataFormat dataFormat = processDataFormat(nextRow, rowPrefix);
@@ -306,13 +291,11 @@ public class CsvFileDataFormatExpectationProvider
 
          int sequenceNumber = processSequenceNumber(nextRow);
 
-         DataBlockInstanceId instanceId = processParentRowIndex(nextRow, id,
-            sequenceNumber, instanceIds, rowPrefix);
+         DataBlockInstanceId instanceId = processParentRowIndex(nextRow, id, sequenceNumber, instanceIds, rowPrefix);
 
          processExpectedBlockSize(nextRow, instanceId);
 
-         processExpectedFieldInterpretedValue(nextRow, id, instanceId,
-            rowPrefix);
+         processExpectedFieldInterpretedValue(nextRow, id, instanceId, rowPrefix);
 
          processExpectedFailedFieldConversion(nextRow, instanceId, rowPrefix);
 
@@ -333,15 +316,14 @@ public class CsvFileDataFormatExpectationProvider
     * @throws InvalidTestDataCsvFormatException
     *            If test data in the csv file is invalid.
     */
-   private DataFormat processDataFormat(Map<String, String> row,
-      String rowPrefix) throws InvalidTestDataCsvFormatException {
+   private DataFormat processDataFormat(Map<String, String> row, String rowPrefix)
+      throws InvalidTestDataCsvFormatException {
 
       Set<DataFormat> dataFormats = getSupportedDataFormats();
 
       String dfName = row.get(COL_DATA_FORMAT);
 
-      for (Iterator<DataFormat> iterator = dataFormats.iterator(); iterator
-         .hasNext();) {
+      for (Iterator<DataFormat> iterator = dataFormats.iterator(); iterator.hasNext();) {
          DataFormat dataFormat2 = iterator.next();
 
          if (dataFormat2.getName().equals(dfName))
@@ -349,9 +331,7 @@ public class CsvFileDataFormatExpectationProvider
       }
 
       throw new InvalidTestDataCsvFormatException(
-         rowPrefix + "No data format found for name <" + dfName
-            + ">. Must be one of <" + dataFormats + ">.",
-         null);
+         rowPrefix + "No data format found for name <" + dfName + ">. Must be one of <" + dataFormats + ">.", null);
    }
 
    /**
@@ -368,8 +348,8 @@ public class CsvFileDataFormatExpectationProvider
     * @throws InvalidTestDataCsvFormatException
     *            If test data in the csv file is invalid.
     */
-   private DataBlockId processId(DataFormat dataFormat, Map<String, String> row,
-      String rowPrefix) throws InvalidTestDataCsvFormatException {
+   private DataBlockId processId(DataFormat dataFormat, Map<String, String> row, String rowPrefix)
+      throws InvalidTestDataCsvFormatException {
 
       String idString = row.get(COL_ID);
 
@@ -378,9 +358,8 @@ public class CsvFileDataFormatExpectationProvider
       DataBlockId id = new DataBlockId(dataFormat, idString);
 
       if (!spec.specifiesBlockWithId(id))
-         throw new InvalidTestDataCsvFormatException(rowPrefix + "Data format <"
-            + dataFormat + "> does not specify a block with id <" + id + ">.",
-            null);
+         throw new InvalidTestDataCsvFormatException(
+            rowPrefix + "Data format <" + dataFormat + "> does not specify a block with id <" + id + ">.", null);
       return id;
    }
 
@@ -420,17 +399,14 @@ public class CsvFileDataFormatExpectationProvider
     * @throws InvalidTestDataCsvFormatException
     *            If test data in the csv file is invalid.
     */
-   private DataBlockInstanceId processParentRowIndex(Map<String, String> row,
-      DataBlockId id, int sequenceNumber, List<DataBlockInstanceId> instanceIds,
-      String rowPrefix) throws InvalidTestDataCsvFormatException {
+   private DataBlockInstanceId processParentRowIndex(Map<String, String> row, DataBlockId id, int sequenceNumber,
+      List<DataBlockInstanceId> instanceIds, String rowPrefix) throws InvalidTestDataCsvFormatException {
 
       String parentRow = row.get(COL_PARENT_ROW_INDEX);
 
-      IDataFormatSpecification spec = getDataFormatSpecification(
-         id.getDataFormat());
+      IDataFormatSpecification spec = getDataFormatSpecification(id.getDataFormat());
 
-      PhysicalDataBlockType blockType = spec.getDataBlockDescription(id)
-         .getPhysicalType();
+      PhysicalDataBlockType blockType = spec.getDataBlockDescription(id).getPhysicalType();
 
       DataBlockInstanceId instanceId = null;
 
@@ -443,15 +419,11 @@ public class CsvFileDataFormatExpectationProvider
          int parentRowIndex = Integer.parseInt(parentRow);
 
          if (parentRowIndex > instanceIds.size())
-            throw new InvalidTestDataCsvFormatException(
-               rowPrefix + "Specified parent row index <" + (parentRowIndex - 1)
-                  + "> must be smaller then the current row index.",
-               null);
+            throw new InvalidTestDataCsvFormatException(rowPrefix + "Specified parent row index <"
+               + (parentRowIndex - 1) + "> must be smaller then the current row index.", null);
 
-         DataBlockInstanceId parentInstanceId = instanceIds
-            .get(parentRowIndex - 1);
-         instanceId = new DataBlockInstanceId(id, parentInstanceId,
-            sequenceNumber);
+         DataBlockInstanceId parentInstanceId = instanceIds.get(parentRowIndex - 1);
+         instanceId = new DataBlockInstanceId(id, parentInstanceId, sequenceNumber);
          instanceIds.add(instanceId);
          addInstanceId(instanceId, blockType);
       }
@@ -471,13 +443,11 @@ public class CsvFileDataFormatExpectationProvider
     * @param instanceId
     *           The {@link DataBlockInstanceId} of the current row.
     */
-   private void processExpectedBlockSize(Map<String, String> row,
-      DataBlockInstanceId instanceId) {
+   private void processExpectedBlockSize(Map<String, String> row, DataBlockInstanceId instanceId) {
 
       String expBlockSizeString = row.get(COL_EXP_BLOCK_SIZE);
 
-      expectedDataBlockSizes.put(instanceId,
-         Long.parseLong(expBlockSizeString));
+      expectedDataBlockSizes.put(instanceId, Long.parseLong(expBlockSizeString));
    }
 
    /**
@@ -498,38 +468,29 @@ public class CsvFileDataFormatExpectationProvider
     * @throws InvalidArrayStringFormatException
     *            If the format of an array string expression in the csv file is invalid.
     */
-   private void processExpectedFieldInterpretedValue(Map<String, String> row,
-      DataBlockId id, DataBlockInstanceId instanceId, String rowPrefix)
-         throws InvalidTestDataCsvFormatException,
-         InvalidArrayStringFormatException {
+   private void processExpectedFieldInterpretedValue(Map<String, String> row, DataBlockId id,
+      DataBlockInstanceId instanceId, String rowPrefix)
+         throws InvalidTestDataCsvFormatException, InvalidArrayStringFormatException {
 
-      String expInterpretedFieldValueString = row
-         .get(COL_EXP_FIELD_INTERPRETED_VALUE);
+      String expInterpretedFieldValueString = row.get(COL_EXP_FIELD_INTERPRETED_VALUE);
 
-      IDataFormatSpecification spec = getDataFormatSpecification(
-         id.getDataFormat());
+      IDataFormatSpecification spec = getDataFormatSpecification(id.getDataFormat());
 
-      PhysicalDataBlockType blockType = spec.getDataBlockDescription(id)
-         .getPhysicalType();
+      PhysicalDataBlockType blockType = spec.getDataBlockDescription(id).getPhysicalType();
 
       if (blockType.equals(PhysicalDataBlockType.FIELD)) {
-         FieldProperties<?> fieldProps = spec.getDataBlockDescription(id)
-            .getFieldProperties();
+         FieldProperties<?> fieldProps = spec.getDataBlockDescription(id).getFieldProperties();
 
          if (expInterpretedFieldValueString.equals(ANY_WILDCARD))
-            expectedFieldInterpretedValues.put(instanceId,
-               expInterpretedFieldValueString);
+            expectedFieldInterpretedValues.put(instanceId, expInterpretedFieldValueString);
 
          // Strings are taken as is
          else if (fieldProps.getFieldType().equals(FieldType.STRING))
-            expectedFieldInterpretedValues.put(instanceId,
-               expInterpretedFieldValueString);
+            expectedFieldInterpretedValues.put(instanceId, expInterpretedFieldValueString);
 
          // Numbers are taken as is
-         else if (fieldProps.getFieldType()
-            .equals(FieldType.UNSIGNED_WHOLE_NUMBER))
-            expectedFieldInterpretedValues.put(instanceId,
-               Long.parseLong(expInterpretedFieldValueString));
+         else if (fieldProps.getFieldType().equals(FieldType.UNSIGNED_WHOLE_NUMBER))
+            expectedFieldInterpretedValues.put(instanceId, Long.parseLong(expInterpretedFieldValueString));
 
          // Set flag names are separated by "&&" and need to be converted to a Flags instance
          else if (fieldProps.getFieldType().equals(FieldType.FLAGS)) {
@@ -537,8 +498,7 @@ public class CsvFileDataFormatExpectationProvider
 
             Flags expectedFlags = new Flags(flagSpec);
 
-            String[] flagsToSet = expInterpretedFieldValueString
-               .split(FLAG_SEPARATOR);
+            String[] flagsToSet = expInterpretedFieldValueString.split(FLAG_SEPARATOR);
 
             for (int i = 0; i < flagsToSet.length; i++) {
                String flagName = flagsToSet[i];
@@ -547,10 +507,8 @@ public class CsvFileDataFormatExpectationProvider
                   continue;
 
                if (!flagSpec.hasFlag(flagName))
-                  throw new InvalidTestDataCsvFormatException(
-                     rowPrefix + "The flag specification <" + flagSpec
-                        + "> does not specify a flag named <" + flagName + ">.",
-                     null);
+                  throw new InvalidTestDataCsvFormatException(rowPrefix + "The flag specification <" + flagSpec
+                     + "> does not specify a flag named <" + flagName + ">.", null);
 
                expectedFlags.setFlag(flagName, true);
             }
@@ -563,15 +521,12 @@ public class CsvFileDataFormatExpectationProvider
          else if (fieldProps.getFieldType().equals(FieldType.BINARY)) {
             byte[] parsedBytes;
             try {
-               parsedBytes = EnhancedArrays
-                  .parseArray(expInterpretedFieldValueString);
+               parsedBytes = EnhancedArrays.parseArray(expInterpretedFieldValueString);
             } catch (InvalidArrayStringFormatException e) {
                // Throw further, enriched with row index information
-               throw new InvalidArrayStringFormatException(
-                  rowPrefix + e.getMessage());
+               throw new InvalidArrayStringFormatException(rowPrefix + e.getMessage());
             }
-            expectedFieldInterpretedValues.put(instanceId,
-               new BinaryValue(parsedBytes));
+            expectedFieldInterpretedValues.put(instanceId, new BinaryValue(parsedBytes));
          }
 
          // Enumerated fields are either charsets, byte orders or arbitrary typed
@@ -584,35 +539,27 @@ public class CsvFileDataFormatExpectationProvider
             for (int i = 0; i < fieldFunctions.size(); ++i) {
                FieldFunction function = fieldFunctions.get(i);
 
-               if (function.getFieldFunctionType()
-                  .equals(FieldFunctionType.BYTE_ORDER_OF)) {
+               if (function.getFieldFunctionType().equals(FieldFunctionType.BYTE_ORDER_OF)) {
                   expectedValueDetermined = true;
 
-                  if (expInterpretedFieldValueString
-                     .equals(ByteOrder.BIG_ENDIAN.toString()))
-                     expectedFieldInterpretedValues.put(instanceId,
-                        ByteOrder.BIG_ENDIAN);
+                  if (expInterpretedFieldValueString.equals(ByteOrder.BIG_ENDIAN.toString()))
+                     expectedFieldInterpretedValues.put(instanceId, ByteOrder.BIG_ENDIAN);
 
-                  else if (expInterpretedFieldValueString
-                     .equals(ByteOrder.LITTLE_ENDIAN.toString()))
-                     expectedFieldInterpretedValues.put(instanceId,
-                        ByteOrder.LITTLE_ENDIAN);
+                  else if (expInterpretedFieldValueString.equals(ByteOrder.LITTLE_ENDIAN.toString()))
+                     expectedFieldInterpretedValues.put(instanceId, ByteOrder.LITTLE_ENDIAN);
 
                   else
                      throw new InvalidTestDataCsvFormatException(
-                        rowPrefix
-                           + "Field type requires a byte order as value. Byte Order with name <"
+                        rowPrefix + "Field type requires a byte order as value. Byte Order with name <"
                            + expInterpretedFieldValueString
                            + "> is unknown. Only BIG_ENDIAN and LITTLE_ENDIAN are allowed",
                         null);
                }
 
-               else if (function.getFieldFunctionType()
-                  .equals(FieldFunctionType.CHARACTER_ENCODING_OF)) {
+               else if (function.getFieldFunctionType().equals(FieldFunctionType.CHARACTER_ENCODING_OF)) {
                   expectedValueDetermined = true;
 
-                  expectedFieldInterpretedValues.put(instanceId,
-                     Charset.forName(expInterpretedFieldValueString));
+                  expectedFieldInterpretedValues.put(instanceId, Charset.forName(expInterpretedFieldValueString));
                }
             }
 
@@ -621,13 +568,11 @@ public class CsvFileDataFormatExpectationProvider
                // If no custom parser for the expected field value is registered,
                // take the read string as expected value
                if (!customFieldValueParsers.containsKey(id))
-                  expectedFieldInterpretedValues.put(instanceId,
-                     expInterpretedFieldValueString);
+                  expectedFieldInterpretedValues.put(instanceId, expInterpretedFieldValueString);
 
                else
                   expectedFieldInterpretedValues.put(instanceId,
-                     customFieldValueParsers.get(id)
-                        .parse(expInterpretedFieldValueString));
+                     customFieldValueParsers.get(id).parse(expInterpretedFieldValueString));
             }
          }
 
@@ -636,13 +581,11 @@ public class CsvFileDataFormatExpectationProvider
             // If no custom parser for the expected field value is registered,
             // take the read string as expected value
             if (!customFieldValueParsers.containsKey(id))
-               expectedFieldInterpretedValues.put(instanceId,
-                  expInterpretedFieldValueString);
+               expectedFieldInterpretedValues.put(instanceId, expInterpretedFieldValueString);
 
             else
                expectedFieldInterpretedValues.put(instanceId,
-                  customFieldValueParsers.get(id)
-                     .parse(expInterpretedFieldValueString));
+                  customFieldValueParsers.get(id).parse(expInterpretedFieldValueString));
          }
       }
    }
@@ -660,50 +603,38 @@ public class CsvFileDataFormatExpectationProvider
     * @throws InvalidTestDataCsvFormatException
     *            if the failed field conversion data could not be parsed correctly.
     */
-   private void processExpectedFailedFieldConversion(Map<String, String> row,
-      DataBlockInstanceId instanceId, String rowPrefix)
-         throws InvalidTestDataCsvFormatException {
+   private void processExpectedFailedFieldConversion(Map<String, String> row, DataBlockInstanceId instanceId,
+      String rowPrefix) throws InvalidTestDataCsvFormatException {
 
-      String failingConversionCharsetString = row
-         .get(COL_EXP_FAILED_FIELD_CONV_CHARSET);
-      String failingConversionByteOrderString = row
-         .get(COL_EXP_FAILED_FIELD_CONV_BYTE_ORDER);
+      String failingConversionCharsetString = row.get(COL_EXP_FAILED_FIELD_CONV_CHARSET);
+      String failingConversionByteOrderString = row.get(COL_EXP_FAILED_FIELD_CONV_BYTE_ORDER);
 
-      if (!failingConversionCharsetString.isEmpty()
-         && failingConversionByteOrderString.isEmpty()
-         || failingConversionCharsetString.isEmpty()
-            && !failingConversionByteOrderString.isEmpty())
+      if (!failingConversionCharsetString.isEmpty() && failingConversionByteOrderString.isEmpty()
+         || failingConversionCharsetString.isEmpty() && !failingConversionByteOrderString.isEmpty())
          throw new InvalidTestDataCsvFormatException(
-            rowPrefix
-               + "If a failing field conversion is expected, both character encoding (column "
-               + COL_EXP_FAILED_FIELD_CONV_CHARSET + ") and byte order (column "
-               + COL_EXP_FAILED_FIELD_CONV_BYTE_ORDER + ") must be given",
+            rowPrefix + "If a failing field conversion is expected, both character encoding (column "
+               + COL_EXP_FAILED_FIELD_CONV_CHARSET + ") and byte order (column " + COL_EXP_FAILED_FIELD_CONV_BYTE_ORDER
+               + ") must be given",
             null);
 
       if (!failingConversionByteOrderString.isEmpty()) {
-         Charset failingConversionCharset = Charset
-            .forName(failingConversionCharsetString);
+         Charset failingConversionCharset = Charset.forName(failingConversionCharsetString);
          ByteOrder failingConversionByteOrder = null;
 
-         if (failingConversionByteOrderString
-            .equals(ByteOrder.BIG_ENDIAN.toString()))
+         if (failingConversionByteOrderString.equals(ByteOrder.BIG_ENDIAN.toString()))
             failingConversionByteOrder = ByteOrder.BIG_ENDIAN;
 
-         else if (failingConversionByteOrderString
-            .equals(ByteOrder.LITTLE_ENDIAN.toString()))
+         else if (failingConversionByteOrderString.equals(ByteOrder.LITTLE_ENDIAN.toString()))
             failingConversionByteOrder = ByteOrder.LITTLE_ENDIAN;
 
          else
             throw new InvalidTestDataCsvFormatException(
-               rowPrefix
-                  + "Failed field conversion requires a byte order as value. Byte Order with name <"
-                  + failingConversionByteOrderString
-                  + "> is unknown. Only BIG_ENDIAN and LITTLE_ENDIAN are allowed",
+               rowPrefix + "Failed field conversion requires a byte order as value. Byte Order with name <"
+                  + failingConversionByteOrderString + "> is unknown. Only BIG_ENDIAN and LITTLE_ENDIAN are allowed",
                null);
 
          expectedFailedFieldConversionData.put(instanceId,
-            new ExpectedFailedFieldConversionData(failingConversionCharset,
-               failingConversionByteOrder));
+            new ExpectedFailedFieldConversionData(failingConversionCharset, failingConversionByteOrder));
       }
    }
 
@@ -718,18 +649,15 @@ public class CsvFileDataFormatExpectationProvider
     * @param rowPrefix
     *           The row prefix.
     */
-   private void processContainerReverseReadable(Map<String, String> nextRow,
-      DataBlockInstanceId instanceId, String rowPrefix) {
+   private void processContainerReverseReadable(Map<String, String> nextRow, DataBlockInstanceId instanceId,
+      String rowPrefix) {
 
-      String isContainerBackwardReadbleString = nextRow
-         .get(COL_CONTAINER_BACKWARD_READABLE);
+      String isContainerBackwardReadbleString = nextRow.get(COL_CONTAINER_BACKWARD_READABLE);
 
-      IDataFormatSpecification spec = getDataFormatSpecification(
-         instanceId.getId().getDataFormat());
+      IDataFormatSpecification spec = getDataFormatSpecification(instanceId.getId().getDataFormat());
 
       if (spec.getTopLevelDataBlockIds().contains(instanceId.getId())) {
-         boolean isContainerBackwardReadble = Boolean
-            .parseBoolean(isContainerBackwardReadbleString);
+         boolean isContainerBackwardReadble = Boolean.parseBoolean(isContainerBackwardReadbleString);
 
          // Each new container must be added AT FRONT of the list because it represents
          // the order in which the containers are expected when backwards reading. And this
@@ -747,19 +675,15 @@ public class CsvFileDataFormatExpectationProvider
     * @param blockType
     *           The {@link PhysicalDataBlockType} of the corresponding data block.
     */
-   private void addInstanceId(DataBlockInstanceId instanceId,
-      PhysicalDataBlockType blockType) {
+   private void addInstanceId(DataBlockInstanceId instanceId, PhysicalDataBlockType blockType) {
 
       DataBlockInstanceId parentInstanceId = instanceId.getParentInstanceId();
       if (!expectedParentChildMap.containsKey(parentInstanceId))
-         expectedParentChildMap.put(parentInstanceId,
-            new HashMap<PhysicalDataBlockType, List<DataBlockInstanceId>>());
+         expectedParentChildMap.put(parentInstanceId, new HashMap<PhysicalDataBlockType, List<DataBlockInstanceId>>());
 
       if (!expectedParentChildMap.get(parentInstanceId).containsKey(blockType))
-         expectedParentChildMap.get(parentInstanceId).put(blockType,
-            new ArrayList<DataBlockInstanceId>());
+         expectedParentChildMap.get(parentInstanceId).put(blockType, new ArrayList<DataBlockInstanceId>());
 
-      expectedParentChildMap.get(parentInstanceId).get(blockType)
-         .add(instanceId);
+      expectedParentChildMap.get(parentInstanceId).get(blockType).add(instanceId);
    }
 }

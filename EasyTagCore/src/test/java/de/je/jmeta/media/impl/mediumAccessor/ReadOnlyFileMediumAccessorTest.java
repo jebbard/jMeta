@@ -1,5 +1,5 @@
 /**
- * {@link WritableMemoryMediumAccessorTest}.java
+ * {@link WritableFileMediumAccessorTest}.java
  *
  * @author Jens Ebert
  * @date 09.12.10 21:22:53 (December 9, 2010)
@@ -10,24 +10,15 @@ package de.je.jmeta.media.impl.mediumAccessor;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.je.jmeta.media.api.datatype.InMemoryMedium;
+import de.je.jmeta.media.api.datatype.FileMedium;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
+import de.je.jmeta.media.impl.FileMediumAccessor;
 import de.je.jmeta.media.impl.IMediumAccessor;
-import de.je.jmeta.media.impl.MemoryMediumAccessor;
 
 /**
- * Tests the class {@MemoryMediumAccessor} for a writable medium.
+ * Tests the class {@FileMediumAccessor} for a read-only medium.
  */
-public class WritableMemoryMediumAccessorTest extends AbstractWritableRandomAccessMediumAccessorTest {
-
-   private byte[] memory;
-
-   /**
-    * @see de.je.jmeta.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getExpectedMedium()
-    */
-   @Override
-   protected InMemoryMedium getExpectedMedium() {
-      return new InMemoryMedium(memory, null, false);
-   }
+public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 
    /**
     * @see AbstractIMediumAccessorTest#getReadTestDataToUse()
@@ -47,6 +38,14 @@ public class WritableMemoryMediumAccessorTest extends AbstractWritableRandomAcce
    }
 
    /**
+    * @see de.je.jmeta.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getExpectedMedium()
+    */
+   @Override
+   protected FileMedium getExpectedMedium() {
+      return new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true);
+   }
+
+   /**
     * @see de.je.jmeta.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getReadTestDataUntilEndOfMedium()
     */
    @Override
@@ -59,7 +58,7 @@ public class WritableMemoryMediumAccessorTest extends AbstractWritableRandomAcce
     */
    @Override
    protected IMediumAccessor<?> createImplementationToTest() {
-      return new MemoryMediumAccessor(getExpectedMedium());
+      return new FileMediumAccessor(getExpectedMedium());
    }
 
    /**
@@ -67,9 +66,5 @@ public class WritableMemoryMediumAccessorTest extends AbstractWritableRandomAcce
     */
    @Override
    protected void prepareMediumData(byte[] testFileContents) {
-
-      memory = new byte[testFileContents.length];
-
-      System.arraycopy(testFileContents, 0, memory, 0, testFileContents.length);
    }
 }

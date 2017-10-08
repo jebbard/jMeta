@@ -94,7 +94,18 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
 
       final byte[] bytes = (buffer.hasArray() ? buffer.array() : new byte[bytesToWrite]);
 
-      System.arraycopy(bytes, buffer.position(), memory, (int) reference.getAbsoluteMediumOffset(), bytesToWrite);
+      // TODO handle case of too big offset!
+
+      int absoluteMediumOffset = (int) reference.getAbsoluteMediumOffset();
+
+      if (absoluteMediumOffset + bytes.length >= memory.length) {
+         byte[] finalMediumBytes = new byte[absoluteMediumOffset + bytes.length];
+         System.arraycopy(memory, 0, finalMediumBytes, 0, memory.length);
+         memory = finalMediumBytes;
+         getMedium().setBytes(finalMediumBytes);
+      }
+
+      System.arraycopy(bytes, buffer.position(), memory, absoluteMediumOffset, bytesToWrite);
 
       buffer.position(buffer.limit());
    }

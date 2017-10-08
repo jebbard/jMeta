@@ -7,31 +7,36 @@
 
 package de.je.jmeta.media.impl.mediumAccessor;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.exception.MediumAccessException;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.FileMediumAccessor;
 import de.je.jmeta.media.impl.IMediumAccessor;
-import de.je.util.javautil.io.file.FileUtility;
 
 /**
- * Tests the class {@FileMediumAccessor}.
+ * Tests the class {@FileMediumAccessor} for a writable medium.
  */
 public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccessMediumAccessorTest {
 
    private static final String TEMP_FOLDER_NAME = "temp/";
 
+   /**
+    * A container increased per call to {@link #prepareMediumData(byte[])}, i.e. per test case, to ensure after
+    * execution of all test cases that the modified files are still present for each of them.
+    */
    private static int TEST_FILE_COUNTER = 0;
 
-   private File copiedTestFile = new File(MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR + TEMP_FOLDER_NAME
-      + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
+   private Path copiedTestFile = MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR
+      .resolve(TEMP_FOLDER_NAME + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
 
    /**
     * Tests whether the creation of a new {@link FileMediumAccessor} on an already locked medium.
@@ -76,7 +81,7 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(550, getExpectedFileContents().length - 550);
+      return new ReadTestData(550, EXPECTED_FILE_CONTENTS.length - 550);
    }
 
    /**
@@ -93,22 +98,16 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
    @Override
    protected void prepareMediumData(byte[] testFileContents) {
 
-      copiedTestFile = new File(MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR,
-         TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
+      copiedTestFile = MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR
+         .resolve(TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
 
       TEST_FILE_COUNTER++;
 
-      // If the copied file still exists (from a recent test run), delete it
-      if (copiedTestFile.exists())
-         if (!copiedTestFile.delete())
-            throw new RuntimeException(
-               "Could not delete copied test file " + copiedTestFile + ". Manuel deletion is necessary.");
+      String message = "Could not copy the test file " + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE + " to "
+         + copiedTestFile;
 
-      final String message = "Could not copy the test file " + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE
-         + " to " + copiedTestFile;
       try {
-         if (!FileUtility.copyFile(MediaTestCaseConstants.STANDARD_TEST_FILE, copiedTestFile))
-            throw new RuntimeException(message);
+         Files.copy(MediaTestCaseConstants.STANDARD_TEST_FILE, copiedTestFile, StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException e) {
          throw new RuntimeException(message, e);
       }

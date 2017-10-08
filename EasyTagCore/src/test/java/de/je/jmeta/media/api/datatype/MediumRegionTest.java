@@ -18,7 +18,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.MediaTestCaseConstants;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 

@@ -13,8 +13,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.InputStreamMedium;
+import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.IMediumAccessor;
 import de.je.jmeta.media.impl.StreamMediumAccessor;
 
@@ -47,7 +47,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(0, getExpectedFileContents().length);
+      return new ReadTestData(0, EXPECTED_FILE_CONTENTS.length);
    }
 
    /**
@@ -73,10 +73,10 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    protected void prepareMediumData(byte[] testFileContents) {
 
       try {
-         testStream = new FileInputStream(MediaTestCaseConstants.STANDARD_TEST_FILE);
+         testStream = new FileInputStream(MediaTestCaseConstants.STANDARD_TEST_FILE.toFile());
       } catch (FileNotFoundException e) {
          throw new RuntimeException("Could not find test file. Make sure it exists" + "on the hard drive: "
-            + MediaTestCaseConstants.STANDARD_TEST_FILE.getAbsolutePath(), e);
+            + MediaTestCaseConstants.STANDARD_TEST_FILE.toAbsolutePath().toString(), e);
       }
    }
 }

@@ -1,14 +1,14 @@
-package de.je.jmeta.media.impl;
+package de.je.jmeta.media.api.helper;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.MediaTestCaseConstants;
 import de.je.jmeta.media.api.datatype.FileMedium;
 import de.je.jmeta.media.api.datatype.InMemoryMedium;
 import de.je.jmeta.media.api.datatype.MediumRegion;
+import de.je.jmeta.media.impl.StandardMediumReference;
 
 public class TestMediumUtility {
 

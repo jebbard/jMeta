@@ -8,7 +8,7 @@
  */
 package de.je.jmeta.defext.datablocks.impl.ogg;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.je.jmeta.defext.datablocks.impl.AbstractDataBlockAccessorDefaultExtensionTest;
 import de.je.util.javautil.testUtil.resource.TestResourceHelper;
@@ -16,8 +16,7 @@ import de.je.util.javautil.testUtil.resource.TestResourceHelper;
 /**
  * {@link OggSingleFileTest_01} tests reading a single ogg file.
  */
-public class OggSingleFileTest_01
-   extends AbstractDataBlockAccessorDefaultExtensionTest {
+public class OggSingleFileTest_01 extends AbstractDataBlockAccessorDefaultExtensionTest {
 
    /**
     * Creates a new {@link OggSingleFileTest_01}.
@@ -26,11 +25,9 @@ public class OggSingleFileTest_01
       super(THE_FILE, THE_CSV_FILE, new Integer[] { 4 });
    }
 
-   private final static File THE_FILE = TestResourceHelper.resourceToFile(
-      AbstractDataBlockAccessorDefaultExtensionTest.class,
-      "ogg/OGG_FILE_01.txt");
+   private final static Path THE_FILE = TestResourceHelper
+      .resourceToFile(AbstractDataBlockAccessorDefaultExtensionTest.class, "ogg/OGG_FILE_01.txt");
 
-   private final static File THE_CSV_FILE = TestResourceHelper.resourceToFile(
-      AbstractDataBlockAccessorDefaultExtensionTest.class,
-      "ogg/Expected_OGG_FILE_01.csv");
+   private final static Path THE_CSV_FILE = TestResourceHelper
+      .resourceToFile(AbstractDataBlockAccessorDefaultExtensionTest.class, "ogg/Expected_OGG_FILE_01.csv");
 }

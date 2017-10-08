@@ -6,15 +6,13 @@
  *
  * @date 25.04.2011
  */
-package de.je.jmeta.media.impl.timeout;
+package de.je.jmeta.media.impl.mediumAccessor;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -23,6 +21,8 @@ import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.jmeta.media.impl.StreamMediumAccessor;
+import de.je.jmeta.media.impl.mediumAccessor.BlockedInputStreamSimulator.WriteMode;
+import junit.framework.Assert;
 
 /**
  * {@link StreamingMediumAccessorTimeoutTest} tests the {@link StreamMediumAccessor} class regarding timeout aspects.
@@ -42,9 +42,8 @@ public class StreamingMediumAccessorTimeoutTest {
    private final static Map<Integer, byte[]> THE_TIMEOUTS = new HashMap<>();
 
    static {
-      final byte[] bytes = new byte[] { 'T', 'h', 'e', ' ', 'W', 'i', 't', 'c',
-         'h', 'e', 'r', ' ', '2', ' ', '-', ' ', 'n', 'e', 'x', 't', ' ', 'g',
-         'a', 'm', 'e', ' ', 'e', 'x', 'p', 'e', 'r', 'i', 'e', 'n', 'c', 'e' };
+      final byte[] bytes = new byte[] { 'T', 'h', 'e', ' ', 'W', 'i', 't', 'c', 'h', 'e', 'r', ' ', '2', ' ', '-', ' ',
+         'n', 'e', 'x', 't', ' ', 'g', 'a', 'm', 'e', ' ', 'e', 'x', 'p', 'e', 'r', 'i', 'e', 'n', 'c', 'e' };
       THE_TIMEOUTS.put(1, bytes);
       THE_TIMEOUTS.put(100, bytes);
       THE_TIMEOUTS.put(200, bytes);
@@ -63,14 +62,11 @@ public class StreamingMediumAccessorTimeoutTest {
     * @param endTime
     *           The system time immediately after the read call.
     */
-   private void checkTimeoutAccuracy(Integer timeoutMillis, long startTime,
-      long endTime) {
+   private void checkTimeoutAccuracy(Integer timeoutMillis, long startTime, long endTime) {
 
       final long diffTime = endTime - startTime;
 
-      System.out.println(
-         "Calculated difference time in milliseconds before and after read call "
-            + diffTime);
+      System.out.println("Calculated difference time in milliseconds before and after read call " + diffTime);
       // The passed time should closely match the specified timeout
       Assert.assertTrue(diffTime + TIMEOUT_TOLERANCE_MILLIS > timeoutMillis);
       Assert.assertTrue(diffTime - TIMEOUT_TOLERANCE_MILLIS < timeoutMillis);
@@ -90,8 +86,7 @@ public class StreamingMediumAccessorTimeoutTest {
       System.out.println(" test_readAllDataWithinTimeout_atOnce ");
       System.out.println("######################################");
 
-      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet().iterator(); iterator.hasNext();) {
          Integer timeoutMillis = iterator.next();
          byte[] bytesExpectedToBeRead = THE_TIMEOUTS.get(timeoutMillis);
 
@@ -100,37 +95,31 @@ public class StreamingMediumAccessorTimeoutTest {
          // Create simulator and schedule thread for starting the simulation
          // soon
          // There are no bytes written, so the timeout is expected to expire
-         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(
-            bytesExpectedToBeRead, timeoutMillis, WriteMode.WM_AT_ONCE);
+         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(bytesExpectedToBeRead, timeoutMillis,
+            WriteMode.WM_AT_ONCE);
 
          // Prepare testling
-         InputStreamMedium medium = new InputStreamMedium(
-            simulator.getInputStream(), null);
+         InputStreamMedium medium = new InputStreamMedium(simulator.getInputStream(), null);
          StreamMediumAccessor testling = new StreamMediumAccessor(medium);
 
          medium.setReadTimeout(timeoutMillis);
 
          // The actual test
-         StandardMediumReference nullReference = new StandardMediumReference(
-            testling.getMedium(), 0);
+         StandardMediumReference nullReference = new StandardMediumReference(testling.getMedium(), 0);
 
-         ByteBuffer readBuffer = ByteBuffer
-            .allocate(bytesExpectedToBeRead.length);
+         ByteBuffer readBuffer = ByteBuffer.allocate(bytesExpectedToBeRead.length);
 
          try {
             testling.read(nullReference, readBuffer);
 
             // Data has been read correctly
-            org.junit.Assert.assertArrayEquals(bytesExpectedToBeRead,
-               readBuffer.array());
+            org.junit.Assert.assertArrayEquals(bytesExpectedToBeRead, readBuffer.array());
          } catch (EndOfMediumException e) {
             throw new RuntimeException("Unexpected end of medium", e);
          }
          // This exception is NOT expected!
          catch (ReadTimedOutException e) {
-            Assert.fail(
-               "read was expected to NOT throw a ReadTimedOutException, but threw: "
-                  + e);
+            Assert.fail("read was expected to NOT throw a ReadTimedOutException, but threw: " + e);
          }
       }
    }
@@ -149,8 +138,7 @@ public class StreamingMediumAccessorTimeoutTest {
       System.out.println(" test_readAllDataWithinTimeout_pieceWise ");
       System.out.println("#########################################");
 
-      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet().iterator(); iterator.hasNext();) {
          Integer timeoutMillis = iterator.next();
          byte[] bytesExpectedToBeRead = THE_TIMEOUTS.get(timeoutMillis);
 
@@ -159,37 +147,31 @@ public class StreamingMediumAccessorTimeoutTest {
          // Create simulator and schedule thread for starting the simulation
          // soon
          // There are no bytes written, so the timeout is expected to expire
-         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(
-            bytesExpectedToBeRead, timeoutMillis, WriteMode.WM_BEFORE_TIMEOUT);
+         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(bytesExpectedToBeRead, timeoutMillis,
+            WriteMode.WM_BEFORE_TIMEOUT);
 
          // Prepare testling
-         InputStreamMedium medium = new InputStreamMedium(
-            simulator.getInputStream(), null);
+         InputStreamMedium medium = new InputStreamMedium(simulator.getInputStream(), null);
          StreamMediumAccessor testling = new StreamMediumAccessor(medium);
 
          medium.setReadTimeout(timeoutMillis);
 
          // The actual test
-         StandardMediumReference nullReference = new StandardMediumReference(
-            testling.getMedium(), 0);
+         StandardMediumReference nullReference = new StandardMediumReference(testling.getMedium(), 0);
 
-         ByteBuffer readBuffer = ByteBuffer
-            .allocate(bytesExpectedToBeRead.length);
+         ByteBuffer readBuffer = ByteBuffer.allocate(bytesExpectedToBeRead.length);
 
          try {
             testling.read(nullReference, readBuffer);
 
             // Data has been read correctly
-            org.junit.Assert.assertArrayEquals(bytesExpectedToBeRead,
-               readBuffer.array());
+            org.junit.Assert.assertArrayEquals(bytesExpectedToBeRead, readBuffer.array());
          } catch (EndOfMediumException e) {
             throw new RuntimeException("Unexpected end of medium", e);
          }
          // This exception is NOT expected!
          catch (ReadTimedOutException e) {
-            Assert.fail(
-               "read was expected to NOT throw a ReadTimedOutException, but threw: "
-                  + e);
+            Assert.fail("read was expected to NOT throw a ReadTimedOutException, but threw: " + e);
          }
       }
    }
@@ -209,8 +191,7 @@ public class StreamingMediumAccessorTimeoutTest {
       System.out.println(" test_timedOutReadWithData_pieceWise ");
       System.out.println("#####################################");
 
-      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet().iterator(); iterator.hasNext();) {
          Integer timeoutMillis = iterator.next();
          byte[] bytesExpectedToBeRead = THE_TIMEOUTS.get(timeoutMillis);
 
@@ -219,22 +200,19 @@ public class StreamingMediumAccessorTimeoutTest {
          // Create simulator and schedule thread for starting the simulation
          // soon
          // There are no bytes written, so the timeout is expected to expire
-         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(
-            bytesExpectedToBeRead, timeoutMillis, WriteMode.WM_EXPIRE_TIMEOUT);
+         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(bytesExpectedToBeRead, timeoutMillis,
+            WriteMode.WM_EXPIRE_TIMEOUT);
 
          // Prepare testling
-         InputStreamMedium medium = new InputStreamMedium(
-            simulator.getInputStream(), null);
+         InputStreamMedium medium = new InputStreamMedium(simulator.getInputStream(), null);
          StreamMediumAccessor testling = new StreamMediumAccessor(medium);
 
          medium.setReadTimeout(timeoutMillis);
 
          // The actual test
-         StandardMediumReference nullReference = new StandardMediumReference(
-            testling.getMedium(), 0);
+         StandardMediumReference nullReference = new StandardMediumReference(testling.getMedium(), 0);
 
-         ByteBuffer readBuffer = ByteBuffer
-            .allocate(bytesExpectedToBeRead.length);
+         ByteBuffer readBuffer = ByteBuffer.allocate(bytesExpectedToBeRead.length);
 
          long startTime = System.currentTimeMillis();
 
@@ -249,8 +227,7 @@ public class StreamingMediumAccessorTimeoutTest {
          catch (ReadTimedOutException e) {
             Assert.assertEquals(timeoutMillis.intValue(), e.getTimeoutValue());
 
-            Assert.assertEquals(bytesExpectedToBeRead.length,
-               e.getByteCountTriedToRead());
+            Assert.assertEquals(bytesExpectedToBeRead.length, e.getByteCountTriedToRead());
 
             // Nevertheless some bytes were read
             Assert.assertTrue(e.getBytesReallyRead() > 0);
@@ -258,8 +235,7 @@ public class StreamingMediumAccessorTimeoutTest {
 
             int index = 0;
             while (readBuffer.hasRemaining()) {
-               Assert.assertEquals(bytesExpectedToBeRead[index++],
-                  readBuffer.get());
+               Assert.assertEquals(bytesExpectedToBeRead[index++], readBuffer.get());
             }
          }
 
@@ -281,8 +257,7 @@ public class StreamingMediumAccessorTimeoutTest {
       System.out.println(" test_timedOutReadWithoutData ");
       System.out.println("##############################");
 
-      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<Integer> iterator = THE_TIMEOUTS.keySet().iterator(); iterator.hasNext();) {
          Integer timeoutMillis = iterator.next();
          byte[] bytesExpectedToBeRead = THE_TIMEOUTS.get(timeoutMillis);
 
@@ -291,22 +266,19 @@ public class StreamingMediumAccessorTimeoutTest {
          // Create simulator and schedule thread for starting the simulation
          // soon
          // There are no bytes written, so the timeout is expected to expire
-         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(
-            new byte[] {}, timeoutMillis, WriteMode.WM_EXPIRE_TIMEOUT);
+         BlockedInputStreamSimulator simulator = new BlockedInputStreamSimulator(new byte[] {}, timeoutMillis,
+            WriteMode.WM_EXPIRE_TIMEOUT);
 
          // Prepare testling
-         InputStreamMedium medium = new InputStreamMedium(
-            simulator.getInputStream(), null);
+         InputStreamMedium medium = new InputStreamMedium(simulator.getInputStream(), null);
          StreamMediumAccessor testling = new StreamMediumAccessor(medium);
 
          medium.setReadTimeout(timeoutMillis);
 
          // The actual test
-         StandardMediumReference nullReference = new StandardMediumReference(
-            testling.getMedium(), 0);
+         StandardMediumReference nullReference = new StandardMediumReference(testling.getMedium(), 0);
 
-         ByteBuffer readBuffer = ByteBuffer
-            .allocate(bytesExpectedToBeRead.length);
+         ByteBuffer readBuffer = ByteBuffer.allocate(bytesExpectedToBeRead.length);
 
          long startTime = System.currentTimeMillis();
 
@@ -320,8 +292,7 @@ public class StreamingMediumAccessorTimeoutTest {
          // This exception is expected!
          catch (ReadTimedOutException e) {
             Assert.assertEquals(timeoutMillis.intValue(), e.getTimeoutValue());
-            Assert.assertEquals(bytesExpectedToBeRead.length,
-               e.getByteCountTriedToRead());
+            Assert.assertEquals(bytesExpectedToBeRead.length, e.getByteCountTriedToRead());
             Assert.assertEquals(0, e.getBytesReallyRead());
 
             // Nothing has been read

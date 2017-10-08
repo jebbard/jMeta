@@ -6,7 +6,7 @@
  *
  * @date 24.04.2011
  */
-package de.je.jmeta.media.impl.timeout;
+package de.je.jmeta.media.impl.mediumAccessor;
 
 import java.io.IOException;
 import java.io.InputStream;

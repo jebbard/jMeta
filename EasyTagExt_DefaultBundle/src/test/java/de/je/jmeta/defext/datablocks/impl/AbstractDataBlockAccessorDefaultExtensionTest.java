@@ -1,7 +1,8 @@
 package de.je.jmeta.defext.datablocks.impl;
 
-import java.io.File;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,40 +15,36 @@ import de.je.util.javautil.testUtil.setup.TestDataException;
 /**
  * {@link AbstractDataBlockAccessorDefaultExtensionTest} is an abstract base class for testing daata block access
  */
-public abstract class AbstractDataBlockAccessorDefaultExtensionTest
-   extends AbstractDataBlockAccessorTest {
+public abstract class AbstractDataBlockAccessorDefaultExtensionTest extends AbstractDataBlockAccessorTest {
 
    /**
-    * @see de.je.jmeta.datablocks.iface.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(File, File,
+    * @see de.je.jmeta.datablocks.iface.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(Path, Path,
     *      Integer[])
     */
-   public AbstractDataBlockAccessorDefaultExtensionTest(File testFile,
-      File csvFile, Integer[] fieldSizes) {
+   public AbstractDataBlockAccessorDefaultExtensionTest(Path testFile, Path csvFile, Integer[] fieldSizes) {
       super(testFile, csvFile, fieldSizes);
    }
 
    /**
-    * @see de.je.jmeta.datablocks.iface.IDataBlockAccessorTest#createMediaToCheck(java.io.File)
+    * @see de.je.jmeta.datablocks.iface.IDataBlockAccessorTest#createMediaToCheck(java.nio.file.Path)
     */
    @Override
-   protected List<IMedium<?>> createMediaToCheck(File baseFile)
-      throws Exception {
+   protected List<IMedium<?>> createMediaToCheck(Path baseFile) throws Exception {
 
       List<IMedium<?>> media = new ArrayList<>();
 
-      if (baseFile.length() > Integer.MAX_VALUE)
-         throw new TestDataException(
-            "Specified file " + baseFile + " is too big: " + baseFile.length(),
-            null);
+      long size = Files.size(baseFile);
 
-      byte[] readMediumBytes = new byte[(int) baseFile.length()];
+      if (size > Integer.MAX_VALUE)
+         throw new TestDataException("Specified file " + baseFile + " is too big: " + size, null);
 
-      try (RandomAccessFile raf = new RandomAccessFile(baseFile, "r")) {
+      byte[] readMediumBytes = new byte[(int) size];
+
+      try (RandomAccessFile raf = new RandomAccessFile(baseFile.toFile(), "r")) {
          int bytesRead = 0;
 
          while (bytesRead < readMediumBytes.length) {
-            int readReturn = raf.read(readMediumBytes, bytesRead,
-               readMediumBytes.length - bytesRead);
+            int readReturn = raf.read(readMediumBytes, bytesRead, readMediumBytes.length - bytesRead);
 
             if (readReturn == -1)
                throw new RuntimeException("Unexpected end of file");
