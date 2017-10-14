@@ -655,25 +655,23 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Let's discuss the topic of timeouts. In Java, each reading and writing I/O call might block. How to deal with this? The following design decision clearly states how.
+Let's discuss the topic of timeouts. In Java, each reading and writing I/O call might block. How to deal with this? The following design decision clearly states it.
 
 %%%% DD --> %%%%
 \DD{dd:426}
 {% Titel
-\LibName{} supports only reading timeouts, and this only for byte streams
+\LibName{} does not support any timeouts, neither reading nor writing
 }
 {% Kurzbeschreibung
-\COMPmedia{} only offers the possibility to configure timeouts in milliseconds for reading from byte streams.
+\COMPmedia{} does not offer the possibility to configure timeouts for any reading or writing actions, and likewise, it does not implement any measures to prevent these actions from blocking arbitrarily long
 }
 {% Begründung
-We assume that reading data from files takes a while and take into account that it might block. Reading data from files is, however, usually not a candidate for long or even any blocking. Althout using interruptible channels, file I/O might be interruptible after timeouts, it is not implemented due to its added complexity without much added value.
+Both for file or stream access, read and write operations, including determining where we are or truncation might or might not block. This is - unfortunately - OS and implementation dependent and cannot be predicted. It is possible and was tried to implement a parallel thread to execute the action against the medium and the main thread to monitor the time taken by the other thread and retrieve the result after a given timeout. While this is easily possible using Java's \texttt{Future}s, it is not so easy to really terminate the blocking action and its thread. In reality, on some OSs the action is really interruptible, on others it is not. This might also depend on the implementation. Thus, \LibName{} won't implement anything that would try to convince the user it can actually do it, leading also to increased complexity. Instead, the user must use his own mechanisms, i.e. an own custom \texttt{InputStream} implementation, using multithreading and monitoring of calls from the outside, or using implementation-specific timeouts such as for \texttt{SocketInputStream}.
 
-For \texttt{InputStream}s, like media streams or socket connections, however, blocking is a quite possible case. Thus timeouts when reading from byte streams are sometimes useful and \LibName{} offers to configure them for the \texttt{read} operation.
-
-Writing operations for byte streams are not supported according to \DesLink{dd:403}. Thus, in general, no timeouts are implemented for write operations.
+Furthermore, it is also problematic what state the medium is in after the timeout was detected. What shall the library or the user do with this implementation? Retry, fail, close and retry? There is not always an easy answer to it.
 }
 {% Nachteile
-Higher complexity for byte stream implementation.
+Users might need to write more custom code themselves, if they strictly require this for mediums they use.
 }
 %%%% <-- DD %%%%
 
@@ -1186,8 +1184,6 @@ The following table summarizes all further error situations when working with \C
 	\hline
 	End of medium during reading & Of course each medium has an end sometimes. When reading, this end can be reached. When writing, this is not actually possible - there, we assume that all output media virtually are unlimited. If there is no more memory for writing, \COMPmedia{} usually reacts with a \texttt{MediumAccessException} following an \texttt{IOException}. It cannot be requested from the calling code during reading, that it knows where the end of the input medium is. Reaching its end during reading can be an error, but it needs not - this depends on the current usage situation. The calling code thus must handle this depending on current context. & Because it is not necessarily an abnormal situation, a \texttt{EndOfMediumException} checked exception is thrown. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()} \\
 	\hline
-	Timeout during reading & A reading call fo the medium does not return after a configured timeout. & It is an abnormal situation, thus a \texttt{ReadTimedOutException} runtime exception is thrown. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()} \\
-	\hline
 	Write to read-only medium & The user-provided \IMedium{} implementation is read-only, thus it only allowes read access. & If the user nevertheless tries to write, this is an abnormal sitation and is signalled by a \texttt{ReadOnlyMediumException} runtime exception. & \IMediumStore{} \texttt{.flush()}, \IMediumStore{} \texttt{.insertData()}, \IMediumStore{} \texttt{.removeData()}, \IMediumStore{} \texttt{.replaceData()}\\
 	\hline
 	Consecutive write calls overlap & Concecutive calls to \texttt{removeData} or \texttt{replaceData} before a \texttt{flush} overlap in an invalid way (see \DesLink{dd:424} and \DesLink{dd:424a}) & Is acquitted with an \texttt{InvalidOverlappingWriteException} runtime exception. & \IMediumStore{} \texttt{.removeData()}, \IMediumStore{} \texttt{.replaceData()}\\
@@ -1255,7 +1251,7 @@ Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing
 	\item \texttt{close}: Close the medium for access. A closed medium cannot be used anymore.
 	\item \texttt{setCurrentPosition}: Sets the current position for the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} call. Is ignored for non-random-access media.
 	\item \texttt{getCurrentPosition}: gets the current position on the medium where the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} will be executed.
-	\item \texttt{read} at the current position: Read $n$ bytes from external medium by explicit access from the current position, return the bytes in a \texttt{ByteBuffer}. For byte stream media, the timeout mechanism according to \DesLink{dd:426} is implemented here. Advances the current position by the number of read bytes.
+	\item \texttt{read} at the current position: Read $n$ bytes from external medium by explicit access from the current position, return the bytes in a \texttt{ByteBuffer}. Advances the current position by the number of read bytes.
 	\item \texttt{write} at the current position: Writes $n$ bytes to the external medium at the current position passed in a \texttt{ByteBuffer}. Throws an exception for read-only media, especially for \texttt{InputStream}. Advances the current position by the number of read bytes.
         \item \texttt{truncate} to new end offset at the current position: Truncates the medium to end at the current position. Throws an exception for read-only media, especially for \texttt{InputStream}.
 	\item \texttt{isAtEndOfMedium}: Check if the current position is at end of the \TERMmedium{}.
@@ -1274,13 +1270,6 @@ Regarding the offset handling for read: This is necessary to ensure readable and
 No disadvantages known
 }
 %%%% <-- DD %%%%
-
-We have to also investigate a bit futher on read timeouts. In \DesLink{dd:426}, we decided to offer timeouts for the \texttt{read} operation. The question is: How is it done and what are the drawbacks?
-
-TODO: Hier weiter - 
-1. Designentscheidung, dass ein weiterer Thread nötig ist und ein Future genutzt wird, sowie dass partielle Daten zurückgeliefert werden.
-2. Designentscheidung, dass versucht wird, den laufenden Thread zu ``interrupten'' + den Stream zu schließen und er dann erneut geöffnet wird (was zu Datenverlust führen kann)
-3. Designentscheidung: Es muss explizit auf die Nachteile des read timeouts (Perf. Overhead, schwieriges Beenden der Threads auf manchen Plattformen) in der Doku hingewiesen werden + gute Alternativen (direkte Socket timeouts auf SocketInputStreams etc.)
 
 % -------------------------------------------------------------------------------------------------------
 \subsubsection{Management of \IMediumReference{} instances}%
@@ -1886,8 +1875,6 @@ Now the question arises: Which configuration parameters are needed? Those listed
 	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_SIZE} & long $> 0$ & Long \texttt{.MAX\_VALUE} & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
 	\texttt{File}, \texttt{byte}-Array & \texttt{MAX\_WRITE\_BLOCK\_SIZE} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
-	\hline
-	\texttt{InputStream} & \texttt{READ\_TIMEOUT\_MILLIS} & int $> 0$ & Integer \texttt{.MAX\_VALUE} & The maximum read timeout for \texttt{InputStream}s according to \DesLink{dd:426}, in milliseconds. \\
 	\hline
 \caption{Configuration parameters of the component \COMPmedia{}}
 \label{tab:ConfigMedia}

@@ -37,9 +37,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     *           The {@link AbstractMedium} this class works on.
     */
    public FileMediumAccessor(FileMedium medium) {
-
       super(medium);
-      lockMedium();
    }
 
    /**
@@ -53,27 +51,29 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
-    */
-   @Override
-   protected void mediumSpecificClose() throws IOException {
-
-      unlockMedium();
-
-      fileChannel.close();
-   }
-
-   /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificOpen()
     */
    @Override
-   protected void mediumSpecificOpen() throws Exception {
+   protected void mediumSpecificOpen() throws IOException {
+
       if (getMedium().isReadOnly()) {
          fileChannel = FileChannel.open(getMedium().getWrappedMedium(), StandardOpenOption.READ);
       } else {
          fileChannel = FileChannel.open(getMedium().getWrappedMedium(), StandardOpenOption.READ,
             StandardOpenOption.WRITE);
+
+         lockMedium();
       }
+   }
+
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
+    */
+   @Override
+   protected void mediumSpecificClose() throws IOException {
+      unlockMedium();
+
+      fileChannel.close();
    }
 
    /**
@@ -94,7 +94,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
 
-            setCurrentPositionInternal(readOffsetRef.advance(bytesRead));
+            updateCurrentPosition(readOffsetRef.advance(bytesRead));
 
             throw new EndOfMediumException(bytesRead, readOffsetRef, size);
          }
@@ -102,14 +102,14 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
          bytesRead += returnCode;
       }
 
-      setCurrentPositionInternal(getCurrentPosition().advance(bytesRead));
+      updateCurrentPosition(getCurrentPosition().advance(bytesRead));
    }
 
    /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificWrite(ByteBuffer buffer) throws Exception {
+   protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
 
       int bytesWritten = 0;
 
@@ -117,16 +117,26 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
          bytesWritten += fileChannel.write(buffer, getCurrentPosition().getAbsoluteMediumOffset() + bytesWritten);
       }
 
-      setCurrentPositionInternal(getCurrentPosition().advance(bytesWritten));
+      updateCurrentPosition(getCurrentPosition().advance(bytesWritten));
    }
 
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificTruncate()
+    */
    @Override
-   protected void mediumSpecificTruncate() {
-      try {
-         fileChannel.truncate(getCurrentPosition().getAbsoluteMediumOffset());
-      } catch (IOException e) {
-         throw new MediumAccessException("Could not truncate medium due to exception", e);
-      }
+   protected void mediumSpecificTruncate() throws IOException {
+      fileChannel.truncate(getCurrentPosition().getAbsoluteMediumOffset());
+   }
+
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(de.je.jmeta.media.api.IMediumReference)
+    */
+   @Override
+   protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {
+      Reject.ifTrue(position.getAbsoluteMediumOffset() > getMedium().getCurrentLength(),
+         "position.getAbsoluteMediumOffset() > getMedium().getCurrentLength()");
+
+      updateCurrentPosition(position);
    }
 
    /**
@@ -134,20 +144,18 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     */
    private void lockMedium() {
 
-      if (!getMedium().isReadOnly()) {
+      try {
          // Using lock() instead blocks on Windows if a lock is already held
-         try {
-            lock = fileChannel.tryLock();
-         } catch (IOException e) {
-            throw new MediumAccessException("Could not lock medium due to exception", e);
-         } catch (OverlappingFileLockException e) {
-            throw new MediumAccessException("File is already locked in this JVM", e);
-         }
-
-         // Another process has locked the file already
-         if (lock == null)
-            throw new MediumAccessException("File is already locked by another process", null);
+         lock = fileChannel.tryLock();
+      } catch (IOException e) {
+         throw new MediumAccessException("Could not lock medium due to exception", e);
+      } catch (OverlappingFileLockException e) {
+         throw new MediumAccessException("File is already locked in this JVM", e);
       }
+
+      // Another process has locked the file already
+      if (lock == null)
+         throw new MediumAccessException("File is already locked by another process", null);
    }
 
    /**

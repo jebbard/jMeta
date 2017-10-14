@@ -23,13 +23,6 @@ import de.je.util.javautil.common.err.Reject;
  */
 public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedium> {
 
-   // /**
-   // * The default timeout value used for this {@link StreamMediumAccessor} in milliseconds.
-   // */
-   // // TODO stage2_008: Reset this to 1000 (1 second) as soon as datablock test
-   // // cases run again
-   // public static final int DEFAULT_TIMEOUT_MILLIS = InputStreamMedium.NO_TIMEOUT;
-
    private static final ByteBuffer SINGLE_BYTE_BUFFER = ByteBuffer.allocate(1);
 
    private PushbackInputStream inputStream;
@@ -38,10 +31,9 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
     * Creates a new {@link StreamMediumAccessor}.
     * 
     * @param medium
-    *           The {@link InputStreamMedium} this class works on.
+    *           The {@link InputStreamMedium} this class works on
     */
    public StreamMediumAccessor(InputStreamMedium medium) {
-
       super(medium);
    }
 
@@ -87,21 +79,19 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
-    */
-   @Override
-   protected void mediumSpecificClose() throws Exception {
-
-      inputStream.close();
-   }
-
-   /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificOpen()
     */
    @Override
-   protected void mediumSpecificOpen() throws Exception {
-
+   protected void mediumSpecificOpen() throws IOException {
       inputStream = new PushbackInputStream(getMedium().getWrappedMedium());
+   }
+
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
+    */
+   @Override
+   protected void mediumSpecificClose() throws IOException {
+      inputStream.close();
    }
 
    /**
@@ -110,32 +100,37 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
 
-      if (getMedium().getReadTimeout() == InputStreamMedium.NO_TIMEOUT)
+      if (getMedium().getReadTimeout() == InputStreamMedium.NO_TIMEOUT) {
          readWithoutTimeout(getCurrentPosition(), buffer);
+      }
 
-      else
+      else {
          timedOutRead(getCurrentPosition(), buffer);
+      }
    }
 
    /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificWrite(ByteBuffer buffer) throws Exception {
-
+   protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
       // do nothing as this is a read-only class
    }
 
-   // /**
-   // * The default timeout value used for this {@link StreamMediumAccessor} in milliseconds.
-   // */
-   // // TODO stage2_008: Reset this to 1000 (1 second) as soon as datablock test
-   // // cases run again
-   // public static final int DEFAULT_TIMEOUT_MILLIS = InputStreamMedium.NO_TIMEOUT;
-
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificTruncate()
+    */
    @Override
    protected void mediumSpecificTruncate() {
       // Not implemented
+   }
+
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(de.je.jmeta.media.api.IMediumReference)
+    */
+   @Override
+   protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {
+      // Does nothing
    }
 
    /**
@@ -165,7 +160,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
 
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
-            setCurrentPositionInternal(getCurrentPosition().advance(bytesRead));
+            updateCurrentPosition(getCurrentPosition().advance(bytesRead));
             throw new EndOfMediumException(bytesRead, reference, size);
          }
 
@@ -174,7 +169,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
          buffer.put(byteBuffer, buffer.position(), bytesRead);
       }
 
-      setCurrentPositionInternal(getCurrentPosition().advance(bytesRead));
+      updateCurrentPosition(getCurrentPosition().advance(bytesRead));
    }
 
    /**

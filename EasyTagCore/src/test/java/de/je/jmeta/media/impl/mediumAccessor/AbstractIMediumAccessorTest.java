@@ -37,7 +37,7 @@ import de.je.util.javautil.testUtil.setup.TestDataException;
 public abstract class AbstractIMediumAccessorTest {
 
    /**
-    * {@link ReadTestData} summarizes offset and size of test data for tests of reading and writing.
+    * {@link ReadTestData} summarizes offset and size of test data for tests of reading.
     */
    protected static class ReadTestData {
 
@@ -357,7 +357,8 @@ public abstract class AbstractIMediumAccessorTest {
     *           The {@link ReadTestData} to use.
     * @return The {@link ByteBuffer} of data read, returned by {@link IMediumAccessor#read(ByteBuffer)}
     */
-   protected static ByteBuffer performReadNoEOMExpected(IMediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
+   protected static ByteBuffer performReadNoEOMExpected(IMediumAccessor<?> mediumAccessor,
+      ReadTestData readTestData) {
       ByteBuffer readContent = ByteBuffer.allocate(readTestData.sizeToRead);
 
       mediumAccessor.setCurrentPosition(createReference(mediumAccessor.getMedium(), readTestData.offsetToRead));
@@ -391,9 +392,11 @@ public abstract class AbstractIMediumAccessorTest {
    protected abstract List<ReadTestData> getReadTestDataToUse();
 
    /**
-    * Returns a {@link ReadTestData} instance ranging from a specific offset until exactly the last byte of the medium.
+    * Returns a {@link ReadTestData} instance ranging from a specific offset until exactly the last byte of the
+    * medium.
     * 
-    * @return a {@link ReadTestData} instance ranging from a specific offset until exactly the last byte of the medium.
+    * @return a {@link ReadTestData} instance ranging from a specific offset until exactly the last byte of the
+    *         medium.
     */
    protected abstract ReadTestData getReadTestDataUntilEndOfMedium();
 

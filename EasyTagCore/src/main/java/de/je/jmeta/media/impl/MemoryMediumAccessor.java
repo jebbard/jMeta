@@ -22,46 +22,42 @@ import de.je.util.javautil.common.err.Reject;
  */
 public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium> {
 
-   @Override
-   protected void mediumSpecificTruncate() {
-      int newSize = (int) getCurrentPosition().getAbsoluteMediumOffset();
-
-      byte[] newBytes = EnhancedArrays.copyOfRange(memory, 0, newSize);
-
-      memory = newBytes;
-      getMedium().setBytes(newBytes);
-
-   }
-
    private byte[] memory;
 
    /**
     * Creates a new {@link MemoryMediumAccessor}.
     * 
     * @param medium
-    *           The {@link AbstractMedium} this class works on.
+    *           The {@link AbstractMedium} this class works on
     */
    public MemoryMediumAccessor(InMemoryMedium medium) {
-
       super(medium);
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
+    * @see de.je.jmeta.media.impl.IMediumAccessor#isAtEndOfMedium(de.je.jmeta.media.api.IMediumReference)
     */
    @Override
-   protected void mediumSpecificClose() throws Exception {
+   public boolean isAtEndOfMedium() {
+      Reject.ifFalse(isOpened(), "isOpened()");
 
-      memory = null;
+      return getCurrentPosition().getAbsoluteMediumOffset() >= getMedium().getCurrentLength();
    }
 
    /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificOpen()
     */
    @Override
-   protected void mediumSpecificOpen() throws Exception {
-
+   protected void mediumSpecificOpen() throws IOException {
       memory = getMedium().getWrappedMedium();
+   }
+
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
+    */
+   @Override
+   protected void mediumSpecificClose() {
+      memory = null;
    }
 
    /**
@@ -92,25 +88,24 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
 
       if (readBeyondEOF) {
          buffer.limit(initialPosition + bytesReallyRead);
-         setCurrentPositionInternal(currentPosition.advance(bytesReallyRead));
+         updateCurrentPosition(currentPosition.advance(bytesReallyRead));
          throw new EndOfMediumException(bytesReallyRead, currentPosition, bytesToRead);
       }
 
-      setCurrentPositionInternal(currentPosition.advance(bytesReallyRead));
+      updateCurrentPosition(currentPosition.advance(bytesReallyRead));
    }
 
    /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificWrite(ByteBuffer buffer) throws Exception {
+   protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
 
       final int bytesToWrite = buffer.remaining();
 
       final byte[] bytes = (buffer.hasArray() ? buffer.array() : new byte[bytesToWrite]);
 
-      // TODO handle case of too big offset!
-
+      // Note: setCurrentPosition prevents offsets bigger than Integert.MAX_VALUE
       int absoluteMediumOffset = (int) getCurrentPosition().getAbsoluteMediumOffset();
 
       if (absoluteMediumOffset + bytes.length >= memory.length) {
@@ -124,16 +119,31 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
 
       buffer.position(buffer.limit());
 
-      setCurrentPositionInternal(getCurrentPosition().advance(bytesToWrite));
+      updateCurrentPosition(getCurrentPosition().advance(bytesToWrite));
    }
 
    /**
-    * @see de.je.jmeta.media.impl.IMediumAccessor#isAtEndOfMedium(de.je.jmeta.media.api.IMediumReference)
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificTruncate()
     */
    @Override
-   public boolean isAtEndOfMedium() {
-      Reject.ifFalse(isOpened(), "isOpened()");
+   protected void mediumSpecificTruncate() {
+      int newSize = (int) getCurrentPosition().getAbsoluteMediumOffset();
 
-      return getCurrentPosition().getAbsoluteMediumOffset() >= getMedium().getCurrentLength();
+      byte[] newBytes = EnhancedArrays.copyOfRange(memory, 0, newSize);
+
+      memory = newBytes;
+      getMedium().setBytes(newBytes);
+
+   }
+
+   /**
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(de.je.jmeta.media.api.IMediumReference)
+    */
+   @Override
+   protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {
+      Reject.ifTrue(position.getAbsoluteMediumOffset() > getMedium().getCurrentLength(),
+         "position.getAbsoluteMediumOffset() > getMedium().getCurrentLength()");
+
+      updateCurrentPosition(position);
    }
 }
