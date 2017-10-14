@@ -447,26 +447,6 @@ The implementation of \COMPmedia{} gets more complex due to corresponding case d
 
 
 %%%% DD --> %%%%
-\DD{dd:411d}
-{% Titel
-The \COMPmedia{} API allows the skipping of bytes for \texttt{InputStream}s. Skipping can be explicitly enabled for read-ahead.
-}
-{% Kurzbeschreibung
-Bytes needs not necessarily be read and delivered to the user. Instead, skipping is possible via \texttt{skip}. For \texttt{InputStream}s, skipping is a built-in functionality. For random-access media, skipping is not needed. Skipped data will not be read into a cache, but actually discarded.
-
-Secondly, the user can enable that whenever a higher offset is read on an \texttt{InputStream}, all bytes between the last read byte and the requested offset are either read into the cache or skipped, i.e. not read into the cache.
-}
-{% Begründung
-The user can explicitly skip data that is not needed and can be ignored.
-
-Second motivation is that \DesLink{dd:411b} in case of \texttt{InputStream}s makes it necessary to read a big number of bytes in case of reading data from higher offsets (i.e. areas that were not read yet) to finally get to the demanded offset were actual reading is to start. That of course might bloat the cache: E.g. assume current offset is 0, and the user wants to read 100 bytes starting from offset 1000. What to be done with the bytes between offsets 0 and 1000? According to \DesLink{dd:411b}, these bytes must be read into the cache. However, with skipping, there would be a second possible alternative.
-}
-{% Nachteile
-No disadvantages known
-}
-%%%% <-- DD %%%%
-
-%%%% DD --> %%%%
 \DD{dd:411e}
 {% Titel
 The user can set the maximum size of the cache per medium, the cache keeps only the newest added data
@@ -488,7 +468,7 @@ No disadvantages known
 Performance drawbacks of \texttt{InputStream}s are explicitly documented
 }
 {% Kurzbeschreibung
-Reducing differences between \texttt{InputStream}s and files by caching in accordance to \DesLink{dd:411b} means: You must deal with the fact that you cannot store virtually unlimited \texttt{InputStream}s in a cache. For file access, the user can also choose between \texttt{FileInputStream} and more direct access via \texttt{RandomAccessFile}s. The performance drawbacks induced by using \texttt{FileInputStream} compared to  random-access \-- which are introduced by a unified API according to \DesLink{dd:411b} \-- are explicity described in the \LibName{} documentation. The mitigation mechanisms (skipping of bytes, setting maximum cache size, disabling caching) are explicitly described with their corresponding consequences.
+Reducing differences between \texttt{InputStream}s and files by caching in accordance to \DesLink{dd:411b} means: You must deal with the fact that you cannot store virtually unlimited \texttt{InputStream}s in a cache. For file access, the user can also choose between \texttt{FileInputStream} and more direct access via \texttt{RandomAccessFile}s. The performance drawbacks induced by using \texttt{FileInputStream} compared to  random-access \-- which are introduced by a unified API according to \DesLink{dd:411b} \-- are explicity described in the \LibName{} documentation. The mitigation mechanisms (setting maximum cache size, disabling caching) are explicitly described with their corresponding consequences.
 }
 {% Begründung
 There are no wrong expectations by providing the unified API. The contract is described clearly enoughto the user. He must choose the medium best suited for his purpose.
@@ -517,9 +497,29 @@ No disadvantages known
 After these results, the disadvantages previously listed in table \hyperref[tab:CachingProCon]{\ref{tab:CachingProCon}} and in \DesLink{dd:411} need a closing look:
 \begin{itemize}
 \item Code Complexity: The higher code complexity cannot be disregarded. You have to accept it when implementing a permanent caching. It implies you need very good unit and integration tests to ensure it works as expected.
-\item More Heap Memory: It is usual to achieve a better runtime performance by increasing the memory footprint. So it is here. To nevertheless avoid \texttt{OutOfMemoryError}s, we have defined \DesLink{dd:411c}, \DesLink{dd:411d} and \DesLink{dd:411e} and thus give enough room for the user to avoid these situations.
+\item More Heap Memory: It is usual to achieve a better runtime performance by increasing the memory footprint. So it is here. To nevertheless avoid \texttt{OutOfMemoryError}s, we have defined \DesLink{dd:411c} and \DesLink{dd:411e} and thus give enough room for the user to avoid these situations.
 \item Data Corruption due to Out-Of-Synch Medium: The cache might receive updates that are not yet persisted on the external medium, as explicitly allowed by  \DesLink{dd:410}. A problem might arise due to changes by other processes or threads. These cannot be handeled in a general way by \LibName{}. Thus we have introduced the locking of media in \DesLink{dd:404}. Even this cannot give a full protection for some OSs. The user is in any case informed about irresolvabe inconsistencies by a runtime exception.
 \end{itemize}
+
+Finally, we want to list a design decision rejected during a proof of concept, which was to provide a mechanism of skipping bytes for \texttt{InputStream}s instead of reading them into the cache, here is why:
+
+%%%% DD --> %%%%
+\DD{dd:411d}
+{% Titel
+The \COMPmedia{} API does not provide the option to skip bytes of an \texttt{InputStream}s instead of reading them into the cache.
+}
+{% Kurzbeschreibung
+It sounds like a good idea to offer the configurable possibility to skip bytes from an \texttt{InputStream} instead of unnecessarily read them (and put them into a cache). This mainly applies for the case when you are currently at offset $x$, but now you want to read bytes from the stream starting at offset $x+100$. You might never want to access the bytes between $x$ and $x+100$. So it would be worthwile to allow the possibility to simply skip them instead of reading them into memory and into the cache.
+
+However, \texttt{InputStream.skip} is not as straightforward as one could wish. It does not guarantee to skip the number of bytes given, but it might skip fewer bytes or even return a negative number. It might also throw an \texttt{IOException}, which might or might not include the case of reaching the end of medium. Although not specified, there might be the same behavior as for read, that \texttt{InputStream.skip} might block. Furthermore the javadocs specify that it is only supported for streams that support seeking. All in all, this gives the impression that the method is highly platform and implementation-dependent. How to bring this implementation into a reliable form that guarantees to always skip the given number of bytes or block (possibly with timeout)?
+}
+{% Begründung
+It is too complex to implement the method reliably, thus we omit it and only offer the possibility to read ahead until a given offset. All bytes read are possibly read into the cache. However, the cache is ``self-cleaning'' if a maximum size is configured. This mechanism should be sufficient for achieving a moderate heap usage.
+}
+{% Nachteile
+Probably more heap usage and bytes might be unnecessary read and kept in memory.
+}
+%%%% <-- DD %%%%
 
 Implementing the discussed caching mechanisms is a big challenge. It will be more detailed in the implementation part of this component. Here, we can only exclude one way of implementing it:
 
@@ -666,7 +666,11 @@ Let's discuss the topic of timeouts. In Java, each reading and writing I/O call 
 \COMPmedia{} only offers the possibility to configure timeouts in milliseconds for reading from byte streams.
 }
 {% Begründung
-We assume that reading data from files takes a while and take into account that it might block. Reading data from files is, however, usually not a candidate for long or even any blocking. As the implementation of a timeout mechanism can be quite complex, we avoid to to this for files. For \texttt{InputStream}s, like media streams or socket connections, however, blocking is a quite possible case. Thus timeouts when reading from byte streams are really useful and \LibName{} offers to configure them. Writing operations forr byte streams are not supported according to \DesLink{dd:403}.
+We assume that reading data from files takes a while and take into account that it might block. Reading data from files is, however, usually not a candidate for long or even any blocking. Althout using interruptible channels, file I/O might be interruptible after timeouts, it is not implemented due to its added complexity without much added value.
+
+For \texttt{InputStream}s, like media streams or socket connections, however, blocking is a quite possible case. Thus timeouts when reading from byte streams are sometimes useful and \LibName{} offers to configure them for the \texttt{read} operation.
+
+Writing operations for byte streams are not supported according to \DesLink{dd:403}. Thus, in general, no timeouts are implemented for write operations.
 }
 {% Nachteile
 Higher complexity for byte stream implementation.
@@ -1104,7 +1108,7 @@ No disadvantages known
 	\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} & \textbf{Features and motivation random-access} & \textbf{Features and motivation \texttt{InputStream}} \\
 	\endhead
 	\hline
-	\texttt{cache(x, n)} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. If caching is disabled, this call is ignored. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is smaller than the current highest read offset, a \texttt{InvalidMediumReferenceException} is thrown. Additionally: Is it bigger than the current highest read offset, the bytes up to the new offset are read or \emph{skip}ped (depending on current configuration). Afterwards the actually requested bytes are read. This ensures that all bytes are available in principle. The last read offset is advanced correspondingly. \\
+	\texttt{cache(x, n)} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. If caching is disabled, this call is ignored. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is smaller than the current highest read offset, a \texttt{InvalidMediumReferenceException} is thrown. Additionally: Is it bigger than the current highest read offset, the bytes up to the new offset are read. Afterwards the actually requested bytes are read. This ensures that all bytes are available in principle. The last read offset is advanced correspondingly. \\
 	\hline
 	\texttt{getCachedByteCountAt(x)} & According to \DesLink{dd:409} and \DesLink{dd:412b}, it provides the number of bytes that are consecutively cached at offset $x$. & See \texttt{cache()}. User code must be able to additionally check whether enough data is already buffered or not. & See random-access.\\
 	\hline
@@ -1113,8 +1117,6 @@ No disadvantages known
     	\texttt{getData(x, n, forceMediumAccess)} & Reads $n$ bytes at offset $x$ with the given mode (\texttt{forceMediumAccess} = \texttt{true} or \texttt{false}) according to \DesLink{dd:410c}, \DesLink{dd:412c}, \DesLink{dd:412d} & With \texttt{forceMediumAccess} = \texttt{false}: It first tries to read the data from the cache. If (partly) not available, the missing data is directly read from external medium. With \texttt{forceMediumAccess} = \texttt{true}: Data is always directly read from external medium, cache is ignored. In both cases, the cache will be updated with data newly read from external medium. Furthermore, only when caching is enabled, the method actually accesses the cache, in both cases. & \texttt{forceMediumAccess} is ignored. If there is data for the given offset with the given size in the cache, the data is returned. If it is not, a \texttt{InvalidMediumReferenceException} is thrown. Thus, for \texttt{InputStream}s, a call to \texttt{cache()} is mandatory before reading can actually start. \\
 	\hline
 	\texttt{isAtEndOfMedium(x)} & Checks if offset $x$ is at the end of the \TERMmedium{}. & Based on this knowledge, the user code can skip further reading and does not need to check for exceptions. & The provided offset is ignored, it is tried to read bytes from current offset. Is this resulting in return code -1, we are at the end of the stream, otherwise the byte is added to the cache. \\
-	\hline
-	\texttt{skip(n)} & Skips $n$ bytes according to \DesLink{dd:411d} & Simply does nothing, as skipping does not give any advantages here. & Skips $n$ bytes by calling \texttt{InputStream.skip(n)}. It allows users to ignore unimportant bytes explicitly, to e.g. save memory when caching is active. The last read offset is advanced correspondingly. \\	
 	\hline
 	\texttt{insertData(x, data)} & Implements the writing operation \emph{insert} according to \DesLink{dd:410}, \DesLink{dd:410d} and  \DesLink{dd:422}: Adds data at the given offset $x$, consecutive bytes are shifted ``to the back'', the changes first get written only with \texttt{flush()}. & The insertion of new metadata is a common case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
 	\hline
@@ -1251,11 +1253,10 @@ Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing
 	\item \texttt{Open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}). It is an implicit operation directly executed with the constructor call.
 	\item \texttt{IsOpened}: Check if the medium is opened.
 	\item \texttt{Close}: Close the medium for access. A closed medium cannot be used anymore.
-	\item \texttt{Read} from offset $x$: Read $n$ bytes from external medium by explicit access, return the bytes in a \texttt{ByteBuffer}, the offset $x$ is ignored for non-random-access media. For byte stream media, the timeout mechanism according to \DesLink{dd:426} is implemented here.
-	\item \texttt{Write} to offset $x$: Writes $n$ bytes to the external medium at a given offset $x$, passed in a \texttt{ByteBuffer}. Not implemented for \texttt{InputStream} media (the call is ignored)
-        \item \texttt{Truncate} to length $n$: Truncates the medium to a new length $n$. Not implemented for \texttt{InputStream} media (the call is ignored).
+	\item \texttt{Read} from offset $x$: Read $n$ bytes from external medium by explicit access, return the bytes in a \texttt{ByteBuffer}. For non-random-access media, it is only allowed to provide a constant as parameter that indicates ``next bytes, offset-independent''. For random-access media, an arbitrary valid offset $x$ can be passed. For byte stream media, the timeout mechanism according to \DesLink{dd:426} is implemented here.
+	\item \texttt{Write} to offset $x$: Writes $n$ bytes to the external medium at a given offset $x$, passed in a \texttt{ByteBuffer}. Throws an exception for read-only media, especially for \texttt{InputStream}.
+        \item \texttt{Truncate} to new end offset $x$: Truncates the medium to end at the new end offset $x$. Throws an exception for read-only media, especially for \texttt{InputStream}.
 	\item \texttt{IsAtEndOfMedium}: Check given offset $x$ is at end of the \TERMmedium{}. $x$ is ignored for non-random-access media.
-	\item \texttt{Skip} $n$ bytes: Skips $n$ bytes according to \DesLink{dd:411d}. For random-access media, it does not do anything, the call is ignored.
 \end{itemize}
 
 There is one implementation of this interface for each distinct \TERMmedium{} type.
@@ -1264,12 +1265,20 @@ There is one implementation of this interface for each distinct \TERMmedium{} ty
 }
 {% Begründung
 \IMediumStore{} itself can deal with caching and the complex implementation of writing functionality independently from the concrete medium, while the actual medium access can be abstracted away by concrete implementations generically. Classical separation of concerns to increase maintainability and comprehensibility of the solution.
+
+Regarding the offset handling for read: This is necessary to ensure readable and non-confusing use for non-random-access media. In that way, the user does not assume the medium is actually read-only.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
+We have to also investigate a bit futher on read timeouts. In \DesLink{dd:426}, we decided to offer timeouts for the \texttt{read} operation. The question is: How is it done and what are the drawbacks?
+
+TODO: Hier weiter - 
+1. Designentscheidung, dass ein weiterer Thread nötig ist und ein Future genutzt wird, sowie dass partielle Daten zurückgeliefert werden.
+2. Designentscheidung, dass versucht wird, den laufenden Thread zu ``interrupten'' + den Stream zu schließen und er dann erneut geöffnet wird (was zu Datenverlust führen kann)
+3. Designentscheidung: Es muss explizit auf die Nachteile des read timeouts (Perf. Overhead, schwieriges Beenden der Threads auf manchen Plattformen) in der Doku hingewiesen werden + gute Alternativen (direkte Socket timeouts auf SocketInputStreams etc.)
 
 % -------------------------------------------------------------------------------------------------------
 \subsubsection{Management of \IMediumReference{} instances}%
@@ -1875,8 +1884,6 @@ Now the question arises: Which configuration parameters are needed? Those listed
 	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_SIZE} & long $> 0$ & Long \texttt{.MAX\_VALUE} & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
 	\texttt{File}, \texttt{byte}-Array & \texttt{MAX\_WRITE\_BLOCK\_SIZE} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
-	\hline
-	\texttt{InputStream} & \texttt{SKIP\_ON\_FORWARD\_READ} & boolean & \texttt{false} & When calling \IMediumStore{}\texttt{.cache()} for an \texttt{InputStream} with a previously not read offset, a value of \texttt{false} means that all in-between bytes, i.e. the bytes between current and given offset, are read into the cache. If \texttt{true}, \IMediumStore{}\texttt{.skip()} is used in contrast, i.e. those bytes will be discarded and not be reachable anymore. Compare \DesLink{dd:411d} and the description of cache() in \hyperref[tab:MediaOps]{\ref{tab:MediaOps}}. \\
 	\hline
 	\texttt{InputStream} & \texttt{READ\_TIMEOUT\_MILLIS} & int $> 0$ & Integer \texttt{.MAX\_VALUE} & The maximum read timeout for \texttt{InputStream}s according to \DesLink{dd:426}, in milliseconds. \\
 	\hline

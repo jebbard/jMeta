@@ -15,6 +15,7 @@ import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
+import de.je.jmeta.media.api.exception.ReadOnlyMediumException;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 
@@ -49,6 +50,12 @@ import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
  *           The type of {@link IMedium}
  */
 public interface IMediumAccessor<T extends IMedium<?>> {
+
+   /**
+    * This constant MUST be used for all calls to {@link #read(IMediumReference, ByteBuffer)} for non-random-access
+    * media.
+    */
+   public final static IMediumReference NEXT_BYTES = null;
 
    /**
     * Closes this {@link IMediumAccessor}. All access methods cannot be used if the {@link IMediumAccessor} is closed.
@@ -94,10 +101,11 @@ public interface IMediumAccessor<T extends IMedium<?>> {
     * their influence on read behavior.
     * 
     * @param reference
-    *           The {@link IMediumReference} to read the data from the {@link IMedium}. Must not exceed current
-    *           {@link IMedium} length. The value of this parameter is ignored if this is not a random-access
-    *           {@link IMediumAccessor}. In this case, the read is done from the current position of the {@link IMedium}
-    *           . Must refer to the same {@link IMedium} as this {@link IMediumAccessor}.
+    *           The {@link IMediumReference} to read the data from the {@link IMedium}. For random-access media, it must
+    *           not be null and it must not exceed current {@link IMedium} length. The value of this parameter must be
+    *           {@link #NEXT_BYTES} if this is not a random-access {@link IMediumAccessor}. In this case, the read is
+    *           done from the current position of the {@link IMedium} . Must refer to the same {@link IMedium} as this
+    *           {@link IMediumAccessor}.
     * @param buffer
     *           The {@link ByteBuffer} to be filled with read bytes. The buffer is filled starting with its current
     *           position up to its limit, i.e. the read byte count, at maximum, is buffer.remaining() at the moment of
@@ -151,4 +159,21 @@ public interface IMediumAccessor<T extends IMedium<?>> {
     * @post buffer.remaining() == 0
     */
    public void write(IMediumReference reference, ByteBuffer buffer);
+
+   /**
+    * Truncates the {@link IMedium} at the given {@link IMediumReference}. If the {@link IMediumReference} is behind the
+    * current end of the {@link IMedium}, nothing is changed for the {@link IMedium}. If the {@link IMediumReference} is
+    * before the current end {@link IMediumReference}, the {@link IMedium} is shortened to the new size, effectively
+    * truncating all previously contained bytes behind the new {@link IMediumReference}.
+    * 
+    * @param newEndOffset
+    *           The new end {@link IMediumReference} of the {@link IMedium}, must not be null and must refer to the same
+    *           {@link IMedium} as this {@link IMediumAccessor}.
+    * 
+    * @throws ReadOnlyMediumException
+    *            if the {@link IMedium} is read-only
+    * @throws MediumAccessException
+    *            in case of any errors during medium access
+    */
+   public void truncate(IMediumReference newEndOffset);
 }

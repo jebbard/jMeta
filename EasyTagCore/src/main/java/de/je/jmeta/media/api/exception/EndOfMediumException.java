@@ -41,7 +41,6 @@ public class EndOfMediumException extends Exception {
     */
    public EndOfMediumException(int bytesRead, IMediumReference mediumReference, int byteCountTriedToRead) {
 
-      Reject.ifNull(mediumReference, "mediumReference");
       Reject.ifNegative(bytesRead, "bytesRead");
       Reject.ifNegativeOrZero(byteCountTriedToRead, "byteCountTriedToRead");
 

@@ -89,28 +89,29 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doClose()
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
     */
    @Override
-   protected void doClose() throws Exception {
+   protected void mediumSpecificClose() throws Exception {
 
       inputStream.close();
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doOpen()
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificOpen()
     */
    @Override
-   protected void doOpen() throws Exception {
+   protected void mediumSpecificOpen() throws Exception {
 
       inputStream = new PushbackInputStream(getMedium().getWrappedMedium());
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doRead(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificRead(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doRead(IMediumReference reference, ByteBuffer buffer) throws IOException, EndOfMediumException {
+   protected void mediumSpecificRead(IMediumReference reference, ByteBuffer buffer)
+      throws IOException, EndOfMediumException {
 
       if (getMedium().getReadTimeout() == InputStreamMedium.NO_TIMEOUT)
          readWithoutTimeout(reference, buffer);
@@ -120,12 +121,24 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doWrite(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
+   protected void mediumSpecificWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
 
       // do nothing as this is a read-only class
+   }
+
+   // /**
+   // * The default timeout value used for this {@link StreamMediumAccessor} in milliseconds.
+   // */
+   // // TODO stage2_008: Reset this to 1000 (1 second) as soon as datablock test
+   // // cases run again
+   // public static final int DEFAULT_TIMEOUT_MILLIS = InputStreamMedium.NO_TIMEOUT;
+
+   @Override
+   protected void mediumSpecificTruncate(IMediumReference newEndOffset) {
+      // Not implemented
    }
 
    /**

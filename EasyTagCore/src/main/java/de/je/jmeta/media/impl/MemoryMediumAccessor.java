@@ -22,6 +22,17 @@ import de.je.util.javautil.common.err.Reject;
  */
 public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium> {
 
+   @Override
+   protected void mediumSpecificTruncate(IMediumReference newEndOffset) {
+      int newSize = (int) newEndOffset.getAbsoluteMediumOffset();
+
+      byte[] newBytes = EnhancedArrays.copyOfRange(memory, 0, newSize);
+
+      memory = newBytes;
+      getMedium().setBytes(newBytes);
+
+   }
+
    private byte[] memory;
 
    /**
@@ -36,28 +47,29 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doClose()
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificClose()
     */
    @Override
-   protected void doClose() throws Exception {
+   protected void mediumSpecificClose() throws Exception {
 
       memory = null;
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doOpen()
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificOpen()
     */
    @Override
-   protected void doOpen() throws Exception {
+   protected void mediumSpecificOpen() throws Exception {
 
       memory = getMedium().getWrappedMedium();
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doRead(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificRead(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doRead(IMediumReference reference, ByteBuffer buffer) throws IOException, EndOfMediumException {
+   protected void mediumSpecificRead(IMediumReference reference, ByteBuffer buffer)
+      throws IOException, EndOfMediumException {
 
       final int currentOffset = (int) reference.getAbsoluteMediumOffset();
       final int currentLength = (int) getMedium().getCurrentLength();
@@ -85,10 +97,10 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#doWrite(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void doWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
+   protected void mediumSpecificWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
 
       final int bytesToWrite = buffer.remaining();
 

@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.IMediumAccessor;
@@ -25,6 +27,26 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
 
    private InputStream testStream;
 
+   @Test
+   public void read_beforeEOMWithTimeoutIfFinishedBeforeTimeout_returnsAllDataAsExpected() {
+      // TODO implement
+   }
+
+   @Test
+   public void read_overEndOfMediumWithTimeoutIfFinishedBeforeTimeout_throwsEndOfMediumException() {
+      // TODO implement
+   }
+
+   @Test
+   public void read_beforeEndOfMediumWithTimeoutTimeOverButOnlyPartialDataRead_throwsExceptionTerminatesThreadAndReturnsPartialData() {
+      // TODO implement
+   }
+
+   @Test
+   public void read_beforeEndOfMediumWithTimeoutTimeOverNoDataRead_throwsExceptionTerminatesThreadAndReturnsNoData() {
+      // TODO implement
+   }
+
    /**
     * @see AbstractIMediumAccessorTest#getReadTestDataToUse()
     */
@@ -33,11 +55,11 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
 
       List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
 
-      readOffsetsAndSizes.add(new ReadTestData(16, 7, 0));
-      readOffsetsAndSizes.add(new ReadTestData(93, 157, 7));
-      readOffsetsAndSizes.add(new ReadTestData(610, 133, 164));
-      readOffsetsAndSizes.add(new ReadTestData(0, 17, 297));
-      readOffsetsAndSizes.add(new ReadTestData(211, 45, 314));
+      readOffsetsAndSizes.add(new ReadTestData(null, 7, 0));
+      readOffsetsAndSizes.add(new ReadTestData(null, 157, 7));
+      readOffsetsAndSizes.add(new ReadTestData(null, 133, 164));
+      readOffsetsAndSizes.add(new ReadTestData(null, 17, 297));
+      readOffsetsAndSizes.add(new ReadTestData(null, 45, 314));
 
       return readOffsetsAndSizes;
    }
@@ -47,7 +69,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(0, EXPECTED_FILE_CONTENTS.length);
+      return new ReadTestData(null, EXPECTED_FILE_CONTENTS.length);
    }
 
    /**

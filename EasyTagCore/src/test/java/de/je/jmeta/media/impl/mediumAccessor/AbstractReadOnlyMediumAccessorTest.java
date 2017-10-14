@@ -40,6 +40,18 @@ public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractIMedium
    }
 
    /**
+    * {@link IMediumAccessor#write(IMediumReference, java.nio.ByteBuffer)}
+    */
+   @Test(expected = ReadOnlyMediumException.class)
+   public void truncate_onReadOnlyMedium_throwsException() {
+
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      final IMediumReference newEndReference = createReference(mediumAccessor.getMedium(), 3);
+      mediumAccessor.truncate(newEndReference);
+   }
+
+   /**
     * @see de.je.jmeta.media.impl.mediumAccessor.AbstractIMediumAccessorTest#validateTestMedium(de.je.jmeta.media.api.IMedium)
     */
    @Override

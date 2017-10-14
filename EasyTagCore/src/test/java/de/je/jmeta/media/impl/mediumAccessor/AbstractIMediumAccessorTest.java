@@ -25,6 +25,7 @@ import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
+import de.je.jmeta.media.api.helper.TestMediumUtility;
 import de.je.jmeta.media.impl.IMediumAccessor;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
 import de.je.util.javautil.testUtil.setup.TestDataException;
@@ -48,8 +49,13 @@ public abstract class AbstractIMediumAccessorTest {
       /**
        * This constructor is used for testing random-access implementations, where the offset to read is actually
        * relevant and the bytes read are expected at the same offset.
+       * 
+       * @param offsetToRead
+       *           The offset to read bytes from, null to indicate {@link IMediumAccessor#NEXT_BYTES} for stream media.
+       * @param sizeToRead
+       *           The number of bytes to read.
        */
-      public ReadTestData(int offsetToRead, int sizeToRead) {
+      public ReadTestData(Integer offsetToRead, int sizeToRead) {
          this(offsetToRead, sizeToRead, offsetToRead);
       }
 
@@ -58,15 +64,15 @@ public abstract class AbstractIMediumAccessorTest {
        * what its value is, the bytes are read just sequentially. Thus, the offsetToRead might be arbitrary, while the
        * expected byte offsets are different.
        */
-      public ReadTestData(int offsetToRead, int sizeToRead, int expectedBytesOffset) {
+      public ReadTestData(Integer offsetToRead, int sizeToRead, Integer expectedBytesOffset) {
          this.offsetToRead = offsetToRead;
          this.sizeToRead = sizeToRead;
          this.expectedBytesOffset = expectedBytesOffset;
       }
 
-      private int offsetToRead;
+      private Integer offsetToRead;
       private int sizeToRead;
-      private int expectedBytesOffset;
+      private Integer expectedBytesOffset;
    }
 
    private IMediumAccessor<?> mediumAccessor;
@@ -164,10 +170,10 @@ public abstract class AbstractIMediumAccessorTest {
    }
 
    /**
-    * Tests the {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}.
+    * Tests {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}.
     */
    @Test
-   public void read_forGivenOffsetAndSize_returnsExpectedBytes() {
+   public void read_noTimeoutSetForGivenOffsetAndSize_returnsExpectedBytes() {
 
       final List<ReadTestData> readTestData = getReadTestDataToUse();
 
@@ -177,7 +183,7 @@ public abstract class AbstractIMediumAccessorTest {
       long mediumSizeBeforeRead = medium.getCurrentLength();
 
       for (ReadTestData readTestDataRecord : readTestData) {
-         ByteBuffer readContent = performReadNoEOFExpected(mediumAccessor, readTestDataRecord);
+         ByteBuffer readContent = performReadNoEOMExpected(mediumAccessor, readTestDataRecord);
 
          // Reads the correct contents
          assertEqualsFileContent(readContent, readTestDataRecord.expectedBytesOffset);
@@ -188,22 +194,23 @@ public abstract class AbstractIMediumAccessorTest {
    }
 
    /**
-    * Tests the {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}.
+    * Tests {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}.
     */
    @Test
-   public void read_untilEndOfMedium_throwsEndOfMediumException() {
+   public void read_noTimeoutSetUntilEndOfMedium_throwsEndOfMediumException() {
 
       ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
       IMediumAccessor<?> mediumAccessor = getImplementationToTest();
       IMedium<?> medium = mediumAccessor.getMedium();
 
-      int readOffset = readOverEndOfMedium.offsetToRead;
+      Integer readOffset = readOverEndOfMedium.offsetToRead;
       int readSize = readOverEndOfMedium.sizeToRead + 20;
 
       ByteBuffer readContent = ByteBuffer.allocate(readSize);
 
-      IMediumReference readReference = createReference(medium, readOffset);
+      IMediumReference readReference = readOffset == null ? IMediumAccessor.NEXT_BYTES
+         : createReference(medium, readOffset);
 
       try {
          mediumAccessor.read(readReference, readContent);
@@ -219,7 +226,7 @@ public abstract class AbstractIMediumAccessorTest {
    }
 
    /**
-    * Tests the {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}.
+    * Tests {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void read_onClosedMediumAccessor_throwsException() {
@@ -227,11 +234,27 @@ public abstract class AbstractIMediumAccessorTest {
 
       mediumAccessor.close();
 
-      performReadNoEOFExpected(mediumAccessor, new ReadTestData(0, 5));
+      performReadNoEOMExpected(mediumAccessor, new ReadTestData(0, 5));
    }
 
    /**
-    * Tests the {@link IMediumAccessor#isAtEndOfMedium(IMediumReference)}.
+    * Tests {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void read_forInvalidMediumReference_throwsException() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      try {
+         mediumAccessor.read(createReference(TestMediumUtility.DUMMY_UNRELATED_MEDIUM, 0), ByteBuffer.allocate(5));
+      }
+
+      catch (EndOfMediumException e) {
+         Assert.fail("Unexpected end of medium detected! Exception: " + e);
+      }
+   }
+
+   /**
+    * Tests {@link IMediumAccessor#isAtEndOfMedium(IMediumReference)}.
     */
    @Test
    public void isAtEndOfMedium_ifNotAtEndOfMedium_returnsFalse() {
@@ -254,7 +277,7 @@ public abstract class AbstractIMediumAccessorTest {
    }
 
    /**
-    * Tests the {@link IMediumAccessor#isAtEndOfMedium(IMediumReference)}.
+    * Tests {@link IMediumAccessor#isAtEndOfMedium(IMediumReference)}.
     */
    @Test
    public void isAtEndOfMedium_ifAtEndOfMedium_returnsTrue() {
@@ -265,7 +288,7 @@ public abstract class AbstractIMediumAccessorTest {
 
       // The explicit read is only really necessary for stream media, see a similar test case without read for
       // random-access media
-      performReadNoEOFExpected(mediumAccessor, readOverEndOfMedium);
+      performReadNoEOMExpected(mediumAccessor, readOverEndOfMedium);
 
       IMediumReference endOfMediumReference = createReference(mediumAccessor.getMedium(),
          readOverEndOfMedium.offsetToRead + readOverEndOfMedium.sizeToRead);
@@ -276,7 +299,7 @@ public abstract class AbstractIMediumAccessorTest {
    }
 
    /**
-    * Tests the {@link IMediumAccessor#isAtEndOfMedium(IMediumReference)}.
+    * Tests {@link IMediumAccessor#isAtEndOfMedium(IMediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void isAtEndOfMedium_onClosedMediumAccessor_throwsException() {
@@ -298,12 +321,12 @@ public abstract class AbstractIMediumAccessorTest {
     * @return The {@link ByteBuffer} of data read, returned by
     *         {@link IMediumAccessor#read(IMediumReference, ByteBuffer)}
     */
-   protected static ByteBuffer performReadNoEOFExpected(IMediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
+   protected static ByteBuffer performReadNoEOMExpected(IMediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
       ByteBuffer readContent = ByteBuffer.allocate(readTestData.sizeToRead);
 
       try {
-         mediumAccessor.read(createReference(mediumAccessor.getMedium(), (long) readTestData.offsetToRead),
-            readContent);
+         mediumAccessor.read(readTestData.offsetToRead == null ? IMediumAccessor.NEXT_BYTES
+            : createReference(mediumAccessor.getMedium(), (long) readTestData.offsetToRead), readContent);
       }
 
       catch (EndOfMediumException e) {

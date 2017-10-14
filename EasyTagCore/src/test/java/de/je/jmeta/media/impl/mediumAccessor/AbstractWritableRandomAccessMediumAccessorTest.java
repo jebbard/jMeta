@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import de.je.jmeta.media.api.IMedium;
 import de.je.jmeta.media.api.IMediumReference;
+import de.je.jmeta.media.api.helper.TestMediumUtility;
 import de.je.jmeta.media.impl.IMediumAccessor;
 import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
@@ -116,6 +117,98 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
+    * Tests the {@link IMediumAccessor#write(IMediumReference, ByteBuffer)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void write_forInvalidMediumReference_throwsException() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.write(createReference(TestMediumUtility.DUMMY_UNRELATED_MEDIUM, 0), ByteBuffer.allocate(5));
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)}.
+    */
+   @Test
+   public void truncate_toStrictlyPositiveLength_mediumBytesBehindReferenceAreGone() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      int newExpectedLength = 200;
+      testTruncate_mediumSizeChangesAndBytesBeforeAreUnchanged(mediumAccessor,
+         createReference(mediumAccessor.getMedium(), newExpectedLength), newExpectedLength);
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)}.
+    */
+   @Test
+   public void truncate_toOneByteSmallerLength_mediumBytesBehindReferenceAreGone() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      int newExpectedLength = EXPECTED_FILE_CONTENTS.length - 1;
+      testTruncate_mediumSizeChangesAndBytesBeforeAreUnchanged(mediumAccessor,
+         createReference(mediumAccessor.getMedium(), newExpectedLength), newExpectedLength);
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)}.
+    */
+   @Test
+   public void truncate_toZeroLength_noMediumBytesAnymore() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      int newExpectedLength = 0;
+      testTruncate_mediumSizeChangesAndBytesBeforeAreUnchanged(mediumAccessor,
+         createReference(mediumAccessor.getMedium(), newExpectedLength), newExpectedLength);
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)}.
+    */
+   @Test
+   public void truncate_toLengthBiggerThanCurrentLength_doesNotChangeTheMedium() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      testTruncate_mediumSizeChangesAndBytesBeforeAreUnchanged(mediumAccessor,
+         createReference(mediumAccessor.getMedium(), EXPECTED_FILE_CONTENTS.length + 100),
+         EXPECTED_FILE_CONTENTS.length);
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)}.
+    */
+   @Test
+   public void truncate_toExactlyCurrentLength_doesNotChangeTheMedium() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      int newExpectedLength = EXPECTED_FILE_CONTENTS.length;
+      testTruncate_mediumSizeChangesAndBytesBeforeAreUnchanged(mediumAccessor,
+         createReference(mediumAccessor.getMedium(), newExpectedLength), newExpectedLength);
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void truncate_onClosedMediumAccessor_throwsException() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.close();
+
+      mediumAccessor.truncate(createReference(mediumAccessor.getMedium(), 0));
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void truncate_forInvalidMediumReference_throwsException() {
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.truncate(createReference(TestMediumUtility.DUMMY_UNRELATED_MEDIUM, 0));
+   }
+
+   /**
     * @see de.je.jmeta.media.impl.mediumAccessor.AbstractIMediumAccessorTest#validateTestMedium(de.je.jmeta.media.api.IMedium)
     */
    @Override
@@ -126,6 +219,38 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       if (theMedium.isReadOnly()) {
          throw new TestDataException("The test IMedium must not be read-only", null);
+      }
+   }
+
+   /**
+    * Tests the {@link IMediumAccessor#truncate(IMediumReference)} method on the given {@link IMediumAccessor} and with
+    * the given truncate {@link IMediumReference}.
+    * 
+    * @param mediumAccessor
+    *           The {@link IMediumAccessor} to test
+    * @param truncateReference
+    *           The truncate {@link IMediumReference}
+    * @param expectedNewLength
+    *           The expected new {@link IMedium} length
+    */
+   private void testTruncate_mediumSizeChangesAndBytesBeforeAreUnchanged(IMediumAccessor<?> mediumAccessor,
+      IMediumReference truncateReference, long expectedNewLength) {
+
+      mediumAccessor.truncate(truncateReference);
+
+      Assert.assertEquals(expectedNewLength, mediumAccessor.getMedium().getCurrentLength());
+      Assert.assertTrue(mediumAccessor.isAtEndOfMedium(truncateReference));
+
+      IMediumReference mediumStartReference = createReference(mediumAccessor.getMedium(), 0);
+      IMediumReference mediumEndReference = createReference(mediumAccessor.getMedium(),
+         mediumAccessor.getMedium().getCurrentLength());
+
+      if (expectedNewLength > 0) {
+         if (mediumEndReference.before(truncateReference)) {
+            assertMediumDidNotChangeInRange(mediumAccessor, mediumStartReference, mediumEndReference);
+         } else {
+            assertMediumDidNotChangeInRange(mediumAccessor, mediumStartReference, truncateReference);
+         }
       }
    }
 
@@ -143,7 +268,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    private static void assertSameDataWrittenIsReadAgain(IMediumAccessor<?> mediumAccessor,
       IMediumReference writeReference, ByteBuffer dataWritten) {
 
-      ByteBuffer reread = performReadNoEOFExpected(mediumAccessor,
+      ByteBuffer reread = performReadNoEOMExpected(mediumAccessor,
          new ReadTestData((int) writeReference.getAbsoluteMediumOffset(), dataWritten.capacity()));
 
       // Reset position to zero
@@ -175,7 +300,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       ByteBuffer bytesExpected = ByteBuffer.wrap(expectedBytes);
 
-      ByteBuffer bytesRead = performReadNoEOFExpected(mediumAccessor,
+      ByteBuffer bytesRead = performReadNoEOMExpected(mediumAccessor,
          new ReadTestData((int) rangeStartReference.getAbsoluteMediumOffset(), sizeToRead));
 
       Assert.assertEquals(bytesExpected, bytesRead);
