@@ -55,26 +55,6 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
       Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
    }
 
-   @Test
-   public void read_beforeEOMWithTimeoutIfFinishedBeforeTimeout_returnsAllDataAsExpected() {
-      // TODO implement
-   }
-
-   @Test
-   public void read_overEndOfMediumWithTimeoutIfFinishedBeforeTimeout_throwsEndOfMediumException() {
-      // TODO implement
-   }
-
-   @Test
-   public void read_beforeEndOfMediumWithTimeoutTimeOverButOnlyPartialDataRead_throwsExceptionTerminatesThreadAndReturnsPartialData() {
-      // TODO implement
-   }
-
-   @Test
-   public void read_beforeEndOfMediumWithTimeoutTimeOverNoDataRead_throwsExceptionTerminatesThreadAndReturnsNoData() {
-      // TODO implement
-   }
-
    /**
     * @see AbstractIMediumAccessorTest#getReadTestDataToUse()
     */

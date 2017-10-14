@@ -15,7 +15,6 @@ import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.MediumAccessException;
-import de.je.jmeta.media.api.exception.ReadTimedOutException;
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -45,7 +44,27 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
       Reject.ifFalse(isOpened(), "isOpened()");
 
       try {
-         readWithoutTimeout(getCurrentPosition(), SINGLE_BYTE_BUFFER);
+         int bytesRead = 0;
+         int size = SINGLE_BYTE_BUFFER.remaining();
+         int initialPosition = SINGLE_BYTE_BUFFER.position();
+
+         byte[] byteBuffer = new byte[size];
+
+         while (bytesRead < size) {
+            int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
+
+            if (returnCode == -1) {
+               SINGLE_BYTE_BUFFER.limit(initialPosition + bytesRead);
+               updateCurrentPosition(getCurrentPosition().advance(bytesRead));
+               throw new EndOfMediumException(bytesRead, getCurrentPosition(), size);
+            }
+
+            bytesRead += returnCode;
+
+            SINGLE_BYTE_BUFFER.put(byteBuffer, SINGLE_BYTE_BUFFER.position(), bytesRead);
+         }
+
+         updateCurrentPosition(getCurrentPosition().advance(bytesRead));
       } catch (EndOfMediumException e) {
          assert e != null;
          return true;
@@ -99,14 +118,27 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
     */
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
+      int bytesRead = 0;
+      int size = buffer.remaining();
+      int initialPosition = buffer.position();
 
-      if (getMedium().getReadTimeout() == InputStreamMedium.NO_TIMEOUT) {
-         readWithoutTimeout(getCurrentPosition(), buffer);
+      byte[] byteBuffer = new byte[size];
+
+      while (bytesRead < size) {
+         int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
+
+         if (returnCode == -1) {
+            buffer.limit(initialPosition + bytesRead);
+            updateCurrentPosition(getCurrentPosition().advance(bytesRead));
+            throw new EndOfMediumException(bytesRead, getCurrentPosition(), size);
+         }
+
+         bytesRead += returnCode;
+
+         buffer.put(byteBuffer, buffer.position(), bytesRead);
       }
 
-      else {
-         timedOutRead(getCurrentPosition(), buffer);
-      }
+      updateCurrentPosition(getCurrentPosition().advance(bytesRead));
    }
 
    /**
@@ -131,114 +163,5 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    @Override
    protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {
       // Does nothing
-   }
-
-   /**
-    * This version of read is called whenever a read is requested without a set timeout value. This version has the
-    * possibility to hit end of medium, but it also may block forever wait for bytes to arrive.
-    * 
-    * @param reference
-    *           The {@link StandardMediumReference} to start reading at.
-    * @param buffer
-    *           The {@link ByteBuffer} to store bytes read. The method tries to read up to buffer.remaining() bytes.
-    * @throws IOException
-    *            If an I/O operation failed.
-    * @throws EndOfMediumException
-    *            If end of medium was hit during reading.
-    */
-   private void readWithoutTimeout(IMediumReference reference, ByteBuffer buffer)
-      throws IOException, EndOfMediumException {
-
-      int bytesRead = 0;
-      int size = buffer.remaining();
-      int initialPosition = buffer.position();
-
-      byte[] byteBuffer = new byte[size];
-
-      while (bytesRead < size) {
-         int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
-
-         if (returnCode == -1) {
-            buffer.limit(initialPosition + bytesRead);
-            updateCurrentPosition(getCurrentPosition().advance(bytesRead));
-            throw new EndOfMediumException(bytesRead, reference, size);
-         }
-
-         bytesRead += returnCode;
-
-         buffer.put(byteBuffer, buffer.position(), bytesRead);
-      }
-
-      updateCurrentPosition(getCurrentPosition().advance(bytesRead));
-   }
-
-   /**
-    * This version of read is called whenever a read is requested with a set timeout value. This version has the
-    * possibility to throw a {@link ReadTimedOutException} (i.e. to time out prematurely before reading the full number
-    * of bytes requested), but it may never hit end of medium.
-    * 
-    * @param reference
-    *           The {@link StandardMediumReference} to start reading at.
-    * @param buffer
-    *           The {@link ByteBuffer} to store bytes read. The method tries to read up to buffer.remaining() bytes.
-    * @throws IOException
-    *            If an I/O operation failed.
-    * @throws ReadTimedOutException
-    *            If reading timed out.
-    */
-   private void timedOutRead(IMediumReference reference, ByteBuffer buffer) throws IOException {
-
-      final int byteCount = buffer.remaining();
-      final int readTimeout = getMedium().getReadTimeout();
-      long sleepInterval = readTimeout > 1500 ? 250 : readTimeout / 4;
-      int initialPosition = buffer.position();
-
-      byte[] dataBuffer = new byte[byteCount];
-
-      long currentTime = System.currentTimeMillis();
-      long newTime = currentTime;
-
-      int bytesRead = 0;
-
-      while (newTime - currentTime < readTimeout && bytesRead < byteCount) {
-         final int availableBytes = inputStream.available();
-
-         if (availableBytes > 0) {
-            int bytesLeftForReading = byteCount - bytesRead;
-            int bytesToRead = availableBytes > bytesLeftForReading ? bytesLeftForReading : availableBytes;
-
-            int currentBytesRead = inputStream.read(dataBuffer, bytesRead, bytesToRead);
-
-            buffer.put(dataBuffer, bytesRead, currentBytesRead);
-
-            bytesRead += currentBytesRead;
-         }
-
-         // Only sleep if still more bytes need to be read
-         if (bytesRead < byteCount) {
-            final long timeLeft = readTimeout - newTime + currentTime;
-
-            if (timeLeft < sleepInterval)
-               sleepInterval = timeLeft;
-
-            try {
-               Thread.sleep(sleepInterval);
-            } catch (InterruptedException e) {
-               // Reassert interrupt.
-               Thread.currentThread().interrupt();
-               // TODO media002: Is this an adequate handling of interruption
-               // during sleeping?
-               throw new RuntimeException("Unexpected thread interruption", e);
-            }
-         }
-
-         newTime = System.currentTimeMillis();
-      }
-
-      // Loop terminated due to reached timeout
-      if (bytesRead < byteCount) {
-         buffer.limit(initialPosition + bytesRead);
-         throw new ReadTimedOutException(readTimeout, bytesRead, reference, byteCount);
-      }
    }
 }

@@ -21,8 +21,7 @@ import de.je.util.javautil.common.configparams.IConfigurable;
 /**
  * {@link InputStreamMediumConfigurableTest} checks the configuration of {@link InputStreamMedium}s.
  */
-public class InputStreamMediumConfigurableTest
-   extends AbstractConfigurableTest<EmptyEnum, EmptyEnum> {
+public class InputStreamMediumConfigurableTest extends AbstractConfigurableTest<EmptyEnum, EmptyEnum> {
 
    /**
     * @see de.je.util.javautil.common.configparams.AbstractConfigurableTest#getConfigurableInstance()
@@ -30,8 +29,7 @@ public class InputStreamMediumConfigurableTest
    @Override
    protected IConfigurable getConfigurableInstance() {
 
-      return new InputStreamMedium(
-         new ByteArrayInputStream(new byte[] { 1, 2, 3 }), null);
+      return new InputStreamMedium(new ByteArrayInputStream(new byte[] { 1, 2, 3 }), null);
    }
 
    /**
@@ -39,13 +37,10 @@ public class InputStreamMediumConfigurableTest
     */
    @SuppressWarnings("unchecked")
    @Override
-   protected <T extends Comparable<T>> T[] getValidValues(
-      AbstractConfigParam<T> param) {
+   protected <T extends Comparable<T>> T[] getValidValues(AbstractConfigParam<T> param) {
 
       if (param == InputStreamMedium.MAX_CACHE_REGION_SIZE) {
          return (T[]) new Integer[] { 8192, 1, Integer.MAX_VALUE, 10 };
-      } else if (param == InputStreamMedium.READ_TIMEOUT_MILLIS) {
-         return (T[]) new Integer[] { 8192, 0, 1, Integer.MAX_VALUE, 10 };
       } else if (param == InputStreamMedium.MAX_CACHE_SIZE) {
          return (T[]) new Long[] { 8192L, 1L, Long.MAX_VALUE, 10L };
       } else if (param == InputStreamMedium.ENABLE_CACHING) {
@@ -63,13 +58,10 @@ public class InputStreamMediumConfigurableTest
     */
    @SuppressWarnings("unchecked")
    @Override
-   protected <T extends Comparable<T>> T[] getInvalidValues(
-      AbstractConfigParam<T> param) {
+   protected <T extends Comparable<T>> T[] getInvalidValues(AbstractConfigParam<T> param) {
 
       if (param == InputStreamMedium.MAX_CACHE_REGION_SIZE) {
          return (T[]) new Integer[] { -1, -2, null };
-      } else if (param == InputStreamMedium.READ_TIMEOUT_MILLIS) {
-         return (T[]) new Integer[] { -8192, -1, Integer.MIN_VALUE };
       } else if (param == InputStreamMedium.MAX_CACHE_SIZE) {
          return (T[]) new Long[] { -8192L, 0L, -1L, null, };
       } else if (param == InputStreamMedium.ENABLE_CACHING) {
@@ -90,7 +82,6 @@ public class InputStreamMediumConfigurableTest
       Set<AbstractConfigParam<Integer>> intParams = new HashSet<>();
 
       intParams.add(InputStreamMedium.MAX_CACHE_REGION_SIZE);
-      intParams.add(InputStreamMedium.READ_TIMEOUT_MILLIS);
 
       return intParams;
    }
