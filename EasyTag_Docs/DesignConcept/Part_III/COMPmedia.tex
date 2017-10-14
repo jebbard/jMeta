@@ -1249,14 +1249,16 @@ Interface \IMediumAccessor{} with implementations for each \TERMmedia{} type acc
 {% Kurzbeschreibung
 Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing a great deal of ensuring \DesLink{dd:407}. It offest the following primitives:
 \begin{itemize}
-	\item \texttt{GetMedium}: Returns the medium this instance is working on.
-	\item \texttt{Open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}). It is an implicit operation directly executed with the constructor call.
-	\item \texttt{IsOpened}: Check if the medium is opened.
-	\item \texttt{Close}: Close the medium for access. A closed medium cannot be used anymore.
-	\item \texttt{Read} from offset $x$: Read $n$ bytes from external medium by explicit access, return the bytes in a \texttt{ByteBuffer}. For non-random-access media, it is only allowed to provide a constant as parameter that indicates ``next bytes, offset-independent''. For random-access media, an arbitrary valid offset $x$ can be passed. For byte stream media, the timeout mechanism according to \DesLink{dd:426} is implemented here.
-	\item \texttt{Write} to offset $x$: Writes $n$ bytes to the external medium at a given offset $x$, passed in a \texttt{ByteBuffer}. Throws an exception for read-only media, especially for \texttt{InputStream}.
-        \item \texttt{Truncate} to new end offset $x$: Truncates the medium to end at the new end offset $x$. Throws an exception for read-only media, especially for \texttt{InputStream}.
-	\item \texttt{IsAtEndOfMedium}: Check given offset $x$ is at end of the \TERMmedium{}. $x$ is ignored for non-random-access media.
+	\item \texttt{getMedium}: Returns the medium this instance is working on.
+	\item \texttt{open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}). It is an implicit operation directly executed with the constructor call.
+	\item \texttt{isOpened}: Check if the medium is opened.
+	\item \texttt{close}: Close the medium for access. A closed medium cannot be used anymore.
+	\item \texttt{setCurrentPosition}: Sets the current position for the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} call. Is ignored for non-random-access media.
+	\item \texttt{getCurrentPosition}: gets the current position on the medium where the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} will be executed.
+	\item \texttt{read} at the current position: Read $n$ bytes from external medium by explicit access from the current position, return the bytes in a \texttt{ByteBuffer}. For byte stream media, the timeout mechanism according to \DesLink{dd:426} is implemented here. Advances the current position by the number of read bytes.
+	\item \texttt{write} at the current position: Writes $n$ bytes to the external medium at the current position passed in a \texttt{ByteBuffer}. Throws an exception for read-only media, especially for \texttt{InputStream}. Advances the current position by the number of read bytes.
+        \item \texttt{truncate} to new end offset at the current position: Truncates the medium to end at the current position. Throws an exception for read-only media, especially for \texttt{InputStream}.
+	\item \texttt{isAtEndOfMedium}: Check if the current position is at end of the \TERMmedium{}.
 \end{itemize}
 
 There is one implementation of this interface for each distinct \TERMmedium{} type.

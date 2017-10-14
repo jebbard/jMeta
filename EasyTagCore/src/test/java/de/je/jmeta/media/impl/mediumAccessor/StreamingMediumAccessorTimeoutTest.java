@@ -110,7 +110,7 @@ public class StreamingMediumAccessorTimeoutTest {
          ByteBuffer readBuffer = ByteBuffer.allocate(bytesExpectedToBeRead.length);
 
          try {
-            testling.read(nullReference, readBuffer);
+            testling.read(readBuffer);
 
             // Data has been read correctly
             org.junit.Assert.assertArrayEquals(bytesExpectedToBeRead, readBuffer.array());
@@ -162,7 +162,7 @@ public class StreamingMediumAccessorTimeoutTest {
          ByteBuffer readBuffer = ByteBuffer.allocate(bytesExpectedToBeRead.length);
 
          try {
-            testling.read(nullReference, readBuffer);
+            testling.read(readBuffer);
 
             // Data has been read correctly
             org.junit.Assert.assertArrayEquals(bytesExpectedToBeRead, readBuffer.array());
@@ -217,7 +217,7 @@ public class StreamingMediumAccessorTimeoutTest {
          long startTime = System.currentTimeMillis();
 
          try {
-            testling.read(nullReference, readBuffer);
+            testling.read(readBuffer);
 
             Assert.fail("read was expected to throw a ReadTimedOutException");
          } catch (EndOfMediumException e) {
@@ -283,7 +283,7 @@ public class StreamingMediumAccessorTimeoutTest {
          long startTime = System.currentTimeMillis();
 
          try {
-            testling.read(nullReference, readBuffer);
+            testling.read(readBuffer);
 
             Assert.fail("read was expected to throw a ReadTimedOutException");
          } catch (EndOfMediumException e) {

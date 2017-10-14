@@ -7,8 +7,6 @@
 
 package de.je.jmeta.media.impl.mediumAccessor;
 
-import static de.je.jmeta.media.api.helper.TestMediumUtility.createReference;
-
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
@@ -28,27 +26,25 @@ import de.je.util.javautil.testUtil.setup.TestDataException;
 public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractIMediumAccessorTest {
 
    /**
-    * {@link IMediumAccessor#write(IMediumReference, java.nio.ByteBuffer)}
+    * Tests {@link IMediumAccessor#write(ByteBuffer)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void write_onReadOnlyMedium_throwsException() {
 
       IMediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      final IMediumReference startReference = createReference(mediumAccessor.getMedium(), 0);
-      mediumAccessor.write(startReference, ByteBuffer.wrap(new byte[1]));
+      mediumAccessor.write(ByteBuffer.wrap(new byte[1]));
    }
 
    /**
-    * {@link IMediumAccessor#write(IMediumReference, java.nio.ByteBuffer)}
+    * Tests {@link IMediumAccessor#truncate(IMediumReference)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void truncate_onReadOnlyMedium_throwsException() {
 
       IMediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      final IMediumReference newEndReference = createReference(mediumAccessor.getMedium(), 3);
-      mediumAccessor.truncate(newEndReference);
+      mediumAccessor.truncate();
    }
 
    /**

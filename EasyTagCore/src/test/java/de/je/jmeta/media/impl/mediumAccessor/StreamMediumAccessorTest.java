@@ -7,6 +7,8 @@
 
 package de.je.jmeta.media.impl.mediumAccessor;
 
+import static de.je.jmeta.media.api.helper.TestMediumUtility.createReference;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -15,10 +17,12 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.je.jmeta.media.api.IMediumReference;
 import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.jmeta.media.api.helper.MediaTestCaseConstants;
 import de.je.jmeta.media.impl.IMediumAccessor;
 import de.je.jmeta.media.impl.StreamMediumAccessor;
+import junit.framework.Assert;
 
 /**
  * Tests the class {@StreamMediumAccessor}.
@@ -26,6 +30,30 @@ import de.je.jmeta.media.impl.StreamMediumAccessor;
 public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 
    private InputStream testStream;
+
+   /**
+    * Tests {@link IMediumAccessor#setCurrentPosition(IMediumReference)} and
+    * {@link IMediumAccessor#getCurrentPosition()}.
+    */
+   @Test
+   public void setCurrentPosition_onStreamMedium_doesNotChangeCurrentPosition() {
+
+      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      int newOffsetOne = 20;
+      IMediumReference changeReferenceOne = createReference(mediumAccessor.getMedium(), newOffsetOne);
+
+      mediumAccessor.setCurrentPosition(changeReferenceOne);
+
+      Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
+
+      int newOffsetTwo = 10;
+      IMediumReference changeReferenceTwo = createReference(mediumAccessor.getMedium(), newOffsetTwo);
+
+      mediumAccessor.setCurrentPosition(changeReferenceTwo);
+
+      Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
+   }
 
    @Test
    public void read_beforeEOMWithTimeoutIfFinishedBeforeTimeout_returnsAllDataAsExpected() {
@@ -55,11 +83,11 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
 
       List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
 
-      readOffsetsAndSizes.add(new ReadTestData(null, 7, 0));
-      readOffsetsAndSizes.add(new ReadTestData(null, 157, 7));
-      readOffsetsAndSizes.add(new ReadTestData(null, 133, 164));
-      readOffsetsAndSizes.add(new ReadTestData(null, 17, 297));
-      readOffsetsAndSizes.add(new ReadTestData(null, 45, 314));
+      readOffsetsAndSizes.add(new ReadTestData(5, 7, 0));
+      readOffsetsAndSizes.add(new ReadTestData(1, 157, 7));
+      readOffsetsAndSizes.add(new ReadTestData(100, 133, 164));
+      readOffsetsAndSizes.add(new ReadTestData(0, 17, 297));
+      readOffsetsAndSizes.add(new ReadTestData(88, 45, 314));
 
       return readOffsetsAndSizes;
    }
@@ -69,7 +97,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(null, EXPECTED_FILE_CONTENTS.length);
+      return new ReadTestData(0, EXPECTED_FILE_CONTENTS.length);
    }
 
    /**

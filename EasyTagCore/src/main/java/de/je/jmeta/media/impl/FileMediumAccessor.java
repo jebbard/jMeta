@@ -46,10 +46,10 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     * @see de.je.jmeta.media.impl.IMediumAccessor#isAtEndOfMedium(de.je.jmeta.media.api.IMediumReference)
     */
    @Override
-   public boolean isAtEndOfMedium(IMediumReference reference) {
+   public boolean isAtEndOfMedium() {
       Reject.ifFalse(isOpened(), "isOpened()");
 
-      return reference.getAbsoluteMediumOffset() >= getMedium().getCurrentLength();
+      return getCurrentPosition().getAbsoluteMediumOffset() >= getMedium().getCurrentLength();
    }
 
    /**
@@ -80,44 +80,50 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificRead(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificRead(IMediumReference reference, ByteBuffer buffer)
-      throws IOException, EndOfMediumException {
+   protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
 
       int bytesRead = 0;
       int size = buffer.remaining();
       int initialPosition = buffer.position();
+      IMediumReference readOffsetRef = getCurrentPosition();
 
       while (bytesRead < size) {
-         final long readOffset = reference.getAbsoluteMediumOffset() + bytesRead;
+         final long readOffset = readOffsetRef.getAbsoluteMediumOffset() + bytesRead;
          int returnCode = fileChannel.read(buffer, readOffset);
 
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
 
-            throw new EndOfMediumException(bytesRead, reference, size);
+            setCurrentPositionInternal(readOffsetRef.advance(bytesRead));
+
+            throw new EndOfMediumException(bytesRead, readOffsetRef, size);
          }
 
          bytesRead += returnCode;
       }
+
+      setCurrentPositionInternal(getCurrentPosition().advance(bytesRead));
    }
 
    /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
+   protected void mediumSpecificWrite(ByteBuffer buffer) throws Exception {
 
       int bytesWritten = 0;
 
       while (bytesWritten < buffer.capacity()) {
-         bytesWritten += fileChannel.write(buffer, reference.getAbsoluteMediumOffset() + bytesWritten);
+         bytesWritten += fileChannel.write(buffer, getCurrentPosition().getAbsoluteMediumOffset() + bytesWritten);
       }
+
+      setCurrentPositionInternal(getCurrentPosition().advance(bytesWritten));
    }
 
    @Override
-   protected void mediumSpecificTruncate(IMediumReference newEndOffset) {
+   protected void mediumSpecificTruncate() {
       try {
-         fileChannel.truncate(newEndOffset.getAbsoluteMediumOffset());
+         fileChannel.truncate(getCurrentPosition().getAbsoluteMediumOffset());
       } catch (IOException e) {
          throw new MediumAccessException("Could not truncate medium due to exception", e);
       }

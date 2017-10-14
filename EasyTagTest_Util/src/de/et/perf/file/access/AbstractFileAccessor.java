@@ -107,7 +107,7 @@ public abstract class AbstractFileAccessor implements MeasuredCommand {
     */
    public void close() throws IOException {
 
-      doClose();
+      mediumSpecificClose();
 
       if (m_deleteFileAfterClose)
          m_file.deleteOnExit();

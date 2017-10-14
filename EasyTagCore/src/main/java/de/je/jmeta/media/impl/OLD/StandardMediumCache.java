@@ -281,7 +281,9 @@ public class StandardMediumCache implements IMediumCache {
    @Override
    public boolean isAtEndOfMedium(IMediumReference reference) {
 
-      return m_accessor.isAtEndOfMedium(reference);
+      m_accessor.setCurrentPosition(reference);
+
+      return m_accessor.isAtEndOfMedium();
    }
 
    /**
@@ -450,8 +452,10 @@ public class StandardMediumCache implements IMediumCache {
 
       ByteBuffer newBuffer = ByteBuffer.allocate(size);
 
+      m_accessor.setCurrentPosition(reference);
+
       try {
-         m_accessor.read(reference, newBuffer);
+         m_accessor.read(newBuffer);
       }
       // In every case put the read content - stored in the buffer by
       // IMediumAccessor.read() - to the cache, also in the case of end of
@@ -472,8 +476,10 @@ public class StandardMediumCache implements IMediumCache {
     */
    private void uncheckedReadFromMedium(IMediumReference reference, ByteBuffer returnedBuffer) {
 
+      m_accessor.setCurrentPosition(reference);
+
       try {
-         m_accessor.read(reference, returnedBuffer);
+         m_accessor.read(returnedBuffer);
       } catch (EndOfMediumException e) {
          throw new MediumAccessException("Unexpected end of medium occurred during read", e);
       }

@@ -17,7 +17,6 @@ import de.je.jmeta.media.api.datatype.InputStreamMedium;
 import de.je.jmeta.media.api.exception.EndOfMediumException;
 import de.je.jmeta.media.api.exception.ReadTimedOutException;
 import de.je.jmeta.media.impl.IMediumAccessor;
-import de.je.jmeta.media.impl.StandardMediumReference;
 import de.je.jmeta.media.impl.StreamMediumAccessor;
 import de.je.util.javautil.common.err.Reject;
 
@@ -154,6 +153,6 @@ public class ManualTimeoutTest {
    private void readInput(ByteBuffer buffer) throws EndOfMediumException {
 
       m_theAccessor.read(
-         new StandardMediumReference(m_theAccessor.getMedium(), 0), buffer);
+         buffer);
    }
 }

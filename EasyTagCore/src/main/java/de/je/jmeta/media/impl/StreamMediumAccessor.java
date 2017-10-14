@@ -49,13 +49,11 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
     * @see de.je.jmeta.media.impl.IMediumAccessor#isAtEndOfMedium(de.je.jmeta.media.api.IMediumReference)
     */
    @Override
-   public boolean isAtEndOfMedium(IMediumReference reference) {
+   public boolean isAtEndOfMedium() {
       Reject.ifFalse(isOpened(), "isOpened()");
 
-      Reject.ifNull(reference, "reference");
-
       try {
-         readWithoutTimeout(reference, SINGLE_BYTE_BUFFER);
+         readWithoutTimeout(getCurrentPosition(), SINGLE_BYTE_BUFFER);
       } catch (EndOfMediumException e) {
          assert e != null;
          return true;
@@ -110,21 +108,20 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificRead(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificRead(IMediumReference reference, ByteBuffer buffer)
-      throws IOException, EndOfMediumException {
+   protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
 
       if (getMedium().getReadTimeout() == InputStreamMedium.NO_TIMEOUT)
-         readWithoutTimeout(reference, buffer);
+         readWithoutTimeout(getCurrentPosition(), buffer);
 
       else
-         timedOutRead(reference, buffer);
+         timedOutRead(getCurrentPosition(), buffer);
    }
 
    /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
+   protected void mediumSpecificWrite(ByteBuffer buffer) throws Exception {
 
       // do nothing as this is a read-only class
    }
@@ -137,7 +134,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    // public static final int DEFAULT_TIMEOUT_MILLIS = InputStreamMedium.NO_TIMEOUT;
 
    @Override
-   protected void mediumSpecificTruncate(IMediumReference newEndOffset) {
+   protected void mediumSpecificTruncate() {
       // Not implemented
    }
 
@@ -168,6 +165,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
 
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
+            setCurrentPositionInternal(getCurrentPosition().advance(bytesRead));
             throw new EndOfMediumException(bytesRead, reference, size);
          }
 
@@ -175,6 +173,8 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
 
          buffer.put(byteBuffer, buffer.position(), bytesRead);
       }
+
+      setCurrentPositionInternal(getCurrentPosition().advance(bytesRead));
    }
 
    /**

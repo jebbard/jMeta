@@ -33,6 +33,8 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
 
    private boolean isOpened;
 
+   private IMediumReference currentPosition;
+
    private static final String INVALID_REFERENCE = "The given reference does not point to the same medium";
 
    private static final String MEDIUM_IS_NOT_OPENED = "Medium is not opened: ";
@@ -56,18 +58,19 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
       try {
          mediumSpecificOpen();
          isOpened = true;
+         currentPosition = new StandardMediumReference(getMedium(), 0);
       } catch (Exception e) {
          throw new MediumAccessException("Could not open medium due to exception", e);
       }
    }
 
    /**
-    * @see de.je.jmeta.media.impl.IMediumAccessor#getMedium()
+    * @see de.je.jmeta.media.impl.IMediumAccessor#isOpened()
     */
    @Override
-   public T getMedium() {
+   public boolean isOpened() {
 
-      return medium;
+      return isOpened;
    }
 
    @Override
@@ -87,32 +90,46 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see de.je.jmeta.media.impl.IMediumAccessor#isOpened()
+    * @see de.je.jmeta.media.impl.IMediumAccessor#getMedium()
     */
    @Override
-   public boolean isOpened() {
+   public T getMedium() {
 
-      return isOpened;
+      return medium;
+   }
+
+   @Override
+   public IMediumReference getCurrentPosition() {
+      return currentPosition;
+   }
+
+   @Override
+   public void setCurrentPosition(IMediumReference position) {
+      Reject.ifNull(position, "position");
+      Reject.ifFalse(position.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
+      Reject.ifFalse(isOpened(), "isOpened()");
+
+      if (getMedium().isRandomAccess()) {
+         Reject.ifTrue(position.getAbsoluteMediumOffset() > medium.getCurrentLength(),
+            "reference.getAbsoluteMediumOffset() > medium.getCurrentLength()");
+
+         setCurrentPositionInternal(position);
+      }
+   }
+
+   protected void setCurrentPositionInternal(IMediumReference position) {
+
+      currentPosition = position;
    }
 
    /**
-    * @see de.je.jmeta.media.impl.IMediumAccessor#read(de.je.jmeta.media.api.IMediumReference, java.nio.ByteBuffer)
+    * @see de.je.jmeta.media.impl.IMediumAccessor#read(java.nio.ByteBuffer)
     */
    @Override
-   public void read(IMediumReference reference, ByteBuffer buffer) throws EndOfMediumException {
+   public void read(ByteBuffer buffer) throws EndOfMediumException {
 
       Reject.ifFalse(isOpened(), "isOpened()");
       Reject.ifNull(buffer, "buffer");
-
-      if (getMedium().isRandomAccess()) {
-
-         Reject.ifNull(reference, "reference");
-         Reject.ifFalse(reference.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
-         Reject.ifFalse(reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
-            "reference.getAbsoluteMediumOffset() < medium.getCurrentLength()");
-      } else {
-         Reject.ifTrue(reference != IMediumAccessor.NEXT_BYTES, "reference != IMediumAccessor.NEXT_BYTES");
-      }
 
       if (buffer.remaining() == 0)
          return;
@@ -120,7 +137,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
       try {
          buffer.mark();
 
-         mediumSpecificRead(reference, buffer);
+         mediumSpecificRead(buffer);
       }
 
       catch (IOException e) {
@@ -134,25 +151,19 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see de.je.jmeta.media.impl.IMediumAccessor#write(de.je.jmeta.media.api.IMediumReference, java.nio.ByteBuffer)
+    * @see de.je.jmeta.media.impl.IMediumAccessor#write(java.nio.ByteBuffer)
     */
    @Override
-   public void write(IMediumReference reference, ByteBuffer buffer) {
+   public void write(ByteBuffer buffer) {
 
       Reject.ifFalse(isOpened(), "isOpened()");
       Reject.ifNull(buffer, "buffer");
-      Reject.ifNull(reference, "reference");
-      Reject.ifFalse(reference.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
-
-      if (getMedium().isRandomAccess())
-         Reject.ifFalse(reference.getAbsoluteMediumOffset() < medium.getCurrentLength(),
-            "reference.getAbsoluteMediumOffset() < medium.getCurrentLength()");
 
       if (medium.isReadOnly())
          throw new ReadOnlyMediumException(medium, null);
 
       try {
-         mediumSpecificWrite(reference, buffer);
+         mediumSpecificWrite(buffer);
       }
 
       catch (Exception e) {
@@ -164,18 +175,14 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
     * @see de.je.jmeta.media.impl.IMediumAccessor#truncate(de.je.jmeta.media.api.IMediumReference)
     */
    @Override
-   public void truncate(IMediumReference newEndOffset) {
+   public void truncate() {
       Reject.ifFalse(isOpened(), "isOpened()");
-      Reject.ifNull(newEndOffset, "newEndOffset");
-      Reject.ifFalse(newEndOffset.getMedium().equals(getMedium()), "newEndOffset.getMedium().equals(getMedium())");
 
       if (getMedium().isReadOnly()) {
          throw new ReadOnlyMediumException(getMedium(), null);
       }
 
-      if (newEndOffset.getAbsoluteMediumOffset() < getMedium().getCurrentLength()) {
-         mediumSpecificTruncate(newEndOffset);
-      }
+      mediumSpecificTruncate();
    }
 
    /**
@@ -196,12 +203,12 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    protected abstract void mediumSpecificOpen() throws Exception;
 
    /**
-    * Concrete core implementation of {@link #read(IMediumReference, ByteBuffer)}
+    * Concrete core implementation of {@link #read(ByteBuffer)}
     * 
     * @param reference
-    * @see de.je.jmeta.media.impl.IMediumAccessor#read(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.IMediumAccessor#read(ByteBuffer)
     * @param buffer
-    * @see de.je.jmeta.media.impl.IMediumAccessor#read(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.IMediumAccessor#read(ByteBuffer)
     * @throws IOException
     *            If an I/O operation failed.
     * @throws EndOfMediumException
@@ -209,20 +216,20 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
     * @throws ReadTimedOutException
     *            If the read operation timed out.
     */
-   protected abstract void mediumSpecificRead(IMediumReference reference, ByteBuffer buffer)
+   protected abstract void mediumSpecificRead(/* IMediumReference reference, */ByteBuffer buffer)
       throws IOException, EndOfMediumException;
 
    /**
-    * Concrete core implementation of {@link #write(IMediumReference, ByteBuffer)}
+    * Concrete core implementation of {@link #write(ByteBuffer)}
     * 
     * @param reference
-    * @see de.je.jmeta.media.impl.IMediumAccessor#write(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.IMediumAccessor#write(ByteBuffer)
     * @param buffer
-    * @see de.je.jmeta.media.impl.IMediumAccessor#write(IMediumReference, ByteBuffer)
+    * @see de.je.jmeta.media.impl.IMediumAccessor#write(ByteBuffer)
     * 
     * @throws Exception
     */
-   protected abstract void mediumSpecificWrite(IMediumReference reference, ByteBuffer buffer) throws Exception;
+   protected abstract void mediumSpecificWrite(/* IMediumReference reference, */ByteBuffer buffer) throws Exception;
 
    /**
     * Performs the actual {@link IMedium} specific truncation up to the given {@link IMediumReference}.
@@ -230,5 +237,5 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
     * @param newEndOffset
     *           The new {@link IMediumReference} pointing to the new end offset
     */
-   protected abstract void mediumSpecificTruncate(IMediumReference newEndOffset);
+   protected abstract void mediumSpecificTruncate(/* IMediumReference newEndOffset */);
 }

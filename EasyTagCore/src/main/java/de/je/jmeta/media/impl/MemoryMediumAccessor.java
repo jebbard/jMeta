@@ -23,8 +23,8 @@ import de.je.util.javautil.common.err.Reject;
 public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium> {
 
    @Override
-   protected void mediumSpecificTruncate(IMediumReference newEndOffset) {
-      int newSize = (int) newEndOffset.getAbsoluteMediumOffset();
+   protected void mediumSpecificTruncate() {
+      int newSize = (int) getCurrentPosition().getAbsoluteMediumOffset();
 
       byte[] newBytes = EnhancedArrays.copyOfRange(memory, 0, newSize);
 
@@ -68,10 +68,10 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificRead(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificRead(IMediumReference reference, ByteBuffer buffer)
-      throws IOException, EndOfMediumException {
+   protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
 
-      final int currentOffset = (int) reference.getAbsoluteMediumOffset();
+      IMediumReference currentPosition = getCurrentPosition();
+      final int currentOffset = (int) currentPosition.getAbsoluteMediumOffset();
       final int currentLength = (int) getMedium().getCurrentLength();
 
       int bytesToRead = buffer.remaining();
@@ -92,15 +92,18 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
 
       if (readBeyondEOF) {
          buffer.limit(initialPosition + bytesReallyRead);
-         throw new EndOfMediumException(bytesReallyRead, reference, bytesToRead);
+         setCurrentPositionInternal(currentPosition.advance(bytesReallyRead));
+         throw new EndOfMediumException(bytesReallyRead, currentPosition, bytesToRead);
       }
+
+      setCurrentPositionInternal(currentPosition.advance(bytesReallyRead));
    }
 
    /**
     * @see de.je.jmeta.media.impl.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
     */
    @Override
-   protected void mediumSpecificWrite(IMediumReference reference, ByteBuffer buffer) throws Exception {
+   protected void mediumSpecificWrite(ByteBuffer buffer) throws Exception {
 
       final int bytesToWrite = buffer.remaining();
 
@@ -108,7 +111,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
 
       // TODO handle case of too big offset!
 
-      int absoluteMediumOffset = (int) reference.getAbsoluteMediumOffset();
+      int absoluteMediumOffset = (int) getCurrentPosition().getAbsoluteMediumOffset();
 
       if (absoluteMediumOffset + bytes.length >= memory.length) {
          byte[] finalMediumBytes = new byte[absoluteMediumOffset + bytes.length];
@@ -120,15 +123,17 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
       System.arraycopy(bytes, buffer.position(), memory, absoluteMediumOffset, bytesToWrite);
 
       buffer.position(buffer.limit());
+
+      setCurrentPositionInternal(getCurrentPosition().advance(bytesToWrite));
    }
 
    /**
     * @see de.je.jmeta.media.impl.IMediumAccessor#isAtEndOfMedium(de.je.jmeta.media.api.IMediumReference)
     */
    @Override
-   public boolean isAtEndOfMedium(IMediumReference reference) {
+   public boolean isAtEndOfMedium() {
       Reject.ifFalse(isOpened(), "isOpened()");
 
-      return reference.getAbsoluteMediumOffset() >= getMedium().getCurrentLength();
+      return getCurrentPosition().getAbsoluteMediumOffset() >= getMedium().getCurrentLength();
    }
 }
