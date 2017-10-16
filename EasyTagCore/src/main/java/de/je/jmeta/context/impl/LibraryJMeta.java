@@ -25,7 +25,7 @@ import de.je.jmeta.config.export.UserConfigParam;
 import de.je.jmeta.context.ILibraryJMeta;
 import de.je.jmeta.datablocks.IDataBlockAccessor;
 import de.je.jmeta.dataformats.IDataFormatRepository;
-import de.je.jmeta.extmanager.export.IExtensionManager;
+import de.je.jmeta.extmanager.api.IExtensionManager;
 import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 import de.je.util.javautil.common.config.issue.ConfigIssueType;
@@ -238,9 +238,7 @@ public class LibraryJMeta implements ILibraryJMeta {
 
       try (NamedInputStream extensionPointsStream = NamedInputStream.createFromResource(LibraryJMeta.class,
          EXTENSION_POINTS_CONFIG)) {
-         IExtensionManager extManager = ComponentRegistry.lookupService(IExtensionManager.class);
-
-         extManager.load(extensionPointsStream, jMetaHomeDir);
+         ComponentRegistry.lookupService(IExtensionManager.class);
 
          LOGGER.info(successfulTask(taskLoadExtensions));
       } catch (Throwable e) {

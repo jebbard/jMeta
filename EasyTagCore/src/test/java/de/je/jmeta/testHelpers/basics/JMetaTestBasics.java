@@ -16,12 +16,10 @@ import org.junit.After;
 import org.junit.Before;
 
 import de.je.jmeta.context.impl.LibraryJMeta;
-import de.je.jmeta.extmanager.export.IExtensionManager;
+import de.je.jmeta.extmanager.api.IExtensionManager;
 import de.je.jmeta.testHelpers.logChecker.LogChecker;
 import de.je.util.javautil.common.registry.ComponentRegistry;
 import de.je.util.javautil.io.file.FileUtility;
-import de.je.util.javautil.io.stream.NamedInputStream;
-import de.je.util.javautil.testUtil.setup.TestDataException;
 import junit.framework.AssertionFailedError;
 
 /**
@@ -63,11 +61,6 @@ public class JMetaTestBasics {
     * The default log file
     */
    public static final File DEFAULT_LOG_FILE = new File(DEFAULT_LOG_PATH, "unitTest.log");
-
-   /**
-    * Stores the relative path to the central extension management configuration file.
-    */
-   private final static String EXTENSION_MANAGEMENT_CONFIG_RESOURCE = "AllExtensionPoints.xml";
 
    /**
     * The default path where log files with errors are copied to.
@@ -121,16 +114,6 @@ public class JMetaTestBasics {
     * configuration file.
     */
    public static void setupExtensions() {
-
-      IExtensionManager extensionManager = ComponentRegistry.lookupService(IExtensionManager.class);
-
-      // Load all extensions BEFORE initializing any other component
-      try {
-         extensionManager.load(
-            NamedInputStream.createFromResource(JMetaTestBasics.class, EXTENSION_MANAGEMENT_CONFIG_RESOURCE), null);
-      } catch (IOException e) {
-         throw new TestDataException(
-            "Could not load extension configuration stream: " + EXTENSION_MANAGEMENT_CONFIG_RESOURCE, e);
-      }
+      ComponentRegistry.lookupService(IExtensionManager.class);
    }
 }

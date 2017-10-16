@@ -22,16 +22,15 @@ import de.je.jmeta.datablocks.IDataBlockAccessor;
 import de.je.jmeta.datablocks.IDataBlockFactory;
 import de.je.jmeta.datablocks.ITransformationHandler;
 import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.datablocks.export.IDataBlocksExtension;
+import de.je.jmeta.datablocks.export.IDataBlockService;
 import de.je.jmeta.datablocks.export.IExtendedDataBlockFactory;
 import de.je.jmeta.dataformats.DataFormat;
 import de.je.jmeta.dataformats.DataTransformationType;
 import de.je.jmeta.dataformats.IDataFormatRepository;
 import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.extmanager.export.BundleType;
-import de.je.jmeta.extmanager.export.IExtensionBundle;
-import de.je.jmeta.extmanager.export.IExtensionManager;
-import de.je.jmeta.extmanager.export.InvalidExtensionException;
+import de.je.jmeta.extmanager.api.IExtension;
+import de.je.jmeta.extmanager.api.IExtensionManager;
+import de.je.jmeta.extmanager.api.InvalidExtensionException;
 import de.je.jmeta.media.api.IMediaAPI;
 import de.je.jmeta.media.api.IMedium;
 import de.je.util.javautil.common.err.Reject;
@@ -72,25 +71,18 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
       m_repository = ComponentRegistry.lookupService(IDataFormatRepository.class);
       m_mediumFactory = ComponentRegistry.lookupService(IMediaAPI.class);
 
-      List<IExtensionBundle> extBundles = extManager.getRegisteredExtensionBundles();
-
-      Map<DataFormat, IDataBlocksExtension> defaultDataBlocksExtensions = new HashMap<>();
-      Map<DataFormat, IDataBlocksExtension> customDataBlocksExtensions = new HashMap<>();
+      List<IExtension> extBundles = extManager.getAllExtensions();
 
       String validatingExtensions = "Validating registered data blocks extensions"
          + ILoggingMessageConstants.SUFFIX_TASK;
 
       LOGGER.info(ILoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
-      for (int i = 0; i < extBundles.size(); ++i) {
-         IExtensionBundle bundle = extBundles.get(i);
+      for (IExtension iExtension2 : extBundles) {
+         List<IDataBlockService> bundleDataBlocksExtensions = iExtension2
+            .getAllServiceProviders(IDataBlockService.class);
 
-         List<IDataBlocksExtension> bundleDataBlocksExtensions = bundle
-            .getExtensionsForExtensionPoint(IDataBlocksExtension.class);
-
-         for (int j = 0; j < bundleDataBlocksExtensions.size(); ++j) {
-            IDataBlocksExtension dataBlocksExtension = bundleDataBlocksExtensions.get(j);
-
+         for (IDataBlockService dataBlocksExtension : bundleDataBlocksExtensions) {
             final DataFormat extensionDataFormat = dataBlocksExtension.getDataFormat();
 
             if (extensionDataFormat == null) {
@@ -99,42 +91,19 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
                LOGGER.error(ILoggingMessageConstants.PREFIX_TASK_FAILED + ILoggingMessageConstants.PREFIX_CRITICAL_ERROR
                   + validatingExtensions);
                LOGGER.error(message);
-               throw new InvalidExtensionException(message, bundle, dataBlocksExtension);
+               throw new InvalidExtensionException(message, iExtension2);
             }
 
-            // Default bundle data formats may not override existing extension data formats
-            if (bundle.getDescription().getType().equals(BundleType.DEFAULT)) {
-               if (defaultDataBlocksExtensions.containsKey(extensionDataFormat))
-                  LOGGER.warn(
-                     "The default data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another default extension with id <%3$s>.",
-                     dataBlocksExtension.getExtensionId(), extensionDataFormat,
-                     defaultDataBlocksExtensions.get(extensionDataFormat).getExtensionId());
-
-               else if (customDataBlocksExtensions.containsKey(extensionDataFormat))
-                  LOGGER.warn(
-                     "The default data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
-                     dataBlocksExtension.getExtensionId(), extensionDataFormat,
-                     customDataBlocksExtensions.get(extensionDataFormat).getExtensionId());
-
-               else
-                  defaultDataBlocksExtensions.put(extensionDataFormat, dataBlocksExtension);
+            if (m_factories.containsKey(extensionDataFormat) || m_readers.containsKey(extensionDataFormat)) {
+               LOGGER.warn(
+                  "The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
+                  iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
             }
 
-            // Custom bundle data formats may override existing default extension data formats, but no other custom ones
-            else if (bundle.getDescription().getType().equals(BundleType.CUSTOM)) {
-               if (customDataBlocksExtensions.containsKey(extensionDataFormat))
-                  LOGGER.warn(
-                     "The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
-                     dataBlocksExtension.getExtensionId(), extensionDataFormat,
-                     customDataBlocksExtensions.get(extensionDataFormat).getExtensionId());
-
-               else
-                  customDataBlocksExtensions.put(extensionDataFormat, dataBlocksExtension);
+            else {
+               addDataBlockExtensions(iExtension2, dataBlocksExtension);
             }
          }
-
-         addDataBlockExtensions(customDataBlocksExtensions, BundleType.CUSTOM, bundle);
-         addDataBlockExtensions(defaultDataBlocksExtensions, BundleType.DEFAULT, bundle);
       }
 
       LOGGER.info(ILoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
@@ -146,70 +115,52 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
     * @param bundle
     * @param logging
     */
-   private void addDataBlockExtensions(Map<DataFormat, IDataBlocksExtension> dataBlocksExtensions,
-      BundleType bundleType, IExtensionBundle bundle) {
+   private void addDataBlockExtensions(IExtension iExtension2, IDataBlockService dataBlocksExtensions) {
 
-      for (Iterator<DataFormat> iterator = dataBlocksExtensions.keySet().iterator(); iterator.hasNext();) {
-         DataFormat format = iterator.next();
-         IDataBlocksExtension extension = dataBlocksExtensions.get(format);
+      DataFormat format = dataBlocksExtensions.getDataFormat();
 
-         final IDataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
+      final IDataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
 
-         if (spec == null)
-            throw new InvalidExtensionException(
-               "The extension " + extension + " for data format " + format
-                  + " must have a corresponding registered data format specification for the format.",
-               bundle, extension);
-
-         IDataBlockReader dataBlockReader = extension.getDataBlockReader(spec, m_lazyFieldSize);
-
-         IExtendedDataBlockFactory dataBlockFactory = extension.getDataBlockFactory();
-
-         // Set default data block factory
-         if (dataBlockFactory == null)
-            dataBlockFactory = new StandardDataBlockFactory();
-
-         dataBlockFactory.setMediumFactory(m_mediumFactory);
-
-         if (bundleType.equals(BundleType.DEFAULT) && m_factories.containsKey(format)) {
-            LOGGER.warn("The default data format extension <%1$s> is OVERRIDDEN by the data formats extension <%2$s>.",
-               extension.getExtensionId(), m_factories.get(format));
-         }
-
-         else
-            m_factories.put(format, dataBlockFactory);
-
-         List<ITransformationHandler> transformationHandlers = extension.getTransformationHandlers(spec,
-            m_factories.get(format));
-
-         if (transformationHandlers == null)
-            throw new InvalidExtensionException(
-               "Transformation handlers returned by " + extension + " must not be null", bundle, extension);
-
-         Map<DataTransformationType, ITransformationHandler> transformationHandlersMap = new HashMap<>();
-
-         for (int i = 0; i < transformationHandlers.size(); ++i) {
-            ITransformationHandler handler = transformationHandlers.get(i);
-
-            transformationHandlersMap.put(handler.getTransformationType(), handler);
-         }
-
-         // Set default data block reader
-         if (dataBlockReader == null) {
-            dataBlockReader = new StandardDataBlockReader(spec, transformationHandlersMap, m_lazyFieldSize);
-         }
-
-         dataBlockReader.initDataBlockFactory(dataBlockFactory);
-
-         if (bundleType.equals(BundleType.DEFAULT) && m_readers.containsKey(format)) {
-            LOGGER.warn(
-               "The default data format reader for <%1$s> is OVERRIDDEN by a reader of data formats extension <%2$s>.",
-               extension.getExtensionId(), m_readers.get(format));
-         }
-
-         else
-            m_readers.put(format, dataBlockReader);
+      if (spec == null) {
+         throw new InvalidExtensionException("The extension " + iExtension2.getExtensionId() + " for data format "
+            + format + " must have a corresponding registered data format specification for the format.", iExtension2);
       }
+
+      IDataBlockReader dataBlockReader = dataBlocksExtensions.getDataBlockReader(spec, m_lazyFieldSize);
+
+      IExtendedDataBlockFactory dataBlockFactory = dataBlocksExtensions.getDataBlockFactory();
+
+      // Set default data block factory
+      if (dataBlockFactory == null)
+         dataBlockFactory = new StandardDataBlockFactory();
+
+      dataBlockFactory.setMediumFactory(m_mediumFactory);
+
+      m_factories.put(format, dataBlockFactory);
+
+      List<ITransformationHandler> transformationHandlers = dataBlocksExtensions.getTransformationHandlers(spec,
+         m_factories.get(format));
+
+      if (transformationHandlers == null) {
+         throw new InvalidExtensionException(
+            "Transformation handlers returned by " + iExtension2.getExtensionId() + " must not be null", iExtension2);
+      }
+
+      Map<DataTransformationType, ITransformationHandler> transformationHandlersMap = new HashMap<>();
+
+      for (int i = 0; i < transformationHandlers.size(); ++i) {
+         ITransformationHandler handler = transformationHandlers.get(i);
+
+         transformationHandlersMap.put(handler.getTransformationType(), handler);
+      }
+
+      // Set default data block reader
+      if (dataBlockReader == null) {
+         dataBlockReader = new StandardDataBlockReader(spec, transformationHandlersMap, m_lazyFieldSize);
+      }
+
+      dataBlockReader.initDataBlockFactory(dataBlockFactory);
+      m_readers.put(format, dataBlockReader);
    }
 
    /**

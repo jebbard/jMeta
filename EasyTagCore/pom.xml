@@ -54,26 +54,6 @@
 	<!-- ========================== Build ========================== -->
 	<build>
 		<plugins>
-			<!-- Add additional source folder for JAXB generated sources -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.10</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>src/main/jaxb</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<!-- JAR: Build a test jar for test reuse -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -84,42 +64,6 @@
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- JAXB code generation from XSD -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>1.6</version>
-				<executions>
-					<execution>
-						<id>xjc1</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.basedir}/src/main/jaxb/</outputDirectory>
-							<schemaDirectory>${project.basedir}/src/main/resources/de/je/jmeta/extmanager/impl/schema</schemaDirectory>
-							<schemaFiles>ExtensionBundleConfiguration.xsd</schemaFiles>
-							<packageName>de.je.jmeta.extmanager.impl.jaxb.extbundles</packageName>
-							<clearOutputDir>false</clearOutputDir>
-							<npa>true</npa>
-						</configuration>
-					</execution>
-					<execution>
-						<id>xjc2</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.basedir}/src/main/jaxb/</outputDirectory>
-							<schemaDirectory>${project.basedir}/src/main/resources/de/je/jmeta/extmanager/impl/schema</schemaDirectory>
-							<schemaFiles>ExtensionPointsConfiguration.xsd</schemaFiles>
-							<packageName>de.je.jmeta.extmanager.impl.jaxb.extpoints</packageName>
-							<clearOutputDir>false</clearOutputDir>
-							<npa>true</npa>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

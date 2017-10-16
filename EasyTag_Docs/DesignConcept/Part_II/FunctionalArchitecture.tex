@@ -392,22 +392,19 @@ Die folgende Abbildung zeigt die Komponenten des Subsystems \SUBSTechBase{}.
 %		Erweiterungen (Subsystem \SUBSExtension{})
 %-----------------------------------------------------------------------------------------------
 
-\section{Erweiterungen (Subsystem \SUBSExtension{})}
+\section{Extensions (Subsystem \SUBSExtension{})}
 \label{sec:KompExt}
 
-Eine \emph{Erweiterung} fasst formatspezifische Inhalte zu einem oder mehreren Datenformaten zusammen. Je Datenformat, dass die Erweiterung definiert, sind dies (vergleiche \DesLink{dd:101}, \DesLink{dd:102} und \DesLink{dd:103}):
+An \emph{Extension} summarizes format-specific content for a given data format (or multiple variations of the data format). Per data format defined by the extension, these are (compare \DesLink{dd:101}, \DesLink{dd:102} and \DesLink{dd:103}):
 \begin{itemize}
-	\item Eine Datenformat-Spezifikation, welche die Datenblöcke des Datenformats und deren Aufbau und Zusammenhang untereinander definiert
-	\item Eine API, welche Komfortfunktionen und Konstanten zum Arbeiten mit dem Datenformat (z.B. Erzeugen von Datenblöcken usw.) bietet
-	\item Die API enthält insbesondere die Datenformat-Kennung, die der Anwender von \LibName{} auch beim Arbeiten mit \SUBSHighLevel{} und \SUBSLowLevel{}verwenden kann.
-	\item Implementierungs-Erweiterungen für \SUBSLowLevel{}, welche den Parse- und Schreibevorgang beeinflussen. Mit diesem Mechanismus kann ein Datenformat den in \SUBSLowLevel{} definierten Standard-Parse- und Schreibe-Algorithmus erweitern oder überschreiben.
+	\item A data format specification which defines data blocks and their structure and relations
+	\item An end-user API to comfortably work with the data format (e.g. creation of data blocks etc.); this API especially holds the data format identifier which the user can use to work with \SUBSHighLevel{} and \SUBSLowLevel{}.
+	\item Implementation extensions for \SUBSLowLevel{}, which influence the parsing and writing process. With this mechanism, a data format can extend or override the standard parsing and writing algorithms defined in \SUBSLowLevel{}.
 \end{itemize}
 
-Die Frage ist nun: Wie korrespondiert der Begriff der Erweiterung mit dem eines Subsystems und einer Komponente? 
-Eine einzelne konkrete Erweiterung wurde oben bereits als Subsystem eingeführt. Sie besteht also aus mehreren Komponenten. Genauer sollte je enthaltenem Datenformat je eine Komponente im Sinne von \DesLink{dd:003} enthalten sein. Jede Komponente enthält die oben definierten API- und Implementierungsanteile. 
-Für die interne Gestaltung der Erweiterung ist freilich der Implementierer der Erweiterung verantwortlich. Jedoch lassen sich Richtlinien für die innere Strukturierung einer Erweiterung definieren, die sich im Wesentlichen an den Richtlinien der \LibName{}-Kernimplementierung orientieren. 
+As a ground rule, every single extension can but should not define extension code for more than one data format. It might expose more data formats only if these two data formats heavily overlap and are based on each other, e.g. ID3v1 and ID3v1.1. This is to fulfill the requirement \SectionLink{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}.
 
-Unterschiedliche Erweiterungen haben i.d.R. nichts miteinander zu tun und sollten sich wie für Komponenten üblich maximal über ihre Schnittstellen gegenseitig aufrufen. 
+Moreover, distinct extensions should never depend on each other, but only on the \LibName{} core to avoid any confusion for the user.
 
 %###############################################################################################
 %###############################################################################################

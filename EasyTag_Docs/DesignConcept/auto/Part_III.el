@@ -5,6 +5,7 @@
     "Part_III/CrossfunctionalAspects"
     "Part_III/COMPUtility"
     "Part_III/COMPcompRegistry"
+    "Part_III/COMPextManagement"
     "Part_III/COMPmedia")
    (LaTeX-add-labels
     "sec:Design"

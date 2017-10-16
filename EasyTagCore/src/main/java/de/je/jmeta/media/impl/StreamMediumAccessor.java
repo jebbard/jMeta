@@ -124,13 +124,14 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
 
       byte[] byteBuffer = new byte[size];
 
+      IMediumReference currentPosition = getCurrentPosition();
       while (bytesRead < size) {
          int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
 
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
-            updateCurrentPosition(getCurrentPosition().advance(bytesRead));
-            throw new EndOfMediumException(bytesRead, getCurrentPosition(), size);
+            updateCurrentPosition(currentPosition.advance(bytesRead));
+            throw new EndOfMediumException(bytesRead, currentPosition, size);
          }
 
          bytesRead += returnCode;
@@ -138,7 +139,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
          buffer.put(byteBuffer, buffer.position(), bytesRead);
       }
 
-      updateCurrentPosition(getCurrentPosition().advance(bytesRead));
+      updateCurrentPosition(currentPosition.advance(bytesRead));
    }
 
    /**

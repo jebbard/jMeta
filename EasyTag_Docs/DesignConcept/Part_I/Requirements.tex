@@ -79,12 +79,12 @@ Ergänzend zur \SectionLink{sec:ANF003SpezifikationUnterstuetzterMetadatenUndCont
 %		ANF 007
 %-----------------------------------------------------------------------------------------------
 
-\section{ANF 007: Erweiterbarkeit um neue Metadaten- und Containerformate}
+\section{ANF 007: Extensibility for new Metadata and Container Formats}
 \label{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}
 
-Die Library muss auf komfortable Art und Weise um neue Metadaten- und Containerformate erweitert werden können. In der Mindestausbaustufe der Anforderung muss eine einfache Erweiterbarkeit durch die Library-Entwickler möglich sein, in der Maximalausbaustufe ist eine einfache Erweiterung durch jeden Anwender der Library mit Programmiererfahrung möglich.
+\LibName{} must be comfortably extensible with new container or metadata formats. As the minimum level, easy extensibility by the library developers must be possible. As the maximum level of extensibility, also end users with programming experience must be able to easily write extensions without too much configuration or boilerplate code.
 
-\textbf{Begründung:} Es werden immer wieder neue Formate entwickelt und verfügbar. Die Erweiterbarkeit stellt eine lange Lebensdauer der Library sicher und ermöglicht zudem eine einfachere Pflege durch die Library-Entwickler. In der Maximalausbaustufe ``Erweiterbar durch Endanwender'' ist dies ein klares Differenzierungskriterium gegenüber Konkurrenzlibraries, die solche Erweiterbarkeit nicht bieten.
+\textbf{Rationale:} New metadata formats are developed and are available over and over again. The extensibility ensures a longer life time of the library and allows easier maintenance by the library developers. In the maximum level ``Extensibility by end users'', this is a clear differntiation criterion to other libraries that do not offer this level of extensibility.
 
 %-----------------------------------------------------------------------------------------------
 %		ANF 008
@@ -101,12 +101,12 @@ Die Library muss auf komfortable Art und Weise um neue Metadaten- und Containerf
 %		ANF 009
 %-----------------------------------------------------------------------------------------------
 
-\section{ANF 009: Selektive Formatauswahl}
+\section{ANF 009: Selective Format Choice}
 \label{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}
 
-Eine Anwendung, die \LibName{} verwendet, muss selektiv diejenigen Formate auswählen können, die sie unterstützen möchte und die zur Laufzeit geladen werden sollen. Dies gilt aber nicht nur für die Laufzeit, sondern auch für die Library-Pakete selbst.
+An application using \LibName{} must be able to selectively choose these formats that it wants to support. This is not only necessary for runtime, but also for the library extension packages it wants to use.
 
-\textbf{Begründung:} Audio-Anwendungen brauchen keine Erweiterungen für Video- oder Bildformate. Anwendungen können den Laufzeit- ebenso wie den Speicher-Overhead minimieren, indem sie nur genau die Formate wählen, die sie wirklich benötigen.
+\textbf{Rationale:} Audio applications do not need extensions for video or image formats. Applications can minimize the runtime and memory overhead by choosing as few extensions as really needed.
 
 %-----------------------------------------------------------------------------------------------
 %		AUS 001
@@ -134,12 +134,12 @@ Es gibt auch XML-Metadatenformate. Üblicherweise werden diese aber nicht in Mult
 %		AUS 003
 %-----------------------------------------------------------------------------------------------
 
-\section{AUS 003: Keine Anwender-Erweiterung der \LibName{}-Medien}
+\section{AUS 003: No User Extensions for \LibName{} Media}
 \label{sec:AUS01220LesenVonXMLMetadaten}
 
-Das Erweitern von \LibName{} um neue Medien wird in der aktuellen Version nicht unterstützt.
+Extending \LibName{} with new media to support - on top of the out-of-the box supported media - is not supported.
 
-\textbf{Begründung:} Die zur Verfügung stehenden Mechanismen decken bereits viele Anwendungsfälle ab. Eine Erweiterbarkeit auch um neue Medien macht \LibName{} selbst ebenso wie den Erweiterungsmechanismus nur komplexer, ohne das ein wesentlicher Mehrwert erkennbar ist. Es ist z.B. nicht klar, um welche Medien \LibName{} überhaupt erweitert werden soll. Sollten neue Medien sinnvoll sein, dann kann es einen neuen Core-Release geben, der diese Medien unterstützt.
+\textbf{Rationale:} The mechanisms available should cover 80 to 90 percent of the use cases. Extensibility by new media might increase the complexity of \LibName{} itself and the extension mechanism in specific, without adding real-world use cases really needing it. It is currently not clear which media beyond streams, byte arrays and files might be candidates for extending \LibName{}. Should new media make sense in future, a new core release can be created to also support media extensions.
 
 %###############################################################################################
 %###############################################################################################

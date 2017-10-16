@@ -56,7 +56,6 @@
   <modules>
     <module>../EasyTagCore</module>
     <module>../EasyTagExt_DefaultBundle</module>
-    <module>../ExtManager_Test_Impl</module>
   </modules>
 
   

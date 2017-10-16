@@ -34,13 +34,11 @@ import de.je.util.javautil.common.err.Reject;
  * {@link StandardDataFormatSpecification}
  *
  */
-public class StandardDataFormatSpecification
-   implements IDataFormatSpecification {
+public class StandardDataFormatSpecification implements IDataFormatSpecification {
 
    private static final String GENERIC_ID_REPLACE_PATTERN = "([^\\.]+)";
 
-   private static final Pattern GENERIC_PLACEHOLDER_PATTERN = Pattern
-      .compile("(\\$\\{.+?\\})");
+   private static final Pattern GENERIC_PLACEHOLDER_PATTERN = Pattern.compile("(\\$\\{.+?\\})");
 
    /**
     * Creates a new {@link StandardDataFormatSpecification}.
@@ -55,11 +53,9 @@ public class StandardDataFormatSpecification
     * @param transformations
     */
    public StandardDataFormatSpecification(DataFormat dataFormat,
-      Map<DataBlockId, DataBlockDescription> dataBlockDescriptions,
-      Set<DataBlockId> topLevelDataBlockIds, Set<DataBlockId> genericDataBlocks,
-      Set<DataBlockId> paddingDataBlocks, List<ByteOrder> supportedByteOrders,
-      List<Charset> supportedCharacterEncodings,
-      List<DataTransformationType> transformations) {
+      Map<DataBlockId, DataBlockDescription> dataBlockDescriptions, Set<DataBlockId> topLevelDataBlockIds,
+      Set<DataBlockId> genericDataBlocks, Set<DataBlockId> paddingDataBlocks, List<ByteOrder> supportedByteOrders,
+      List<Charset> supportedCharacterEncodings, List<DataTransformationType> transformations) {
       Reject.ifNull(transformations, "transformations");
       Reject.ifNull(dataBlockDescriptions, "dataBlockDescriptions");
       Reject.ifNull(topLevelDataBlockIds, "topLevelDataBlockIds");
@@ -87,19 +83,15 @@ public class StandardDataFormatSpecification
    public DataBlockDescription getDataBlockDescription(DataBlockId id) {
 
       Reject.ifNull(id, "id");
-      Reject.ifFalse(specifiesBlockWithId(id),
-         "specifiesBlockWithId(id)");
+      Reject.ifFalse(specifiesBlockWithId(id), "specifiesBlockWithId(id)");
 
       // The requested id is an unspecified id that must match a generic id
       if (!m_dataBlockDescriptions.containsKey(id)) {
          DataBlockId matchingGenericId = getMatchingGenericId(id);
 
-         DataBlockDescription genericDescription = getDataBlockDescription(
-            matchingGenericId);
+         DataBlockDescription genericDescription = getDataBlockDescription(matchingGenericId);
 
-         Matcher matcher = Pattern
-            .compile(m_genericDataBlocks.get(matchingGenericId))
-            .matcher(id.getGlobalId());
+         Matcher matcher = Pattern.compile(m_genericDataBlocks.get(matchingGenericId)).matcher(id.getGlobalId());
 
          List<String> matchingStrings = new ArrayList<>();
 
@@ -112,17 +104,15 @@ public class StandardDataFormatSpecification
          // Replace parent ids in location properties
          Map<DataBlockId, LocationProperties> locationProps = new HashMap<>();
 
-         for (Iterator<DataBlockId> iterator = genericDescription
-            .getAllParentsForLocationProperties().iterator(); iterator
-               .hasNext();) {
+         for (Iterator<DataBlockId> iterator = genericDescription.getAllParentsForLocationProperties()
+            .iterator(); iterator.hasNext();) {
             DataBlockId parentId = iterator.next();
             String replacedParentId = parentId.getGlobalId();
 
             for (int j = 0; j < matchingStrings.size(); ++j) {
                String matchingString = matchingStrings.get(j);
 
-               replacedParentId = replacedParentId.replaceFirst(
-                  GENERIC_PLACEHOLDER_PATTERN.pattern(), matchingString);
+               replacedParentId = replacedParentId.replaceFirst(GENERIC_PLACEHOLDER_PATTERN.pattern(), matchingString);
             }
 
             locationProps.put(new DataBlockId(m_dataFormat, replacedParentId),
@@ -132,29 +122,23 @@ public class StandardDataFormatSpecification
          // Replace child ids
          List<DataBlockId> realChildIds = new ArrayList<>();
 
-         for (int i = 0; i < genericDescription.getOrderedChildIds()
-            .size(); ++i) {
-            DataBlockId childId = genericDescription.getOrderedChildIds()
-               .get(i);
+         for (int i = 0; i < genericDescription.getOrderedChildIds().size(); ++i) {
+            DataBlockId childId = genericDescription.getOrderedChildIds().get(i);
 
             String replacedChildId = childId.getGlobalId();
 
             for (int j = 0; j < matchingStrings.size(); ++j) {
                String matchingString = matchingStrings.get(j);
 
-               replacedChildId = replacedChildId.replaceFirst(
-                  GENERIC_PLACEHOLDER_PATTERN.pattern(), matchingString);
+               replacedChildId = replacedChildId.replaceFirst(GENERIC_PLACEHOLDER_PATTERN.pattern(), matchingString);
             }
 
             realChildIds.add(new DataBlockId(m_dataFormat, replacedChildId));
          }
-         return new DataBlockDescription(id, genericDescription.getName(),
-            "Unspecified data block", genericDescription.getPhysicalType(),
-            realChildIds, genericDescription.getChildOrder(),
-            genericDescription.getFieldProperties(), locationProps,
-            genericDescription.getMinimumByteLength(),
-            genericDescription.getMaximumByteLength(),
-            genericDescription.getMagicKeys(), null);
+         return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
+            genericDescription.getPhysicalType(), realChildIds, genericDescription.getChildOrder(),
+            genericDescription.getFieldProperties(), locationProps, genericDescription.getMinimumByteLength(),
+            genericDescription.getMaximumByteLength(), genericDescription.getMagicKeys(), null);
       }
 
       return m_dataBlockDescriptions.get(id);
@@ -229,8 +213,7 @@ public class StandardDataFormatSpecification
    @Override
    public boolean isGeneric(DataBlockId id) {
 
-	  Reject.ifFalse(specifiesBlockWithId(id),
-         "specifiesBlockWithId(id)");
+      Reject.ifFalse(specifiesBlockWithId(id), "specifiesBlockWithId(id)");
 
       return m_genericDataBlocks.containsKey(id);
    }
@@ -264,8 +247,7 @@ public class StandardDataFormatSpecification
       if (m_genericDataBlocks.containsKey(id))
          return id;
 
-      for (Iterator<DataBlockId> iterator = m_genericDataBlocks.keySet()
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<DataBlockId> iterator = m_genericDataBlocks.keySet().iterator(); iterator.hasNext();) {
          DataBlockId nextId = iterator.next();
          String nextPattern = m_genericDataBlocks.get(nextId);
 
@@ -278,8 +260,7 @@ public class StandardDataFormatSpecification
 
    private void initGenericIdPatterns(Set<DataBlockId> genericDataBlocks) {
 
-      for (Iterator<DataBlockId> iterator = genericDataBlocks
-         .iterator(); iterator.hasNext();) {
+      for (Iterator<DataBlockId> iterator = genericDataBlocks.iterator(); iterator.hasNext();) {
          DataBlockId genericBlockId = iterator.next();
 
          final String idString = genericBlockId.getGlobalId();
