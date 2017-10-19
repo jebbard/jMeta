@@ -7,12 +7,14 @@
  * @date 25.06.2016
  *
  */
-package de.je.jmeta.context;
+package com.github.jmeta.library.context;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
 
 import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
 
