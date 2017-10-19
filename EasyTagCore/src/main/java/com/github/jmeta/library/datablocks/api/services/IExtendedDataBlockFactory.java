@@ -7,13 +7,13 @@
  * @date 04.01.2011
  */
 
-package de.je.jmeta.datablocks.export;
+package com.github.jmeta.library.datablocks.api.services;
 
-import de.je.jmeta.datablocks.IDataBlockFactory;
-import de.je.jmeta.datablocks.IPayload;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.media.api.IMediaAPI;
-import de.je.jmeta.media.api.IMediumReference;
+import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.type.IPayload;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.media.api.services.IMediaAPI;
+import com.github.jmeta.library.media.api.type.IMediumReference;
 
 /**
  * {@link IExtendedDataBlockFactory}

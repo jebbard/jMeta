@@ -6,22 +6,23 @@
  *
  * @date 12.02.2011
  */
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import de.je.jmeta.datablocks.BinaryValueConversionException;
-import de.je.jmeta.datablocks.IDataBlock;
-import de.je.jmeta.datablocks.IField;
-import de.je.jmeta.datablocks.InterpretedValueConversionException;
-import de.je.jmeta.datablocks.export.AbstractDataBlock;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.datablocks.export.IExtendedDataBlockFactory;
-import de.je.jmeta.dataformats.BinaryValue;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.media.api.IMediumReference;
+import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.type.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.type.IDataBlock;
+import com.github.jmeta.library.datablocks.api.type.IField;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.BinaryValue;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -79,7 +80,7 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IField#getInterpretedValue()
+    * @see com.github.jmeta.library.datablocks.api.type.IField#getInterpretedValue()
     */
    @Override
    public Object getInterpretedValue() throws BinaryValueConversionException {
@@ -90,7 +91,7 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {

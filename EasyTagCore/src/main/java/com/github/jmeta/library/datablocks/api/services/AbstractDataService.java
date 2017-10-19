@@ -6,15 +6,13 @@
  *
  * @date 28.04.2011
  */
-package de.je.jmeta.datablocks.export;
+package com.github.jmeta.library.datablocks.api.services;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.je.jmeta.datablocks.IDataBlockFactory;
-import de.je.jmeta.datablocks.ITransformationHandler;
-import de.je.jmeta.dataformats.DataFormat;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
 
 /**
  * {@link AbstractDataService} provides a default implementation of {@link IDataFormatsExtension} that only returns a
@@ -32,7 +30,7 @@ public abstract class AbstractDataService implements IDataBlockService {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockService#getDataBlockFactory()
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getDataBlockFactory()
     */
    @Override
    public IExtendedDataBlockFactory getDataBlockFactory() {
@@ -42,7 +40,7 @@ public abstract class AbstractDataService implements IDataBlockService {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockService#getDataBlockReader(IDataFormatSpecification, int)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getDataBlockReader(IDataFormatSpecification, int)
     */
    @Override
    public IDataBlockReader getDataBlockReader(IDataFormatSpecification spec, int lazyFieldSize) {
@@ -52,7 +50,7 @@ public abstract class AbstractDataService implements IDataBlockService {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockService#getDataFormat()
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getDataFormat()
     */
    @Override
    public DataFormat getDataFormat() {
@@ -61,7 +59,7 @@ public abstract class AbstractDataService implements IDataBlockService {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockService#getTransformationHandlers(IDataFormatSpecification,
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getTransformationHandlers(IDataFormatSpecification,
     *      IDataBlockFactory)
     */
    @Override

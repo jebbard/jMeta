@@ -6,12 +6,11 @@
  *
  * @date 02.03.2011
  */
-package de.je.jmeta.datablocks.export;
+package com.github.jmeta.library.datablocks.api.services;
 
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.IDataBlockFactory;
-import de.je.jmeta.datablocks.ITransformationHandler;
-import de.je.jmeta.dataformats.DataTransformationType;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -37,7 +36,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see de.je.jmeta.datablocks.ITransformationHandler#getTransformationType()
+    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#getTransformationType()
     */
    @Override
    public DataTransformationType getTransformationType() {
@@ -46,7 +45,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see de.je.jmeta.datablocks.ITransformationHandler#requiresTransform(de.je.jmeta.datablocks.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.type.IContainer)
     */
    @Override
    public boolean requiresTransform(IContainer container) {
@@ -58,7 +57,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see de.je.jmeta.datablocks.ITransformationHandler#requiresUntransform(de.je.jmeta.datablocks.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.type.IContainer)
     */
    @Override
    public boolean requiresUntransform(IContainer container) {

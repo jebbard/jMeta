@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,24 +15,25 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
+import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.media.api.services.IMediaAPI;
+import com.github.jmeta.library.media.api.type.IMedium;
+import com.github.jmeta.utility.extmanager.api.IExtension;
+import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+import com.github.jmeta.utility.extmanager.api.InvalidExtensionException;
+
 import de.je.jmeta.common.ILoggingMessageConstants;
-import de.je.jmeta.datablocks.AbstractDataBlockIterator;
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.IDataBlockAccessor;
-import de.je.jmeta.datablocks.IDataBlockFactory;
-import de.je.jmeta.datablocks.ITransformationHandler;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.datablocks.export.IDataBlockService;
-import de.je.jmeta.datablocks.export.IExtendedDataBlockFactory;
-import de.je.jmeta.dataformats.DataFormat;
-import de.je.jmeta.dataformats.DataTransformationType;
-import de.je.jmeta.dataformats.IDataFormatRepository;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.extmanager.api.IExtension;
-import de.je.jmeta.extmanager.api.IExtensionManager;
-import de.je.jmeta.extmanager.api.InvalidExtensionException;
-import de.je.jmeta.media.api.IMediaAPI;
-import de.je.jmeta.media.api.IMedium;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.registry.ComponentRegistry;
 
@@ -191,7 +192,7 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlockAccessor#getDataBlockFactory(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#getDataBlockFactory(DataFormat)
     */
    @Override
    public IDataBlockFactory getDataBlockFactory(DataFormat dataFormat) {
@@ -200,7 +201,7 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlockAccessor#getTransformationHandlers(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#getTransformationHandlers(DataFormat)
     */
    @Override
    public Map<DataTransformationType, ITransformationHandler> getTransformationHandlers(DataFormat dataFormat) {
@@ -211,8 +212,8 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlockAccessor#setTransformationHandler(DataFormat, DataTransformationType,
-    *      de.je.jmeta.datablocks.ITransformationHandler)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#setTransformationHandler(DataFormat, DataTransformationType,
+    *      com.github.jmeta.library.datablocks.api.services.ITransformationHandler)
     */
    @Override
    public void setTransformationHandler(DataFormat dataFormat, DataTransformationType transformationType,

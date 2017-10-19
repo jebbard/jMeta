@@ -5,19 +5,20 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.util.List;
 
-import de.je.jmeta.datablocks.AbstractDataBlockIterator;
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.IPayload;
-import de.je.jmeta.datablocks.export.FieldFunctionStack;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.PhysicalDataBlockType;
-import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.datablocks.api.type.IPayload;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**

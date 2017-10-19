@@ -5,16 +5,17 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.export;
+package com.github.jmeta.library.datablocks.api.type;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.je.jmeta.datablocks.IDataBlock;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.media.api.IMediumReference;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -52,7 +53,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getBytes(long, int)
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getBytes(long, int)
     */
    @Override
    public byte[] getBytes(long offset, int size) {
@@ -76,7 +77,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getMediumReference()
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getMediumReference()
     */
    @Override
    public IMediumReference getMediumReference() {
@@ -85,7 +86,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getParent()
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getParent()
     */
    @Override
    public IDataBlock getParent() {
@@ -94,7 +95,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getId()
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getId()
     */
    @Override
    public DataBlockId getId() {
@@ -103,7 +104,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#initParent(de.je.jmeta.datablocks.IDataBlock)
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#initParent(com.github.jmeta.library.datablocks.api.type.IDataBlock)
     */
    @Override
    public void initParent(IDataBlock parent) {
@@ -133,7 +134,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    private DataBlockId m_id;
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#setBytes(byte[][])
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#setBytes(byte[][])
     */
    @Override
    public void setBytes(byte[][] bytes) {

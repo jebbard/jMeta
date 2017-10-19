@@ -7,7 +7,7 @@
  * @date 17.01.2011
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,33 +25,34 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.je.jmeta.datablocks.BinaryValueConversionException;
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.IField;
-import de.je.jmeta.datablocks.IHeader;
-import de.je.jmeta.datablocks.IPayload;
-import de.je.jmeta.datablocks.ITransformationHandler;
-import de.je.jmeta.datablocks.export.FieldFunctionStack;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.datablocks.export.IExtendedDataBlockFactory;
-import de.je.jmeta.dataformats.BinaryValue;
-import de.je.jmeta.dataformats.ChildOrder;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.dataformats.DataFormat;
-import de.je.jmeta.dataformats.DataTransformationType;
-import de.je.jmeta.dataformats.FieldFunction;
-import de.je.jmeta.dataformats.FieldFunctionType;
-import de.je.jmeta.dataformats.FieldProperties;
-import de.je.jmeta.dataformats.FieldType;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.dataformats.LocationProperties;
-import de.je.jmeta.dataformats.MagicKey;
-import de.je.jmeta.dataformats.PhysicalDataBlockType;
-import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
-import de.je.jmeta.media.api.datatype.AbstractMedium;
-import de.je.jmeta.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
+import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.datablocks.api.type.IField;
+import com.github.jmeta.library.datablocks.api.type.IHeader;
+import com.github.jmeta.library.datablocks.api.type.IPayload;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.BinaryValue;
+import com.github.jmeta.library.dataformats.api.type.ChildOrder;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.type.FieldFunction;
+import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.type.FieldProperties;
+import com.github.jmeta.library.dataformats.api.type.FieldType;
+import com.github.jmeta.library.dataformats.api.type.LocationProperties;
+import com.github.jmeta.library.dataformats.api.type.MagicKey;
+import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
+import com.github.jmeta.library.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.media.api.type.AbstractMedium;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.charset.Charsets;
 import de.je.util.javautil.common.err.Reject;
 
@@ -124,8 +125,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#hasContainerWithId(IMediumReference,
-    *      de.je.jmeta.dataformats.DataBlockId, de.je.jmeta.datablocks.IPayload, long)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#hasContainerWithId(IMediumReference,
+    *      com.github.jmeta.library.dataformats.api.type.DataBlockId, com.github.jmeta.library.datablocks.api.type.IPayload, long)
     */
    @Override
    public boolean hasContainerWithId(IMediumReference reference, DataBlockId id, IPayload parent,
@@ -492,8 +493,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#readPayload(IMediumReference,
-    *      de.je.jmeta.dataformats.DataBlockId, DataBlockId, java.util.List, FieldFunctionStack, long)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#readPayload(IMediumReference,
+    *      com.github.jmeta.library.dataformats.api.type.DataBlockId, DataBlockId, java.util.List, FieldFunctionStack, long)
     */
    @Override
    public IPayload readPayload(IMediumReference reference, DataBlockId id, DataBlockId parentId, List<IHeader> headers,
@@ -524,8 +525,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#readFields(IMediumReference,
-    *      de.je.jmeta.dataformats.DataBlockId, FieldFunctionStack, long)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#readFields(IMediumReference,
+    *      com.github.jmeta.library.dataformats.api.type.DataBlockId, FieldFunctionStack, long)
     */
    @Override
    public List<IField<?>> readFields(IMediumReference reference, DataBlockId parentId, FieldFunctionStack context,
@@ -605,7 +606,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#setMediumCache(de.je.jmeta.media.api.OLD.IMediumStore_OLD)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#setMediumCache(com.github.jmeta.library.media.api.OLD.IMediumStore_OLD)
     */
    @Override
    public void setMediumCache(IMediumStore_OLD cache) {
@@ -616,7 +617,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#getLongestMinimumContainerHeaderSize(DataBlockId)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#getLongestMinimumContainerHeaderSize(DataBlockId)
     */
    @Override
    public long getLongestMinimumContainerHeaderSize(DataBlockId payloadId) {
@@ -673,7 +674,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#identifiesDataFormat(IMediumReference)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#identifiesDataFormat(IMediumReference)
     */
    @Override
    public boolean identifiesDataFormat(IMediumReference reference) {
@@ -693,7 +694,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#getSpecification()
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#getSpecification()
     */
    @Override
    public IDataFormatSpecification getSpecification() {
@@ -702,7 +703,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlockAccessor#getTransformationHandlers(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#getTransformationHandlers(DataFormat)
     */
    @Override
    public Map<DataTransformationType, ITransformationHandler> getTransformationHandlers() {
@@ -711,8 +712,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlockAccessor#setTransformationHandler(DataFormat, DataTransformationType,
-    *      de.je.jmeta.datablocks.ITransformationHandler)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#setTransformationHandler(DataFormat, DataTransformationType,
+    *      com.github.jmeta.library.datablocks.api.services.ITransformationHandler)
     */
    @Override
    public void setTransformationHandler(DataTransformationType transformationType, ITransformationHandler handler) {
@@ -1213,7 +1214,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    private Map<DataTransformationType, ITransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#readBytes(de.je.jmeta.media.api.IMediumReference, int)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#readBytes(com.github.jmeta.library.media.api.type.IMediumReference, int)
     */
    @Override
    public ByteBuffer readBytes(IMediumReference reference, int size) {
@@ -1228,7 +1229,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IDataBlockReader#cache(de.je.jmeta.media.api.IMediumReference, long)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#cache(com.github.jmeta.library.media.api.type.IMediumReference, long)
     */
    @Override
    public void cache(IMediumReference reference, long size) throws EndOfMediumException {

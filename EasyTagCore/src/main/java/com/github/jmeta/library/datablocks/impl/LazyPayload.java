@@ -5,24 +5,25 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.je.jmeta.datablocks.AbstractDataBlockIterator;
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.IField;
-import de.je.jmeta.datablocks.IPayload;
-import de.je.jmeta.datablocks.export.AbstractDataBlock;
-import de.je.jmeta.datablocks.export.FieldFunctionStack;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.dataformats.PhysicalDataBlockType;
-import de.je.jmeta.media.api.IMediumReference;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.type.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.datablocks.api.type.IField;
+import com.github.jmeta.library.datablocks.api.type.IPayload;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -85,7 +86,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IPayload#getFields()
+    * @see com.github.jmeta.library.datablocks.api.type.IPayload#getFields()
     */
    @Override
    public List<IField<?>> getFields() {
@@ -138,7 +139,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IPayload#getContainerIterator()
+    * @see com.github.jmeta.library.datablocks.api.type.IPayload#getContainerIterator()
     */
    @Override
    public AbstractDataBlockIterator<IContainer> getContainerIterator() {
@@ -164,7 +165,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {

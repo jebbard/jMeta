@@ -7,7 +7,7 @@
  * @date 17.01.2011
  */
 
-package de.je.jmeta.datablocks.export;
+package com.github.jmeta.library.datablocks.api.type;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,14 +19,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.je.jmeta.datablocks.BinaryValueConversionException;
-import de.je.jmeta.datablocks.IField;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.dataformats.FieldFunction;
-import de.je.jmeta.dataformats.FieldFunctionType;
-import de.je.jmeta.dataformats.FieldProperties;
-import de.je.jmeta.dataformats.PhysicalDataBlockType;
+import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.type.FieldFunction;
+import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.type.FieldProperties;
+import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.Flags;
 

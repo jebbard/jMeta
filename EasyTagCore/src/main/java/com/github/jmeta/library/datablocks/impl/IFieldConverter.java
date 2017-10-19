@@ -6,15 +6,15 @@
  *
  * @date 19.06.2011
  */
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import de.je.jmeta.datablocks.BinaryValueConversionException;
-import de.je.jmeta.datablocks.InterpretedValueConversionException;
-import de.je.jmeta.dataformats.BinaryValue;
-import de.je.jmeta.dataformats.DataBlockDescription;
+import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
+import com.github.jmeta.library.dataformats.api.type.BinaryValue;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
 
 /**
  * {@link IFieldConverter}

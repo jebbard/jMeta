@@ -1,11 +1,9 @@
-package de.je.jmeta.datablocks.export;
+package com.github.jmeta.library.datablocks.api.services;
 
 import java.util.List;
 
-import de.je.jmeta.datablocks.IDataBlockFactory;
-import de.je.jmeta.datablocks.ITransformationHandler;
-import de.je.jmeta.dataformats.DataFormat;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
 
 /**
  * {@link IDataBlockService}

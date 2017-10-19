@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,18 +17,19 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.je.jmeta.datablocks.AbstractDataBlockIterator;
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.UnknownDataFormatException;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataFormat;
-import de.je.jmeta.dataformats.PhysicalDataBlockType;
-import de.je.jmeta.media.api.IMediaAPI;
-import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.IMediumReference;
-import de.je.jmeta.media.api.OLD.IMediumStore_OLD;
-import de.je.jmeta.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.datablocks.api.exception.UnknownDataFormatException;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
+import com.github.jmeta.library.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.media.api.services.IMediaAPI;
+import com.github.jmeta.library.media.api.type.IMedium;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 // TODO stage2_002: Implement timeout when reading from stream-based medium

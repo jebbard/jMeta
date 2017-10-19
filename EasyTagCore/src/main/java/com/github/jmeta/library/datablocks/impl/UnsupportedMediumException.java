@@ -6,7 +6,7 @@
  *
  * @date 06.05.2011
  */
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 /**
  * {@link UnsupportedMediumException}

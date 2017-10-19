@@ -5,20 +5,21 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.je.jmeta.datablocks.IField;
-import de.je.jmeta.datablocks.IHeader;
-import de.je.jmeta.datablocks.export.AbstractDataBlock;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.media.api.IMediumReference;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.type.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.type.IField;
+import com.github.jmeta.library.datablocks.api.type.IHeader;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -48,7 +49,7 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IHeader#isFooter()
+    * @see com.github.jmeta.library.datablocks.api.type.IHeader#isFooter()
     */
    @Override
    public boolean isFooter() {
@@ -57,7 +58,7 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IHeader#getFields()
+    * @see com.github.jmeta.library.datablocks.api.type.IHeader#getFields()
     */
    @Override
    public List<IField<?>> getFields() {
@@ -66,7 +67,7 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {

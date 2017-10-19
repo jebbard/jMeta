@@ -5,21 +5,22 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.IDataBlock;
-import de.je.jmeta.datablocks.IHeader;
-import de.je.jmeta.datablocks.IPayload;
-import de.je.jmeta.datablocks.export.AbstractDataBlock;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.media.api.IMediumReference;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.type.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.datablocks.api.type.IDataBlock;
+import com.github.jmeta.library.datablocks.api.type.IHeader;
+import com.github.jmeta.library.datablocks.api.type.IPayload;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -89,7 +90,7 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IContainer#getHeaders()
+    * @see com.github.jmeta.library.datablocks.api.type.IContainer#getHeaders()
     */
    @Override
    public List<IHeader> getHeaders() {
@@ -98,7 +99,7 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IContainer#getFooters()
+    * @see com.github.jmeta.library.datablocks.api.type.IContainer#getFooters()
     */
    @Override
    public List<IHeader> getFooters() {
@@ -107,7 +108,7 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IContainer#getPayload()
+    * @see com.github.jmeta.library.datablocks.api.type.IContainer#getPayload()
     */
    @Override
    public IPayload getPayload() {
@@ -116,7 +117,7 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {

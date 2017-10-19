@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:08 (December 31, 2010)
  */
 
-package de.je.jmeta.datablocks.impl;
+package com.github.jmeta.library.datablocks.impl;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -13,21 +13,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.je.jmeta.datablocks.IContainer;
-import de.je.jmeta.datablocks.IDataBlock;
-import de.je.jmeta.datablocks.IField;
-import de.je.jmeta.datablocks.IHeader;
-import de.je.jmeta.datablocks.IPayload;
-import de.je.jmeta.datablocks.export.FieldFunctionStack;
-import de.je.jmeta.datablocks.export.IDataBlockReader;
-import de.je.jmeta.datablocks.export.IExtendedDataBlockFactory;
-import de.je.jmeta.dataformats.BinaryValue;
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.dataformats.FieldType;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.media.api.IMediaAPI;
-import de.je.jmeta.media.api.IMediumReference;
+import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.type.IContainer;
+import com.github.jmeta.library.datablocks.api.type.IDataBlock;
+import com.github.jmeta.library.datablocks.api.type.IField;
+import com.github.jmeta.library.datablocks.api.type.IHeader;
+import com.github.jmeta.library.datablocks.api.type.IPayload;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.BinaryValue;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.type.FieldType;
+import com.github.jmeta.library.media.api.services.IMediaAPI;
+import com.github.jmeta.library.media.api.type.IMediumReference;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -37,8 +38,8 @@ import de.je.util.javautil.common.err.Reject;
 public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
 
    /**
-    * @see de.je.jmeta.datablocks.export.IExtendedDataBlockFactory#createContainer(de.je.jmeta.dataformats.DataBlockId,
-    *      de.je.jmeta.datablocks.IDataBlock, IMediumReference, java.util.List, de.je.jmeta.datablocks.IPayload,
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.type.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.type.IDataBlock, IMediumReference, java.util.List, com.github.jmeta.library.datablocks.api.type.IPayload,
     *      java.util.List)
     */
    @Override
@@ -56,7 +57,7 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
     *      IDataFormatSpecification, IMediumReference, BinaryValue, ByteOrder, Charset)
     */
    @Override
@@ -82,8 +83,8 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IExtendedDataBlockFactory#createPayloadAfterRead(de.je.jmeta.dataformats.DataBlockId,
-    *      IMediumReference, long, de.je.jmeta.datablocks.export.IDataBlockReader, FieldFunctionStack)
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.type.DataBlockId,
+    *      IMediumReference, long, com.github.jmeta.library.datablocks.api.services.IDataBlockReader, FieldFunctionStack)
     */
    @Override
    public IPayload createPayloadAfterRead(DataBlockId id,
@@ -97,7 +98,7 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IExtendedDataBlockFactory#createHeader(de.je.jmeta.dataformats.DataBlockId,
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.type.DataBlockId,
     *      IMediumReference, java.util.List, boolean)
     */
    @Override
@@ -113,7 +114,7 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.export.IExtendedDataBlockFactory#setDataBlockReader(de.je.jmeta.datablocks.export.IDataBlockReader)
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#setDataBlockReader(com.github.jmeta.library.datablocks.api.services.IDataBlockReader)
     */
    @Override
    public void setDataBlockReader(IDataBlockReader dataBlockReader) {
@@ -124,8 +125,8 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see de.je.jmeta.datablocks.IDataBlockFactory#createPayload(de.je.jmeta.dataformats.DataBlockId,
-    *      de.je.jmeta.datablocks.IDataBlock, java.util.List, java.util.List)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockFactory#createPayload(com.github.jmeta.library.dataformats.api.type.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.type.IDataBlock, java.util.List, java.util.List)
     */
    @Override
    public IPayload createPayload(DataBlockId id, IDataBlock parent,
