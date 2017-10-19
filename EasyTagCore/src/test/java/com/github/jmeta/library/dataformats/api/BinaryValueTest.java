@@ -1,4 +1,4 @@
-package com.github.jmeta.library.dataformats;
+package com.github.jmeta.library.dataformats.api;
 
 import java.util.HashMap;
 import java.util.Iterator;

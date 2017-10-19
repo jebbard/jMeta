@@ -6,7 +6,7 @@
  *
  * @date 28.05.2011
  */
-package com.github.jmeta.library.datablocks.api;
+package com.github.jmeta.library.datablocks.api.service;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

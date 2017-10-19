@@ -6,7 +6,7 @@
  *
  * @date 03.06.2011
  */
-package com.github.jmeta.library.datablocks.api;
+package com.github.jmeta.library.datablocks.api.service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,7 +51,7 @@ public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTe
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.IDataBlockAccessorTest#getFieldSizesForTestingLazyFields()
+    * @see com.github.jmeta.library.datablocks.api.service.IDataBlockAccessorTest#getFieldSizesForTestingLazyFields()
     */
    @Override
    protected List<Integer> getFieldSizesForTestingLazyFields() {
@@ -60,7 +60,7 @@ public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTe
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.IDataBlockAccessorTest#getFileForMediaContents()
+    * @see com.github.jmeta.library.datablocks.api.service.IDataBlockAccessorTest#getFileForMediaContents()
     */
    @Override
    protected Path getFileForMediaContents() {
@@ -69,7 +69,7 @@ public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTe
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.IDataBlockAccessorTest#createExpectationProvider()
+    * @see com.github.jmeta.library.datablocks.api.service.IDataBlockAccessorTest#createExpectationProvider()
     */
    @Override
    protected AbstractMediumExpectationProvider createExpectationProvider() throws InvalidTestDataCsvFormatException {

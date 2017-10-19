@@ -1,4 +1,4 @@
-package com.github.jmeta.library.datablocks.api;
+package com.github.jmeta.library.datablocks.api.service;
 
 import com.github.jmeta.library.datablocks.api.type.IDataBlock;
 import com.github.jmeta.library.dataformats.api.type.DataBlockId;

@@ -6,7 +6,7 @@
  *
  * @date 29.05.2011
  */
-package com.github.jmeta.library.datablocks.api;
+package com.github.jmeta.library.datablocks.api.service;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -166,7 +166,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.AbstractMediumExpectationProvider#getExpectedFieldInterpretedValue(com.github.jmeta.library.datablocks.api.DataBlockInstanceId)
+    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedFieldInterpretedValue(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId)
     */
    @Override
    public Object getExpectedFieldInterpretedValue(DataBlockInstanceId fieldInstanceId) {
@@ -175,7 +175,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.AbstractMediumExpectationProvider#getExpectedChildBlocksOfType(com.github.jmeta.library.datablocks.api.DataBlockInstanceId,
+    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedChildBlocksOfType(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId,
     *      com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType)
     */
    @Override
@@ -192,7 +192,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.AbstractMediumExpectationProvider#getExpectedDataBlockSize(com.github.jmeta.library.datablocks.api.DataBlockInstanceId)
+    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedDataBlockSize(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId)
     */
    @Override
    public long getExpectedDataBlockSize(DataBlockInstanceId dataBlockId) {
@@ -201,7 +201,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.AbstractMediumExpectationProvider#getExpectedFailingFieldConversions(com.github.jmeta.library.datablocks.api.DataBlockInstanceId)
+    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedFailingFieldConversions(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId)
     */
    @Override
    public ExpectedFailedFieldConversionData getExpectedFailingFieldConversions(DataBlockInstanceId fieldInstance) {
@@ -210,7 +210,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.AbstractMediumExpectationProvider#getExpectedTopLevelContainers()
+    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedTopLevelContainers()
     */
    @Override
    public List<DataBlockInstanceId> getExpectedTopLevelContainers() {
@@ -219,7 +219,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.AbstractMediumExpectationProvider#getExpectedTopLevelContainersReverse()
+    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedTopLevelContainersReverse()
     */
    @Override
    public List<DataBlockInstanceId> getExpectedTopLevelContainersReverse() {
