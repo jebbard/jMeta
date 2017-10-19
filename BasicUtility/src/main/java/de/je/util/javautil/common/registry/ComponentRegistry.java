@@ -49,7 +49,7 @@ public class ComponentRegistry {
       Iterator<S> serviceProviderIterator = serviceLoader.iterator();
 
       if (!serviceProviderIterator.hasNext()) {
-         throw new NoRegisteredServiceFoundException("No registered service found for class " + service);
+         throw new NoRegisteredServiceFoundException("No registered service found for " + service);
       }
 
       SERVICE_LOADERS.put(service, serviceLoader);
