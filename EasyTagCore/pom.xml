@@ -28,6 +28,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.github.jmeta.utility</groupId>
+			<artifactId>jMetaUtility</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>de.je.util.javautil</groupId>
 			<artifactId>BasicUtility</artifactId>
 			<version>0.5</version>

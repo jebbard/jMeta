@@ -15,8 +15,9 @@ import java.io.RandomAccessFile;
 import org.junit.After;
 import org.junit.Before;
 
-import de.je.jmeta.context.impl.LibraryJMeta;
-import de.je.jmeta.extmanager.api.IExtensionManager;
+import com.github.jmeta.library.startup.impl.LibraryJMeta;
+import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+
 import de.je.jmeta.testHelpers.logChecker.LogChecker;
 import de.je.util.javautil.common.registry.ComponentRegistry;
 import de.je.util.javautil.io.file.FileUtility;

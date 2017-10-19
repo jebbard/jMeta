@@ -1,8 +1,8 @@
 eclipse.preferences.version=1
-encoding//src/main/java/de/je/jmeta/datablocks/export/FieldFunctionStack.java=UTF-8
+encoding//src/main/java/com/github/jmeta/library/datablocks/api/type/FieldFunctionStack.java=UTF-8
+encoding//src/main/resources/META-INF/services/com.github.jmeta.library.api.services.ILibraryJMeta=UTF-8
+encoding//src/main/resources/META-INF/services/com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor=UTF-8
+encoding//src/main/resources/META-INF/services/com.github.jmeta.library.dataformats.api.service.IDataFormatRepository=UTF-8
+encoding//src/main/resources/META-INF/services/com.github.jmeta.library.media.api.services.IMediaAPI=UTF-8
+encoding//src/main/resources/META-INF/services/com.github.jmeta.utility.extmanager.api.IExtensionManager=UTF-8
 encoding//src/main/resources/META-INF/services/de.je.jmeta.config.export.IUserConfigAccessor=UTF-8
-encoding//src/main/resources/META-INF/services/de.je.jmeta.context.ILibraryJMeta=UTF-8
-encoding//src/main/resources/META-INF/services/de.je.jmeta.datablocks.IDataBlockAccessor=UTF-8
-encoding//src/main/resources/META-INF/services/de.je.jmeta.dataformats.IDataFormatRepository=UTF-8
-encoding//src/main/resources/META-INF/services/de.je.jmeta.extmanager.api.IExtensionManager=UTF-8
-encoding//src/main/resources/META-INF/services/de.je.jmeta.media.api.IMediaAPI=UTF-8
