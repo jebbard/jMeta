@@ -26,6 +26,7 @@
     "xcolor")
    (TeX-add-symbols
     "LibName"
+    "LibNamePackage"
     "LibVersion"
     "Lib"
     "JavaVersion"

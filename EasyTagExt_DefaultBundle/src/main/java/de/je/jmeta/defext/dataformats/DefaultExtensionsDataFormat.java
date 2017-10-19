@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.je.jmeta.dataformats.DataFormat;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
 
 /**
  * {@link DefaultExtensionsDataFormat}

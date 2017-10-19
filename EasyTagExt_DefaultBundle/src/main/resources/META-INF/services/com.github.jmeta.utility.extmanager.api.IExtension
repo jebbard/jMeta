@@ -1,0 +1,6 @@
+com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension
+com.github.jmeta.defaultextensions.id3v1.impl.ID3v1Extension
+com.github.jmeta.defaultextensions.id3v23.impl.ID3v23Extension
+com.github.jmeta.defaultextensions.lyrics3v2.impl.Lyrics3v2Extension
+com.github.jmeta.defaultextensions.mp3.impl.MP3Extension
+com.github.jmeta.defaultextensions.ogg.impl.OggExtension

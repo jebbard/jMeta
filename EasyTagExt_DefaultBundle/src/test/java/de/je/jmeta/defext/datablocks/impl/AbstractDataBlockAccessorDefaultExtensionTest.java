@@ -6,10 +6,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.je.jmeta.datablocks.iface.AbstractDataBlockAccessorTest;
-import de.je.jmeta.media.api.IMedium;
-import de.je.jmeta.media.api.datatype.FileMedium;
-import de.je.jmeta.media.api.datatype.InMemoryMedium;
+import com.github.jmeta.library.datablocks.api.AbstractDataBlockAccessorTest;
+import com.github.jmeta.library.media.api.type.FileMedium;
+import com.github.jmeta.library.media.api.type.IMedium;
+import com.github.jmeta.library.media.api.type.InMemoryMedium;
+
 import de.je.util.javautil.testUtil.setup.TestDataException;
 
 /**
@@ -18,7 +19,7 @@ import de.je.util.javautil.testUtil.setup.TestDataException;
 public abstract class AbstractDataBlockAccessorDefaultExtensionTest extends AbstractDataBlockAccessorTest {
 
    /**
-    * @see de.je.jmeta.datablocks.iface.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(Path, Path,
+    * @see com.github.jmeta.library.datablocks.api.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(Path, Path,
     *      Integer[])
     */
    public AbstractDataBlockAccessorDefaultExtensionTest(Path testFile, Path csvFile, Integer[] fieldSizes) {
@@ -26,7 +27,7 @@ public abstract class AbstractDataBlockAccessorDefaultExtensionTest extends Abst
    }
 
    /**
-    * @see de.je.jmeta.datablocks.iface.IDataBlockAccessorTest#createMediaToCheck(java.nio.file.Path)
+    * @see com.github.jmeta.library.datablocks.api.IDataBlockAccessorTest#createMediaToCheck(java.nio.file.Path)
     */
    @Override
    protected List<IMedium<?>> createMediaToCheck(Path baseFile) throws Exception {

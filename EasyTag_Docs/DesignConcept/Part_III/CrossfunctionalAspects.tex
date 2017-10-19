@@ -2,7 +2,7 @@
 %		Basic Aspects
 %===============================================================================================
 
-\chapter{Übergreigende Aspekte}
+\chapter{Cross-functional Aspects}
 \label{sec:BasicAspects}
 
 Als Design wird hier die Fortsetzung der skizzierten Architektur im Detail verstanden.
@@ -321,6 +321,43 @@ Konfiguration kann über eine generische API erfolgen. Die Notwendigkeit von Konf
 }
 %%%% <-- DD %%%%
 
+% -------------------------------------------------------------------------------------------------------
+%  Package Naming Conventions
+% -------------------------------------------------------------------------------------------------------
+\section{Package Naming Conventions}%
+\label{sec:PackageNamingConventions}%
+
+Here, we quickly define the package naming to be used for the library and extensions of the library.
+
+% =======================================================================================================
+\subsection{Core Library}%
+\label{sec:CoreLibrary}%
+
+All packages for the core library start with \texttt{com.github.\LibNamePackage{}}, according to the Java naming conventions. The reason is that the library is hosted on Github. Below this core name, the following sub-packages are used:
+\begin{itemize}
+\item \texttt{.library.<component>} for all core components of the library, where ``\texttt{<component>}'' is replaced by the actual component name
+\item \texttt{.utility.<component>} for all technical utility code needed for the library, where ``\texttt{<component>}'' is replaced by the actual category name
+\item \texttt{.defaultextensions.<extension name>} for all extensions delivered by default bundled with \LibName{}, where ``\texttt{<extension name>}'' is the name of the extension, usually a single data format name; see also the next section for third-party extensions
+\end{itemize}
+
+Below these package names, there is another hierarchy:
+\begin{itemize}
+\item \texttt{.api} containing the public interface of the component, utility or extension; this package itself should not contain classes directly, but is further subdivided into:
+\begin{itemize}
+\item \texttt{.services} containing the function interfaces the user needs to use to work with the component, utility or extension
+\item \texttt{.types} containing any transport objects, data types or the like for the component, utility or extension
+\item \texttt{.exception} containing any public exceptions of the component, utility or extension
+\end{itemize}
+\item \texttt{.impl} containing the private implementation of the component, utility or extension; sub-divisions into further packages below it  are possible, but component-specific and not standardized
+\end{itemize}
+
+% =======================================================================================================
+\subsection{Extensions}%
+\label{sec:Extensions}%
+
+As mentioned already, the default extensions delivered together with \LibName{} of course also use a package naming convention quite similar to the core library package names. For any third party extensions, there is of course no definition of how the packages should be named, but it is up to the creators of the extension.
+
+However, extension providers should follow the standard Java package naming conventions, and they should ensure that their package names do not clash with package names of other \LibName{} extensions.
 
 %###############################################################################################
 %###############################################################################################
@@ -329,3 +366,8 @@ Konfiguration kann über eine generische API erfolgen. Die Notwendigkeit von Konf
 %
 %###############################################################################################
 %###############################################################################################
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../EasyTag_DesignConcept"
+%%% End:

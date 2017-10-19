@@ -113,7 +113,7 @@ To avoid such problems, there are special locking mechanisms for exclusive acces
 Locking of files during \LibName{} access
 }
 {% Kurzbeschreibung
-Files are \emph{always} locked during access by \LibName{} explicitly. File content are protected by exclusive locks from corruption by other processes and threads. See \cite{PWikIO}, where we show that a file in Java must be explicitly opened for writing to be able to lock it. ``During access'' means: After opening it and until closing it. The lock thus might be long-term. \LibName{} opens a file for writing (and locking) even if the user explicitly requested read-access only.
+Files are \emph{always} locked during access by \LibName{} explicitly. File content is protected by exclusive locks from corruption by other processes and threads. See \cite{PWikIO}, where we show that a file in Java must be explicitly opened for writing to be able to lock it. ``During access'' means: After opening it and until closing it. The lock thus might be long-term. \LibName{} opens a file for writing (and locking) even if the user explicitly requested read access only.
 }
 {% Begründung
 Other processes and threads of the same JVM cannot access the files and corrupt any data, which avoids consistency problems.
@@ -164,7 +164,7 @@ No disadvantages known
 \subsubsection{Unified API for Media Access}
 \label{sec:PerfMediaZUGR}
 
-In the wiki article \cite{PWikIO}, we have shown clearly the differences between byte streams and random-file-access. With so many difference the question arises: Can this be unified at all and does the effort make sense here? The least common demoninator for random-file-access and \texttt{InputStream}s is the linear reading of all bytes in the medium. This is clearly too less. It denies all advantages of random-access. The intersection of features for a unification is therefore not making sense.
+In the wiki article \cite{PWikIO}, we have shown clearly the differences between byte streams and random-access files. With so many difference the question arises: Can this be unified at all and does the effort make sense here? The least common demoninator for random-file-access and \texttt{InputStream}s is the linear reading of all bytes in the medium. This is clearly too less. It denies all advantages of random-access. The intersection of features for a unification is therefore not making sense.
 
 Moreover, we want a unifying combination of both approaches:
 
@@ -183,7 +183,7 @@ While byte arrays are no problem for the abstraction, even random-access files a
 	\item Files can be read-only, too, which \texttt{InputStream}s are always by definition.
 \end{itemize}
 
-Writing access to a read-only medium are acquitted with a runtime exception (especially for an \texttt{InputStream}).
+Writing access to a read-only medium is acquitted with a runtime exception, especially for an \texttt{InputStream}.
 
 The main difference between files and \texttt{InputStream}s is of course: Random access is possible for files, while \texttt{InputStream}s can only be read sequentially. This difference can be potentially decreased using mechanisms such as buffering.
 }
@@ -341,7 +341,7 @@ No disadvantages known.
 }
 %%%% <-- DD %%%%
 
-A further important aspect is caching: With \emph{Caching}, we refer to the possibly persistent storage of \TERMmedium{} contents in RAM to support faster access to the data. Buffering differs from caching in a sense that buffering is only a short-lived temporary storage without the necessity of synchronisation.
+A further important aspect is caching: With \emph{Caching}, we refer to the possibly long-term storage of \TERMmedium{} contents in RAM to support faster access to the data. Buffering differs from caching in a sense that buffering is only a short-lived temporary storage without the necessity of synchronisation.
 
 To start with, we can see - besides the already mentioned buffering - different kinds of ``Caching'' in an application that is based on \LibName{}:
 \begin{itemize}
@@ -352,9 +352,9 @@ To start with, we can see - besides the already mentioned buffering - different 
 
 If we look at all these alternatives, the question arises why at all an additional built-in caching in \LibName{} would be needed? For answering this question, we should look at some use case scenarios for the library: One scenario is the already mentioned reading of metadata from a file to display it in a GUI. For such a case, caching would usually not be very useful. You read once, and maybe twice, if the user wishes to update the screen. It would be an acceptable performance without caching. Another use case is the arbitrary jumping between parts of a container format file using a low-level API to process specific contents. This is true ``random access''. The question is: Do you want to read the same place twice? Sometimes possibly yes. Instead, would you want a direct medium access again? Possibly yes or no.
 
-The last question brings up a general problem with caching: The problem of synchronicity with the external medium. If the medium has been changed in between, the cache content is probably aged and invalid. Code that accesses the cache can usually not recognize this.
+The last question brings up another general problem with caching: The problem of synchronicity with the external medium. If the medium has been changed in between, the cache content is probably aged and invalid. Code that accesses the cache can usually not recognize this.
 
-We first sum up the determined advantages and disadvantages:
+We first sum up the identified advantages and disadvantages:
 
 \begin{longtable}{|p{0.5\textwidth}|p{0.5\textwidth}|}
 	\hline
@@ -363,7 +363,7 @@ We first sum up the determined advantages and disadvantages:
 	\hline
 	$+$ Performance improvement when reading the same data multiple times, as cache access is much faster than the access to the external medium & $-$ When only accessing once there is of course no performance improvement \\
 	\hline
-  $+$ In a cache you are - in principle - more flexible to reorganize data than on an external medium, making it easier to correct, undo or bundle changes. & $-$ Changes on the \TERMmedium{} cannot be recognized and lead to invalid cache content that might lead to erroneous behaviour or data corruption in follow-up write actions. \\
+  $+$ In a cache you are - in principle - more flexible to reorganize data than on an external medium, making it easier to correct, undo or bundle changes. & $-$ External 3rd party changes on the \TERMmedium{} cannot be recognized and lead to invalid cache content that might lead to erroneous behaviour or data corruption in follow-up write actions. \\
 	\hline
 	 & $-$ There is additional code necessary for caching, e.g. questions such as ``when is the allocated memory freed?'' must be answered. For consistency topics, even more complex code is necessary.\\
 	\hline
@@ -373,11 +373,11 @@ We first sum up the determined advantages and disadvantages:
 \label{tab:CachingProCon}
 \end{longtable}
 
-The disadvantages outweight the advantages. Why should you then use caching in \LibName{}? Some of the previous design decisions combine well with a caching approach:
+The disadvantages outweight the advantages. Why should you then use caching in \LibName{} at all? Because some of the previous design decisions combine well with a caching approach:
 \begin{itemize}
 \item \DesLink{dd:407} can be achieved using a cache, as we see just a little later
 \item \DesLink{dd:409} can be implemented with a cache, i.e. anything that has been buffered should directly go into the cache for subsequent read actions
-\item \DesLink{dd:410} may or may not be easier to implement using a cache. In this case the cache would be used to store the registered changes before a flush. However, if it would only be this, a cache would be greatly too complex, Easier solutions are possible for holding the not-yet-flushed data.
+\item \DesLink{dd:410} may or may not be easier to implement using a cache. In this case the cache would be used to store the registered changes before a flush. However, if it would only be this, a cache would be greatly too complex. Easier solutions are possible for holding the not-yet-flushed data.
 \end{itemize}
 
 Thus we decide:
@@ -388,12 +388,12 @@ Thus we decide:
 \COMPmedia{} keeps medium data read in a cache
 }
 {% Kurzbeschreibung
-\COMPmedia{} uses a RAM based, permanent fast storage (Cache) to store already read content of the \TERMmedium{}. Subsequent read accesses request the cache content (if present) only.
+\COMPmedia{} uses a RAM-based, potentially long-lived fast storage (cache) to store already read content of the \TERMmedium{}. Subsequent read accesses request the cache content (if present) only.
 }
 {% Begründung
 \begin{itemize}
 \item We provide faster repeated read access to already read data to the end-user
-\item This can be used for direct implementation of \DesLink{dd:409} in a sense of buffering when reading. The cache works as the buffer for \DesLink{dd:409}.
+\item This can be used for direct implementation of \DesLink{dd:409} in a sense of buffering when reading. i.e. the cache works as the buffer for \DesLink{dd:409}
 \item Implementation of \DesLink{dd:407} can be done using a cache
 \end{itemize}
 }
@@ -506,22 +506,22 @@ Finally, we want to list a design decision rejected during a proof of concept, w
 %%%% DD --> %%%%
 \DD{dd:411d}
 {% Titel
-The \COMPmedia{} API does not provide the option to skip bytes of an \texttt{InputStream}s instead of reading them into the cache.
+The \COMPmedia{} API does not provide the option to skip bytes of an \texttt{InputStream} instead of reading them into the cache
 }
 {% Kurzbeschreibung
-It sounds like a good idea to offer the configurable possibility to skip bytes from an \texttt{InputStream} instead of unnecessarily read them (and put them into a cache). This mainly applies for the case when you are currently at offset $x$, but now you want to read bytes from the stream starting at offset $x+100$. You might never want to access the bytes between $x$ and $x+100$. So it would be worthwile to allow the possibility to simply skip them instead of reading them into memory and into the cache.
+It sounds like a good idea to offer the configurable possibility to skip bytes from an \texttt{InputStream} instead of unnecessarily reading them (and put them into a cache). This mainly applies for the case when you are currently at offset $x$, but now you want to read bytes from the stream starting at offset $x+100$. You might never want to access the bytes between $x$ and $x+100$. So it would be worthwile to allow the possibility to simply skip them instead of reading them into memory and into the cache.
 
 However, \texttt{InputStream.skip} is not as straightforward as one could wish. It does not guarantee to skip the number of bytes given, but it might skip fewer bytes or even return a negative number. It might also throw an \texttt{IOException}, which might or might not include the case of reaching the end of medium. Although not specified, there might be the same behavior as for read, that \texttt{InputStream.skip} might block. Furthermore the javadocs specify that it is only supported for streams that support seeking. All in all, this gives the impression that the method is highly platform and implementation-dependent. How to bring this implementation into a reliable form that guarantees to always skip the given number of bytes or block (possibly with timeout)?
 }
 {% Begründung
-It is too complex to implement the method reliably, thus we omit it and only offer the possibility to read ahead until a given offset. All bytes read are possibly read into the cache. However, the cache is ``self-cleaning'' if a maximum size is configured. This mechanism should be sufficient for achieving a moderate heap usage.
+It is too complex to implement the method reliably, thus we omit it and only offer the possibility to read ahead until a given offset. All bytes read are possibly read into the cache. However, the cache is ``self-cleaning'' according to \DesLink{dd:411e}, if a maximum size is configured. This mechanism should be sufficient for achieving a moderate heap usage.
 }
 {% Nachteile
 Probably more heap usage and bytes might be unnecessary read and kept in memory.
 }
 %%%% <-- DD %%%%
 
-Implementing the discussed caching mechanisms is a big challenge. It will be more detailed in the implementation part of this component. Here, we can only exclude one way of implementing it:
+Implementing the discussed caching mechanisms is a big challenge. It will be detailed more in the implementation part of this component. Here, we can only exclude one way of implementing it:
 
 %%%% DD --> %%%%
 \DD{dd:412}
@@ -539,7 +539,7 @@ The ``by hand'' caching is harder to implement.
 }
 %%%% <-- DD %%%%
 
-At the end we shortly list a special case for of caching for byte array media:
+At the end we shortly list a special case of caching for byte array media:
 %%%% DD --> %%%%
 \DD{dd:412a}
 {% Titel
@@ -567,7 +567,7 @@ The two-stage write protocol introduced in \SectionLink{sec:GrundSchreiben} brin
 \item Or already a state the includes any ``pending'' changes introduced by writing calls before the \emph{flush}?
 \end{enumerate}
  
-You could base your answer on the following: For sure alternative (2), as it is this way that transactions mostly work on databases: What you have already written during the transaction, you re-read later, too, even if the transaction is not yet persisted. However, the view of \LibName{} is as follows:
+You could base your answer on the following: For sure alternative (2), as it is this way that e.g. transactions mostly work for code accessing databases. What you have already written during the transaction, you re-read later, too, even if the transaction is not yet persisted. However, the view of \LibName{} is different:
 
 %%%% DD --> %%%%
 \DD{dd:410c}
@@ -580,7 +580,7 @@ Even if there are pending changes not yet \emph{flush}ed (e.g. inserts, removes)
 {% Begründung
 The changes the user has registered are coming form the user, and he thus could potentially keep bookmarks of them. Therefore their sole management by \COMPmedia{} is - at this point in time - not strictly necessary. Furthermore it must still be possible to read the data of a datablock that is threatened by a pending remove. 
 
-Another good reason for this behaviour is that  the reading operations are much less complex, as they do not need to consider any pending changes. The code that reads data can be sure to always only work on a persistent state. Thus it cannot occur that logic is basing on data that is not yet persisted.
+Another good reason for this behaviour is that  the reading operations are much less complex, as they do not need to consider any pending changes. The code that reads data can be sure to always only work on a persistent (or at least a cached) state. Thus it cannot occur that logic is basing on data that is not yet persisted.
 }
 {% Nachteile
 The expectation that ``what I have written before - even if pending - I can re-read afterwards'' is not fulfilled. The user must manage this for changed data by himself, at least temporarily until the next flush. 
@@ -594,10 +594,10 @@ In \SectionLink{sec:PerfMedia}, caching has been discussed in detail. For buffer
 Explicit operation for buffering of media data
 }
 {% Kurzbeschreibung
-There is an operation \emph{cache} which buffers $n$ data bytes starting at a given offset, without returning this data. Additionally, there is an operation to query the number of bytes buffered concecutively starting at a given offset.
+There is an operation \emph{cache} which buffers $n$ data bytes starting at a given offset, without returning this data. Additionally, there is an operation to query the number of bytes buffered concecutively starting at a given offset. Of course, this might lead to an ``end of medium'' situation indicated by the method to the caller.
 }
 {% Begründung
-Necessary for implementing \DesLink{dd:409}.
+Necessary for implementing \DesLink{dd:409}. Of course one could ask: Why isn't it sufficient to just provide a single \texttt{getData} operation that returns data, either from the cache or from the medium. If the data was not yet in cache, it also adds it to the cache. The reason is: The code might not want the bytes yet! It just wants to give a statement like ``At this point in time, I know how much bytes I might need to read later, so please already buffer them. But do not give the bytes to me, because at this point in the code I cannot really use them and it would complicate my code strucutre.'' For instance, if only providing one method returning the data, the code must pass the read data as parameter to other methods to read it. Instead of doing this, the code can just buffer the needed number of bytes, then call other code to get just the data it needs without needing to fiddle keeping track of the last read byte.
 }
 {% Nachteile
 No disadvantages known
@@ -608,30 +608,47 @@ Additionally, you must be able to get your hands at the buffered data:
 %%%% DD --> %%%%
 \DD{dd:412c}
 {% Titel
-Explicit operation to get read data
+Explicit operation to get medium bytes
 }
 {% Kurzbeschreibung
-There is an operation \emph{getData} which returns $n$ data bytes starting at a given offset
+There is an operation \emph{getData} which returns $n$ data bytes starting at a given offset.
 }
 {% Begründung
-Without it there would not be any possibility to read data from a medium
+Without it there would not be any possibility to read data from a medium, as \emph{cache} only buffers it internally without returning it.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Now the question areises, how the operation \emph{getData} interacts with the cache, which is answered here:
+Now the question arises, how the operation \emph{getData} interacts with the cache, which is answered here:
 %%%% DD --> %%%%
 \DD{dd:412d}
 {% Titel
 \emph{getData} combines data from the cache with data form the medium and updates the cache thereby, if necessary
 }
 {% Kurzbeschreibung
-\emph{getData} reads data from the cache, if they are entirely contained in it. Are they not entirely contained, \emph{getData} reads the bytes present in the cache, and reads the non-present ones from the medium, adding it to the cache afterwards. Thus data is combined from the two sources. The user can control for each call, if \emph{getData} behaves as mentioned previously or in any case directly accesses the medium, i.e. ignoring the cache, while still updating it.
+\emph{getData} reads data from the cache, if the given range is entirely contained in it. Is it not entirely contained in the cache, \emph{getData} reads the bytes present in the cache, and reads the non-present ones from the medium, adding it to the cache afterwards. Thus data is combined from the two sources.
 }
 {% Begründung
-To ensure efficient reading, \emph{getData} can be used as such to fetch data from the cache, if anyhow possible, and only in other cases the medium must be accessed. The forced direct access is offered as additional possibility. Updating the cache by read data is useful, e.g. if the cache is very fragmented and the \emph{getData} result would reduce fragmentation.
+To ensure efficient reading, \emph{getData} can be used as such to fetch data from the cache, if anyhow possible. Only if there is at leaast one byte not in the cache, the medium must be accessed directly. Updating the cache by read data is useful, to ensure later calls to query the same data can fully leverage the cache and do not need another access to the external medium.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Should we provide a way to force medium access when getting data?
+%%%% DD --> %%%%
+\DD{dd:412da}
+{% Titel
+\emph{getData} provides no specific mode or configuration to ignore the cache and always read from the medium
+}
+{% Kurzbeschreibung
+\emph{getData} does not provide a forced read mechanism, but it always only reads data from the external medium that it cannot find in the cache.
+}
+{% Begründung
+It is not clear when using code should use the forced or the unforced mode. If the using code somehow can magically see that the underlying medium was changed by other processes, it could do a forced direct read. But in this case, everything is lost already, because you can never know what the other process did. A better way to ensure integrity and consistency would be for the using code to close the medium and reopen another access instance.
 }
 {% Nachteile
 No disadvantages known
@@ -702,6 +719,7 @@ A medium is represented as Java interface \IMedium{} and allows users of \LibNam
 A medium has the following properties:
 \begin{itemize}
 	\item Is random-access: Yes/No \-- \textbf{Motivation:} This property has strong impact on the read and write process, yet it is an intrinsic property of the \TERMmedium{} itself and not of the access mechanism. Thus it is directly available for at a \TERMmedium{}.
+	\item Is cacheable: Yes/No \-- \textbf{Motivation:} See \DesLink{dd:412a}. All media supported except byte arrays are cacheable.
 	\item Currently exists: Yes/No \-- \textbf{Motivation:} Checking existence in Java can be done at the \TERMmedium{} level itself.
 	\item Read-only: Yes/No \-- \textbf{Motivation:} This property disables writing in practice if set to ``Yes''. Some \TERMmedia{} can never be written (e.g. \texttt{InputStream}s), for others it is possible. This flag shall be used to also give the \LibName{} user a possibility to signal he wants to only access read-only.
 	\item Current lenght in bytes (only relevant for random-access) \-- \textbf{Motivation:} Java offers queries for each kind of \IMedium{} except \texttt{InputStream}. Thus this should be implemented directly in the \IMedium{} implementation. For \texttt{InputStream} and non-random-access media in general, terms like length to not make much sense. Thus here there is no value, but a constant indicating an unknown length. In spirit pf design decision \DesLink{dd:410}, it is a currently persisted lenght and not a length including any not-yet persisted changes.
@@ -742,7 +760,7 @@ Here is a very importante note for byte array media:
 For byte array media, a writing method for resetting the whole byte array is necessary
 }
 {% Kurzbeschreibung
-The user can reset the bytes of the medium via a public method \texttt{setBytes()} of class \InMemoryMedium{}.
+The user can reset the bytes of the medium via a public method \texttt{setBytes} of class \InMemoryMedium{}.
 }
 {% Begründung
 It is mostly not harmful to offer the method as public, it is even an advantage for the users, as he can set the bytes himself. Only between registering write operations and a flush, this call leads to unexpected behaviour.
@@ -787,9 +805,9 @@ It makes not so much sense to represent offsets only via a primitve data type. I
 {% Kurzbeschreibung
 The interface binds both the \TERMmedium{} and the offset on this \TERMmedium{} together, and thus is a kind of ``global'' address of a byte. Next to reading medium and of offset, it offers some helper methods:
 \begin{itemize}
-\item \texttt{behindOrEqual():} Returns true if another \IMediumReference{} is located on the same medium behind of at the same position as this instance.
-\item \texttt{before():} Returns true if another \IMediumReference{} is located on the same medium before the position of this instance.
-\item \texttt{advance():} Creates a new \IMediumReference{} that is located by the given byte number before (negative argument) or after (positive argument) this instance.
+\item \texttt{behindOrEqual:} Returns true if another \IMediumReference{} is located on the same medium behind of at the same position as this instance.
+\item \texttt{before:} Returns true if another \IMediumReference{} is located on the same medium before the position of this instance.
+\item \texttt{advance:} Creates a new \IMediumReference{} that is located by the given byte number before (negative argument) or after (positive argument) this instance.
 \end{itemize}
 }
 {% Begründung
@@ -976,7 +994,7 @@ The operation \emph{remove} behaves as follows:
 %%%% DD --> %%%%
 \DD{dd:424}
 {% Titel
-\emph{remove} allows no overlaps, only later calls with bitter region make earlier calls obsolete
+\emph{remove} allows no overlaps, only later calls with bigger region make earlier calls obsolete
 }
 {% Kurzbeschreibung
 The following temporal order of calls have the described semantics:
@@ -1106,13 +1124,13 @@ No disadvantages known
 	\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} & \textbf{Features and motivation random-access} & \textbf{Features and motivation \texttt{InputStream}} \\
 	\endhead
 	\hline
-	\texttt{cache(x, n)} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. If caching is disabled, this call is ignored. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is smaller than the current highest read offset, a \texttt{InvalidMediumReferenceException} is thrown. Additionally: Is it bigger than the current highest read offset, the bytes up to the new offset are read. Afterwards the actually requested bytes are read. This ensures that all bytes are available in principle. The last read offset is advanced correspondingly. \\
+	\texttt{cache(x, n)} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. If caching is disabled (specifically for byte array media, see \DesLink{dd:412a}), this call is ignored. The method might reach the end of medium which it signals as an exception. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is bigger than the last read end position, the bytes up to the new offset are read and possibly cached. If $x$ is smaller instead, a \texttt{InvalidMediumReferenceException} is thrown. The last read end position is advanced correspondingly. \\
 	\hline
-	\texttt{getCachedByteCountAt(x)} & According to \DesLink{dd:409} and \DesLink{dd:412b}, it provides the number of bytes that are consecutively cached at offset $x$. & See \texttt{cache()}. User code must be able to additionally check whether enough data is already buffered or not. & See random-access.\\
+	\texttt{getCachedByteCountAt(x)} & According to \DesLink{dd:409} and \DesLink{dd:412b}, it provides the number of bytes that are consecutively cached at offset $x$. & See \texttt{cache}. User (and test) code must be able to additionally check whether enough data is already buffered or not. & See random-access.\\
 	\hline
 	\texttt{getMedium()} & Returns the \IMedium{} instance this \IMediumStore{} is associated with. &  & \\
 	\hline
-    	\texttt{getData(x, n, forceMediumAccess)} & Reads $n$ bytes at offset $x$ with the given mode (\texttt{forceMediumAccess} = \texttt{true} or \texttt{false}) according to \DesLink{dd:410c}, \DesLink{dd:412c}, \DesLink{dd:412d} & With \texttt{forceMediumAccess} = \texttt{false}: It first tries to read the data from the cache. If (partly) not available, the missing data is directly read from external medium. With \texttt{forceMediumAccess} = \texttt{true}: Data is always directly read from external medium, cache is ignored. In both cases, the cache will be updated with data newly read from external medium. Furthermore, only when caching is enabled, the method actually accesses the cache, in both cases. & \texttt{forceMediumAccess} is ignored. If there is data for the given offset with the given size in the cache, the data is returned. If it is not, a \texttt{InvalidMediumReferenceException} is thrown. Thus, for \texttt{InputStream}s, a call to \texttt{cache()} is mandatory before reading can actually start. \\
+    	\texttt{getData(x, n)} & Reads $n$ bytes at offset $x$ according to \DesLink{dd:410c}, \DesLink{dd:412c}, \DesLink{dd:412d}. & Calls \texttt{cache} to ensure all bytes are cached, then returns the data in a consolidated \texttt{ByteBuffer}. & Same as for random-access media. This indicates that this method also might throw an \texttt{InvalidMediumReferenceException}. \\
 	\hline
 	\texttt{isAtEndOfMedium(x)} & Checks if offset $x$ is at the end of the \TERMmedium{}. & Based on this knowledge, the user code can skip further reading and does not need to check for exceptions. & The provided offset is ignored, it is tried to read bytes from current offset. Is this resulting in return code -1, we are at the end of the stream, otherwise the byte is added to the cache. \\
 	\hline
@@ -1188,7 +1206,7 @@ The following table summarizes all further error situations when working with \C
 	\hline
 	Consecutive write calls overlap & Concecutive calls to \texttt{removeData} or \texttt{replaceData} before a \texttt{flush} overlap in an invalid way (see \DesLink{dd:424} and \DesLink{dd:424a}) & Is acquitted with an \texttt{InvalidOverlappingWriteException} runtime exception. & \IMediumStore{} \texttt{.removeData()}, \IMediumStore{} \texttt{.replaceData()}\\
 	\hline
-	Invalid cache offset & With \texttt{cache()} it is tried for an \texttt{InputStream} to cache an offset that is smaller than the last read offset. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException} runtime exception. & \IMediumStore{} \texttt{.cache()} \\
+	Invalid cache offset & With \texttt{cache()} it is tried for an \texttt{InputStream} to cache an offset that is smaller than the last read offset. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException} runtime exception. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()} \\
 	\hline
 	Stream data not available & Data requested with \texttt{getData()} for a given offset is not available (anymore) in the cache, and the underlying medium is an \texttt{InputStream}. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException}, a runtime exception. & \IMediumStore{} \texttt{.getData()} \\
 	\hline
