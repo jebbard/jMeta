@@ -7,7 +7,7 @@
  * @date 20.03.2016
  *
  */
-package de.je.jmeta.context.impl;
+package com.github.jmeta.library.startup.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,13 +19,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
+import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
+import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+
 import de.je.jmeta.common.ILoggingMessageConstants;
 import de.je.jmeta.config.export.IUserConfigAccessor;
 import de.je.jmeta.config.export.UserConfigParam;
-import de.je.jmeta.context.ILibraryJMeta;
-import de.je.jmeta.datablocks.IDataBlockAccessor;
-import de.je.jmeta.dataformats.IDataFormatRepository;
-import de.je.jmeta.extmanager.api.IExtensionManager;
 import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 import de.je.util.javautil.common.config.issue.ConfigIssueType;
