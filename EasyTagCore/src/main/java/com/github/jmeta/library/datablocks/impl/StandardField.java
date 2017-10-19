@@ -1,0 +1,312 @@
+/**
+ * {@link StandardField}.java
+ *
+ * @author Jens Ebert
+ * @date 31.12.10 19:47:07 (December 31, 2010)
+ */
+
+package de.je.jmeta.datablocks.impl;
+
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+
+import de.je.jmeta.datablocks.BinaryValueConversionException;
+import de.je.jmeta.datablocks.IDataBlock;
+import de.je.jmeta.datablocks.IField;
+import de.je.jmeta.datablocks.InterpretedValueConversionException;
+import de.je.jmeta.dataformats.BinaryValue;
+import de.je.jmeta.dataformats.DataBlockDescription;
+import de.je.jmeta.dataformats.DataBlockId;
+import de.je.jmeta.media.api.IMediumReference;
+import de.je.jmeta.media.api.datatype.AbstractMedium;
+import de.je.util.javautil.common.err.Reject;
+
+// TODO writeTests001: Test failing conversion when Enum interpr. value is unknown
+// TODO writeTests002: Test failing conversion when Numeric interpr. value > specified static field size
+// TODO writeTests003: Test failing conversion when SyncSafe interpr. value > 2^28
+// TODO writeTests004: Test conversion of ANY fields: No converter found
+
+// TODO stage2_011: Test cases for specification validation:
+// - Flag bytes length != field static length
+// - Numeric field length > 8
+// - String field: Unsupported encoding (Spec default and enumerated value)
+
+/**
+ * Represents a leaf node in the data hierarchy of a {@link AbstractMedium}. A {@link StandardField} usually has a small
+ * size and represents a concrete value, e.g. for parsing, descriptive properties or containing raw binary data.
+ *
+ * For {@link StandardField}s, one must distinguish the raw byte value and the so-called <i>interpreted</i> value. The
+ * interpreted value is the value interesting for the user, therefore often human-readable. To convert raw bytes to an
+ * interpreted value, specific knowledge about and interpretation of the raw bytes is necessary.
+ *
+ * Derived classes represent the concrete value types a {@link StandardField} can have.
+ *
+ * @param <T>
+ *           the exact type of interpreted value stored in this {@link StandardField}.
+ */
+public class StandardField<T> implements IField<T> {
+
+   @Override
+   public void free() {
+
+      // TODO: How to implement free for fields?
+   }
+
+   private StandardField(DataBlockDescription fieldDesc,
+      IMediumReference reference, IFieldConverter<T> fieldConverter) {
+      Reject.ifNull(fieldDesc, "fieldDesc");
+      Reject.ifNull(fieldConverter, "fieldConverter");
+
+      m_desc = fieldDesc;
+      m_mediumReference = reference;
+      m_fieldConverter = fieldConverter;
+   }
+
+   /**
+    * @param byteOrder
+    */
+   public void initByteOrder(ByteOrder byteOrder) {
+
+      Reject.ifNull(byteOrder, "byteOrder");
+      Reject.ifFalse(m_byteOrder == null,
+         "m_byteOrder == null");
+
+      m_byteOrder = byteOrder;
+   }
+
+   /**
+    * @param characterEncoding
+    */
+   public void initCharacterEncoding(Charset characterEncoding) {
+
+      Reject.ifNull(characterEncoding, "characterEncoding");
+      Reject.ifFalse(m_characterEncoding == null,
+    	         "m_characterEncoding == null");
+
+      m_characterEncoding = characterEncoding;
+   }
+
+   /**
+    * Creates a new {@link StandardField}.
+    * 
+    * @param fieldDesc
+    * @param interpretedValue
+    * @param reference
+    * @param fieldConverter
+    */
+   public StandardField(DataBlockDescription fieldDesc, T interpretedValue,
+      IMediumReference reference, IFieldConverter<T> fieldConverter) {
+      this(fieldDesc, reference, fieldConverter);
+
+      Reject.ifNull(interpretedValue, "interpretedValue");
+
+      m_interpretedValue = interpretedValue;
+      m_totalSize = DataBlockDescription.UNKNOWN_SIZE;
+   }
+
+   /**
+    * Creates a new {@link StandardField}.
+    * 
+    * @param fieldDesc
+    * @param byteValue
+    * @param reference
+    * @param fieldConverter
+    */
+   public StandardField(DataBlockDescription fieldDesc, BinaryValue byteValue,
+      IMediumReference reference, IFieldConverter<T> fieldConverter) {
+      this(fieldDesc, reference, fieldConverter);
+
+      Reject.ifNull(byteValue, "byteValue");
+
+      m_byteValue = byteValue;
+      m_totalSize = byteValue.getTotalSize();
+   }
+
+   @Override
+   public String getStringRepresentation()
+      throws BinaryValueConversionException {
+
+      return getInterpretedValue().toString();
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IDataBlock#getBytes(long, int)
+    */
+   @Override
+   public byte[] getBytes(long offset, int size) {
+      Reject.ifNegative(offset, "offset");
+      Reject.ifNegative(size, "size");
+   	  Reject.ifFalse(offset + size <= getTotalSize(),
+            "offset + size <= getTotalSize()");
+
+      byte[] byteValue = new byte[size];
+
+      BinaryValue value;
+      try {
+         value = getBinaryValue();
+      } catch (InterpretedValueConversionException e) {
+         // TODO writeConcept003: log conversion error or return null?
+         assert e != null;
+         return byteValue;
+      }
+
+      return value.getBytes(offset, size);
+   }
+
+   @Override
+   public BinaryValue getBinaryValue()
+      throws InterpretedValueConversionException {
+
+      if (m_byteValue == null) {
+         m_byteValue = convertToBinary();
+         m_totalSize = m_byteValue.getTotalSize();
+      }
+
+      return m_byteValue;
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IDataBlock#getMediumReference()
+    */
+   @Override
+   public IMediumReference getMediumReference() {
+
+      return m_mediumReference;
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IDataBlock#getParent()
+    */
+   @Override
+   public IDataBlock getParent() {
+
+      return m_parent;
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IDataBlock#getId()
+    */
+   @Override
+   public DataBlockId getId() {
+
+      return m_desc.getId();
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IDataBlock#getTotalSize()
+    */
+   @Override
+   public long getTotalSize() {
+
+      return m_totalSize;
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IDataBlock#initParent(de.je.jmeta.datablocks.IDataBlock)
+    */
+   @Override
+   public void initParent(IDataBlock parent) {
+
+      Reject.ifNull(parent, "parent");
+      Reject.ifFalse(getParent() == null, "getParent() == null");
+
+      m_parent = parent;
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IField#getInterpretedValue()
+    */
+   @Override
+   public T getInterpretedValue() throws BinaryValueConversionException {
+
+      if (m_interpretedValue == null)
+         m_interpretedValue = convertToInterpreted();
+
+      return m_interpretedValue;
+   }
+
+   /**
+    */
+   private T convertToInterpreted() throws BinaryValueConversionException {
+
+      if (m_fieldConverter == null)
+         throw new BinaryValueConversionException(
+            "No field converter found for field id " + m_desc.getId(), null,
+            m_desc, m_byteValue, m_byteOrder, m_characterEncoding);
+
+      if (m_byteOrder == null)
+         throw new BinaryValueConversionException(
+            "No byte order set for field id " + m_desc.getId(), null, m_desc,
+            m_byteValue, null, null);
+
+      if (m_characterEncoding == null)
+         throw new BinaryValueConversionException(
+            "No character encoding set for field id " + m_desc.getId(), null,
+            m_desc, m_byteValue, null, null);
+
+      return m_fieldConverter.toInterpreted(m_byteValue, m_desc, m_byteOrder,
+         m_characterEncoding);
+   }
+
+   private BinaryValue convertToBinary()
+      throws InterpretedValueConversionException {
+
+      if (m_fieldConverter == null)
+         throw new InterpretedValueConversionException(
+            "No field converter found for field id " + m_desc.getId(), null,
+            m_desc, m_interpretedValue, m_byteOrder, m_characterEncoding);
+
+      if (m_byteOrder == null)
+         throw new InterpretedValueConversionException(
+            "No byte order set for field id " + m_desc.getId(), null, m_desc,
+            m_interpretedValue, null, null);
+
+      if (m_characterEncoding == null)
+         throw new InterpretedValueConversionException(
+            "No character encoding set for field id " + m_desc.getId(), null,
+            m_desc, m_interpretedValue, null, null);
+
+      return m_fieldConverter.toBinary(m_interpretedValue, m_desc, m_byteOrder,
+         m_characterEncoding);
+   }
+
+   /**
+    * @see de.je.jmeta.datablocks.IDataBlock#setBytes(byte[][])
+    */
+   @Override
+   public void setBytes(byte[][] bytes) {
+
+      // TODO writeConcept002: Implement setBytes for fields
+   }
+
+   /**
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+
+      return getClass().getSimpleName() + "[id=" + getId().getGlobalId()
+         + ", totalSize=" + getTotalSize() + ", m_interpretedValue="
+         + m_interpretedValue + ", parentId="
+         + (getParent() == null ? getParent() : getParent().getId())
+         + ", medium=" + getMediumReference() + "]";
+   }
+
+   private final IFieldConverter<T> m_fieldConverter;
+
+   private IDataBlock m_parent;
+
+   private final DataBlockDescription m_desc;
+
+   private Charset m_characterEncoding;
+
+   private ByteOrder m_byteOrder;
+
+   private IMediumReference m_mediumReference;
+
+   private long m_totalSize;
+
+   private BinaryValue m_byteValue;
+
+   private T m_interpretedValue;
+}
