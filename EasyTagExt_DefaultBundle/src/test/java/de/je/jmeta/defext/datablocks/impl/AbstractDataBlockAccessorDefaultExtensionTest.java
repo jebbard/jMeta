@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.AbstractDataBlockAccessorTest;
+import com.github.jmeta.library.datablocks.api.service.AbstractDataBlockAccessorTest;
 import com.github.jmeta.library.media.api.type.FileMedium;
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.InMemoryMedium;
@@ -19,7 +19,7 @@ import de.je.util.javautil.testUtil.setup.TestDataException;
 public abstract class AbstractDataBlockAccessorDefaultExtensionTest extends AbstractDataBlockAccessorTest {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(Path, Path,
+    * @see com.github.jmeta.library.datablocks.api.service.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(Path, Path,
     *      Integer[])
     */
    public AbstractDataBlockAccessorDefaultExtensionTest(Path testFile, Path csvFile, Integer[] fieldSizes) {
@@ -27,7 +27,7 @@ public abstract class AbstractDataBlockAccessorDefaultExtensionTest extends Abst
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.IDataBlockAccessorTest#createMediaToCheck(java.nio.file.Path)
+    * @see com.github.jmeta.library.datablocks.api.service.IDataBlockAccessorTest#createMediaToCheck(java.nio.file.Path)
     */
    @Override
    protected List<IMedium<?>> createMediaToCheck(Path baseFile) throws Exception {
