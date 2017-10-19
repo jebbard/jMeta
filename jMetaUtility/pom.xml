@@ -3,4 +3,112 @@
   <groupId>com.github.jmeta.utility</groupId>
   <artifactId>jMetaUtility</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
+	<!-- ========================== Parent ========================== -->
+	<parent>
+		<groupId>de.je.jmeta</groupId>
+		<artifactId>jMetaBuild</artifactId>
+		<version>0.2-SNAPSHOT</version>
+		<relativePath>../EasyTag_Deployment/pom.xml</relativePath>
+	</parent>
+
+	<!-- ========================== Dependencies ========================== -->
+	<dependencies>
+		<dependency>
+			<groupId>de.je.util.javautil</groupId>
+			<artifactId>JavaTestUtils</artifactId>
+			<version>0.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.je.util.javautil</groupId>
+			<artifactId>BasicUtility</artifactId>
+			<version>0.5</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.je.util.javautil</groupId>
+			<artifactId>BasicUtility</artifactId>
+			<version>0.5</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.21</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.7</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!-- ========================== Build ========================== -->
+	<build>
+		<plugins>
+			<!-- JAR: Build a test jar for test reuse -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- ========================== Reporting ========================== -->
+	<reporting>
+		<plugins>
+			<!-- TEST: For test result generation in sites -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+			<!-- JAVADOC: For javadoc generation in sites -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<reportSets>
+					<!-- Generierung aller Javadocs -->
+					<reportSet>
+						<id>all</id>
+						<configuration>
+							<subpackages>de.je.jmeta</subpackages>
+						</configuration>
+						<reports>
+							<report>javadoc</report>
+							<report>test-javadoc</report>
+						</reports>
+					</reportSet>
+					<!-- Generierung der IF-Javadocs -->
+					<reportSet>
+						<id>IF</id>
+						<configuration>
+							<subpackages>de.je.jmeta</subpackages>
+							<destDir>ifdocs</destDir>
+							<!-- CURRENTLY doesn't work! See http://jira.codehaus.org/browse/MJAVADOC-299 
+								<excludePackageNames>*.impl:*.export</excludePackageNames> -->
+							<!-- WORKAROUND -->
+							<additionalparam>-exclude
+								de.je.jmeta.datablocks.impl:de.je.jmeta.datablocks.export:de.je.jmeta.dataformats.impl:de.je.jmeta.dataformats.export:de.je.jmeta.config.impl:de.je.jmeta.config.export:de.je.jmeta.media.impl:de.je.jmeta.media.export:de.je.jmeta.extmanager.impl:de.je.jmeta.extmanager.export:de.je.jmeta.context.impl:de.je.jmeta.logging.impl</additionalparam>
+						</configuration>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
