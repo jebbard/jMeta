@@ -1,0 +1,1692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:CommonStereotypes="http:///schemas/CommonStereotypes/_buGqQHOjEd63TMf_SwR2Zw/9" xmlns:CommonStereotypes_1="http:///schemas/CommonStereotypes/_Ri5B4HDQEeCSdtq34tGhqQ/22" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xsi:schemaLocation="http:///schemas/CommonStereotypes/_buGqQHOjEd63TMf_SwR2Zw/9 ../../GeneratorTemplates/models/CommonStereotypes.uml#_buGqQXOjEd63TMf_SwR2Zw http:///schemas/CommonStereotypes/_Ri5B4HDQEeCSdtq34tGhqQ/22 ../../CommonUMLModels/models/CommonStereotypes.uml#_Ri5B4XDQEeCSdtq34tGhqQ">
+  <uml:Model xmi:id="_sbh2sKCOEd6zlNXooB-z8A" name="Utility">
+    <packageImport xmi:id="_sbh2saCOEd6zlNXooB-z8A">
+      <importedPackage xmi:type="uml:Model" href="../../GeneratorTemplates/models/CommonElements.uml#_qb8akM37EdqwVrslYOdUDA"/>
+    </packageImport>
+    <packagedElement xmi:type="uml:Package" xmi:id="_sbrnu6COEd6zlNXooB-z8A" name="de">
+      <packagedElement xmi:type="uml:Package" xmi:id="_sbrnvKCOEd6zlNXooB-z8A" name="je">
+        <packagedElement xmi:type="uml:Package" xmi:id="_sbrnvaCOEd6zlNXooB-z8A" name="util">
+          <packagedElement xmi:type="uml:Package" xmi:id="_sbrnvqCOEd6zlNXooB-z8A" name="comm">
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrnv6COEd6zlNXooB-z8A" name="array">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrnwKCOEd6zlNXooB-z8A" name="EnhancedArrays">
+                <eAnnotations xmi:id="_sbrnwaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrnwqCOEd6zlNXooB-z8A" key="documentation" value=" {@link EnhancedArrays} provides further array algorithms  not contained in&#xD;&#xA; {@link Arrays}.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedOperation xmi:id="_sb0xu6COEd6zlNXooB-z8A" name="merge" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0xvKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0xvaCOEd6zlNXooB-z8A" key="documentation" value=" Merges a list of arrays in the order as given in the corresponding parameter. The&#xD;&#xA; total length of the resulting merged array must be available before calling this&#xD;&#xA; method due to performance issues - it safes one iteration through the whole list.&#xD;&#xA; When filling the list with the fragment arrays, the total length can be calculated.&#xD;&#xA; @param arrayList A list of arrays that are fragments and are to be merged to a&#xD;&#xA; &#x9;resulting array.&#xD;&#xA; @param totalLength The overall total length of the destination array.&#xD;&#xA; @return A merged array containing all array fragments in the given order.&#xD;&#xA; @throws IndexOutOfBoundsException If the given total length does not match the sum&#xD;&#xA; &#x9;of all array fragment lengths.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0xvqCOEd6zlNXooB-z8A" name="arrayList">
+                    <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xv6COEd6zlNXooB-z8A" name="totalLength">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xwKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sb0xwaCOEd6zlNXooB-z8A" name="findFirst" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0xwqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0xw6COEd6zlNXooB-z8A" key="documentation" value=" Determines the offset of the first occurrence of a sub-array within a given array of&#xD;&#xA; the same type.&#xD;&#xA; @param array The array to search in.. Its length must be equal&#xD;&#xA; &#x9;or longer than the length of the array to find plus the given start offset.&#xD;&#xA; @param subArray The array to find.. Its length must be equal&#xD;&#xA; &#x9;or shorter than the length of the array to search in minus the given start offset.&#xD;&#xA; @param startOffset The offset in the array to start searching for the sub-array.&#xD;&#xA; &#x9;Must not be negative. Must not be greater or equal to the array's length.&#xD;&#xA; @param increase The count the offset for searching the sub-array in the&#xD;&#xA; &#x9;given array is increased. E.g. if this parameter is 2, this method will find&#xD;&#xA; &#x9;occurrences of the given sub-array at offsets 0, 2, 4, 6 ... It will not find&#xD;&#xA; &#x9;occurrences at offsets 1, 3, 5, 7 ... This is useful if sub-arrays are required&#xD;&#xA; &#x9;to start at word or dword offsets, e.g. for finding byte representations of&#xD;&#xA; &#x9;multi-byte characters. Must not be smaller than 1.&#xD;&#xA; @return The offset of the first occurrence of toFind within searchIn or -1 if the&#xD;&#xA; &#x9;array to find is not contained in the searched array.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0xxKCOEd6zlNXooB-z8A" name="array">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xxaCOEd6zlNXooB-z8A" name="subArray">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xxqCOEd6zlNXooB-z8A" name="startOffset">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xx6COEd6zlNXooB-z8A" name="increase">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xyKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sb0xyaCOEd6zlNXooB-z8A" name="copyOfRange" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0xyqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0xy6COEd6zlNXooB-z8A" key="documentation" value=" Copies the specified range of the specified array into a new array. The&#xD;&#xA; initial index of the range (from) must lie between zero and original.length,&#xD;&#xA; inclusive. The value at original[from] is placed into the initial element of&#xD;&#xA; the copy (unless from == original.length or from == to). Values from subsequent&#xD;&#xA; elements in the original array are placed into subsequent elements in the copy. The final&#xD;&#xA; index of the range (to), which must be greater than or equal to from, may be greater&#xD;&#xA; than original.length, in which case (byte)0 is placed in all elements of the copy&#xD;&#xA; whose index is greater than or equal to original.length - from. The length of the&#xD;&#xA; returned array will be to - from.&#xD;&#xA; @param original The array from which a range is to be copied.&#xD;&#xA; @param from The initial index of the range to be copied, inclusive.&#xD;&#xA; @param to The final index of the range to be copied, exclusive. (This index may lie outside the array.)&#xD;&#xA; @return A new array containing the specified range from the original array, truncated or padded with zeros to obtain the required length.&#xD;&#xA; @throws ArrayIndexOutOfBoundsException If from &lt; 0  or from > original.length()&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0xzKCOEd6zlNXooB-z8A" name="original">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xzaCOEd6zlNXooB-z8A" name="from">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xzqCOEd6zlNXooB-z8A" name="to">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0xz6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrnw6COEd6zlNXooB-z8A" name="err">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrnxKCOEd6zlNXooB-z8A" name="Reject">
+                <eAnnotations xmi:id="_sbrnxaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrnxqCOEd6zlNXooB-z8A" key="documentation" value=" Reject is a class to check preconditions of a method in a definedd way and to&#xD;&#xA; raise a PreconditionException, if necessary.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedOperation xmi:id="_sb0x0aCOEd6zlNXooB-z8A" name="ifTrue" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0x0qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0x06COEd6zlNXooB-z8A" key="documentation" value=" Checks a condition to be true. If this is the case, a&#xD;&#xA; PreconditionException is thrown.&#xD;&#xA; @param condition The condition to check&#xD;&#xA; @param conditionExpectedFalse The string representation of the expected&#xD;&#xA; &#x9;condition.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0x1KCOEd6zlNXooB-z8A" name="condition">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0x1aCOEd6zlNXooB-z8A" name="conditionExpectedFalse" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sb0x1qCOEd6zlNXooB-z8A" name="ifTrue" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0x16COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0x2KCOEd6zlNXooB-z8A" key="documentation" value=" Checks a condition to be true. If this is the case, a&#xD;&#xA; PreconditionException is thrown.&#xD;&#xA; @param condition The condition to check&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0x2aCOEd6zlNXooB-z8A" name="condition">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sb0x26COEd6zlNXooB-z8A" name="ifNull" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0x3KCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0x3aCOEd6zlNXooB-z8A" key="documentation" value=" Checks an object to be null. If it is null, a PreconditionException is&#xD;&#xA; thrown.&#xD;&#xA; @param object The object to check.&#xD;&#xA; @param objectName The name of the object expected to be null.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0x3qCOEd6zlNXooB-z8A" name="object" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sb0x36COEd6zlNXooB-z8A" name="objectName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sb0x4KCOEd6zlNXooB-z8A" name="ifNull" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0x4aCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0x4qCOEd6zlNXooB-z8A" key="documentation" value=" Checks an object to be null. If it is null, a PreconditionException is&#xD;&#xA; thrown.&#xD;&#xA; @param object The object to check.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0x46COEd6zlNXooB-z8A" name="object" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sb0x5KCOEd6zlNXooB-z8A" name="ifNotInInterval" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sb0x5aCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb0x5qCOEd6zlNXooB-z8A" key="documentation" value=" Checks a numerical value to be between upper and lower bound (both&#xD;&#xA; inclusive).&#xD;&#xA; @param value The value to check for.&#xD;&#xA; @param lower The lower bound (inclusive).&#xD;&#xA; @param upper The upper bound (inclusive).&#xD;&#xA; @param numberName The name of the checked number.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb0x56COEd6zlNXooB-z8A" name="value">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0x6KCOEd6zlNXooB-z8A" name="lower">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0x6aCOEd6zlNXooB-z8A" name="upper">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sb0x6qCOEd6zlNXooB-z8A" name="numberName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrnx6COEd6zlNXooB-z8A" name="PreconditionException">
+                <eAnnotations xmi:id="_sbrnyKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrnyaCOEd6zlNXooB-z8A" key="documentation" value=" PreconditionException is thrown whenever a specified prerequisite-condition&#xD;&#xA; of a class is violated.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sb0x7KCOEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sb-ioKCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:DataType" xmi:id="_sb0x0KCOEd6zlNXooB-z8A" name="String"/>
+              <packagedElement xmi:type="uml:DataType" xmi:id="_sb0x2qCOEd6zlNXooB-z8A" name="Object"/>
+              <packagedElement xmi:type="uml:DataType" xmi:id="_sb0x66COEd6zlNXooB-z8A" name="RuntimeException"/>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrnyqCOEd6zlNXooB-z8A" name="extenum">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrny6COEd6zlNXooB-z8A" name="DuplicateEnumIdException">
+                <eAnnotations xmi:id="_sbrnzKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrnzaCOEd6zlNXooB-z8A" key="documentation" value=" {@link DuplicateEnumIdException} is thrown whenever an&#xD;&#xA; {@link AbstractExtendibleEnum} instance uses an already defined enum ID.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sb-ioaCOEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sb-ioqCOEd6zlNXooB-z8A" name="m_duplicateId" visibility="private" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sb-io6COEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sb-ipKCOEd6zlNXooB-z8A" name="getDuplicateId" visibility="public">
+                  <eAnnotations xmi:id="_sb-ipaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb-ipqCOEd6zlNXooB-z8A" key="documentation" value=" Returns the duplicate enum id that caused this exception.&#xD;&#xA; @return the duplicate enum id that caused this exception.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb-ip6COEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrnzqCOEd6zlNXooB-z8A" name="AbstractExtendibleEnum" isAbstract="true">
+                <eAnnotations xmi:id="_sbrnz6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn0KCOEd6zlNXooB-z8A" key="documentation" value=" {@link AbstractExtendibleEnum} represents an extendible enumeration base&#xD;&#xA; class that provides type safety like Java's &quot;enum&quot; keyword, but does not&#xD;&#xA; add the drawback of a highly static nature. Thanks to polymorphism, defining&#xD;&#xA; an argument or member with a concrete {@link AbstractExtendibleEnum} always&#xD;&#xA; allows to later use an extended enumeration instance of a later added sub-class.&#xD;&#xA; A class extending from this class may also prohibit further extension of the&#xD;&#xA; enum values by just specifying a private constructor and the class itself as&#xD;&#xA; final.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sb-iqKCOEd6zlNXooB-z8A" name="m_id" visibility="private" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sb-iqaCOEd6zlNXooB-z8A" name="ALL_INSTANCE_IDS" visibility="private" isStatic="true" association="_sgTCNaCOEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sb-iqqCOEd6zlNXooB-z8A" name="ALL_INSTANCES" visibility="private" isStatic="true" association="_sgTCN6COEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sb-irKCOEd6zlNXooB-z8A" name="findClassInHierarchy" visibility="private" isStatic="true">
+                  <eAnnotations xmi:id="_sb-iraCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb-irqCOEd6zlNXooB-z8A" key="documentation" value=" Finds a class in {@value #ALL_INSTANCES} that is either sub class or superclass&#xD;&#xA; of the given class and returns it.&#xD;&#xA; @param clazz The class to find.&#xD;&#xA; @return The sub- or super class (or itself) of the given class or null if&#xD;&#xA; &#x9;no such is found.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb-ir6COEd6zlNXooB-z8A" name="clazz" type="_sb-iq6COEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sb-isKCOEd6zlNXooB-z8A" name="return" type="_sb-iq6COEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sb-isaCOEd6zlNXooB-z8A" name="getId" visibility="public">
+                  <eAnnotations xmi:id="_sb-isqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sb-is6COEd6zlNXooB-z8A" key="documentation" value=" Returns a unique String id of the enum value used in {@link #hashCode()}&#xD;&#xA; and {@link #equals(Object)}.&#xD;&#xA; @return A unique String id of the enum value used in {@link #hashCode()}&#xD;&#xA; &#x9;and {@link #equals(Object)}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sb-itKCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqEKCOEd6zlNXooB-z8A" name="equals" visibility="public">
+                  <eAnnotations xmi:id="_sfZqEaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqEqCOEd6zlNXooB-z8A" key="documentation" value=" @see java.lang.Object#equals(java.lang.Object)&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqE6COEd6zlNXooB-z8A" name="obj" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfZqFKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqFaCOEd6zlNXooB-z8A" name="hashCode" visibility="public">
+                  <eAnnotations xmi:id="_sfZqFqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqF6COEd6zlNXooB-z8A" key="documentation" value=" @see java.lang.Object#hashCode()&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqGKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqGaCOEd6zlNXooB-z8A" name="toString" visibility="public">
+                  <eAnnotations xmi:id="_sfZqGqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqG6COEd6zlNXooB-z8A" key="documentation" value=" @see java.lang.Object#toString()&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqHKCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqHaCOEd6zlNXooB-z8A" name="getAllInstances" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sfZqHqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqH6COEd6zlNXooB-z8A" key="documentation" value=" Returns all instance of the given concrete enumeration class and all of its&#xD;&#xA; sub-classes.&#xD;&#xA; @param concreteEnumClass The concrete enumeration class..&#xD;&#xA; @return All instance of the given concrete enumeration class and all of its&#xD;&#xA; &#x9;sub-classes.&#xD;&#xA; @throws UnknownEnumClassException if the given class is not registered.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqIKCOEd6zlNXooB-z8A" name="concreteEnumClass" type="_sb-iq6COEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfZqIaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn0aCOEd6zlNXooB-z8A" name="UnknownEnumClassException">
+                <eAnnotations xmi:id="_sbrn0qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn06COEd6zlNXooB-z8A" key="documentation" value=" {@link UnknownEnumClassException} is thrown whenever&#xD;&#xA; {@link AbstractExtendibleEnum#getAllInstances(Class)} is called with an&#xD;&#xA; unknown instance.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sfZqIqCOEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sfZqI6COEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfZqJKCOEd6zlNXooB-z8A" name="m_causingClass" visibility="private" type="_sb-iq6COEd6zlNXooB-z8A"/>
+                <ownedOperation xmi:id="_sfZqJaCOEd6zlNXooB-z8A" name="getCausingClass" visibility="public">
+                  <eAnnotations xmi:id="_sfZqJqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqJ6COEd6zlNXooB-z8A" key="documentation" value=" Returns class that caused this exception.&#xD;&#xA; @return class that caused this exception.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqKKCOEd6zlNXooB-z8A" name="return" type="_sb-iq6COEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:DataType" xmi:id="_sb-iq6COEd6zlNXooB-z8A" name="Class"/>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCNaCOEd6zlNXooB-z8A" memberEnd="_sb-iqaCOEd6zlNXooB-z8A _sgTCNqCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCNqCOEd6zlNXooB-z8A" name="target" type="_sbrnzqCOEd6zlNXooB-z8A" association="_sgTCNaCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCN6COEd6zlNXooB-z8A" memberEnd="_sb-iqqCOEd6zlNXooB-z8A _sgTCOKCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCOKCOEd6zlNXooB-z8A" name="target" type="_sbrnzqCOEd6zlNXooB-z8A" association="_sgTCN6COEd6zlNXooB-z8A"/>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrn1KCOEd6zlNXooB-z8A" name="file">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn1aCOEd6zlNXooB-z8A" name="FileUtility">
+                <eAnnotations xmi:id="_sbrn1qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn16COEd6zlNXooB-z8A" key="documentation" value=" {@link FileUtility} is a utility for {@link File} related operations.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sfZqKaCOEd6zlNXooB-z8A" name="FILE_EXTENSION_SEPARATOR" visibility="public" isStatic="true" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sfZqKqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqK6COEd6zlNXooB-z8A" key="documentation" value=" The separator of file name and file extension (the same on all platforms).&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <defaultValue xmi:type="uml:LiteralString" xmi:id="_sfZqLKCOEd6zlNXooB-z8A" name="" type="_sb0x0KCOEd6zlNXooB-z8A" value="&quot;.&quot;"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sfZqLaCOEd6zlNXooB-z8A" name="getExtension" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sfZqLqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqL6COEd6zlNXooB-z8A" key="documentation" value=" Returns the extension of an abstract pathname ({@link File}). The extension is&#xD;&#xA; defined as all path name characters behind the last dot (.) of the path name.&#xD;&#xA; @param abstractPathName The abstract path name to determine the extension for. Must not be&#xD;&#xA; &#x9;null.&#xD;&#xA; @return The extension. May be empty (&quot;&quot;) to signal that the abstract path name has no extension.&#xD;&#xA; @pre abstractPathName != null&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqMKCOEd6zlNXooB-z8A" name="abstractPathName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfZqMaCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrn2KCOEd6zlNXooB-z8A" name="flags">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn2aCOEd6zlNXooB-z8A" name="FlagSpecification">
+                <eAnnotations xmi:id="_sbrn2qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn26COEd6zlNXooB-z8A" key="documentation" value=" {@link FlagSpecification} defines the structure of {@link Flags} belonging together.&#xD;&#xA; Defines length, positions and names of the flags for easy access.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sfZqMqCOEd6zlNXooB-z8A" name="MAXIMUM_BYTE_COUNT" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sfZqM6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqNKCOEd6zlNXooB-z8A" key="documentation" value="The maximum length of {@link Flags} in bytes. "/>
+                  </eAnnotations>
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_sfZqNaCOEd6zlNXooB-z8A" name="" value="8">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </defaultValue>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfZqNqCOEd6zlNXooB-z8A" name="m_flagPositions" visibility="private" association="_sgTCOaCOEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfZqN6COEd6zlNXooB-z8A" name="m_byteLength" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfZqOKCOEd6zlNXooB-z8A" name="m_byteOrdering" visibility="private" association="_sgTCO6COEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sfZqOaCOEd6zlNXooB-z8A" name="getByteOrdering" visibility="public">
+                  <eAnnotations xmi:id="_sfZqOqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqO6COEd6zlNXooB-z8A" key="documentation" value=" Returns the byte ordering of this {@link FlagSpecification}.&#xD;&#xA; @return The byte ordering of this {@link FlagSpecification}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqPKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqPaCOEd6zlNXooB-z8A" name="getFlagPosition" visibility="public">
+                  <eAnnotations xmi:id="_sfZqPqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqP6COEd6zlNXooB-z8A" key="documentation" value=" Returns the {@link BitAddress} of the given flag.&#xD;&#xA; @param flagName The name of the flag to get the {@link BitAddress} for. Must not be&#xD;&#xA; &#x9;null. Must exist.&#xD;&#xA; @return The {@link BitAddress} of the given flag.&#xD;&#xA; @pre flagName != null&#xD;&#xA; @pre {@link #hasFlag(String)}(flagName)&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqQKCOEd6zlNXooB-z8A" name="flagName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfZqQaCOEd6zlNXooB-z8A" name="return" type="_sbrn3KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqQqCOEd6zlNXooB-z8A" name="getByteLength" visibility="public">
+                  <eAnnotations xmi:id="_sfZqQ6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqRKCOEd6zlNXooB-z8A" key="documentation" value=" Returns the byte length of this {@link Flags}.&#xD;&#xA; @return The byte length of this {@link Flags}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqRaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqRqCOEd6zlNXooB-z8A" name="hasFlag" visibility="public">
+                  <eAnnotations xmi:id="_sfZqR6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqSKCOEd6zlNXooB-z8A" key="documentation" value=" Determines if the {@link FlagSpecification} knows a flag of the given name.&#xD;&#xA; @param flagName The name of the flag..&#xD;&#xA; @return true if the {@link FlagSpecification} knows a flag of the given name, false&#xD;&#xA; &#x9;otherwise.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqSaCOEd6zlNXooB-z8A" name="flagName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfZqSqCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqS6COEd6zlNXooB-z8A" name="getFlagPositions" visibility="public">
+                  <eAnnotations xmi:id="_sfZqTKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqTaCOEd6zlNXooB-z8A" key="documentation" value=" Returns all flag names and their position as specified by this {@link FlagSpecification}.&#xD;&#xA; @return All flag names and their position as specified by this {@link FlagSpecification}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqTqCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn3KCOEd6zlNXooB-z8A" name="BitAddress">
+                <eAnnotations xmi:id="_sbrn3aCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn3qCOEd6zlNXooB-z8A" key="documentation" value=" {@link BitAddress} defines a position of bits within a series of bytes. This enables&#xD;&#xA; to define global bit positions without respect to byte ordering. Bits in one byte are&#xD;&#xA; always arranged left (highest) to right (lowest) bit - where lowest bit has index 0 and&#xD;&#xA; highest bit has index {@link #BITS_PER_BYTE} - 1. Therefore a byte within this class always has&#xD;&#xA; {@link #BITS_PER_BYTE} bits.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sfZqT6COEd6zlNXooB-z8A" name="BITS_PER_BYTE" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sfZqUKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqUaCOEd6zlNXooB-z8A" key="documentation" value="The number of bits within one byte. "/>
+                  </eAnnotations>
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_sfZqUqCOEd6zlNXooB-z8A" name="" value="8">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </defaultValue>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfZqU6COEd6zlNXooB-z8A" name="m_bitPosition" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfZqVKCOEd6zlNXooB-z8A" name="m_byteAddress" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sfZqVaCOEd6zlNXooB-z8A" name="getBitPosition" visibility="public">
+                  <eAnnotations xmi:id="_sfZqVqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqV6COEd6zlNXooB-z8A" key="documentation" value=" Returns the bit position. The bit position is an int between 0 and {@link #BITS_PER_BYTE} - 1.&#xD;&#xA; @return The bit position. The bit position is an int between 0 and {@link #BITS_PER_BYTE} - 1.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqWKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqWaCOEd6zlNXooB-z8A" name="getByteAddress" visibility="public">
+                  <eAnnotations xmi:id="_sfZqWqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqW6COEd6zlNXooB-z8A" key="documentation" value=" Returns the byte address. The byte address is an arbitrary positive integer.&#xD;&#xA; @return The byte address. The byte address is an arbitrary positive integer.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqXKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqXaCOEd6zlNXooB-z8A" name="equals" visibility="public">
+                  <eAnnotations xmi:id="_sfZqXqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqX6COEd6zlNXooB-z8A" key="documentation" value=" @see java.lang.Object#equals(java.lang.Object)&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqYKCOEd6zlNXooB-z8A" name="otherObject" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfZqYaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqYqCOEd6zlNXooB-z8A" name="hashCode" visibility="public">
+                  <eAnnotations xmi:id="_sfZqY6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqZKCOEd6zlNXooB-z8A" key="documentation" value=" @see java.lang.Object#hashCode()&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqZaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfZqZqCOEd6zlNXooB-z8A" name="toString" visibility="public">
+                  <eAnnotations xmi:id="_sfZqZ6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfZqaKCOEd6zlNXooB-z8A" key="documentation" value=" @see java.lang.Object#toString()&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfZqaaCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn36COEd6zlNXooB-z8A" name="UnsupportedFlagLengthException">
+                <eAnnotations xmi:id="_sbrn4KCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn4aCOEd6zlNXooB-z8A" key="documentation" value=" {@link UnsupportedFlagLengthException} is thrown if a {@link Flags} object cannot&#xD;&#xA; perform an operation because it would exceed the maximum length of the {@link Flags}&#xD;&#xA; object.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sfZqa6COEd6zlNXooB-z8A" general="_sfZqaqCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sfZqbKCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn4qCOEd6zlNXooB-z8A" name="Flags">
+                <eAnnotations xmi:id="_sbrn46COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn5KCOEd6zlNXooB-z8A" key="documentation" value=" {@link Flags} provides support for reading and writing flag values. A flag is a single&#xD;&#xA; bit that can be set (=1) or not set (=0) within a number of bytes. Each flag has a&#xD;&#xA; meaning which is expressed by its name in the {@link FlagSpecification} belonging to&#xD;&#xA; the flags. The {@link FlagSpecification} defines the byte length, order and position of&#xD;&#xA; flags. It does not change over the whole lifetime of a {@link Flags} object.&#xD;&#xA; Flag values can be written by using {@link #setFlag(String, boolean)} or by specifying&#xD;&#xA; a byte value that e.g. comes from a file.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sfjbEKCOEd6zlNXooB-z8A" name="SHORT_BYTE_LENGTH" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sfjbEaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfjbEqCOEd6zlNXooB-z8A" key="documentation" value="The length of a {@link Short} in bytes. "/>
+                  </eAnnotations>
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_sfjbE6COEd6zlNXooB-z8A" name="" value="2">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </defaultValue>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfjbFKCOEd6zlNXooB-z8A" name="INT_BYTE_LENGTH" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sfjbFaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfjbFqCOEd6zlNXooB-z8A" key="documentation" value="The length of an {@link Integer} in bytes. "/>
+                  </eAnnotations>
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_sfjbF6COEd6zlNXooB-z8A" name="" value="4">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </defaultValue>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfjbGKCOEd6zlNXooB-z8A" name="LONG_BYTE_LENGTH" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sfjbGaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfjbGqCOEd6zlNXooB-z8A" key="documentation" value="The length of a {@link Long} in bytes. "/>
+                  </eAnnotations>
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_sfjbG6COEd6zlNXooB-z8A" name="" value="8">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </defaultValue>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sfjbHKCOEd6zlNXooB-z8A" name="m_spec" visibility="private" type="_sbrn2aCOEd6zlNXooB-z8A" association="_sgTCPaCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sfjbHaCOEd6zlNXooB-z8A" name="m_flagBytes" visibility="private" association="_sgTCP6COEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sfjbHqCOEd6zlNXooB-z8A" name="getFlag" visibility="public">
+                  <eAnnotations xmi:id="_sfjbH6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfjbIKCOEd6zlNXooB-z8A" key="documentation" value=" Determines if a specific flag is set in the current byte value of this {@link Flags}.&#xD;&#xA; @param flagName The name of the flag.. Must be defined in the specification.&#xD;&#xA; @return true if the flag is set, false if it is not set.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfjbIaCOEd6zlNXooB-z8A" name="flagName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfjbIqCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sfjbI6COEd6zlNXooB-z8A" name="setFlag" visibility="public">
+                  <eAnnotations xmi:id="_sfjbJKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sfjbJaCOEd6zlNXooB-z8A" key="documentation" value=" Sets the flag with the given name to the given state.&#xD;&#xA; @param flagName The flag to set..&#xD;&#xA; @param set true to set the flag, false to unset the flag.&#xD;&#xA; @throws UnknownFlagException If the given flagName is unknown.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sfjbJqCOEd6zlNXooB-z8A" name="flagName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sfjbJ6COEd6zlNXooB-z8A" name="set">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMEKCOEd6zlNXooB-z8A" name="asByte" visibility="public">
+                  <eAnnotations xmi:id="_sftMEaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMEqCOEd6zlNXooB-z8A" key="documentation" value=" Returns a byte representation of the {@link Flags}. If the flags consist of&#xD;&#xA; multiple bytes, this only returns the first byte.&#xD;&#xA; @return A byte representation of the {@link Flags}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftME6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMFKCOEd6zlNXooB-z8A" name="fromByte" visibility="public">
+                  <eAnnotations xmi:id="_sftMFaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMFqCOEd6zlNXooB-z8A" key="documentation" value=" Writes the flags from a byte value. Flag positions that are not actually occupied&#xD;&#xA; by a named flag are ignored. Flags are set or unset according to the state of the&#xD;&#xA; bit at the specified position. If the flags consist of multiple bytes, this only&#xD;&#xA; writes the first byte.&#xD;&#xA; @param byteValue The byte value to set.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMF6COEd6zlNXooB-z8A" name="byteValue">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMGKCOEd6zlNXooB-z8A" name="asShort" visibility="public">
+                  <eAnnotations xmi:id="_sftMGaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMGqCOEd6zlNXooB-z8A" key="documentation" value=" Returns a short representation of the {@link Flags}. If the flags consist of&#xD;&#xA; more than {@link #SHORT_BYTE_LENGTH} bytes, this only returns the first two bytes.&#xD;&#xA; @return A short representation of the {@link Flags}.&#xD;&#xA; @throws UnsupportedFlagLengthException If the {@link Flags} object has a length&#xD;&#xA; &#x9;smaller than {@link #SHORT_BYTE_LENGTH}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMG6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57d3L-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMHKCOEd6zlNXooB-z8A" name="fromShort" visibility="public">
+                  <eAnnotations xmi:id="_sftMHaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMHqCOEd6zlNXooB-z8A" key="documentation" value=" Writes the flags from a short value. Flag positions that are not actually occupied&#xD;&#xA; by a named flag are ignored. Flags are set or unset according to the state of the&#xD;&#xA; bit at the specified position. If the flags consist of more than&#xD;&#xA; {@link #SHORT_BYTE_LENGTH} bytes, this only writes the first two byte.&#xD;&#xA; @param shortValue The short value to set.&#xD;&#xA; @throws UnsupportedFlagLengthException If the {@link Flags} object has a length&#xD;&#xA; &#x9;smaller than {@link #SHORT_BYTE_LENGTH}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMH6COEd6zlNXooB-z8A" name="shortValue">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57d3L-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMIKCOEd6zlNXooB-z8A" name="asInt" visibility="public">
+                  <eAnnotations xmi:id="_sftMIaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMIqCOEd6zlNXooB-z8A" key="documentation" value=" Returns an int representation of the {@link Flags}. If the flags consist of&#xD;&#xA; more than {@link #INT_BYTE_LENGTH} bytes, this only returns the first four bytes.&#xD;&#xA; @return An int representation of the {@link Flags}.&#xD;&#xA; @throws UnsupportedFlagLengthException If the {@link Flags} object has a length&#xD;&#xA; &#x9;smaller than {@link #INT_BYTE_LENGTH}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMI6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMJKCOEd6zlNXooB-z8A" name="fromInt" visibility="public">
+                  <eAnnotations xmi:id="_sftMJaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMJqCOEd6zlNXooB-z8A" key="documentation" value=" Writes the flags from an int value. Flag positions that are not actually occupied&#xD;&#xA; by a named flag are ignored. Flags are set or unset according to the state of the&#xD;&#xA; bit at the specified position. If the flags consist of more than&#xD;&#xA; {@link #INT_BYTE_LENGTH} bytes, this only writes the first four bytes.&#xD;&#xA; @param intValue The int value to set.&#xD;&#xA; @throws UnsupportedFlagLengthException If the {@link Flags} object has a length&#xD;&#xA; &#x9;smaller than {@link #INT_BYTE_LENGTH}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMJ6COEd6zlNXooB-z8A" name="intValue">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMKKCOEd6zlNXooB-z8A" name="asLong" visibility="public">
+                  <eAnnotations xmi:id="_sftMKaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMKqCOEd6zlNXooB-z8A" key="documentation" value=" Returns a long representation of the {@link Flags}.&#xD;&#xA; @return A long representation of the {@link Flags}.&#xD;&#xA; @throws UnsupportedFlagLengthException If the {@link Flags} object has a length&#xD;&#xA; &#x9;smaller than {@link #LONG_BYTE_LENGTH}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMK6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMLKCOEd6zlNXooB-z8A" name="fromLong" visibility="public">
+                  <eAnnotations xmi:id="_sftMLaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMLqCOEd6zlNXooB-z8A" key="documentation" value=" Writes the flags from a long value. Flag positions that are not actually occupied&#xD;&#xA; by a named flag are ignored. Flags are set or unset according to the state of the&#xD;&#xA; bit at the specified position.&#xD;&#xA; @param longValue The long value to set.&#xD;&#xA; @throws UnsupportedFlagLengthException If the {@link Flags} object has a length&#xD;&#xA; &#x9;smaller than {@link #LONG_BYTE_LENGTH}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftML6COEd6zlNXooB-z8A" name="longValue">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMMKCOEd6zlNXooB-z8A" name="asArray" visibility="public">
+                  <eAnnotations xmi:id="_sftMMaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMMqCOEd6zlNXooB-z8A" key="documentation" value=" Returns a byte array representation of the {@link Flags}.&#xD;&#xA; @return A byte array representation of the {@link Flags}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMM6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMNKCOEd6zlNXooB-z8A" name="fromArray" visibility="public">
+                  <eAnnotations xmi:id="_sftMNaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMNqCOEd6zlNXooB-z8A" key="documentation" value=" Writes the flags from a byte array. Flag positions that are not actually occupied&#xD;&#xA; by a named flag are ignored. Flags are set or unset according to the state of the&#xD;&#xA; bit at the specified position. If the flags consist of more than&#xD;&#xA; the arrays byte length bytes, this only writes the array bytes.&#xD;&#xA; @param array The array to set.&#xD;&#xA; @throws UnsupportedFlagLengthException If the {@link Flags} object has a length&#xD;&#xA; &#x9;smaller than array.length.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMN6COEd6zlNXooB-z8A" name="array">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMOKCOEd6zlNXooB-z8A" name="getSpecification" visibility="public">
+                  <eAnnotations xmi:id="_sftMOaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMOqCOEd6zlNXooB-z8A" key="documentation" value=" Returns the {@link FlagSpecification} associated with this {@link Flags} object.&#xD;&#xA; @return The {@link FlagSpecification} associated with this {@link Flags} object.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMO6COEd6zlNXooB-z8A" name="return" type="_sbrn2aCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMPKCOEd6zlNXooB-z8A" name="testLength" visibility="private">
+                  <eAnnotations xmi:id="_sftMPaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMPqCOEd6zlNXooB-z8A" key="documentation" value=" Tests the length specified to be smaller than the byte length defined by the&#xD;&#xA; {@link FlagSpecification}.&#xD;&#xA; @param maximumLength The length to be tested. Must not be smaller than 0.&#xD;&#xA; @throws UnsupportedFlagLengthException If the length is invalid.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMP6COEd6zlNXooB-z8A" name="maximumLength">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn5aCOEd6zlNXooB-z8A" name="UnknownFlagException">
+                <eAnnotations xmi:id="_sbrn5qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn56COEd6zlNXooB-z8A" key="documentation" value=" {@link UnknownFlagException} is thrown if a given flag is unknown.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sftMQKCOEd6zlNXooB-z8A" general="_sfZqaqCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sftMQaCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn6KCOEd6zlNXooB-z8A" name="InvalidFlagSpecificationException">
+                <eAnnotations xmi:id="_sbrn6aCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn6qCOEd6zlNXooB-z8A" key="documentation" value=" {@link InvalidFlagSpecificationException} is thrown on initialization of a&#xD;&#xA; {@link FlagSpecification} object in case that the {@link BitAddress} within the&#xD;&#xA; specified flagMapping contains byte addresses bigger than the&#xD;&#xA; {@link FlagSpecification#MAXIMUM_BYTE_COUNT} or if it contains duplicate&#xD;&#xA; {@link BitAddress}es.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sftMQqCOEd6zlNXooB-z8A" general="_sfZqaqCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sftMQ6COEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:DataType" xmi:id="_sfZqaqCOEd6zlNXooB-z8A" name="Exception"/>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCOaCOEd6zlNXooB-z8A" memberEnd="_sfZqNqCOEd6zlNXooB-z8A _sgTCOqCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCOqCOEd6zlNXooB-z8A" name="target" type="_sbrn2aCOEd6zlNXooB-z8A" association="_sgTCOaCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCO6COEd6zlNXooB-z8A" memberEnd="_sfZqOKCOEd6zlNXooB-z8A _sgTCPKCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCPKCOEd6zlNXooB-z8A" name="target" type="_sbrn2aCOEd6zlNXooB-z8A" association="_sgTCO6COEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCPaCOEd6zlNXooB-z8A" memberEnd="_sfjbHKCOEd6zlNXooB-z8A _sgTCPqCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCPqCOEd6zlNXooB-z8A" name="target" type="_sbrn4qCOEd6zlNXooB-z8A" association="_sgTCPaCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCP6COEd6zlNXooB-z8A" memberEnd="_sfjbHaCOEd6zlNXooB-z8A _sgTCQKCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCQKCOEd6zlNXooB-z8A" name="target" type="_sbrn4qCOEd6zlNXooB-z8A" association="_sgTCP6COEd6zlNXooB-z8A"/>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrn66COEd6zlNXooB-z8A" name="map">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn7KCOEd6zlNXooB-z8A" name="SimpleEntry">
+                <eAnnotations xmi:id="_sbrn7aCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn7qCOEd6zlNXooB-z8A" key="documentation" value=" {@link SimpleEntry} is a simple implementation of {@link Entry}.&#xD;&#xA; @param &lt;K> The type of the key.&#xD;&#xA; @param &lt;V> The type of the value.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_sbrn76COEd6zlNXooB-z8A" parameter="_sbrn8KCOEd6zlNXooB-z8A _sbrn8qCOEd6zlNXooB-z8A">
+                  <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_sbrn8KCOEd6zlNXooB-z8A" parameteredElement="_sbrn8aCOEd6zlNXooB-z8A">
+                    <ownedParameteredElement xmi:type="uml:Class" xmi:id="_sbrn8aCOEd6zlNXooB-z8A" name="K" templateParameter="_sbrn8KCOEd6zlNXooB-z8A"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_sbrn8qCOEd6zlNXooB-z8A" parameteredElement="_sbrn86COEd6zlNXooB-z8A">
+                    <ownedParameteredElement xmi:type="uml:Class" xmi:id="_sbrn86COEd6zlNXooB-z8A" name="V" templateParameter="_sbrn8qCOEd6zlNXooB-z8A"/>
+                  </ownedParameter>
+                </ownedTemplateSignature>
+                <ownedAttribute xmi:id="_sftMRKCOEd6zlNXooB-z8A" name="m_key" visibility="private" type="_sbrn8aCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sftMRaCOEd6zlNXooB-z8A" name="m_value" visibility="private" type="_sbrn86COEd6zlNXooB-z8A"/>
+                <ownedOperation xmi:id="_sftMRqCOEd6zlNXooB-z8A" name="getKey" visibility="public">
+                  <eAnnotations xmi:id="_sftMR6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMSKCOEd6zlNXooB-z8A" key="documentation" value=" @see java.util.Map.Entry#getKey()&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMSaCOEd6zlNXooB-z8A" name="return" type="_sbrn8aCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMSqCOEd6zlNXooB-z8A" name="getValue" visibility="public">
+                  <eAnnotations xmi:id="_sftMS6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMTKCOEd6zlNXooB-z8A" key="documentation" value=" @see java.util.Map.Entry#getValue()&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMTaCOEd6zlNXooB-z8A" name="return" type="_sbrn86COEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMTqCOEd6zlNXooB-z8A" name="setValue" visibility="public">
+                  <eAnnotations xmi:id="_sftMT6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMUKCOEd6zlNXooB-z8A" key="documentation" value=" @see java.util.Map.Entry#setValue(java.lang.Object)&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMUaCOEd6zlNXooB-z8A" name="value" type="_sbrn86COEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMUqCOEd6zlNXooB-z8A" name="return" type="_sbrn86COEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrn9KCOEd6zlNXooB-z8A" name="msg">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn9aCOEd6zlNXooB-z8A" name="MsgFormatter">
+                <eAnnotations xmi:id="_sbrn9qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn96COEd6zlNXooB-z8A" key="documentation" value=" {@link MsgFormatter} replaces place holders in a string by string&#xD;&#xA; representations of given objects. Currently there is no escape mechanism.&#xD;&#xA; Should the place holder should be contained in the message as is, there must&#xD;&#xA; not be any object arguments (specify empty array).&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sftMU6COEd6zlNXooB-z8A" name="STR" visibility="public" isStatic="true" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sftMVKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMVaCOEd6zlNXooB-z8A" key="documentation" value=" The place holder for a string argument.&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sftMVqCOEd6zlNXooB-z8A" name="format" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sftMV6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMWKCOEd6zlNXooB-z8A" key="documentation" value=" See {@link #format(String, Object[])}.&#xD;&#xA; @param message The message to format, may or may not contain place holders.&#xD;&#xA; @param argument1 The single argument from which to take the string representation&#xD;&#xA; &#x9;using {@link #toString()}.&#xD;&#xA; @return The formatted string, i.e. place holders in the message are&#xD;&#xA; &#x9;replaced with the arguments object in correct order.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMWaCOEd6zlNXooB-z8A" name="message" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMWqCOEd6zlNXooB-z8A" name="argument1" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMW6COEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMXKCOEd6zlNXooB-z8A" name="format" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sftMXaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMXqCOEd6zlNXooB-z8A" key="documentation" value=" See {@link #format(String, Object[])}.&#xD;&#xA; @param message The message to format, may or may not contain place holders.&#xD;&#xA; @param argument1 The first argument from which to take the string representation&#xD;&#xA; &#x9;using {@link #toString()}.&#xD;&#xA; @param argument2 The second argument from which to take the string representation&#xD;&#xA; &#x9;using {@link #toString()}.&#xD;&#xA; @return The formatted string, i.e. place holders in the message are&#xD;&#xA; &#x9;replaced with the arguments object in correct order.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMX6COEd6zlNXooB-z8A" name="message" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMYKCOEd6zlNXooB-z8A" name="argument1" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMYaCOEd6zlNXooB-z8A" name="argument2" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMYqCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMY6COEd6zlNXooB-z8A" name="format" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sftMZKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMZaCOEd6zlNXooB-z8A" key="documentation" value=" See {@link #format(String, Object[])}.&#xD;&#xA; @param message The message to format, may or may not contain place holders.&#xD;&#xA; @param argument1 The first argument from which to take the string representation&#xD;&#xA; &#x9;using {@link #toString()}.&#xD;&#xA; @param argument2 The second argument from which to take the string representation&#xD;&#xA; &#x9;using {@link #toString()}.&#xD;&#xA; @param argument3 The third argument from which to take the string representation&#xD;&#xA; &#x9;using {@link #toString()}.&#xD;&#xA; @return The formatted string, i.e. place holders in the message are&#xD;&#xA; &#x9;replaced with the arguments object in correct order.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMZqCOEd6zlNXooB-z8A" name="message" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMZ6COEd6zlNXooB-z8A" name="argument1" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMaKCOEd6zlNXooB-z8A" name="argument2" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMaaCOEd6zlNXooB-z8A" name="argument3" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMaqCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMa6COEd6zlNXooB-z8A" name="format" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sftMbKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMbaCOEd6zlNXooB-z8A" key="documentation" value=" Replaces each occurrence of the place holder string by a string representation&#xD;&#xA; of the {@link Object} at the corresponding index using its {@link #toString()}&#xD;&#xA; method. Therefore the first place holder is replaced by the string&#xD;&#xA; representation of the first object in the array and so on. If the object&#xD;&#xA; array is empty, the string is returned unchanged, no matter how much&#xD;&#xA; place holders are contained in the message. If the object array contains&#xD;&#xA; more objects than the number of place holders in the message, they are&#xD;&#xA; ignored.&#xD;&#xA; @param message The message to format, may or may not contain place holders.&#xD;&#xA; @param arguments The arguments from which to take the string representations&#xD;&#xA; &#x9;using {@link #toString()}. May be an empty array.&#xD;&#xA; @return The formatted string, i.e. place holders in the message are&#xD;&#xA; &#x9;replaced with the arguments object in correct order.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMbqCOEd6zlNXooB-z8A" name="message" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMb6COEd6zlNXooB-z8A" name="arguments" type="_sb0x2qCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sftMcKCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrn-KCOEd6zlNXooB-z8A" name="rand">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn-aCOEd6zlNXooB-z8A" name="RandomByteGenerator">
+                <eAnnotations xmi:id="_sbrn-qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn-6COEd6zlNXooB-z8A" key="documentation" value=" {@link RandomByteGenerator} generates a random byte in a defined range.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sftMcaCOEd6zlNXooB-z8A" name="m_generationBytes" visibility="private" association="_sgTCQaCOEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sftMcqCOEd6zlNXooB-z8A" name="m_rangeFrom" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sftMc6COEd6zlNXooB-z8A" name="m_rangeTo" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sftMdKCOEd6zlNXooB-z8A" name="excludeByteFromGeneration" visibility="public">
+                  <eAnnotations xmi:id="_sftMdaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMdqCOEd6zlNXooB-z8A" key="documentation" value=" Excludes a specific byte from being generated as a random byte.&#xD;&#xA; @param exclude The byte to exclude. Must by in the generation byte range. If this&#xD;&#xA; &#x9;is the case the generation range must contain more than one byte.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMd6COEd6zlNXooB-z8A" name="exclude">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sftMeKCOEd6zlNXooB-z8A" name="isInGenerationByteRange" visibility="public">
+                  <eAnnotations xmi:id="_sftMeaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sftMeqCOEd6zlNXooB-z8A" key="documentation" value=" Returns whether a given byte is contained within the range of generation bytes.&#xD;&#xA; @param b The byte to be tested.&#xD;&#xA; @return true if the given byte is contained within the range of generation bytes,&#xD;&#xA; &#x9;false otherwise.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sftMe6COEd6zlNXooB-z8A" name="b">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sftMfKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WAKCOEd6zlNXooB-z8A" name="setGenerationByteRange" visibility="public">
+                  <eAnnotations xmi:id="_sf2WAaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WAqCOEd6zlNXooB-z8A" key="documentation" value=" Redefines the generation range used for generating bytes.&#xD;&#xA; @param from The start byte of the generation range. Must not be greater than the&#xD;&#xA; &#x9;end byte of the range.&#xD;&#xA; @param to The end byte of the generation range. Must not be smaller than the&#xD;&#xA; &#x9;end byte of the range.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WA6COEd6zlNXooB-z8A" name="from">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sf2WBKCOEd6zlNXooB-z8A" name="to">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WBaCOEd6zlNXooB-z8A" name="generateRandomByte" visibility="public">
+                  <eAnnotations xmi:id="_sf2WBqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WB6COEd6zlNXooB-z8A" key="documentation" value=" Returns a random byte within the generation byte range.&#xD;&#xA; @return A random byte within the generation byte range.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WCKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WCaCOEd6zlNXooB-z8A" name="getRangeByteCount" visibility="public">
+                  <eAnnotations xmi:id="_sf2WCqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WC6COEd6zlNXooB-z8A" key="documentation" value=" Returns the number of bytes currently contained within the generation byte range.&#xD;&#xA; @return The number of bytes currently contained within the generation byte range.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WDKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WDaCOEd6zlNXooB-z8A" name="getRangeFrom" visibility="public">
+                  <eAnnotations xmi:id="_sf2WDqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WD6COEd6zlNXooB-z8A" key="documentation" value=" Returns the lower byte of the generation range.&#xD;&#xA; @return The lower byte of the generation range.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WEKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WEaCOEd6zlNXooB-z8A" name="getRangeTo" visibility="public">
+                  <eAnnotations xmi:id="_sf2WEqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WE6COEd6zlNXooB-z8A" key="documentation" value=" Returns the upper byte of the generation range.&#xD;&#xA; @return The upper byte of the generation range.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WFKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCQaCOEd6zlNXooB-z8A" memberEnd="_sftMcaCOEd6zlNXooB-z8A _sgTCQqCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCQqCOEd6zlNXooB-z8A" name="target" type="_sbrn-aCOEd6zlNXooB-z8A" association="_sgTCQaCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbrn_KCOEd6zlNXooB-z8A" name="string">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbrn_aCOEd6zlNXooB-z8A" name="UnknownCharsetException">
+                <eAnnotations xmi:id="_sbrn_qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbrn_6COEd6zlNXooB-z8A" key="documentation" value=" {@link UnknownCharsetException} is thrown whenever conversion of a&#xD;&#xA; {@link String} into a sequence of bytes or vice versa using an unknown&#xD;&#xA; {@link Charset} is done.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sf2WFaCOEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sf2WFqCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbroAKCOEd6zlNXooB-z8A" name="Charsets">
+                <eAnnotations xmi:id="_sbroAaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbroAqCOEd6zlNXooB-z8A" key="documentation" value=" {@link Charsets} is a helper class defining constants for all {@link Charset}s Java&#xD;&#xA; defines as always available.&#xD;&#xA; Additionally it provides helper methods to deal with BOMs and figure out character&#xD;&#xA; byte lengths.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sf2WF6COEd6zlNXooB-z8A" name="LENGTH_MAPPING" visibility="private" isStatic="true" association="_sgTCQ6COEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sf2WGaCOEd6zlNXooB-z8A" name="CHARSET_ASCII" visibility="public" isStatic="true" type="_sf2WGKCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sf2WGqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WG6COEd6zlNXooB-z8A" key="documentation" value=" Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the&#xD;&#xA; Unicode character set&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sf2WHKCOEd6zlNXooB-z8A" name="CHARSET_ISO" visibility="public" isStatic="true" type="_sf2WGKCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sf2WHaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WHqCOEd6zlNXooB-z8A" key="documentation" value=" ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sf2WH6COEd6zlNXooB-z8A" name="CHARSET_UTF16" visibility="public" isStatic="true" type="_sf2WGKCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sf2WIKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WIaCOEd6zlNXooB-z8A" key="documentation" value=" Sixteen-bit UCS Transformation Format, byte order identified by an&#xD;&#xA; optional byte- order mark&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sf2WIqCOEd6zlNXooB-z8A" name="CHARSET_UTF16BE" visibility="public" isStatic="true" type="_sf2WGKCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sf2WI6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WJKCOEd6zlNXooB-z8A" key="documentation" value=" Sixteen-bit UCS Transformation Format, big-endian byte order&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sf2WJaCOEd6zlNXooB-z8A" name="CHARSET_UTF16LE" visibility="public" isStatic="true" type="_sf2WGKCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sf2WJqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WJ6COEd6zlNXooB-z8A" key="documentation" value=" Sixteen-bit UCS Transformation Format, little-endian byte order&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sf2WKKCOEd6zlNXooB-z8A" name="CHARSET_UTF8" visibility="public" isStatic="true" type="_sf2WGKCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sf2WKaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WKqCOEd6zlNXooB-z8A" key="documentation" value=" Eight-bit UCS Transformation Format&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sf2WK6COEd6zlNXooB-z8A" name="REPRESENTATIONAL_STRING" visibility="private" isStatic="true" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <defaultValue xmi:type="uml:LiteralString" xmi:id="_sf2WLKCOEd6zlNXooB-z8A" name="" type="_sb0x0KCOEd6zlNXooB-z8A" value="&quot;abcdefghijklmnopqrstuvwxyz&quot;"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sf2WLaCOEd6zlNXooB-z8A" name="getCharacterByteLength" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sf2WLqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WL6COEd6zlNXooB-z8A" key="documentation" value=" Determines the length in bytes of one character given in the specified {@link Charset}.&#xD;&#xA; @param cs The {@link Charset} to determine the character byte length for..&#xD;&#xA; @return The length in bytes of one character given in the specified {@link Charset}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WMKCOEd6zlNXooB-z8A" name="cs" type="_sf2WGKCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sf2WMaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WMqCOEd6zlNXooB-z8A" name="getBytesWithoutBOM" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sf2WM6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WNKCOEd6zlNXooB-z8A" key="documentation" value=" Returns a byte representation of a {@link String} encoded in the given {@link Charset}&#xD;&#xA; without BOM (byte order management) bytes which are usually contained when using&#xD;&#xA; {@link String#getBytes(String)}. For instance, all UTF-16 encoded strings contain&#xD;&#xA; the bytes -2 and -1 at the beginning (FEFF or FFEF, depending on byte order).&#xD;&#xA; This is necessary to identify the byte ordering. However, in some cases a String&#xD;&#xA; needs to be converter without BOM e.g. when appending raw bytes to an already&#xD;&#xA; BOMed byte representation of a string.&#xD;&#xA; @param string The string to get the bytes for.&#xD;&#xA; @param cs The {@link Charset} the string is encoded in.&#xD;&#xA; @return A byte representation of the string according to the given {@link Charset} without&#xD;&#xA; &#x9;BOM (byte order management) bytes.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WNaCOEd6zlNXooB-z8A" name="string" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sf2WNqCOEd6zlNXooB-z8A" name="cs" type="_sf2WGKCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sf2WN6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WOKCOEd6zlNXooB-z8A" name="getBytesFromString" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sf2WOaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WOqCOEd6zlNXooB-z8A" key="documentation" value=" Converts a {@link String} object into a sequence of bytes using the given {@link Charset}.&#xD;&#xA; @param string The {@link String} from which to retrieve bytes..&#xD;&#xA; @param cs The {@link Charset} to use for conversion into bytes..&#xD;&#xA; @return A sequence of bytes converted from a {@link String} object using the given {@link Charset}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WO6COEd6zlNXooB-z8A" name="string" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sf2WPKCOEd6zlNXooB-z8A" name="cs" type="_sf2WGKCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sf2WPaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sf2WPqCOEd6zlNXooB-z8A" name="getStringFromBytes" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sf2WP6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sf2WQKCOEd6zlNXooB-z8A" key="documentation" value=" Converts a sequence of bytes into a {@link String} object using the given {@link Charset}.&#xD;&#xA; @param bytes The byte array from which to retrieve a String..&#xD;&#xA; @param cs The {@link Charset} to use for conversion into bytes..&#xD;&#xA; @return A {@link String} object converted from a sequence of bytes using the given {@link Charset}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sf2WQaCOEd6zlNXooB-z8A" name="bytes">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sf2WQqCOEd6zlNXooB-z8A" name="cs" type="_sf2WGKCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sf2WQ6COEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:DataType" xmi:id="_sf2WGKCOEd6zlNXooB-z8A" name="Charset"/>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCQ6COEd6zlNXooB-z8A" memberEnd="_sf2WF6COEd6zlNXooB-z8A _sgTCRKCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCRKCOEd6zlNXooB-z8A" name="target" type="_sbroAKCOEd6zlNXooB-z8A" association="_sgTCQ6COEd6zlNXooB-z8A"/>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_UQ3-QKq8EeCLJs56jOqOJA" name="config">
+              <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_W0EeUqq9EeCLJs56jOqOJA"/>
+              <packagedElement xmi:type="uml:Package" xmi:id="_oZ0pgKq8EeCLJs56jOqOJA" name="handler">
+                <packagedElement xmi:type="uml:Interface" xmi:id="_lttokKq8EeCLJs56jOqOJA" name="IConfigParamValueHandler" clientDependency="_NRv-EKq-EeCLJs56jOqOJA">
+                  <ownedOperation xmi:id="_VK3r4Kq9EeCLJs56jOqOJA" name="checkBounds">
+                    <ownedParameter xmi:id="_XPfPAKq9EeCLJs56jOqOJA" name="return" direction="return">
+                      <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                    </ownedParameter>
+                    <ownedParameter xmi:id="_akk7gKq9EeCLJs56jOqOJA" name="param" type="_wHgG4Kq8EeCLJs56jOqOJA"/>
+                    <ownedParameter xmi:id="_dCOpsKq9EeCLJs56jOqOJA" name="value">
+                      <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                    </ownedParameter>
+                  </ownedOperation>
+                  <ownedOperation xmi:id="_WMb2kqq9EeCLJs56jOqOJA" name="convert">
+                    <ownedParameter xmi:id="_YkujoKq9EeCLJs56jOqOJA" name="return" direction="return">
+                      <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                    </ownedParameter>
+                    <ownedParameter xmi:id="_f9_QMKq9EeCLJs56jOqOJA" name="param" type="_wHgG4Kq8EeCLJs56jOqOJA"/>
+                    <ownedParameter xmi:id="_hrNnAKq9EeCLJs56jOqOJA" name="stringValue">
+                      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+                    </ownedParameter>
+                  </ownedOperation>
+                </packagedElement>
+                <packagedElement xmi:type="uml:Class" xmi:id="_3SLvcKq9EeCLJs56jOqOJA" name="IntegerParamHandler" clientDependency="__mdSwKq9EeCLJs56jOqOJA">
+                  <interfaceRealization xmi:id="__mdSwKq9EeCLJs56jOqOJA" name="InterfaceRealization1" supplier="_lttokKq8EeCLJs56jOqOJA" client="_3SLvcKq9EeCLJs56jOqOJA" contract="_lttokKq8EeCLJs56jOqOJA"/>
+                </packagedElement>
+                <packagedElement xmi:type="uml:Class" xmi:id="_56a9AKq9EeCLJs56jOqOJA" name="StringParamHandler" clientDependency="_8HFo4Kq9EeCLJs56jOqOJA">
+                  <interfaceRealization xmi:id="_8HFo4Kq9EeCLJs56jOqOJA" name="InterfaceRealization1" supplier="_lttokKq8EeCLJs56jOqOJA" client="_56a9AKq9EeCLJs56jOqOJA" contract="_lttokKq8EeCLJs56jOqOJA"/>
+                </packagedElement>
+                <packagedElement xmi:type="uml:Class" xmi:id="_90T_sKq9EeCLJs56jOqOJA" name="LogLevelParamHandler" clientDependency="__MFD4Kq9EeCLJs56jOqOJA">
+                  <interfaceRealization xmi:id="__MFD4Kq9EeCLJs56jOqOJA" name="InterfaceRealization1" supplier="_lttokKq8EeCLJs56jOqOJA" client="_90T_sKq9EeCLJs56jOqOJA" contract="_lttokKq8EeCLJs56jOqOJA"/>
+                </packagedElement>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Package" xmi:id="_rPnx8Kq8EeCLJs56jOqOJA" name="issue"/>
+              <packagedElement xmi:type="uml:Class" xmi:id="_wHgG4Kq8EeCLJs56jOqOJA" name="AbstractConfigParam">
+                <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_C4PCAqq9EeCLJs56jOqOJA"/>
+                <ownedAttribute xmi:id="_GOqLQKq9EeCLJs56jOqOJA" name="defaultValue" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_IfgMgqq9EeCLJs56jOqOJA" name="handler" visibility="private" type="_lttokKq8EeCLJs56jOqOJA"/>
+                <ownedAttribute xmi:id="_K8tOwqq9EeCLJs56jOqOJA" name="minimumValue" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_NGZfIqq9EeCLJs56jOqOJA" name="maximumValue" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_O_GGIqq9EeCLJs56jOqOJA" name="enumValues" visibility="private">
+                  <type xmi:type="uml:Interface" href="../../CommonUMLModels/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_D1EBMKq-EeCLJs56jOqOJA" name="AbstractConfigLoader" clientDependency="_MxkCJKq-EeCLJs56jOqOJA _JfMdAKq_EeCLJs56jOqOJA _37YLgKq_EeCLJs56jOqOJA" isAbstract="true">
+                <ownedOperation xmi:id="_FgWeUqq-EeCLJs56jOqOJA" name="AbstractConfigLoader">
+                  <ownedParameter xmi:id="_KYFCQKq-EeCLJs56jOqOJA" name="parameters">
+                    <type xmi:type="uml:Interface" href="../../CommonUMLModels/models/CommonElements.uml#_UpAnOHVhEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_PGIFwqq-EeCLJs56jOqOJA" name="getConfigParamValue">
+                  <ownedParameter xmi:id="_QglRkKq-EeCLJs56jOqOJA" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_SFmuoKq-EeCLJs56jOqOJA" name="param" type="_wHgG4Kq8EeCLJs56jOqOJA"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_VVyF8qq-EeCLJs56jOqOJA" name="setConfigParamValue">
+                  <ownedParameter xmi:id="_XAeGIKq-EeCLJs56jOqOJA" name="param" type="_wHgG4Kq8EeCLJs56jOqOJA"/>
+                  <ownedParameter xmi:id="_Ytsc8Kq-EeCLJs56jOqOJA" name="value">
+                    <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_aVaBoqq-EeCLJs56jOqOJA" name="hasConfigParam">
+                  <ownedParameter xmi:id="_bPrRgKq-EeCLJs56jOqOJA" name="param" type="_wHgG4Kq8EeCLJs56jOqOJA"/>
+                  <ownedParameter xmi:id="_dM_SwKq-EeCLJs56jOqOJA" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_ftx0gqq-EeCLJs56jOqOJA" name="reset"/>
+                <ownedOperation xmi:id="_gfF8sqq-EeCLJs56jOqOJA" name="load">
+                  <ownedParameter xmi:id="_hO7eMKq-EeCLJs56jOqOJA" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../CommonUMLModels/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_iTxmYKq-EeCLJs56jOqOJA" name="stream">
+                    <type xmi:type="uml:Class" href="../../CommonUMLModels/models/CommonElements.uml#_dHGykM8XEd-NZcvRTr-rhA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_l6l8Eqq-EeCLJs56jOqOJA" name="getConfigFromStream" visibility="protected" isAbstract="true">
+                  <ownedParameter xmi:id="_m9pUgKq-EeCLJs56jOqOJA" name="stream">
+                    <type xmi:type="uml:Class" href="../../CommonUMLModels/models/CommonElements.uml#_dHGykM8XEd-NZcvRTr-rhA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_oxkwQKq-EeCLJs56jOqOJA" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../CommonUMLModels/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_rsS08qq-EeCLJs56jOqOJA" name="searchParamForId" visibility="private">
+                  <ownedParameter xmi:id="_skUpIKq-EeCLJs56jOqOJA" name="return" type="_wHgG4Kq8EeCLJs56jOqOJA" direction="return"/>
+                  <ownedParameter xmi:id="_t2RZMKq-EeCLJs56jOqOJA" name="id">
+                    <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_vdZIAqq-EeCLJs56jOqOJA" name="validateConfigParamValue" visibility="private">
+                  <ownedParameter xmi:id="_xpArAKq-EeCLJs56jOqOJA" name="param" type="_wHgG4Kq8EeCLJs56jOqOJA"/>
+                  <ownedParameter xmi:id="_zKd2sKq-EeCLJs56jOqOJA" name="value">
+                    <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_1EqSgKq-EeCLJs56jOqOJA" name="return" type="_2v8voKq-EeCLJs56jOqOJA" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Dependency" xmi:id="_MxkCJKq-EeCLJs56jOqOJA" name="Dependency1" supplier="_wHgG4Kq8EeCLJs56jOqOJA" client="_D1EBMKq-EeCLJs56jOqOJA"/>
+              <packagedElement xmi:type="uml:Dependency" xmi:id="_NRv-EKq-EeCLJs56jOqOJA" name="Dependency2" supplier="_wHgG4Kq8EeCLJs56jOqOJA" client="_lttokKq8EeCLJs56jOqOJA"/>
+              <packagedElement xmi:type="uml:Class" xmi:id="_2v8voKq-EeCLJs56jOqOJA" name="ConfigIssue" clientDependency="_u2Fa8Kq_EeCLJs56jOqOJA">
+                <ownedAttribute xmi:id="_El0TQqq_EeCLJs56jOqOJA" name="type" visibility="private" type="_OT8lcKq_EeCLJs56jOqOJA"/>
+                <ownedAttribute xmi:id="_E2z8oqq_EeCLJs56jOqOJA" name="param" visibility="private" type="_wHgG4Kq8EeCLJs56jOqOJA"/>
+                <ownedAttribute xmi:id="_FJu4oqq_EeCLJs56jOqOJA" name="paramConvertedValue" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_SnqP0LRKEd-PgN3SAEMFUA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_FXvfcqq_EeCLJs56jOqOJA" name="paramId" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_FuPT4qq_EeCLJs56jOqOJA" name="paramStringValue" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_GFL0Qqq_EeCLJs56jOqOJA" name="exception" visibility="private" type="_sfZqaqCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Dependency" xmi:id="_JfMdAKq_EeCLJs56jOqOJA" name="Dependency4" supplier="_2v8voKq-EeCLJs56jOqOJA" client="_D1EBMKq-EeCLJs56jOqOJA"/>
+              <packagedElement xmi:type="uml:Class" xmi:id="_OT8lcKq_EeCLJs56jOqOJA" name="ConfigIssueType">
+                <ownedAttribute xmi:id="_-ahZMqq_EeCLJs56jOqOJA" name="EMPTY_PARAMETER" visibility="private" isStatic="true" type="_OT8lcKq_EeCLJs56jOqOJA" isReadOnly="true"/>
+                <ownedAttribute xmi:id="_BNVfEqrAEeCLJs56jOqOJA" name="MISSING_PARAMETER" visibility="private" isStatic="true" type="_OT8lcKq_EeCLJs56jOqOJA" isReadOnly="true"/>
+                <ownedAttribute xmi:id="_CdEBkqrAEeCLJs56jOqOJA" name="NON_ENUMERATED_PARAMETER_VALUE" visibility="private" isStatic="true" type="_OT8lcKq_EeCLJs56jOqOJA" isReadOnly="true"/>
+                <ownedAttribute xmi:id="_FLG8MqrAEeCLJs56jOqOJA" name="PARAMETER_VALUE_CONVERSION_FAILED" visibility="private" isStatic="true" type="_OT8lcKq_EeCLJs56jOqOJA" isReadOnly="true"/>
+                <ownedAttribute xmi:id="_HIa9cqrAEeCLJs56jOqOJA" name="PARAMETER_VALUE_OUT_OF:BOUNDS" visibility="private" isStatic="true" type="_OT8lcKq_EeCLJs56jOqOJA" isReadOnly="true"/>
+                <ownedAttribute xmi:id="_JO1QUqrAEeCLJs56jOqOJA" name="UNKNOWN_PARAMETER" visibility="private" isStatic="true" type="_OT8lcKq_EeCLJs56jOqOJA" isReadOnly="true"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Dependency" xmi:id="_u2Fa8Kq_EeCLJs56jOqOJA" name="Dependency3" supplier="_OT8lcKq_EeCLJs56jOqOJA" client="_2v8voKq-EeCLJs56jOqOJA"/>
+              <packagedElement xmi:type="uml:Dependency" xmi:id="_37YLgKq_EeCLJs56jOqOJA" name="Dependency5" supplier="_lttokKq8EeCLJs56jOqOJA" client="_D1EBMKq-EeCLJs56jOqOJA"/>
+              <packagedElement xmi:type="uml:Class" xmi:id="_5Er88Kq_EeCLJs56jOqOJA" name="PropertyConfigLoader">
+                <generalization xmi:id="_7_aBoKq_EeCLJs56jOqOJA" general="_D1EBMKq-EeCLJs56jOqOJA"/>
+              </packagedElement>
+            </packagedElement>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Package" xmi:id="_sbroA6COEd6zlNXooB-z8A" name="dataaccess">
+            <packagedElement xmi:type="uml:Class" xmi:id="_sbroBKCOEd6zlNXooB-z8A" name="FileDataAccessor" clientDependency="_sf2WRKCOEd6zlNXooB-z8A">
+              <eAnnotations xmi:id="_sbroBaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                <details xmi:id="_sbroBqCOEd6zlNXooB-z8A" key="documentation" value=" @author Jens Ebert&#xD;&#xA; "/>
+              </eAnnotations>
+              <ownedAttribute xmi:id="_sf2WRaCOEd6zlNXooB-z8A" name="m_file" visibility="private" association="_sgTCRaCOEd6zlNXooB-z8A">
+                <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+              </ownedAttribute>
+              <ownedAttribute xmi:id="_sf2WRqCOEd6zlNXooB-z8A" name="m_randomAccessFile" visibility="private" association="_sgTCR6COEd6zlNXooB-z8A">
+                <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_R610SHjkEd6tyYOm0zT22g"/>
+              </ownedAttribute>
+              <ownedAttribute xmi:id="_sf2WR6COEd6zlNXooB-z8A" name="m_isOpened" visibility="private">
+                <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+              </ownedAttribute>
+              <ownedAttribute xmi:id="_sf2WSKCOEd6zlNXooB-z8A" name="m_byteOrdering" visibility="private" association="_sgTCSaCOEd6zlNXooB-z8A">
+                <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+              </ownedAttribute>
+              <interfaceRealization xmi:id="_sf2WRKCOEd6zlNXooB-z8A" name="IDataSource" supplier="_sbroB6COEd6zlNXooB-z8A" client="_sbroBKCOEd6zlNXooB-z8A" contract="_sbroB6COEd6zlNXooB-z8A"/>
+              <ownedOperation xmi:id="_sf2WSaCOEd6zlNXooB-z8A" name="isOpened" visibility="public">
+                <eAnnotations xmi:id="_sf2WSqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WS6COEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#isOpened()&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sf2WTKCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sf2WTaCOEd6zlNXooB-z8A" name="physicallyExists" visibility="public">
+                <eAnnotations xmi:id="_sf2WTqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WT6COEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#physicallyExists()&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sf2WUKCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sf2WUaCOEd6zlNXooB-z8A" name="open" visibility="public">
+                <eAnnotations xmi:id="_sf2WUqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WU6COEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#open()&#xD;&#xA; "/>
+                </eAnnotations>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sf2WVKCOEd6zlNXooB-z8A" name="close" visibility="public">
+                <eAnnotations xmi:id="_sf2WVaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WVqCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#close()&#xD;&#xA; "/>
+                </eAnnotations>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sf2WV6COEd6zlNXooB-z8A" name="getLength" visibility="public">
+                <eAnnotations xmi:id="_sf2WWKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WWaCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#getLength()&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sf2WWqCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sf2WW6COEd6zlNXooB-z8A" name="setLength" visibility="public">
+                <eAnnotations xmi:id="_sf2WXKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WXaCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#setLength(long)&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sf2WXqCOEd6zlNXooB-z8A" name="newLength">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sf2WX6COEd6zlNXooB-z8A" name="readBytes" visibility="public">
+                <eAnnotations xmi:id="_sf2WYKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WYaCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#readBytes(long)&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sf2WYqCOEd6zlNXooB-z8A" name="byteOffset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_sf2WY6COEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sf2WZKCOEd6zlNXooB-z8A" name="readBytes" visibility="public">
+                <eAnnotations xmi:id="_sf2WZaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sf2WZqCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#readBytes(long, int)&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sf2WZ6COEd6zlNXooB-z8A" name="byteOffset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_sf2WaKCOEd6zlNXooB-z8A" name="byteLength">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_sf2WaaCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHAKCOEd6zlNXooB-z8A" name="writeBytes" visibility="public">
+                <eAnnotations xmi:id="_sgAHAaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHAqCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#writeBytes(long, java.nio.ByteBuffer[])&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHA6COEd6zlNXooB-z8A" name="byteOffset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_sgAHBKCOEd6zlNXooB-z8A" name="dataBuffers">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHBaCOEd6zlNXooB-z8A" name="setPhysicalName" visibility="public">
+                <eAnnotations xmi:id="_sgAHBqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHB6COEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#setPhysicalName(java.lang.String)&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHCKCOEd6zlNXooB-z8A" name="newName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                <ownedParameter xmi:id="_sgAHCaCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHCqCOEd6zlNXooB-z8A" name="getPhysicalName" visibility="public">
+                <eAnnotations xmi:id="_sgAHC6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHDKCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#getPhysicalName()&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHDaCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHDqCOEd6zlNXooB-z8A" name="getByteOrdering" visibility="public">
+                <eAnnotations xmi:id="_sgAHD6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHEKCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#getByteOrdering()&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHEaCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHEqCOEd6zlNXooB-z8A" name="setByteOrdering" visibility="public">
+                <eAnnotations xmi:id="_sgAHE6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHFKCOEd6zlNXooB-z8A" key="documentation" value=" @see de.je.util.datasource.IDataSource#setByteOrdering(java.nio.ByteOrder)&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHFaCOEd6zlNXooB-z8A" name="byteOrdering">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Interface" xmi:id="_sbroB6COEd6zlNXooB-z8A" name="IDataAccessor">
+              <eAnnotations xmi:id="_sbroCKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                <details xmi:id="_sbroCaCOEd6zlNXooB-z8A" key="documentation" value=" @author Jens Ebert&#xD;&#xA; "/>
+              </eAnnotations>
+              <ownedOperation xmi:id="_sgAHFqCOEd6zlNXooB-z8A" name="getSize" visibility="public">
+                <eAnnotations xmi:id="_sgAHF6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHGKCOEd6zlNXooB-z8A" key="documentation" value=" Returns the current length of the source in bytes.&#xD;&#xA; @return The current length of the source in bytes.&#xD;&#xA; @throws DataSourceAccessException if the data source could not be accessed.&#xD;&#xA; @throws DataSourceNotOpenedException if the data source is currently not opened.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHGaCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHI6COEd6zlNXooB-z8A" name="mappedRead" visibility="public">
+                <eAnnotations xmi:id="_sgAHJKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHJaCOEd6zlNXooB-z8A" key="documentation" value=" Reads a number of bytes from the data source beginning with the given&#xD;&#xA; offset and the given length. If the given length plus the given offset is greater&#xD;&#xA; than the overall data source length, only the bytes until the end of the data source&#xD;&#xA; are returned.&#xD;&#xA; @param byteOffset&#x9;The byte offset within the data source. Must not be negative. If the&#xD;&#xA;           byteOffset is beyond the max data source offset (e.g. the data source&#xD;&#xA;           length is zero and a byteOffset > 0 is specified), an empty&#xD;&#xA;           {@link ByteBuffer} is returned, i.e. a {@link ByteBuffer} with position,&#xD;&#xA;           limit and capacity of 0.&#xD;&#xA; @param byteLength The number of bytes to read. Must not be negative.&#xD;&#xA; @return The bytes read. A {@link ByteBuffer} that may be empty. Its byte ordering is&#xD;&#xA; &#x9;set to the value returned by {@link #getByteOrdering()}. The position of the&#xD;&#xA; &#x9;returned buffer is set to 0.&#xD;&#xA; @throws DataSourceAccessException if the data source could not be accessed.&#xD;&#xA; @throws DataSourceNotOpenedException if the data source is currently not opened.&#xD;&#xA; @pre byteOffset >= 0&#xD;&#xA; @pre byteLength >= 0&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHJ6COEd6zlNXooB-z8A" name="relativeOffset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_sgAHKKCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_arda8GBHEd-0Y-X2VpQk6A" name="byteLength">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHNKCOEd6zlNXooB-z8A" name="close" visibility="public">
+                <eAnnotations xmi:id="_sgAHNaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHNqCOEd6zlNXooB-z8A" key="documentation" value=" Closes this data source. After having been closed, the data source cannot be used&#xD;&#xA; until the next call of {@link #open()}.&#xD;&#xA; Therefore subsequent calls to this method will fail without calling {@link #open()}&#xD;&#xA; in between.&#xD;&#xA; @throws DataSourceAccessException if the data source could not be accessed.&#xD;&#xA; @pre isOpened()&#xD;&#xA; "/>
+                </eAnnotations>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHN6COEd6zlNXooB-z8A" name="mappedWrite" visibility="public">
+                <eAnnotations xmi:id="_sgAHOKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHOaCOEd6zlNXooB-z8A" key="documentation" value=" Writes data into the data source. Writes the given ByteBuffers sequentially to the&#xD;&#xA; data source beginning with the given offset.&#xD;&#xA; @param byteOffset The byte offset within the data source. Must not be negative. If this&#xD;&#xA;           offset is bigger than the current file offset, the file will grow and&#xD;&#xA;           have the size byteOffset + number of bytes in dataBuffers. Intermediate&#xD;&#xA;           new byte values between the previous file size and the byteOffset are&#xD;&#xA;           undefined.&#xD;&#xA; @param dataBuffers The data buffers to write.. The array may be empty.&#xD;&#xA; @throws DataSourceAccessException if the data source could not be accessed.&#xD;&#xA; @throws DataSourceNotOpenedException if the data source is currently not opened.&#xD;&#xA; @pre dataBuffers != null&#xD;&#xA; @pre byteOffset >= 0&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_j0xv4GBHEd-0Y-X2VpQk6A" name="relativeOffset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_le36MGBHEd-0Y-X2VpQk6A" name="dataBuffer">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_rMsYoGBHEd-0Y-X2VpQk6A" name="followUpOffset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHRaCOEd6zlNXooB-z8A" name="getByteOrdering" visibility="public">
+                <eAnnotations xmi:id="_sgAHRqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHR6COEd6zlNXooB-z8A" key="documentation" value=" Returns the currently set {@link ByteOrder}. Must not return null.&#xD;&#xA; @return The currently set {@link ByteOrder}. Must not return null.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHSKCOEd6zlNXooB-z8A" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_sgAHSaCOEd6zlNXooB-z8A" name="setByteOrdering" visibility="public">
+                <eAnnotations xmi:id="_sgAHSqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sgAHS6COEd6zlNXooB-z8A" key="documentation" value=" Sets a new {@link ByteOrder}. For any read operations, this byte order is set&#xD;&#xA; initially for any returned {@link ByteOrder} object.&#xD;&#xA; @param byteOrdering The new byte ordering to set..&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedParameter xmi:id="_sgAHTKCOEd6zlNXooB-z8A" name="byteOrdering">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_aYWMGHjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_rqKXgk1eEd-MV-kgBxcTAg" name="isClosed">
+                <ownedParameter xmi:id="_t9iIUE1eEd-MV-kgBxcTAg" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_ClxXok1fEd-MV-kgBxcTAg" name="getMappedOffset">
+                <ownedParameter xmi:id="_4YPz8GBHEd-0Y-X2VpQk6A" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_D34fwk1fEd-MV-kgBxcTAg" name="getMappedSize">
+                <ownedParameter xmi:id="_Etq4QE1fEd-MV-kgBxcTAg" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_ICC9ok1gEd-MV-kgBxcTAg" name="isReadOnlyStream">
+                <ownedParameter xmi:id="_EbSK0GACEd-GDq_SWVTeWw" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_GMxBcmAAEd-GDq_SWVTeWw" name="map">
+                <ownedParameter xmi:id="_Q8CyIGABEd-GDq_SWVTeWw" name="offset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_OquKkGATEd-GDq_SWVTeWw" name="size">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_VO9_4mABEd-GDq_SWVTeWw" name="unmappedRead">
+                <ownedParameter xmi:id="_DX3WQGATEd-GDq_SWVTeWw" name="offset">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_K56ycGATEd-GDq_SWVTeWw" name="byteLength">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_ZjsQgGAZEd-GDq_SWVTeWw" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_8kLB0GBHEd-0Y-X2VpQk6A" name="isMapped">
+                <ownedParameter xmi:id="_9DnW4GBHEd-0Y-X2VpQk6A" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbroCqCOEd6zlNXooB-z8A" name="except">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbroC6COEd6zlNXooB-z8A" name="DataSourceDoesNotExistException">
+                <eAnnotations xmi:id="_sbroDKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbroDaCOEd6zlNXooB-z8A" key="documentation" value=" {@link DataSourceDoesNotExistException} is thrown whenever an operation that must access the&#xD;&#xA; underlying file is not able to find the file because it may have been renamed after&#xD;&#xA; it has been initially loaded.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sgAHTaCOEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgAHTqCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbroDqCOEd6zlNXooB-z8A" name="DataSourceAccessException">
+                <eAnnotations xmi:id="_sbroD6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbroEKCOEd6zlNXooB-z8A" key="documentation" value=" {@link DataSourceAccessException} is thrown if access to tag data fails.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sgAHT6COEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgAHUKCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbroEaCOEd6zlNXooB-z8A" name="NoCanonicalPathNameException">
+                <eAnnotations xmi:id="_sbroEqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbroE6COEd6zlNXooB-z8A" key="documentation" value=" {@link NoCanonicalPathNameException}&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sgAHUaCOEd6zlNXooB-z8A" general="_sfZqaqCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgAHUqCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sbroFKCOEd6zlNXooB-z8A" name="DataSourceNotOpenedException">
+                <eAnnotations xmi:id="_sbroFaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sbroFqCOEd6zlNXooB-z8A" key="documentation" value=" @author Jens Ebert&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sgAHU6COEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgAHVKCOEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Association" xmi:id="_sgTCRaCOEd6zlNXooB-z8A" memberEnd="_sf2WRaCOEd6zlNXooB-z8A _sgTCRqCOEd6zlNXooB-z8A">
+              <ownedEnd xmi:id="_sgTCRqCOEd6zlNXooB-z8A" name="target" type="_sbroBKCOEd6zlNXooB-z8A" association="_sgTCRaCOEd6zlNXooB-z8A"/>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Association" xmi:id="_sgTCR6COEd6zlNXooB-z8A" memberEnd="_sf2WRqCOEd6zlNXooB-z8A _sgTCSKCOEd6zlNXooB-z8A">
+              <ownedEnd xmi:id="_sgTCSKCOEd6zlNXooB-z8A" name="target" type="_sbroBKCOEd6zlNXooB-z8A" association="_sgTCR6COEd6zlNXooB-z8A"/>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Association" xmi:id="_sgTCSaCOEd6zlNXooB-z8A" memberEnd="_sf2WSKCOEd6zlNXooB-z8A _sgTCSqCOEd6zlNXooB-z8A">
+              <ownedEnd xmi:id="_sgTCSqCOEd6zlNXooB-z8A" name="target" type="_sbroBKCOEd6zlNXooB-z8A" association="_sgTCSaCOEd6zlNXooB-z8A"/>
+            </packagedElement>
+            <packagedElement xmi:type="uml:StateMachine" xmi:id="_ZenHwGAPEd-GDq_SWVTeWw" name="Data Accessor state model">
+              <region xmi:id="_ZenHwWAPEd-GDq_SWVTeWw">
+                <subvertex xmi:type="uml:Pseudostate" xmi:id="_bc-R4GAPEd-GDq_SWVTeWw" name=""/>
+                <subvertex xmi:type="uml:State" xmi:id="_dMRsUGAPEd-GDq_SWVTeWw" name="Nothing Mapped"/>
+                <subvertex xmi:type="uml:State" xmi:id="_m_eEsGAPEd-GDq_SWVTeWw" name="Region Mapped"/>
+                <subvertex xmi:type="uml:FinalState" xmi:id="_qvkDcmAVEd-GDq_SWVTeWw" name="FinalState1"/>
+                <subvertex xmi:type="uml:State" xmi:id="_yY7BgGAVEd-GDq_SWVTeWw" name="Closed"/>
+                <transition xmi:id="_jGK35mAPEd-GDq_SWVTeWw" name="new" kind="local" source="_bc-R4GAPEd-GDq_SWVTeWw" target="_dMRsUGAPEd-GDq_SWVTeWw"/>
+                <transition xmi:id="_pyIZlGAPEd-GDq_SWVTeWw" name="map" kind="local" source="_dMRsUGAPEd-GDq_SWVTeWw" target="_m_eEsGAPEd-GDq_SWVTeWw"/>
+                <transition xmi:id="_sGvRxWAVEd-GDq_SWVTeWw" name="close" kind="local" source="_dMRsUGAPEd-GDq_SWVTeWw" target="_yY7BgGAVEd-GDq_SWVTeWw"/>
+                <transition xmi:id="_ti01RGAVEd-GDq_SWVTeWw" name="close" kind="local" source="_m_eEsGAPEd-GDq_SWVTeWw" target="_yY7BgGAVEd-GDq_SWVTeWw"/>
+                <transition xmi:id="_3Y_pJGAVEd-GDq_SWVTeWw" name="" kind="local" source="_yY7BgGAVEd-GDq_SWVTeWw" target="_qvkDcmAVEd-GDq_SWVTeWw"/>
+              </region>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Collaboration" xmi:id="_dIUugGAREd-GDq_SWVTeWw">
+              <ownedBehavior xmi:type="uml:Interaction" xmi:id="_dIUugWAREd-GDq_SWVTeWw">
+                <ownedAttribute xmi:id="_kNdlMGAREd-GDq_SWVTeWw" name="Property1" type="_sbroB6COEd6zlNXooB-z8A"/>
+                <ownedConnector xmi:id="_kNwgIGAREd-GDq_SWVTeWw" name="Connector1">
+                  <end xmi:id="_kN6RIGAREd-GDq_SWVTeWw" role="_kNdlMGAREd-GDq_SWVTeWw"/>
+                </ownedConnector>
+                <lifeline xmi:id="_hKQS4GAREd-GDq_SWVTeWw" name="Client" coveredBy="_oswbAGAREd-GDq_SWVTeWw _3O4nuWAREd-GDq_SWVTeWw _3O4nsmAREd-GDq_SWVTeWw"/>
+                <lifeline xmi:id="_iktesmAREd-GDq_SWVTeWw" name="" represents="_kNdlMGAREd-GDq_SWVTeWw" coveredBy="_oswbAWAREd-GDq_SWVTeWw _urki0GAREd-GDq_SWVTeWw _3O4nuGAREd-GDq_SWVTeWw _sObt1mAYEd-GDq_SWVTeWw _Or8q5GAZEd-GDq_SWVTeWw _urH24GAREd-GDq_SWVTeWw _sObt0GAYEd-GDq_SWVTeWw _Orzg8mAZEd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_oswbAGAREd-GDq_SWVTeWw" name="MessageOccurrenceSpecification1" covered="_hKQS4GAREd-GDq_SWVTeWw" event="_oswbAmAREd-GDq_SWVTeWw" message="_oswbA2AREd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_oswbAWAREd-GDq_SWVTeWw" name="MessageOccurrenceSpecification2" covered="_iktesmAREd-GDq_SWVTeWw" event="_oswbAmAREd-GDq_SWVTeWw" message="_oswbA2AREd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_urki0GAREd-GDq_SWVTeWw" name="MessageOccurrenceSpecification3" covered="_iktesmAREd-GDq_SWVTeWw" event="_urki0WAREd-GDq_SWVTeWw" message="_urki0mAREd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_3O4nuGAREd-GDq_SWVTeWw" name="MessageOccurrenceSpecification4" covered="_iktesmAREd-GDq_SWVTeWw" event="_3O4numAREd-GDq_SWVTeWw" message="_3O4nu2AREd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_3O4nuWAREd-GDq_SWVTeWw" name="MessageOccurrenceSpecification5" covered="_hKQS4GAREd-GDq_SWVTeWw" event="_3O4numAREd-GDq_SWVTeWw" message="_3O4nu2AREd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_sObt1mAYEd-GDq_SWVTeWw" name="MessageOccurrenceSpecification6" covered="_iktesmAREd-GDq_SWVTeWw" event="_sObt12AYEd-GDq_SWVTeWw" message="_sObt2GAYEd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="_Or8q5GAZEd-GDq_SWVTeWw" name="MessageOccurrenceSpecification7" covered="_iktesmAREd-GDq_SWVTeWw" event="_Or8q5WAZEd-GDq_SWVTeWw" message="_Or8q5mAZEd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_urH24GAREd-GDq_SWVTeWw" name="BehaviorExecutionSpecification1" covered="_iktesmAREd-GDq_SWVTeWw" start="_urki0GAREd-GDq_SWVTeWw" finish="_3O4nuGAREd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_3O4nsmAREd-GDq_SWVTeWw" name="BehaviorExecutionSpecification2" covered="_hKQS4GAREd-GDq_SWVTeWw" start="_oswbAGAREd-GDq_SWVTeWw" finish="_oswbAGAREd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_sObt0GAYEd-GDq_SWVTeWw" name="BehaviorExecutionSpecification3" covered="_iktesmAREd-GDq_SWVTeWw" start="_sObt1mAYEd-GDq_SWVTeWw" finish="_sObt1mAYEd-GDq_SWVTeWw"/>
+                <fragment xmi:type="uml:BehaviorExecutionSpecification" xmi:id="_Orzg8mAZEd-GDq_SWVTeWw" name="BehaviorExecutionSpecification4" covered="_iktesmAREd-GDq_SWVTeWw" start="_Or8q5GAZEd-GDq_SWVTeWw" finish="_Or8q5GAZEd-GDq_SWVTeWw"/>
+                <message xmi:id="_oswbA2AREd-GDq_SWVTeWw" name="create" messageSort="createMessage" receiveEvent="_oswbAWAREd-GDq_SWVTeWw" sendEvent="_oswbAGAREd-GDq_SWVTeWw"/>
+                <message xmi:id="_urki0mAREd-GDq_SWVTeWw" name="hasBytes" receiveEvent="_urki0GAREd-GDq_SWVTeWw">
+                  <argument xmi:type="uml:LiteralString" xmi:id="_FMIhgGAZEd-GDq_SWVTeWw" name="offset" value="tagOffset">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </argument>
+                  <argument xmi:type="uml:LiteralString" xmi:id="_xssKcGAREd-GDq_SWVTeWw" name="bytes" value="tagID">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_nSfwQClaEd-MlYIGQIPuBA"/>
+                  </argument>
+                </message>
+                <message xmi:id="_3O4nu2AREd-GDq_SWVTeWw" name="true" messageSort="reply" receiveEvent="_3O4nuWAREd-GDq_SWVTeWw" sendEvent="_3O4nuGAREd-GDq_SWVTeWw"/>
+                <message xmi:id="_sObt2GAYEd-GDq_SWVTeWw" name="init" receiveEvent="_sObt1mAYEd-GDq_SWVTeWw">
+                  <argument xmi:type="uml:LiteralString" xmi:id="_0_nPkGAYEd-GDq_SWVTeWw" name="offset" value="tagOffset">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </argument>
+                  <argument xmi:type="uml:LiteralString" xmi:id="_0_nPkWAYEd-GDq_SWVTeWw" name="size" value="tagSize">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </argument>
+                </message>
+                <message xmi:id="_Or8q5mAZEd-GDq_SWVTeWw" name="readBytes" receiveEvent="_Or8q5GAZEd-GDq_SWVTeWw">
+                  <argument xmi:type="uml:LiteralString" xmi:id="_Q1MPUGAZEd-GDq_SWVTeWw" name="byteLength" value="relOffset">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                  </argument>
+                  <argument xmi:type="uml:InstanceValue" xmi:id="_Q1MPUWAZEd-GDq_SWVTeWw" name="return">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_ZNsW2HjkEd6tyYOm0zT22g"/>
+                  </argument>
+                </message>
+              </ownedBehavior>
+            </packagedElement>
+            <packagedElement xmi:type="uml:CreationEvent" xmi:id="_oswbAmAREd-GDq_SWVTeWw" name="CreationEvent1"/>
+            <packagedElement xmi:type="uml:CallEvent" xmi:id="_urki0WAREd-GDq_SWVTeWw" name="CallEvent1" operation="_VO9_4mABEd-GDq_SWVTeWw"/>
+            <packagedElement xmi:type="uml:CallEvent" xmi:id="_3O4numAREd-GDq_SWVTeWw" name="CallEvent2"/>
+            <packagedElement xmi:type="uml:CallEvent" xmi:id="_sObt12AYEd-GDq_SWVTeWw" name="CallEvent3" operation="_GMxBcmAAEd-GDq_SWVTeWw"/>
+            <packagedElement xmi:type="uml:CallEvent" xmi:id="_Or8q5WAZEd-GDq_SWVTeWw" name="CallEvent4" operation="_sgAHI6COEd6zlNXooB-z8A"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Package" xmi:id="_sbroF6COEd6zlNXooB-z8A" name="testutil">
+            <packagedElement xmi:type="uml:Package" xmi:id="_sbroGKCOEd6zlNXooB-z8A" name="equa">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xoKCOEd6zlNXooB-z8A" name="EqualsTest" isAbstract="true">
+                <eAnnotations xmi:id="_sb0xoaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xoqCOEd6zlNXooB-z8A" key="documentation" value=" EqualsTest tests for the correct implementation of the equals method.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedOperation xmi:id="_sgJ4AKCOEd6zlNXooB-z8A" name="setUp" visibility="public">
+                  <eAnnotations xmi:id="_sgJ4AaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4AqCOEd6zlNXooB-z8A" key="documentation" value=" Sets up the test fixtures.&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4A6COEd6zlNXooB-z8A" name="checkTestData" visibility="private">
+                  <eAnnotations xmi:id="_sgJ4BKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4BaCOEd6zlNXooB-z8A" key="documentation" value=" Checks the test data to be valid.&#xD;&#xA; @throws IllegalArgumentException If data is not valid with a speaking message what&#xD;&#xA; &#x9;is wrong in detail.&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4BqCOEd6zlNXooB-z8A" name="test_equals" visibility="public">
+                  <eAnnotations xmi:id="_sgJ4B6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4CKCOEd6zlNXooB-z8A" key="documentation" value=" Tests {@link Object#equals(Object)}.&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4CaCOEd6zlNXooB-z8A" name="getLeftObjects" visibility="protected" isAbstract="true">
+                  <eAnnotations xmi:id="_sgJ4CqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4C6COEd6zlNXooB-z8A" key="documentation" value=" Returns left objects to be used in equals test. The right objects are tested to be&#xD;&#xA; unequal to null, equal to themselves and equal to the right objects with the same index.&#xD;&#xA; @return The left objects to be used in equals test.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4DKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4DaCOEd6zlNXooB-z8A" name="getRightObjects" visibility="protected" isAbstract="true">
+                  <eAnnotations xmi:id="_sgJ4DqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4D6COEd6zlNXooB-z8A" key="documentation" value=" Returns right objects to be used in equals test. The right objects are tested to be&#xD;&#xA; unequal to null, equal to themselves and equal to the left objects with the same index.&#xD;&#xA; @return The right objects to be used in equals test.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4EKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4EaCOEd6zlNXooB-z8A" name="getRightObjectsNotEqual" visibility="protected" isAbstract="true">
+                  <eAnnotations xmi:id="_sgJ4EqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4E6COEd6zlNXooB-z8A" key="documentation" value=" Returns right objects that are known to be unequal to the corresponding left object&#xD;&#xA; with the same index.&#xD;&#xA; @return Right objects that are known to be unequal to the corresponding left object.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4FKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4FaCOEd6zlNXooB-z8A" name="getThirdObjectsEqualToRight" visibility="protected" isAbstract="true">
+                  <eAnnotations xmi:id="_sgJ4FqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4F6COEd6zlNXooB-z8A" key="documentation" value=" Returns third objects that are known to be equal to the right objects with the same index.&#xD;&#xA; @return Third objects that are known to be equal to the right objects with the same index.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4GKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_Mrz8mHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sb0xo6COEd6zlNXooB-z8A" name="run">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xpKCOEd6zlNXooB-z8A" name="RunAllTests">
+                <eAnnotations xmi:id="_sb0xpaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xpqCOEd6zlNXooB-z8A" key="documentation" value=" RunAllTests is used to run all available JUnit tests at once.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedOperation xmi:id="_sgJ4GaCOEd6zlNXooB-z8A" name="main" visibility="public" isStatic="true">
+                  <eAnnotations xmi:id="_sgJ4GqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4G6COEd6zlNXooB-z8A" key="documentation" value=" Runs all tests available in the test-folder.&#xD;&#xA; @param args No information in this array is processed by this program.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4HKCOEd6zlNXooB-z8A" name="args" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xp6COEd6zlNXooB-z8A" name="RunTests">
+                <eAnnotations xmi:id="_sb0xqKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xqaCOEd6zlNXooB-z8A" key="documentation" value=" RunTests is a class that allows to run unit tests for all test classes&#xD;&#xA; contained in a specific folder or given in an array of test class names.&#xD;&#xA; A test class must be a compiled java class and is identified by a specific&#xD;&#xA; file extension (usually &quot;.class&quot;) and a pattern for the file name. I.e. class&#xD;&#xA; files that do not match this patterns are not recognized as test classes and&#xD;&#xA; the test cases contained in these classes are not executed.&#xD;&#xA; Internally, RunTests uses JUnit to run the test by invoking JUnitCore.main.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sgJ4HqCOEd6zlNXooB-z8A" name="m_testClassNamePattern" visibility="private" type="_sgJ4HaCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sgJ4H6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4IKCOEd6zlNXooB-z8A" key="documentation" value="An arbitrary pattern that identifies the test classes by name "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgJ4IaCOEd6zlNXooB-z8A" name="m_testClassExtension" visibility="private" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sgJ4IqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4I6COEd6zlNXooB-z8A" key="documentation" value="Extension of the test class files beginning with a dot "/>
+                  </eAnnotations>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgJ4JKCOEd6zlNXooB-z8A" name="PACKAGE_DELIMITER" visibility="private" isStatic="true" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sgJ4JaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4JqCOEd6zlNXooB-z8A" key="documentation" value="Standard Java-Package delimiter "/>
+                  </eAnnotations>
+                  <defaultValue xmi:type="uml:LiteralString" xmi:id="_sgJ4J6COEd6zlNXooB-z8A" name="" type="_sb0x0KCOEd6zlNXooB-z8A" value="&quot;.&quot;"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sgJ4KKCOEd6zlNXooB-z8A" name="getTestClassesInPackage" visibility="public">
+                  <eAnnotations xmi:id="_sgJ4KaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4KqCOEd6zlNXooB-z8A" key="documentation" value=" Gets a vector of all test classes contained in a given package. This also&#xD;&#xA; finds all test classes in sub-packages of the given package.&#xD;&#xA; @param packageName The name of the package. Must reside in the current working&#xD;&#xA;           directory of the Java VM.&#xD;&#xA; @return A vector containing the fully qualified names of all test classes&#xD;&#xA;         in the given package that match the pattern given to the&#xD;&#xA;         constructor.&#xD;&#xA; @pre packageName != null&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4K6COEd6zlNXooB-z8A" name="packageName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sgJ4LKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_T-qfKHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4LaCOEd6zlNXooB-z8A" name="runAllTestsInPackage" visibility="public">
+                  <eAnnotations xmi:id="_sgJ4LqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4L6COEd6zlNXooB-z8A" key="documentation" value=" Runs all tests contained in the given package. This also includes test&#xD;&#xA; classes that reside in sup-packages of the given package.&#xD;&#xA; @param packageName Name of the package.&#xD;&#xA; @pre packageName != null&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4MKCOEd6zlNXooB-z8A" name="packageName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4MaCOEd6zlNXooB-z8A" name="runTests" visibility="public">
+                  <eAnnotations xmi:id="_sgJ4MqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4M6COEd6zlNXooB-z8A" key="documentation" value=" Runs arbitrary tests. The test names are given in the vector.&#xD;&#xA; @param testClassNames Vector containing fully qualified names of test classes. This&#xD;&#xA;           classes do not need to match the pattern given to the&#xD;&#xA;           constructor.&#xD;&#xA; @pre testClassNames != null&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4NKCOEd6zlNXooB-z8A" name="testClassNames">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_T-qfKHVgEd6FgeqRnn-mAw"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4NaCOEd6zlNXooB-z8A" name="getPathFromPackageName" visibility="private">
+                  <eAnnotations xmi:id="_sgJ4NqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4N6COEd6zlNXooB-z8A" key="documentation" value=" Returns the path representation of a package identifier.&#xD;&#xA; @param packageName&#xD;&#xA;           The name of a package.&#xD;&#xA; @return Relative Path to a given package name.&#xD;&#xA; @pre packageName != null&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4OKCOEd6zlNXooB-z8A" name="packageName" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sgJ4OaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgJ4OqCOEd6zlNXooB-z8A" name="getPackageNameFromPath" visibility="private">
+                  <eAnnotations xmi:id="_sgJ4O6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4PKCOEd6zlNXooB-z8A" key="documentation" value=" Returns the fully qualified package name of a path.&#xD;&#xA; @param path&#xD;&#xA;           The name of the package.&#xD;&#xA; @return The fully qualified package name of a path.&#xD;&#xA; @pre path != null&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgJ4PaCOEd6zlNXooB-z8A" name="path">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sgJ4PqCOEd6zlNXooB-z8A" name="return" type="_sb0x0KCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:DataType" xmi:id="_sgJ4HaCOEd6zlNXooB-z8A" name="Pattern"/>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sb0xqqCOEd6zlNXooB-z8A" name="setup">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xq6COEd6zlNXooB-z8A" name="TestBase" isAbstract="true">
+                <eAnnotations xmi:id="_sb0xrKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xraCOEd6zlNXooB-z8A" key="documentation" value=" {@link TestBase} is a possible base class for any test case.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sgJ4P6COEd6zlNXooB-z8A" name="NULL_CHECK_FAILURE" visibility="protected" isStatic="true" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <eAnnotations xmi:id="_sgJ4QKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4QaCOEd6zlNXooB-z8A" key="documentation" value="Default message if test data is illegally null. "/>
+                  </eAnnotations>
+                  <defaultValue xmi:type="uml:LiteralString" xmi:id="_sgJ4QqCOEd6zlNXooB-z8A" name="" type="_sb0x0KCOEd6zlNXooB-z8A" value="&quot;Test data must not be null&quot;"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sgJ4Q6COEd6zlNXooB-z8A" name="checkTestData" visibility="protected" isAbstract="true">
+                  <eAnnotations xmi:id="_sgJ4RKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgJ4RaCOEd6zlNXooB-z8A" key="documentation" value=" Checks the test data to be valid.&#xD;&#xA; @throws TestDataCreationException If data is not valid with a speaking message what&#xD;&#xA; &#x9;is wrong in detail.&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xrqCOEd6zlNXooB-z8A" name="TestDataCreationException">
+                <eAnnotations xmi:id="_sb0xr6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xsKCOEd6zlNXooB-z8A" key="documentation" value=" {@link TestDataCreationException} is thrown whenever test data to create before a&#xD;&#xA; test run could not be set up due to errors.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sgJ4RqCOEd6zlNXooB-z8A" general="_sb0x66COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgJ4R6COEd6zlNXooB-z8A" name="serialVersionUID" visibility="private" isStatic="true">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dnL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+              </packagedElement>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Package" xmi:id="_sb0xsaCOEd6zlNXooB-z8A" name="testfile">
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xsqCOEd6zlNXooB-z8A" name="TestDataDefaultFileCreator" isAbstract="true">
+                <eAnnotations xmi:id="_sb0xs6COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xtKCOEd6zlNXooB-z8A" key="documentation" value=" {@link TestDataDefaultFileCreator} creates some default files required for multiple&#xD;&#xA; test cases within this package.&#xD;&#xA; "/>
+                </eAnnotations>
+                <generalization xmi:id="_sgJ4SKCOEd6zlNXooB-z8A" general="_sb0xq6COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgJ4SaCOEd6zlNXooB-z8A" name="m_fileUtility" visibility="private" type="_sb0xtaCOEd6zlNXooB-z8A" association="_sgTCS6COEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgJ4SqCOEd6zlNXooB-z8A" name="m_generatedFileId" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgJ4S6COEd6zlNXooB-z8A" name="m_realFileId" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgTB8KCOEd6zlNXooB-z8A" name="m_generatedFileName" visibility="private" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgTB8aCOEd6zlNXooB-z8A" name="m_realFileName" visibility="private" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgTB8qCOEd6zlNXooB-z8A" name="m_dataFolder" visibility="private" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                <ownedOperation xmi:id="_sgTB86COEd6zlNXooB-z8A" name="setUp" visibility="public">
+                  <eAnnotations xmi:id="_sgTB9KCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTB9aCOEd6zlNXooB-z8A" key="documentation" value=" Sets up the test fixtures.&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTB9qCOEd6zlNXooB-z8A" name="tearDown" visibility="public">
+                  <eAnnotations xmi:id="_sgTB96COEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTB-KCOEd6zlNXooB-z8A" key="documentation" value=" Tears down the test fixtures. Each tear down is even called if {@link #setUp()} fails.&#xD;&#xA; "/>
+                  </eAnnotations>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTB-aCOEd6zlNXooB-z8A" name="getGeneratedFileDescriptor" visibility="protected">
+                  <eAnnotations xmi:id="_sgTB-qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTB-6COEd6zlNXooB-z8A" key="documentation" value=" Returns the {@link TestFileDescriptor} for the generated file.&#xD;&#xA; @return The {@link TestFileDescriptor} for the generated file.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTB_KCOEd6zlNXooB-z8A" name="return" type="_sb0xuKCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTB_aCOEd6zlNXooB-z8A" name="setGeneratedFile" visibility="protected">
+                  <eAnnotations xmi:id="_sgTB_qCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTB_6COEd6zlNXooB-z8A" key="documentation" value=" Sets a new file object after e.g. renaming a file.&#xD;&#xA; @param file The file to set..&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCAKCOEd6zlNXooB-z8A" name="file">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCAaCOEd6zlNXooB-z8A" name="getRealFileDescriptor" visibility="protected">
+                  <eAnnotations xmi:id="_sgTCAqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCA6COEd6zlNXooB-z8A" key="documentation" value=" Returns the {@link TestFileDescriptor} for the real file.&#xD;&#xA; @return The {@link TestFileDescriptor} for the real file.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCBKCOEd6zlNXooB-z8A" name="return" type="_sb0xuKCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCBaCOEd6zlNXooB-z8A" name="getFileUtility" visibility="protected">
+                  <eAnnotations xmi:id="_sgTCBqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCB6COEd6zlNXooB-z8A" key="documentation" value=" Returns the {@link TestFileUtility} used for creating and releasing test files.&#xD;&#xA; @return The {@link TestFileUtility} used for creating and releasing test files.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCCKCOEd6zlNXooB-z8A" name="return" type="_sb0xtaCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xtaCOEd6zlNXooB-z8A" name="TestFileUtility">
+                <eAnnotations xmi:id="_sb0xtqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xt6COEd6zlNXooB-z8A" key="documentation" value=" {@link TestFileUtility} can be used to create/open and delete/close test files.&#xD;&#xA; Therefore it supports both generated files to delete after the test as well as&#xD;&#xA; already existing &quot;real life&quot; files.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sgTCCaCOEd6zlNXooB-z8A" name="CLOSS_ERROR_MESSAGE_PART1" visibility="private" isStatic="true" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <defaultValue xmi:type="uml:LiteralString" xmi:id="_sgTCCqCOEd6zlNXooB-z8A" name="" type="_sb0x0KCOEd6zlNXooB-z8A" value="&quot;File could not be deleted: &quot;"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgTCC6COEd6zlNXooB-z8A" name="CLOSS_ERROR_MESSAGE_PART2" visibility="private" isStatic="true" type="_sb0x0KCOEd6zlNXooB-z8A">
+                  <defaultValue xmi:type="uml:LiteralString" xmi:id="_sgTCDKCOEd6zlNXooB-z8A" name="" type="_sb0x0KCOEd6zlNXooB-z8A" value="&quot;,  manual deletion might be necessary.&quot;"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgTCDaCOEd6zlNXooB-z8A" name="m_idCounter" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgTCDqCOEd6zlNXooB-z8A" name="m_fileDescriptors" visibility="private" association="_sgTCTaCOEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Interface" href="../../GeneratorTemplates/models/CommonElements.uml#_NpWi6HVgEd6FgeqRnn-mAw"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sgTCD6COEd6zlNXooB-z8A" name="openTestFile" visibility="public">
+                  <eAnnotations xmi:id="_sgTCEKCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCEaCOEd6zlNXooB-z8A" key="documentation" value=" Opens or newly creates a test file. If the file with the given absolute path name&#xD;&#xA; is already existing, it is opened, otherwise it is created and opened.&#xD;&#xA; @param name The path name of the file to open..&#xD;&#xA; @return An identifier of the file to be used with other methods.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCEqCOEd6zlNXooB-z8A" name="name" type="_sb0x0KCOEd6zlNXooB-z8A"/>
+                  <ownedParameter xmi:id="_sgTCE6COEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCFKCOEd6zlNXooB-z8A" name="closeTestFile" visibility="public">
+                  <eAnnotations xmi:id="_sgTCFaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCFqCOEd6zlNXooB-z8A" key="documentation" value=" Closes a given test file. If it has been generated (= temporarily created for the&#xD;&#xA; test case) with {@link #openTestFile(String)} it is deleted, too.&#xD;&#xA; @param id The id of the file to close. Must exist.&#xD;&#xA; @pre {@link #hasFile(int)}(id)&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCF6COEd6zlNXooB-z8A" name="id">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCGKCOEd6zlNXooB-z8A" name="getFileDescriptor" visibility="public">
+                  <eAnnotations xmi:id="_sgTCGaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCGqCOEd6zlNXooB-z8A" key="documentation" value=" Returns a {@link TestFileDescriptor} object for the given file.&#xD;&#xA; @param id The id of the file. Must exist.&#xD;&#xA; @return A {@link TestFileDescriptor} object for the given file.&#xD;&#xA; @pre {@link #hasFile(int)}(id)&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCG6COEd6zlNXooB-z8A" name="id">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sgTCHKCOEd6zlNXooB-z8A" name="return" type="_sb0xuKCOEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCHaCOEd6zlNXooB-z8A" name="hasFile" visibility="public">
+                  <eAnnotations xmi:id="_sgTCHqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCH6COEd6zlNXooB-z8A" key="documentation" value=" Determines if a given id is belonging to a file held within this {@link TestFileUtility}.&#xD;&#xA; @param id The id of the file.&#xD;&#xA; @return true if the given id is known, false otherwise.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCIKCOEd6zlNXooB-z8A" name="id">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57dXL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                  <ownedParameter xmi:id="_sgTCIaCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Class" xmi:id="_sb0xuKCOEd6zlNXooB-z8A" name="TestFileDescriptor">
+                <eAnnotations xmi:id="_sb0xuaCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                  <details xmi:id="_sb0xuqCOEd6zlNXooB-z8A" key="documentation" value=" {@link TestFileDescriptor} holds objects used to describe and access a {@link File}.&#xD;&#xA; "/>
+                </eAnnotations>
+                <ownedAttribute xmi:id="_sgTCIqCOEd6zlNXooB-z8A" name="m_file" visibility="private" association="_sgcy8KCOEd6zlNXooB-z8A">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                </ownedAttribute>
+                <ownedAttribute xmi:id="_sgTCI6COEd6zlNXooB-z8A" name="m_dataSource" visibility="private" type="_sbroB6COEd6zlNXooB-z8A" association="_sgcy8qCOEd6zlNXooB-z8A"/>
+                <ownedAttribute xmi:id="_sgTCJKCOEd6zlNXooB-z8A" name="m_existed" visibility="private">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedAttribute>
+                <ownedOperation xmi:id="_sgTCJaCOEd6zlNXooB-z8A" name="getFile" visibility="public">
+                  <eAnnotations xmi:id="_sgTCJqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCJ6COEd6zlNXooB-z8A" key="documentation" value=" Returns the file stored within this object.&#xD;&#xA; @return The file stored within this object.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCKKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCKaCOEd6zlNXooB-z8A" name="resetFile" visibility="public">
+                  <eAnnotations xmi:id="_sgTCKqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCK6COEd6zlNXooB-z8A" key="documentation" value=" Resets the file to a new location after e.g. having renamed it.&#xD;&#xA; @param file The new file..&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCLKCOEd6zlNXooB-z8A" name="file">
+                    <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                  </ownedParameter>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCLaCOEd6zlNXooB-z8A" name="getDataSource" visibility="public">
+                  <eAnnotations xmi:id="_sgTCLqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCL6COEd6zlNXooB-z8A" key="documentation" value=" Returns the {@link IDataSource} used for accessing the file.&#xD;&#xA; @return The {@link IDataSource} used for accessing the file.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCMKCOEd6zlNXooB-z8A" name="return" type="_sbroB6COEd6zlNXooB-z8A" direction="return"/>
+                </ownedOperation>
+                <ownedOperation xmi:id="_sgTCMaCOEd6zlNXooB-z8A" name="fileExistedBeforeOpen" visibility="public">
+                  <eAnnotations xmi:id="_sgTCMqCOEd6zlNXooB-z8A" source="http://www.topcased.org/documentation">
+                    <details xmi:id="_sgTCM6COEd6zlNXooB-z8A" key="documentation" value=" Returns true if the file already existed before it had been opened, false otherwise.&#xD;&#xA; @return true if the file already existed before it had been opened, false otherwise.&#xD;&#xA; "/>
+                  </eAnnotations>
+                  <ownedParameter xmi:id="_sgTCNKCOEd6zlNXooB-z8A" name="return" direction="return">
+                    <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                  </ownedParameter>
+                </ownedOperation>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCS6COEd6zlNXooB-z8A" memberEnd="_sgJ4SaCOEd6zlNXooB-z8A _sgTCTKCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCTKCOEd6zlNXooB-z8A" name="target" type="_sb0xsqCOEd6zlNXooB-z8A" association="_sgTCS6COEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgTCTaCOEd6zlNXooB-z8A" memberEnd="_sgTCDqCOEd6zlNXooB-z8A _sgTCTqCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgTCTqCOEd6zlNXooB-z8A" name="target" type="_sb0xtaCOEd6zlNXooB-z8A" association="_sgTCTaCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgcy8KCOEd6zlNXooB-z8A" memberEnd="_sgTCIqCOEd6zlNXooB-z8A _sgcy8aCOEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgcy8aCOEd6zlNXooB-z8A" name="target" type="_sb0xuKCOEd6zlNXooB-z8A" association="_sgcy8KCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+              <packagedElement xmi:type="uml:Association" xmi:id="_sgcy8qCOEd6zlNXooB-z8A" memberEnd="_sgTCI6COEd6zlNXooB-z8A _sgcy86COEd6zlNXooB-z8A">
+                <ownedEnd xmi:id="_sgcy86COEd6zlNXooB-z8A" name="target" type="_sb0xuKCOEd6zlNXooB-z8A" association="_sgcy8qCOEd6zlNXooB-z8A"/>
+              </packagedElement>
+            </packagedElement>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Package" xmi:id="_JpU2QHhzEeCnH9oBYKZMrQ" name="xml.jaxbloader">
+            <packagedElement xmi:type="uml:Class" xmi:id="_PMkcaHhzEeCnH9oBYKZMrQ" name="AbstractJAXBLoader" clientDependency="_-UQmBnhzEeCnH9oBYKZMrQ" isAbstract="true">
+              <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_QrLvcnhzEeCnH9oBYKZMrQ"/>
+              <ownedOperation xmi:id="_S2ESonhzEeCnH9oBYKZMrQ" name="AbstractJAXBLoader">
+                <ownedParameter xmi:id="_Xcz0QHhzEeCnH9oBYKZMrQ" name="schemaFileRelativePath">
+                  <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+                </ownedParameter>
+                <ownedParameter xmi:id="_YziWoHhzEeCnH9oBYKZMrQ" name="rootObjectClass">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_qmjygA9bEeC5mKKa1YlKHQ"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_ip27gnhzEeCnH9oBYKZMrQ" name="getRootObject">
+                <ownedParameter xmi:id="_jrkQIHhzEeCnH9oBYKZMrQ" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_jp-ZeBTCEeCCdI4pKGnu6Q"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_nu2fYnhzEeCnH9oBYKZMrQ" name="isLoaded">
+                <ownedParameter xmi:id="_oUZccHhzEeCnH9oBYKZMrQ" name="return" direction="return">
+                  <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_prubwnhzEeCnH9oBYKZMrQ" name="load">
+                <ownedParameter xmi:id="_reA4wHhzEeCnH9oBYKZMrQ" name="configurationFile">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_vMR6QnhzEeCnH9oBYKZMrQ" name="loadSchema" visibility="private">
+                <ownedParameter xmi:id="_wl_fMHhzEeCnH9oBYKZMrQ" name="return" direction="return">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+              <ownedOperation xmi:id="_xmghAnhzEeCnH9oBYKZMrQ" name="unmarshal" visibility="private">
+                <ownedParameter xmi:id="_zBtTsHhzEeCnH9oBYKZMrQ" name="configurationFile">
+                  <type xmi:type="uml:Class" href="../../GeneratorTemplates/models/CommonElements.uml#_RMgHmHjkEd6tyYOm0zT22g"/>
+                </ownedParameter>
+              </ownedOperation>
+            </packagedElement>
+            <packagedElement xmi:type="uml:Class" xmi:id="_7IHaKHhzEeCnH9oBYKZMrQ" name="JAXBLoaderException"/>
+            <packagedElement xmi:type="uml:Dependency" xmi:id="_-UQmBnhzEeCnH9oBYKZMrQ" name="Dependency1" supplier="_7IHaKHhzEeCnH9oBYKZMrQ" client="_PMkcaHhzEeCnH9oBYKZMrQ"/>
+          </packagedElement>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_PernwMBLEeCgw907U5xDPg" name="registry">
+          <packagedElement xmi:type="uml:Class" xmi:id="_RSUIkMBLEeCgw907U5xDPg" name="ComponentRegistry"/>
+        </packagedElement>
+      </packagedElement>
+    </packagedElement>
+    <profileApplication xmi:id="_sbrnuaCOEd6zlNXooB-z8A">
+      <eAnnotations xmi:id="_sbrnuqCOEd6zlNXooB-z8A" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../../GeneratorTemplates/models/CommonStereotypes.uml#_buGqQXOjEd63TMf_SwR2Zw"/>
+      </eAnnotations>
+      <appliedProfile href="../../GeneratorTemplates/models/CommonStereotypes.uml#_d0ndU3L_Ed6ZZvimjx0tAA"/>
+    </profileApplication>
+    <profileApplication xmi:id="__EwJUKq8EeCLJs56jOqOJA">
+      <eAnnotations xmi:id="__E5TQKq8EeCLJs56jOqOJA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../../CommonUMLModels/models/CommonStereotypes.uml#_Ri5B4XDQEeCSdtq34tGhqQ"/>
+      </eAnnotations>
+      <appliedProfile href="../../CommonUMLModels/models/CommonStereotypes.uml#_d0ndU3L_Ed6ZZvimjx0tAA"/>
+    </profileApplication>
+  </uml:Model>
+  <CommonStereotypes:RuntimeException xmi:id="_9A0BIHhzEeCnH9oBYKZMrQ" base_Class="_7IHaKHhzEeCnH9oBYKZMrQ"/>
+  <CommonStereotypes_1:ExtendableEnum xmi:id="_CZsE0Kq9EeCLJs56jOqOJA" base_Class="_wHgG4Kq8EeCLJs56jOqOJA"/>
+  <CommonStereotypes_1:create xmi:id="_JIEL4Kq-EeCLJs56jOqOJA" base_Operation="_FgWeUqq-EeCLJs56jOqOJA"/>
+  <CommonStereotypes_1:DataType xmi:id="_3sl-EKq-EeCLJs56jOqOJA" base_Class="_2v8voKq-EeCLJs56jOqOJA"/>
+  <CommonStereotypes_1:ExtendableEnum xmi:id="_QD2c0Kq_EeCLJs56jOqOJA" base_Class="_OT8lcKq_EeCLJs56jOqOJA"/>
+</xmi:XMI>
