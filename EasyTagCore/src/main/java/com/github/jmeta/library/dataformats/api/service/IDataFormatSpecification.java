@@ -5,12 +5,17 @@
  * @date 31.12.10 19:47:10 (December 31, 2010)
  */
 
-package de.je.jmeta.dataformats;
+package com.github.jmeta.library.dataformats.api.service;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
+
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
 
 /**
  * Represents the complete specification of a single {@link DataFormat}. The specification contains all

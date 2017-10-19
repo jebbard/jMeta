@@ -7,7 +7,7 @@
  * @date 04.01.2011
  */
 
-package de.je.jmeta.dataformats;
+package com.github.jmeta.library.dataformats.api.type;
 
 import de.je.util.javautil.common.extenum.AbstractExtensibleEnum;
 import de.je.util.javautil.common.flags.Flags;

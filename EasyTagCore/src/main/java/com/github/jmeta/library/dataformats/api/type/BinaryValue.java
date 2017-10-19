@@ -6,7 +6,7 @@
  *
  * @date 18.06.2011
  */
-package de.je.jmeta.dataformats;
+package com.github.jmeta.library.dataformats.api.type;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

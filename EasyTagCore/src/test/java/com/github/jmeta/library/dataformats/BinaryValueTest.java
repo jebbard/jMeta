@@ -1,4 +1,4 @@
-package de.je.jmeta.dataformats;
+package com.github.jmeta.library.dataformats;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,6 +7,8 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
+
+import com.github.jmeta.library.dataformats.api.type.BinaryValue;
 
 /**
  * {@link BinaryValueTest} tests the {@link BinaryValue} class.

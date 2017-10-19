@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:07 (December 31, 2010)
  */
 
-package de.je.jmeta.dataformats;
+package com.github.jmeta.library.dataformats.api.type;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;

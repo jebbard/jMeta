@@ -7,7 +7,7 @@
  * @date 31.12.2010
  */
 
-package de.je.jmeta.dataformats.export;
+package com.github.jmeta.library.dataformats.api.service;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -22,12 +22,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.je.jmeta.dataformats.DataBlockDescription;
-import de.je.jmeta.dataformats.DataBlockId;
-import de.je.jmeta.dataformats.DataFormat;
-import de.je.jmeta.dataformats.DataTransformationType;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.dataformats.LocationProperties;
+import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.type.LocationProperties;
+
 import de.je.util.javautil.common.err.Reject;
 
 /**
@@ -77,7 +77,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getDataBlockDescription(de.je.jmeta.dataformats.DataBlockId)
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getDataBlockDescription(com.github.jmeta.library.dataformats.api.type.DataBlockId)
     */
    @Override
    public DataBlockDescription getDataBlockDescription(DataBlockId id) {
@@ -145,7 +145,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getDataFormat()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getDataFormat()
     */
    @Override
    public DataFormat getDataFormat() {
@@ -154,7 +154,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getDefaultByteOrder()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getDefaultByteOrder()
     */
    @Override
    public ByteOrder getDefaultByteOrder() {
@@ -163,7 +163,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getDefaultCharacterEncoding()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getDefaultCharacterEncoding()
     */
    @Override
    public Charset getDefaultCharacterEncoding() {
@@ -172,7 +172,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getDataTransformations()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getDataTransformations()
     */
    @Override
    public List<DataTransformationType> getDataTransformations() {
@@ -181,7 +181,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getSupportedByteOrders()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getSupportedByteOrders()
     */
    @Override
    public List<ByteOrder> getSupportedByteOrders() {
@@ -190,7 +190,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getSupportedCharacterEncodings()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getSupportedCharacterEncodings()
     */
    @Override
    public List<Charset> getSupportedCharacterEncodings() {
@@ -199,7 +199,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getTopLevelDataBlockIds()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getTopLevelDataBlockIds()
     */
    @Override
    public Set<DataBlockId> getTopLevelDataBlockIds() {
@@ -208,7 +208,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#isGeneric(DataBlockId)
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#isGeneric(DataBlockId)
     */
    @Override
    public boolean isGeneric(DataBlockId id) {
@@ -219,7 +219,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#getPaddingBlockIds()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#getPaddingBlockIds()
     */
    @Override
    public Set<DataBlockId> getPaddingBlockIds() {
@@ -228,7 +228,7 @@ public class StandardDataFormatSpecification implements IDataFormatSpecification
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatSpecification#specifiesBlockWithId(de.je.jmeta.dataformats.DataBlockId)
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification#specifiesBlockWithId(com.github.jmeta.library.dataformats.api.type.DataBlockId)
     */
    @Override
    public boolean specifiesBlockWithId(DataBlockId id) {

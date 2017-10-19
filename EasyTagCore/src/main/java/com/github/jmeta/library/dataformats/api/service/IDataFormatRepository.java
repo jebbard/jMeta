@@ -5,10 +5,12 @@
  * @date 31.12.10 19:47:10 (December 31, 2010)
  */
 
-package de.je.jmeta.dataformats;
+package com.github.jmeta.library.dataformats.api.service;
 
 import java.util.List;
 import java.util.Set;
+
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
 
 /**
  *

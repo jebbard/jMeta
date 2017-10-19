@@ -7,7 +7,7 @@
  * @date 31.12.2010
  */
 
-package de.je.jmeta.dataformats.impl;
+package com.github.jmeta.library.dataformats.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,13 +18,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.utility.extmanager.api.IExtension;
+import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+import com.github.jmeta.utility.extmanager.api.InvalidExtensionException;
+
 import de.je.jmeta.common.ILoggingMessageConstants;
-import de.je.jmeta.dataformats.DataFormat;
-import de.je.jmeta.dataformats.IDataFormatRepository;
-import de.je.jmeta.dataformats.IDataFormatSpecification;
-import de.je.jmeta.extmanager.api.IExtension;
-import de.je.jmeta.extmanager.api.IExtensionManager;
-import de.je.jmeta.extmanager.api.InvalidExtensionException;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.registry.ComponentRegistry;
 
@@ -82,7 +83,7 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatRepository#getDataFormatSpecification(de.je.jmeta.dataformats.DataFormat)
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.type.DataFormat)
     */
    @Override
    public IDataFormatSpecification getDataFormatSpecification(DataFormat dataFormat) {
@@ -94,7 +95,7 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
    }
 
    /**
-    * @see de.je.jmeta.dataformats.IDataFormatRepository#getSupportedDataFormats()
+    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatRepository#getSupportedDataFormats()
     */
    @Override
    public Set<DataFormat> getSupportedDataFormats() {
