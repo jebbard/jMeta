@@ -9,7 +9,7 @@ package com.github.jmeta.library.dataformats.api.type;
 
 import java.nio.ByteBuffer;
 
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *

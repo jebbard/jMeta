@@ -29,8 +29,7 @@ import com.github.jmeta.library.media.api.exception.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.IMediaAPI;
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO stage2_002: Implement timeout when reading from stream-based medium
 

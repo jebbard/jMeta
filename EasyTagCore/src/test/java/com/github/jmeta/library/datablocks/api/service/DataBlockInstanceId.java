@@ -4,8 +4,7 @@ import com.github.jmeta.library.datablocks.api.type.IDataBlock;
 import com.github.jmeta.library.dataformats.api.type.DataBlockId;
 import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link DataBlockInstanceId} represents and uniquely determines a single occurrence of a {@link IDataBlock} with a

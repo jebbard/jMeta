@@ -18,8 +18,7 @@ import com.github.jmeta.library.media.api.exception.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link AbstractMediumAccessor} is an abstract base class for easier implementation of an {@link IMediumAccessor}.

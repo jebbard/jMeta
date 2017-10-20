@@ -16,10 +16,10 @@ import com.github.jmeta.library.media.AllMediaTests;
 import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests;
 
 /**
- * {@link AlljMetaTests} is used for running all test cases of the extension management component.
+ * {@link AlljMetaLibraryTests} is used for running all test cases of the extension management component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ AllMediaTests.class, })
-public class AlljMetaTests {
+public class AlljMetaLibraryTests {
    // Nothing necessary here
 }

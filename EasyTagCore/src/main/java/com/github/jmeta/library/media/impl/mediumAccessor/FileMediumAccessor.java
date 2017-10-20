@@ -19,8 +19,7 @@ import com.github.jmeta.library.media.api.exception.MediumAccessException;
 import com.github.jmeta.library.media.api.type.AbstractMedium;
 import com.github.jmeta.library.media.api.type.FileMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * Represents an {@link IMediumAccessor} that is a physical file with random access.

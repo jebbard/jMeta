@@ -16,9 +16,9 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.helper.TestMediumUtility;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.MediumRegion;
+import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
-import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
-import de.je.util.javautil.common.err.Reject;
 import junit.framework.Assert;
 
 /**

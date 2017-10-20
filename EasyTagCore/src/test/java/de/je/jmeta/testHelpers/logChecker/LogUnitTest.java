@@ -14,10 +14,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
 
 import junit.framework.AssertionFailedError;
-import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.testUtil.setup.TestDataException;
 
 /**

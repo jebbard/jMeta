@@ -27,8 +27,7 @@ import com.github.jmeta.library.media.api.type.MediumActionType;
 import com.github.jmeta.library.media.api.type.MediumRegion;
 import com.github.jmeta.library.media.api.type.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediumChangeManager} performs all tasks of handling and consolidating {@link MediumAction}s.

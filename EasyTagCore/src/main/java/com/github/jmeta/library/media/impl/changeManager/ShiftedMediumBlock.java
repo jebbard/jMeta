@@ -18,8 +18,7 @@ import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.MediumAction;
 import com.github.jmeta.library.media.api.type.MediumActionType;
 import com.github.jmeta.library.media.api.type.MediumRegion;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link ShiftedMediumBlock} represents a block of existing, consecutive {@link IMedium} bytes which potentially need

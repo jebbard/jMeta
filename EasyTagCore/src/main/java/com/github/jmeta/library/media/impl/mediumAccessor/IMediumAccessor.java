@@ -16,8 +16,7 @@ import com.github.jmeta.library.media.api.exception.MediumAccessException;
 import com.github.jmeta.library.media.api.exception.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
 
 /**
  * This class provides the mechanisms to read data from and write data to an {@link IMedium}. We can basically

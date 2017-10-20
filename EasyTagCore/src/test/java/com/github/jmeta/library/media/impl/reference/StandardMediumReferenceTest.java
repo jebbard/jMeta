@@ -20,8 +20,7 @@ import com.github.jmeta.library.media.api.type.FileMedium;
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-
-import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
 
 /**
  * {@link StandardMediumReferenceTest} tests the {@link StandardMediumReference} class and its interface

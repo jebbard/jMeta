@@ -14,9 +14,9 @@ import com.github.jmeta.library.media.api.exception.EndOfMediumException;
 import com.github.jmeta.library.media.api.type.AbstractMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.InMemoryMedium;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 import de.je.util.javautil.common.array.EnhancedArrays;
-import de.je.util.javautil.common.err.Reject;
 
 /**
  * Represents an in-memory, random-access {@link IMediumAccessor}.

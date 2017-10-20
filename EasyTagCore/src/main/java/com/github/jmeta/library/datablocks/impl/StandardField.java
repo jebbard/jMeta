@@ -19,8 +19,7 @@ import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.type.DataBlockId;
 import com.github.jmeta.library.media.api.type.AbstractMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO writeTests001: Test failing conversion when Enum interpr. value is unknown
 // TODO writeTests002: Test failing conversion when Numeric interpr. value > specified static field size

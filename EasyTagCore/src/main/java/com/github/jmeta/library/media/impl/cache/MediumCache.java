@@ -13,8 +13,7 @@ import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.MediumRegion;
 import com.github.jmeta.library.media.api.type.MediumRegion.MediumRegionOverlapType;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * Represents a permanent in-memory cache for an {@link IMedium}. It provides methods for adding and retrieving cache

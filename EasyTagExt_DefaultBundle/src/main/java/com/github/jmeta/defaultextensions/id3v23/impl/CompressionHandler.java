@@ -22,8 +22,8 @@ import com.github.jmeta.library.datablocks.api.type.IContainer;
 import com.github.jmeta.library.datablocks.api.type.IField;
 import com.github.jmeta.library.datablocks.api.type.IHeader;
 import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
-import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.Flags;
 
 /**

@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.jmeta.utility.config.api.type.UserConfigParam;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 import de.je.util.javautil.common.config.AbstractConfigLoader;
 import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.PropertiesConfigLoader;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 import de.je.util.javautil.common.config.issue.ConfigIssueType;
-import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link AbstractConfigAccessor} provides access to configuration parameters loaded from an external file.

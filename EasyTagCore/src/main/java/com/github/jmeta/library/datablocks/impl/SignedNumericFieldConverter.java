@@ -16,8 +16,8 @@ import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionEx
 import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
 import com.github.jmeta.library.dataformats.api.type.BinaryValue;
 import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
-import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.num.NumericDataTypeHelper;
 
 /**

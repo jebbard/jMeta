@@ -28,8 +28,7 @@ import com.github.jmeta.library.dataformats.api.type.DataBlockId;
 import com.github.jmeta.library.dataformats.api.type.FieldType;
 import com.github.jmeta.library.media.api.services.IMediaAPI;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *

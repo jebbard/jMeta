@@ -13,8 +13,7 @@ import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.type.MediumAction;
 import com.github.jmeta.library.media.api.type.MediumActionType;
 import com.github.jmeta.library.media.api.type.MediumRegion;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link InvalidOverlappingWriteException} is thrown whenever one of the operations

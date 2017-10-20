@@ -10,8 +10,7 @@ package com.github.jmeta.library.media.impl.reference;
 
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link StandardMediumReference} refers to a specific offset on a {@link IMedium}.

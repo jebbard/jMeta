@@ -10,7 +10,7 @@ package com.github.jmeta.library.media.api.type;
 
 import java.nio.ByteBuffer;
 
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediumRegion} represents a part of an external medium. This part can either be cached or not. If it is cached,

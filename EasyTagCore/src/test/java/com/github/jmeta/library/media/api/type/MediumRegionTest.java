@@ -23,8 +23,7 @@ import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.InMemoryMedium;
 import com.github.jmeta.library.media.api.type.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-
-import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
 
 /**
  * {@link MediumRegionTest} tests the {@link MediumRegion} class.

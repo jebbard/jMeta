@@ -17,8 +17,7 @@ import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.type.IDataBlock;
 import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *

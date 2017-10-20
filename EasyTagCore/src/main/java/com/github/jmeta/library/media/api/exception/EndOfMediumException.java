@@ -11,8 +11,7 @@ package com.github.jmeta.library.media.api.exception;
 
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link EndOfMediumException} is thrown whenever end of medium is reached while reading from an {@link IMedium}.

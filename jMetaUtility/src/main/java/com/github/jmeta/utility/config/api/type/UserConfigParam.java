@@ -27,8 +27,7 @@ public final class UserConfigParam<T> extends AbstractConfigParam<T> {
    /**
     * Prefix of each configuration parameter id used by all {@link UserConfigParam} instances.
     */
-   public static final String CONFIG_PREFIX = UserConfigParam.class.getPackage()
-      .getName();
+   public static final String CONFIG_PREFIX = UserConfigParam.class.getPackage().getName();
 
    private static final HashSet<Level> LEVEL_ENUM_VALUES = new HashSet<>();
 
@@ -45,16 +44,14 @@ public final class UserConfigParam<T> extends AbstractConfigParam<T> {
    /**
     * Absolute or relative path to the central log file.
     */
-   public static final UserConfigParam<String> LOG_FILE_PATH = new UserConfigParam<>(
-      CONFIG_PREFIX + ".logFilePath", null, null, "./logs", null,
-      StringParamHandler.DEFAULT_INSTANCE);
+   public static final UserConfigParam<String> LOG_FILE_PATH = new UserConfigParam<>(CONFIG_PREFIX + ".logFilePath",
+      null, null, "./logs", null, StringParamHandler.DEFAULT_INSTANCE);
 
    /**
     * Log level to use when logging to the central or any of its child log files.
     */
-   public static final UserConfigParam<Level> LOG_LEVEL = new UserConfigParam<>(
-      CONFIG_PREFIX + ".logLevel", null, null, Level.FINEST, LEVEL_ENUM_VALUES,
-      new LogLevelParamHandler());
+   public static final UserConfigParam<Level> LOG_LEVEL = new UserConfigParam<>(CONFIG_PREFIX + ".logLevel", null, null,
+      Level.FINEST, LEVEL_ENUM_VALUES, new LogLevelParamHandler());
 
    /**
     * Creates a new {@link UserConfigParam}.
@@ -72,8 +69,8 @@ public final class UserConfigParam<T> extends AbstractConfigParam<T> {
     * @param handler
     *           The {@link IConfigParamValueHandler} that checks and converts {@link AbstractConfigParam}s.
     */
-   private UserConfigParam(String id, T minimumValue, T maximumValue,
-      T defaultValue, Set<T> enumValues, IConfigParamValueHandler<T> handler) {
+   private UserConfigParam(String id, T minimumValue, T maximumValue, T defaultValue, Set<T> enumValues,
+      IConfigParamValueHandler<T> handler) {
       super(id, minimumValue, maximumValue, defaultValue, enumValues, handler);
    }
 }

@@ -22,8 +22,7 @@ import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification
 import com.github.jmeta.library.dataformats.api.type.BinaryValue;
 import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link LazyField}

@@ -34,12 +34,12 @@ import com.github.jmeta.library.dataformats.api.type.FieldType;
 import com.github.jmeta.library.dataformats.api.type.LocationProperties;
 import com.github.jmeta.library.dataformats.api.type.MagicKey;
 import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
 import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
 
 import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
 import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.BitAddress;
 import de.je.util.javautil.common.flags.FlagDescription;
 import de.je.util.javautil.common.flags.FlagSpecification;

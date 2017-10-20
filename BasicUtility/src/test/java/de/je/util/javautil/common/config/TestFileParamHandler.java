@@ -10,7 +10,6 @@ package de.je.util.javautil.common.config;
 
 import java.io.File;
 
-import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.handler.IConfigParamValueHandler;
 import de.je.util.javautil.common.err.Reject;
 
@@ -20,7 +19,7 @@ import de.je.util.javautil.common.err.Reject;
 public class TestFileParamHandler implements IConfigParamValueHandler<File> {
 
    /**
-    * @see de.je.util.javautil.common.config.handler.IConfigParamValueHandler#convert(de.je.util.javautil.common.config.AbstractConfigParam,
+    * @see com.github.jmeta.utility.config.api.services.IConfigParamValueHandler#convert(com.github.jmeta.utility.config.api.type.AbstractConfigParam,
     *      java.lang.String)
     */
    @Override
@@ -32,7 +31,7 @@ public class TestFileParamHandler implements IConfigParamValueHandler<File> {
    }
 
    /**
-    * @see de.je.util.javautil.common.config.handler.IConfigParamValueHandler#checkBounds(de.je.util.javautil.common.config.AbstractConfigParam,
+    * @see com.github.jmeta.utility.config.api.services.IConfigParamValueHandler#checkBounds(com.github.jmeta.utility.config.api.type.AbstractConfigParam,
     *      java.lang.Object)
     */
    @Override

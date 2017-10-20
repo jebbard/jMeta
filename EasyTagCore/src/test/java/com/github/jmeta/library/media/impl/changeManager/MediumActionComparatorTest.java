@@ -21,8 +21,7 @@ import com.github.jmeta.library.media.api.type.MediumAction;
 import com.github.jmeta.library.media.api.type.MediumActionType;
 import com.github.jmeta.library.media.api.type.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-
-import de.je.util.javautil.common.err.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
 
 /**
  * {@link MediumActionComparatorTest} tests the class {@link MediumActionComparator}.

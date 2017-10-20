@@ -12,8 +12,7 @@ package com.github.jmeta.library.media.api.type;
 import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediumAction} represents an action performed on a given {@link IMedium}, either a reading or a writing action.

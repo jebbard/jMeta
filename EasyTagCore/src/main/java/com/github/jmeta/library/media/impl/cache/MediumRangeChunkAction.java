@@ -6,8 +6,7 @@ import java.util.List;
 import com.github.jmeta.library.media.api.type.IMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.MediumRegion;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * Represents an action to perform for a given chunk of a range within an {@link IMedium}. A range is not a formal term,

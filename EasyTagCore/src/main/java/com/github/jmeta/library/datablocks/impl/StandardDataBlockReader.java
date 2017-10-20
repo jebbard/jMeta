@@ -52,9 +52,9 @@ import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exception.EndOfMediumException;
 import com.github.jmeta.library.media.api.type.AbstractMedium;
 import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.err.Reject;
 
 // TODO document001: MagicKey inclusion and exclusion key mechanism
 // TODO document002: Determine payload size by reading children

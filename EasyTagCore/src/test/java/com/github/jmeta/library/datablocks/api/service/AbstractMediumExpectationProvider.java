@@ -22,8 +22,8 @@ import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
 import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.type.DataFormat;
 import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
-import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.testUtil.setup.TestDataException;
 
 /**

@@ -23,8 +23,7 @@ import com.github.jmeta.library.media.api.type.MediumAction;
 import com.github.jmeta.library.media.api.type.MediumRegion;
 import com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link StandardMediumCache} provides a standard implementation of the {@link IMediumCache} interface. To fulfill the

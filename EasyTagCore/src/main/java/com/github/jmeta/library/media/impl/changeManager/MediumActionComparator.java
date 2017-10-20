@@ -14,8 +14,7 @@ import java.util.Comparator;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.MediumAction;
 import com.github.jmeta.library.media.api.type.MediumActionType;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediumActionComparator} compares two {@link MediumAction} objects.

@@ -10,9 +10,10 @@
 
 package com.github.jmeta.library.media.api.type;
 
+import com.github.jmeta.utility.dbc.api.services.Reject;
+
 import de.je.util.javautil.common.configparams.AbstractConfigParam;
 import de.je.util.javautil.common.configparams.ConfigParamHandler;
-import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link AbstractMedium} represents a physical medium where binary data can be stored.

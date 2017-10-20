@@ -18,8 +18,7 @@ import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionEx
 import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
 import com.github.jmeta.library.dataformats.api.type.BinaryValue;
 import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO stage2_006: For enumerated fields, ensure during load time that there is
 // a constructor of the interpreted value type that accepts single string argument.

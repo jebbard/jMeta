@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
 import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
 import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.config.api.services.IUserConfigAccessor;
 import com.github.jmeta.utility.config.api.type.UserConfigParam;
 import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
@@ -31,7 +32,6 @@ import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 import de.je.util.javautil.common.config.issue.ConfigIssueType;
 import de.je.util.javautil.common.extenum.AbstractExtensibleEnum;
-import de.je.util.javautil.common.registry.ComponentRegistry;
 import de.je.util.javautil.io.stream.NamedInputStream;
 
 /**

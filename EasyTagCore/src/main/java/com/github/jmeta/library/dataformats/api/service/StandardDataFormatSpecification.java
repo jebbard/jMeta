@@ -27,8 +27,7 @@ import com.github.jmeta.library.dataformats.api.type.DataBlockId;
 import com.github.jmeta.library.dataformats.api.type.DataFormat;
 import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.type.LocationProperties;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link StandardDataFormatSpecification}

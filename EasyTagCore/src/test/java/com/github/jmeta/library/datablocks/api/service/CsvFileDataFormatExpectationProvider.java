@@ -31,11 +31,11 @@ import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.type.FieldProperties;
 import com.github.jmeta.library.dataformats.api.type.FieldType;
 import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 import de.je.util.javautil.common.array.EnhancedArrays;
 import de.je.util.javautil.common.array.InvalidArrayStringFormatException;
 import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.flags.FlagSpecification;
 import de.je.util.javautil.common.flags.Flags;
 import de.je.util.javautil.io.csv.CsvReader;

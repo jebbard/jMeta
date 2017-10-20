@@ -25,9 +25,9 @@ import com.github.jmeta.library.dataformats.api.type.DataFormat;
 import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.type.AbstractMedium;
 import com.github.jmeta.library.media.api.type.IMedium;
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 
 import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
-import de.je.util.javautil.common.registry.ComponentRegistry;
 import de.je.util.javautil.testUtil.setup.TestDataException;
 import junit.framework.Assert;
 

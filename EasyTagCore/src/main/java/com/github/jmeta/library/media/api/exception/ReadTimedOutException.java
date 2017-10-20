@@ -10,8 +10,7 @@ package com.github.jmeta.library.media.api.exception;
 
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link ReadTimedOutException} is thrown whenever a call to {@link IMediumStore_OLD#buffer(IMediumReference, long)} or

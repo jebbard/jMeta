@@ -6,8 +6,7 @@ import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.type.IContainer;
 import com.github.jmeta.library.datablocks.api.type.IPayload;
 import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link AbstractID3v2TransformationHandler}

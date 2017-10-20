@@ -15,8 +15,7 @@ import com.github.jmeta.library.media.api.exception.EndOfMediumException;
 import com.github.jmeta.library.media.api.exception.MediumAccessException;
 import com.github.jmeta.library.media.api.type.IMediumReference;
 import com.github.jmeta.library.media.api.type.InputStreamMedium;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * Represents a read-only streaming media {@link IMediumAccessor} that may block when reading.

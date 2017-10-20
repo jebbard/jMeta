@@ -27,8 +27,7 @@ import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.MemoryMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.StreamMediumAccessor;
-
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediaAPI} is the default implementation of the {@link IMediaAPI} interface.

@@ -9,9 +9,9 @@ import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactor
 import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
 import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
-import de.je.util.javautil.common.err.Reject;
 
 /**
  * {@link ID3v23DataBlocksService}

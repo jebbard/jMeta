@@ -1,4 +1,6 @@
-package de.je.util.javautil.common.registry;
+package com.github.jmeta.utility.compregistry.api.exception;
+
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 
 /**
  * This exception is thrown whenever {@link ComponentRegistry#lookupService(Class)} is not able to find a service

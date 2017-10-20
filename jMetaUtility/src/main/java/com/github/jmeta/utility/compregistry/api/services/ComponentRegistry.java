@@ -1,11 +1,12 @@
-package de.je.util.javautil.common.registry;
+package com.github.jmeta.utility.compregistry.api.services;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import de.je.util.javautil.common.err.Reject;
+import com.github.jmeta.utility.compregistry.api.exception.NoRegisteredServiceFoundException;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * This class allows to load a single service provider implementation for a given service interface. This facilitates
