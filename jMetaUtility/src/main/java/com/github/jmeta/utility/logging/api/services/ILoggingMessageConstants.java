@@ -1,4 +1,4 @@
-package de.je.jmeta.common;
+package com.github.jmeta.utility.logging.api.services;
 
 /**
  * {@link ILoggingMessageConstants} provides general string constants for logging several classes of issues. Using it

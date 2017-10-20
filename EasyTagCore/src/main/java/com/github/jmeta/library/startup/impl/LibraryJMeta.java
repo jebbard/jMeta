@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
 import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
 import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
-import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+import com.github.jmeta.utility.config.api.services.IUserConfigAccessor;
+import com.github.jmeta.utility.config.api.type.UserConfigParam;
+import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
+import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
 
-import de.je.jmeta.common.ILoggingMessageConstants;
-import de.je.jmeta.config.export.IUserConfigAccessor;
-import de.je.jmeta.config.export.UserConfigParam;
 import de.je.util.javautil.common.config.AbstractConfigParam;
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 import de.je.util.javautil.common.config.issue.ConfigIssueType;

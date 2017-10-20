@@ -7,7 +7,7 @@
  * @date 25.06.2016
  *
  */
-package com.github.jmeta.library.context;
+package com.github.jmeta.library.startup;
 
 import org.junit.After;
 import org.junit.Assert;

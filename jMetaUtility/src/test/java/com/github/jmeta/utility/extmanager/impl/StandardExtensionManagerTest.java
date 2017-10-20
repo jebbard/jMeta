@@ -14,8 +14,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.utility.extmanager.api.IExtension;
-import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
 import com.github.jmeta.utility.extmanager.impl.testextensions.ITestExtensionServiceOne;
 import com.github.jmeta.utility.extmanager.impl.testextensions.ITestExtensionServiceTwo;
 

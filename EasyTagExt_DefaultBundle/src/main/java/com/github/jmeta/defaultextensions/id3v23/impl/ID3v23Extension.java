@@ -34,8 +34,8 @@ import com.github.jmeta.library.dataformats.api.type.FieldType;
 import com.github.jmeta.library.dataformats.api.type.LocationProperties;
 import com.github.jmeta.library.dataformats.api.type.MagicKey;
 import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
-import com.github.jmeta.utility.extmanager.api.ExtensionDescription;
-import com.github.jmeta.utility.extmanager.api.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
 
 import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
 import de.je.util.javautil.common.charset.Charsets;
@@ -140,7 +140,7 @@ public class ID3v23Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -148,7 +148,7 @@ public class ID3v23Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -156,7 +156,7 @@ public class ID3v23Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
     */
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {

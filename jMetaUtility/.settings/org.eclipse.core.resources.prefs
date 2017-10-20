@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+encoding//src/main/resources/META-INF/services/com.github.jmeta.utility.config.api.services.IUserConfigAccessor=UTF-8
+encoding//src/main/resources/META-INF/services/com.github.jmeta.utility.extmanager.api.services.IExtensionManager=UTF-8

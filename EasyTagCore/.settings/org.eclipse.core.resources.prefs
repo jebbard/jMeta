@@ -4,5 +4,3 @@ encoding//src/main/resources/META-INF/services/com.github.jmeta.library.api.serv
 encoding//src/main/resources/META-INF/services/com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor=UTF-8
 encoding//src/main/resources/META-INF/services/com.github.jmeta.library.dataformats.api.service.IDataFormatRepository=UTF-8
 encoding//src/main/resources/META-INF/services/com.github.jmeta.library.media.api.services.IMediaAPI=UTF-8
-encoding//src/main/resources/META-INF/services/com.github.jmeta.utility.extmanager.api.IExtensionManager=UTF-8
-encoding//src/main/resources/META-INF/services/de.je.jmeta.config.export.IUserConfigAccessor=UTF-8

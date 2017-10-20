@@ -14,8 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import com.github.jmeta.utility.extmanager.api.IExtension;
-import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
 
 /**
  * {@link StandardExtensionManager} is the default implementation of {@link IExtensionManager}.
@@ -35,7 +35,7 @@ public class StandardExtensionManager implements IExtensionManager {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.IExtensionManager#getAllExtensions()
+    * @see com.github.jmeta.utility.extmanager.api.services.IExtensionManager#getAllExtensions()
     */
    @Override
    public List<IExtension> getAllExtensions() {

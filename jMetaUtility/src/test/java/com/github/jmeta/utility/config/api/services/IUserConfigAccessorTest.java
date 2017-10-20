@@ -6,22 +6,19 @@
  *
  * @date 06.08.2011
  */
-package de.je.jmeta.config.iface;
+package com.github.jmeta.utility.config.api.services;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
-import de.je.jmeta.config.export.AbstractConfigAccessor;
-import de.je.jmeta.config.export.IUserConfigAccessor;
-import de.je.jmeta.config.export.UserConfigParam;
+import com.github.jmeta.utility.config.api.type.UserConfigParam;
+
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 
 /**
@@ -47,28 +44,19 @@ public abstract class IUserConfigAccessorTest {
 
             Assert.assertTrue(testling.isLoaded());
 
-            Map<UserConfigParam<?>, Object> expectedParamValues = getExpectedUserConfigValues()
-               .get(configStream);
+            Map<UserConfigParam<?>, Object> expectedParamValues = getExpectedUserConfigValues().get(configStream);
 
-            for (Iterator<UserConfigParam<?>> iterator = expectedParamValues
-               .keySet().iterator(); iterator.hasNext();) {
+            for (Iterator<UserConfigParam<?>> iterator = expectedParamValues.keySet().iterator(); iterator.hasNext();) {
                UserConfigParam<?> nextParam = iterator.next();
                Object nextValue = expectedParamValues.get(nextParam);
 
-               Assert.assertEquals(nextValue,
-                  testling.getUserConfigParam(nextParam));
+               Assert.assertEquals(nextValue, testling.getUserConfigParam(nextParam));
             }
          } catch (IOException e) {
             Assert.fail("Unexpected exception: " + e);
          }
       }
    }
-
-   /**
-    * The base path for the config files to test.
-    */
-   protected static final File BASE_CONFIG_FILE_PATH = new File(
-      new File(new File("."), "data"), "config");
 
    /**
     * Returns the {@link IUserConfigAccessor} instance to test.

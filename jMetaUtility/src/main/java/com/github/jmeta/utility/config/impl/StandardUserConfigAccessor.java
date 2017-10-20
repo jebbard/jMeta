@@ -5,14 +5,15 @@
  * @date 28.06.11 15:26:21 (June 28, 2011)
  */
 
-package de.je.jmeta.config.impl;
+package com.github.jmeta.utility.config.impl;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import de.je.jmeta.config.export.AbstractConfigAccessor;
-import de.je.jmeta.config.export.IUserConfigAccessor;
-import de.je.jmeta.config.export.UserConfigParam;
+import com.github.jmeta.utility.config.api.services.AbstractConfigAccessor;
+import com.github.jmeta.utility.config.api.services.IUserConfigAccessor;
+import com.github.jmeta.utility.config.api.type.UserConfigParam;
+
 import de.je.util.javautil.common.config.AbstractConfigParam;
 
 /**
@@ -30,7 +31,7 @@ public class StandardUserConfigAccessor extends AbstractConfigAccessor implement
    }
 
    /**
-    * @see de.je.jmeta.config.export.IUserConfigAccessor#hasUserConfigParam(de.je.jmeta.config.export.UserConfigParam)
+    * @see com.github.jmeta.utility.config.api.services.IUserConfigAccessor#hasUserConfigParam(com.github.jmeta.utility.config.api.type.UserConfigParam)
     */
    @Override
    public <T> boolean hasUserConfigParam(UserConfigParam<T> configParam) {
@@ -39,7 +40,7 @@ public class StandardUserConfigAccessor extends AbstractConfigAccessor implement
    }
 
    /**
-    * @see de.je.jmeta.config.export.IUserConfigAccessor#getUserConfigParam(de.je.jmeta.config.export.UserConfigParam)
+    * @see com.github.jmeta.utility.config.api.services.IUserConfigAccessor#getUserConfigParam(com.github.jmeta.utility.config.api.type.UserConfigParam)
     */
    @Override
    public <T> T getUserConfigParam(UserConfigParam<T> configParam) {

@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.utility.extmanager.api.ExtensionDescription;
-import com.github.jmeta.utility.extmanager.api.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
 
 /**
  * {@link TestExtensionsTwo} is just an example extension.
@@ -22,7 +22,7 @@ import com.github.jmeta.utility.extmanager.api.IExtension;
 public class TestExtensionsTwo implements IExtension {
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -30,7 +30,7 @@ public class TestExtensionsTwo implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -38,7 +38,7 @@ public class TestExtensionsTwo implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
     */
    @SuppressWarnings("unchecked")
    @Override

@@ -29,11 +29,11 @@ import com.github.jmeta.library.dataformats.api.type.DataFormat;
 import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
 import com.github.jmeta.library.media.api.services.IMediaAPI;
 import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.utility.extmanager.api.IExtension;
-import com.github.jmeta.utility.extmanager.api.IExtensionManager;
-import com.github.jmeta.utility.extmanager.api.InvalidExtensionException;
+import com.github.jmeta.utility.extmanager.api.exception.InvalidExtensionException;
+import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
+import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
 
-import de.je.jmeta.common.ILoggingMessageConstants;
 import de.je.util.javautil.common.err.Reject;
 import de.je.util.javautil.common.registry.ComponentRegistry;
 

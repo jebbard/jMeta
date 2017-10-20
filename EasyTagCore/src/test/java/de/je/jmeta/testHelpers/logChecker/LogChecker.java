@@ -11,7 +11,7 @@ package de.je.jmeta.testHelpers.logChecker;
 import java.io.File;
 import java.util.logging.Level;
 
-import de.je.jmeta.common.ILoggingMessageConstants;
+import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
 
 /**
  * {@link LogChecker} performs standard checks on a JMeta log file.

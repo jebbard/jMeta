@@ -16,7 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.github.jmeta.library.startup.impl.LibraryJMeta;
-import com.github.jmeta.utility.extmanager.api.IExtensionManager;
+import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
 
 import de.je.jmeta.testHelpers.logChecker.LogChecker;
 import de.je.util.javautil.common.registry.ComponentRegistry;

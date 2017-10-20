@@ -1,11 +1,13 @@
 
-package de.je.jmeta.config.export;
+package com.github.jmeta.utility.config.api.services;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import com.github.jmeta.utility.config.api.type.UserConfigParam;
 
 import de.je.util.javautil.common.config.AbstractConfigLoader;
 import de.je.util.javautil.common.config.AbstractConfigParam;
@@ -62,8 +64,7 @@ public abstract class AbstractConfigAccessor {
          for (int i = 0; i < issues.size(); ++i)
             m_configIssues.add(issues.get(i));
       } catch (Exception e) {
-         m_configIssues.add(new ConfigIssue(ConfigIssueType.CONFIG_FILE_LOADING,
-            null, null, null, null, e));
+         m_configIssues.add(new ConfigIssue(ConfigIssueType.CONFIG_FILE_LOADING, null, null, null, null, e));
       }
       return Collections.unmodifiableList(m_configIssues);
    }
@@ -95,8 +96,7 @@ public abstract class AbstractConfigAccessor {
    protected <T> T getConfigParam(AbstractConfigParam<T> configParam) {
 
       Reject.ifNull(configParam, "configParam");
-      Reject.ifFalse(m_paramLoader.hasConfigParam(configParam),
-         "m_paramLoader.hasConfigParam(configParam)");
+      Reject.ifFalse(m_paramLoader.hasConfigParam(configParam), "m_paramLoader.hasConfigParam(configParam)");
 
       return m_paramLoader.getConfigParamValue(configParam);
    }

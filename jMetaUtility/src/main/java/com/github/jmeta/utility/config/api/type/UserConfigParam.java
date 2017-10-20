@@ -5,7 +5,7 @@
  * @date 28.06.11 15:26:21 (June 28, 2011)
  */
 
-package de.je.jmeta.config.export;
+package com.github.jmeta.utility.config.api.type;
 
 import java.util.HashSet;
 import java.util.Set;

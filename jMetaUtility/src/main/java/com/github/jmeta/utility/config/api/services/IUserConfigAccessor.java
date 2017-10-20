@@ -1,8 +1,10 @@
 
-package de.je.jmeta.config.export;
+package com.github.jmeta.utility.config.api.services;
 
 import java.io.InputStream;
 import java.util.List;
+
+import com.github.jmeta.utility.config.api.type.UserConfigParam;
 
 import de.je.util.javautil.common.config.issue.ConfigIssue;
 
