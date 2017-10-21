@@ -1,6 +1,6 @@
 eclipse.preferences.version=1
-encoding//src/main/java/com/github/jmeta/library/datablocks/api/type/FieldFunctionStack.java=UTF-8
+encoding//src/main/java/com/github/jmeta/library/datablocks/api/types/FieldFunctionStack.java=UTF-8
 encoding//src/main/resources/META-INF/services/com.github.jmeta.library.api.services.ILibraryJMeta=UTF-8
 encoding//src/main/resources/META-INF/services/com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor=UTF-8
-encoding//src/main/resources/META-INF/services/com.github.jmeta.library.dataformats.api.service.IDataFormatRepository=UTF-8
+encoding//src/main/resources/META-INF/services/com.github.jmeta.library.dataformats.api.services.IDataFormatRepository=UTF-8
 encoding//src/main/resources/META-INF/services/com.github.jmeta.library.media.api.services.IMediaAPI=UTF-8

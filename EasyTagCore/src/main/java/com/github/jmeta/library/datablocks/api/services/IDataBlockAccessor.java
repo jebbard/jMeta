@@ -11,12 +11,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.media.api.type.AbstractMedium;
-import com.github.jmeta.library.media.api.type.IMedium;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.IMedium;
 
 /**
  * This interface is the starting point when accessing the {@link IDataBlock}s of a {@link AbstractMedium}. For any

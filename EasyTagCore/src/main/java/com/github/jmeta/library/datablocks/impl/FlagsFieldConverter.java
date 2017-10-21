@@ -11,14 +11,13 @@ package com.github.jmeta.library.datablocks.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
+import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.common.flags.FlagSpecification;
-import de.je.util.javautil.common.flags.Flags;
 
 /**
  * {@link FlagsFieldConverter}

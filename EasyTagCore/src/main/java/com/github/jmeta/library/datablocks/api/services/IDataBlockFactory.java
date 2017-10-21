@@ -11,16 +11,16 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.datablocks.api.type.IHeader;
-import com.github.jmeta.library.datablocks.api.type.IPayload;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.media.api.type.AbstractMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 
 /**
  * A factory used for creating {@link IDataBlock} instances of the various types.

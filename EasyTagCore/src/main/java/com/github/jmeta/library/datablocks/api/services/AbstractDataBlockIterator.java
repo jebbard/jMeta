@@ -9,8 +9,8 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import java.util.Iterator;
 
-import com.github.jmeta.library.datablocks.api.exception.UnknownDataFormatException;
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
+import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
 
 /**
  * An {@link Iterator} used for iterating over {@link IDataBlock}s. This {@link Iterator} will throw an

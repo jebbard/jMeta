@@ -15,30 +15,22 @@
 
 	<!-- ========================== Dependencies ========================== -->
 	<dependencies>
+				<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+			</dependency>
+	
 		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>JavaTestUtils</artifactId>
-			<version>0.5</version>
+			<groupId>com.github.jmeta.utility</groupId>
+			<artifactId>jMetaTestUtility</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>BasicUtility</artifactId>
-			<version>0.5</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta.utility</groupId>
 			<artifactId>jMetaUtility</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>BasicUtility</artifactId>
-			<version>0.5</version>
-			<type>test-jar</type>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -15,19 +15,19 @@ import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.datablocks.api.type.IHeader;
-import com.github.jmeta.library.datablocks.api.type.IPayload;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -37,8 +37,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.type.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.type.IDataBlock, IMediumReference, java.util.List, com.github.jmeta.library.datablocks.api.type.IPayload,
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.types.IDataBlock, IMediumReference, java.util.List, com.github.jmeta.library.datablocks.api.types.IPayload,
     *      java.util.List)
     */
    @Override
@@ -82,7 +82,7 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.type.DataBlockId,
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      IMediumReference, long, com.github.jmeta.library.datablocks.api.services.IDataBlockReader, FieldFunctionStack)
     */
    @Override
@@ -97,7 +97,7 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.type.DataBlockId,
+    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      IMediumReference, java.util.List, boolean)
     */
    @Override
@@ -124,8 +124,8 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockFactory#createPayload(com.github.jmeta.library.dataformats.api.type.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.type.IDataBlock, java.util.List, java.util.List)
+    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockFactory#createPayload(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.types.IDataBlock, java.util.List, java.util.List)
     */
    @Override
    public IPayload createPayload(DataBlockId id, IDataBlock parent,

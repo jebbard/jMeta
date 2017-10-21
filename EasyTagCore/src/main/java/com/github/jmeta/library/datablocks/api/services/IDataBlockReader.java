@@ -5,18 +5,18 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
-import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.datablocks.api.type.IHeader;
-import com.github.jmeta.library.datablocks.api.type.IPayload;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
-import com.github.jmeta.library.media.api.type.AbstractMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 
 /**
  * {@link IDataBlockReader}

@@ -2,12 +2,12 @@ package com.github.jmeta.library.media.api.OLD;
 
 import java.nio.ByteBuffer;
 
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
-import com.github.jmeta.library.media.api.exception.MediumAccessException;
-import com.github.jmeta.library.media.api.exception.ReadTimedOutException;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.MediumAction;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
+import com.github.jmeta.library.media.api.exceptions.ReadTimedOutException;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumAction;
 
 /**
  * {@link IMediumStore_OLD} defines primitives to work with a {@link IMedium}. The implementation might or might not be

@@ -2,8 +2,8 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import java.util.List;
 
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
 
 /**
  * {@link IDataBlockService}

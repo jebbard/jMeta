@@ -11,8 +11,8 @@ package com.github.jmeta.library.datablocks.api.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
 
 /**
  * {@link AbstractDataService} provides a default implementation of {@link IDataFormatsExtension} that only returns a

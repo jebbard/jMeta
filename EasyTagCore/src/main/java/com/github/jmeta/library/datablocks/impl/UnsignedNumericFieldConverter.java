@@ -12,13 +12,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.common.num.NumericDataTypeHelper;
+import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
 
 /**
  * {@link UnsignedNumericFieldConverter}
@@ -51,13 +50,13 @@ public class UnsignedNumericFieldConverter implements IFieldConverter<Long> {
       buffer.order(byteOrder);
 
       if (fieldByteCount == 1)
-         return (long) NumericDataTypeHelper.unsignedValue(buffer.get());
+         return (long) NumericDataTypeUtil.unsignedValue(buffer.get());
 
       else if (fieldByteCount == 2)
-         return (long) NumericDataTypeHelper.unsignedValue(buffer.getShort());
+         return (long) NumericDataTypeUtil.unsignedValue(buffer.getShort());
 
       else if (fieldByteCount <= 4)
-         return (long) NumericDataTypeHelper.unsignedValue(buffer.getInt());
+         return (long) NumericDataTypeUtil.unsignedValue(buffer.getInt());
 
       else if (fieldByteCount <= MAX_LONG_BYTE_SIZE) {
          final long longValue = buffer.getLong();

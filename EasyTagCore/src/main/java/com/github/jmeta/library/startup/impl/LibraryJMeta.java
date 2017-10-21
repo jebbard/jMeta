@@ -13,13 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
 import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
 import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
-
-import de.je.util.javautil.io.stream.NamedInputStream;
+import com.github.jmeta.utility.namedio.api.services.NamedInputStream;
 
 /**
  * {@link LibraryJMeta}

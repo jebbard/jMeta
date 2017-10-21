@@ -8,8 +8,8 @@
  */
 package com.github.jmeta.library.datablocks.api.services;
 
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -44,7 +44,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.type.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.IContainer)
     */
    @Override
    public boolean requiresTransform(IContainer container) {
@@ -56,7 +56,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.type.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.IContainer)
     */
    @Override
    public boolean requiresUntransform(IContainer container) {

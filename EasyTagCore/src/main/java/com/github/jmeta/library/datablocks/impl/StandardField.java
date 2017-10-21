@@ -10,15 +10,15 @@ package com.github.jmeta.library.datablocks.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.media.api.type.AbstractMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO writeTests001: Test failing conversion when Enum interpr. value is unknown
@@ -130,7 +130,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getBytes(long, int)
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getBytes(long, int)
     */
    @Override
    public byte[] getBytes(long offset, int size) {
@@ -166,7 +166,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getMediumReference()
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getMediumReference()
     */
    @Override
    public IMediumReference getMediumReference() {
@@ -175,7 +175,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getParent()
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getParent()
     */
    @Override
    public IDataBlock getParent() {
@@ -184,7 +184,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getId()
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getId()
     */
    @Override
    public DataBlockId getId() {
@@ -193,7 +193,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {
@@ -202,7 +202,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#initParent(com.github.jmeta.library.datablocks.api.type.IDataBlock)
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#initParent(com.github.jmeta.library.datablocks.api.types.IDataBlock)
     */
    @Override
    public void initParent(IDataBlock parent) {
@@ -214,7 +214,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IField#getInterpretedValue()
+    * @see com.github.jmeta.library.datablocks.api.types.IField#getInterpretedValue()
     */
    @Override
    public T getInterpretedValue() throws BinaryValueConversionException {
@@ -271,7 +271,7 @@ public class StandardField<T> implements IField<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#setBytes(byte[][])
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#setBytes(byte[][])
     */
    @Override
    public void setBytes(byte[][] bytes) {

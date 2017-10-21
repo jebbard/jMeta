@@ -9,11 +9,11 @@
 
 package com.github.jmeta.library.datablocks.api.services;
 
-import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.type.IPayload;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 
 /**
  * {@link IExtendedDataBlockFactory}

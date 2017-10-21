@@ -19,16 +19,16 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
-import com.github.jmeta.library.dataformats.api.type.MagicKey;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO primeRefactor008: Review, refactor and document TopLevelReverseContainerIterator

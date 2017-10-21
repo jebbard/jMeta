@@ -18,12 +18,12 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-import com.github.jmeta.utility.extmanager.api.exception.InvalidExtensionException;
+import com.github.jmeta.utility.extmanager.api.exceptions.InvalidExtensionException;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
 import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
 import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
@@ -82,7 +82,7 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.type.DataFormat)
+    * @see com.github.jmeta.library.dataformats.api.services.IDataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.types.DataFormat)
     */
    @Override
    public IDataFormatSpecification getDataFormatSpecification(DataFormat dataFormat) {
@@ -94,7 +94,7 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.service.IDataFormatRepository#getSupportedDataFormats()
+    * @see com.github.jmeta.library.dataformats.api.services.IDataFormatRepository#getSupportedDataFormats()
     */
    @Override
    public Set<DataFormat> getSupportedDataFormats() {

@@ -7,8 +7,8 @@
 
 package com.github.jmeta.library.datablocks.api.services;
 
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
  *

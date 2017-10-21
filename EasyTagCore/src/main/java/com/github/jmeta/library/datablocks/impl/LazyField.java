@@ -11,17 +11,17 @@ package com.github.jmeta.library.datablocks.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.type.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -79,7 +79,7 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IField#getInterpretedValue()
+    * @see com.github.jmeta.library.datablocks.api.types.IField#getInterpretedValue()
     */
    @Override
    public Object getInterpretedValue() throws BinaryValueConversionException {
@@ -90,7 +90,7 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {

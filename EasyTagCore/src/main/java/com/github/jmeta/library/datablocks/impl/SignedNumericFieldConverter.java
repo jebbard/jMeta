@@ -12,13 +12,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.common.num.NumericDataTypeHelper;
+import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
 
 /**
  * {@link SignedNumericFieldConverter}
@@ -86,14 +85,14 @@ public class SignedNumericFieldConverter implements IFieldConverter<Long> {
       ByteBuffer buffer = ByteBuffer.wrap(new byte[(int) fieldByteCount]);
 
       if (fieldByteCount == 1)
-         buffer.put(NumericDataTypeHelper.signedByteValue(interpretedValue));
+         buffer.put(NumericDataTypeUtil.signedByteValue(interpretedValue));
 
       else if (fieldByteCount == 2)
          buffer
-            .putShort(NumericDataTypeHelper.signedShortValue(interpretedValue));
+            .putShort(NumericDataTypeUtil.signedShortValue(interpretedValue));
 
       else if (fieldByteCount <= 4)
-         buffer.putInt(NumericDataTypeHelper.signedIntValue(interpretedValue));
+         buffer.putInt(NumericDataTypeUtil.signedIntValue(interpretedValue));
 
       else if (fieldByteCount <= MAX_LONG_BYTE_SIZE)
          buffer.putLong(interpretedValue);

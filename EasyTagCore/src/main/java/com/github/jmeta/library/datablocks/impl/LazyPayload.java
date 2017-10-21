@@ -13,16 +13,16 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.type.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.datablocks.api.type.IPayload;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -85,7 +85,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IPayload#getFields()
+    * @see com.github.jmeta.library.datablocks.api.types.IPayload#getFields()
     */
    @Override
    public List<IField<?>> getFields() {
@@ -138,7 +138,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IPayload#getContainerIterator()
+    * @see com.github.jmeta.library.datablocks.api.types.IPayload#getContainerIterator()
     */
    @Override
    public AbstractDataBlockIterator<IContainer> getContainerIterator() {
@@ -164,7 +164,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.type.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {

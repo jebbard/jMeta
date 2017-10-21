@@ -10,7 +10,7 @@
 package com.github.jmeta.library.media.api.services;
 
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-import com.github.jmeta.library.media.api.type.IMedium;
+import com.github.jmeta.library.media.api.types.IMedium;
 
 /**
  * {@link IMediaAPI} provides access to all functionality of the component Media.

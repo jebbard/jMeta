@@ -11,15 +11,15 @@ package com.github.jmeta.library.media.api.services;
 
 import java.nio.ByteBuffer;
 
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
-import com.github.jmeta.library.media.api.exception.InvalidMediumReferenceException;
-import com.github.jmeta.library.media.api.exception.InvalidOverlappingWriteException;
-import com.github.jmeta.library.media.api.exception.MediumAccessException;
-import com.github.jmeta.library.media.api.exception.MediumStoreClosedException;
-import com.github.jmeta.library.media.api.exception.ReadOnlyMediumException;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.MediumAction;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
+import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
+import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
+import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumAction;
 
 /**
  * {@link IMediumStore}

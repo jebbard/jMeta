@@ -10,7 +10,7 @@
 package com.github.jmeta.library.startup.api.services;
 
 import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
 import com.github.jmeta.library.startup.impl.LibraryJMeta;
 
 /**
