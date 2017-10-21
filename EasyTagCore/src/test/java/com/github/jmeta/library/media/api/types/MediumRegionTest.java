@@ -6,24 +6,20 @@
  *
  * @date 17.04.2011
  */
-package com.github.jmeta.library.media.api.type;
+package com.github.jmeta.library.media.api.types;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.InMemoryMedium;
-import com.github.jmeta.library.media.api.type.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
+
+import junit.framework.Assert;
 
 /**
  * {@link MediumRegionTest} tests the {@link MediumRegion} class.

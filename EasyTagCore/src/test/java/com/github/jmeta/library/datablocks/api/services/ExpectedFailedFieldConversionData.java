@@ -6,7 +6,7 @@
  *
  * @date 28.06.2011
  */
-package com.github.jmeta.library.datablocks.api.service;
+package com.github.jmeta.library.datablocks.api.services;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;

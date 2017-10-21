@@ -20,9 +20,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.library.media.impl.OLD.IMediumCache;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 

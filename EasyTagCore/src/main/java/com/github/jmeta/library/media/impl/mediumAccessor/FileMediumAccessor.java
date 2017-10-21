@@ -14,11 +14,11 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.StandardOpenOption;
 
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
-import com.github.jmeta.library.media.api.exception.MediumAccessException;
-import com.github.jmeta.library.media.api.type.AbstractMedium;
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
+import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -41,7 +41,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.type.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.IMediumReference)
     */
    @Override
    public boolean isAtEndOfMedium() {
@@ -129,7 +129,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.type.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.IMediumReference)
     */
    @Override
    protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {

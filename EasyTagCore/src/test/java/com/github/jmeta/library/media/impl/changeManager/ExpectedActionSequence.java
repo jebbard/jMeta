@@ -14,15 +14,15 @@ import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.Assert;
 
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.MediumAction;
-import com.github.jmeta.library.media.api.type.MediumActionType;
-import com.github.jmeta.library.media.api.type.MediumRegion;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.services.Reject;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * {@link ExpectedActionSequence} represents a sequence (i.e. possibly multiple ordered) {@link MediumAction}s that are

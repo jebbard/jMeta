@@ -12,15 +12,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.github.jmeta.library.media.api.type.DummyFileMediumTest;
-import com.github.jmeta.library.media.api.type.ExistingFileMediumTest;
-import com.github.jmeta.library.media.api.type.IMediumEqualityTest;
-import com.github.jmeta.library.media.api.type.IMediumReferenceEqualityTest;
-import com.github.jmeta.library.media.api.type.InMemoryMediumTest;
-import com.github.jmeta.library.media.api.type.InputStreamMediumTest;
-import com.github.jmeta.library.media.api.type.MediumActionEqualityTest;
-import com.github.jmeta.library.media.api.type.MediumActionTest;
-import com.github.jmeta.library.media.api.type.MediumRegionTest;
+import com.github.jmeta.library.media.api.types.DummyFileMediumTest;
+import com.github.jmeta.library.media.api.types.ExistingFileMediumTest;
+import com.github.jmeta.library.media.api.types.IMediumEqualityTest;
+import com.github.jmeta.library.media.api.types.IMediumReferenceEqualityTest;
+import com.github.jmeta.library.media.api.types.InMemoryMediumTest;
+import com.github.jmeta.library.media.api.types.InputStreamMediumTest;
+import com.github.jmeta.library.media.api.types.MediumActionEqualityTest;
+import com.github.jmeta.library.media.api.types.MediumActionTest;
+import com.github.jmeta.library.media.api.types.MediumRegionTest;
 import com.github.jmeta.library.media.impl.OLD.BlockWiseFileMediumCacheTest;
 import com.github.jmeta.library.media.impl.OLD.FileMediumCacheTest;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerCreateFlushPlanTest;
@@ -28,8 +28,6 @@ import com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerTest
 import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactoryTest;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
-
-import de.je.util.javautil.AllUtilityTests;
 
 /**
  * {@link AllMediaTests} is used for running all test cases of the media component.

@@ -3,7 +3,7 @@ package com.github.jmeta.library.media.impl.OLD;
 import java.util.Map;
 
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 
 /**
  * {@link IMediumCache} is a cache extension of {@link IMediumStore_OLD} and provides fine grained access to pre-loaded data

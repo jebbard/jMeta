@@ -17,11 +17,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.MediumAction;
-import com.github.jmeta.library.media.api.type.MediumActionType;
-import com.github.jmeta.library.media.api.type.MediumRegion;
+import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;

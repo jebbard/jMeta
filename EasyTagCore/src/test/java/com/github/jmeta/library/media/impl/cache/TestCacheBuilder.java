@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.jmeta.library.media.api.helper.TestMediumUtility;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.MediumRegion;
-import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**

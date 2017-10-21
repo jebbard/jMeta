@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.type.FileMedium;
+import com.github.jmeta.library.media.api.types.FileMedium;
 
 /**
  * Tests the class {@FileMediumAccessor} for a read-only medium.

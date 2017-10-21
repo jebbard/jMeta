@@ -6,13 +6,11 @@
  *
  * @date 10.04.2011
  */
-package com.github.jmeta.library.media.api.type;
-
-import junit.framework.Assert;
+package com.github.jmeta.library.media.api.types;
 
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.type.IMedium;
+import junit.framework.Assert;
 
 /**
  * {@link AbstractIMediumTest} tests the {@link IMedium} interface. It basically only checks that the constructors are

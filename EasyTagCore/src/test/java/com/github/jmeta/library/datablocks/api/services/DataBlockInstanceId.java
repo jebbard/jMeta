@@ -1,9 +1,9 @@
-package com.github.jmeta.library.datablocks.api.service;
+package com.github.jmeta.library.datablocks.api.services;
 
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**

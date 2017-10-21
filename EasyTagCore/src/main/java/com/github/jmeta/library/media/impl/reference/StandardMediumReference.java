@@ -8,8 +8,8 @@
  */
 package com.github.jmeta.library.media.impl.reference;
 
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -45,7 +45,7 @@ public class StandardMediumReference implements IMediumReference {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.IMediumReference#advance(long)
+    * @see com.github.jmeta.library.media.api.types.IMediumReference#advance(long)
     */
    @Override
    public IMediumReference advance(long count) {
@@ -62,7 +62,7 @@ public class StandardMediumReference implements IMediumReference {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.IMediumReference#before(com.github.jmeta.library.media.api.type.IMediumReference)
+    * @see com.github.jmeta.library.media.api.types.IMediumReference#before(com.github.jmeta.library.media.api.types.IMediumReference)
     */
    @Override
    public boolean before(IMediumReference other) {
@@ -75,7 +75,7 @@ public class StandardMediumReference implements IMediumReference {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.IMediumReference#behindOrEqual(com.github.jmeta.library.media.api.type.IMediumReference)
+    * @see com.github.jmeta.library.media.api.types.IMediumReference#behindOrEqual(com.github.jmeta.library.media.api.types.IMediumReference)
     */
    @Override
    public boolean behindOrEqual(IMediumReference other) {
@@ -88,7 +88,7 @@ public class StandardMediumReference implements IMediumReference {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.IMediumReference#distanceTo(com.github.jmeta.library.media.api.type.IMediumReference)
+    * @see com.github.jmeta.library.media.api.types.IMediumReference#distanceTo(com.github.jmeta.library.media.api.types.IMediumReference)
     */
    @Override
    public long distanceTo(IMediumReference other) {
@@ -101,7 +101,7 @@ public class StandardMediumReference implements IMediumReference {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.IMediumReference#getAbsoluteMediumOffset()
+    * @see com.github.jmeta.library.media.api.types.IMediumReference#getAbsoluteMediumOffset()
     */
    @Override
    public long getAbsoluteMediumOffset() {
@@ -110,7 +110,7 @@ public class StandardMediumReference implements IMediumReference {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.IMediumReference#getMedium()
+    * @see com.github.jmeta.library.media.api.types.IMediumReference#getMedium()
     */
    @Override
    public IMedium<?> getMedium() {

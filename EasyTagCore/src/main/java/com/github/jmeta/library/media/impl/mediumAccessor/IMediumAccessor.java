@@ -11,12 +11,12 @@ package com.github.jmeta.library.media.impl.mediumAccessor;
 
 import java.nio.ByteBuffer;
 
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
-import com.github.jmeta.library.media.api.exception.MediumAccessException;
-import com.github.jmeta.library.media.api.exception.ReadOnlyMediumException;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
+import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
  * This class provides the mechanisms to read data from and write data to an {@link IMedium}. We can basically

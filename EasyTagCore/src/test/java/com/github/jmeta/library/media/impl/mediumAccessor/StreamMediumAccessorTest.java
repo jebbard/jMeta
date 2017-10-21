@@ -18,8 +18,8 @@ import java.util.List;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.InputStreamMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.InputStreamMedium;
 
 import junit.framework.Assert;
 

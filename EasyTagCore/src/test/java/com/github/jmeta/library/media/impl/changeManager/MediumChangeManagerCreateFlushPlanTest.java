@@ -27,14 +27,13 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import com.github.jmeta.library.media.api.helper.MediaTestHelper;
-import com.github.jmeta.library.media.api.type.MediumAction;
-import com.github.jmeta.library.media.api.type.MediumActionType;
-import com.github.jmeta.library.media.api.type.MediumRegion;
+import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.changeManager.ReadWriteActionSequence.ActionOrder;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
-
-import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
-import de.je.util.javautil.testUtil.setup.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
+import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 /**
  * {@link MediumChangeManagerCreateFlushPlanTest} checks the quite complex method

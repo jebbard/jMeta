@@ -7,7 +7,7 @@
  * @date 25.06.2016
  *
  */
-package com.github.jmeta.library.startup;
+package com.github.jmeta.library.startup.api.services;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -15,8 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
-
-import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
+import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 /**
  * {@link ILibraryJMetaTest_CURRENTLY_NOT_TESTED}

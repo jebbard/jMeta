@@ -7,13 +7,10 @@
  * @date 27.05.2015
  *
  */
-package com.github.jmeta.library.media.api.type;
+package com.github.jmeta.library.media.api.types;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.IMedium;
 
 /**
  * {@link DummyFileMediumTest} tests the {@link FileMedium} class with a non-existing dummy file.
@@ -25,7 +22,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
    private static final boolean READ_ONLY = false;
 
    /**
-    * @see com.github.jmeta.library.media.api.type.AbstractIMediumTest#getExpectedLength()
+    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedLength()
     */
    @Override
    protected long getExpectedLength() {
@@ -34,7 +31,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.AbstractIMediumTest#getMediumToTest()
+    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getMediumToTest()
     */
    @Override
    protected IMedium<Path> getMediumToTest() {
@@ -43,7 +40,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.AbstractIMediumTest#isExpectedAsReadOnly()
+    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsReadOnly()
     */
    @Override
    protected boolean isExpectedAsReadOnly() {
@@ -52,7 +49,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.AbstractIMediumTest#isExpectedAsRandomAccess()
+    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsRandomAccess()
     */
    @Override
    protected boolean isExpectedAsRandomAccess() {
@@ -61,7 +58,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.AbstractIMediumTest#getExpectedWrappedMedium()
+    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedWrappedMedium()
     */
    @Override
    protected Path getExpectedWrappedMedium() {
@@ -70,7 +67,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.AbstractIMediumTest#getExpectedExternalName()
+    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedExternalName()
     */
    @Override
    protected String getExpectedExternalName() {
@@ -79,7 +76,7 @@ public class DummyFileMediumTest extends AbstractIMediumTest<Path> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.type.AbstractIMediumTest#isExpectedAsExisting()
+    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsExisting()
     */
    @Override
    protected boolean isExpectedAsExisting() {

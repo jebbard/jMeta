@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 import org.junit.Assert;
 
-import com.github.jmeta.library.media.api.type.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumAction;
 
 /**
  * {@link SingleActionSequence} represents a simple single {@link MediumAction} of arbitrary type.

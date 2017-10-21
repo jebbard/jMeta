@@ -6,7 +6,7 @@
  *
  * @date 10.04.2011
  */
-package com.github.jmeta.library.media.api.type;
+package com.github.jmeta.library.media.api.types;
 
 import java.io.ByteArrayInputStream;
 import java.nio.file.Paths;
@@ -14,13 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.DummyMediumCreator;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.InputStreamMedium;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
-
-import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;
+import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
  * {@link IMediumReferenceEqualityTest} tests the {@link StandardMediumReference} class (and its interface

@@ -6,7 +6,7 @@
  *
  * @date 28.05.2011
  */
-package com.github.jmeta.library.datablocks.api.service;
+package com.github.jmeta.library.datablocks.api.services;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -17,14 +17,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
 
-import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.testUtil.setup.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
 
 /**
  * {@link AbstractMediumExpectationProvider} provides expected test data for a single top-level data block of a single

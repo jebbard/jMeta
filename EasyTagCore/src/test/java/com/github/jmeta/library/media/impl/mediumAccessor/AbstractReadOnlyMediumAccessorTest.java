@@ -11,11 +11,10 @@ import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exception.ReadOnlyMediumException;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-
-import de.je.util.javautil.testUtil.setup.TestDataException;
+import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
 
 /**
  * {@link AbstractReadOnlyMediumAccessorTest} is the base class for testing read-only {@link IMediumAccessor} instances,
@@ -48,7 +47,7 @@ public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractIMedium
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#validateTestMedium(com.github.jmeta.library.media.api.type.IMedium)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#validateTestMedium(com.github.jmeta.library.media.api.types.IMedium)
     */
    @Override
    protected void validateTestMedium(IMedium<?> theMedium) {

@@ -11,8 +11,8 @@ package com.github.jmeta.library.media.impl.changeManager;
 
 import java.util.Comparator;
 
-import com.github.jmeta.library.media.api.type.MediumAction;
-import com.github.jmeta.library.media.api.type.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
 
 /**
  * {@link ShiftedMediumBlockComparator}

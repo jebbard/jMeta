@@ -12,9 +12,9 @@ package com.github.jmeta.library.media.api.helper;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.InMemoryMedium;
+import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.InMemoryMedium;
 
 // TODO dissolve this class, use TestMediumHelper
 /**

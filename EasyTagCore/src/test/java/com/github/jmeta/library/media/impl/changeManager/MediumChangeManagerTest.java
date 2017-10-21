@@ -12,12 +12,12 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exception.InvalidMediumActionException;
-import com.github.jmeta.library.media.api.exception.InvalidOverlappingWriteException;
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumActionException;
+import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
 import com.github.jmeta.library.media.api.helper.MediaTestHelper;
-import com.github.jmeta.library.media.api.type.MediumAction;
-import com.github.jmeta.library.media.api.type.MediumActionType;
-import com.github.jmeta.library.media.api.type.MediumRegion;
+import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 
 /***

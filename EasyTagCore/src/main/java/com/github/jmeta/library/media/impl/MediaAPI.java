@@ -15,12 +15,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-import com.github.jmeta.library.media.api.exception.MediumAccessException;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.InMemoryMedium;
-import com.github.jmeta.library.media.api.type.InputStreamMedium;
+import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.InMemoryMedium;
+import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.library.media.impl.OLD.IMediumCache;
 import com.github.jmeta.library.media.impl.OLD.StandardMediumCache;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
@@ -45,7 +45,7 @@ public class MediaAPI implements IMediaAPI {
    private final Map<IMedium<?>, IMediumCache> m_alreadyCreatedCaches = new HashMap<>();
 
    /**
-    * @see com.github.jmeta.library.media.api.services.IMediaAPI#getMediumStore(com.github.jmeta.library.media.api.type.IMedium)
+    * @see com.github.jmeta.library.media.api.services.IMediaAPI#getMediumStore(com.github.jmeta.library.media.api.types.IMedium)
     */
    @Override
    public IMediumStore_OLD getMediumStore(IMedium<?> medium) {

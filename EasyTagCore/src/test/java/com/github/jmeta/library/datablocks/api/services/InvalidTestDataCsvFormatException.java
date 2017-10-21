@@ -6,7 +6,7 @@
  *
  * @date 03.06.2011
  */
-package com.github.jmeta.library.datablocks.api.service;
+package com.github.jmeta.library.datablocks.api.services;
 
 /**
  * {@link InvalidTestDataCsvFormatException} is thrown by {@link CsvFileDataFormatExpectationProvider} in case of

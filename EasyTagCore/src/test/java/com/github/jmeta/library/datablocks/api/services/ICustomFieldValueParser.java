@@ -1,9 +1,9 @@
-package com.github.jmeta.library.datablocks.api.service;
+package com.github.jmeta.library.datablocks.api.services;
 
 import java.util.Set;
 
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
  * {@link ICustomFieldValueParser} represents a class that can parse a fields expected value from a given string and

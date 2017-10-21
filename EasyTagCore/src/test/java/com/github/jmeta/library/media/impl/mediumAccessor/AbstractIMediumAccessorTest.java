@@ -21,13 +21,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
-
-import de.je.util.javautil.testUtil.setup.TestDataException;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
 
 /**
  * Tests the interface {@IMediumAccessor}. Basic idea is to work on the

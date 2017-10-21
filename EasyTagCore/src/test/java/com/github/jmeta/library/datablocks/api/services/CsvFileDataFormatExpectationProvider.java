@@ -6,7 +6,7 @@
  *
  * @date 29.05.2011
  */
-package com.github.jmeta.library.datablocks.api.service;
+package com.github.jmeta.library.datablocks.api.services;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -21,26 +21,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
-import com.github.jmeta.library.dataformats.api.type.FieldFunction;
-import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.type.FieldProperties;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
+import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.byteutils.api.exceptions.InvalidArrayStringFormatException;
+import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
+import com.github.jmeta.utility.charset.api.services.Charsets;
+import com.github.jmeta.utility.csv.api.exception.CsvRowFormatException;
+import com.github.jmeta.utility.csv.api.services.CsvReader;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.common.array.EnhancedArrays;
-import de.je.util.javautil.common.array.InvalidArrayStringFormatException;
-import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.flags.FlagSpecification;
-import de.je.util.javautil.common.flags.Flags;
-import de.je.util.javautil.io.csv.CsvReader;
-import de.je.util.javautil.io.csv.CsvRowFormatException;
-import de.je.util.javautil.io.stream.NamedReader;
+import com.github.jmeta.utility.namedio.api.services.NamedReader;
 
 /**
  * {@link CsvFileDataFormatExpectationProvider} reads test data from a single csv file and returns it accordingly.
@@ -127,22 +126,20 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
       }
 
       catch (InvalidArrayStringFormatException e) {
-         throw new InvalidTestDataCsvFormatException("Invalid array string format detected in csv file <"
-            + absolutePath + ">.", e);
-      } catch (CsvRowFormatException e) {
          throw new InvalidTestDataCsvFormatException(
-            "Invalid row format detected in csv file <" + absolutePath + ">.", e);
+            "Invalid array string format detected in csv file <" + absolutePath + ">.", e);
+      } catch (CsvRowFormatException e) {
+         throw new InvalidTestDataCsvFormatException("Invalid row format detected in csv file <" + absolutePath + ">.",
+            e);
       } catch (IOException e) {
-         throw new RuntimeException(
-            "Could not read csv file <" + absolutePath + ">.", e);
+         throw new RuntimeException("Could not read csv file <" + absolutePath + ">.", e);
       }
 
       finally {
          try {
             CSV_READER.closeCurrentCsvResource();
          } catch (IOException e) {
-            throw new RuntimeException(
-               "Could not close csv reader for file <" + absolutePath + ">.", e);
+            throw new RuntimeException("Could not close csv reader for file <" + absolutePath + ">.", e);
          }
       }
    }
@@ -166,7 +163,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedFieldInterpretedValue(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId)
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractMediumExpectationProvider#getExpectedFieldInterpretedValue(com.github.jmeta.library.datablocks.api.services.DataBlockInstanceId)
     */
    @Override
    public Object getExpectedFieldInterpretedValue(DataBlockInstanceId fieldInstanceId) {
@@ -175,8 +172,8 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedChildBlocksOfType(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId,
-    *      com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType)
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractMediumExpectationProvider#getExpectedChildBlocksOfType(com.github.jmeta.library.datablocks.api.services.DataBlockInstanceId,
+    *      com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType)
     */
    @Override
    public List<DataBlockInstanceId> getExpectedChildBlocksOfType(DataBlockInstanceId parentBlock,
@@ -192,7 +189,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedDataBlockSize(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId)
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractMediumExpectationProvider#getExpectedDataBlockSize(com.github.jmeta.library.datablocks.api.services.DataBlockInstanceId)
     */
    @Override
    public long getExpectedDataBlockSize(DataBlockInstanceId dataBlockId) {
@@ -201,7 +198,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedFailingFieldConversions(com.github.jmeta.library.datablocks.api.service.DataBlockInstanceId)
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractMediumExpectationProvider#getExpectedFailingFieldConversions(com.github.jmeta.library.datablocks.api.services.DataBlockInstanceId)
     */
    @Override
    public ExpectedFailedFieldConversionData getExpectedFailingFieldConversions(DataBlockInstanceId fieldInstance) {
@@ -210,7 +207,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedTopLevelContainers()
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractMediumExpectationProvider#getExpectedTopLevelContainers()
     */
    @Override
    public List<DataBlockInstanceId> getExpectedTopLevelContainers() {
@@ -219,7 +216,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.service.AbstractMediumExpectationProvider#getExpectedTopLevelContainersReverse()
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractMediumExpectationProvider#getExpectedTopLevelContainersReverse()
     */
    @Override
    public List<DataBlockInstanceId> getExpectedTopLevelContainersReverse() {
@@ -519,7 +516,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
          else if (fieldProps.getFieldType().equals(FieldType.BINARY)) {
             byte[] parsedBytes;
             try {
-               parsedBytes = EnhancedArrays.parseArray(expInterpretedFieldValueString);
+               parsedBytes = ByteArrayUtils.parseArray(expInterpretedFieldValueString);
             } catch (InvalidArrayStringFormatException e) {
                // Throw further, enriched with row index information
                throw new InvalidArrayStringFormatException(rowPrefix + e.getMessage());

@@ -12,7 +12,7 @@ package com.github.jmeta.library.media.impl.mediumAccessor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.media.api.type.InMemoryMedium;
+import com.github.jmeta.library.media.api.types.InMemoryMedium;
 
 /**
  * {@link ReadOnlyMemoryMediumAccessorTest} tests a {@link MemoryMediumAccessor} working on a read-only medium.

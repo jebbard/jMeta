@@ -7,20 +7,15 @@
  * @date 20.05.2016
  *
  */
-package com.github.jmeta.library.media.api.type;
+package com.github.jmeta.library.media.api.types;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.MediumAction;
-import com.github.jmeta.library.media.api.type.MediumActionType;
-import com.github.jmeta.library.media.api.type.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-
-import de.je.util.javautil.testUtil.equa.AbstractEqualsTest;
+import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
  * {@link MediumActionEqualityTest} tests the equals and hashCode implementation of {@link MediumAction}.

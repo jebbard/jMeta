@@ -19,22 +19,22 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-import com.github.jmeta.library.media.api.exception.InvalidMediumActionException;
-import com.github.jmeta.library.media.api.exception.InvalidOverlappingWriteException;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.MediumAction;
-import com.github.jmeta.library.media.api.type.MediumActionType;
-import com.github.jmeta.library.media.api.type.MediumRegion;
-import com.github.jmeta.library.media.api.type.MediumRegion.MediumRegionOverlapType;
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumActionException;
+import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediumChangeManager} performs all tasks of handling and consolidating {@link MediumAction}s.
  * {@link MediumAction}s are created by the methods
- * {@link IMediumStore_OLD#insertData(com.github.jmeta.library.media.api.type.IMediumReference, ByteBuffer)},
- * {@link IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.type.IMediumReference, int)} and
- * {@link IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.type.IMediumReference, int, ByteBuffer)} by calling one of the
+ * {@link IMediumStore_OLD#insertData(com.github.jmeta.library.media.api.types.IMediumReference, ByteBuffer)},
+ * {@link IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.IMediumReference, int)} and
+ * {@link IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.IMediumReference, int, ByteBuffer)} by calling one of the
  * corresponding schedule methods of {@link MediumChangeManager}.
  * 
  * {@link MediumAction}s represent an open action that is still to be performed before a

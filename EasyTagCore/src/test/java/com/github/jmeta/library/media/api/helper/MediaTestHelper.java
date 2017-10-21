@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.github.jmeta.library.media.api.type.FileMedium;
-import com.github.jmeta.library.media.api.type.IMedium;
-import com.github.jmeta.library.media.api.type.IMediumReference;
+import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.common.array.EnhancedArrays;
 
 // TODO dissolve this class, use TestMediumHelper
 /**
@@ -114,7 +113,7 @@ public class MediaTestHelper {
       totalByteSequence.addAll(
          IntStream.rangeClosed(startByteOffset, remainder - 1).mapToObj(i -> (byte) i).collect(Collectors.toList()));
 
-      return ByteBuffer.wrap(EnhancedArrays.toArray(totalByteSequence));
+      return ByteBuffer.wrap(ByteArrayUtils.toArray(totalByteSequence));
    }
 
 }

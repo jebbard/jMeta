@@ -1,4 +1,4 @@
-package com.github.jmeta.library.datablocks.api.service;
+package com.github.jmeta.library.datablocks.api.services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,26 +9,24 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.exception.InterpretedValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.datablocks.api.type.IFieldSequence;
-import com.github.jmeta.library.datablocks.api.type.IHeader;
-import com.github.jmeta.library.datablocks.api.type.IPayload;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.DataFormat;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.type.AbstractMedium;
-import com.github.jmeta.library.media.api.type.IMedium;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.datablocks.api.types.IFieldSequence;
+import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.IMedium;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
+import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
+import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
-import de.je.jmeta.testHelpers.basics.JMetaTestBasics;
-import de.je.util.javautil.testUtil.setup.TestDataException;
 import junit.framework.Assert;
 
 // TODO doItFirst005: write test case for "out of order" reading

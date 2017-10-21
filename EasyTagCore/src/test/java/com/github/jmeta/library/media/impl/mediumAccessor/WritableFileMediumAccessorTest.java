@@ -16,9 +16,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exception.MediumAccessException;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.type.FileMedium;
+import com.github.jmeta.library.media.api.types.FileMedium;
 
 /**
  * Tests the class {@FileMediumAccessor} for a writable medium.

@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
 
-import com.github.jmeta.library.media.api.exception.EndOfMediumException;
-import com.github.jmeta.library.media.api.exception.MediumAccessException;
-import com.github.jmeta.library.media.api.type.IMediumReference;
-import com.github.jmeta.library.media.api.type.InputStreamMedium;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
+import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -37,7 +37,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.type.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.IMediumReference)
     */
    @Override
    public boolean isAtEndOfMedium() {
@@ -159,7 +159,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.type.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.IMediumReference)
     */
    @Override
    protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {
