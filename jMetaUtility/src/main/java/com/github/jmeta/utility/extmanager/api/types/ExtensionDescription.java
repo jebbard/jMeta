@@ -7,7 +7,7 @@
  * @date 15.10.2017
  *
  */
-package com.github.jmeta.utility.extmanager.api.type;
+package com.github.jmeta.utility.extmanager.api.types;
 
 import java.time.LocalDateTime;
 

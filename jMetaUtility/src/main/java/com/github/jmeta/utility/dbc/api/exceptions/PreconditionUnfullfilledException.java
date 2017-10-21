@@ -8,7 +8,7 @@
  *
  */
 
-package com.github.jmeta.utility.dbc.api.exception;
+package com.github.jmeta.utility.dbc.api.exceptions;
 
 /**
  * {@link PreconditionUnfullfilledException} is thrown whenever a specified prerequisite-condition of a class is violated.

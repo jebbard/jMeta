@@ -10,7 +10,7 @@
 
 package com.github.jmeta.utility.dbc.api.services;
 
-import com.github.jmeta.utility.dbc.api.exception.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
  * {@link Reject} is a class to check preconditions to be met, its methods raise a

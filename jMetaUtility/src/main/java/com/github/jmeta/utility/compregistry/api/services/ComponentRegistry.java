@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import com.github.jmeta.utility.compregistry.api.exception.NoRegisteredServiceFoundException;
+import com.github.jmeta.utility.compregistry.api.exceptions.NoRegisteredServiceFoundException;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**

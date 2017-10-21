@@ -20,19 +20,19 @@
 			<version>0.5</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>BasicUtility</artifactId>
-			<version>0.5</version>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>BasicUtility</artifactId>
-			<version>0.5</version>
-			<scope>compile</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>de.je.util.javautil</groupId> -->
+<!-- 			<artifactId>BasicUtility</artifactId> -->
+<!-- 			<version>0.5</version> -->
+<!-- 			<type>test-jar</type> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>de.je.util.javautil</groupId> -->
+<!-- 			<artifactId>BasicUtility</artifactId> -->
+<!-- 			<version>0.5</version> -->
+<!-- 			<scope>compile</scope> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

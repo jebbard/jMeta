@@ -11,7 +11,7 @@ package com.github.jmeta.utility.extmanager.api.services;
 
 import java.util.List;
 
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link IExtension} represents a jMeta extension that has an ID, an {@link ExtensionDescription} and provides service

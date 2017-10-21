@@ -7,7 +7,7 @@
  * @date 15.10.2017
  *
  */
-package com.github.jmeta.utility.extmanager.api.exception;
+package com.github.jmeta.utility.extmanager.api.exceptions;
 
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
 

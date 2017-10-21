@@ -1,4 +1,4 @@
-package com.github.jmeta.utility.compregistry.api.exception;
+package com.github.jmeta.utility.compregistry.api.exceptions;
 
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 

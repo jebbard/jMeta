@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link TestExtensionsTwo} is just an example extension.
