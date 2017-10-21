@@ -12,17 +12,13 @@ package com.github.jmeta.library.media.api.type;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
-import de.je.util.javautil.common.configparams.AbstractConfigParam;
-import de.je.util.javautil.common.configparams.ConfigParamHandler;
-
 /**
  * {@link AbstractMedium} represents a physical medium where binary data can be stored.
  * 
  * @param <T>
  *           The concrete type of wrapped medium object.
  */
-public abstract class AbstractMedium<T> extends ConfigParamHandler
-   implements IMedium<T> {
+public abstract class AbstractMedium<T> implements IMedium<T> {
 
    private T medium;
 
@@ -31,6 +27,16 @@ public abstract class AbstractMedium<T> extends ConfigParamHandler
    private final boolean isRandomAccess;
 
    private final boolean isReadOnly;
+
+   private final boolean isCacheable;
+
+   private boolean cachingEnabled;
+
+   private long maxCacheSizeInBytes;
+
+   private int maxCacheRegionSizeInBytes;
+
+   private int maxReadWriteBlockSizeInBytes;
 
    /**
     * Creates a new {@link AbstractMedium}.
@@ -44,23 +50,29 @@ public abstract class AbstractMedium<T> extends ConfigParamHandler
     *           true if the medium is random-access, false otherwise
     * @param isReadOnly
     *           true to make this a read-only {@link IMedium}, false otherwise.
-    * @param supportedParameters
-    *           The supported {@link AbstractConfigParam}s. For ease of specification, it is an array. The array must
-    *           not contain two {@link AbstractConfigParam} instances with the same name, especially they must not
-    *           contain the same instance twice. The specified array must contain at least one
-    *           {@link AbstractConfigParam}.
+    * @param isCacheable
+    *           true if this {@link AbstractMedium} supports caching, false otherwise
     */
-   public AbstractMedium(T medium, String name, boolean isRandomAccess,
-      boolean isReadOnly,
-      AbstractConfigParam<? extends Comparable<?>>[] supportedParameters) {
-      super(supportedParameters);
-
+   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, boolean isCacheable) {
       Reject.ifNull(medium, "medium");
 
       this.medium = medium;
       this.name = name;
       this.isRandomAccess = isRandomAccess;
       this.isReadOnly = isReadOnly;
+      this.isCacheable = isCacheable;
+   }
+
+   /**
+    * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
+
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((medium == null) ? 0 : medium.hashCode());
+      return result;
    }
 
    /**
@@ -90,6 +102,16 @@ public abstract class AbstractMedium<T> extends ConfigParamHandler
    }
 
    /**
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+
+      return getClass().getSimpleName() + "[medium=" + medium + ", name=" + name + ", isRandomAccess=" + isRandomAccess
+         + ", isReadOnly=" + isReadOnly + "]";
+   }
+
+   /**
     * @see com.github.jmeta.library.media.api.type.IMedium#getName()
     */
    @Override
@@ -105,18 +127,6 @@ public abstract class AbstractMedium<T> extends ConfigParamHandler
    public T getWrappedMedium() {
 
       return medium;
-   }
-
-   /**
-    * @see java.lang.Object#hashCode()
-    */
-   @Override
-   public int hashCode() {
-
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((medium == null) ? 0 : medium.hashCode());
-      return result;
    }
 
    @Override
@@ -135,6 +145,84 @@ public abstract class AbstractMedium<T> extends ConfigParamHandler
    }
 
    /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#isCacheable()
+    */
+   @Override
+   public boolean isCacheable() {
+      return isCacheable;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#isCachingEnabled()
+    */
+   @Override
+   public boolean isCachingEnabled() {
+      return cachingEnabled;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#setCachingEnabled(boolean)
+    */
+   @Override
+   public void setCachingEnabled(boolean cachingEnabled) {
+      this.cachingEnabled = cachingEnabled;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#getMaxCacheSizeInBytes()
+    */
+   @Override
+   public long getMaxCacheSizeInBytes() {
+      return maxCacheSizeInBytes;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#setMaxCacheSizeInBytes(long)
+    */
+   @Override
+   public void setMaxCacheSizeInBytes(long maxCacheSizeInBytes) {
+      Reject.ifNegativeOrZero(maxCacheSizeInBytes, "maxCacheSizeInBytes");
+
+      this.maxCacheSizeInBytes = maxCacheSizeInBytes;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#getMaxCacheRegionSizeInBytes()
+    */
+   @Override
+   public int getMaxCacheRegionSizeInBytes() {
+      return maxCacheRegionSizeInBytes;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#setMaxCacheRegionSizeInBytes(int)
+    */
+   @Override
+   public void setMaxCacheRegionSizeInBytes(int maxCacheRegionSizeInBytes) {
+      Reject.ifNegativeOrZero(maxCacheRegionSizeInBytes, "maxCacheRegionSizeInBytes");
+
+      this.maxCacheRegionSizeInBytes = maxCacheRegionSizeInBytes;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#getMaxReadWriteBlockSizeInBytes()
+    */
+   @Override
+   public int getMaxReadWriteBlockSizeInBytes() {
+      return maxReadWriteBlockSizeInBytes;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.type.IMedium#setMaxReadWriteBlockSizeInBytes(int)
+    */
+   @Override
+   public void setMaxReadWriteBlockSizeInBytes(int maxReadWriteBlockSizeInBytes) {
+      Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
+
+      this.maxReadWriteBlockSizeInBytes = maxReadWriteBlockSizeInBytes;
+   }
+
+   /**
     * Provides the possibility to overwrite the wrapped medium.
     * 
     * @param newMedium
@@ -145,16 +233,5 @@ public abstract class AbstractMedium<T> extends ConfigParamHandler
       Reject.ifNull(newMedium, "medium");
 
       this.medium = newMedium;
-   }
-
-   /**
-    * @see java.lang.Object#toString()
-    */
-   @Override
-   public String toString() {
-
-      return getClass().getSimpleName() + "[medium=" + medium
-         + ", name=" + name + ", isRandomAccess="
-         + isRandomAccess + ", isReadOnly=" + isReadOnly + "]";
    }
 }

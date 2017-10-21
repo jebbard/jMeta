@@ -9,13 +9,6 @@
  */
 package com.github.jmeta.library.startup.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,15 +16,9 @@ import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
 import com.github.jmeta.library.dataformats.api.service.IDataFormatRepository;
 import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
-import com.github.jmeta.utility.config.api.services.IUserConfigAccessor;
-import com.github.jmeta.utility.config.api.type.UserConfigParam;
 import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
 import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
 
-import de.je.util.javautil.common.config.AbstractConfigParam;
-import de.je.util.javautil.common.config.issue.ConfigIssue;
-import de.je.util.javautil.common.config.issue.ConfigIssueType;
-import de.je.util.javautil.common.extenum.AbstractExtensibleEnum;
 import de.je.util.javautil.io.stream.NamedInputStream;
 
 /**
@@ -58,7 +45,6 @@ public class LibraryJMeta implements ILibraryJMeta {
    public final static String LIBRARY_RELEASE_VERSION = "0.1.0";
    private final static String EXTENSION_POINTS_CONFIG = "config/ExtensionPoints.xml";
    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryJMeta.class);
-   private static final String MSG_CONFIG_LOAD_EXCEPTION = "All configuration parameters will be set to their defaults due to configuration loading exception";
    private static final String MSG_INSTALLATION_CHECK = ILoggingMessageConstants.LINE_SEPARATOR
       + "################################################################################"
       + ILoggingMessageConstants.LINE_SEPARATOR + "  " + LIBRARY_NAME
@@ -66,9 +52,6 @@ public class LibraryJMeta implements ILibraryJMeta {
       + ILoggingMessageConstants.LINE_SEPARATOR
       + "################################################################################"
       + ILoggingMessageConstants.LINE_SEPARATOR;
-   private static final String MSG_RESET_DEFAULT = " - value has been reset to default";
-   private final static String USER_CONFIG_FILE = "." + System.getProperty("file.separator") + "config"
-      + System.getProperty("file.separator") + "userConfig.properties";
    // TODO stage2_014: hide this field
    /**
     * Internally used logging trigger.
@@ -158,20 +141,14 @@ public class LibraryJMeta implements ILibraryJMeta {
    public LibraryJMeta() {
       String loadComponents = "Loading components initially" + ILoggingMessageConstants.SUFFIX_TASK;
 
-      IUserConfigAccessor userConfigAccessor = null;
-
       String jMetaIntro = ILoggingMessageConstants.LINE_SEPARATOR + LIBRARY_NAME + " is about to start..."
          + ILoggingMessageConstants.LINE_SEPARATOR;
-
-      File jMetaHomeDir = null;
 
       //////////
       // ##### (1.) Log jMeta startup
       //////////
       try {
          LOGGER.info(jMetaIntro);
-
-         userConfigAccessor = ComponentRegistry.lookupService(IUserConfigAccessor.class);
 
          logJMetaStartup();
       }
@@ -187,51 +164,7 @@ public class LibraryJMeta implements ILibraryJMeta {
       }
 
       //////////
-      // ##### (2.) Load and validate user configuration
-      //////////
-      String loadConfig = "Loading configuration" + ILoggingMessageConstants.SUFFIX_TASK;
-
-      LOGGER.info(startingTask(loadConfig));
-
-      final File userConfigFile = new File(jMetaHomeDir, USER_CONFIG_FILE);
-
-      try (InputStream configStream = new FileInputStream(userConfigFile)) {
-         // Load configuration parameters
-         List<ConfigIssue> userConfigIssues = userConfigAccessor.load(configStream);
-
-         checkConfigIssues(userConfigIssues, userConfigFile.getAbsolutePath());
-
-         // Log user configuration parameter values
-         LOGGER.info(ILoggingMessageConstants.LINE_SEPARATOR + LIBRARY_NAME
-            + " has loaded the following user configuration parameter values: "
-            + ILoggingMessageConstants.LINE_SEPARATOR);
-
-         // It seems that the explicit specification of generic concrete types <AbstractConfigParam, UserConfigParam>
-         // in the following line is necessary for javac to compile, which is not for Eclipse java compiler...
-         @SuppressWarnings({ "unchecked", "rawtypes" })
-         Set<AbstractConfigParam> allUserInstances = AbstractExtensibleEnum
-            .<AbstractConfigParam, UserConfigParam> values(UserConfigParam.class);
-
-         for (@SuppressWarnings("rawtypes")
-         Iterator<AbstractConfigParam> iterator = allUserInstances.iterator(); iterator.hasNext();) {
-            UserConfigParam<?> configParam = (UserConfigParam<?>) iterator.next();
-
-            if (userConfigAccessor.hasUserConfigParam(configParam))
-               LOGGER.info(String.format("Parameter: <%1$s> = '%2$s'", configParam.getId(),
-                  userConfigAccessor.getUserConfigParam(configParam)));
-         }
-      }
-
-      catch (Throwable e) {
-         LOGGER.warn("Exception during validation of configuration parameters - see below");
-         LOGGER.error(getClass().getSimpleName(), e);
-         LOGGER.warn(MSG_CONFIG_LOAD_EXCEPTION);
-      }
-
-      LOGGER.info(neutralTask(loadConfig));
-
-      //////////
-      // ##### (3.) Load all extensions
+      // ##### (2.) Load all extensions
       //////////
       String taskLoadExtensions = "Load all extensions" + ILoggingMessageConstants.SUFFIX_TASK;
 
@@ -251,7 +184,7 @@ public class LibraryJMeta implements ILibraryJMeta {
       }
 
       //////////
-      // ##### (4.) Load all components initially
+      // ##### (3.) Load all components initially
       //////////
       LOGGER.info(startingTask(loadComponents));
 
@@ -291,58 +224,6 @@ public class LibraryJMeta implements ILibraryJMeta {
    public IDataFormatRepository getDataFormatRepository() {
 
       return ComponentRegistry.lookupService(IDataFormatRepository.class);
-   }
-
-   /**
-    * Checks the given {@link List} of {@link ConfigIssue}s and logs appropriate messages when problems are detected.
-    *
-    * @param issues
-    *           The {@link List} of {@link ConfigIssue}s.
-    * @param configStreamName
-    *           The name of the configuration {@link InputStream} loaded, for files this could be the file's absolute
-    *           path.
-    */
-   private void checkConfigIssues(List<ConfigIssue> issues, String configStreamName) {
-
-      for (int i = 0; i < issues.size(); ++i) {
-         ConfigIssue issue = issues.get(i);
-
-         String prefix = "Validate config param <%1$s> - ";
-
-         if (issue.getType().equals(ConfigIssueType.EMPTY_PARAMETER))
-            LOGGER.warn(String.format(prefix + "Value was empty" + MSG_RESET_DEFAULT, issue.getParam()));
-
-         else if (issue.getType().equals(ConfigIssueType.CONFIG_FILE_LOADING)) {
-            LOGGER.warn(String.format("Failed to load user configuration <%1$s> due to exception - see below.",
-               configStreamName));
-            LOGGER.warn(MSG_CONFIG_LOAD_EXCEPTION);
-         }
-
-         else if (issue.getType().equals(ConfigIssueType.MISSING_PARAMETER))
-            LOGGER.warn(String.format(prefix + "Parameter not configured" + MSG_RESET_DEFAULT, issue.getParam()));
-
-         else if (issue.getType().equals(ConfigIssueType.NON_ENUMERATED_PARAMETER_VALUE))
-            LOGGER.warn(String.format(
-               prefix + "Parameter value <%2$s> is not allowed. Allowed values: <%3$s>" + MSG_RESET_DEFAULT,
-               issue.getParam(), issue.getParamStringValue(), issue.getParam().getEnumValues()));
-
-         else if (issue.getType().equals(ConfigIssueType.PARAMETER_VALUE_CONVERSION_FAILED))
-            LOGGER.warn(String.format(prefix + "Parameter value <%2$s> could not be converted", issue.getParam(),
-               issue.getParamStringValue()));
-
-         else if (issue.getType().equals(ConfigIssueType.PARAMETER_VALUE_OUT_OF_BOUNDS))
-            LOGGER.warn(String.format(
-               prefix + "Parameter value <%2$s> out of bounds: [min=<%3$s>, max=<%4$s>]" + MSG_RESET_DEFAULT,
-               issue.getParam(), issue.getParamStringValue(), issue.getParam().getMinimumValue(),
-               issue.getParam().getMaximumValue()));
-
-         else if (issue.getType().equals(ConfigIssueType.UNKNOWN_PARAMETER))
-            LOGGER.warn(
-               String.format(prefix + "Parameter with id <%2$s> is unknown.", issue.getParam(), issue.getParamId()));
-
-         if (issue.getException() != null)
-            LOGGER.error(getClass().getSimpleName(), issue.getException());
-      }
    }
 
    /**

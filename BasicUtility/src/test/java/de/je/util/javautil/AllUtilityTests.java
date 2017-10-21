@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import de.je.util.javautil.common.array.EnhancedArraysXXXTest;
 import de.je.util.javautil.common.config.PropertiesConfigLoaderTest;
+import de.je.util.javautil.common.config.StandardUserConfigAccessorTest;
 import de.je.util.javautil.common.extenum.ConcreteExtensibleEnumTest;
 import de.je.util.javautil.common.flags.BitAddressXXXTest;
 import de.je.util.javautil.common.flags.FlagSpecificationXXXTest;
@@ -44,7 +45,8 @@ import de.je.util.javautil.io.csv.TwoColumnCsvFileTest;
    Flags7ByteXXXTest.class, Flags8ByteXXXTest.class, FlagSpecificationXXXTest.class, FlagsMultibitTest.class,
    TwelveColumnCsvFileTest.class, NineColumnCsvFileTest.class, TwoColumnCsvFileTest.class, OneColumnCsvFileTest.class,
    EmptyCsvFileTest.class, NumericDataTypeHelperTest.class, PropertiesConfigLoaderTest.class,
-   MeasurementDurationTest.class, MeasurementSessionTest.class, ConcreteExtensibleEnumTest.class, })
+   MeasurementDurationTest.class, MeasurementSessionTest.class, ConcreteExtensibleEnumTest.class,
+   StandardUserConfigAccessorTest.class })
 public class AllUtilityTests {
    // Nothing necessary here
 }

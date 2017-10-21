@@ -11,21 +11,10 @@ package com.github.jmeta.library.media.api.type;
 
 import java.io.InputStream;
 
-import de.je.util.javautil.common.configparams.AbstractConfigParam;
-import de.je.util.javautil.common.configparams.IntegerConfigParam;
-
 /**
  * {@link InMemoryMedium} represents data stored already in memory.
  */
 public class InMemoryMedium extends AbstractMedium<byte[]> {
-
-   /**
-    * Parameter for setting the maximum write block size, default is: 8192 bytes. It determines the maximum number of
-    * bytes read or written during a flush operation.
-    */
-   public final static AbstractConfigParam<Integer> MAX_WRITE_BLOCK_SIZE = new IntegerConfigParam(
-      InMemoryMedium.class.getName() + ".MAX_WRITE_BLOCK_SIZE", 8192, 1,
-      Integer.MAX_VALUE);
 
    /**
     * Creates a new {@link InMemoryMedium}.
@@ -38,9 +27,7 @@ public class InMemoryMedium extends AbstractMedium<byte[]> {
     *           true to make this {@link InMemoryMedium} read-only, false enables read and write.
     */
    public InMemoryMedium(byte[] medium, String name, boolean readOnly) {
-
-      super(medium, name, true, readOnly,
-         new AbstractConfigParam<?>[] { MAX_WRITE_BLOCK_SIZE });
+      super(medium, name, true, readOnly, false);
    }
 
    /**

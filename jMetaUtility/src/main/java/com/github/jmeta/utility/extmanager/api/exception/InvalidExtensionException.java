@@ -12,16 +12,19 @@ package com.github.jmeta.utility.extmanager.api.exception;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
 
 /**
- * {@link InvalidExtensionException}
- *
+ * {@link InvalidExtensionException} is thrown whenever an {@link IExtension} is determined to be invalid.
  */
 public class InvalidExtensionException extends RuntimeException {
+
+   private static final long serialVersionUID = 2901376365515630547L;
 
    /**
     * Creates a new {@link InvalidExtensionException}.
     * 
     * @param message
-    * @param dataFormatsExtension
+    *           the exception message
+    * @param extension
+    *           the extension
     */
    public InvalidExtensionException(String message, IExtension extension) {
    }
