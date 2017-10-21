@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:06 (December 31, 2010)
  */
 
-package com.github.jmeta.library.dataformats.api.type;
+package com.github.jmeta.library.dataformats.api.types;
 
 import java.nio.ByteBuffer;
 

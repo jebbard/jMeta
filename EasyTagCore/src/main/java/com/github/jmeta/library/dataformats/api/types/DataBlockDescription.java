@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:06 (December 31, 2010)
  */
 
-package com.github.jmeta.library.dataformats.api.type;
+package com.github.jmeta.library.dataformats.api.types;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.jmeta.library.datablocks.api.type.IDataBlock;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.types.IDataBlock;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**

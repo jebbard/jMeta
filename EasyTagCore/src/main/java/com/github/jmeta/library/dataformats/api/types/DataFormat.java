@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:06 (December 31, 2010)
  */
 
-package com.github.jmeta.library.dataformats.api.type;
+package com.github.jmeta.library.dataformats.api.types;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,12 +16,10 @@ import java.util.Set;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
-import de.je.util.javautil.common.extenum.AbstractExtensibleEnum;
-
 /**
  *
  */
-public class DataFormat extends AbstractExtensibleEnum<DataFormat> {
+public class DataFormat {
 
    /**
     * Creates a new {@link DataFormat}.
@@ -33,11 +31,8 @@ public class DataFormat extends AbstractExtensibleEnum<DataFormat> {
     * @param author
     * @param revisionDate
     */
-   protected DataFormat(String id, Set<String> fileExtensions,
-      Set<String> mimeTypes, List<String> specificationLinks, String author,
-      Date revisionDate) {
-      super(id);
-
+   public DataFormat(String id, Set<String> fileExtensions, Set<String> mimeTypes, List<String> specificationLinks,
+      String author, Date revisionDate) {
       Reject.ifNull(author, "author");
       Reject.ifNull(specificationLinks, "specificationLinks");
       Reject.ifNull(mimeTypes, "mimeTypes");
@@ -108,10 +103,8 @@ public class DataFormat extends AbstractExtensibleEnum<DataFormat> {
    @Override
    public String toString() {
 
-      return getClass().getName() + "[" + "name=" + m_name + ", author="
-         + m_author + ", specificationLinks=" + m_specificationLinks
-         + ", mimeTypes=" + m_mimeTypes + ", fileExtensions=" + m_fileExtensions
-         + "]";
+      return getClass().getName() + "[" + "name=" + m_name + ", author=" + m_author + ", specificationLinks="
+         + m_specificationLinks + ", mimeTypes=" + m_mimeTypes + ", fileExtensions=" + m_fileExtensions + "]";
    }
 
    private final Set<String> m_fileExtensions = new HashSet<>();

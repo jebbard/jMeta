@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:07 (December 31, 2010)
  */
 
-package com.github.jmeta.library.dataformats.api.type;
+package com.github.jmeta.library.dataformats.api.types;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -5,7 +5,7 @@
  * @date 31.12.10 19:47:07 (December 31, 2010)
  */
 
-package com.github.jmeta.library.dataformats.api.type;
+package com.github.jmeta.library.dataformats.api.types;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.common.flags.FlagSpecification;
 
 /**
  * {@link FieldProperties}

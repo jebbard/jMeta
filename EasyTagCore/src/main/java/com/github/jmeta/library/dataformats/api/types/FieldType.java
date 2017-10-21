@@ -7,29 +7,26 @@
  * @date 04.01.2011
  */
 
-package com.github.jmeta.library.dataformats.api.type;
+package com.github.jmeta.library.dataformats.api.types;
 
-import de.je.util.javautil.common.extenum.AbstractExtensibleEnum;
-import de.je.util.javautil.common.flags.Flags;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link FieldType}
  *
  * @param <T>
  */
-public class FieldType<T> extends AbstractExtensibleEnum<FieldType<T>> {
+public class FieldType<T> {
 
    /**
     *
     */
-   public static final FieldType<BinaryValue> BINARY = new FieldType<>(
-      "BINARY");
+   public static final FieldType<BinaryValue> BINARY = new FieldType<>("BINARY");
 
    /**
     *
     */
-   public static final FieldType<Long> UNSIGNED_WHOLE_NUMBER = new FieldType<>(
-      "UNSIGNED WHOLE NUMBER");
+   public static final FieldType<Long> UNSIGNED_WHOLE_NUMBER = new FieldType<>("UNSIGNED WHOLE NUMBER");
 
    /**
     *
@@ -51,13 +48,16 @@ public class FieldType<T> extends AbstractExtensibleEnum<FieldType<T>> {
     */
    public static final FieldType<?> ANY = new FieldType<>("ANY");
 
+   private final String id;
+
    /**
     * Creates a new {@link FieldType}.
     *
     * @param id
     */
    protected FieldType(String id) {
-      super(id);
+      Reject.ifNull(id, "id");
+      this.id = id;
    }
 
 }
