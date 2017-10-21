@@ -12,31 +12,32 @@ package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.service.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.ChildOrder;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.dataformats.api.type.FieldFunction;
-import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.type.FieldProperties;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
-import com.github.jmeta.library.dataformats.api.type.LocationProperties;
-import com.github.jmeta.library.dataformats.api.type.MagicKey;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.ChildOrder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
-import de.je.util.javautil.common.charset.Charsets;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link Lyrics3v2Extension}
@@ -55,6 +56,11 @@ public class Lyrics3v2Extension implements IExtension {
       '0' };
    private static final byte[] LYRICS3v2_MAGIC_KEY_HEADER_BYTES = new byte[] { 'L', 'Y', 'R', 'I', 'C', 'S', 'B', 'E',
       'G', 'I', 'N' };
+   /**
+    *
+    */
+   public static final DataFormat LYRICS3v2 = new DataFormat("Lyrics3v2", new HashSet<String>(), new HashSet<String>(),
+      new ArrayList<String>(), "", new Date());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
@@ -90,30 +96,25 @@ public class Lyrics3v2Extension implements IExtension {
    private IDataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId lyrics3V2TagId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2, "lyrics3v2");
-      final DataBlockId lyrics3V2HeaderId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2, "lyrics3v2.header");
-      final DataBlockId lyrics3V2PayloadId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
-         "lyrics3v2.payload");
-      final DataBlockId lyrics3V2FooterId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2, "lyrics3v2.footer");
+      final DataBlockId lyrics3V2TagId = new DataBlockId(LYRICS3v2, "lyrics3v2");
+      final DataBlockId lyrics3V2HeaderId = new DataBlockId(LYRICS3v2, "lyrics3v2.header");
+      final DataBlockId lyrics3V2PayloadId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload");
+      final DataBlockId lyrics3V2FooterId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer");
 
-      final DataBlockId lyrics3V2HeaderMagicKeyId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
-         "lyrics3v2.header.id");
-      final DataBlockId lyrics3V2FooterMagicKeyId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
-         "lyrics3v2.footer.id");
-      final DataBlockId lyrics3V2FooterSizeId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
-         "lyrics3v2.footer.size");
+      final DataBlockId lyrics3V2HeaderMagicKeyId = new DataBlockId(LYRICS3v2, "lyrics3v2.header.id");
+      final DataBlockId lyrics3V2FooterMagicKeyId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer.id");
+      final DataBlockId lyrics3V2FooterSizeId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer.size");
 
-      final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
-         "lyrics3v2.payload.${FIELD_ID}");
-      final DataBlockId lyrics3V2GenericFieldHeaderId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
+      final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload.${FIELD_ID}");
+      final DataBlockId lyrics3V2GenericFieldHeaderId = new DataBlockId(LYRICS3v2,
          "lyrics3v2.payload.${FIELD_ID}.header");
-      final DataBlockId lyrics3V2GenericFieldPayloadId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
+      final DataBlockId lyrics3V2GenericFieldPayloadId = new DataBlockId(LYRICS3v2,
          "lyrics3v2.payload.${FIELD_ID}.payload");
-      final DataBlockId lyrics3V2GenericFieldHeaderSizeId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
+      final DataBlockId lyrics3V2GenericFieldHeaderSizeId = new DataBlockId(LYRICS3v2,
          "lyrics3v2.payload.${FIELD_ID}.header.size");
-      final DataBlockId lyrics3V2GenericFieldHeaderIdId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
+      final DataBlockId lyrics3V2GenericFieldHeaderIdId = new DataBlockId(LYRICS3v2,
          "lyrics3v2.payload.${FIELD_ID}.header.id");
-      final DataBlockId lyrics3V2GenericFieldPayloadDataId = new DataBlockId(DefaultExtensionsDataFormat.LYRICS3v2,
+      final DataBlockId lyrics3V2GenericFieldPayloadDataId = new DataBlockId(LYRICS3v2,
          "lyrics3v2.payload.${FIELD_ID}.payload.value");
 
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
@@ -380,9 +381,9 @@ public class Lyrics3v2Extension implements IExtension {
       genericDataBlocks.add(lyrics3V2GenericFieldHeaderId);
       genericDataBlocks.add(lyrics3V2GenericFieldPayloadId);
 
-      IDataFormatSpecification dummyLyrics3v2Spec = new StandardDataFormatSpecification(
-         DefaultExtensionsDataFormat.LYRICS3v2, descMap, topLevelIds, genericDataBlocks, new HashSet<>(),
-         supportedByteOrders, supportedCharsets, new ArrayList<DataTransformationType>());
+      IDataFormatSpecification dummyLyrics3v2Spec = new StandardDataFormatSpecification(LYRICS3v2, descMap, topLevelIds,
+         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
+         new ArrayList<DataTransformationType>());
 
       return dummyLyrics3v2Spec;
    }

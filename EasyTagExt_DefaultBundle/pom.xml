@@ -35,10 +35,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>BasicUtility</artifactId>
-			<version>0.5</version>
-			<scope>compile</scope>
+			<groupId>com.github.jmeta.utility</groupId>
+			<artifactId>jMetaTestUtility</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta.utility</groupId>

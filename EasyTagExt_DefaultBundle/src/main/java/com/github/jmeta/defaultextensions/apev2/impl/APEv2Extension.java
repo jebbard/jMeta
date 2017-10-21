@@ -12,6 +12,7 @@ package com.github.jmeta.defaultextensions.apev2.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,29 +20,28 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.service.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.ChildOrder;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.dataformats.api.type.FieldFunction;
-import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.type.FieldProperties;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
-import com.github.jmeta.library.dataformats.api.type.LocationProperties;
-import com.github.jmeta.library.dataformats.api.type.MagicKey;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.BitAddress;
+import com.github.jmeta.library.dataformats.api.types.ChildOrder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.FlagDescription;
+import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
+import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
-import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.flags.BitAddress;
-import de.je.util.javautil.common.flags.FlagDescription;
-import de.je.util.javautil.common.flags.FlagSpecification;
-import de.je.util.javautil.common.flags.Flags;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link APEv2Extension}
@@ -55,6 +55,11 @@ public class APEv2Extension implements IExtension {
       0, 0 };
    private static final int APEv2_MIN_ITEM_HEADER_LENGTH = 9;
    private static final int PREAMPLE_BYTE_LENGTH = 8;
+   /**
+    *
+    */
+   public static final DataFormat APEv2 = new DataFormat("APEv2", new HashSet<String>(), new HashSet<String>(),
+      new ArrayList<String>(), "", new Date());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
@@ -91,18 +96,13 @@ public class APEv2Extension implements IExtension {
       DataBlockId headerOrFooterId, DataBlockId otherId, DataBlockId payloadId, DataBlockId itemId,
       List<FlagDescription> itemFlagDescriptions) {
 
-      final DataBlockId apeV2PreampleId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         headerOrFooterId.getGlobalId() + ".preample");
-      final DataBlockId apeV2VersionNumberId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
+      final DataBlockId apeV2PreampleId = new DataBlockId(APEv2, headerOrFooterId.getGlobalId() + ".preample");
+      final DataBlockId apeV2VersionNumberId = new DataBlockId(APEv2,
          headerOrFooterId.getGlobalId() + ".versionNumber");
-      final DataBlockId apeV2TagSizeId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         headerOrFooterId.getGlobalId() + ".tagSize");
-      final DataBlockId apeV2ItemCountId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         headerOrFooterId.getGlobalId() + ".itemCount");
-      final DataBlockId apeV2TagFlagsId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         headerOrFooterId.getGlobalId() + ".tagFlags");
-      final DataBlockId apeV2ReservedId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         headerOrFooterId.getGlobalId() + ".reserved");
+      final DataBlockId apeV2TagSizeId = new DataBlockId(APEv2, headerOrFooterId.getGlobalId() + ".tagSize");
+      final DataBlockId apeV2ItemCountId = new DataBlockId(APEv2, headerOrFooterId.getGlobalId() + ".itemCount");
+      final DataBlockId apeV2TagFlagsId = new DataBlockId(APEv2, headerOrFooterId.getGlobalId() + ".tagFlags");
+      final DataBlockId apeV2ReservedId = new DataBlockId(APEv2, headerOrFooterId.getGlobalId() + ".reserved");
 
       List<DataBlockId> returnedList = new ArrayList<>();
 
@@ -241,25 +241,18 @@ public class APEv2Extension implements IExtension {
    private IDataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId apeV2TagId = new DataBlockId(DefaultExtensionsDataFormat.APEv2, "apev2");
-      final DataBlockId apeV2HeaderId = new DataBlockId(DefaultExtensionsDataFormat.APEv2, "apev2.header");
-      final DataBlockId apeV2PayloadId = new DataBlockId(DefaultExtensionsDataFormat.APEv2, "apev2.payload");
-      final DataBlockId apeV2FooterId = new DataBlockId(DefaultExtensionsDataFormat.APEv2, "apev2.footer");
+      final DataBlockId apeV2TagId = new DataBlockId(APEv2, "apev2");
+      final DataBlockId apeV2HeaderId = new DataBlockId(APEv2, "apev2.header");
+      final DataBlockId apeV2PayloadId = new DataBlockId(APEv2, "apev2.payload");
+      final DataBlockId apeV2FooterId = new DataBlockId(APEv2, "apev2.footer");
 
-      final DataBlockId apeV2GenericItemId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         "apev2.payload.${ITEM_ID}");
-      final DataBlockId apeV2GenericItemHeaderId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         "apev2.payload.${ITEM_ID}.header");
-      final DataBlockId apeV2GenericItemPayloadId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         "apev2.payload.${ITEM_ID}.payload");
-      final DataBlockId apeV2GenericItemValueSizeId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         "apev2.payload.${ITEM_ID}.header.size");
-      final DataBlockId apeV2GenericItemFlagsId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         "apev2.payload.${ITEM_ID}.header.flags");
-      final DataBlockId apeV2GenericItemKeyId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         "apev2.payload.${ITEM_ID}.header.key");
-      final DataBlockId apeV2GenericItemValueId = new DataBlockId(DefaultExtensionsDataFormat.APEv2,
-         "apev2.payload.${ITEM_ID}.payload.value");
+      final DataBlockId apeV2GenericItemId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}");
+      final DataBlockId apeV2GenericItemHeaderId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header");
+      final DataBlockId apeV2GenericItemPayloadId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.payload");
+      final DataBlockId apeV2GenericItemValueSizeId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header.size");
+      final DataBlockId apeV2GenericItemFlagsId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header.flags");
+      final DataBlockId apeV2GenericItemKeyId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header.key");
+      final DataBlockId apeV2GenericItemValueId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.payload.value");
 
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 
@@ -494,8 +487,8 @@ public class APEv2Extension implements IExtension {
       genericDataBlocks.add(apeV2GenericItemHeaderId);
       genericDataBlocks.add(apeV2GenericItemPayloadId);
 
-      IDataFormatSpecification dummyAPEv2Spec = new StandardDataFormatSpecification(DefaultExtensionsDataFormat.APEv2,
-         descMap, topLevelIds, genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
+      IDataFormatSpecification dummyAPEv2Spec = new StandardDataFormatSpecification(APEv2, descMap, topLevelIds,
+         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 
       return dummyAPEv2Spec;

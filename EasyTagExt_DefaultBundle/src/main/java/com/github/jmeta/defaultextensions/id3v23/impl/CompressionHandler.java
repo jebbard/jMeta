@@ -16,15 +16,14 @@ import java.util.zip.Inflater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.type.IContainer;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.datablocks.api.type.IHeader;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.util.javautil.common.flags.Flags;
 
 /**
  * {@link CompressionHandler}
@@ -54,7 +53,7 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.type.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.IContainer)
     */
    @Override
    public boolean requiresTransform(IContainer container) {
@@ -88,7 +87,7 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.type.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.IContainer)
     */
    @Override
    public boolean requiresUntransform(IContainer container) {

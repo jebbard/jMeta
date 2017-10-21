@@ -12,35 +12,36 @@ package com.github.jmeta.defaultextensions.mp3.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.service.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.ChildOrder;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.dataformats.api.type.FieldFunction;
-import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.type.FieldProperties;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
-import com.github.jmeta.library.dataformats.api.type.LocationProperties;
-import com.github.jmeta.library.dataformats.api.type.MagicKey;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BitAddress;
+import com.github.jmeta.library.dataformats.api.types.ChildOrder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.FlagDescription;
+import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
+import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
-import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.flags.BitAddress;
-import de.je.util.javautil.common.flags.FlagDescription;
-import de.je.util.javautil.common.flags.FlagSpecification;
-import de.je.util.javautil.common.flags.Flags;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link MP3Extension}
@@ -51,6 +52,11 @@ public class MP3Extension implements IExtension {
    private static final int FRAME_SYNC_BIT_COUNT = 11;
    private static final byte[] MP3_FRAME_SYNC = new byte[] { -1, -32 }; // 11 one bits
    private static final int MP3_HEADER_BYTE_LENGTH = 4;
+   /**
+    *
+    */
+   public static final DataFormat MP3 = new DataFormat("MP3", new HashSet<String>(), new HashSet<String>(),
+      new ArrayList<String>(), "", new Date());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
@@ -86,13 +92,13 @@ public class MP3Extension implements IExtension {
    private IDataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId mp3FrameId = new DataBlockId(DefaultExtensionsDataFormat.MP3, "mp3");
-      final DataBlockId mp3HeaderId = new DataBlockId(DefaultExtensionsDataFormat.MP3, "mp3.header");
-      final DataBlockId mp3CRCId = new DataBlockId(DefaultExtensionsDataFormat.MP3, "mp3.crc");
-      final DataBlockId mp3CRCFieldId = new DataBlockId(DefaultExtensionsDataFormat.MP3, "mp3.crc.data");
-      final DataBlockId mp3PayloadId = new DataBlockId(DefaultExtensionsDataFormat.MP3, "mp3.payload");
-      final DataBlockId mp3PayloadDataId = new DataBlockId(DefaultExtensionsDataFormat.MP3, "mp3.payload.data");
-      final DataBlockId mp3HeaderContentId = new DataBlockId(DefaultExtensionsDataFormat.MP3, "mp3.header.content");
+      final DataBlockId mp3FrameId = new DataBlockId(MP3, "mp3");
+      final DataBlockId mp3HeaderId = new DataBlockId(MP3, "mp3.header");
+      final DataBlockId mp3CRCId = new DataBlockId(MP3, "mp3.crc");
+      final DataBlockId mp3CRCFieldId = new DataBlockId(MP3, "mp3.crc.data");
+      final DataBlockId mp3PayloadId = new DataBlockId(MP3, "mp3.payload");
+      final DataBlockId mp3PayloadDataId = new DataBlockId(MP3, "mp3.payload.data");
+      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
 
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 
@@ -263,8 +269,8 @@ public class MP3Extension implements IExtension {
 
       supportedCharsets.add(Charsets.CHARSET_ISO);
 
-      IDataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(DefaultExtensionsDataFormat.MP3,
-         descMap, topLevelIds, new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
+      IDataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 
       return dummyMP3Spec;

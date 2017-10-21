@@ -7,11 +7,9 @@ import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
 
 /**
  * {@link ID3v23DataBlocksService}
@@ -23,7 +21,7 @@ public class ID3v23DataBlocksService extends AbstractDataService {
     * Creates a new {@link ID3v23DataBlocksService}.
     */
    public ID3v23DataBlocksService() {
-      super(DefaultExtensionsDataFormat.ID3v23);
+      super(ID3v23Extension.ID3v23);
    }
 
    /**

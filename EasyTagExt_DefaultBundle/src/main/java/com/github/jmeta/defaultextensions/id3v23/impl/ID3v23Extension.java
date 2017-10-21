@@ -12,6 +12,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,31 +20,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.service.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.ChildOrder;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.dataformats.api.type.FieldFunction;
-import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.type.FieldProperties;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
-import com.github.jmeta.library.dataformats.api.type.LocationProperties;
-import com.github.jmeta.library.dataformats.api.type.MagicKey;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.BitAddress;
+import com.github.jmeta.library.dataformats.api.types.ChildOrder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.FlagDescription;
+import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
+import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
-import de.je.util.javautil.common.charset.Charsets;
-import de.je.util.javautil.common.flags.BitAddress;
-import de.je.util.javautil.common.flags.FlagDescription;
-import de.je.util.javautil.common.flags.FlagSpecification;
-import de.je.util.javautil.common.flags.Flags;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link ID3v23Extension}
@@ -61,67 +62,62 @@ public class ID3v23Extension implements IExtension {
    private static final int FRAME_ID_SIZE = 4;
    private static final String ID3V23_GENERIC_CONTAINER_ID = "id3v23.payload.${FRAME_ID}";
    private static final byte[] ID3V23_TAG_VERSION_BYTES = new byte[] { 3, 0 };
-   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
-   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, ID3V23_GENERIC_CONTAINER_ID + ".header.id");
-   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_SIZE_FIELD_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, ID3V23_GENERIC_CONTAINER_ID + ".header.size");
-   private static final DataBlockId GENERIC_FRAME_HEADER_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
+   /**
+    *
+    */
+   public static final DataFormat ID3v23 = new DataFormat("ID3v2.3", new HashSet<String>(), new HashSet<String>(),
+      new ArrayList<String>(), "M. Nilsson", new Date());
+   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
+   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".header.id");
+   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_SIZE_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".header.size");
+   private static final DataBlockId GENERIC_FRAME_HEADER_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header");
-   private static final DataBlockId GENERIC_FRAME_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID);
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, ID3V23_GENERIC_CONTAINER_ID + ".payload.data");
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, ID3V23_GENERIC_CONTAINER_ID + ".payload.decompressedSize");
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, ID3V23_GENERIC_CONTAINER_ID + ".payload.encryptionMethod");
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, ID3V23_GENERIC_CONTAINER_ID + ".payload.groupId");
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
+   private static final DataBlockId GENERIC_FRAME_ID = new DataBlockId(ID3v23, ID3V23_GENERIC_CONTAINER_ID);
+   private static final DataBlockId GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".payload.data");
+   private static final DataBlockId GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".payload.decompressedSize");
+   private static final DataBlockId GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".payload.encryptionMethod");
+   private static final DataBlockId GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".payload.groupId");
+   private static final DataBlockId GENERIC_FRAME_PAYLOAD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload");
-   private static final DataBlockId GENERIC_INFORMATION_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
+   private static final DataBlockId GENERIC_INFORMATION_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload.information");
-   private static final DataBlockId GENERIC_TEXT_ENCODING_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
+   private static final DataBlockId GENERIC_TEXT_ENCODING_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload.textEncoding");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_CRC_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, "id3v23.extHeader.crc");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_FLAGS_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, "id3v23.extHeader.flags");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_PADDINGSIZE_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, "id3v23.extHeader.paddingSize");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_SIZE_ID = new DataBlockId(
-      DefaultExtensionsDataFormat.ID3v23, "id3v23.extHeader.size");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.extHeader");
+   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_CRC_ID = new DataBlockId(ID3v23,
+      "id3v23.extHeader.crc");
+   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_FLAGS_ID = new DataBlockId(ID3v23,
+      "id3v23.extHeader.flags");
+   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_PADDINGSIZE_ID = new DataBlockId(ID3v23,
+      "id3v23.extHeader.paddingSize");
+   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_SIZE_ID = new DataBlockId(ID3v23,
+      "id3v23.extHeader.size");
+   private static final DataBlockId ID3V23_EXTENDED_HEADER_ID = new DataBlockId(ID3v23, "id3v23.extHeader");
    private static final int ID3V23_FRAME_FLAG_SIZE = 2;
-   private static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.header.flags");
-   private static final DataBlockId ID3V23_HEADER_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.header");
-   private static final DataBlockId ID3V23_HEADER_ID_FIELD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.header.id");
-   private static final DataBlockId ID3V23_HEADER_SIZE_FIELD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.header.size");
-   private static final DataBlockId ID3V23_HEADER_VERSION_FIELD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.header.version");
-   private static final DataBlockId ID3V23_PAYLOAD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.payload");
+   private static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.flags");
+   private static final DataBlockId ID3V23_HEADER_ID = new DataBlockId(ID3v23, "id3v23.header");
+   private static final DataBlockId ID3V23_HEADER_ID_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.id");
+   private static final DataBlockId ID3V23_HEADER_SIZE_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.size");
+   private static final DataBlockId ID3V23_HEADER_VERSION_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.version");
+   private static final DataBlockId ID3V23_PAYLOAD_ID = new DataBlockId(ID3v23, "id3v23.payload");
    private static final int ID3V23_TAG_FLAG_SIZE = 1;
-   private static final DataBlockId ID3V23_TAG_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23, "id3v23");
+   private static final DataBlockId ID3V23_TAG_ID = new DataBlockId(ID3v23, "id3v23");
    private static final byte[] ID3V23_TAG_ID_BYTES = new byte[] { 'I', 'D', '3' };
    private static final String ID3V23_TAG_ID_STRING = "ID3";
    private static final String ID3V23_TAG_VERSION_STRING = "\u0003\u0000";
    private static final byte[] ID3V23_TAG_MAGIC_KEY_BYTES = new byte[ID3V23_TAG_ID_BYTES.length
       + ID3V23_TAG_VERSION_BYTES.length];
    private static final String ID3V23_TAG_MAGIC_KEY_STRING = ID3V23_TAG_ID_STRING + ID3V23_TAG_VERSION_STRING;
-   private static final DataBlockId PADDING_BYTES_FIELD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
+   private static final DataBlockId PADDING_BYTES_FIELD_ID = new DataBlockId(ID3v23,
       "id3v23.payload.padding.payload.bytes");
-   private static final DataBlockId PADDING_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.payload.padding");
-   private static final DataBlockId PADDING_PAYLOAD_ID = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-      "id3v23.payload.padding.payload");
+   private static final DataBlockId PADDING_ID = new DataBlockId(ID3v23, "id3v23.payload.padding");
+   private static final DataBlockId PADDING_PAYLOAD_ID = new DataBlockId(ID3v23, "id3v23.payload.padding.payload");
    private static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
    private static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
    private static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
@@ -967,9 +963,8 @@ public class ID3v23Extension implements IExtension {
 
       transformations.add(new DataTransformationType("Unsynchronisation", unsynchronisationContainers, true, 0, 0));
 
-      IDataFormatSpecification dummyID3v23Spec = new StandardDataFormatSpecification(DefaultExtensionsDataFormat.ID3v23,
-         descMap, topLevelIds, genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets,
-         transformations);
+      IDataFormatSpecification dummyID3v23Spec = new StandardDataFormatSpecification(ID3v23, descMap, topLevelIds,
+         genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets, transformations);
       return dummyID3v23Spec;
    }
 
@@ -994,8 +989,7 @@ public class ID3v23Extension implements IExtension {
       DataBlockId concreteId = genericId;
 
       if (genericId.getGlobalId().contains(genericLocalId))
-         concreteId = new DataBlockId(DefaultExtensionsDataFormat.ID3v23,
-            genericId.getGlobalId().replace(genericLocalId, concreteLocalId));
+         concreteId = new DataBlockId(ID3v23, genericId.getGlobalId().replace(genericLocalId, concreteLocalId));
 
       return concreteId;
    }

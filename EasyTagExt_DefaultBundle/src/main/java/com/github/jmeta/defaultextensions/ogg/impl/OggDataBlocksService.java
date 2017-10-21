@@ -14,10 +14,8 @@ import com.github.jmeta.defaultextensions.id3v1.impl.ID3v1DataBlocksService;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
  * {@link OggDataBlocksService}
@@ -29,7 +27,7 @@ public class OggDataBlocksService extends AbstractDataService {
     * Creates a new {@link OggDataBlocksService}.
     */
    public OggDataBlocksService() {
-      super(DefaultExtensionsDataFormat.OGG);
+      super(OggExtension.OGG);
    }
 
    @Override

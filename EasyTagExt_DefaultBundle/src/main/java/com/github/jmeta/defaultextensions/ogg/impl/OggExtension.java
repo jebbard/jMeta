@@ -12,32 +12,33 @@ package com.github.jmeta.defaultextensions.ogg.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.service.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.BinaryValue;
-import com.github.jmeta.library.dataformats.api.type.ChildOrder;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.dataformats.api.type.FieldFunction;
-import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.type.FieldProperties;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
-import com.github.jmeta.library.dataformats.api.type.LocationProperties;
-import com.github.jmeta.library.dataformats.api.type.MagicKey;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.ChildOrder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
-import de.je.util.javautil.common.charset.Charsets;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link OggExtension}
@@ -47,6 +48,11 @@ public class OggExtension implements IExtension {
 
    private static final byte[] OGG_MAGIC_KEY_BYTES = new byte[] { 'O', 'g', 'g', 'S' };
    private static final String OGG_MAGIC_KEY_STRING = "OggS";
+   /**
+    *
+    */
+   public static final DataFormat OGG = new DataFormat("Ogg", new HashSet<String>(), new HashSet<String>(),
+      new ArrayList<String>(), "", new Date());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
@@ -82,35 +88,23 @@ public class OggExtension implements IExtension {
    private IDataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId oggPageId = new DataBlockId(DefaultExtensionsDataFormat.OGG, "ogg");
-      final DataBlockId oggPageHeaderId = new DataBlockId(DefaultExtensionsDataFormat.OGG, "ogg.header");
-      final DataBlockId oggPayloadId = new DataBlockId(DefaultExtensionsDataFormat.OGG, "ogg.payload");
+      final DataBlockId oggPageId = new DataBlockId(OGG, "ogg");
+      final DataBlockId oggPageHeaderId = new DataBlockId(OGG, "ogg.header");
+      final DataBlockId oggPayloadId = new DataBlockId(OGG, "ogg.payload");
 
-      final DataBlockId oggPageHeaderCaptureId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.capturePattern");
-      final DataBlockId oggPageHeaderStreamStructVersionId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.streamStructureVersion");
-      final DataBlockId oggPageHeaderHeaderTypeFlagId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.headerTypeFlag");
-      final DataBlockId oggPageHeaderAbsoluteGranulePosId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.absoluteGranulePos");
-      final DataBlockId oggPageHeaderStreamSerialNoId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.streamSerialNumber");
-      final DataBlockId oggPageHeaderPageSequNoId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.pageSequenceNumber");
-      final DataBlockId oggPageHeaderPageChecksumId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.pageChecksum");
-      final DataBlockId oggPageHeaderSegmentsId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.pageSegments");
-      final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.header.segmentTableEntry");
+      final DataBlockId oggPageHeaderCaptureId = new DataBlockId(OGG, "ogg.header.capturePattern");
+      final DataBlockId oggPageHeaderStreamStructVersionId = new DataBlockId(OGG, "ogg.header.streamStructureVersion");
+      final DataBlockId oggPageHeaderHeaderTypeFlagId = new DataBlockId(OGG, "ogg.header.headerTypeFlag");
+      final DataBlockId oggPageHeaderAbsoluteGranulePosId = new DataBlockId(OGG, "ogg.header.absoluteGranulePos");
+      final DataBlockId oggPageHeaderStreamSerialNoId = new DataBlockId(OGG, "ogg.header.streamSerialNumber");
+      final DataBlockId oggPageHeaderPageSequNoId = new DataBlockId(OGG, "ogg.header.pageSequenceNumber");
+      final DataBlockId oggPageHeaderPageChecksumId = new DataBlockId(OGG, "ogg.header.pageChecksum");
+      final DataBlockId oggPageHeaderSegmentsId = new DataBlockId(OGG, "ogg.header.pageSegments");
+      final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(OGG, "ogg.header.segmentTableEntry");
 
-      final DataBlockId oggPacketPartContainerId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.payload.packetPartContainer");
-      final DataBlockId oggPacketPartId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.payload.packetPartContainer.payload");
-      final DataBlockId oggSegmentId = new DataBlockId(DefaultExtensionsDataFormat.OGG,
-         "ogg.payload.packetPartContainer.payload.segment");
+      final DataBlockId oggPacketPartContainerId = new DataBlockId(OGG, "ogg.payload.packetPartContainer");
+      final DataBlockId oggPacketPartId = new DataBlockId(OGG, "ogg.payload.packetPartContainer.payload");
+      final DataBlockId oggSegmentId = new DataBlockId(OGG, "ogg.payload.packetPartContainer.payload.segment");
 
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 
@@ -369,8 +363,8 @@ public class OggExtension implements IExtension {
 
       final Set<DataBlockId> genericDataBlocks = new HashSet<>();
 
-      IDataFormatSpecification dummyOggSpec = new StandardDataFormatSpecification(DefaultExtensionsDataFormat.OGG,
-         descMap, topLevelIds, genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
+      IDataFormatSpecification dummyOggSpec = new StandardDataFormatSpecification(OGG, descMap, topLevelIds,
+         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 
       return dummyOggSpec;

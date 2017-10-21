@@ -12,29 +12,30 @@ package com.github.jmeta.defaultextensions.id3v1.impl;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
 import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.service.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.ChildOrder;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.dataformats.api.type.FieldProperties;
-import com.github.jmeta.library.dataformats.api.type.FieldType;
-import com.github.jmeta.library.dataformats.api.type.LocationProperties;
-import com.github.jmeta.library.dataformats.api.type.MagicKey;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.ChildOrder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.type.ExtensionDescription;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
-import de.je.util.javautil.common.charset.Charsets;
+import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 // REMINDER: ID3v1 and ID3v1.1 are ONE SINGLE data format in the components
 // DataBlocks and DataFormats. In the component Metadata, these formats can
@@ -47,6 +48,11 @@ public class ID3v1Extension implements IExtension {
 
    private static final byte[] ID3V1_TAG_ID = new byte[] { 'T', 'A', 'G' };
    private static final String ID3V1_TAG_ID_STRING = "TAG";
+   /**
+    *
+    */
+   public static final DataFormat ID3v1 = new DataFormat("ID3v1", new HashSet<String>(), new HashSet<String>(),
+      new ArrayList<String>(), "M. Nilsson", new Date());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
@@ -86,19 +92,18 @@ public class ID3v1Extension implements IExtension {
       final char nullCharacter = '\0';
 
       // Data blocks
-      final DataBlockId id3v1TagId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1");
-      final DataBlockId id3v1HeaderId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.header");
-      final DataBlockId id3v1PayloadId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload");
-      final DataBlockId id3v1TagHeaderId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.header.id");
-      final DataBlockId titleId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload.title");
-      final DataBlockId artistId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload.artist");
-      final DataBlockId albumId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload.album");
-      final DataBlockId yearId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload.year");
-      final DataBlockId commentId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload.comment");
-      final DataBlockId trackIndicatorId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1,
-         "id3v1.payload.trackIndicator");
-      final DataBlockId trackId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload.track");
-      final DataBlockId genreId = new DataBlockId(DefaultExtensionsDataFormat.ID3v1, "id3v1.payload.genre");
+      final DataBlockId id3v1TagId = new DataBlockId(ID3v1, "id3v1");
+      final DataBlockId id3v1HeaderId = new DataBlockId(ID3v1, "id3v1.header");
+      final DataBlockId id3v1PayloadId = new DataBlockId(ID3v1, "id3v1.payload");
+      final DataBlockId id3v1TagHeaderId = new DataBlockId(ID3v1, "id3v1.header.id");
+      final DataBlockId titleId = new DataBlockId(ID3v1, "id3v1.payload.title");
+      final DataBlockId artistId = new DataBlockId(ID3v1, "id3v1.payload.artist");
+      final DataBlockId albumId = new DataBlockId(ID3v1, "id3v1.payload.album");
+      final DataBlockId yearId = new DataBlockId(ID3v1, "id3v1.payload.year");
+      final DataBlockId commentId = new DataBlockId(ID3v1, "id3v1.payload.comment");
+      final DataBlockId trackIndicatorId = new DataBlockId(ID3v1, "id3v1.payload.trackIndicator");
+      final DataBlockId trackId = new DataBlockId(ID3v1, "id3v1.payload.track");
+      final DataBlockId genreId = new DataBlockId(ID3v1, "id3v1.payload.genre");
 
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 
@@ -304,8 +309,8 @@ public class ID3v1Extension implements IExtension {
       supportedCharsets.add(Charsets.CHARSET_ASCII);
       supportedCharsets.add(Charsets.CHARSET_UTF8);
 
-      IDataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(DefaultExtensionsDataFormat.ID3v1,
-         descMap, topLevelIds, new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
+      IDataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 
       return dummyID3v1Spec;

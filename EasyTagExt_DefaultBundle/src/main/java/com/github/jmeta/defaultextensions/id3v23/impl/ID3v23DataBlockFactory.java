@@ -13,7 +13,7 @@ import java.util.Set;
 
 import com.github.jmeta.library.datablocks.impl.IFieldConverter;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockFactory;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 /**
  * {@link ID3v23DataBlockFactory}

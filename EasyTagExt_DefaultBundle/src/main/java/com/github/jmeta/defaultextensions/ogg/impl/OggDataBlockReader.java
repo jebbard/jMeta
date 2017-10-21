@@ -12,20 +12,18 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.jmeta.defaultextensions.mp3.impl.MP3DataBlockReader;
-import com.github.jmeta.library.datablocks.api.exception.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
-import com.github.jmeta.library.datablocks.api.type.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.type.IField;
-import com.github.jmeta.library.datablocks.api.type.IHeader;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
+import com.github.jmeta.library.datablocks.api.types.IField;
+import com.github.jmeta.library.datablocks.api.types.IHeader;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
-import com.github.jmeta.library.dataformats.api.service.IDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.type.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
-import com.github.jmeta.library.dataformats.api.type.DataTransformationType;
-import com.github.jmeta.library.dataformats.api.type.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.type.PhysicalDataBlockType;
-
-import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
+import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
 // TODO primeRefactor010: cleanup and document OggDataBlockReader
 /**
@@ -34,7 +32,7 @@ import de.je.jmeta.defext.dataformats.DefaultExtensionsDataFormat;
  */
 public class OggDataBlockReader extends StandardDataBlockReader {
 
-   private static final DataBlockId PACKET_CONTAINER_ID = new DataBlockId(DefaultExtensionsDataFormat.OGG,
+   private static final DataBlockId PACKET_CONTAINER_ID = new DataBlockId(OggExtension.OGG,
       "ogg.payload.packetPartContainer");
 
    @Override

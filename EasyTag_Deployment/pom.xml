@@ -30,9 +30,8 @@
 	<modules>
 		<module>../EasyTagCore</module>
 		<module>../EasyTagExt_DefaultBundle</module>
-		<module>../BasicUtility</module>
-		<module>../JavaTestUtils</module>
 		<module>../jMetaUtility</module>
+		<module>../jMetaTestUtility</module>
 	</modules>
 
 

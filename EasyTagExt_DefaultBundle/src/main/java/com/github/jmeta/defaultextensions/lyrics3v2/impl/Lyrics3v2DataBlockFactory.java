@@ -11,7 +11,7 @@ package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 import com.github.jmeta.defaultextensions.id3v23.impl.ID3v23DataBlockFactory;
 import com.github.jmeta.library.datablocks.impl.IFieldConverter;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockFactory;
-import com.github.jmeta.library.dataformats.api.type.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 // TODO primeRefactor009: There must be a better approach to implement setting other field converters (the same for
 // ID3v23)
