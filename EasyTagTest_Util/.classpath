@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ComponentRegistry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JavaUtils"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/EasyTagCore"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jMetaLibrary"/>
 	<classpathentry kind="lib" path="E:/Programmieren/ArtifactRepos/Maven/junit/junit/4.8.2/junit-4.8.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
