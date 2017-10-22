@@ -26,7 +26,7 @@ import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
 import com.github.jmeta.library.media.api.types.IMedium;
 import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
-import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 /**
  * Tests the interface {@IMediumAccessor}. Basic idea is to work on the

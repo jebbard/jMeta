@@ -11,8 +11,7 @@ package com.github.jmeta.defaultextensions.ogg.impl;
 import java.nio.file.Path;
 
 import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
-
-import de.je.util.javautil.testUtil.resource.TestResourceHelper;
+import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link OggSingleFileTest_01} tests reading a single ogg file.

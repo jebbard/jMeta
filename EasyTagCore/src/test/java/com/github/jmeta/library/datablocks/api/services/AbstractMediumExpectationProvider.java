@@ -22,7 +22,7 @@ import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecificatio
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 /**
  * {@link AbstractMediumExpectationProvider} provides expected test data for a single top-level data block of a single

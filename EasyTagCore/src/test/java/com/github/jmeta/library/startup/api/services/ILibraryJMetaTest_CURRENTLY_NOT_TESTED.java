@@ -14,7 +14,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.jmeta.library.startup.api.services.ILibraryJMeta;
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 /**

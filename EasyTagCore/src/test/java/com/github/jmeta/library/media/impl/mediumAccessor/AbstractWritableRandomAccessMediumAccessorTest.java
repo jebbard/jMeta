@@ -18,7 +18,7 @@ import com.github.jmeta.library.media.api.types.IMedium;
 import com.github.jmeta.library.media.api.types.IMediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
-import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 import junit.framework.Assert;
 

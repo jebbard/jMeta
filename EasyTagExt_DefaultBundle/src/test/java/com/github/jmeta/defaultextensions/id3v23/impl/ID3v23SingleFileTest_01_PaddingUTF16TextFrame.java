@@ -11,8 +11,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import java.nio.file.Path;
 
 import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
-
-import de.je.util.javautil.testUtil.resource.TestResourceHelper;
+import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link ID3v23SingleFileTest_01_PaddingUTF16TextFrame} tests reading a single ID3v23 tag that contains a usual amount

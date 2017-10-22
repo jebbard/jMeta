@@ -9,8 +9,6 @@
 package com.github.jmeta.library.media.impl.OLD;
 
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.impl.OLD.IMediumCache;
-import com.github.jmeta.library.media.impl.OLD.StandardMediumCache;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 
 /**

@@ -10,8 +10,7 @@ import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccesso
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.IMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
-
-import de.je.util.javautil.testUtil.setup.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 /**
  * {@link AbstractDataBlockAccessorDefaultExtensionTest} is an abstract base class for testing daata block access
@@ -19,8 +18,8 @@ import de.je.util.javautil.testUtil.setup.TestDataException;
 public abstract class AbstractDataBlockAccessorDefaultExtensionTest extends AbstractDataBlockAccessorTest {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(Path, Path,
-    *      Integer[])
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest#AbstractDataBlockAccessorTest(Path,
+    *      Path, Integer[])
     */
    public AbstractDataBlockAccessorDefaultExtensionTest(Path testFile, Path csvFile, Integer[] fieldSizes) {
       super(testFile, csvFile, fieldSizes);

@@ -32,7 +32,7 @@ import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.changeManager.ReadWriteActionSequence.ActionOrder;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
-import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 /**

@@ -12,17 +12,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.github.jmeta.library.dataformats.api.BitAddressXXXTest;
-import com.github.jmeta.library.dataformats.api.FlagSpecificationXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags1ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags2ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags3ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags4ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags5ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags6ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags7ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.Flags8ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.FlagsMultibitTest;
+import com.github.jmeta.library.dataformats.api.types.BitAddressXXXTest;
+import com.github.jmeta.library.dataformats.api.types.FlagSpecificationXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags1ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags2ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags3ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags4ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags5ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags6ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags7ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.Flags8ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.FlagsMultibitTest;
 import com.github.jmeta.library.media.AllMediaTests;
 import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests;
 

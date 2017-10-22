@@ -36,7 +36,7 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.byteutils.api.exceptions.InvalidArrayStringFormatException;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.csv.api.exception.CsvRowFormatException;
+import com.github.jmeta.utility.csv.api.exceptions.CsvRowFormatException;
 import com.github.jmeta.utility.csv.api.services.CsvReader;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.namedio.api.services.NamedReader;

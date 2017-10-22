@@ -16,8 +16,6 @@ import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.IMedium;
 import com.github.jmeta.library.media.api.types.IMediumReference;
-import com.github.jmeta.library.media.impl.OLD.IMediumCache;
-import com.github.jmeta.library.media.impl.OLD.StandardMediumCache;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 

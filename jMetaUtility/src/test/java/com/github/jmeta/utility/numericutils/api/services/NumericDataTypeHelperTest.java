@@ -11,9 +11,7 @@ package com.github.jmeta.utility.numericutils.api.services;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
-
-import de.je.util.javautil.testUtil.setup.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 /**
  * {@link NumericDataTypeHelperTest} tests the {@link NumericDataTypeUtil} class.

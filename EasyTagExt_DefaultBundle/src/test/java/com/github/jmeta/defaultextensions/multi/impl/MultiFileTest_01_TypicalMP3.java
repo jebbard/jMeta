@@ -11,8 +11,7 @@ package com.github.jmeta.defaultextensions.multi.impl;
 import java.nio.file.Path;
 
 import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
-
-import de.je.util.javautil.testUtil.resource.TestResourceHelper;
+import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link MultiFileTest_01_TypicalMP3} tests reading a typical MP3 file with ID3v2.3 tag at the beginning, some MP3

@@ -1,56 +1,49 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jMetaDefaultBundle</artifactId>
+	<artifactId>jmetadefaultextensions</artifactId>
 	<packaging>jar</packaging>
-	<name>jMetaDefaultBundle</name>
+	<name>jMetaDefaultExtensions</name>
 
 	<!-- ========================== Parent ========================== -->
 	<parent>
-		<groupId>de.je.jmeta</groupId>
-		<artifactId>jMetaBuild</artifactId>
-		<version>0.2-SNAPSHOT</version>
+		<groupId>com.github.jmeta</groupId>
+		<artifactId>jmetaparent</artifactId>
+		<version>0.1</version>
 		<relativePath>../EasyTag_Deployment/pom.xml</relativePath>
 	</parent>
 
 	<!-- ========================== Dependencies ========================== -->
 	<dependencies>
 		<dependency>
-			<groupId>de.je.jmeta</groupId>
-			<artifactId>jMeta</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetalibrary</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>de.je.jmeta</groupId>
-			<artifactId>jMeta</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetalibrary</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>de.je.util.javautil</groupId>
-			<artifactId>JavaTestUtils</artifactId>
-			<version>0.5</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.jmeta.utility</groupId>
-			<artifactId>jMetaTestUtility</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.jmeta.utility</groupId>
-			<artifactId>jMetaUtility</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetautility</artifactId>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetautility</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.1.7</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

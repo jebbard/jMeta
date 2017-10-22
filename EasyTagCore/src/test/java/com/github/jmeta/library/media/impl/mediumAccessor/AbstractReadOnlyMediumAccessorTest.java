@@ -14,7 +14,7 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.IMedium;
 import com.github.jmeta.library.media.api.types.IMediumReference;
-import com.github.jmeta.utility.testsetup.api.exception.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 /**
  * {@link AbstractReadOnlyMediumAccessorTest} is the base class for testing read-only {@link IMediumAccessor} instances,

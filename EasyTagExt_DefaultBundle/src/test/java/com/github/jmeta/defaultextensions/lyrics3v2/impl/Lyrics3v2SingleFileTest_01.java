@@ -12,8 +12,7 @@ import java.nio.file.Path;
 
 import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
 import com.github.jmeta.defaultextensions.multi.impl.MultiFileTest_01_TypicalMP3;
-
-import de.je.util.javautil.testUtil.resource.TestResourceHelper;
+import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link Lyrics3v2SingleFileTest_01} tests reading a single Lyrics3v2 tag with header and footer.

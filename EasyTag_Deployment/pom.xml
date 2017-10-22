@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.je.jmeta</groupId>
-	<artifactId>jMetaBuild</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<groupId>com.github.jmeta</groupId>
+	<artifactId>jmetaparent</artifactId>
+	<version>0.1</version>
 	<packaging>pom</packaging>
-	<name>jMetaBuild</name>
+	<name>jMetaParent</name>
 	<url>http://maven.apache.org</url>
 
 	<!-- ========================== Dependencies ========================== -->
@@ -17,6 +17,44 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.12</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetalibrary</artifactId>
+				<version>0.1</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetalibrary</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetautility</artifactId>
+				<version>0.1</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetautility</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.21</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.1.7</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -31,7 +69,6 @@
 		<module>../EasyTagCore</module>
 		<module>../EasyTagExt_DefaultBundle</module>
 		<module>../jMetaUtility</module>
-		<module>../jMetaTestUtility</module>
 	</modules>
 
 
