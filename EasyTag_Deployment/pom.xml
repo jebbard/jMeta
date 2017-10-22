@@ -66,8 +66,8 @@
 		to be build. Order is not of importance, Maven ensures projects required 
 		by other projects are build first. -->
 	<modules>
-		<module>../EasyTagCore</module>
-		<module>../EasyTagExt_DefaultBundle</module>
+		<module>../jMetaLibrary</module>
+		<module>../jMetaDefaultExtensions</module>
 		<module>../jMetaUtility</module>
 	</modules>
 
