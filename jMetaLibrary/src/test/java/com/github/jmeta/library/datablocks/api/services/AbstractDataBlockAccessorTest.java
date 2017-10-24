@@ -17,9 +17,9 @@ import java.util.List;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractDataBlockAccessorTest} is a convenience class for derived classes of {@link IDataBlockAccessorTest}.
+ * {@link AbstractDataBlockAccessorTest} is a convenience class for derived classes of {@link AbtractDataBlockAccessorTest}.
  */
-public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTest {
+public abstract class AbstractDataBlockAccessorTest extends AbtractDataBlockAccessorTest {
 
    private final Path testFile;
 
@@ -51,7 +51,7 @@ public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTe
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessorTest#getFieldSizesForTestingLazyFields()
+    * @see com.github.jmeta.library.datablocks.api.services.AbtractDataBlockAccessorTest#getFieldSizesForTestingLazyFields()
     */
    @Override
    protected List<Integer> getFieldSizesForTestingLazyFields() {
@@ -60,7 +60,7 @@ public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTe
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessorTest#getFileForMediaContents()
+    * @see com.github.jmeta.library.datablocks.api.services.AbtractDataBlockAccessorTest#getFileForMediaContents()
     */
    @Override
    protected Path getFileForMediaContents() {
@@ -69,7 +69,7 @@ public abstract class AbstractDataBlockAccessorTest extends IDataBlockAccessorTe
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessorTest#createExpectationProvider()
+    * @see com.github.jmeta.library.datablocks.api.services.AbtractDataBlockAccessorTest#createExpectationProvider()
     */
    @Override
    protected AbstractMediumExpectationProvider createExpectationProvider() throws InvalidTestDataCsvFormatException {

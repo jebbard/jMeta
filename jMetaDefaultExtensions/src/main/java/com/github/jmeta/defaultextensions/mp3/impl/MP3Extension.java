@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ChildOrder;
@@ -40,14 +40,14 @@ import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link MP3Extension}
  *
  */
-public class MP3Extension implements IExtension {
+public class MP3Extension implements Extension {
 
    private static final int FRAME_SYNC_BIT_COUNT = 11;
    private static final byte[] MP3_FRAME_SYNC = new byte[] { -1, -32 }; // 11 one bits
@@ -59,7 +59,7 @@ public class MP3Extension implements IExtension {
       new ArrayList<String>(), "", new Date());
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -67,7 +67,7 @@ public class MP3Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -75,21 +75,21 @@ public class MP3Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();
 
-      if (serviceInterface == IDataFormatSpecification.class) {
+      if (serviceInterface == DataFormatSpecification.class) {
          serviceProviders.add((T) createSpecification());
-      } else if (serviceInterface == IDataBlockService.class) {
+      } else if (serviceInterface == DataBlockService.class) {
          serviceProviders.add((T) new MP3DataBlocksService());
       }
       return serviceProviders;
    }
 
-   private IDataFormatSpecification createSpecification() {
+   private DataFormatSpecification createSpecification() {
 
       // Data blocks
       final DataBlockId mp3FrameId = new DataBlockId(MP3, "mp3");
@@ -269,7 +269,7 @@ public class MP3Extension implements IExtension {
 
       supportedCharsets.add(Charsets.CHARSET_ISO);
 
-      IDataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
+      DataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
          new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 

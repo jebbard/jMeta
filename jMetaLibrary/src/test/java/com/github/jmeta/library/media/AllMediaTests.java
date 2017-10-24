@@ -12,10 +12,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.github.jmeta.library.media.api.types.DummyFileMediumTest;
-import com.github.jmeta.library.media.api.types.ExistingFileMediumTest;
-import com.github.jmeta.library.media.api.types.IMediumEqualityTest;
-import com.github.jmeta.library.media.api.types.IMediumReferenceEqualityTest;
+import com.github.jmeta.library.media.api.types.FileMediumTest;
+import com.github.jmeta.library.media.api.types.MediumEqualityTest;
+import com.github.jmeta.library.media.api.types.MediumReferenceEqualityTest;
 import com.github.jmeta.library.media.api.types.InMemoryMediumTest;
 import com.github.jmeta.library.media.api.types.InputStreamMediumTest;
 import com.github.jmeta.library.media.api.types.MediumActionEqualityTest;
@@ -34,10 +33,10 @@ import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest
  */
 @RunWith(Suite.class)
 @SuiteClasses({ BlockWiseFileMediumCacheTest.class, FileMediumCacheTest.class, MediumRegionTest.class,
-   IMediumEqualityTest.class, StandardMediumReferenceTest.class, IMediumReferenceEqualityTest.class,
-   DummyFileMediumTest.class, ExistingFileMediumTest.class, InMemoryMediumTest.class, InputStreamMediumTest.class,
-   MediumActionTest.class, MediumActionEqualityTest.class, MediumReferenceFactoryTest.class,
-   MediumChangeManagerTest.class, MediumChangeManagerCreateFlushPlanTest.class, AllMediumAccessorTests.class, })
+   MediumEqualityTest.class, StandardMediumReferenceTest.class, MediumReferenceEqualityTest.class,
+   FileMediumTest.class, InMemoryMediumTest.class, InputStreamMediumTest.class, MediumActionTest.class,
+   MediumActionEqualityTest.class, MediumReferenceFactoryTest.class, MediumChangeManagerTest.class,
+   MediumChangeManagerCreateFlushPlanTest.class, AllMediumAccessorTests.class, })
 public class AllMediaTests {
    // Nothing necessary here
 }

@@ -27,7 +27,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  * @param <T>
  */
-public class EnumeratedFieldConverter<T> implements IFieldConverter<T> {
+public class EnumeratedFieldConverter<T> implements FieldConverter<T> {
 
    @SuppressWarnings("unchecked")
    @Override

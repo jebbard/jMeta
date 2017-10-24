@@ -13,13 +13,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
-
-import junit.framework.Assert;
 
 /**
  * {@link MediumRegionTest} tests the {@link MediumRegion} class.
@@ -46,8 +45,8 @@ public class MediumRegionTest {
    @Test
    public void getBytes_forCachedRegion_returnsInitializedBytes() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          ByteBuffer buffer = region.getBytes();
@@ -73,8 +72,8 @@ public class MediumRegionTest {
    @Test
    public void getSize_forCachedRegion_returnsByteBufferSize() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          ByteBuffer buffer = region.getBytes();
@@ -111,8 +110,8 @@ public class MediumRegionTest {
    @Test
    public void isCached_forCachedRegion_returnsTrue() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          Assert.assertTrue(region.isCached());
@@ -126,8 +125,8 @@ public class MediumRegionTest {
    @Test
    public void getStartAndEndReference_forCachedRegion_matchSize() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          assertRegionIsConsistent(region);
@@ -147,17 +146,17 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#contains(IMediumReference)}.
+    * Tests {@link MediumRegion#contains(MediumReference)}.
     */
    @Test
    public void isContained_forStartReferenceAndContainedByteOffsets_returnsTrue() {
 
       // For both cached and uncached regions
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
 
       cacheRegionsToTest.put(createUncachedMediumRegion().getStartReference(), createUncachedMediumRegion());
 
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          // By definition, the start reference of the region is contained
@@ -166,7 +165,7 @@ public class MediumRegionTest {
          int difference = (int) (region.calculateEndReference().distanceTo(region.getStartReference()));
 
          for (int i = 1; i < difference; i++) {
-            IMediumReference containedReference = region.getStartReference().advance(i);
+            MediumReference containedReference = region.getStartReference().advance(i);
 
             Assert.assertTrue(region.contains(containedReference));
          }
@@ -174,17 +173,17 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#contains(IMediumReference)}.
+    * Tests {@link MediumRegion#contains(MediumReference)}.
     */
    @Test
    public void isContained_forEndReferenceAndOutsideByteOffsets_returnsFalse() {
 
       // For both cached and uncached regions
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
 
       cacheRegionsToTest.put(createUncachedMediumRegion().getStartReference(), createUncachedMediumRegion());
 
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          // By definition, the end reference of the region is NOT contained
@@ -195,20 +194,20 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#discardBytesAtEnd(IMediumReference)}.
+    * Tests {@link MediumRegion#discardBytesAtEnd(MediumReference)}.
     */
    @Test
    public void discardBytesAtEnd_oneHalfOfBytesForCachedRegion_areDiscarded() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
       int buffIndex = 0;
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator
          .hasNext(); buffIndex++) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          int halfSize = region.getSize() / 2;
 
-         IMediumReference sharedReference = region.getStartReference().advance(halfSize);
+         MediumReference sharedReference = region.getStartReference().advance(halfSize);
 
          region.discardBytesAtEnd(sharedReference);
 
@@ -225,21 +224,21 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#discardBytesAtFront(IMediumReference)}.
+    * Tests {@link MediumRegion#discardBytesAtFront(MediumReference)}.
     */
    @Test
    public void discardBytesAtFront_firstBytesForCachedRegion_areDiscarded() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
       int buffIndex = 0;
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator
          .hasNext(); buffIndex++) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          int initialSize = region.getSize();
          int sizeDiff = initialSize / 2;
 
-         IMediumReference sharedReference = region.getStartReference().advance(sizeDiff);
+         MediumReference sharedReference = region.getStartReference().advance(sizeDiff);
 
          region.discardBytesAtFront(sharedReference);
 
@@ -256,7 +255,7 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#discardBytesAtEnd(IMediumReference)}.
+    * Tests {@link MediumRegion#discardBytesAtEnd(MediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void discardBytesAtEnd_forUncachedRegion_throwsException() {
@@ -266,7 +265,7 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#discardBytesAtFront(IMediumReference)}.
+    * Tests {@link MediumRegion#discardBytesAtFront(MediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void discardBytesAtFront_forUncachedRegion_throwsException() {
@@ -276,12 +275,12 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#discardBytesAtEnd(IMediumReference)}.
+    * Tests {@link MediumRegion#discardBytesAtEnd(MediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void discardBytesAtEnd_endReference_throwsException() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
 
       MediumRegion region = cacheRegionsToTest.values().iterator().next();
 
@@ -289,19 +288,19 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#discardBytesAtFront(IMediumReference)}.
+    * Tests {@link MediumRegion#discardBytesAtFront(MediumReference)}.
     */
    @Test
    public void discardBytesAtFront_startReference_changesNothing() {
 
-      final Map<IMediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
-      for (Iterator<IMediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
+      final Map<MediumReference, MediumRegion> cacheRegionsToTest = createCachedMediumRegions();
+      for (Iterator<MediumReference> iterator = cacheRegionsToTest.keySet().iterator(); iterator.hasNext();) {
          MediumRegion region = cacheRegionsToTest.get(iterator.next());
 
          ByteBuffer bytesBeforeChange = region.getBytes();
          int sizeBeforeChange = region.getSize();
-         IMediumReference startReferenceBeforeChange = region.getStartReference();
-         IMediumReference endReferenceBeforeChange = region.calculateEndReference();
+         MediumReference startReferenceBeforeChange = region.getStartReference();
+         MediumReference endReferenceBeforeChange = region.calculateEndReference();
 
          region.discardBytesAtFront(region.getStartReference());
 
@@ -551,7 +550,7 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#split(IMediumReference)}.
+    * Tests {@link MediumRegion#split(MediumReference)}.
     */
    @Test
    public void split_atValidOffsetForUncachedRegion_returnsTwoCorrectSizedRegions() {
@@ -563,7 +562,7 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#split(IMediumReference)}.
+    * Tests {@link MediumRegion#split(MediumReference)}.
     */
    @Test
    public void split_atValidOffsetForCachedRegion_returnsTwoCorrectSizedRegions() {
@@ -578,55 +577,55 @@ public class MediumRegionTest {
    }
 
    /**
-    * Tests {@link MediumRegion#split(IMediumReference)}.
+    * Tests {@link MediumRegion#split(MediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void split_atInvalidOffsetBefore_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 
-      IMediumReference invalidOffsetBefore = new StandardMediumReference(MEDIUM, 4L);
+      MediumReference invalidOffsetBefore = new StandardMediumReference(MEDIUM, 4L);
 
       uncachedRegion.split(invalidOffsetBefore);
    }
 
    /**
-    * Tests {@link MediumRegion#split(IMediumReference)}.
+    * Tests {@link MediumRegion#split(MediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void split_atInvalidOffsetBehind_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 
-      IMediumReference invalidOffsetBehind = new StandardMediumReference(MEDIUM, 30L);
+      MediumReference invalidOffsetBehind = new StandardMediumReference(MEDIUM, 30L);
 
       uncachedRegion.split(invalidOffsetBehind);
    }
 
    /**
-    * Tests {@link MediumRegion#split(IMediumReference)}.
+    * Tests {@link MediumRegion#split(MediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void split_atStartOffsetOfRegion_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 
-      IMediumReference invalidStartOffset = new StandardMediumReference(MEDIUM, 10L);
+      MediumReference invalidStartOffset = new StandardMediumReference(MEDIUM, 10L);
 
       uncachedRegion.split(invalidStartOffset);
    }
 
    /**
-    * Tests {@link MediumRegion#split(IMediumReference)}.
+    * Tests {@link MediumRegion#split(MediumReference)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void split_forInvalidMediumReference_throwsException() {
       MediumRegion uncachedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 10L), 20);
 
-      IMediumReference unrelatedMediumOffset = new StandardMediumReference(UNRELATED_MEDIUM, 15L);
+      MediumReference unrelatedMediumOffset = new StandardMediumReference(UNRELATED_MEDIUM, 15L);
 
       uncachedRegion.split(unrelatedMediumOffset);
    }
 
    /**
-    * Checks {@link MediumRegion#split(IMediumReference)}.
+    * Checks {@link MediumRegion#split(MediumReference)}.
     * 
     * @param regionToSplit
     *           The {@link MediumRegion} to call the method for
@@ -682,8 +681,8 @@ public class MediumRegionTest {
     */
    private void assertRegionIsConsistent(MediumRegion region) {
 
-      IMediumReference startReference = region.getStartReference();
-      IMediumReference endReference = region.calculateEndReference();
+      MediumReference startReference = region.getStartReference();
+      MediumReference endReference = region.calculateEndReference();
 
       Assert.assertNotNull(startReference);
       Assert.assertNotNull(endReference);
@@ -713,11 +712,11 @@ public class MediumRegionTest {
     * 
     * @return The cached {@link MediumRegion}s to test.
     */
-   private static Map<IMediumReference, MediumRegion> createCachedMediumRegions() {
+   private static Map<MediumReference, MediumRegion> createCachedMediumRegions() {
 
-      final Map<IMediumReference, MediumRegion> theCacheRegions = new LinkedHashMap<>();
+      final Map<MediumReference, MediumRegion> theCacheRegions = new LinkedHashMap<>();
       for (int i = 0; i < THE_BUFFERS.length; i++) {
-         final IMediumReference nextStartReference = new StandardMediumReference(MEDIUM, i * 10 + START_OFFSET);
+         final MediumReference nextStartReference = new StandardMediumReference(MEDIUM, i * 10 + START_OFFSET);
          theCacheRegions.put(nextStartReference, new MediumRegion(nextStartReference, ByteBuffer.wrap(THE_BUFFERS[i])));
       }
 

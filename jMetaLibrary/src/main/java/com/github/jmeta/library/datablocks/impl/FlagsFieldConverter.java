@@ -23,7 +23,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link FlagsFieldConverter}
  *
  */
-public class FlagsFieldConverter implements IFieldConverter<Flags> {
+public class FlagsFieldConverter implements FieldConverter<Flags> {
 
    @Override
    public Flags toInterpreted(BinaryValue binaryValue,

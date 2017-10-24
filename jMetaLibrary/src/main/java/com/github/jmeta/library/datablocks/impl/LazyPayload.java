@@ -12,23 +12,23 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.datablocks.api.types.IPayload;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *
  */
-public class LazyPayload extends AbstractDataBlock implements IPayload {
+public class LazyPayload extends AbstractDataBlock implements Payload {
 
    /**
     * Creates a new {@link LazyPayload}.
@@ -39,8 +39,8 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
     * @param dataBlockReader
     * @param context
     */
-   public LazyPayload(DataBlockId id, IMediumReference reference,
-      long totalSize, IDataBlockReader dataBlockReader,
+   public LazyPayload(DataBlockId id, MediumReference reference,
+      long totalSize, DataBlockReader dataBlockReader,
       FieldFunctionStack context) {
       super(id, null, reference, dataBlockReader);
 
@@ -58,20 +58,20 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
          long summedUpTotalSize = 0;
 
          if (m_hasFields) {
-            List<IField<?>> fields = getFields();
+            List<Field<?>> fields = getFields();
 
             for (int i = 0; i < fields.size(); ++i) {
-               IField<?> field = fields.get(i);
+               Field<?> field = fields.get(i);
 
                summedUpTotalSize += field.getTotalSize();
             }
          }
 
          if (m_hasContainers) {
-            AbstractDataBlockIterator<IContainer> containerIter = getContainerIterator();
+            AbstractDataBlockIterator<Container> containerIter = getContainerIterator();
 
             while (containerIter.hasNext()) {
-               IContainer container = containerIter.next();
+               Container container = containerIter.next();
 
                summedUpTotalSize += container.getTotalSize();
             }
@@ -85,10 +85,10 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IPayload#getFields()
+    * @see com.github.jmeta.library.datablocks.api.types.Payload#getFields()
     */
    @Override
-   public List<IField<?>> getFields() {
+   public List<Field<?>> getFields() {
       // TODO: Big issue using fieldFunctionStack here:
       // When reading a Payload that has both fields and containers as children, and
       // when the containers are located before the fields, then calling getFields()
@@ -102,7 +102,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
             m_fields = new ArrayList<>();
 
          else {
-            IMediumReference fieldReference = getMediumReference();
+            MediumReference fieldReference = getMediumReference();
 
             m_fields = new ArrayList<>();
 
@@ -110,10 +110,10 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
 
             // First read the containers to know where exactly the fields start
             if (!m_fieldsFirst) {
-               AbstractDataBlockIterator<IContainer> iter = getContainerIterator();
+               AbstractDataBlockIterator<Container> iter = getContainerIterator();
 
                while (iter.hasNext()) {
-                  IContainer container = iter.next();
+                  Container container = iter.next();
 
                   totalContainerSize += container.getTotalSize();
                }
@@ -122,12 +122,12 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
             }
 
             if (m_hasFields || m_totalSize - totalContainerSize > 0) {
-               List<IField<?>> readFields = getDataBlockReader().readFields(
+               List<Field<?>> readFields = getDataBlockReader().readFields(
                   fieldReference, getId(), m_context,
                   m_totalSize - totalContainerSize);
 
                for (int i = 0; i < readFields.size(); ++i) {
-                  IField<?> field = readFields.get(i);
+                  Field<?> field = readFields.get(i);
 
                   addField(field);
                }
@@ -138,20 +138,20 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IPayload#getContainerIterator()
+    * @see com.github.jmeta.library.datablocks.api.types.Payload#getContainerIterator()
     */
    @Override
-   public AbstractDataBlockIterator<IContainer> getContainerIterator() {
+   public AbstractDataBlockIterator<Container> getContainerIterator() {
 
-      IMediumReference containerReference = getMediumReference();
+      MediumReference containerReference = getMediumReference();
 
       long totalFieldSize = 0;
 
       if (m_hasFields && m_fieldsFirst) {
-         Iterator<IField<?>> fieldIterator = getFields().iterator();
+         Iterator<Field<?>> fieldIterator = getFields().iterator();
 
          while (fieldIterator.hasNext()) {
-            IField<?> field = fieldIterator.next();
+            Field<?> field = fieldIterator.next();
 
             totalFieldSize += field.getTotalSize();
          }
@@ -164,7 +164,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {
@@ -177,7 +177,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
     */
    private void determineFieldPosition(DataBlockId id) {
 
-      IDataFormatSpecification spec = getDataBlockReader().getSpecification();
+      DataFormatSpecification spec = getDataBlockReader().getSpecification();
 
       int fieldCount = DataBlockDescription
          .getChildDescriptionsOfType(spec, id, PhysicalDataBlockType.FIELD)
@@ -225,7 +225,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
             + ", there child containers and child fields must each form exactly one contiguous sequence, either fields first or containers first, no mixture possible.");
    }
 
-   private void addField(IField<?> field) {
+   private void addField(Field<?> field) {
 
       Reject.ifNull(field, "field");
 
@@ -238,7 +238,7 @@ public class LazyPayload extends AbstractDataBlock implements IPayload {
 
    private long m_totalSize;
 
-   private List<IField<?>> m_fields;
+   private List<Field<?>> m_fields;
 
    private boolean m_fieldsFirst;
 

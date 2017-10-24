@@ -12,7 +12,7 @@ package com.github.jmeta.library.media.api.types;
 /**
  * {@link InMemoryMediumTest} tests the {@link InMemoryMedium} class.
  */
-public class InMemoryMediumTest extends AbstractIMediumTest<byte[]> {
+public class InMemoryMediumTest extends AbstractMediumTest<byte[]> {
 
    private static final byte[] WRAPPED_MEDIUM = new byte[] { 1, 2, 3, 4, 5, 6 };
 
@@ -21,7 +21,7 @@ public class InMemoryMediumTest extends AbstractIMediumTest<byte[]> {
    private static final boolean READ_ONLY = true;
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedLength()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedLength()
     */
    @Override
    protected long getExpectedLength() {
@@ -30,16 +30,16 @@ public class InMemoryMediumTest extends AbstractIMediumTest<byte[]> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getMediumToTest()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getMediumToTest()
     */
    @Override
-   protected IMedium<byte[]> getMediumToTest() {
+   protected Medium<byte[]> getMediumToTest() {
 
       return new InMemoryMedium(WRAPPED_MEDIUM, EXTERNAL_NAME, READ_ONLY);
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsReadOnly()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsReadOnly()
     */
    @Override
    protected boolean isExpectedAsReadOnly() {
@@ -48,7 +48,7 @@ public class InMemoryMediumTest extends AbstractIMediumTest<byte[]> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsRandomAccess()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsRandomAccess()
     */
    @Override
    protected boolean isExpectedAsRandomAccess() {
@@ -57,7 +57,7 @@ public class InMemoryMediumTest extends AbstractIMediumTest<byte[]> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedWrappedMedium()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedWrappedMedium()
     */
    @Override
    protected byte[] getExpectedWrappedMedium() {
@@ -66,7 +66,7 @@ public class InMemoryMediumTest extends AbstractIMediumTest<byte[]> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedExternalName()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedExternalName()
     */
    @Override
    protected String getExpectedExternalName() {
@@ -75,7 +75,7 @@ public class InMemoryMediumTest extends AbstractIMediumTest<byte[]> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsExisting()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsExisting()
     */
    @Override
    protected boolean isExpectedAsExisting() {

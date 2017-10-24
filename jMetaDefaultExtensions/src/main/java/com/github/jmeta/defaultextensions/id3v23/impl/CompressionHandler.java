@@ -17,10 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -48,25 +48,25 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
     * @param dbFactory
     * @param logging
     */
-   public CompressionHandler(DataTransformationType dtt, IDataBlockFactory dbFactory) {
+   public CompressionHandler(DataTransformationType dtt, DataBlockFactory dbFactory) {
       super(dtt, COMPRESSION_TRANSFORMATION_ID, dbFactory);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
-   public boolean requiresTransform(IContainer container) {
+   public boolean requiresTransform(Container container) {
 
       Reject.ifNull(container, "container");
 
       if (container.getHeaders().size() == 0)
          return false;
 
-      IHeader firstHeader = container.getHeaders().get(0);
+      Header firstHeader = container.getHeaders().get(0);
 
       for (int i = 0; i < firstHeader.getFields().size(); ++i) {
-         IField<?> field = firstHeader.getFields().get(i);
+         Field<?> field = firstHeader.getFields().get(i);
 
          if (field.getId().equals(ID3V23_HEADER_FLAGS_ID)) {
             try {
@@ -87,10 +87,10 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
-   public boolean requiresUntransform(IContainer container) {
+   public boolean requiresUntransform(Container container) {
 
       Reject.ifNull(container, "container");
 

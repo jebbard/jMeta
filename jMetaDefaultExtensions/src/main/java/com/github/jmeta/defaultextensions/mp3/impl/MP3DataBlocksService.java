@@ -12,9 +12,9 @@ import java.util.HashMap;
 
 import com.github.jmeta.defaultextensions.id3v1.impl.ID3v1DataBlocksService;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
@@ -31,8 +31,8 @@ public class MP3DataBlocksService extends AbstractDataService {
    }
 
    @Override
-   public IDataBlockReader getDataBlockReader(IDataFormatSpecification spec, int lazyFieldSize) {
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
 
-      return new MP3DataBlockReader(spec, new HashMap<DataTransformationType, ITransformationHandler>(), lazyFieldSize);
+      return new MP3DataBlockReader(spec, new HashMap<DataTransformationType, TransformationHandler>(), lazyFieldSize);
    }
 }

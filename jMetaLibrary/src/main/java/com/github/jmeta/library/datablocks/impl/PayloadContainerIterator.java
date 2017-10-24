@@ -10,21 +10,21 @@ package com.github.jmeta.library.datablocks.impl;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *
  */
 public class PayloadContainerIterator
-   extends AbstractDataBlockIterator<IContainer> {
+   extends AbstractDataBlockIterator<Container> {
 
    /**
     * Creates a new instance of {@link PayloadContainerIterator}.
@@ -35,8 +35,8 @@ public class PayloadContainerIterator
     * @param context
     * @param previousFieldSize
     */
-   public PayloadContainerIterator(IPayload parent, IDataBlockReader reader,
-      IMediumReference reference, FieldFunctionStack context,
+   public PayloadContainerIterator(Payload parent, DataBlockReader reader,
+      MediumReference reference, FieldFunctionStack context,
       long previousFieldSize) {
       Reject.ifNull(parent, "parent");
       Reject.ifNull(reader, "reader");
@@ -84,7 +84,7 @@ public class PayloadContainerIterator
          try {
             // The whole header size is cached intentionally due to the premise of small headers
             m_reader.cache(m_nextContainerReference, minHeaderSize);
-         } catch (@SuppressWarnings("unused") EndOfMediumException e) {
+         } catch (EndOfMediumException e) {
             return false;
          }
 
@@ -106,7 +106,7 @@ public class PayloadContainerIterator
     * @see java.util.Iterator#next()
     */
    @Override
-   public IContainer next() {
+   public Container next() {
 
 	   Reject.ifFalse(hasNext(), "hasNext()");
 
@@ -119,7 +119,7 @@ public class PayloadContainerIterator
 
          if (m_reader.hasContainerWithId(m_nextContainerReference,
             containerDesc.getId(), m_parent, m_remainingParentSize)) {
-            IContainer container = m_reader.readContainerWithId(
+            Container container = m_reader.readContainerWithId(
                m_nextContainerReference, containerDesc.getId(), m_parent,
                m_context, m_remainingParentSize);
 
@@ -141,13 +141,13 @@ public class PayloadContainerIterator
 
    private final FieldFunctionStack m_context;
 
-   private final IPayload m_parent;
+   private final Payload m_parent;
 
    private long m_remainingParentSize;
 
-   private IMediumReference m_nextContainerReference;
+   private MediumReference m_nextContainerReference;
 
-   private final IDataBlockReader m_reader;
+   private final DataBlockReader m_reader;
 
    private List<DataBlockDescription> m_containerDescs;
 }

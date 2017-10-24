@@ -9,10 +9,10 @@
  */
 package com.github.jmeta.utility.extmanager.api.exceptions;
 
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 
 /**
- * {@link InvalidExtensionException} is thrown whenever an {@link IExtension} is determined to be invalid.
+ * {@link InvalidExtensionException} is thrown whenever an {@link Extension} is determined to be invalid.
  */
 public class InvalidExtensionException extends RuntimeException {
 
@@ -26,7 +26,7 @@ public class InvalidExtensionException extends RuntimeException {
     * @param extension
     *           the extension
     */
-   public InvalidExtensionException(String message, IExtension extension) {
+   public InvalidExtensionException(String message, Extension extension) {
    }
 
 }

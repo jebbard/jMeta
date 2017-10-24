@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
+import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
@@ -59,10 +59,10 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
          { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, -1 }, }, };
 
    @Override
-   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<IHeader> headers) {
+   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
 
       if (containerId.getGlobalId().equals("mp3")) {
-         IHeader header = headers.get(0);
+         Header header = headers.get(0);
 
          byte[] bytes = header.getBytes(0, 4);
          assert bytes != null;
@@ -75,7 +75,7 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
          // System.out.println("Header bytes: " + Arrays.toString(bytes));
 
          @SuppressWarnings("unchecked")
-         IField<Flags> flagsHeaderField = (IField<Flags>) header.getFields().get(0);
+         Field<Flags> flagsHeaderField = (Field<Flags>) header.getFields().get(0);
 
          long totalPayloadSize = DataBlockDescription.UNKNOWN_SIZE;
          try {
@@ -155,8 +155,8 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
     * @param maxFieldBlockSize
     * @param logging
     */
-   public MP3DataBlockReader(IDataFormatSpecification spec,
-      Map<DataTransformationType, ITransformationHandler> transformationHandlers, int maxFieldBlockSize) {
+   public MP3DataBlockReader(DataFormatSpecification spec,
+      Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {
       super(spec, transformationHandlers, maxFieldBlockSize);
    }
 }

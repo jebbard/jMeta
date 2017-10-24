@@ -9,46 +9,66 @@
  */
 package com.github.jmeta.library.media.api.types;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
- * {@link InputStreamMedium} represents an {@link InputStream} as read-only {@link IMedium}. It supports configuring a
- * read timeout in millisecond. This timeout will be used for every read operation on the {@link IMedium}. Use
- * {@value #NO_TIMEOUT} for using no read timeout.
+ * {@link InputStreamMedium} represents an {@link Medium} working on an {@link InputStream}. By definition, an
+ * {@link InputStreamMedium} is read-only and non-random-access.
  * 
- * It is not recommended to use {@link InputStreamMedium} for accessing files because it imposes possibly significant
- * performance drawbacks compared to using {@link FileMedium}.
+ * Furthermore, you should only use an {@link InputStreamMedium} in situations where it is necessary, e.g. for accessing
+ * real streamed content (e.g. internet radio streams) or zipped content. If performance is crucial and you require true
+ * random access, prefer using a {@link FileMedium} or an {@link InMemoryMedium}. For instance, you should prefer using
+ * a {@link FileMedium} instead of using a {@link FileInputStream}. If you need to use a stream, be sure to read it
+ * mostly sequential and be sure to configure a reasonable maximum cache size for it to avoid out-of-memory situations
+ * for "endless" streams.
+ * 
+ * The reason behind is that the reading implementation uses caching to simulate the possibility of random-access for
+ * users of the component, still allowing flexibility to use arbitrary {@link InputStream}s as media.
  */
 public class InputStreamMedium extends AbstractMedium<InputStream> {
 
    /**
-    * Creates a new {@link InputStreamMedium}.
+    * Creates a new {@link InputStreamMedium} with default values for all properties that influence reading and writing.
     * 
     * @param medium
-    *           The {@link InputStream} to use.
+    *           The {@link InputStream} to use, must not be null
     * @param name
-    *           A name of the {@link InputStream} to be able to identify it. Optional, null may be passed.
+    *           A name of the {@link InputStream} to be able to identify it. Optional, null may be passed
     */
    public InputStreamMedium(InputStream medium, String name) {
-
-      super(medium, name, false, true, true);
+      this(medium, name, DEFAULT_CACHING_ENABLED, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
+         DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#exists()
+    * Creates a new {@link InputStreamMedium} and allows to explicitly set all configuration properties that influence
+    * reading and writing.
+    * 
+    * @param medium
+    *           The {@link InputStream} to use, must not be null
+    * @param name
+    *           A name of the {@link InputStream} to be able to identify it. Optional, null may be passed
+    * @param cachingEnabled
+    *           see {@link #isCachingEnabled()}
+    * @param maxCacheSizeInBytes
+    *           see #getMaxCacheSizeInBytes()
+    * @param maxCacheRegionSizeInBytes
+    *           see #getMaxCacheRegionSizeInBytes()
+    * @param maxReadWriteBlockSizeInBytes
+    *           see #getMaxReadWriteBlockSizeInBytes()
     */
-   @Override
-   public boolean exists() {
-
-      return true;
+   public InputStreamMedium(InputStream medium, String name, boolean cachingEnabled, long maxCacheSizeInBytes,
+      int maxCacheRegionSizeInBytes, int maxReadWriteBlockSizeInBytes) {
+      super(medium, name, false, true, cachingEnabled, maxCacheSizeInBytes, maxCacheRegionSizeInBytes,
+         maxReadWriteBlockSizeInBytes);
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#getCurrentLength()
+    * @see com.github.jmeta.library.media.api.types.Medium#getCurrentLength()
     */
    @Override
    public long getCurrentLength() {
-
       return UNKNOWN_LENGTH;
    }
 }

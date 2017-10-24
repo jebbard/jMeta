@@ -13,12 +13,12 @@ import java.util.Map;
 
 import com.github.jmeta.defaultextensions.mp3.impl.MP3DataBlockReader;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
+import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
@@ -36,7 +36,7 @@ public class OggDataBlockReader extends StandardDataBlockReader {
       "ogg.payload.packetPartContainer");
 
    @Override
-   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<IHeader> headers) {
+   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
 
       if (containerId.getGlobalId().equals("ogg")) {
          final DataBlockId packetPayloadId = DataBlockDescription
@@ -48,14 +48,14 @@ public class OggDataBlockReader extends StandardDataBlockReader {
             .getChildDescriptionsOfType(getSpecification(), packetPayloadId, PhysicalDataBlockType.FIELD).get(0)
             .getId();
 
-         IHeader header = headers.get(0);
+         Header header = headers.get(0);
 
          long totalPayloadSize = 0;
          long sizeOfCurrentPacket = 0;
          long segmentCountOfCurrentPacket = 0;
 
          for (int i = 8; i < header.getFields().size(); ++i) {
-            IField<?> segmentTableEntry = header.getFields().get(i);
+            Field<?> segmentTableEntry = header.getFields().get(i);
 
             try {
                long segmentSize = (Long) segmentTableEntry.getInterpretedValue();
@@ -90,8 +90,8 @@ public class OggDataBlockReader extends StandardDataBlockReader {
     * @param maxFieldBlockSize
     * @param logging
     */
-   public OggDataBlockReader(IDataFormatSpecification spec,
-      Map<DataTransformationType, ITransformationHandler> transformationHandlers, int maxFieldBlockSize) {
+   public OggDataBlockReader(DataFormatSpecification spec,
+      Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {
       super(spec, transformationHandlers, maxFieldBlockSize);
    }
 }

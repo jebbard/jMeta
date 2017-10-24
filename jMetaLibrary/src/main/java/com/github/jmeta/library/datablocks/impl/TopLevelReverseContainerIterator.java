@@ -18,24 +18,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.services.MediaAPI;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO primeRefactor008: Review, refactor and document TopLevelReverseContainerIterator
 /**
  *
  */
-public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<IContainer> {
+public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<Container> {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(TopLevelReverseContainerIterator.class);
 
@@ -49,8 +49,8 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
     * @param mediumFactory
     * @param logging
     */
-   public TopLevelReverseContainerIterator(IMedium<?> medium, List<DataFormat> dataFormatHints,
-      boolean forceMediumReadOnly, Map<DataFormat, IDataBlockReader> readers, IMediaAPI mediumFactory) {
+   public TopLevelReverseContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints,
+      boolean forceMediumReadOnly, Map<DataFormat, DataBlockReader> readers, MediaAPI mediumFactory) {
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
@@ -84,13 +84,13 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
     * @see java.util.Iterator#next()
     */
    @Override
-   public IContainer next() {
+   public Container next() {
 
 	   Reject.ifFalse(hasNext(), "hasNext()");
 
       DataFormat dataFormat = identifyDataFormat(m_currentReference);
 
-      IDataBlockReader reader = m_readerMap.get(dataFormat);
+      DataBlockReader reader = m_readerMap.get(dataFormat);
 
       List<DataBlockDescription> containerDescs = DataBlockDescription
          .getChildDescriptionsOfType(reader.getSpecification(), null, PhysicalDataBlockType.CONTAINER);
@@ -101,7 +101,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
          DataBlockDescription headerOrFooterDesc = m_readerMap.get(dataFormat).getSpecification()
             .getDataBlockDescription(m_theMagicKey.getHeaderOrFooterId());
 
-         IContainer container = null;
+         Container container = null;
 
          // The magic key is contained in a footer and needs to be read "backward" (as is usually the case)
          if (headerOrFooterDesc.getPhysicalType().equals(PhysicalDataBlockType.FOOTER))
@@ -134,7 +134,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
       return new ArrayList<>(allFormats);
    }
 
-   private DataFormat identifyDataFormat(IMediumReference reference) {
+   private DataFormat identifyDataFormat(MediumReference reference) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(m_precedenceList, "setDataFormatHints() must have been called before");
@@ -145,7 +145,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
       for (Iterator<DataFormat> iterator = m_precedenceList.iterator(); iterator.hasNext();) {
          DataFormat dataFormat = iterator.next();
 
-         final IDataBlockReader dataBlockReader = m_readerMap.get(dataFormat);
+         final DataBlockReader dataBlockReader = m_readerMap.get(dataFormat);
          List<DataBlockDescription> topLevelContainerDescs = DataBlockDescription
             .getChildDescriptionsOfType(dataBlockReader.getSpecification(), null, PhysicalDataBlockType.CONTAINER);
 
@@ -162,7 +162,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
 
                   if (offsetForBackwardReading != MagicKey.NO_BACKWARD_READING
                      && reference.getAbsoluteMediumOffset() + offsetForBackwardReading >= 0) {
-                     IMediumReference footerStartReference = reference.advance(offsetForBackwardReading);
+                     MediumReference footerStartReference = reference.advance(offsetForBackwardReading);
                      try {
                         dataBlockReader.cache(footerStartReference, -offsetForBackwardReading);
                      }
@@ -202,27 +202,27 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
     * @param medium
     * @param forceMediumReadOnly
     */
-   private void setMedium(IMedium<?> medium, boolean forceMediumReadOnly) {
+   private void setMedium(Medium<?> medium, boolean forceMediumReadOnly) {
 
       for (Iterator<DataFormat> iterator = m_readerMap.keySet().iterator(); iterator.hasNext();) {
          DataFormat dataFormat = iterator.next();
-         IDataBlockReader reader = m_readerMap.get(dataFormat);
+         DataBlockReader reader = m_readerMap.get(dataFormat);
          m_mediumStore = m_mediumFactory.getMediumStore(medium);
          reader.setMediumCache(m_mediumStore);
       }
    }
 
-   private IMediumReference m_currentReference;
+   private MediumReference m_currentReference;
 
-   private final IMediaAPI m_mediumFactory;
+   private final MediaAPI m_mediumFactory;
 
    private final List<DataFormat> m_precedenceList = new ArrayList<>();
 
-   private IMediumReference m_previousFooterStartReference;
+   private MediumReference m_previousFooterStartReference;
 
    private MagicKey m_theMagicKey;
 
    private IMediumStore_OLD m_mediumStore;
 
-   private final Map<DataFormat, IDataBlockReader> m_readerMap = new LinkedHashMap<>();
+   private final Map<DataFormat, DataBlockReader> m_readerMap = new LinkedHashMap<>();
 }

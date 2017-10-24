@@ -17,18 +17,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 
-import junit.framework.Assert;
-
 /**
- * {@link IMediumCacheTest} tests the {@link IMediumCache} interface.
+ * {@link IMediumCacheTest} tests the {@link MediumCache} interface.
  */
 public abstract class IMediumCacheTest {
 
@@ -54,7 +53,7 @@ public abstract class IMediumCacheTest {
     * Adds another cache region starting at medium offset 100 plus arbitrary offset and size.
     * 
     * @param cache
-    *           The {@link IMediumCache}.
+    *           The {@link MediumCache}.
     * @param offset
     *           The offset, added to the fixed offset of 100.
     * @param size
@@ -62,7 +61,7 @@ public abstract class IMediumCacheTest {
     * @throws EndOfMediumException
     *            If end of medium has been reached.
     */
-   private void addCacheRegion(IMediumCache cache, int offset, int size) throws EndOfMediumException {
+   private void addCacheRegion(MediumCache cache, int offset, int size) throws EndOfMediumException {
 
       StandardMediumReference anotherExistingRegionReference = new StandardMediumReference(getExpectedMedium(), offset);
       final int anotherExistingRegionSize = size;
@@ -71,20 +70,20 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Checks the {@link IMediumCache#buffer} method.
+    * Checks the {@link MediumCache#buffer} method.
     * 
     * @param testCacheSizes
     *           The regions to cache.
     * @param testling
-    *           The {@link IMediumCache} instance to test.
+    *           The {@link MediumCache} instance to test.
     * @throws EndOfMediumException
     *            if read goes beyond end of medium.
     */
-   private void checkCache(final Map<IMediumReference, Integer> testCacheSizes, IMediumCache testling)
+   private void checkCache(final Map<MediumReference, Integer> testCacheSizes, MediumCache testling)
       throws EndOfMediumException {
 
-      for (Iterator<IMediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference reference = iterator.next();
+      for (Iterator<MediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
+         MediumReference reference = iterator.next();
          long size = testCacheSizes.get(reference);
 
          testling.buffer(reference, (int) size);
@@ -97,11 +96,11 @@ public abstract class IMediumCacheTest {
          }
       }
 
-      Map<IMediumReference, Integer> cacheRegions = testling.getBufferedRegions();
+      Map<MediumReference, Integer> cacheRegions = testling.getBufferedRegions();
 
       // Cache regions are smaller than the allowed maximum size
-      for (Iterator<IMediumReference> iterator = cacheRegions.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference nextKey = iterator.next();
+      for (Iterator<MediumReference> iterator = cacheRegions.keySet().iterator(); iterator.hasNext();) {
+         MediumReference nextKey = iterator.next();
          Integer nextValue = cacheRegions.get(nextKey);
 
          Assert.assertTrue(nextValue <= getMaximumCacheSize());
@@ -112,22 +111,22 @@ public abstract class IMediumCacheTest {
     * Checks that there must be no overlapping regions within the current cache contents.
     * 
     * @param testling
-    *           The {@link IMediumCache}.
+    *           The {@link MediumCache}.
     */
-   private void checkNoOverlappingRegions(IMediumCache testling) {
+   private void checkNoOverlappingRegions(MediumCache testling) {
 
-      Comparator<? super IMediumReference> mediumReferenceComparator = (leftRef,
+      Comparator<? super MediumReference> mediumReferenceComparator = (leftRef,
          rightRef) -> new Long(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset());
 
-      Map<IMediumReference, Integer> sortedCachedRegions = new TreeMap<>(mediumReferenceComparator);
+      Map<MediumReference, Integer> sortedCachedRegions = new TreeMap<>(mediumReferenceComparator);
 
       sortedCachedRegions.putAll(testling.getBufferedRegions());
 
-      IMediumReference previousEndReference = null;
+      MediumReference previousEndReference = null;
 
-      for (Iterator<IMediumReference> iterator = sortedCachedRegions.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference currentReference = iterator.next();
-         IMediumReference currentEndReference = currentReference
+      for (Iterator<MediumReference> iterator = sortedCachedRegions.keySet().iterator(); iterator.hasNext();) {
+         MediumReference currentReference = iterator.next();
+         MediumReference currentEndReference = currentReference
             .advance(testling.getBufferedRegions().get(currentReference));
 
          if (previousEndReference != null) {
@@ -139,10 +138,10 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Checks whether expected data is read from the {@link IMediumCache}.
+    * Checks whether expected data is read from the {@link MediumCache}.
     * 
     * @param bytesRead
-    *           The bytes read from the {@link IMediumCache}, relevant are those bytes between position and limit.
+    *           The bytes read from the {@link MediumCache}, relevant are those bytes between position and limit.
     * @param expectedBytes
     *           The bytes expected to be read.
     */
@@ -160,14 +159,14 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Checks whether expected data for boundary cases is read from the {@link IMediumCache}.
+    * Checks whether expected data for boundary cases is read from the {@link MediumCache}.
     * 
     * @param bytesRead
-    *           The bytes read from the {@link IMediumCache}, relevant are those bytes between position and limit.
+    *           The bytes read from the {@link MediumCache}, relevant are those bytes between position and limit.
     * @param reference
     *           The {@link StandardMediumReference} where the data has been read.
     */
-   private void checkReadDataBoundaryCases(ByteBuffer bytesRead, IMediumReference reference) {
+   private void checkReadDataBoundaryCases(ByteBuffer bytesRead, MediumReference reference) {
 
       byte[] expectedBytes = getExpectedDataBoundaryCases();
 
@@ -194,8 +193,8 @@ public abstract class IMediumCacheTest {
       if (!getExpectedData().keySet().equals(getTestCacheSizes().keySet()))
          throw new RuntimeException("KeySets of getExpectedData() and getTestCacheSizes() must match");
 
-      for (Iterator<IMediumReference> iterator = getExpectedData().keySet().iterator(); iterator.hasNext();) {
-         IMediumReference nextKey = iterator.next();
+      for (Iterator<MediumReference> iterator = getExpectedData().keySet().iterator(); iterator.hasNext();) {
+         MediumReference nextKey = iterator.next();
          byte[] nextValue = getExpectedData().get(nextKey);
 
          Integer nextSize = getTestCacheSizes().get(nextKey);
@@ -214,7 +213,7 @@ public abstract class IMediumCacheTest {
     * 
     * @return the data bytes expected at the cached {@link StandardMediumReference}s.
     */
-   protected abstract Map<IMediumReference, byte[]> getExpectedData();
+   protected abstract Map<MediumReference, byte[]> getExpectedData();
 
    /**
     * Returns the data bytes expected in the boundary test cases from offset 0 onwards. (About 50 bytes are sufficient)
@@ -224,16 +223,16 @@ public abstract class IMediumCacheTest {
    protected abstract byte[] getExpectedDataBoundaryCases();
 
    /**
-    * Returns the expected {@link IMedium} that is cached by the {@link IMediumCache} implementation.
+    * Returns the expected {@link Medium} that is cached by the {@link MediumCache} implementation.
     * 
-    * @return the expected {@link IMedium} that is cached by the {@link IMediumCache} implementation.
+    * @return the expected {@link Medium} that is cached by the {@link MediumCache} implementation.
     */
-   protected abstract IMedium<?> getExpectedMedium();
+   protected abstract Medium<?> getExpectedMedium();
 
    /**
-    * Returns whether the {@link IMediumCache} is expected to be random-access or not.
+    * Returns whether the {@link MediumCache} is expected to be random-access or not.
     * 
-    * @return whether the {@link IMediumCache} is expected to be random-access or not.
+    * @return whether the {@link MediumCache} is expected to be random-access or not.
     */
    protected abstract boolean getExpectedRandomAccess();
 
@@ -245,9 +244,9 @@ public abstract class IMediumCacheTest {
    protected abstract int getMaximumCacheSize();
 
    /**
-    * Returns the cache regions to be used for testing {@link IMediumCache#buffer} and
-    * {@link IMediumCache#getBufferedByteCountAt} with an end of medium situation. The map contains the
-    * {@link StandardMediumReference}s to be used with {@link IMediumCache#buffer}, mapped to the actual number bytes
+    * Returns the cache regions to be used for testing {@link MediumCache#buffer} and
+    * {@link MediumCache#getBufferedByteCountAt} with an end of medium situation. The map contains the
+    * {@link StandardMediumReference}s to be used with {@link MediumCache#buffer}, mapped to the actual number bytes
     * left up to the end of the medium.
     * 
     * It should be regions included that overlap each other.
@@ -256,10 +255,10 @@ public abstract class IMediumCacheTest {
     * should be chosen to be more than 1 byte before the end of medium, so that bytes can be cached regularly using half
     * of the distance to end of medium before finally testing the caching that will cause the end of medium situation.
     * 
-    * @return the cache regions to be used for testing {@link IMediumCache#buffer} and
-    *         {@link IMediumCache#getBufferedByteCountAt}.
+    * @return the cache regions to be used for testing {@link MediumCache#buffer} and
+    *         {@link MediumCache#getBufferedByteCountAt}.
     */
-   protected abstract Map<IMediumReference, Integer> getMediumReferencesAndDistToEOM();
+   protected abstract Map<MediumReference, Integer> getMediumReferencesAndDistToEOM();
 
    /**
     * Returns all the coherent overlapping multi-regions, i.e. those regions that consist of several other regions
@@ -269,28 +268,28 @@ public abstract class IMediumCacheTest {
     * @return all the coherent overlapping multi-regions, i.e. those regions that consist of several other regions
     *         returned by {@link #getTestCacheSizes()}.
     */
-   protected abstract Map<IMediumReference, Integer> getOverlappingRegions();
+   protected abstract Map<MediumReference, Integer> getOverlappingRegions();
 
    /**
-    * Returns the cache regions to be used for testing {@link IMediumCache#buffer} and
-    * {@link IMediumCache#getBufferedByteCountAt}. The {@link StandardMediumReference} keys must be stored in order from
+    * Returns the cache regions to be used for testing {@link MediumCache#buffer} and
+    * {@link MediumCache#getBufferedByteCountAt}. The {@link StandardMediumReference} keys must be stored in order from
     * lowest to highest offset in the map.
     * 
     * It should be regions included that overlap each other.
     * 
     * These regions must be cacheable without {@link EndOfMediumException}.
     * 
-    * @return the cache regions to be used for testing {@link IMediumCache#buffer} and
-    *         {@link IMediumCache#getBufferedByteCountAt}.
+    * @return the cache regions to be used for testing {@link MediumCache#buffer} and
+    *         {@link MediumCache#getBufferedByteCountAt}.
     */
-   protected abstract LinkedHashMap<IMediumReference, Integer> getTestCacheSizes();
+   protected abstract LinkedHashMap<MediumReference, Integer> getTestCacheSizes();
 
    /**
-    * Returns an {@link IMediumCache} implementation for test.
+    * Returns an {@link MediumCache} implementation for test.
     * 
-    * @return an {@link IMediumCache} implementation for test.
+    * @return an {@link MediumCache} implementation for test.
     */
-   protected abstract IMediumCache getTestling();
+   protected abstract MediumCache getTestling();
 
    /**
     * Sets up the test fixtures.
@@ -311,17 +310,17 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * overlaps an existing region at the beginning for about 1 byte. => EXPECTED: The existing region remains unchanged.
     * The new region is trimmed at its back by one byte, making it end one byte earlier.
     */
    @Test
    public void test_cacheBoundaryCase1_overlapStart() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
-      IMediumReference existingRegionReference = null;
-      IMediumReference newRegionReference = null;
+      MediumReference existingRegionReference = null;
+      MediumReference newRegionReference = null;
 
       try {
          // Several other, for asserts as such unimportant region to test
@@ -364,7 +363,7 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * exactly covers the same portion of the medium as an existing cache region (equal size). => EXPECTED: The existing
     * region remains unchanged, the new region is ignored. From the outside point-of-view, this cannot be distinguished
     * from the behavior that the new region is cached while the existing one is dropped.
@@ -372,7 +371,7 @@ public abstract class IMediumCacheTest {
    @Test
    public void test_cacheBoundaryCase10_equalSize() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -424,14 +423,14 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * overlaps an existing region at the end for about 1 byte. => EXPECTED: The existing region remains unchanged. The
     * new region is trimmed at its start by one byte, making it start one byte later.
     */
    @Test
    public void test_cacheBoundaryCase2_overlapEnd() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -471,7 +470,7 @@ public abstract class IMediumCacheTest {
 
          // The new region has been shifted to start 1 byte later
          Assert.assertFalse(cache.getBufferedRegions().containsKey(newRegionReference));
-         final IMediumReference shiftedNewRegionReference = newRegionReference.advance(1);
+         final MediumReference shiftedNewRegionReference = newRegionReference.advance(1);
          Assert.assertTrue(cache.getBufferedRegions().containsKey(shiftedNewRegionReference));
          Assert.assertEquals(new Integer(newRegionSize - 1), cache.getBufferedRegions().get(shiftedNewRegionReference));
       } catch (EndOfMediumException e) {
@@ -480,14 +479,14 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * ends exactly at the byte before another already cached region. => EXPECTED: The new region is completely cached,
     * the existing region remains unchanged.
     */
    @Test
    public void test_cacheBoundaryCase3_borderingBack() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -533,14 +532,14 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * ends exactly at the byte before another already cached region. => EXPECTED: The new region is completely cached,
     * the existing region remains unchanged.
     */
    @Test
    public void test_cacheBoundaryCase4_borderingFront() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -586,14 +585,14 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * is completely covered by an already cached region. => EXPECTED: The existing region remains unchanged, nothing at
     * all changes in the cache.
     */
    @Test
    public void test_cacheBoundaryCase5_alreadyCached() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -640,7 +639,7 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * contains an already cached region completely, the start byte of the already cached region is behind the new region
     * start byte AND its end byte is before the end byte of the new region. => EXPECTED: The new region is completely
     * cached, the existing region is dropped.
@@ -648,7 +647,7 @@ public abstract class IMediumCacheTest {
    @Test
    public void test_cacheBoundaryCase6_dropExisting() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -700,7 +699,7 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * contains an already cached region completely, the start byte of the already cached region is behind the new region
     * BUT its end byte is located at the same offset as the end byte of the existing region. => EXPECTED: The new region
     * is completely cached, the existing region is dropped.
@@ -708,7 +707,7 @@ public abstract class IMediumCacheTest {
    @Test
    public void test_cacheBoundaryCase7_dropExistingStart() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -760,7 +759,7 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * contains an already cached region completely, the start byte of the already cached region is at the same offset as
     * the new region's start byte AND its end byte is located before the offset of the end byte of the new region. =>
     * EXPECTED: The new region is completely cached, the existing region is dropped.
@@ -768,7 +767,7 @@ public abstract class IMediumCacheTest {
    @Test
    public void test_cacheBoundaryCase8_dropExistingEnd() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -817,14 +816,14 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} for following boundary case: A new region to be cached
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
     * contains multiple already cached regions completely. => EXPECTED: The new region is completely cached, all of the
     * existing regions are dropped.
     */
    @Test
    public void test_cacheBoundaryCase9_dropExistingMultiple() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
       StandardMediumReference existingRegionReference = null;
       StandardMediumReference newRegionReference = null;
@@ -881,19 +880,19 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} and
-    * {@link IMediumCache#getBufferedByteCountAt(IMediumReference)}.
+    * Tests {@link MediumCache#buffer(MediumReference, long)} and
+    * {@link MediumCache#getBufferedByteCountAt(MediumReference)}.
     */
    @Test
    public void test_cacheGetCachedByteCountAt() {
 
-      final Map<IMediumReference, Integer> testCacheSizes = getTestCacheSizes();
+      final Map<MediumReference, Integer> testCacheSizes = getTestCacheSizes();
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       // At first, the cached regions are not at all cached
-      for (Iterator<IMediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference reference = iterator.next();
+      for (Iterator<MediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
+         MediumReference reference = iterator.next();
 
          Assert.assertEquals(0, testling.getBufferedByteCountAt(reference));
       }
@@ -909,19 +908,19 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer} and {@link IMediumCache#getBufferedByteCountAt} if the size to cache exceeds the
+    * Tests {@link MediumCache#buffer} and {@link MediumCache#getBufferedByteCountAt} if the size to cache exceeds the
     * current medium length and therefore must cause an {@link EndOfMediumException}.
     */
    @Test
    public void test_cacheIsCachedEndOfMedium() {
 
-      IMediumCache cache = getTestling();
+      MediumCache cache = getTestling();
 
-      final Map<IMediumReference, Integer> distancesToEOM = getMediumReferencesAndDistToEOM();
+      final Map<MediumReference, Integer> distancesToEOM = getMediumReferencesAndDistToEOM();
 
       // At first, the cached regions are not at all cached
-      for (Iterator<IMediumReference> iterator = distancesToEOM.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference reference = iterator.next();
+      for (Iterator<MediumReference> iterator = distancesToEOM.keySet().iterator(); iterator.hasNext();) {
+         MediumReference reference = iterator.next();
 
          Assert.assertEquals(0, cache.getBufferedByteCountAt(reference));
       }
@@ -929,8 +928,8 @@ public abstract class IMediumCacheTest {
       // Caching creates an EndOfMediumExeption, but all bytes up to end of
       // medium are
       // cached nevertheless
-      for (Iterator<IMediumReference> iterator = distancesToEOM.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference reference = iterator.next();
+      for (Iterator<MediumReference> iterator = distancesToEOM.keySet().iterator(); iterator.hasNext();) {
+         MediumReference reference = iterator.next();
          long size = distancesToEOM.get(reference);
 
          try {
@@ -948,30 +947,30 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#buffer(IMediumReference, long)} and {@link IMediumCache#getBufferedByteCountAt} in case
+    * Tests {@link MediumCache#buffer(MediumReference, long)} and {@link MediumCache#getBufferedByteCountAt} in case
     * of overlapping, larger regions.
     */
    @Test
    public void test_cacheIsCachedOverlapping() {
 
-      final Map<IMediumReference, Integer> testCacheSizes = getTestCacheSizes();
+      final Map<MediumReference, Integer> testCacheSizes = getTestCacheSizes();
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       try {
          // Cache the regions
-         for (Iterator<IMediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
-            IMediumReference reference = iterator.next();
+         for (Iterator<MediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
+            MediumReference reference = iterator.next();
             long size = testCacheSizes.get(reference);
 
             testling.buffer(reference, (int) size);
          }
 
-         final Map<IMediumReference, Integer> overlappingRegions = getOverlappingRegions();
+         final Map<MediumReference, Integer> overlappingRegions = getOverlappingRegions();
 
          // Check caching of larger composed regions
-         for (Iterator<IMediumReference> iterator = overlappingRegions.keySet().iterator(); iterator.hasNext();) {
-            IMediumReference composedReference = iterator.next();
+         for (Iterator<MediumReference> iterator = overlappingRegions.keySet().iterator(); iterator.hasNext();) {
+            MediumReference composedReference = iterator.next();
             long composedSize = overlappingRegions.get(composedReference);
 
             Assert.assertEquals(composedSize, testling.getBufferedByteCountAt(composedReference));
@@ -990,18 +989,18 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#discard(IMediumReference, long)} with non-consecutive and non overlapping regions.
+    * Tests {@link MediumCache#discard(MediumReference, long)} with non-consecutive and non overlapping regions.
     */
    @Test
    public void test_free() {
 
-      final Map<IMediumReference, Integer> testCacheSizes = getTestCacheSizes();
-      final Map<IMediumReference, byte[]> expectedData = getExpectedData();
+      final Map<MediumReference, Integer> testCacheSizes = getTestCacheSizes();
+      final Map<MediumReference, byte[]> expectedData = getExpectedData();
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
-      for (Iterator<IMediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference reference = iterator.next();
+      for (Iterator<MediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
+         MediumReference reference = iterator.next();
          int size = testCacheSizes.get(reference);
 
          // Calls to free with a size of 0 have no effect
@@ -1046,13 +1045,13 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#discard(IMediumReference, long)} with multiple consecutive regions freed at once. The
+    * Tests {@link MediumCache#discard(MediumReference, long)} with multiple consecutive regions freed at once. The
     * {@link StandardMediumReference} given to free is exactly the start reference of an existing region.
     */
    @Test
    public void test_freeBoundaryCase1_consecutiveRegions() {
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       try {
          // These two regions are consecutive (120 bytes)
@@ -1080,7 +1079,7 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#discard(IMediumReference, long)} with multiple consecutive regions freed at once, while
+    * Tests {@link MediumCache#discard(MediumReference, long)} with multiple consecutive regions freed at once, while
     * another consecutive regions follows it, but stays untouched due to the free size is only up to the second
     * consecutive region. The last consecutive region must NOT get freed. The {@link StandardMediumReference} given to
     * free is exactly the start reference of an existing region.
@@ -1088,7 +1087,7 @@ public abstract class IMediumCacheTest {
    @Test
    public void test_freeBoundaryCase2_consecutiveRegionsOneUntouched() {
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       try {
          // These three regions are consecutive (123 bytes)
@@ -1120,7 +1119,7 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#discard(IMediumReference, long)} with multiple consecutive regions freed at once, while
+    * Tests {@link MediumCache#discard(MediumReference, long)} with multiple consecutive regions freed at once, while
     * a bigger free size is specified, exceeding the consecutive regions and reaching up to another, non-consecutive
     * region. Only the consecutive regions must get freed. The {@link StandardMediumReference} given to free is exactly
     * the start reference of an existing region.
@@ -1128,7 +1127,7 @@ public abstract class IMediumCacheTest {
    @Test
    public void test_freeBoundaryCase3_consecutiveRegionsBiggerSize() {
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       try {
          // These two regions are consecutive (120 bytes)
@@ -1161,13 +1160,13 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#discard(IMediumReference, long)} with multiple consecutive regions freed at once, while
+    * Tests {@link MediumCache#discard(MediumReference, long)} with multiple consecutive regions freed at once, while
     * the start {@link StandardMediumReference} overlaps the end of an existing region.
     */
    @Test
    public void test_freeBoundaryCase4_overlapEndOfRegion() {
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       try {
          // These two regions are consecutive (120 bytes)
@@ -1191,7 +1190,7 @@ public abstract class IMediumCacheTest {
          FREE_REGION_3_START);
 
       final int freeStartOverlapSize = 10;
-      final IMediumReference freeStartReference = FREE_REGION_1_START_REF.advance(freeStartOverlapSize);
+      final MediumReference freeStartReference = FREE_REGION_1_START_REF.advance(freeStartOverlapSize);
       testling.discard(freeStartReference, FREE_REGION_1_SIZE + FREE_REGION_2_SIZE + FREE_REGION_2A_SIZE + 10);
 
       // A region is still cached at the region 1 start offset
@@ -1204,14 +1203,14 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#discard(IMediumReference, long)} with multiple consecutive regions freed at once, while
+    * Tests {@link MediumCache#discard(MediumReference, long)} with multiple consecutive regions freed at once, while
     * the start {@link StandardMediumReference} overlaps the end of an existing region and the end of the portion to
     * three overlaps the start of an existing region.
     */
    @Test
    public void test_freeBoundaryCase5_overlapStartOfRegion() {
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       try {
          // These two regions are consecutive (120 bytes)
@@ -1236,7 +1235,7 @@ public abstract class IMediumCacheTest {
 
       final int freeStartOverlapSize = 10;
       final int freeEndOverlapSize = 5;
-      final IMediumReference freeStartReference = freeRegion1StartRef.advance(freeStartOverlapSize);
+      final MediumReference freeStartReference = freeRegion1StartRef.advance(freeStartOverlapSize);
       testling.discard(freeStartReference,
          FREE_REGION_1_SIZE + FREE_REGION_2_SIZE - freeStartOverlapSize - freeEndOverlapSize);
 
@@ -1253,18 +1252,18 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#getData}.
+    * Tests {@link MediumCache#getData}.
     */
    @Test
    public void test_getData() {
 
-      final Map<IMediumReference, Integer> testCacheSizes = getTestCacheSizes();
-      final Map<IMediumReference, byte[]> expectedData = getExpectedData();
+      final Map<MediumReference, Integer> testCacheSizes = getTestCacheSizes();
+      final Map<MediumReference, byte[]> expectedData = getExpectedData();
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
-      for (Iterator<IMediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference reference = iterator.next();
+      for (Iterator<MediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
+         MediumReference reference = iterator.next();
          int size = testCacheSizes.get(reference);
 
          // Read data without prior caching (except for totally overlapping
@@ -1303,17 +1302,17 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#getData} when end of medium conditions occur.
+    * Tests {@link MediumCache#getData} when end of medium conditions occur.
     */
    @Test
    public void test_getDataEndOfMedium() {
 
-      final Map<IMediumReference, Integer> testCacheSizes = getMediumReferencesAndDistToEOM();
+      final Map<MediumReference, Integer> testCacheSizes = getMediumReferencesAndDistToEOM();
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
-      for (Iterator<IMediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference reference = iterator.next();
+      for (Iterator<MediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
+         MediumReference reference = iterator.next();
          int size = testCacheSizes.get(reference);
 
          // Read data without prior caching, in EOM case
@@ -1330,19 +1329,19 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#getData} in case of reading across overlapping cached regions.
+    * Tests {@link MediumCache#getData} in case of reading across overlapping cached regions.
     */
    @Test
    public void test_getDataOverlapping() {
 
-      final Map<IMediumReference, Integer> testCacheSizes = getTestCacheSizes();
+      final Map<MediumReference, Integer> testCacheSizes = getTestCacheSizes();
 
-      IMediumCache testling = getTestling();
+      MediumCache testling = getTestling();
 
       try {
          // Cache the regions
-         for (Iterator<IMediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
-            IMediumReference reference = iterator.next();
+         for (Iterator<MediumReference> iterator = testCacheSizes.keySet().iterator(); iterator.hasNext();) {
+            MediumReference reference = iterator.next();
             long size = testCacheSizes.get(reference);
 
             testling.buffer(reference, (int) size);
@@ -1351,11 +1350,11 @@ public abstract class IMediumCacheTest {
          Assert.fail(UNEXPECTED_END_OF_MEDIUM + e);
       }
 
-      final Map<IMediumReference, Integer> overlappingRegions = getOverlappingRegions();
+      final Map<MediumReference, Integer> overlappingRegions = getOverlappingRegions();
 
       // Check retrieving the data from larger composed regions
-      for (Iterator<IMediumReference> iterator = overlappingRegions.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference composedReference = iterator.next();
+      for (Iterator<MediumReference> iterator = overlappingRegions.keySet().iterator(); iterator.hasNext();) {
+         MediumReference composedReference = iterator.next();
          int composedSize = overlappingRegions.get(composedReference);
 
          Assert.assertEquals(composedSize, testling.getBufferedByteCountAt(composedReference));
@@ -1372,7 +1371,7 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link IMediumCache#getMedium}.
+    * Tests {@link MediumCache#getMedium}.
     */
    @Test
    public void test_getMedium() {

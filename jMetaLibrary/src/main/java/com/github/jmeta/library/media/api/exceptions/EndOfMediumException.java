@@ -9,12 +9,12 @@
 
 package com.github.jmeta.library.media.api.exceptions;
 
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link EndOfMediumException} is thrown whenever end of medium is reached while reading from an {@link IMedium}.
+ * {@link EndOfMediumException} is thrown whenever end of medium is reached while reading from an {@link Medium}.
  */
 public class EndOfMediumException extends Exception {
 
@@ -22,7 +22,7 @@ public class EndOfMediumException extends Exception {
 
    private final int byteCountTriedToRead;
 
-   private final IMediumReference mediumReference;
+   private final MediumReference mediumReference;
 
    private static final long serialVersionUID = 1L;
 
@@ -32,14 +32,14 @@ public class EndOfMediumException extends Exception {
     * @param bytesRead
     *           The number of bytes read before the exception was thrown.
     * @param mediumReference
-    *           The start {@link IMediumReference} of the read attempt.
+    *           The start {@link MediumReference} of the read attempt.
     * @param byteCountTriedToRead
     *           The number of bytes initially tried to read.
     * 
     * @pre bytesRead >= 0
     * @pre byteCountTriedToRead > 0
     */
-   public EndOfMediumException(int bytesRead, IMediumReference mediumReference, int byteCountTriedToRead) {
+   public EndOfMediumException(int bytesRead, MediumReference mediumReference, int byteCountTriedToRead) {
 
       Reject.ifNegative(bytesRead, "bytesRead");
       Reject.ifNegativeOrZero(byteCountTriedToRead, "byteCountTriedToRead");
@@ -70,11 +70,11 @@ public class EndOfMediumException extends Exception {
    }
 
    /**
-    * Returns the {@link IMediumReference} that was the starting point for the causing read attempt.
+    * Returns the {@link MediumReference} that was the starting point for the causing read attempt.
     * 
-    * @return the {@link IMediumReference} that was the starting point for the causing read attempt.
+    * @return the {@link MediumReference} that was the starting point for the causing read attempt.
     */
-   public IMediumReference getMediumReference() {
+   public MediumReference getMediumReference() {
 
       return mediumReference;
    }

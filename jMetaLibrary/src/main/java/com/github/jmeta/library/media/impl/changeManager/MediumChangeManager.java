@@ -21,7 +21,7 @@ import java.util.TreeSet;
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumActionException;
 import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -32,9 +32,9 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * {@link MediumChangeManager} performs all tasks of handling and consolidating {@link MediumAction}s.
  * {@link MediumAction}s are created by the methods
- * {@link IMediumStore_OLD#insertData(com.github.jmeta.library.media.api.types.IMediumReference, ByteBuffer)},
- * {@link IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.IMediumReference, int)} and
- * {@link IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.IMediumReference, int, ByteBuffer)} by calling one of the
+ * {@link IMediumStore_OLD#insertData(com.github.jmeta.library.media.api.types.MediumReference, ByteBuffer)},
+ * {@link IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.MediumReference, int)} and
+ * {@link IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.MediumReference, int, ByteBuffer)} by calling one of the
  * corresponding schedule methods of {@link MediumChangeManager}.
  * 
  * {@link MediumAction}s represent an open action that is still to be performed before a
@@ -53,7 +53,7 @@ public class MediumChangeManager {
     * Creates a new {@link MediumChangeManager}.
     * 
     * @param mediumReferenceFactory
-    *           the {@link MediumReferenceFactory} used to create new {@link IMediumReference}s, if necessary.
+    *           the {@link MediumReferenceFactory} used to create new {@link MediumReference}s, if necessary.
     */
    public MediumChangeManager(MediumReferenceFactory mediumReferenceFactory) {
       this.mediumReferenceFactory = mediumReferenceFactory;
@@ -74,8 +74,8 @@ public class MediumChangeManager {
     *           remove on the external medium.
     * @return The {@link MediumAction} representing the removal. The returned {@link MediumAction} is assigned a
     *         zero-based sequence number that is guaranteed to be bigger than the sequence number of the last scheduled
-    *         {@link MediumAction} (no matter what type) for the same {@link IMediumReference}, of 0 if there was no
-    *         previous {@link MediumAction} scheduled at the {@link IMediumReference} of the given {@link MediumRegion}.
+    *         {@link MediumAction} (no matter what type) for the same {@link MediumReference}, of 0 if there was no
+    *         previous {@link MediumAction} scheduled at the {@link MediumReference} of the given {@link MediumRegion}.
     */
    public MediumAction scheduleRemove(MediumRegion removedRegion) {
 
@@ -112,8 +112,8 @@ public class MediumChangeManager {
     *           {@link ByteBuffer#limit()}
     * @return The {@link MediumAction} representing the replacement. The returned {@link MediumAction} is assigned a
     *         zero-based sequence number that is guaranteed to be bigger than the sequence number of the last scheduled
-    *         {@link MediumAction} (no matter what type) for the same {@link IMediumReference}, of 0 if there was no
-    *         previous {@link MediumAction} scheduled at the {@link IMediumReference} of the given {@link MediumRegion}.
+    *         {@link MediumAction} (no matter what type) for the same {@link MediumReference}, of 0 if there was no
+    *         previous {@link MediumAction} scheduled at the {@link MediumReference} of the given {@link MediumRegion}.
     */
    public MediumAction scheduleReplace(MediumRegion replacedRegion, ByteBuffer replacementBytes) {
 
@@ -160,8 +160,8 @@ public class MediumChangeManager {
     *           {@link ByteBuffer#limit()}
     * @return The {@link MediumAction} representing the insertion. The returned {@link MediumAction} is assigned a
     *         zero-based sequence number that is guaranteed to be bigger than the sequence number of the last scheduled
-    *         {@link MediumAction} (no matter what type) for the same {@link IMediumReference}, of 0 if there was no
-    *         previous {@link MediumAction} scheduled at the {@link IMediumReference} of the given {@link MediumRegion}.
+    *         {@link MediumAction} (no matter what type) for the same {@link MediumReference}, of 0 if there was no
+    *         previous {@link MediumAction} scheduled at the {@link MediumReference} of the given {@link MediumRegion}.
     */
    public MediumAction scheduleInsert(MediumRegion insertionRegion, ByteBuffer insertionBytes) {
 
@@ -289,7 +289,7 @@ public class MediumChangeManager {
 
       // Add a truncate action to ensure the file is shortened, if necessary
       if (delta < 0) {
-         IMediumReference truncateRef = mediumReferenceFactory.createMediumReference(totalMediumSizeInBytes + delta);
+         MediumReference truncateRef = mediumReferenceFactory.createMediumReference(totalMediumSizeInBytes + delta);
 
          flushPlan.add(new MediumAction(MediumActionType.TRUNCATE, new MediumRegion(truncateRef, -delta), 0, null));
       }
@@ -300,7 +300,7 @@ public class MediumChangeManager {
    /**
     * Returns an {@link Iterator} of all {@link MediumAction}s currently maintained in this {@link MediumChangeManager}.
     * The order the {@link MediumAction}s are returned by this {@link Iterator} follows the order induced by the
-    * {@link MediumActionComparator} class, i.e. sorted by {@link IMediumReference} and sequence number, ascending.
+    * {@link MediumActionComparator} class, i.e. sorted by {@link MediumReference} and sequence number, ascending.
     * 
     * @return an {@link Iterator} of all {@link MediumAction}s currently maintained in this {@link MediumChangeManager}.
     */
@@ -321,7 +321,7 @@ public class MediumChangeManager {
    /**
     * Gets the previous {@link MediumAction} already scheduled in this {@link MediumChangeManager}, according to the
     * {@link MediumActionComparator}, or null if there is none. According to the definition of
-    * {@link MediumActionComparator}, the previous {@link MediumAction} with a smaller or equal {@link IMediumReference}
+    * {@link MediumActionComparator}, the previous {@link MediumAction} with a smaller or equal {@link MediumReference}
     * and smaller or equal sequence number will be returned by this method.
     * 
     * Due to the {@link MediumActionComparator} implementation, an existing action whose region starts at the same
@@ -343,9 +343,9 @@ public class MediumChangeManager {
    /**
     * Gets the next {@link MediumAction} already scheduled in this {@link MediumChangeManager}, according to the
     * {@link MediumActionComparator}, or null if there is none. According to the definition of
-    * {@link MediumActionComparator}, the next {@link MediumAction} with a bigger or equal {@link IMediumReference} and
+    * {@link MediumActionComparator}, the next {@link MediumAction} with a bigger or equal {@link MediumReference} and
     * bigger or equal sequence number will be returned by this method. This method also returns any {@link MediumAction}
-    * that has equal {@link IMediumReference} and equal sequence number, but differs in any other attribute.
+    * that has equal {@link MediumReference} and equal sequence number, but differs in any other attribute.
     * 
     * @param newRegion
     *           The new {@link MediumRegion} for which a new {@link MediumAction} is scheduled.
@@ -451,7 +451,7 @@ public class MediumChangeManager {
    /**
     * Determines the next sequence number to take for a new {@link MediumAction} to be scheduled based on the sequence
     * number of its previous {@link MediumAction}. Only if the previous {@link MediumAction} has the same
-    * {@link IMediumReference}, its sequence number incremented by 1 is returned. Otherwise this method returns 0.
+    * {@link MediumReference}, its sequence number incremented by 1 is returned. Otherwise this method returns 0.
     * 
     * @param newRegion
     *           The new {@link MediumRegion} for which a new {@link MediumAction} is scheduled.

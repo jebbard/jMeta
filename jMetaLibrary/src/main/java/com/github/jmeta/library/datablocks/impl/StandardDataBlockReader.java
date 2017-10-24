@@ -26,15 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.datablocks.api.types.IHeader;
-import com.github.jmeta.library.datablocks.api.types.IPayload;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Header;
+import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.ChildOrder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -51,7 +51,7 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -69,20 +69,20 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link StandardDataBlockReader}
  *
  */
-public class StandardDataBlockReader implements IDataBlockReader {
+public class StandardDataBlockReader implements DataBlockReader {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockReader.class);
 
    /**
-    * @return the {@link IExtendedDataBlockFactory}
+    * @return the {@link ExtendedDataBlockFactory}
     */
-   protected IExtendedDataBlockFactory getDataBlockFactory() {
+   protected ExtendedDataBlockFactory getDataBlockFactory() {
 
       return m_dataBlockFactory;
    }
 
    @Override
-   public void free(IMediumReference startReference, long size) {
+   public void free(MediumReference startReference, long size) {
 
       m_cache.discard(startReference, size);
    }
@@ -99,8 +99,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
     * @param maxFieldBlockSize
     * @param logging
     */
-   public StandardDataBlockReader(IDataFormatSpecification spec,
-      Map<DataTransformationType, ITransformationHandler> transformationHandlers, int maxFieldBlockSize) {
+   public StandardDataBlockReader(DataFormatSpecification spec,
+      Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {
       Reject.ifNull(spec, "spec");
       Reject.ifTrue(maxFieldBlockSize < 1, "Maximum field block size may not be smaller than 1");
 
@@ -113,7 +113,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    @Override
-   public void initDataBlockFactory(IExtendedDataBlockFactory dataBlockFactory) {
+   public void initDataBlockFactory(ExtendedDataBlockFactory dataBlockFactory) {
 
       Reject.ifNull(dataBlockFactory, "dataBlockFactory");
       Reject.ifFalse(m_dataBlockFactory == null, "m_dataBlockFactory");
@@ -124,12 +124,12 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#hasContainerWithId(IMediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#hasContainerWithId(MediumReference,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.IPayload, long)
+    *      com.github.jmeta.library.datablocks.api.types.Payload, long)
     */
    @Override
-   public boolean hasContainerWithId(IMediumReference reference, DataBlockId id, IPayload parent,
+   public boolean hasContainerWithId(MediumReference reference, DataBlockId id, Payload parent,
       long remainingDirectParentByteCount) {
 
       Reject.ifNull(reference, "reference");
@@ -157,7 +157,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
             && magicKeySize > remainingDirectParentByteCount)
             return false;
 
-         IMediumReference magicKeyReference = reference.advance(magicKey.getOffsetFromStartOfHeaderOrFooter());
+         MediumReference magicKeyReference = reference.advance(magicKey.getOffsetFromStartOfHeaderOrFooter());
 
          final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySize);
          final boolean equalsBytes = magicKey.equalsBytes(readBytes);
@@ -175,14 +175,14 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * Returns the next {@link IContainer} with the given {@link DataBlockId} assumed to be stored starting at the given
-    * {@link IMediumReference} or null. If the {@link IContainer}s presence is optional, its actual presence is
+    * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
+    * {@link MediumReference} or null. If the {@link Container}s presence is optional, its actual presence is
     * determined
     * 
     * @param parent
     */
    @Override
-   public IContainer readContainerWithId(IMediumReference reference, DataBlockId id, IPayload parent,
+   public Container readContainerWithId(MediumReference reference, DataBlockId id, Payload parent,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(reference, "reference");
@@ -200,9 +200,9 @@ public class StandardDataBlockReader implements IDataBlockReader {
          theContext = new FieldFunctionStack();
 
       // Read headers
-      IMediumReference nextReference = reference;
+      MediumReference nextReference = reference;
 
-      List<IHeader> headers = new ArrayList<>();
+      List<Header> headers = new ArrayList<>();
 
       List<DataBlockDescription> headerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
          PhysicalDataBlockType.HEADER);
@@ -210,13 +210,13 @@ public class StandardDataBlockReader implements IDataBlockReader {
       for (int i = 0; i < headerDescs.size(); ++i) {
          DataBlockDescription headerDesc = headerDescs.get(i);
 
-         List<IHeader> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers,
+         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers,
             theContext);
 
          long totalHeaderSize = 0;
 
          for (int j = 0; j < nextHeaders.size(); ++j) {
-            IHeader nextHeader = nextHeaders.get(j);
+            Header nextHeader = nextHeaders.get(j);
 
             totalHeaderSize += nextHeader.getTotalSize();
          }
@@ -240,26 +240,26 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       DataBlockDescription payloadDesc = payloadDescs.get(0);
 
-      IPayload payload = readPayload(nextReference, payloadDesc.getId(), actualId, headers, theContext,
+      Payload payload = readPayload(nextReference, payloadDesc.getId(), actualId, headers, theContext,
          remainingDirectParentByteCount);
 
       // Read footers
       nextReference = nextReference.advance(payload.getTotalSize());
 
-      List<IHeader> footers = new ArrayList<>();
+      List<Header> footers = new ArrayList<>();
       List<DataBlockDescription> footerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
          PhysicalDataBlockType.FOOTER);
 
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         List<IHeader> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
+         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
             theContext);
 
          long totalFooterSize = 0;
 
          for (int j = 0; j < nextFooters.size(); ++j) {
-            IHeader nextFooter = nextFooters.get(j);
+            Header nextFooter = nextFooters.get(j);
 
             totalFooterSize += nextFooter.getTotalSize();
          }
@@ -274,7 +274,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       afterFooterReading(actualId, theContext, footers);
 
       // Create container
-      final IContainer container = m_dataBlockFactory.createContainer(actualId, parent, reference, headers, payload,
+      final Container container = m_dataBlockFactory.createContainer(actualId, parent, reference, headers, payload,
          footers);
 
       return applyTransformationsAfterRead(container);
@@ -283,7 +283,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
    // readPayloadBackwards
    @Override
-   public IContainer readContainerWithIdBackwards(IMediumReference reference, DataBlockId id, IPayload parent,
+   public Container readContainerWithIdBackwards(MediumReference reference, DataBlockId id, Payload parent,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(reference, "reference");
@@ -300,23 +300,23 @@ public class StandardDataBlockReader implements IDataBlockReader {
          theContext = new FieldFunctionStack();
 
       // Read footers
-      IMediumReference nextReference = reference;
+      MediumReference nextReference = reference;
 
-      List<IHeader> footers = new ArrayList<>();
+      List<Header> footers = new ArrayList<>();
       List<DataBlockDescription> footerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
          PhysicalDataBlockType.FOOTER);
 
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         List<IHeader> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
+         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
             theContext);
 
          @SuppressWarnings("unused")
          long totalFooterSize = 0;
 
          for (int j = 0; j < nextFooters.size(); ++j) {
-            IHeader nextFooter = nextFooters.get(j);
+            Header nextFooter = nextFooters.get(j);
 
             totalFooterSize += nextFooter.getTotalSize();
          }
@@ -340,13 +340,13 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       DataBlockDescription payloadDesc = payloadDescs.get(0);
 
-      IPayload payload = readPayloadBackwards(nextReference, payloadDesc.getId(), actualId, footers, theContext,
+      Payload payload = readPayloadBackwards(nextReference, payloadDesc.getId(), actualId, footers, theContext,
          remainingDirectParentByteCount);
 
       // Read headers
       nextReference = nextReference.advance(-payload.getTotalSize());
 
-      List<IHeader> headers = new ArrayList<>();
+      List<Header> headers = new ArrayList<>();
 
       List<DataBlockDescription> headerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
          PhysicalDataBlockType.HEADER);
@@ -359,14 +359,14 @@ public class StandardDataBlockReader implements IDataBlockReader {
          // TODO primeRefactor003: expects static header size?
          nextReference = nextReference.advance(-headerDesc.getMaximumByteLength());
 
-         List<IHeader> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers,
+         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers,
             theContext);
 
          @SuppressWarnings("unused")
          long totalHeaderSize = 0;
 
          for (int j = 0; j < nextHeaders.size(); ++j) {
-            IHeader nextHeader = nextHeaders.get(j);
+            Header nextHeader = nextHeaders.get(j);
 
             totalHeaderSize += nextHeader.getTotalSize();
          }
@@ -381,7 +381,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       // Create container
       // IMPORTANT: The containers StandardMediumReference MUST NOT be set to the original passed
       // StandardMediumReference because that one points to the containers back!
-      final IContainer container = m_dataBlockFactory.createContainer(actualId, parent, nextReference, headers, payload,
+      final Container container = m_dataBlockFactory.createContainer(actualId, parent, nextReference, headers, payload,
          footers);
 
       return applyTransformationsAfterRead(container);
@@ -390,8 +390,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
    // readPayloadBackwards
    @Override
-   public IPayload readPayloadBackwards(IMediumReference reference, DataBlockId id, DataBlockId parentId,
-      List<IHeader> footers, FieldFunctionStack context, long remainingDirectParentByteCount) {
+   public Payload readPayloadBackwards(MediumReference reference, DataBlockId id, DataBlockId parentId,
+      List<Header> footers, FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(footers, "footers");
       Reject.ifNull(id, "id");
@@ -405,7 +405,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       if (totalPayloadSize == DataBlockDescription.UNKNOWN_SIZE)
          throw new IllegalStateException("Payload size could not be determined");
 
-      final IPayload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(),
+      final Payload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(),
          m_cache.createMediumReference(reference.getAbsoluteMediumOffset() - totalPayloadSize), totalPayloadSize, this,
          context);
 
@@ -413,28 +413,28 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * Returns the next {@link IHeader} with the given {@link DataBlockId} assumed to be stored starting at the given
-    * {@link IMediumReference} or null. If the {@link IHeader}s presence is optional, its actual presence is determined
-    * using the given previous {@link IHeader}s. The method returns null if no {@link IHeader} with the
-    * {@link DataBlockId} is present at the given {@link IMediumReference}.
+    * Returns the next {@link Header} with the given {@link DataBlockId} assumed to be stored starting at the given
+    * {@link MediumReference} or null. If the {@link Header}s presence is optional, its actual presence is determined
+    * using the given previous {@link Header}s. The method returns null if no {@link Header} with the
+    * {@link DataBlockId} is present at the given {@link MediumReference}.
     *
     * @param reference
-    *           The {@link IMediumReference} pointing to the location of the assumed {@link IHeader} in the
+    *           The {@link MediumReference} pointing to the location of the assumed {@link Header} in the
     *           {@link AbstractMedium}.
     * @param headerId
-    *           The {@link DataBlockId} of the assumed {@link IHeader}.
+    *           The {@link DataBlockId} of the assumed {@link Header}.
     * @param parentId
     * @param previousHeaders
-    *           The {@link List} of previous {@link IHeader}s belonging to the same {@link IContainer}. Have been
-    *           already read beforehand. These {@link IHeader}s can be used to determine the presence of the currently
-    *           requested {@link IHeader}. If there are no {@link IHeader}s that have been read beforehand, this
+    *           The {@link List} of previous {@link Header}s belonging to the same {@link Container}. Have been
+    *           already read beforehand. These {@link Header}s can be used to determine the presence of the currently
+    *           requested {@link Header}. If there are no {@link Header}s that have been read beforehand, this
     *           {@link List} must be empty.
-    * @return The {@link IHeader} with the given {@link DataBlockId} with its {@link StandardField}s read from the given
-    *         {@link IMediumReference}.
+    * @return The {@link Header} with the given {@link DataBlockId} with its {@link StandardField}s read from the given
+    *         {@link MediumReference}.
     */
    @Override
-   public List<IHeader> readHeadersWithId(IMediumReference reference, DataBlockId headerId, DataBlockId parentId,
-      List<IHeader> previousHeaders, FieldFunctionStack context) {
+   public List<Header> readHeadersWithId(MediumReference reference, DataBlockId headerId, DataBlockId parentId,
+      List<Header> previousHeaders, FieldFunctionStack context) {
 
       Reject.ifNull(previousHeaders, "previousHeaders");
       Reject.ifNull(headerId, "headerId");
@@ -443,7 +443,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       DataBlockDescription headerDesc = m_spec.getDataBlockDescription(headerId);
 
-      List<IHeader> nextHeaders = new ArrayList<>();
+      List<Header> nextHeaders = new ArrayList<>();
 
       // Get the actual occurrences of this headerId based on the fields of the previous
       // headers
@@ -454,7 +454,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       // Read all header occurrences
       for (int i = 0; i < actualOccurrences; i++) {
-         List<IField<?>> headerFields = readFields(reference, headerId, context, staticHeaderLength);
+         List<Field<?>> headerFields = readFields(reference, headerId, context, staticHeaderLength);
 
          nextHeaders.add(m_dataBlockFactory.createHeader(headerId, reference, headerFields, false));
       }
@@ -463,8 +463,8 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    @Override
-   public List<IHeader> readFootersWithId(IMediumReference reference, DataBlockId footerId, DataBlockId parentId,
-      List<IHeader> previousFooters, FieldFunctionStack context) {
+   public List<Header> readFootersWithId(MediumReference reference, DataBlockId footerId, DataBlockId parentId,
+      List<Header> previousFooters, FieldFunctionStack context) {
 
       Reject.ifNull(previousFooters, "previousFooters");
       Reject.ifNull(footerId, "footerId");
@@ -473,7 +473,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       DataBlockDescription footerDesc = m_spec.getDataBlockDescription(footerId);
 
-      List<IHeader> nextFooters = new ArrayList<>();
+      List<Header> nextFooters = new ArrayList<>();
 
       // Get the actual occurrences of this footerId based on the fields of the previous
       // headers
@@ -484,7 +484,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
 
       // Read all footer occurrences
       for (int i = 0; i < actualOccurrences; i++) {
-         List<IField<?>> footerFields = readFields(reference, footerId, context, staticFooterLength);
+         List<Field<?>> footerFields = readFields(reference, footerId, context, staticFooterLength);
 
          nextFooters.add(m_dataBlockFactory.createHeader(footerId, reference, footerFields, true));
       }
@@ -493,12 +493,12 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#readPayload(IMediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readPayload(MediumReference,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId, DataBlockId, java.util.List, FieldFunctionStack,
     *      long)
     */
    @Override
-   public IPayload readPayload(IMediumReference reference, DataBlockId id, DataBlockId parentId, List<IHeader> headers,
+   public Payload readPayload(MediumReference reference, DataBlockId id, DataBlockId parentId, List<Header> headers,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(headers, "headers");
@@ -519,30 +519,30 @@ public class StandardDataBlockReader implements IDataBlockReader {
          }
       }
 
-      final IPayload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(), reference,
+      final Payload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(), reference,
          totalPayloadSize, this, context);
 
       return createPayloadAfterRead;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#readFields(IMediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumReference,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId, FieldFunctionStack, long)
     */
    @Override
-   public List<IField<?>> readFields(IMediumReference reference, DataBlockId parentId, FieldFunctionStack context,
+   public List<Field<?>> readFields(MediumReference reference, DataBlockId parentId, FieldFunctionStack context,
       long remainingDirectParentByteCount) {
 
       List<DataBlockDescription> fieldChildren = DataBlockDescription.getChildDescriptionsOfType(m_spec, parentId,
          PhysicalDataBlockType.FIELD);
 
-      List<IField<?>> fields = new ArrayList<>();
+      List<Field<?>> fields = new ArrayList<>();
 
       if (reference.getAbsoluteMediumOffset() == 72095) {
          System.out.println("TEST");
       }
 
-      IMediumReference currentFieldReference = reference;
+      MediumReference currentFieldReference = reference;
       ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
       Charset currentCharset = m_spec.getDefaultCharacterEncoding();
       ByteOrder actualByteOrder = currentByteOrder;
@@ -581,7 +581,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
             long fieldSize = determineActualFieldSize(fieldDesc, parentId, context, currentlyRemainingParentByteCount,
                currentFieldReference, actualByteOrder, actualCharacterEncoding);
 
-            IField<?> newField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding, fieldDesc,
+            Field<?> newField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding, fieldDesc,
                fieldSize, currentlyRemainingParentByteCount);
 
             context.pushFieldFunctions(fieldDesc, newField);
@@ -596,7 +596,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       }
 
       if (currentlyRemainingParentByteCount > 0) {
-         IField<?> unknownField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding,
+         Field<?> unknownField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding,
             createUnknownFieldDescription(parentId), currentlyRemainingParentByteCount,
             currentlyRemainingParentByteCount);
 
@@ -607,7 +607,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#setMediumCache(com.github.jmeta.library.media.api.OLD.IMediumStore_OLD)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setMediumCache(com.github.jmeta.library.media.api.OLD.IMediumStore_OLD)
     */
    @Override
    public void setMediumCache(IMediumStore_OLD cache) {
@@ -618,7 +618,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#getLongestMinimumContainerHeaderSize(DataBlockId)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#getLongestMinimumContainerHeaderSize(DataBlockId)
     */
    @Override
    public long getLongestMinimumContainerHeaderSize(DataBlockId payloadId) {
@@ -675,10 +675,10 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#identifiesDataFormat(IMediumReference)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumReference)
     */
    @Override
-   public boolean identifiesDataFormat(IMediumReference reference) {
+   public boolean identifiesDataFormat(MediumReference reference) {
 
       List<DataBlockDescription> topLevelContainerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, null,
          PhysicalDataBlockType.CONTAINER);
@@ -695,29 +695,29 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#getSpecification()
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#getSpecification()
     */
    @Override
-   public IDataFormatSpecification getSpecification() {
+   public DataFormatSpecification getSpecification() {
 
       return m_spec;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#getTransformationHandlers(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(DataFormat)
     */
    @Override
-   public Map<DataTransformationType, ITransformationHandler> getTransformationHandlers() {
+   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers() {
 
       return Collections.unmodifiableMap(m_transformationsReadOrder);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#setTransformationHandler(DataFormat,
-    *      DataTransformationType, com.github.jmeta.library.datablocks.api.services.ITransformationHandler)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(DataFormat,
+    *      DataTransformationType, com.github.jmeta.library.datablocks.api.services.TransformationHandler)
     */
    @Override
-   public void setTransformationHandler(DataTransformationType transformationType, ITransformationHandler handler) {
+   public void setTransformationHandler(DataTransformationType transformationType, TransformationHandler handler) {
 
       Reject.ifFalse(m_transformationsReadOrder.containsKey(transformationType),
          "m_transformationsReadOrder.containsKey(transformationType)");
@@ -735,7 +735,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
          m_transformationsReadOrder.remove(transformationType);
    }
 
-   private void addTransformationHandlers(Map<DataTransformationType, ITransformationHandler> transformationHandlers) {
+   private void addTransformationHandlers(Map<DataTransformationType, TransformationHandler> transformationHandlers) {
 
       Map<Integer, DataTransformationType> transformationsReadOrder = new TreeMap<>();
 
@@ -759,7 +759,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       }
    }
 
-   private IField<?> readField(final IMediumReference reference, ByteOrder currentByteOrder, Charset currentCharset,
+   private Field<?> readField(final MediumReference reference, ByteOrder currentByteOrder, Charset currentCharset,
       DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount) {
 
       ByteBuffer fieldBuffer = null;
@@ -801,16 +801,16 @@ public class StandardDataBlockReader implements IDataBlockReader {
          currentByteOrder, currentCharset);
    }
 
-   private IContainer applyTransformationsAfterRead(IContainer container) {
+   private Container applyTransformationsAfterRead(Container container) {
 
       Reject.ifNull(container, "container");
 
-      IContainer transformedContainer = container;
+      Container transformedContainer = container;
 
-      Iterator<ITransformationHandler> handlerIterator = m_transformationsReadOrder.values().iterator();
+      Iterator<TransformationHandler> handlerIterator = m_transformationsReadOrder.values().iterator();
 
       while (handlerIterator.hasNext()) {
-         ITransformationHandler transformationHandler = handlerIterator.next();
+         TransformationHandler transformationHandler = handlerIterator.next();
 
          if (transformationHandler.requiresUntransform(transformedContainer)) {
             if (m_cache.getBufferedByteCountAt(transformedContainer.getMediumReference()) < transformedContainer
@@ -875,7 +875,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
     * @param context
     * @param footers
     */
-   protected void afterFooterReading(DataBlockId containerId, FieldFunctionStack context, List<IHeader> footers) {
+   protected void afterFooterReading(DataBlockId containerId, FieldFunctionStack context, List<Header> footers) {
 
       // Default behavior: Do nothing. This method is intended to be overridden by a
       // data format specific implementation.
@@ -886,7 +886,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
     * @param context
     * @param headers
     */
-   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<IHeader> headers) {
+   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
 
       // Default behavior: Do nothing. This method is intended to be overridden by a
       // data format specific implementation.
@@ -902,7 +902,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
     * @return the actual payload size
     */
    private long determineActualPayloadSize(DataBlockDescription payloadDesc, DataBlockId parentId,
-      FieldFunctionStack context, List<IHeader> headers, List<IHeader> footers, long remainingDirectParentByteCount) {
+      FieldFunctionStack context, List<Header> headers, List<Header> footers, long remainingDirectParentByteCount) {
 
       long actualBlockSize = DataBlockDescription.UNKNOWN_SIZE;
 
@@ -933,7 +933,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    private long determineActualFieldSize(DataBlockDescription fieldDesc, DataBlockId parentId,
-      FieldFunctionStack context, long remainingDirectParentByteCount, IMediumReference reference, ByteOrder byteOrder,
+      FieldFunctionStack context, long remainingDirectParentByteCount, MediumReference reference, ByteOrder byteOrder,
       Charset characterEncoding) {
 
       long actualBlockSize = DataBlockDescription.UNKNOWN_SIZE;
@@ -977,12 +977,12 @@ public class StandardDataBlockReader implements IDataBlockReader {
       return actualBlockSize;
    }
 
-   private long getSizeUpToTerminationBytes(IMediumReference reference, ByteOrder byteOrder, byte[] terminationBytes,
+   private long getSizeUpToTerminationBytes(MediumReference reference, ByteOrder byteOrder, byte[] terminationBytes,
       long remainingDirectParentByteCount) {
 
       long sizeUpToTerminationBytes = 0;
 
-      IMediumReference currentReference = reference;
+      MediumReference currentReference = reference;
 
       boolean endOfMediumReached = false;
 
@@ -1063,7 +1063,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       return -1;
    }
 
-   private DataBlockId determineActualId(IMediumReference reference, DataBlockId id, FieldFunctionStack context,
+   private DataBlockId determineActualId(MediumReference reference, DataBlockId id, FieldFunctionStack context,
       long remainingParentByteCount, ByteOrder byteOrder, Charset characterEncoding) {
 
       if (m_spec.isGeneric(id)) {
@@ -1089,7 +1089,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
                + ", a LocationProperties object with the exact offset for its container parent " + id
                + " must be specified.");
 
-         IMediumReference idFieldReference = reference.advance(byteOffset);
+         MediumReference idFieldReference = reference.advance(byteOffset);
 
          long actualFieldSize = determineActualFieldSize(idFieldDesc, id, context,
             remainingParentByteCount - byteOffset, idFieldReference, byteOrder, characterEncoding);
@@ -1102,7 +1102,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
          ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
          Charset currentCharacterEncoding = m_spec.getDefaultCharacterEncoding();
 
-         IField<?> idField = readField(idFieldReference, currentByteOrder, currentCharacterEncoding, idFieldDesc,
+         Field<?> idField = readField(idFieldReference, currentByteOrder, currentCharacterEncoding, idFieldDesc,
             actualFieldSize, actualFieldSize);
 
          return concreteBlockIdFromGenericId(id, idField);
@@ -1170,7 +1170,7 @@ public class StandardDataBlockReader implements IDataBlockReader {
       return actualOccurrences;
    }
 
-   private DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, IField<?> headerField) {
+   private DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, Field<?> headerField) {
 
       String concreteLocalId = "";
       try {
@@ -1189,37 +1189,37 @@ public class StandardDataBlockReader implements IDataBlockReader {
    private DataBlockDescription createUnknownFieldDescription(DataBlockId parentId) {
 
       DataBlockId unknownBlockId = new DataBlockId(m_spec.getDataFormat(), parentId,
-         IDataFormatSpecification.UNKNOWN_FIELD_ID);
+         DataFormatSpecification.UNKNOWN_FIELD_ID);
 
       FieldProperties<BinaryValue> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY,
          new BinaryValue(new byte[] { 0 }), null, null, DataBlockDescription.UNKNOWN_SIZE,
          DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null);
 
-      return new DataBlockDescription(unknownBlockId, IDataFormatSpecification.UNKNOWN_FIELD_ID,
-         IDataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
+      return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
+         DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
          ChildOrder.SEQUENTIAL, unknownFieldProperties, new HashMap<DataBlockId, LocationProperties>(),
          DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null);
    }
 
-   private String buildEOFExceptionMessage(IMediumReference reference, long byteCount, final long bytesRead) {
+   private String buildEOFExceptionMessage(MediumReference reference, long byteCount, final long bytesRead) {
 
       return "Unexpected EOF occurred during read from medium " + reference.getMedium() + " [offset="
          + reference.getAbsoluteMediumOffset() + ", byteCount=" + byteCount + "]. Only " + bytesRead
          + " were read before EOF.";
    }
 
-   private IExtendedDataBlockFactory m_dataBlockFactory;
+   private ExtendedDataBlockFactory m_dataBlockFactory;
 
-   private final IDataFormatSpecification m_spec;
+   private final DataFormatSpecification m_spec;
 
-   private Map<DataTransformationType, ITransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
+   private Map<DataTransformationType, TransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#readBytes(com.github.jmeta.library.media.api.types.IMediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumReference,
     *      int)
     */
    @Override
-   public ByteBuffer readBytes(IMediumReference reference, int size) {
+   public ByteBuffer readBytes(MediumReference reference, int size) {
 
       Reject.ifNull(reference, "reference");
 
@@ -1231,11 +1231,11 @@ public class StandardDataBlockReader implements IDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockReader#cache(com.github.jmeta.library.media.api.types.IMediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#cache(com.github.jmeta.library.media.api.types.MediumReference,
     *      long)
     */
    @Override
-   public void cache(IMediumReference reference, long size) throws EndOfMediumException {
+   public void cache(MediumReference reference, long size) throws EndOfMediumException {
 
       m_cache.buffer(reference, (int) size);
    }

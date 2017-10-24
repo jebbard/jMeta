@@ -14,8 +14,8 @@ import java.util.Map;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
 import com.github.jmeta.library.media.api.types.FileMedium;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 
@@ -28,28 +28,28 @@ public class FileMediumCacheTest extends IMediumCacheTest {
 
    private static final int MAXIMUM_CACHE_BLOCK_SIZE = Integer.MAX_VALUE;
 
-   private IMediumCache m_theCache = null;
+   private MediumCache m_theCache = null;
 
    private FileMedium m_theMedium = null;
 
-   private LinkedHashMap<IMediumReference, Integer> m_theTestCacheSizes;
+   private LinkedHashMap<MediumReference, Integer> m_theTestCacheSizes;
 
-   private LinkedHashMap<IMediumReference, Integer> m_cacheDistancesToEOM;
+   private LinkedHashMap<MediumReference, Integer> m_cacheDistancesToEOM;
 
-   private Map<IMediumReference, Integer> m_overlappingRegions;
+   private Map<MediumReference, Integer> m_overlappingRegions;
 
-   private Map<IMediumReference, byte[]> m_expectedData;
+   private Map<MediumReference, byte[]> m_expectedData;
 
    /**
     * @see IMediumCacheTest#getExpectedData()
     */
    @Override
-   protected Map<IMediumReference, byte[]> getExpectedData() {
+   protected Map<MediumReference, byte[]> getExpectedData() {
 
       if (m_expectedData == null) {
          m_expectedData = new HashMap<>();
 
-         IMedium<?> medium = getExpectedMedium();
+         Medium<?> medium = getExpectedMedium();
 
          m_expectedData.put(new StandardMediumReference(medium, 0),
             new byte[] { '0', '0', '0', 'S', 't', 'a', 'l', 'k', 'e', 'r' });
@@ -145,12 +145,12 @@ public class FileMediumCacheTest extends IMediumCacheTest {
     * @see IMediumCacheTest#getMediumReferencesAndDistToEOM()
     */
    @Override
-   protected Map<IMediumReference, Integer> getMediumReferencesAndDistToEOM() {
+   protected Map<MediumReference, Integer> getMediumReferencesAndDistToEOM() {
 
       if (m_cacheDistancesToEOM == null) {
          m_cacheDistancesToEOM = new LinkedHashMap<>();
 
-         IMedium<?> medium = getExpectedMedium();
+         Medium<?> medium = getExpectedMedium();
 
          // Must be put in order into this map!
          m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 0),
@@ -183,12 +183,12 @@ public class FileMediumCacheTest extends IMediumCacheTest {
     * @see IMediumCacheTest#getOverlappingRegions()
     */
    @Override
-   protected Map<IMediumReference, Integer> getOverlappingRegions() {
+   protected Map<MediumReference, Integer> getOverlappingRegions() {
 
       if (m_overlappingRegions == null) {
          m_overlappingRegions = new HashMap<>();
 
-         IMedium<?> medium = getExpectedMedium();
+         Medium<?> medium = getExpectedMedium();
 
          m_overlappingRegions.put(new StandardMediumReference(medium, 15), 72);
          m_overlappingRegions.put(new StandardMediumReference(medium, 121), 90);
@@ -201,12 +201,12 @@ public class FileMediumCacheTest extends IMediumCacheTest {
     * @see IMediumCacheTest#getTestCacheSizes()
     */
    @Override
-   protected LinkedHashMap<IMediumReference, Integer> getTestCacheSizes() {
+   protected LinkedHashMap<MediumReference, Integer> getTestCacheSizes() {
 
       if (m_theTestCacheSizes == null) {
          m_theTestCacheSizes = new LinkedHashMap<>();
 
-         IMedium<?> medium = getExpectedMedium();
+         Medium<?> medium = getExpectedMedium();
 
          // Must be put in order into this map!
          m_theTestCacheSizes.put(new StandardMediumReference(medium, 0), 10);
@@ -234,7 +234,7 @@ public class FileMediumCacheTest extends IMediumCacheTest {
     * @see IMediumCacheTest#getTestling()
     */
    @Override
-   protected IMediumCache getTestling() {
+   protected MediumCache getTestling() {
 
       if (m_theCache == null) {
          final FileMediumAccessor accessor = new FileMediumAccessor(

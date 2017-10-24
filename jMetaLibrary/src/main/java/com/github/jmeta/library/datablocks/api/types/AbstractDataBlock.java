@@ -11,16 +11,16 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *
  */
-public abstract class AbstractDataBlock implements IDataBlock {
+public abstract class AbstractDataBlock implements DataBlock {
 
    /**
     * Creates a new {@link AbstractDataBlock}.
@@ -30,8 +30,8 @@ public abstract class AbstractDataBlock implements IDataBlock {
     * @param reference
     * @param dataBlockReader
     */
-   public AbstractDataBlock(DataBlockId id, IDataBlock parent,
-      IMediumReference reference, IDataBlockReader dataBlockReader) {
+   public AbstractDataBlock(DataBlockId id, DataBlock parent,
+      MediumReference reference, DataBlockReader dataBlockReader) {
       Reject.ifNull(id, "id");
       Reject.ifNull(dataBlockReader, "dataBlockReader");
       Reject.ifNull(reference, "reference");
@@ -52,7 +52,7 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getBytes(long, int)
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(long, int)
     */
    @Override
    public byte[] getBytes(long offset, int size) {
@@ -76,25 +76,25 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getMediumReference()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getMediumReference()
     */
    @Override
-   public IMediumReference getMediumReference() {
+   public MediumReference getMediumReference() {
 
       return m_mediumReference;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getParent()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getParent()
     */
    @Override
-   public IDataBlock getParent() {
+   public DataBlock getParent() {
 
       return m_parent;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getId()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getId()
     */
    @Override
    public DataBlockId getId() {
@@ -103,10 +103,10 @@ public abstract class AbstractDataBlock implements IDataBlock {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#initParent(com.github.jmeta.library.datablocks.api.types.IDataBlock)
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#initParent(com.github.jmeta.library.datablocks.api.types.DataBlock)
     */
    @Override
-   public void initParent(IDataBlock parent) {
+   public void initParent(DataBlock parent) {
 
       Reject.ifNull(parent, "parent");
       Reject.ifFalse(getParent() == null, "getParent() == null");
@@ -126,14 +126,14 @@ public abstract class AbstractDataBlock implements IDataBlock {
          + "]";
    }
 
-   private IDataBlock m_parent;
+   private DataBlock m_parent;
 
-   private IMediumReference m_mediumReference;
+   private MediumReference m_mediumReference;
 
    private DataBlockId m_id;
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#setBytes(byte[][])
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#setBytes(byte[][])
     */
    @Override
    public void setBytes(byte[][] bytes) {
@@ -147,14 +147,14 @@ public abstract class AbstractDataBlock implements IDataBlock {
       // m_mediumReference.setCache(cache);
    }
 
-   private final IDataBlockReader m_dataBlockReader;
+   private final DataBlockReader m_dataBlockReader;
 
    /**
     * Returns dataBlockReader
     *
     * @return dataBlockReader
     */
-   protected IDataBlockReader getDataBlockReader() {
+   protected DataBlockReader getDataBlockReader() {
 
       return m_dataBlockReader;
    }

@@ -17,8 +17,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
 
-import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -26,7 +26,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 /**
  * {@link AbstractMediumExpectationProvider} provides expected test data for a single top-level data block of a single
- * {@link DataFormat} for testing {@link IDataBlockAccessor} instances.
+ * {@link DataFormat} for testing {@link DataBlockAccessor} instances.
  */
 public abstract class AbstractMediumExpectationProvider {
 
@@ -35,17 +35,17 @@ public abstract class AbstractMediumExpectationProvider {
     */
    public static String ANY_WILDCARD = "*";
 
-   private IDataFormatRepository dataFormatRepository;
+   private DataFormatRepository dataFormatRepository;
 
    /**
     * Creates a new {@AbstractDataFormatExpectationProvider}.
     * 
     * @param dataFormatRepository
-    *           The {@link IDataFormatRepository}.
+    *           The {@link DataFormatRepository}.
     * @param testFile
     *           The test data file.
     */
-   public AbstractMediumExpectationProvider(IDataFormatRepository dataFormatRepository, Path testFile) {
+   public AbstractMediumExpectationProvider(DataFormatRepository dataFormatRepository, Path testFile) {
 
       Reject.ifNull(testFile, "testFile");
       Reject.ifNull(dataFormatRepository, "dataFormatRepository");
@@ -176,14 +176,14 @@ public abstract class AbstractMediumExpectationProvider {
    }
 
    /**
-    * Returns the {@link IDataFormatSpecification} corresponding to the given {@link DataFormat}.
+    * Returns the {@link DataFormatSpecification} corresponding to the given {@link DataFormat}.
     * 
     * @param format
     *           The {@link DataFormat}
     *
-    * @return the {@link IDataFormatSpecification} corresponding to the given {@link DataFormat}.
+    * @return the {@link DataFormatSpecification} corresponding to the given {@link DataFormat}.
     */
-   protected IDataFormatSpecification getDataFormatSpecification(DataFormat format) {
+   protected DataFormatSpecification getDataFormatSpecification(DataFormat format) {
 
       return dataFormatRepository.getDataFormatSpecification(format);
    }

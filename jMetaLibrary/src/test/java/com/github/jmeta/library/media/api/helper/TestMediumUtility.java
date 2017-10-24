@@ -4,8 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import com.github.jmeta.library.media.api.types.FileMedium;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
@@ -13,7 +13,7 @@ import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 public class TestMediumUtility {
 
    /**
-    * A test {@link IMedium} to be used whenever it does not matter if the medium exists or it does, i.e. this medium is
+    * A test {@link Medium} to be used whenever it does not matter if the medium exists or it does, i.e. this medium is
     * never accessed or relevant in the test, but it must exist. This is a {@link FileMedium} pointing to an existing
     * file.
     */
@@ -21,16 +21,16 @@ public class TestMediumUtility {
       true);
 
    /**
-    * A second test {@link IMedium} to be used whenever it does not matter if it exists. This medium is mainly used for
+    * A second test {@link Medium} to be used whenever it does not matter if it exists. This medium is mainly used for
     * negative testing a class with a second but different unrelated medium and checking its behavior.
     */
    public static final InMemoryMedium DUMMY_UNRELATED_MEDIUM = new InMemoryMedium(new byte[] {}, "Fake", false);
 
-   public static MediumRegion createUnCachedMediumRegion(IMedium<?> medium, long offset, Integer size) {
+   public static MediumRegion createUnCachedMediumRegion(Medium<?> medium, long offset, Integer size) {
       return new MediumRegion(createReference(medium, offset), size);
    }
 
-   public static MediumRegion createCachedMediumRegion(IMedium<?> medium, long offset, Integer size,
+   public static MediumRegion createCachedMediumRegion(Medium<?> medium, long offset, Integer size,
       int repeatedByteValue) {
 
       byte[] newRegionBytes = new byte[size];
@@ -39,16 +39,16 @@ public class TestMediumUtility {
       return new MediumRegion(createReference(medium, offset), ByteBuffer.wrap(newRegionBytes));
    }
 
-   public static MediumRegion createCachedMediumRegion(IMedium<?> medium, long offset, Integer size) {
+   public static MediumRegion createCachedMediumRegion(Medium<?> medium, long offset, Integer size) {
       return new MediumRegion(createReference(medium, offset),
          ByteBuffer.wrap(regionBytesFromDistinctOffsetSequence(offset, size)));
    }
 
-   public static IMediumReference createReference(IMedium<?> medium, long offset) {
+   public static MediumReference createReference(Medium<?> medium, long offset) {
       return new StandardMediumReference(medium, offset);
    }
 
-   public static IMediumReference createReferenceToDefaultMedium(long offset) {
+   public static MediumReference createReferenceToDefaultMedium(long offset) {
       return createReference(DUMMY_DEFAULT_TEST_MEDIUM, offset);
    }
 

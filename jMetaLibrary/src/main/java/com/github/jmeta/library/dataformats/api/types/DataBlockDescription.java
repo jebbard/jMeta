@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.jmeta.library.datablocks.api.types.IDataBlock;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -238,7 +238,7 @@ public class DataBlockDescription {
     * @param headerDesc
     * @return the total minimum size of the data block
     */
-   public static long getTotalMinimumSize(IDataFormatSpecification spec,
+   public static long getTotalMinimumSize(DataFormatSpecification spec,
       DataBlockDescription headerDesc) {
 
       Reject.ifNull(headerDesc, "headerDesc");
@@ -265,7 +265,7 @@ public class DataBlockDescription {
     * @return a list of child {@link DataBlockDescription}s
     */
    public static List<DataBlockDescription> getChildDescriptionsOfType(
-      IDataFormatSpecification spec, DataBlockId parentId,
+      DataFormatSpecification spec, DataBlockId parentId,
       PhysicalDataBlockType type) {
 
       Reject.ifNull(spec, "spec");
@@ -331,8 +331,8 @@ public class DataBlockDescription {
    }
 
    /**
-    * States that the total size of an {@link IDataBlock} is unknown. This is a possible return value of the method
-    * {@link IDataBlock#getTotalSize()}.
+    * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
+    * {@link DataBlock#getTotalSize()}.
     */
    public final static long UNKNOWN_SIZE = -1;
 

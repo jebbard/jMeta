@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ChildOrder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -34,7 +34,7 @@ import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 // REMINDER: ID3v1 and ID3v1.1 are ONE SINGLE data format in the components
@@ -44,7 +44,7 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  * {@link ID3v1Extension}
  *
  */
-public class ID3v1Extension implements IExtension {
+public class ID3v1Extension implements Extension {
 
    private static final byte[] ID3V1_TAG_ID = new byte[] { 'T', 'A', 'G' };
    private static final String ID3V1_TAG_ID_STRING = "TAG";
@@ -55,7 +55,7 @@ public class ID3v1Extension implements IExtension {
       new ArrayList<String>(), "M. Nilsson", new Date());
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -63,7 +63,7 @@ public class ID3v1Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -71,21 +71,21 @@ public class ID3v1Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();
 
-      if (serviceInterface == IDataFormatSpecification.class) {
+      if (serviceInterface == DataFormatSpecification.class) {
          serviceProviders.add((T) createSpecification());
-      } else if (serviceInterface == IDataBlockService.class) {
+      } else if (serviceInterface == DataBlockService.class) {
          serviceProviders.add((T) new ID3v1DataBlocksService());
       }
       return serviceProviders;
    }
 
-   private IDataFormatSpecification createSpecification() {
+   private DataFormatSpecification createSpecification() {
 
       final int id3v1TagLength = 128;
 
@@ -309,7 +309,7 @@ public class ID3v1Extension implements IExtension {
       supportedCharsets.add(Charsets.CHARSET_ASCII);
       supportedCharsets.add(Charsets.CHARSET_UTF8);
 
-      IDataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
+      DataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
          new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 

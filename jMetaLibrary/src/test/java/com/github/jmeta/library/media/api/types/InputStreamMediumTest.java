@@ -15,7 +15,7 @@ import java.io.InputStream;
 /**
  * {@link InputStreamMediumTest} tests the {@link InputStreamMedium} class.
  */
-public class InputStreamMediumTest extends AbstractIMediumTest<InputStream> {
+public class InputStreamMediumTest extends AbstractMediumTest<InputStream> {
 
    private static final InputStream WRAPPED_MEDIUM = new ByteArrayInputStream(
       new byte[] { 1, 2, 3, 4, 5, 6 });
@@ -23,25 +23,25 @@ public class InputStreamMediumTest extends AbstractIMediumTest<InputStream> {
    private static final String EXTERNAL_NAME = "your name";
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedLength()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedLength()
     */
    @Override
    protected long getExpectedLength() {
 
-      return IMedium.UNKNOWN_LENGTH;
+      return Medium.UNKNOWN_LENGTH;
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getMediumToTest()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getMediumToTest()
     */
    @Override
-   protected IMedium<InputStream> getMediumToTest() {
+   protected Medium<InputStream> getMediumToTest() {
 
       return new InputStreamMedium(WRAPPED_MEDIUM, EXTERNAL_NAME);
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsReadOnly()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsReadOnly()
     */
    @Override
    protected boolean isExpectedAsReadOnly() {
@@ -50,7 +50,7 @@ public class InputStreamMediumTest extends AbstractIMediumTest<InputStream> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsRandomAccess()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsRandomAccess()
     */
    @Override
    protected boolean isExpectedAsRandomAccess() {
@@ -59,7 +59,7 @@ public class InputStreamMediumTest extends AbstractIMediumTest<InputStream> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedWrappedMedium()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedWrappedMedium()
     */
    @Override
    protected InputStream getExpectedWrappedMedium() {
@@ -68,7 +68,7 @@ public class InputStreamMediumTest extends AbstractIMediumTest<InputStream> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#getExpectedExternalName()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedExternalName()
     */
    @Override
    protected String getExpectedExternalName() {
@@ -77,7 +77,7 @@ public class InputStreamMediumTest extends AbstractIMediumTest<InputStream> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.AbstractIMediumTest#isExpectedAsExisting()
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsExisting()
     */
    @Override
    protected boolean isExpectedAsExisting() {

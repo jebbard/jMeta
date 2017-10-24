@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
 import com.github.jmeta.library.media.api.types.FileMedium;
-import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
@@ -26,12 +26,12 @@ public abstract class AbstractDataBlockAccessorDefaultExtensionTest extends Abst
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessorTest#createMediaToCheck(java.nio.file.Path)
+    * @see com.github.jmeta.library.datablocks.api.services.AbtractDataBlockAccessorTest#createMediaToCheck(java.nio.file.Path)
     */
    @Override
-   protected List<IMedium<?>> createMediaToCheck(Path baseFile) throws Exception {
+   protected List<Medium<?>> createMediaToCheck(Path baseFile) throws Exception {
 
-      List<IMedium<?>> media = new ArrayList<>();
+      List<Medium<?>> media = new ArrayList<>();
 
       long size = Files.size(baseFile);
 

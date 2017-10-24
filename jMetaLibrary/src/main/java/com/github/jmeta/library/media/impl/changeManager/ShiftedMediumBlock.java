@@ -13,8 +13,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -64,8 +64,8 @@ public class ShiftedMediumBlock {
    public static final int UNDEFINED_COUNT = -1;
 
    private final MediumAction causingAction;
-   private final IMediumReference startReferenceOfFollowUpBytes;
-   private IMediumReference endReferenceOfFollowUpBytes;
+   private final MediumReference startReferenceOfFollowUpBytes;
+   private MediumReference endReferenceOfFollowUpBytes;
    private int totalShiftOfMediumBytes;
 
    /**
@@ -90,14 +90,14 @@ public class ShiftedMediumBlock {
    }
 
    /**
-    * Initializes the start {@link IMediumReference} of the medium bytes as described in the javadocs of
+    * Initializes the start {@link MediumReference} of the medium bytes as described in the javadocs of
     * {@link #getStartReferenceOfFollowUpBytes()}.
     * 
     * @param causingAction
     *           The causing {@link MediumAction} of this {@link ShiftedMediumBlock}.
-    * @return The start {@link IMediumReference} of the medium bytes.
+    * @return The start {@link MediumReference} of the medium bytes.
     */
-   private static IMediumReference initStartReference(MediumAction causingAction) {
+   private static MediumReference initStartReference(MediumAction causingAction) {
       MediumRegion region = causingAction.getRegion();
 
       if (causingAction.getActionType() == MediumActionType.INSERT) {
@@ -120,7 +120,7 @@ public class ShiftedMediumBlock {
    }
 
    /**
-    * Returns the start {@link IMediumReference} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
+    * Returns the start {@link MediumReference} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
     * It must be clearly stated that these are the bytes <i>behind</i> the causing {@link MediumAction}s region, in
     * detail:
     * <ul>
@@ -130,35 +130,35 @@ public class ShiftedMediumBlock {
     * <li>For {@link MediumActionType#REPLACE}: It is the offset of the first medium byte after the replaced region</li>
     * </ul>
     * 
-    * @return the start {@link IMediumReference} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
+    * @return the start {@link MediumReference} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
     */
-   public IMediumReference getStartReferenceOfFollowUpBytes() {
+   public MediumReference getStartReferenceOfFollowUpBytes() {
       return startReferenceOfFollowUpBytes;
    }
 
    /**
-    * Returns the end {@link IMediumReference} of the medium bytes this {@link ShiftedMediumBlock} refers to. It is set
+    * Returns the end {@link MediumReference} of the medium bytes this {@link ShiftedMediumBlock} refers to. It is set
     * during execution of the CFP algorithm. Might return {@link #UNDEFINED_COUNT} if the CFP algorithm is still in
     * progress.
     * 
-    * @return the end {@link IMediumReference} of the medium bytes this {@link ShiftedMediumBlock} refers to.
+    * @return the end {@link MediumReference} of the medium bytes this {@link ShiftedMediumBlock} refers to.
     */
-   public IMediumReference getEndReferenceOfFollowUpBytes() {
+   public MediumReference getEndReferenceOfFollowUpBytes() {
       return endReferenceOfFollowUpBytes;
    }
 
    /**
-    * Sets the end {@link IMediumReference} of the consecutive block of medium bytes this {@link ShiftedMediumBlock}
+    * Sets the end {@link MediumReference} of the consecutive block of medium bytes this {@link ShiftedMediumBlock}
     * refers to. These are actual and current offsets on the external medium. Saying this, they not yet reflect any
     * shift operations by any already or not yet executed {@link MediumAction}s.
     * 
-    * After this method has been called with a valid end {@link IMediumReference}, {@link #computeMediumByteCount()}
+    * After this method has been called with a valid end {@link MediumReference}, {@link #computeMediumByteCount()}
     * will return the corresponding size.
     *
     * @param endReferenceOfFollowUpBytes
-    *           the end {@link IMediumReference} of the {@link ShiftedMediumBlock}.
+    *           the end {@link MediumReference} of the {@link ShiftedMediumBlock}.
     */
-   public void setEndReferenceOfMediumBytes(IMediumReference endReferenceOfFollowUpBytes) {
+   public void setEndReferenceOfMediumBytes(MediumReference endReferenceOfFollowUpBytes) {
       Reject.ifNull(endReferenceOfFollowUpBytes, "endReferenceOfFollowUpBytes");
       Reject.ifTrue(endReferenceOfFollowUpBytes.before(getStartReferenceOfFollowUpBytes()),
          "the given end reference <" + endReferenceOfFollowUpBytes + "> must be located before the start refernce <"
@@ -196,7 +196,7 @@ public class ShiftedMediumBlock {
     * Computes and returns the number of existing medium bytes between {@link #getStartReferenceOfFollowUpBytes()} and
     * {@link #getEndReferenceOfFollowUpBytes()} shifted by this {@link ShiftedMediumBlock}. It returns
     * {@link #UNDEFINED_COUNT} if the CFP algorithm is currently still in progress and the method
-    * {@link #setEndReferenceOfMediumBytes(IMediumReference)} of this {@link ShiftedMediumBlock} has not yet been
+    * {@link #setEndReferenceOfMediumBytes(MediumReference)} of this {@link ShiftedMediumBlock} has not yet been
     * called.
     * 
     * @return the number of medium bytes shifted by this {@link ShiftedMediumBlock}.
@@ -213,7 +213,7 @@ public class ShiftedMediumBlock {
    /**
     * Returns a {@link MediumRegion} that represents the final location of the whole {@link ShiftedMediumBlock}, not
     * only including the original medium bytes behind the causing {@link MediumAction}, but also including the newly
-    * written bytes, if any. Thus, the returned {@link MediumRegion} starts at the target offset of the {@link IMedium}
+    * written bytes, if any. Thus, the returned {@link MediumRegion} starts at the target offset of the {@link Medium}
     * where bytes will be written. It therefore reflects the state in which all {@link MediumAction}s are already
     * finally applied to the medium after a flush. Saying this, the offsets and sizes of the returned
     * {@link MediumRegion} usually do not yet refer to a valid region of the <i>current</i> medium content.
@@ -247,7 +247,7 @@ public class ShiftedMediumBlock {
          int targetRegionStartRefAdvance = -getCausingAction().getRegion().getSize() + getTotalShiftOfMediumBytes()
             - (getCausingAction().getActionBytes().remaining() - getCausingAction().getRegion().getSize());
 
-         IMediumReference targetRegionStartRef = getStartReferenceOfFollowUpBytes()
+         MediumReference targetRegionStartRef = getStartReferenceOfFollowUpBytes()
             .advance(targetRegionStartRefAdvance);
 
          return new MediumRegion(targetRegionStartRef,
@@ -324,7 +324,7 @@ public class ShiftedMediumBlock {
       int readWriteBlockCount = computeMediumByteCount() / writeBlockSizeInBytes;
       int remainingByteCount = computeMediumByteCount() % writeBlockSizeInBytes;
 
-      IMediumReference startReadRef = null;
+      MediumReference startReadRef = null;
 
       boolean backwardReadWrite = totalShiftOfMediumBytes > 0;
 
@@ -334,7 +334,7 @@ public class ShiftedMediumBlock {
          startReadRef = getStartReferenceOfFollowUpBytes();
       }
 
-      IMediumReference startWriteRef = startReadRef.advance(totalShiftOfMediumBytes);
+      MediumReference startWriteRef = startReadRef.advance(totalShiftOfMediumBytes);
 
       List<MediumAction> readWriteActions = new ArrayList<>();
 

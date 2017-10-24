@@ -11,7 +11,7 @@ package com.github.jmeta.library.media.impl.changeManager;
 
 import java.util.Comparator;
 
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -21,8 +21,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * 
  * A {@link MediumAction} X is smaller than another {@link MediumAction} Y, if one of the following is true:
  * <ul>
- * <li>The {@link IMediumReference} of X is smaller than the {@link IMediumReference} of Y, or</li>
- * <li>The {@link IMediumReference} of X is equal to the {@link IMediumReference} of Y, but the sequence number of X is
+ * <li>The {@link MediumReference} of X is smaller than the {@link MediumReference} of Y, or</li>
+ * <li>The {@link MediumReference} of X is equal to the {@link MediumReference} of Y, but the sequence number of X is
  * smaller than the sequence number of Y</li>
  * </ul>
  * 
@@ -33,7 +33,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link MediumAction#equals(Object)}.
  * 
  * A {@link MediumAction} X is bigger than another {@link MediumAction} Y, if it is neither smaller nor equal. That
- * means in case of equal {@link IMediumReference} and equal sequence number, X is always considered bigger than Y if
+ * means in case of equal {@link MediumReference} and equal sequence number, X is always considered bigger than Y if
  * any other attribute differs.
  */
 public class MediumActionComparator implements Comparator<MediumAction> {
@@ -44,8 +44,8 @@ public class MediumActionComparator implements Comparator<MediumAction> {
    @Override
    public int compare(MediumAction left, MediumAction right) {
 
-      IMediumReference leftStartReference = left.getRegion().getStartReference();
-      IMediumReference rightStartReference = right.getRegion().getStartReference();
+      MediumReference leftStartReference = left.getRegion().getStartReference();
+      MediumReference rightStartReference = right.getRegion().getStartReference();
       Reject.ifFalse(leftStartReference.getMedium().equals(rightStartReference.getMedium()),
          "leftStartReference.getMedium().equals(rightStartReference.getMedium())");
 

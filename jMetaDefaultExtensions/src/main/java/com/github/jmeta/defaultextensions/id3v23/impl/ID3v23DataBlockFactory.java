@@ -11,7 +11,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.jmeta.library.datablocks.impl.IFieldConverter;
+import com.github.jmeta.library.datablocks.impl.FieldConverter;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockFactory;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
@@ -25,10 +25,10 @@ public class ID3v23DataBlockFactory extends StandardDataBlockFactory {
 
    @SuppressWarnings("unchecked")
    @Override
-   protected <T> IFieldConverter<T> getFieldConverter(DataBlockId fieldId) {
+   protected <T> FieldConverter<T> getFieldConverter(DataBlockId fieldId) {
 
       if (SYNC_SAFE_INTEGER_FIELD_IDS.contains(fieldId.getGlobalId()))
-         return (IFieldConverter<T>) SYNC_SAFE_INTEGER_CONVERTER;
+         return (FieldConverter<T>) SYNC_SAFE_INTEGER_CONVERTER;
 
       return super.getFieldConverter(fieldId);
    }

@@ -23,7 +23,7 @@ import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
  * {@link SignedNumericFieldConverter}
  *
  */
-public class SignedNumericFieldConverter implements IFieldConverter<Long> {
+public class SignedNumericFieldConverter implements FieldConverter<Long> {
 
    private static final int MAX_LONG_BYTE_SIZE = 8;
 

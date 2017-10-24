@@ -428,8 +428,6 @@ public class Flags {
       return true;
    }
 
-   private static final String INVALID_BYTE_LEN_MESSAGE = "Specified byte length must be greater or equal to required byte length ";
-
    private final FlagSpecification m_spec;
    private final ByteBuffer m_flagBytes;
 }

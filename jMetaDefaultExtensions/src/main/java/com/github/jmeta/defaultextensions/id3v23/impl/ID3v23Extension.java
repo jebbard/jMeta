@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
@@ -43,14 +43,14 @@ import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link ID3v23Extension}
  *
  */
-public class ID3v23Extension implements IExtension {
+public class ID3v23Extension implements Extension {
 
    private static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
    private static final String FRAME_FLAGS_COMPRESSION = "Compression";
@@ -136,7 +136,7 @@ public class ID3v23Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -144,7 +144,7 @@ public class ID3v23Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -152,15 +152,15 @@ public class ID3v23Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();
 
-      if (serviceInterface == IDataFormatSpecification.class) {
+      if (serviceInterface == DataFormatSpecification.class) {
          serviceProviders.add((T) createSpecification());
-      } else if (serviceInterface == IDataBlockService.class) {
+      } else if (serviceInterface == DataBlockService.class) {
          serviceProviders.add((T) new ID3v23DataBlocksService());
       }
       return serviceProviders;
@@ -923,7 +923,7 @@ public class ID3v23Extension implements IExtension {
             null));
    }
 
-   private IDataFormatSpecification createSpecification(Map<DataBlockId, DataBlockDescription> descMap) {
+   private DataFormatSpecification createSpecification(Map<DataBlockId, DataBlockDescription> descMap) {
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(ID3V23_TAG_ID);
@@ -963,12 +963,12 @@ public class ID3v23Extension implements IExtension {
 
       transformations.add(new DataTransformationType("Unsynchronisation", unsynchronisationContainers, true, 0, 0));
 
-      IDataFormatSpecification dummyID3v23Spec = new StandardDataFormatSpecification(ID3v23, descMap, topLevelIds,
+      DataFormatSpecification dummyID3v23Spec = new StandardDataFormatSpecification(ID3v23, descMap, topLevelIds,
          genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets, transformations);
       return dummyID3v23Spec;
    }
 
-   private IDataFormatSpecification createSpecification() {
+   private DataFormatSpecification createSpecification() {
 
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 

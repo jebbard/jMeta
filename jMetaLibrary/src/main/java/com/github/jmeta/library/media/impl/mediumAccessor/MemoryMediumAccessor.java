@@ -12,13 +12,13 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * Represents an in-memory, random-access {@link IMediumAccessor}.
+ * Represents an in-memory, random-access {@link MediumAccessor}.
  */
 public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium> {
 
@@ -35,7 +35,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumReference)
     */
    @Override
    public boolean isAtEndOfMedium() {
@@ -61,13 +61,13 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(IMediumReference,
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumReference,
     *      ByteBuffer)
     */
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
 
-      IMediumReference currentPosition = getCurrentPosition();
+      MediumReference currentPosition = getCurrentPosition();
       final int currentOffset = (int) currentPosition.getAbsoluteMediumOffset();
       final int currentLength = (int) getMedium().getCurrentLength();
 
@@ -97,7 +97,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference,
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumReference,
     *      ByteBuffer)
     */
    @Override
@@ -139,10 +139,10 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.MediumReference)
     */
    @Override
-   protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {
+   protected void mediumSpecificSetCurrentPosition(MediumReference position) throws IOException {
       Reject.ifTrue(position.getAbsoluteMediumOffset() > getMedium().getCurrentLength(),
          "position.getAbsoluteMediumOffset() > getMedium().getCurrentLength()");
 

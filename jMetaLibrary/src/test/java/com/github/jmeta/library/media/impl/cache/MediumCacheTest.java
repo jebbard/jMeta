@@ -11,15 +11,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.TestMediumUtility;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import junit.framework.Assert;
 
 /**
  * This class tests the {@link MediumCache} class. It uses special naming conventions for the test methods of
@@ -69,8 +68,8 @@ public class MediumCacheTest {
    private static final byte DEFAULT_FILL_BYTE = -13;
 
    /**
-    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()},
-    * {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
+    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()}
+    * , {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
     */
    @Test
    public void constructor_initializesMediumAndDefaultSizesCorrectly() {
@@ -82,8 +81,8 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()},
-    * {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
+    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()}
+    * , {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
     */
    @Test
    public void constructor_initializesMediumAndSizesCorrectly() {
@@ -98,8 +97,8 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()},
-    * {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
+    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()}
+    * , {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void constructor_forMaxCacheSizeSmallerThanMaxRegionSize_throwsException() {
@@ -328,7 +327,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_forEmptyCache_returnsEmptyList() {
@@ -341,7 +340,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeCoveringFullCachedRegion_returnsSingleRegion() {
@@ -355,7 +354,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeWithinCachedRegion_returnsEnclosingRegion() {
@@ -369,7 +368,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeFullyCoveringMultipleCachedRegions_returnsAllCoveredRegions() {
@@ -385,7 +384,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeStartingAndEndingWithinDifferentCachedRegionsWithoutGaps_returnsAllCoveredRegions() {
@@ -401,7 +400,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeOutsideCachedRegionAndSizeLessThanMaxRegionSize_returnsSingleUncachedRegion() {
@@ -416,7 +415,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeOutsideCachedRegionSizeBiggerThanButNoMultipleOfMaxRegionSize_returnsTwoUncachedRegions() {
@@ -434,7 +433,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeOutsideCachedRegionExactlyTripleSizeOfMaxRegionSize_returnsThreeUncachedRegions() {
@@ -452,7 +451,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeWithGapBetweenTwoCachedRegionsAndSizeLessThanMaxRegionSize_returnsCachedRegionsAndGap() {
@@ -473,7 +472,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeWithGapBetweenTwoCachedRegionsAndExactlyDoubleSizeOfMaxRegionSize_returnsCachedRegionsAndGap() {
@@ -491,7 +490,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeOverlappingCachedRegionsAtFront_returnsSingleGapAndSingleCachedRegion() {
@@ -509,7 +508,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeOverlappingCachedRegionsAtBack_returnsTwoCachedAndSingleGapRegion() {
@@ -527,7 +526,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
    public void getRegionsInRange_rangeCoveringAllCachedRegions_returnsCachedRegionsAndGapsBetweenThem() {
@@ -555,7 +554,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void getRegionsInRange_forInvalidReference_throwsException() {
@@ -564,7 +563,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void getRegionsInRange_forInvalidRangeSize_throwsException() {
@@ -1017,7 +1016,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)}.
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void addRegion_forInvalidReference_throwsException() {
@@ -1026,7 +1025,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)} for a range that exactly fully covers a list of
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)} for a range that exactly fully covers a list of
     * expected {@link MediumRegion}s.
     * 
     * @param cacheLayout
@@ -1035,8 +1034,8 @@ public class MediumCacheTest {
     *           Allows to pass in a custom maximum cache region size to use in the test.
     * @param expectedRegions
     *           The {@link MediumRegion}s expected to be returned by
-    *           {@link MediumCache#getRegionsInRange(IMediumReference, int)}. The input range when calling this method
-    *           is derived from this list, its start reference is the {@link IMediumReference} of the first region in
+    *           {@link MediumCache#getRegionsInRange(MediumReference, int)}. The input range when calling this method
+    *           is derived from this list, its start reference is the {@link MediumReference} of the first region in
     *           the list, and its size is the total size of all regions in the list.
     */
    private void testGetRegionsInRange_fullyCoveringExpectedRegions(TestCacheBuilder cacheLayout, int maxCacheRegionSize,
@@ -1045,7 +1044,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getRegionsInRange(IMediumReference, int)} for a range that exactly fully covers a list of
+    * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)} for a range that exactly fully covers a list of
     * expected {@link MediumRegion}s.
     * 
     * @param cacheLayout
@@ -1056,8 +1055,8 @@ public class MediumCacheTest {
     *           Allows to pass in a custom maximum cache region size to use in the test.
     * @param expectedRegions
     *           The {@link MediumRegion}s expected to be returned by
-    *           {@link MediumCache#getRegionsInRange(IMediumReference, int)}. The input range when calling this method
-    *           is derived from this list, its start reference is the {@link IMediumReference} of the first region in
+    *           {@link MediumCache#getRegionsInRange(MediumReference, int)}. The input range when calling this method
+    *           is derived from this list, its start reference is the {@link MediumReference} of the first region in
     *           the list advanced by "firstRegionAddSizeToStart" bytes, and its size is the total size of all regions in
     *           the list minus "firstRegionAddSizeToStart" minus "lastRegionSubstractSizeFromEnd".
     */
@@ -1069,7 +1068,7 @@ public class MediumCacheTest {
 
       List<MediumRegion> expectedRegionList = Arrays.asList(expectedRegions);
 
-      IMediumReference rangeStartReference = expectedRegionList.get(0).getStartReference();
+      MediumReference rangeStartReference = expectedRegionList.get(0).getStartReference();
 
       int totalRegionSize = getTotalRegionSize(expectedRegionList);
 
@@ -1178,7 +1177,7 @@ public class MediumCacheTest {
       List<MediumRegion> actualRegions = cache.getAllCachedRegions();
 
       long actualCacheSize = 0;
-      IMediumReference previousEndReference = null;
+      MediumReference previousEndReference = null;
 
       for (MediumRegion mediumRegion : actualRegions) {
          actualCacheSize += mediumRegion.getSize();

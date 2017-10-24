@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
@@ -97,13 +97,13 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
 
    private static final CsvReader CSV_READER = new CsvReader(CSV_READER_COLUMNS);
 
-   private Map<DataBlockId, ICustomFieldValueParser> customFieldValueParsers = new HashMap<>();
+   private Map<DataBlockId, CustomFieldValueParser> customFieldValueParsers = new HashMap<>();
 
    /**
     * Creates a new {@CsvFileDataFormatExpectationProvider}.
     * 
     * @param repository
-    *           The {@link IDataFormatRepository}.
+    *           The {@link DataFormatRepository}.
     * @param testFile
     *           The test file that is read. Necessary for reading the expected bytes.
     * @param expectedDataCsvFile
@@ -111,7 +111,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
     * @throws InvalidTestDataCsvFormatException
     *            if the csv file is incorrect.
     */
-   public CsvFileDataFormatExpectationProvider(IDataFormatRepository repository, Path testFile,
+   public CsvFileDataFormatExpectationProvider(DataFormatRepository repository, Path testFile,
       Path expectedDataCsvFile) throws InvalidTestDataCsvFormatException {
       super(repository, testFile);
 
@@ -145,13 +145,13 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    }
 
    /**
-    * Adds an {@link ICustomFieldValueParser}. These objects are needed whenever the string representation of a
+    * Adds an {@link CustomFieldValueParser}. These objects are needed whenever the string representation of a
     * non-standard field type must be parsed and converted to an {@link Object} for testing against an expected value.
     *
     * @param parser
-    *           The {@link ICustomFieldValueParser}.
+    *           The {@link CustomFieldValueParser}.
     */
-   public void addExpectedFieldValueParser(ICustomFieldValueParser parser) {
+   public void addExpectedFieldValueParser(CustomFieldValueParser parser) {
 
       Reject.ifNull(parser, "parser");
 
@@ -348,7 +348,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
 
       String idString = row.get(COL_ID);
 
-      IDataFormatSpecification spec = getDataFormatSpecification(dataFormat);
+      DataFormatSpecification spec = getDataFormatSpecification(dataFormat);
 
       DataBlockId id = new DataBlockId(dataFormat, idString);
 
@@ -399,7 +399,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
 
       String parentRow = row.get(COL_PARENT_ROW_INDEX);
 
-      IDataFormatSpecification spec = getDataFormatSpecification(id.getDataFormat());
+      DataFormatSpecification spec = getDataFormatSpecification(id.getDataFormat());
 
       PhysicalDataBlockType blockType = spec.getDataBlockDescription(id).getPhysicalType();
 
@@ -469,7 +469,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
 
       String expInterpretedFieldValueString = row.get(COL_EXP_FIELD_INTERPRETED_VALUE);
 
-      IDataFormatSpecification spec = getDataFormatSpecification(id.getDataFormat());
+      DataFormatSpecification spec = getDataFormatSpecification(id.getDataFormat());
 
       PhysicalDataBlockType blockType = spec.getDataBlockDescription(id).getPhysicalType();
 
@@ -649,7 +649,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
 
       String isContainerBackwardReadbleString = nextRow.get(COL_CONTAINER_BACKWARD_READABLE);
 
-      IDataFormatSpecification spec = getDataFormatSpecification(instanceId.getId().getDataFormat());
+      DataFormatSpecification spec = getDataFormatSpecification(instanceId.getId().getDataFormat());
 
       if (spec.getTopLevelDataBlockIds().contains(instanceId.getId())) {
          boolean isContainerBackwardReadble = Boolean.parseBoolean(isContainerBackwardReadbleString);

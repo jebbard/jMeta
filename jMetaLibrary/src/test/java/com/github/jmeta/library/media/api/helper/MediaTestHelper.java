@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.github.jmeta.library.media.api.types.FileMedium;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -39,22 +39,22 @@ public class MediaTestHelper {
    }
 
    /**
-    * Convenience method returning a new {@link IMediumReference} pointing to the specified offset on the default
+    * Convenience method returning a new {@link MediumReference} pointing to the specified offset on the default
     * {@value #STANDARD_MEDIUM}.
     * 
     * @param offset
     *           The offset to use.
-    * @return a new {@link IMediumReference} pointing to the specified offset on the default {@value #STANDARD_MEDIUM}.
+    * @return a new {@link MediumReference} pointing to the specified offset on the default {@value #STANDARD_MEDIUM}.
     */
-   public static IMediumReference at(long offset) {
+   public static MediumReference at(long offset) {
 
       return new StandardMediumReference(STANDARD_MEDIUM, offset);
    }
 
    /**
-    * @return a standard dummy {@link IMedium} with no specific properties for testing
+    * @return a standard dummy {@link Medium} with no specific properties for testing
     */
-   public static IMedium<?> getStandardMedium() {
+   public static Medium<?> getStandardMedium() {
       return STANDARD_MEDIUM;
    }
 

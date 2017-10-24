@@ -13,7 +13,7 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
 
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -57,7 +57,7 @@ public class ReadWriteActionSequence extends ExpectedActionSequence {
     * Creates a new {@link ReadWriteActionSequence}.
     * 
     * @param startRef
-    *           The {@link IMediumReference} that marks where to start processing this {@link ReadWriteActionSequence}.
+    *           The {@link MediumReference} that marks where to start processing this {@link ReadWriteActionSequence}.
     *           Either pointing to the front of the byte area this {@link ReadWriteActionSequence} encompasses (in case
     *           of forward-reading), or pointing to its end (in case of forward-reading).
     * @param blockCount
@@ -71,7 +71,7 @@ public class ReadWriteActionSequence extends ExpectedActionSequence {
     *           forward-shifts, i.e. by increasing the offset after each block pair, or by decrementing the offset after
     *           each block pair.
     */
-   public ReadWriteActionSequence(IMediumReference startRef, int blockCount, int blockSizeInBytes,
+   public ReadWriteActionSequence(MediumReference startRef, int blockCount, int blockSizeInBytes,
       int relativeWriteShiftInBytes, ActionOrder expectedActionOrder) {
       super(startRef, blockCount, blockSizeInBytes);
       Reject.ifNull(expectedActionOrder, "expectedActionOrder");
@@ -86,7 +86,7 @@ public class ReadWriteActionSequence extends ExpectedActionSequence {
     * {@link ActionOrder#FORWARD}.
     * 
     * @param startRef
-    *           The {@link IMediumReference} that marks where to start processing this {@link ReadWriteActionSequence}.
+    *           The {@link MediumReference} that marks where to start processing this {@link ReadWriteActionSequence}.
     *           Either pointing to the front of the byte area this {@link ReadWriteActionSequence} encompasses (in case
     *           of forward-reading), or pointing to its end (in case of forward-reading).
     * @param blockSizeInBytes
@@ -95,7 +95,7 @@ public class ReadWriteActionSequence extends ExpectedActionSequence {
     *           Allows to specify an arbitrary byte shift that is added to every write (but NOT read!) action.
     * @return A single-blocked {@link ReadWriteActionSequence}.
     */
-   public static ReadWriteActionSequence createSingleBlock(IMediumReference startRef, int blockSizeInBytes,
+   public static ReadWriteActionSequence createSingleBlock(MediumReference startRef, int blockSizeInBytes,
       int relativeWriteShiftInBytes) {
       return new ReadWriteActionSequence(startRef, 1, blockSizeInBytes, relativeWriteShiftInBytes, ActionOrder.FORWARD);
    }
@@ -121,11 +121,11 @@ public class ReadWriteActionSequence extends ExpectedActionSequence {
             new MediumAction(MediumActionType.WRITE, new MediumRegion(ref, size), 0, null)));
    }
 
-   private void iterateBlock(BiConsumer<IMediumReference, Integer> readAction,
-      BiConsumer<IMediumReference, Integer> writeAction) {
+   private void iterateBlock(BiConsumer<MediumReference, Integer> readAction,
+      BiConsumer<MediumReference, Integer> writeAction) {
 
-      IMediumReference nextExpectedReadRef = getStartRef();
-      IMediumReference nextExpectedWriteRef = nextExpectedReadRef.advance(relativeWriteShiftInBytes);
+      MediumReference nextExpectedReadRef = getStartRef();
+      MediumReference nextExpectedWriteRef = nextExpectedReadRef.advance(relativeWriteShiftInBytes);
 
       for (int i = 0; i < getBlockCount(); i++) {
          if (expectedActionOrder == ActionOrder.BACKWARD) {

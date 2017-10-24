@@ -12,45 +12,45 @@ import java.nio.ByteBuffer;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
 
 /**
- * {@link AbstractReadOnlyMediumAccessorTest} is the base class for testing read-only {@link IMediumAccessor} instances,
+ * {@link AbstractReadOnlyMediumAccessorTest} is the base class for testing read-only {@link MediumAccessor} instances,
  * no matter if random-access or not.
  * 
- * It thus has only some test cases to ensure write operations are not possible with the {@link IMediumAccessor}.
+ * It thus has only some test cases to ensure write operations are not possible with the {@link MediumAccessor}.
  */
-public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractIMediumAccessorTest {
+public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractMediumAccessorTest {
 
    /**
-    * Tests {@link IMediumAccessor#write(ByteBuffer)}.
+    * Tests {@link MediumAccessor#write(ByteBuffer)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void write_onReadOnlyMedium_throwsException() {
 
-      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
       mediumAccessor.write(ByteBuffer.wrap(new byte[1]));
    }
 
    /**
-    * Tests {@link IMediumAccessor#truncate(IMediumReference)}.
+    * Tests {@link MediumAccessor#truncate(MediumReference)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void truncate_onReadOnlyMedium_throwsException() {
 
-      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
       mediumAccessor.truncate();
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#validateTestMedium(com.github.jmeta.library.media.api.types.IMedium)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#validateTestMedium(com.github.jmeta.library.media.api.types.Medium)
     */
    @Override
-   protected void validateTestMedium(IMedium<?> theMedium) {
+   protected void validateTestMedium(Medium<?> theMedium) {
       if (!theMedium.isReadOnly()) {
          throw new TestDataException("The test IMedium must be a read-only medium", null);
       }

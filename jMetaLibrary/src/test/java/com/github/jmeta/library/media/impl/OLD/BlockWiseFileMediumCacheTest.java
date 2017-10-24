@@ -19,7 +19,7 @@ public class BlockWiseFileMediumCacheTest extends FileMediumCacheTest {
 
    private static final int MAXIMUM_CACHE_BLOCK_SIZE = 20;
 
-   private IMediumCache m_theCache = null;
+   private MediumCache m_theCache = null;
 
    /**
     * Creates a new {@BlockWiseFileMediumCacheTest }.
@@ -41,7 +41,7 @@ public class BlockWiseFileMediumCacheTest extends FileMediumCacheTest {
     * @see FileMediumCacheTest#getTestling()
     */
    @Override
-   protected IMediumCache getTestling() {
+   protected MediumCache getTestling() {
 
       if (m_theCache == null) {
          final FileMediumAccessor accessor = new FileMediumAccessor(

@@ -24,7 +24,6 @@ import com.github.jmeta.library.dataformats.api.types.Flags7ByteXXXTest;
 import com.github.jmeta.library.dataformats.api.types.Flags8ByteXXXTest;
 import com.github.jmeta.library.dataformats.api.types.FlagsMultibitTest;
 import com.github.jmeta.library.media.AllMediaTests;
-import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests;
 
 /**
  * {@link AlljMetaLibraryTests} is used for running all test cases of the extension management component.

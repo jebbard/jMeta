@@ -9,10 +9,10 @@
  */
 package com.github.jmeta.library.media.api.exceptions;
 
-import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.Medium;
 
 /**
- * {@link ReadOnlyMediumException} is thrown whenever a read-only {@link IMedium} is accessed writing.
+ * {@link ReadOnlyMediumException} is thrown whenever a read-only {@link Medium} is accessed writing.
  */
 public class ReadOnlyMediumException extends MediumAccessException {
 
@@ -22,11 +22,11 @@ public class ReadOnlyMediumException extends MediumAccessException {
     * Creates a new {@link ReadOnlyMediumException}.
     * 
     * @param medium
-    *           The {@link IMedium} that is read-only
+    *           The {@link Medium} that is read-only
     * @param cause
     *           The cause
     */
-   public ReadOnlyMediumException(IMedium<?> medium, Throwable cause) {
+   public ReadOnlyMediumException(Medium<?> medium, Throwable cause) {
       super("Medium <" + medium + "> is read-only!", cause);
    }
 }

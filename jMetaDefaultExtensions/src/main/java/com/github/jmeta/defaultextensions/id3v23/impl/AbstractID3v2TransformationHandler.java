@@ -2,9 +2,9 @@
 package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractTransformationHandler;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -24,20 +24,20 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
     * @param dbFactory
     * @param logging
     */
-   public AbstractID3v2TransformationHandler(DataTransformationType dtt, int handlerId, IDataBlockFactory dbFactory) {
+   public AbstractID3v2TransformationHandler(DataTransformationType dtt, int handlerId, DataBlockFactory dbFactory) {
       super(dtt, dbFactory);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#transform(com.github.jmeta.library.datablocks.api.types.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#transform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
-   public IContainer transform(IContainer container) {
+   public Container transform(Container container) {
 
       Reject.ifNull(container, "container");
       Reject.ifFalse(requiresTransform(container), "requiresTransform(container)");
 
-      IPayload payload = container.getPayload();
+      Payload payload = container.getPayload();
 
       if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE)
          throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
@@ -55,15 +55,15 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#untransform(com.github.jmeta.library.datablocks.api.types.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#untransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
-   public IContainer untransform(IContainer container) {
+   public Container untransform(Container container) {
 
       Reject.ifNull(container, "container");
       Reject.ifFalse(requiresUntransform(container), "requiresUntransform(container)");
 
-      IPayload payload = container.getPayload();
+      Payload payload = container.getPayload();
 
       if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE)
          throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");

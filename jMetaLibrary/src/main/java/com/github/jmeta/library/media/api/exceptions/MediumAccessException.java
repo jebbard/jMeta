@@ -7,10 +7,10 @@
 
 package com.github.jmeta.library.media.api.exceptions;
 
-import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.Medium;
 
 /**
- * This exception is thrown whenever an {@link IMedium} could not be accessed.
+ * This exception is thrown whenever an {@link Medium} could not be accessed.
  */
 public class MediumAccessException extends RuntimeException {
 

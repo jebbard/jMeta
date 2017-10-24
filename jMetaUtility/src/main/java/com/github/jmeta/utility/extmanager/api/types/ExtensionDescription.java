@@ -11,10 +11,10 @@ package com.github.jmeta.utility.extmanager.api.types;
 
 import java.time.LocalDateTime;
 
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 
 /**
- * {@link ExtensionDescription} is just a set of additional descriptions of an {@link IExtension}. These values just
+ * {@link ExtensionDescription} is just a set of additional descriptions of an {@link Extension}. These values just
  * have information purpose and are not used in any functional way.
  */
 public class ExtensionDescription {

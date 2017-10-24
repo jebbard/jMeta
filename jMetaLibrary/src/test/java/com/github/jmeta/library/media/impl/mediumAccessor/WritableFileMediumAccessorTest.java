@@ -50,7 +50,7 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
    }
 
    /**
-    * @see AbstractIMediumAccessorTest#getReadTestDataToUse()
+    * @see AbstractMediumAccessorTest#getReadTestDataToUse()
     */
    @Override
    protected List<ReadTestData> getReadTestDataToUse() {
@@ -67,7 +67,7 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getExpectedMedium()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
     */
    @Override
    protected FileMedium getExpectedMedium() {
@@ -75,7 +75,7 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getReadTestDataUntilEndOfMedium()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
@@ -83,15 +83,15 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
    }
 
    /**
-    * @see AbstractIMediumAccessorTest#getImplementationToTest()
+    * @see AbstractMediumAccessorTest#getImplementationToTest()
     */
    @Override
-   protected IMediumAccessor<?> createImplementationToTest() {
+   protected MediumAccessor<?> createImplementationToTest() {
       return new FileMediumAccessor(getExpectedMedium());
    }
 
    /**
-    * @see AbstractIMediumAccessorTest#prepareMediumData(byte[])
+    * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
     */
    @Override
    protected void prepareMediumData(byte[] testFileContents) {

@@ -10,7 +10,7 @@ package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 
 import com.github.jmeta.defaultextensions.id3v1.impl.ID3v1DataBlocksService;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
-import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 
 /**
  * {@link Lyrics3v2DataBlocksService}
@@ -26,7 +26,7 @@ public class Lyrics3v2DataBlocksService extends AbstractDataService {
    }
 
    @Override
-   public IExtendedDataBlockFactory getDataBlockFactory() {
+   public ExtendedDataBlockFactory getDataBlockFactory() {
 
       return new Lyrics3v2DataBlockFactory();
    }

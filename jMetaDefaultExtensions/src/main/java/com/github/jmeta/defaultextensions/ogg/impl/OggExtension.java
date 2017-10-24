@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.ChildOrder;
@@ -37,14 +37,14 @@ import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link OggExtension}
  *
  */
-public class OggExtension implements IExtension {
+public class OggExtension implements Extension {
 
    private static final byte[] OGG_MAGIC_KEY_BYTES = new byte[] { 'O', 'g', 'g', 'S' };
    private static final String OGG_MAGIC_KEY_STRING = "OggS";
@@ -55,7 +55,7 @@ public class OggExtension implements IExtension {
       new ArrayList<String>(), "", new Date());
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -63,7 +63,7 @@ public class OggExtension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -71,21 +71,21 @@ public class OggExtension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();
 
-      if (serviceInterface == IDataFormatSpecification.class) {
+      if (serviceInterface == DataFormatSpecification.class) {
          serviceProviders.add((T) createSpecification());
-      } else if (serviceInterface == IDataBlockService.class) {
+      } else if (serviceInterface == DataBlockService.class) {
          serviceProviders.add((T) new OggDataBlocksService());
       }
       return serviceProviders;
    }
 
-   private IDataFormatSpecification createSpecification() {
+   private DataFormatSpecification createSpecification() {
 
       // Data blocks
       final DataBlockId oggPageId = new DataBlockId(OGG, "ogg");
@@ -363,7 +363,7 @@ public class OggExtension implements IExtension {
 
       final Set<DataBlockId> genericDataBlocks = new HashSet<>();
 
-      IDataFormatSpecification dummyOggSpec = new StandardDataFormatSpecification(OGG, descMap, topLevelIds,
+      DataFormatSpecification dummyOggSpec = new StandardDataFormatSpecification(OGG, descMap, topLevelIds,
          genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 

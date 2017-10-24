@@ -16,30 +16,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
-import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.services.MediaAPI;
+import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.exceptions.InvalidExtensionException;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
-import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
+import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
+import com.github.jmeta.utility.logging.api.services.LoggingMessageConstants;
 
 /**
  *
  */
-public class StandardDataBlockAccessor implements IDataBlockAccessor {
+public class StandardDataBlockAccessor implements DataBlockAccessor {
    // TODO stage2_013: Provide means to set timeouts (read block timeout + identify timeout)
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
@@ -53,7 +53,7 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
 
       for (Iterator<DataFormat> iterator = m_readers.keySet().iterator(); iterator.hasNext();) {
          DataFormat nextKey = iterator.next();
-         IDataBlockReader nextValue = m_readers.get(nextKey);
+         DataBlockReader nextValue = m_readers.get(nextKey);
 
          nextValue.setMaxFieldBlockSize(lazyFieldSize);
       }
@@ -66,29 +66,29 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
     */
    public StandardDataBlockAccessor() {
 
-      extManager = ComponentRegistry.lookupService(IExtensionManager.class);
+      extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
-      m_repository = ComponentRegistry.lookupService(IDataFormatRepository.class);
-      m_mediumFactory = ComponentRegistry.lookupService(IMediaAPI.class);
+      m_repository = ComponentRegistry.lookupService(DataFormatRepository.class);
+      m_mediumFactory = ComponentRegistry.lookupService(MediaAPI.class);
 
-      List<IExtension> extBundles = extManager.getAllExtensions();
+      List<Extension> extBundles = extManager.getAllExtensions();
 
       String validatingExtensions = "Validating registered data blocks extensions"
-         + ILoggingMessageConstants.SUFFIX_TASK;
+         + LoggingMessageConstants.SUFFIX_TASK;
 
-      LOGGER.info(ILoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
+      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
-      for (IExtension iExtension2 : extBundles) {
-         List<IDataBlockService> bundleDataBlocksExtensions = iExtension2
-            .getAllServiceProviders(IDataBlockService.class);
+      for (Extension iExtension2 : extBundles) {
+         List<DataBlockService> bundleDataBlocksExtensions = iExtension2
+            .getAllServiceProviders(DataBlockService.class);
 
-         for (IDataBlockService dataBlocksExtension : bundleDataBlocksExtensions) {
+         for (DataBlockService dataBlocksExtension : bundleDataBlocksExtensions) {
             final DataFormat extensionDataFormat = dataBlocksExtension.getDataFormat();
 
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataBlocksExtension
                   + " must not return null for its data format.";
-               LOGGER.error(ILoggingMessageConstants.PREFIX_TASK_FAILED + ILoggingMessageConstants.PREFIX_CRITICAL_ERROR
+               LOGGER.error(LoggingMessageConstants.PREFIX_TASK_FAILED + LoggingMessageConstants.PREFIX_CRITICAL_ERROR
                   + validatingExtensions);
                LOGGER.error(message);
                throw new InvalidExtensionException(message, iExtension2);
@@ -106,7 +106,7 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
          }
       }
 
-      LOGGER.info(ILoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
+      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
    }
 
    /**
@@ -115,20 +115,20 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
     * @param bundle
     * @param logging
     */
-   private void addDataBlockExtensions(IExtension iExtension2, IDataBlockService dataBlocksExtensions) {
+   private void addDataBlockExtensions(Extension iExtension2, DataBlockService dataBlocksExtensions) {
 
       DataFormat format = dataBlocksExtensions.getDataFormat();
 
-      final IDataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
+      final DataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
 
       if (spec == null) {
          throw new InvalidExtensionException("The extension " + iExtension2.getExtensionId() + " for data format "
             + format + " must have a corresponding registered data format specification for the format.", iExtension2);
       }
 
-      IDataBlockReader dataBlockReader = dataBlocksExtensions.getDataBlockReader(spec, m_lazyFieldSize);
+      DataBlockReader dataBlockReader = dataBlocksExtensions.getDataBlockReader(spec, m_lazyFieldSize);
 
-      IExtendedDataBlockFactory dataBlockFactory = dataBlocksExtensions.getDataBlockFactory();
+      ExtendedDataBlockFactory dataBlockFactory = dataBlocksExtensions.getDataBlockFactory();
 
       // Set default data block factory
       if (dataBlockFactory == null)
@@ -138,7 +138,7 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
 
       m_factories.put(format, dataBlockFactory);
 
-      List<ITransformationHandler> transformationHandlers = dataBlocksExtensions.getTransformationHandlers(spec,
+      List<TransformationHandler> transformationHandlers = dataBlocksExtensions.getTransformationHandlers(spec,
          m_factories.get(format));
 
       if (transformationHandlers == null) {
@@ -146,10 +146,10 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
             "Transformation handlers returned by " + iExtension2.getExtensionId() + " must not be null", iExtension2);
       }
 
-      Map<DataTransformationType, ITransformationHandler> transformationHandlersMap = new HashMap<>();
+      Map<DataTransformationType, TransformationHandler> transformationHandlersMap = new HashMap<>();
 
       for (int i = 0; i < transformationHandlers.size(); ++i) {
-         ITransformationHandler handler = transformationHandlers.get(i);
+         TransformationHandler handler = transformationHandlers.get(i);
 
          transformationHandlersMap.put(handler.getTransformationType(), handler);
       }
@@ -164,10 +164,10 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
    }
 
    /**
-    * @see IDataBlockAccessor#getContainerIterator
+    * @see DataBlockAccessor#getContainerIterator
     */
    @Override
-   public AbstractDataBlockIterator<IContainer> getContainerIterator(IMedium<?> medium,
+   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium,
       List<DataFormat> dataFormatHints, boolean forceMediumReadOnly) {
 
       Reject.ifNull(dataFormatHints, "dataFormatHints");
@@ -177,7 +177,7 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
    }
 
    @Override
-   public AbstractDataBlockIterator<IContainer> getReverseContainerIterator(IMedium<?> medium,
+   public AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium,
       List<DataFormat> dataFormatHints, boolean forceMediumReadOnly) {
 
       Reject.ifNull(dataFormatHints, "dataFormatHints");
@@ -191,19 +191,19 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#getDataBlockFactory(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getDataBlockFactory(DataFormat)
     */
    @Override
-   public IDataBlockFactory getDataBlockFactory(DataFormat dataFormat) {
+   public DataBlockFactory getDataBlockFactory(DataFormat dataFormat) {
 
       return m_factories.get(dataFormat);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#getTransformationHandlers(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(DataFormat)
     */
    @Override
-   public Map<DataTransformationType, ITransformationHandler> getTransformationHandlers(DataFormat dataFormat) {
+   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers(DataFormat dataFormat) {
 
       Reject.ifNull(dataFormat, "dataFormat");
 
@@ -211,12 +211,12 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockAccessor#setTransformationHandler(DataFormat, DataTransformationType,
-    *      com.github.jmeta.library.datablocks.api.services.ITransformationHandler)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(DataFormat, DataTransformationType,
+    *      com.github.jmeta.library.datablocks.api.services.TransformationHandler)
     */
    @Override
    public void setTransformationHandler(DataFormat dataFormat, DataTransformationType transformationType,
-      ITransformationHandler handler) {
+      TransformationHandler handler) {
 
       Reject.ifNull(dataFormat, "dataFormat");
 
@@ -225,21 +225,21 @@ public class StandardDataBlockAccessor implements IDataBlockAccessor {
 
    private int m_lazyFieldSize = DEFAULT_LAZY_FIELD_SIZE;
 
-   private final IDataFormatRepository m_repository;
+   private final DataFormatRepository m_repository;
 
-   private final IMediaAPI m_mediumFactory;
+   private final MediaAPI m_mediumFactory;
 
-   private final Map<DataFormat, IDataBlockReader> m_readers = new HashMap<>();
+   private final Map<DataFormat, DataBlockReader> m_readers = new HashMap<>();
 
-   private final Map<DataFormat, IExtendedDataBlockFactory> m_factories = new HashMap<>();
+   private final Map<DataFormat, ExtendedDataBlockFactory> m_factories = new HashMap<>();
 
-   private final IExtensionManager extManager;
+   private final ExtensionManager extManager;
 
    /**
-    * @see IDataBlockAccessor#closeMedium
+    * @see DataBlockAccessor#closeMedium
     */
    @Override
-   public void closeMedium(IMedium<?> medium) {
+   public void closeMedium(Medium<?> medium) {
 
       Reject.ifNull(medium, "medium");
 

@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * Represents a permanent in-memory cache for an {@link IMedium}. It provides methods for adding and retrieving cache
+ * Represents a permanent in-memory cache for an {@link Medium}. It provides methods for adding and retrieving cache
  * data. Cache data is represented using {@link MediumRegion} instances. The cache itself and its {@link MediumRegion}s
  * adhere to a maximum size that can be passed to the constructor of this class.
  * 
@@ -40,12 +40,12 @@ public class MediumCache {
 
    private final long maximumCacheSizeInBytes;
    private final int maximumCacheRegionSizeInBytes;
-   private final IMedium<?> medium;
+   private final Medium<?> medium;
 
-   private static final Comparator<IMediumReference> OFFSET_ORDER_ASCENDING_COMPARATOR = (leftRef,
+   private static final Comparator<MediumReference> OFFSET_ORDER_ASCENDING_COMPARATOR = (leftRef,
       rightRef) -> new Long(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset());
 
-   private final TreeMap<IMediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(
+   private final TreeMap<MediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(
       OFFSET_ORDER_ASCENDING_COMPARATOR);
    private final List<MediumRegion> cachedRegionsInInsertOrder = new LinkedList<>();
 
@@ -55,9 +55,9 @@ public class MediumCache {
     * throughout the lifetime of a {@link MediumCache} instance.
     * 
     * @param medium
-    *           The {@link IMedium} instance this cache is based on.
+    *           The {@link Medium} instance this cache is based on.
     */
-   public MediumCache(IMedium<?> medium) {
+   public MediumCache(Medium<?> medium) {
       this(medium, UNLIMITED_CACHE_SIZE, UNLIMITED_CACHE_REGION_SIZE);
    }
 
@@ -66,14 +66,14 @@ public class MediumCache {
     * that these sizes remain unchanged throughout the lifetime of a {@link MediumCache} instance.
     * 
     * @param medium
-    *           The {@link IMedium} instance this cache is based on.
+    *           The {@link Medium} instance this cache is based on.
     * @param maximumCacheSizeInBytes
     *           The maximum cache size in bytes, must be bigger than zero.
     * @param maximumCacheRegionSizeInBytes
     *           The maximum cache size in bytes, must be bigger than zero. Must be smaller than the maximum cache size
     *           given in the other parameter.
     */
-   public MediumCache(IMedium<?> medium, long maximumCacheSizeInBytes, int maximumCacheRegionSizeInBytes) {
+   public MediumCache(Medium<?> medium, long maximumCacheSizeInBytes, int maximumCacheRegionSizeInBytes) {
 
       Reject.ifNull(medium, "medium");
 
@@ -86,9 +86,9 @@ public class MediumCache {
    }
 
    /**
-    * @return The {@link IMedium} instance this cache is used for.
+    * @return The {@link Medium} instance this cache is used for.
     */
-   public IMedium<?> getMedium() {
+   public Medium<?> getMedium() {
       return medium;
    }
 
@@ -117,7 +117,7 @@ public class MediumCache {
 
    /**
     * @return all {@link MediumRegion}s currently maintained in this {@link MediumCache}, ordered by their
-    *         {@link IMediumReference} ascending. If there are none currently, returns an empty {@link List}.
+    *         {@link MediumReference} ascending. If there are none currently, returns an empty {@link List}.
     */
    public List<MediumRegion> getAllCachedRegions() {
       return new ArrayList<>(cachedRegionsInOffsetOrder.values());
@@ -148,14 +148,14 @@ public class MediumCache {
     * </ul>
     * 
     * @param startReference
-    *           The starting {@link IMediumReference} of the range. Must refer to the same {@link IMedium} as returned
+    *           The starting {@link MediumReference} of the range. Must refer to the same {@link Medium} as returned
     *           by {@link #getMedium()}.
     * @param rangeSizeInBytes
     *           The size of the range in bytes. Must not be negative and must not be zero.
     * @return {@link MediumRegion}s covering the whole range specified as input parameters. For details see the method
     *         description above.
     */
-   public List<MediumRegion> getRegionsInRange(IMediumReference startReference, int rangeSizeInBytes) {
+   public List<MediumRegion> getRegionsInRange(MediumReference startReference, int rangeSizeInBytes) {
 
       Reject.ifNull(startReference, "startReference");
       Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
@@ -169,16 +169,16 @@ public class MediumCache {
 
       MediumRegion virtualRangeRegion = new MediumRegion(startReference, rangeSizeInBytes);
 
-      IMediumReference endReference = virtualRangeRegion.calculateEndReference();
+      MediumReference endReference = virtualRangeRegion.calculateEndReference();
 
-      IMediumReference firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder
+      MediumReference firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder
          .floorKey(startReference);
 
       if (firstCachedRegionReferenceNearToStartReference == null) {
          firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder.ceilingKey(startReference);
 
          if (firstCachedRegionReferenceNearToStartReference == null) {
-            throw new IllegalStateException("The cache is not empty, but no " + IMediumReference.class.getSimpleName()
+            throw new IllegalStateException("The cache is not empty, but no " + MediumReference.class.getSimpleName()
                + " was found that is smaller, equal or bigger than the given start reference <" + startReference
                + ">. This must never happen.");
          }
@@ -195,14 +195,14 @@ public class MediumCache {
          return regionsInRange;
       }
 
-      Map<IMediumReference, MediumRegion> cachedRegionsStartingWithFirstNearRangeStart = cachedRegionsInOffsetOrder
+      Map<MediumReference, MediumRegion> cachedRegionsStartingWithFirstNearRangeStart = cachedRegionsInOffsetOrder
          .tailMap(firstCachedRegionReferenceNearToStartReference);
 
-      IMediumReference previousRegionEndReference = startReference;
+      MediumReference previousRegionEndReference = startReference;
 
       for (MediumRegion currentRegion : cachedRegionsStartingWithFirstNearRangeStart.values()) {
-         IMediumReference currentRegionStartReference = currentRegion.getStartReference();
-         IMediumReference currentRegionEndReference = currentRegion.calculateEndReference();
+         MediumReference currentRegionStartReference = currentRegion.getStartReference();
+         MediumReference currentRegionEndReference = currentRegion.calculateEndReference();
 
          MediumRegionOverlapType overlapWithRangeRegion = MediumRegion.determineOverlapWithOtherRegion(currentRegion,
             virtualRangeRegion);
@@ -224,24 +224,24 @@ public class MediumCache {
    }
 
    /**
-    * Returns the number of consecutively cached bytes starting the the given start {@link IMediumReference}. If there
+    * Returns the number of consecutively cached bytes starting the the given start {@link MediumReference}. If there
     * is no cached byte at the given start reference, returns 0L. THe methods stops at the first non cached byte behind
     * start reference, so whenever the first gap is detected.
     * 
     * @param startReference
-    *           The starting {@link IMediumReference}. Must refer to the same {@link IMedium} as returned by
+    *           The starting {@link MediumReference}. Must refer to the same {@link Medium} as returned by
     *           {@link #getMedium()}.
-    * @return the number of consecutively cached bytes starting the the given start {@link IMediumReference}. For
+    * @return the number of consecutively cached bytes starting the the given start {@link MediumReference}. For
     *         details see the method description above.
     */
-   public long getCachedByteCountAt(IMediumReference startReference) {
+   public long getCachedByteCountAt(MediumReference startReference) {
 
       Reject.ifNull(startReference, "startReference");
       Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
 
       long totalCachedByteCount = 0L;
 
-      IMediumReference previousOrEqualReference = cachedRegionsInOffsetOrder.floorKey(startReference);
+      MediumReference previousOrEqualReference = cachedRegionsInOffsetOrder.floorKey(startReference);
 
       if (previousOrEqualReference != null) {
          MediumRegion previousRegion = cachedRegionsInOffsetOrder.get(previousOrEqualReference);
@@ -250,10 +250,10 @@ public class MediumCache {
             totalCachedByteCount += previousRegion.getSize()
                - startReference.distanceTo(previousRegion.getStartReference());
 
-            Map<IMediumReference, MediumRegion> tailRegions = cachedRegionsInOffsetOrder.tailMap(startReference, false);
+            Map<MediumReference, MediumRegion> tailRegions = cachedRegionsInOffsetOrder.tailMap(startReference, false);
 
-            for (Iterator<IMediumReference> iterator = tailRegions.keySet().iterator(); iterator.hasNext();) {
-               IMediumReference nextReference = iterator.next();
+            for (Iterator<MediumReference> iterator = tailRegions.keySet().iterator(); iterator.hasNext();) {
+               MediumReference nextReference = iterator.next();
 
                MediumRegion nextRegion = tailRegions.get(nextReference);
 
@@ -288,7 +288,7 @@ public class MediumCache {
     * added to the cache.
     * 
     * @param regionToAdd
-    *           The new {@link MediumRegion} to add. Must contain data and must refer to the same {@link IMedium} as
+    *           The new {@link MediumRegion} to add. Must contain data and must refer to the same {@link Medium} as
     *           returned by {@link #getMedium()}.
     */
    public void addRegion(MediumRegion regionToAdd) {
@@ -344,13 +344,13 @@ public class MediumCache {
     * {@link #getMaximumCacheRegionSizeInBytes()} each.
     * 
     * @param previousRegionEndReference
-    *           The start {@link IMediumReference} of the range
+    *           The start {@link MediumReference} of the range
     * @param currentRegionStartReference
-    *           The start {@link IMediumReference} of the range
+    *           The start {@link MediumReference} of the range
     * @return all uncached gap {@link MediumRegion}s in the range.
     */
-   private List<MediumRegion> getGapsBetweenCurrentAndPreviousCachedRegion(IMediumReference previousRegionEndReference,
-      IMediumReference currentRegionStartReference) {
+   private List<MediumRegion> getGapsBetweenCurrentAndPreviousCachedRegion(MediumReference previousRegionEndReference,
+      MediumReference currentRegionStartReference) {
 
       List<MediumRegion> gapRegions = new ArrayList<>();
 
@@ -369,23 +369,23 @@ public class MediumCache {
    /**
     * This method performs the actual splitting of a {@link MediumRegion} according to the maximum allowed cache region
     * size. It is used with
-    * {@link MediumRangeChunkAction#walkDividedRange(Class, IMediumReference, int, int, MediumRangeChunkAction)} and is
+    * {@link MediumRangeChunkAction#walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)} and is
     * called for each chunk the original {@link MediumRegion} is split into. It returns the {@link MediumRegion}
     * corresponding to the current chunk.
     * 
     * @param regionToSplit
     *           The enclosing region to split
     * @param chunkStartReference
-    *           The start {@link IMediumReference} of the current chunk
+    *           The start {@link MediumReference} of the current chunk
     * @param chunkSize
     *           The size of the current chunk
-    * @return The split {@link MediumRegion} with given start {@link IMediumReference} and (chunk) size with the
+    * @return The split {@link MediumRegion} with given start {@link MediumReference} and (chunk) size with the
     *         corresponding portion of the original region to split.
     */
    private MediumRegion splitRegionExceedingMaxCacheRegionSize(MediumRegion regionToSplit,
-      IMediumReference chunkStartReference, int chunkSize) {
+      MediumReference chunkStartReference, int chunkSize) {
 
-      IMediumReference chunkEndReference = chunkStartReference.advance(chunkSize);
+      MediumReference chunkEndReference = chunkStartReference.advance(chunkSize);
 
       MediumRegion splitRegion = regionToSplit;
 

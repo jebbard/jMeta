@@ -18,7 +18,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * @param <T>
  *           The concrete type of wrapped medium object.
  */
-public abstract class AbstractMedium<T> implements IMedium<T> {
+public abstract class AbstractMedium<T> implements Medium<T> {
 
    private T medium;
 
@@ -28,39 +28,69 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
 
    private final boolean isReadOnly;
 
-   private final boolean isCacheable;
+   private final boolean cachingEnabled;
 
-   private boolean cachingEnabled = DEFAULT_CACHING_ENABLED;
+   private final long maxCacheSizeInBytes;
 
-   private long maxCacheSizeInBytes = DEFAULT_MAX_CACHE_SIZE_IN_BYTES;
+   private final int maxCacheRegionSizeInBytes;
 
-   private int maxCacheRegionSizeInBytes = DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES;
-
-   private int maxReadWriteBlockSizeInBytes = DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES;
+   private final int maxReadWriteBlockSizeInBytes;
 
    /**
-    * Creates a new {@link AbstractMedium}.
+    * Creates a new {@link AbstractMedium} with caching enabled (see {@link #isCachingEnabled()}), and default values
+    * used for all configuration values, see {@link #getMaxCacheRegionSizeInBytes()}, {@link #getMaxCacheSizeInBytes()}
+    * and {@link #getMaxReadWriteBlockSizeInBytes()}.
     * 
     * @param medium
-    *           The medium to store.
+    *           see #AbstractMedium(Object, String, boolean, boolean, boolean, long, int, int)
+    * @param name
+    *           see #AbstractMedium(Object, String, boolean, boolean, boolean, long, int, int)
+    * @param isRandomAccess
+    *           see #AbstractMedium(Object, String, boolean, boolean, boolean, long, int, int)
+    * @param isReadOnly
+    *           see #AbstractMedium(Object, String, boolean, boolean, boolean, long, int, int)
+    */
+   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly) {
+      this(medium, name, isRandomAccess, isReadOnly, true, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
+         DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+   }
+
+   /**
+    * Creates a new {@link AbstractMedium}, using explicit values for all properties.
+    * 
+    * @param medium
+    *           The underlying raw medium object
     * @param name
     *           An externally known name of the {@link AbstractMedium} that must be used as medium name. May be null to
     *           indicate that only the physical name of the {@link AbstractMedium} is relevant.
     * @param isRandomAccess
     *           true if the medium is random-access, false otherwise
     * @param isReadOnly
-    *           true to make this a read-only {@link IMedium}, false otherwise.
-    * @param isCacheable
-    *           true if this {@link AbstractMedium} supports caching, false otherwise
+    *           true to make this a read-only {@link Medium}, false otherwise.
+    * @param cachingEnabled
+    *           see {@link #isCachingEnabled()}
+    * @param maxCacheSizeInBytes
+    *           see #getMaxCacheSizeInBytes()
+    * @param maxCacheRegionSizeInBytes
+    *           see #getMaxCacheRegionSizeInBytes()
+    * @param maxReadWriteBlockSizeInBytes
+    *           see #getMaxReadWriteBlockSizeInBytes()
     */
-   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, boolean isCacheable) {
-      Reject.ifNull(medium, "medium");
+   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, boolean cachingEnabled,
+      long maxCacheSizeInBytes, int maxCacheRegionSizeInBytes, int maxReadWriteBlockSizeInBytes) {
+      Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
+      Reject.ifNegativeOrZero(maxCacheSizeInBytes, "maxCacheSizeInBytes");
+      Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
+      Reject.ifTrue(maxCacheRegionSizeInBytes > maxCacheSizeInBytes, "maxCacheRegionSizeInBytes > maxCacheSizeInBytes");
 
       this.medium = medium;
       this.name = name;
       this.isRandomAccess = isRandomAccess;
       this.isReadOnly = isReadOnly;
-      this.isCacheable = isCacheable;
+      this.cachingEnabled = cachingEnabled;
+      this.maxCacheSizeInBytes = maxCacheSizeInBytes;
+      this.maxCacheRegionSizeInBytes = maxCacheRegionSizeInBytes;
+      this.maxReadWriteBlockSizeInBytes = maxReadWriteBlockSizeInBytes;
    }
 
    /**
@@ -107,13 +137,13 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    @Override
    public String toString() {
       return "AbstractMedium [medium=" + medium + ", name=" + name + ", isRandomAccess=" + isRandomAccess
-         + ", isReadOnly=" + isReadOnly + ", isCacheable=" + isCacheable + ", cachingEnabled=" + cachingEnabled
-         + ", maxCacheSizeInBytes=" + maxCacheSizeInBytes + ", maxCacheRegionSizeInBytes=" + maxCacheRegionSizeInBytes
+         + ", isReadOnly=" + isReadOnly + ", cachingEnabled=" + cachingEnabled + ", maxCacheSizeInBytes="
+         + maxCacheSizeInBytes + ", maxCacheRegionSizeInBytes=" + maxCacheRegionSizeInBytes
          + ", maxReadWriteBlockSizeInBytes=" + maxReadWriteBlockSizeInBytes + "]";
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#getName()
+    * @see com.github.jmeta.library.media.api.types.Medium#getName()
     */
    @Override
    public String getName() {
@@ -122,7 +152,7 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#getWrappedMedium()
+    * @see com.github.jmeta.library.media.api.types.Medium#getWrappedMedium()
     */
    @Override
    public T getWrappedMedium() {
@@ -131,7 +161,7 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#isRandomAccess()
+    * @see com.github.jmeta.library.media.api.types.Medium#isRandomAccess()
     */
    @Override
    public boolean isRandomAccess() {
@@ -140,7 +170,7 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#isReadOnly()
+    * @see com.github.jmeta.library.media.api.types.Medium#isReadOnly()
     */
    @Override
    public boolean isReadOnly() {
@@ -149,15 +179,7 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#isCacheable()
-    */
-   @Override
-   public boolean isCacheable() {
-      return isCacheable;
-   }
-
-   /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#isCachingEnabled()
+    * @see com.github.jmeta.library.media.api.types.Medium#isCachingEnabled()
     */
    @Override
    public boolean isCachingEnabled() {
@@ -165,15 +187,7 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#setCachingEnabled(boolean)
-    */
-   @Override
-   public void setCachingEnabled(boolean cachingEnabled) {
-      this.cachingEnabled = cachingEnabled;
-   }
-
-   /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#getMaxCacheSizeInBytes()
+    * @see com.github.jmeta.library.media.api.types.Medium#getMaxCacheSizeInBytes()
     */
    @Override
    public long getMaxCacheSizeInBytes() {
@@ -181,19 +195,7 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#setMaxCacheSizeInBytes(long)
-    */
-   @Override
-   public void setMaxCacheSizeInBytes(long maxCacheSizeInBytes) {
-      Reject.ifNegativeOrZero(maxCacheSizeInBytes, "maxCacheSizeInBytes");
-      Reject.ifTrue(maxCacheSizeInBytes < getMaxCacheRegionSizeInBytes(),
-         "maxCacheSizeInBytes < getMaxCacheRegionSizeInBytes()");
-
-      this.maxCacheSizeInBytes = maxCacheSizeInBytes;
-   }
-
-   /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#getMaxCacheRegionSizeInBytes()
+    * @see com.github.jmeta.library.media.api.types.Medium#getMaxCacheRegionSizeInBytes()
     */
    @Override
    public int getMaxCacheRegionSizeInBytes() {
@@ -201,33 +203,11 @@ public abstract class AbstractMedium<T> implements IMedium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#setMaxCacheRegionSizeInBytes(int)
-    */
-   @Override
-   public void setMaxCacheRegionSizeInBytes(int maxCacheRegionSizeInBytes) {
-      Reject.ifNegativeOrZero(maxCacheRegionSizeInBytes, "maxCacheRegionSizeInBytes");
-      Reject.ifTrue(maxCacheRegionSizeInBytes > getMaxCacheSizeInBytes(),
-         "maxCacheRegionSizeInBytes > getMaxCacheSizeInBytes()");
-
-      this.maxCacheRegionSizeInBytes = maxCacheRegionSizeInBytes;
-   }
-
-   /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#getMaxReadWriteBlockSizeInBytes()
+    * @see com.github.jmeta.library.media.api.types.Medium#getMaxReadWriteBlockSizeInBytes()
     */
    @Override
    public int getMaxReadWriteBlockSizeInBytes() {
       return maxReadWriteBlockSizeInBytes;
-   }
-
-   /**
-    * @see com.github.jmeta.library.media.api.types.IMedium#setMaxReadWriteBlockSizeInBytes(int)
-    */
-   @Override
-   public void setMaxReadWriteBlockSizeInBytes(int maxReadWriteBlockSizeInBytes) {
-      Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
-
-      this.maxReadWriteBlockSizeInBytes = maxReadWriteBlockSizeInBytes;
    }
 
    /**

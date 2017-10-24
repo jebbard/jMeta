@@ -13,38 +13,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.datablocks.api.types.IDataBlock;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.datablocks.api.types.IHeader;
-import com.github.jmeta.library.datablocks.api.types.IPayload;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Header;
+import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.services.MediaAPI;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *
  */
 @SuppressWarnings("rawtypes")
-public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
+public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.IDataBlock, IMediumReference, java.util.List, com.github.jmeta.library.datablocks.api.types.IPayload,
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.types.DataBlock, MediumReference, java.util.List, com.github.jmeta.library.datablocks.api.types.Payload,
     *      java.util.List)
     */
    @Override
-   public IContainer createContainer(DataBlockId id, IDataBlock parent,
-      IMediumReference reference, List<IHeader> headers, IPayload payload,
-      List<IHeader> footers) {
+   public Container createContainer(DataBlockId id, DataBlock parent,
+      MediumReference reference, List<Header> headers, Payload payload,
+      List<Header> footers) {
 
       Reject.ifNull(id, "id");
       Reject.ifNull(reference, "reference");
@@ -56,12 +56,12 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
-    *      IDataFormatSpecification, IMediumReference, BinaryValue, ByteOrder, Charset)
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
+    *      DataFormatSpecification, MediumReference, BinaryValue, ByteOrder, Charset)
     */
    @Override
-   public <T> IField<T> createFieldFromBytes(DataBlockId id,
-      IDataFormatSpecification spec, IMediumReference reference,
+   public <T> Field<T> createFieldFromBytes(DataBlockId id,
+      DataFormatSpecification spec, MediumReference reference,
       BinaryValue fieldBytes, ByteOrder byteOrder, Charset characterEncoding) {
 
       Reject.ifNull(id, "fieldDesc");
@@ -73,7 +73,7 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
 
       @SuppressWarnings("unchecked")
       StandardField<T> field = new StandardField<>(desc, fieldBytes, reference,
-         (IFieldConverter<T>) getFieldConverter(id));
+         (FieldConverter<T>) getFieldConverter(id));
 
       field.initByteOrder(byteOrder);
       field.initCharacterEncoding(characterEncoding);
@@ -82,12 +82,12 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      IMediumReference, long, com.github.jmeta.library.datablocks.api.services.IDataBlockReader, FieldFunctionStack)
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      MediumReference, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader, FieldFunctionStack)
     */
    @Override
-   public IPayload createPayloadAfterRead(DataBlockId id,
-      IMediumReference reference, long totalSize, IDataBlockReader reader,
+   public Payload createPayloadAfterRead(DataBlockId id,
+      MediumReference reference, long totalSize, DataBlockReader reader,
       FieldFunctionStack context) {
 
       Reject.ifNull(id, "id");
@@ -97,12 +97,12 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      IMediumReference, java.util.List, boolean)
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      MediumReference, java.util.List, boolean)
     */
    @Override
-   public IHeader createHeader(DataBlockId id, IMediumReference reference,
-      List<IField<?>> fields, boolean isFooter) {
+   public Header createHeader(DataBlockId id, MediumReference reference,
+      List<Field<?>> fields, boolean isFooter) {
 
       Reject.ifNull(id, "headerRef");
       Reject.ifNull(reference, "parent");
@@ -113,10 +113,10 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory#setDataBlockReader(com.github.jmeta.library.datablocks.api.services.IDataBlockReader)
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#setDataBlockReader(com.github.jmeta.library.datablocks.api.services.DataBlockReader)
     */
    @Override
-   public void setDataBlockReader(IDataBlockReader dataBlockReader) {
+   public void setDataBlockReader(DataBlockReader dataBlockReader) {
 
       Reject.ifNull(dataBlockReader, "dataBlockReader");
 
@@ -124,21 +124,21 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockFactory#createPayload(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.IDataBlock, java.util.List, java.util.List)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockFactory#createPayload(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.types.DataBlock, java.util.List, java.util.List)
     */
    @Override
-   public IPayload createPayload(DataBlockId id, IDataBlock parent,
-      List<IContainer> containers, List<IField<?>> fields) {
+   public Payload createPayload(DataBlockId id, DataBlock parent,
+      List<Container> containers, List<Field<?>> fields) {
 
       return null;
    }
 
    /**
-    * @see IExtendedDataBlockFactory#setMediumFactory
+    * @see ExtendedDataBlockFactory#setMediumFactory
     */
    @Override
-   public void setMediumFactory(IMediaAPI mediumFactory) {
+   public void setMediumFactory(MediaAPI mediumFactory) {
 
       Reject.ifNull(mediumFactory, "mediumFactory");
 
@@ -146,7 +146,7 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
    }
 
    @Override
-   public <T> IField<T> createFieldForWriting(DataBlockId fieldId, T value) {
+   public <T> Field<T> createFieldForWriting(DataBlockId fieldId, T value) {
 
       Reject.ifNull(fieldId, "fieldId");
       Reject.ifNull(value, "value");
@@ -160,28 +160,28 @@ public class StandardDataBlockFactory implements IExtendedDataBlockFactory {
 
    /**
     * @param fieldId
-    * @return the {@link IFieldConverter}
+    * @return the {@link FieldConverter}
     */
    @SuppressWarnings("unchecked")
-   protected <T> IFieldConverter<T> getFieldConverter(DataBlockId fieldId) {
+   protected <T> FieldConverter<T> getFieldConverter(DataBlockId fieldId) {
 
-      IDataFormatSpecification spec = m_dataBlockReader.getSpecification();
+      DataFormatSpecification spec = m_dataBlockReader.getSpecification();
 
       DataBlockDescription desc = spec.getDataBlockDescription(fieldId);
 
-      return (IFieldConverter<T>) FIELD_CONVERTERS
+      return (FieldConverter<T>) FIELD_CONVERTERS
          .get(desc.getFieldProperties().getFieldType());
    }
 
    @SuppressWarnings("unused")
-   private IMediaAPI m_mediumFactory;
+   private MediaAPI m_mediumFactory;
 
-   private IDataBlockReader m_dataBlockReader;
+   private DataBlockReader m_dataBlockReader;
 
    /**
     *
     */
-   protected final static Map<FieldType<?>, IFieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
+   protected final static Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
 
    static {
       FIELD_CONVERTERS.put(FieldType.BINARY, new BinaryFieldConverter());

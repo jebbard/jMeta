@@ -23,7 +23,7 @@ import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
  * {@link UnsignedNumericFieldConverter}
  *
  */
-public class UnsignedNumericFieldConverter implements IFieldConverter<Long> {
+public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
 
    private static final int MAX_LONG_BYTE_SIZE = Long.SIZE / Byte.SIZE;
 

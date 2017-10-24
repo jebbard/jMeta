@@ -18,7 +18,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
-import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
+import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
 import com.github.jmeta.utility.logchecker.api.services.LogChecker;
 
 import junit.framework.AssertionFailedError;
@@ -111,10 +111,10 @@ public class JMetaTestBasics {
    }
 
    /**
-    * Initially loads the extensions into the {@link IExtensionManager} from the central test extension point
+    * Initially loads the extensions into the {@link ExtensionManager} from the central test extension point
     * configuration file.
     */
    public static void setupExtensions() {
-      ComponentRegistry.lookupService(IExtensionManager.class);
+      ComponentRegistry.lookupService(ExtensionManager.class);
    }
 }

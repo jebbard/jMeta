@@ -12,19 +12,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.datablocks.api.types.IHeader;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *
  */
-public class StandardHeader extends AbstractDataBlock implements IHeader {
+public class StandardHeader extends AbstractDataBlock implements Header {
 
    /**
     * Creates a new {@link StandardHeader}.
@@ -35,9 +35,9 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
     * @param isFooter
     * @param dataBlockReader
     */
-   public StandardHeader(DataBlockId id, IMediumReference reference,
-      List<IField<?>> fields, boolean isFooter,
-      IDataBlockReader dataBlockReader) {
+   public StandardHeader(DataBlockId id, MediumReference reference,
+      List<Field<?>> fields, boolean isFooter,
+      DataBlockReader dataBlockReader) {
       super(id, null, reference, dataBlockReader);
 
       Reject.ifNull(fields, "fields");
@@ -48,7 +48,7 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IHeader#isFooter()
+    * @see com.github.jmeta.library.datablocks.api.types.Header#isFooter()
     */
    @Override
    public boolean isFooter() {
@@ -57,16 +57,16 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IHeader#getFields()
+    * @see com.github.jmeta.library.datablocks.api.types.Header#getFields()
     */
    @Override
-   public List<IField<?>> getFields() {
+   public List<Field<?>> getFields() {
 
       return Collections.unmodifiableList(m_fields);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {
@@ -76,9 +76,9 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
 
       long returnedSize = 0;
 
-      for (Iterator<IField<?>> fieldIterator = m_fields
+      for (Iterator<Field<?>> fieldIterator = m_fields
          .iterator(); fieldIterator.hasNext();) {
-         IField<?> field = fieldIterator.next();
+         Field<?> field = fieldIterator.next();
 
          // As soon as one child has unknown size, the whole header has unknown size
          if (field.getTotalSize() == DataBlockDescription.UNKNOWN_SIZE)
@@ -93,7 +93,7 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
    /**
     * @param fields
     */
-   public void setFields(List<IField<?>> fields) {
+   public void setFields(List<Field<?>> fields) {
 
       Reject.ifNull(fields, "fields");
 
@@ -103,7 +103,7 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
          addField(fields.get(i));
    }
 
-   private void addField(IField<?> field) {
+   private void addField(Field<?> field) {
 
       Reject.ifNull(field, "field");
 
@@ -113,7 +113,7 @@ public class StandardHeader extends AbstractDataBlock implements IHeader {
       m_fields.add(field);
    }
 
-   private final List<IField<?>> m_fields = new ArrayList<>();
+   private final List<Field<?>> m_fields = new ArrayList<>();
 
    private final boolean m_isFooter;
 }

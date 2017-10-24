@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.jmeta.library.media.api.helper.TestMediumUtility;
-import com.github.jmeta.library.media.api.types.IMedium;
+import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -58,10 +58,10 @@ class TestCacheBuilder {
        * Converts this {@link TestCacheRegionInfo} to a cached {@link MediumRegion}.
        * 
        * @param medium
-       *           The {@link IMedium} to use.
+       *           The {@link Medium} to use.
        * @return this {@link TestCacheRegionInfo} converted to a cached {@link MediumRegion}
        */
-      public MediumRegion asMediumRegion(IMedium<?> medium) {
+      public MediumRegion asMediumRegion(Medium<?> medium) {
          return createCachedMediumRegion(medium, getRegionStartOffset(), getRegionSize());
       }
 
@@ -114,16 +114,16 @@ class TestCacheBuilder {
 
    private final List<TestCacheRegionInfo> regionInfos;
 
-   private final IMedium<?> regionMedium;
+   private final Medium<?> regionMedium;
 
    /**
-    * Creates a new empty {@link TestCacheBuilder} for the given {@link IMedium}. After this, it can be populated using
+    * Creates a new empty {@link TestCacheBuilder} for the given {@link Medium}. After this, it can be populated using
     * {@link #appendRegionInfo(long, long)}.
     * 
     * @param regionMedium
-    *           The {@link IMedium} to use.
+    *           The {@link Medium} to use.
     */
-   public TestCacheBuilder(IMedium<?> regionMedium) {
+   public TestCacheBuilder(Medium<?> regionMedium) {
       Reject.ifNull(regionMedium, "regionMedium");
 
       this.regionInfos = new ArrayList<>();

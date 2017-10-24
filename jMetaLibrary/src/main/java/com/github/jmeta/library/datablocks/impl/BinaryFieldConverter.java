@@ -21,7 +21,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link BinaryFieldConverter}
  *
  */
-public class BinaryFieldConverter implements IFieldConverter<BinaryValue> {
+public class BinaryFieldConverter implements FieldConverter<BinaryValue> {
 
    @Override
    public BinaryValue toInterpreted(BinaryValue binaryValue,

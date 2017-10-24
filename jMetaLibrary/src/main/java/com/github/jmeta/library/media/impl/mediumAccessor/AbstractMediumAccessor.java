@@ -15,35 +15,34 @@ import java.nio.ByteBuffer;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractMediumAccessor} is an abstract base class for easier implementation of an {@link IMediumAccessor}.
+ * {@link AbstractMediumAccessor} is an abstract base class for easier implementation of an {@link MediumAccessor}.
  *
  * @param <T>
- *           The type of {@link IMedium}
+ *           The type of {@link Medium}
  */
-public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IMediumAccessor<T> {
+public abstract class AbstractMediumAccessor<T extends Medium<?>> implements MediumAccessor<T> {
 
    private final T medium;
 
    private boolean isOpened;
 
-   private IMediumReference currentPosition;
+   private MediumReference currentPosition;
 
    /**
     * Creates a new {@link AbstractMediumAccessor}.
     * 
     * @param medium
-    *           the {@link IMedium} this {@link AbstractMediumAccessor} works on.
+    *           the {@link Medium} this {@link AbstractMediumAccessor} works on.
     */
    public AbstractMediumAccessor(T medium) {
 
       Reject.ifNull(medium, "medium");
-      Reject.ifFalse(medium.exists(), "medium.exists()");
 
       this.isOpened = false;
       this.medium = medium;
@@ -58,7 +57,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#isOpened()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isOpened()
     */
    @Override
    public boolean isOpened() {
@@ -66,7 +65,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#close()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#close()
     */
    @Override
    public void close() {
@@ -85,7 +84,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#getMedium()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#getMedium()
     */
    @Override
    public T getMedium() {
@@ -93,18 +92,18 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#getCurrentPosition()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#getCurrentPosition()
     */
    @Override
-   public IMediumReference getCurrentPosition() {
+   public MediumReference getCurrentPosition() {
       return currentPosition;
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#setCurrentPosition(com.github.jmeta.library.media.api.types.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#setCurrentPosition(com.github.jmeta.library.media.api.types.MediumReference)
     */
    @Override
-   public void setCurrentPosition(IMediumReference position) {
+   public void setCurrentPosition(MediumReference position) {
       Reject.ifNull(position, "position");
       Reject.ifFalse(position.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
       Reject.ifFalse(isOpened(), "isOpened()");
@@ -117,7 +116,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#read(java.nio.ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#read(java.nio.ByteBuffer)
     */
    @Override
    public void read(ByteBuffer buffer) throws EndOfMediumException {
@@ -145,7 +144,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#write(java.nio.ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#write(java.nio.ByteBuffer)
     */
    @Override
    public void write(ByteBuffer buffer) {
@@ -165,7 +164,7 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#truncate(com.github.jmeta.library.media.api.types.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#truncate(com.github.jmeta.library.media.api.types.MediumReference)
     */
    @Override
    public void truncate() {
@@ -184,9 +183,9 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
     * Updates the position returned by {@link #getCurrentPosition()}.
     * 
     * @param position
-    *           The new {@link IMediumReference} position
+    *           The new {@link MediumReference} position
     */
-   protected void updateCurrentPosition(IMediumReference position) {
+   protected void updateCurrentPosition(MediumReference position) {
 
       currentPosition = position;
    }
@@ -236,17 +235,17 @@ public abstract class AbstractMediumAccessor<T extends IMedium<?>> implements IM
    protected abstract void mediumSpecificTruncate() throws IOException;
 
    /**
-    * Concrete core implementation of {@link #setCurrentPosition(IMediumReference)}
+    * Concrete core implementation of {@link #setCurrentPosition(MediumReference)}
     * 
     * @param position
-    *           The new {@link IMediumReference} position to set
+    *           The new {@link MediumReference} position to set
     * @throws IOException
     *            in case of anything goes wrong in the concrete implementation
     */
-   protected abstract void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException;
+   protected abstract void mediumSpecificSetCurrentPosition(MediumReference position) throws IOException;
 
    /**
-    * Checks if the underlying {@link IMedium} is read-only, and if so, it throws a {@link ReadOnlyMediumException}.
+    * Checks if the underlying {@link Medium} is read-only, and if so, it throws a {@link ReadOnlyMediumException}.
     */
    private void preventWriteOnReadyOnlyMedium() {
       if (getMedium().isReadOnly()) {

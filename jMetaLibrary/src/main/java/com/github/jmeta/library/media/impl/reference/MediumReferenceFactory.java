@@ -13,51 +13,51 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link MediumReferenceFactory} is a class to create and manage all created {@link IMediumReference} instances. Due to
- * this, it has a strong coupling to the {@link IMediumReference} and {@link StandardMediumReference} classes.
+ * {@link MediumReferenceFactory} is a class to create and manage all created {@link MediumReference} instances. Due to
+ * this, it has a strong coupling to the {@link MediumReference} and {@link StandardMediumReference} classes.
  * 
- * When creating an instance of {@link IMediumReference}, it automatically passes a reference to itself to the instance,
- * to ensure any call to {@link IMediumReference#advance(long)} can use it to create advanced {@link IMediumReference}
+ * When creating an instance of {@link MediumReference}, it automatically passes a reference to itself to the instance,
+ * to ensure any call to {@link MediumReference#advance(long)} can use it to create advanced {@link MediumReference}
  * instance.
  * 
- * It not only creates {@link IMediumReference} instances, but it also maintains all created instances in an internal
- * data structure. It provides corresponding methods to retrieve all {@link IMediumReference}s in a specific range.
- * Furthermore, it implements update functionality to automatically update all {@link IMediumReference} instances due to
- * an action that was done on the current {@link IMedium}.
+ * It not only creates {@link MediumReference} instances, but it also maintains all created instances in an internal
+ * data structure. It provides corresponding methods to retrieve all {@link MediumReference}s in a specific range.
+ * Furthermore, it implements update functionality to automatically update all {@link MediumReference} instances due to
+ * an action that was done on the current {@link Medium}.
  */
 public class MediumReferenceFactory {
 
-   private final List<IMediumReference> references = new ArrayList<>();
+   private final List<MediumReference> references = new ArrayList<>();
 
-   private final IMedium<?> medium;
+   private final Medium<?> medium;
 
    /**
     * Creates a new {@link MediumReferenceFactory}.
     * 
     * @param medium
-    *           The {@link IMedium} this {@link MediumReferenceFactory} is working on.
+    *           The {@link Medium} this {@link MediumReferenceFactory} is working on.
     */
-   public MediumReferenceFactory(IMedium<?> medium) {
+   public MediumReferenceFactory(Medium<?> medium) {
       Reject.ifNull(medium, "medium");
       this.medium = medium;
    }
 
    /**
-    * The factory method to create a new {@link IMediumReference} instance.
+    * The factory method to create a new {@link MediumReference} instance.
     * 
     * @param absoluteMediumOffset
-    *           The absolute, positive and null-origin byte offset of the new {@link IMediumReference} instance.
-    * @return The created {@link IMediumReference} instance.
+    *           The absolute, positive and null-origin byte offset of the new {@link MediumReference} instance.
+    * @return The created {@link MediumReference} instance.
     */
-   public IMediumReference createMediumReference(long absoluteMediumOffset) {
+   public MediumReference createMediumReference(long absoluteMediumOffset) {
 
       StandardMediumReference newReference = new StandardMediumReference(medium, absoluteMediumOffset);
 
@@ -70,29 +70,29 @@ public class MediumReferenceFactory {
    }
 
    /**
-    * Returns the {@link IMedium} this {@link MediumReferenceFactory} is working on.
+    * Returns the {@link Medium} this {@link MediumReferenceFactory} is working on.
     * 
-    * @return medium the {@link IMedium} this {@link MediumReferenceFactory} is working on.
+    * @return medium the {@link Medium} this {@link MediumReferenceFactory} is working on.
     */
-   public IMedium<?> getMedium() {
+   public Medium<?> getMedium() {
 
       return medium;
    }
 
    /**
-    * Updates all {@link IMediumReference}s currently managed by this {@link MediumReferenceFactory} according to the
+    * Updates all {@link MediumReference}s currently managed by this {@link MediumReferenceFactory} according to the
     * given {@link MediumAction}. Only {@link MediumAction}s of types {@link MediumActionType#INSERT} and
     * {@link MediumActionType#REMOVE} are supported, because only these actions move objects (in terms of sequences of
     * bytes) that are stored behind the location of the change. In case of {@link MediumActionType#INSERT}, bytes behind
     * the insert location must be moved back by the number of inserted bytes. In case of {@link MediumActionType#REMOVE}
     * , bytes behind the remove location must be moved forward by the number of removed bytes. In either case, the idea
-    * of this method is that bytes/objects on the {@link IMedium} get addressed by their {@link IMediumReference}. And
-    * if an insertion or removal happens before these objects, their {@link IMediumReference} addresses must be changed
-    * accordingly. Otherwise these {@link IMediumReference}s would no longer point to the same objects/bytes.
+    * of this method is that bytes/objects on the {@link Medium} get addressed by their {@link MediumReference}. And
+    * if an insertion or removal happens before these objects, their {@link MediumReference} addresses must be changed
+    * accordingly. Otherwise these {@link MediumReference}s would no longer point to the same objects/bytes.
     * 
     * @param action
     *           The {@link MediumAction} to apply. Only {@link MediumAction}s of types {@link MediumActionType#INSERT}
-    *           and {@link MediumActionType#REMOVE} are supported. Must refer to the same {@link IMedium} as this
+    *           and {@link MediumActionType#REMOVE} are supported. Must refer to the same {@link Medium} as this
     *           {@link MediumReferenceFactory}.
     */
    public void updateReferences(MediumAction action) {
@@ -104,7 +104,7 @@ public class MediumReferenceFactory {
             && action.getActionType() != MediumActionType.REPLACE,
          "action.getActionType() != MediumActionType.INSERT && action.getActionType() != MediumActionType.REMOVE && action.getActionType() != MediumActionType.REPLACE");
 
-      IMediumReference startReference = action.getRegion().getStartReference();
+      MediumReference startReference = action.getRegion().getStartReference();
 
       Reject.ifFalse(startReference.getMedium().equals(getMedium()),
 	   	         "startReference.getMedium().equals(getMedium())");
@@ -134,11 +134,11 @@ public class MediumReferenceFactory {
          }
       }
 
-      List<IMediumReference> referencesBehindOrEqual = getAllReferencesBehindOrEqual(startReference);
+      List<MediumReference> referencesBehindOrEqual = getAllReferencesBehindOrEqual(startReference);
 
       long y = startReference.getAbsoluteMediumOffset();
 
-      for (IMediumReference updatedReference : referencesBehindOrEqual) {
+      for (MediumReference updatedReference : referencesBehindOrEqual) {
          long x = updatedReference.getAbsoluteMediumOffset();
 
          StandardMediumReference ref = (StandardMediumReference) updatedReference;
@@ -165,33 +165,33 @@ public class MediumReferenceFactory {
    }
 
    /**
-    * Returns all {@link IMediumReference}s currently maintained in this factory.
+    * Returns all {@link MediumReference}s currently maintained in this factory.
     * 
-    * @return all {@link IMediumReference}s currently maintained in this factory.
+    * @return all {@link MediumReference}s currently maintained in this factory.
     */
-   public List<IMediumReference> getAllReferences() {
+   public List<MediumReference> getAllReferences() {
 
       return Collections.unmodifiableList(references);
    }
 
    /**
-    * Returns all {@link IMediumReference}s currently maintained in this factory that lie within the provided
+    * Returns all {@link MediumReference}s currently maintained in this factory that lie within the provided
     * {@link MediumRegion}.
     * 
     * @param region
     *           The {@link MediumRegion}
-    * @return all {@link IMediumReference}s currently maintained in this factory that lie within the provided
+    * @return all {@link MediumReference}s currently maintained in this factory that lie within the provided
     *         {@link MediumRegion}.
     */
-   public List<IMediumReference> getAllReferencesInRegion(MediumRegion region) {
+   public List<MediumReference> getAllReferencesInRegion(MediumRegion region) {
 
       Reject.ifNull(region, "region");
       Reject.ifFalse(region.getStartReference().getMedium().equals(getMedium()),
 	   	         "region.getStartReference().getMedium().equals(getMedium())");
 
-      List<IMediumReference> allReferencesInRegion = new ArrayList<>();
+      List<MediumReference> allReferencesInRegion = new ArrayList<>();
 
-      for (IMediumReference mediumReference : references) {
+      for (MediumReference mediumReference : references) {
          if (region.contains(mediumReference)) {
             allReferencesInRegion.add(mediumReference);
          }
@@ -201,23 +201,23 @@ public class MediumReferenceFactory {
    }
 
    /**
-    * Returns all {@link IMediumReference}s currently maintained in this factory that lie behind or are equal to the
-    * provided {@link IMediumReference}.
+    * Returns all {@link MediumReference}s currently maintained in this factory that lie behind or are equal to the
+    * provided {@link MediumReference}.
     * 
     * @param reference
-    *           The {@link IMediumReference}, must belong to the same {@link IMedium}.
-    * @return all {@link IMediumReference}s currently maintained in this factory that lie behind or are equal to the
-    *         provided {@link IMediumReference}.
+    *           The {@link MediumReference}, must belong to the same {@link Medium}.
+    * @return all {@link MediumReference}s currently maintained in this factory that lie behind or are equal to the
+    *         provided {@link MediumReference}.
     */
-   public List<IMediumReference> getAllReferencesBehindOrEqual(IMediumReference reference) {
+   public List<MediumReference> getAllReferencesBehindOrEqual(MediumReference reference) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifFalse(reference.getMedium().equals(getMedium()),
 	   	         "reference.getMedium().equals(getMedium())");
 
-      List<IMediumReference> allReferencesBehindOrEqual = new ArrayList<>();
+      List<MediumReference> allReferencesBehindOrEqual = new ArrayList<>();
 
-      for (IMediumReference mediumReference : references) {
+      for (MediumReference mediumReference : references) {
          if (mediumReference.behindOrEqual(reference)) {
             allReferencesBehindOrEqual.add(mediumReference);
          }

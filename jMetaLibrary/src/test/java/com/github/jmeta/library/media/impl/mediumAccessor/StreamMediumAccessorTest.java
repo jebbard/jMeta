@@ -15,13 +15,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
-
-import junit.framework.Assert;
 
 /**
  * Tests the class {@StreamMediumAccessor}.
@@ -31,23 +30,23 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    private InputStream testStream;
 
    /**
-    * Tests {@link IMediumAccessor#setCurrentPosition(IMediumReference)} and
-    * {@link IMediumAccessor#getCurrentPosition()}.
+    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)} and
+    * {@link MediumAccessor#getCurrentPosition()}.
     */
    @Test
    public void setCurrentPosition_onStreamMedium_doesNotChangeCurrentPosition() {
 
-      IMediumAccessor<?> mediumAccessor = getImplementationToTest();
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
       int newOffsetOne = 20;
-      IMediumReference changeReferenceOne = createReference(mediumAccessor.getMedium(), newOffsetOne);
+      MediumReference changeReferenceOne = createReference(mediumAccessor.getMedium(), newOffsetOne);
 
       mediumAccessor.setCurrentPosition(changeReferenceOne);
 
       Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
 
       int newOffsetTwo = 10;
-      IMediumReference changeReferenceTwo = createReference(mediumAccessor.getMedium(), newOffsetTwo);
+      MediumReference changeReferenceTwo = createReference(mediumAccessor.getMedium(), newOffsetTwo);
 
       mediumAccessor.setCurrentPosition(changeReferenceTwo);
 
@@ -55,7 +54,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    }
 
    /**
-    * @see AbstractIMediumAccessorTest#getReadTestDataToUse()
+    * @see AbstractMediumAccessorTest#getReadTestDataToUse()
     */
    @Override
    protected List<ReadTestData> getReadTestDataToUse() {
@@ -72,7 +71,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getReadTestDataUntilEndOfMedium()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
@@ -80,15 +79,15 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    }
 
    /**
-    * @see AbstractIMediumAccessorTest#getImplementationToTest()
+    * @see AbstractMediumAccessorTest#getImplementationToTest()
     */
    @Override
-   protected IMediumAccessor<?> createImplementationToTest() {
+   protected MediumAccessor<?> createImplementationToTest() {
       return new StreamMediumAccessor(getExpectedMedium());
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getExpectedMedium()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
     */
    @Override
    protected InputStreamMedium getExpectedMedium() {
@@ -96,7 +95,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    }
 
    /**
-    * @see AbstractIMediumAccessorTest#prepareMediumData(byte[])
+    * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
     */
    @Override
    protected void prepareMediumData(byte[] testFileContents) {

@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
@@ -40,14 +40,14 @@ import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link APEv2Extension}
  *
  */
-public class APEv2Extension implements IExtension {
+public class APEv2Extension implements Extension {
 
    private static final String APE_MAGIC_KEY_STRING = "APETAGX";
    private static final int APEv2_HEADER_FOOTER_BYTE_LENGTH = 32;
@@ -62,7 +62,7 @@ public class APEv2Extension implements IExtension {
       new ArrayList<String>(), "", new Date());
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -70,7 +70,7 @@ public class APEv2Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -78,15 +78,15 @@ public class APEv2Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();
 
-      if (serviceInterface == IDataFormatSpecification.class) {
+      if (serviceInterface == DataFormatSpecification.class) {
          serviceProviders.add((T) createSpecification());
-      } else if (serviceInterface == IDataBlockService.class) {
+      } else if (serviceInterface == DataBlockService.class) {
          serviceProviders.add((T) new APEv2DataBlocksService());
       }
       return serviceProviders;
@@ -238,7 +238,7 @@ public class APEv2Extension implements IExtension {
       return returnedList;
    }
 
-   private IDataFormatSpecification createSpecification() {
+   private DataFormatSpecification createSpecification() {
 
       // Data blocks
       final DataBlockId apeV2TagId = new DataBlockId(APEv2, "apev2");
@@ -487,7 +487,7 @@ public class APEv2Extension implements IExtension {
       genericDataBlocks.add(apeV2GenericItemHeaderId);
       genericDataBlocks.add(apeV2GenericItemPayloadId);
 
-      IDataFormatSpecification dummyAPEv2Spec = new StandardDataFormatSpecification(APEv2, descMap, topLevelIds,
+      DataFormatSpecification dummyAPEv2Spec = new StandardDataFormatSpecification(APEv2, descMap, topLevelIds,
          genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 

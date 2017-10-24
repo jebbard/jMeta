@@ -18,21 +18,21 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmeta.library.dataformats.api.services.IDataFormatRepository;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.exceptions.InvalidExtensionException;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
-import com.github.jmeta.utility.logging.api.services.ILoggingMessageConstants;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
+import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
+import com.github.jmeta.utility.logging.api.services.LoggingMessageConstants;
 
 /**
  * {@link StandardDataFormatRepository}
  *
  */
-public class StandardDataFormatRepository implements IDataFormatRepository {
+public class StandardDataFormatRepository implements DataFormatRepository {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataFormatRepository.class);
 
@@ -41,26 +41,26 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
     * instantiated by reflection by a component loader.
     */
    public StandardDataFormatRepository() {
-      extManager = ComponentRegistry.lookupService(IExtensionManager.class);
+      extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
       String validatingExtensions = "Validating registered data format extensions"
-         + ILoggingMessageConstants.SUFFIX_TASK;
+         + LoggingMessageConstants.SUFFIX_TASK;
 
-      LOGGER.info(ILoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
+      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
-      List<IExtension> availableExtensions = extManager.getAllExtensions();
+      List<Extension> availableExtensions = extManager.getAllExtensions();
 
-      for (IExtension iExtension2 : availableExtensions) {
+      for (Extension iExtension2 : availableExtensions) {
 
-         List<IDataFormatSpecification> dataFormatSpecificationsInExtension = iExtension2
-            .getAllServiceProviders(IDataFormatSpecification.class);
+         List<DataFormatSpecification> dataFormatSpecificationsInExtension = iExtension2
+            .getAllServiceProviders(DataFormatSpecification.class);
 
-         for (IDataFormatSpecification dataFormatSpec : dataFormatSpecificationsInExtension) {
+         for (DataFormatSpecification dataFormatSpec : dataFormatSpecificationsInExtension) {
             final DataFormat extensionDataFormat = dataFormatSpec.getDataFormat();
 
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataFormatSpec + " must not return null for its data format.";
-               LOGGER.error(ILoggingMessageConstants.PREFIX_TASK_FAILED + ILoggingMessageConstants.PREFIX_CRITICAL_ERROR
+               LOGGER.error(LoggingMessageConstants.PREFIX_TASK_FAILED + LoggingMessageConstants.PREFIX_CRITICAL_ERROR
                   + validatingExtensions);
                LOGGER.error(message);
                throw new InvalidExtensionException(message, iExtension2);
@@ -78,14 +78,14 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
          }
       }
 
-      LOGGER.info(ILoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
+      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.IDataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.types.DataFormat)
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.types.DataFormat)
     */
    @Override
-   public IDataFormatSpecification getDataFormatSpecification(DataFormat dataFormat) {
+   public DataFormatSpecification getDataFormatSpecification(DataFormat dataFormat) {
 
       Reject.ifNull(dataFormat, "dataFormat");
       Reject.ifFalse(getSupportedDataFormats().contains(dataFormat), "getSupportedDataFormats().contains(dataFormat)");
@@ -94,7 +94,7 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.IDataFormatRepository#getSupportedDataFormats()
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getSupportedDataFormats()
     */
    @Override
    public Set<DataFormat> getSupportedDataFormats() {
@@ -102,7 +102,7 @@ public class StandardDataFormatRepository implements IDataFormatRepository {
       return Collections.unmodifiableSet(m_dataFormatMap.keySet());
    }
 
-   private final Map<DataFormat, IDataFormatSpecification> m_dataFormatMap = new HashMap<>();
+   private final Map<DataFormat, DataFormatSpecification> m_dataFormatMap = new HashMap<>();
 
-   private final IExtensionManager extManager;
+   private final ExtensionManager extManager;
 }

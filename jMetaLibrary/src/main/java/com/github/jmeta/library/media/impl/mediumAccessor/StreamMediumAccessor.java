@@ -13,12 +13,12 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * Represents a read-only streaming media {@link IMediumAccessor} that may block when reading.
+ * Represents a read-only streaming media {@link MediumAccessor} that may block when reading.
  */
 public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedium> {
 
@@ -37,7 +37,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumReference)
     */
    @Override
    public boolean isAtEndOfMedium() {
@@ -114,7 +114,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(IMediumReference, ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumReference, ByteBuffer)
     */
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
@@ -124,7 +124,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
 
       byte[] byteBuffer = new byte[size];
 
-      IMediumReference currentPosition = getCurrentPosition();
+      MediumReference currentPosition = getCurrentPosition();
       while (bytesRead < size) {
          int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
 
@@ -143,7 +143,7 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(IMediumReference, ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumReference, ByteBuffer)
     */
    @Override
    protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
@@ -159,10 +159,10 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.IMediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.MediumReference)
     */
    @Override
-   protected void mediumSpecificSetCurrentPosition(IMediumReference position) throws IOException {
+   protected void mediumSpecificSetCurrentPosition(MediumReference position) throws IOException {
       // Does nothing
    }
 }

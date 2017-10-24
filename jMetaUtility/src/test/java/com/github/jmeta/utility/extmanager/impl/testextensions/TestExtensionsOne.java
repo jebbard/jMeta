@@ -13,16 +13,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link TestExtensionsOne} is just an example extension.
  */
-public class TestExtensionsOne implements IExtension {
+public class TestExtensionsOne implements Extension {
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -30,7 +30,7 @@ public class TestExtensionsOne implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -38,7 +38,7 @@ public class TestExtensionsOne implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
    @SuppressWarnings("unchecked")
    @Override
@@ -46,7 +46,7 @@ public class TestExtensionsOne implements IExtension {
 
       ArrayList<T> returnedProviders = new ArrayList<T>();
 
-      if (serviceInterface == ITestExtensionServiceOne.class) {
+      if (serviceInterface == TestExtensionServiceOne.class) {
          returnedProviders.add((T) new ExtensionOneServiceProviderOne());
          returnedProviders.add((T) new ExtensionOneServiceProviderTwo());
       }

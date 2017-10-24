@@ -22,7 +22,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link StringFieldConverter}
  *
  */
-public class StringFieldConverter implements IFieldConverter<String> {
+public class StringFieldConverter implements FieldConverter<String> {
 
    @Override
    public String toInterpreted(BinaryValue binaryValue,

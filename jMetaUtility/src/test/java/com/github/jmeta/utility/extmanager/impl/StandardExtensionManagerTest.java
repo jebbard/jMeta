@@ -14,29 +14,29 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
-import com.github.jmeta.utility.extmanager.api.services.IExtensionManager;
-import com.github.jmeta.utility.extmanager.impl.testextensions.ITestExtensionServiceOne;
-import com.github.jmeta.utility.extmanager.impl.testextensions.ITestExtensionServiceTwo;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
+import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
+import com.github.jmeta.utility.extmanager.impl.testextensions.TestExtensionServiceOne;
+import com.github.jmeta.utility.extmanager.impl.testextensions.TestExtensionServiceTwo;
 
 /**
- * {@link StandardExtensionManagerTest} tests the {@link IExtensionManager} and its standard implementation as well as
- * the {@link IExtension} interface for a dummy implementation.
+ * {@link StandardExtensionManagerTest} tests the {@link ExtensionManager} and its standard implementation as well as
+ * the {@link Extension} interface for a dummy implementation.
  */
 public class StandardExtensionManagerTest {
 
    /**
-    * Tests {@link IExtensionManager#getAllExtensions()}.
+    * Tests {@link ExtensionManager#getAllExtensions()}.
     */
    @Test
    public void getAllExtensions_returnsAllRegisteredExtensionsOnClassPath() {
-      IExtensionManager extManager = new StandardExtensionManager();
+      ExtensionManager extManager = new StandardExtensionManager();
 
-      List<IExtension> extensions = extManager.getAllExtensions();
+      List<Extension> extensions = extManager.getAllExtensions();
 
       Assert.assertEquals(2, extensions.size());
-      IExtension firstExtension = extensions.get(0);
-      IExtension secondExtension = extensions.get(1);
+      Extension firstExtension = extensions.get(0);
+      Extension secondExtension = extensions.get(1);
 
       Assert.assertNotNull(firstExtension);
       Assert.assertNotNull(secondExtension);
@@ -44,11 +44,11 @@ public class StandardExtensionManagerTest {
       Assert.assertNotNull(firstExtension.getExtensionDescription());
       Assert.assertNotNull(secondExtension.getExtensionDescription());
 
-      Assert.assertEquals(2, firstExtension.getAllServiceProviders(ITestExtensionServiceOne.class).size());
-      Assert.assertEquals(0, firstExtension.getAllServiceProviders(ITestExtensionServiceTwo.class).size());
+      Assert.assertEquals(2, firstExtension.getAllServiceProviders(TestExtensionServiceOne.class).size());
+      Assert.assertEquals(0, firstExtension.getAllServiceProviders(TestExtensionServiceTwo.class).size());
 
-      Assert.assertEquals(1, secondExtension.getAllServiceProviders(ITestExtensionServiceOne.class).size());
-      Assert.assertEquals(1, secondExtension.getAllServiceProviders(ITestExtensionServiceTwo.class).size());
+      Assert.assertEquals(1, secondExtension.getAllServiceProviders(TestExtensionServiceOne.class).size());
+      Assert.assertEquals(1, secondExtension.getAllServiceProviders(TestExtensionServiceTwo.class).size());
    }
 
 }

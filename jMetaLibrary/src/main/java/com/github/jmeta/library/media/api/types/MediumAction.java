@@ -15,7 +15,7 @@ import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link MediumAction} represents an action performed on a given {@link IMedium}, either a reading or a writing action.
+ * {@link MediumAction} represents an action performed on a given {@link Medium}, either a reading or a writing action.
  * A {@link MediumAction} belonging to an {@link IMediumStore_OLD} gets invalid as soon as the store is flushed or it is
  * undone. The validity of a {@link MediumAction} is represented by its {@link MediumAction#isPending} method. See the
  * methods description for more details.

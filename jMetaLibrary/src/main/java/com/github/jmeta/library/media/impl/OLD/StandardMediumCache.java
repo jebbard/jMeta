@@ -17,41 +17,41 @@ import java.util.Map;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumRegion;
-import com.github.jmeta.library.media.impl.mediumAccessor.IMediumAccessor;
+import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link StandardMediumCache} provides a standard implementation of the {@link IMediumCache} interface. To fulfill the
- * contract of the {@link IMediumCache} interface, it uses a {@link HashMap} internally to implement an efficient
- * caching. It works with an {@link IMediumAccessor} to read from an {@link AbstractMedium}.
+ * {@link StandardMediumCache} provides a standard implementation of the {@link MediumCache} interface. To fulfill the
+ * contract of the {@link MediumCache} interface, it uses a {@link HashMap} internally to implement an efficient
+ * caching. It works with an {@link MediumAccessor} to read from an {@link AbstractMedium}.
  * 
  * @invariant A single cache region returned by {@link #getBufferedRegions()} must not be bigger than the maximum cache
  *            region size specified to the constructor.
  */
-public class StandardMediumCache implements IMediumCache {
+public class StandardMediumCache implements MediumCache {
 
-   private final IMediumAccessor<?> m_accessor;
+   private final MediumAccessor<?> m_accessor;
 
-   private Map<IMediumReference, MediumRegion> m_cache = new HashMap<>();
+   private Map<MediumReference, MediumRegion> m_cache = new HashMap<>();
 
    private final int m_maxCacheRegionSize;
 
    /**
-    * Creates a new {@link StandardMediumCache} working on the given {@link IMediumAccessor}.
+    * Creates a new {@link StandardMediumCache} working on the given {@link MediumAccessor}.
     * 
     * @param accessor
-    *           The {@link IMediumAccessor} used for accessing the {@link AbstractMedium} bytes. Must be opened.
+    *           The {@link MediumAccessor} used for accessing the {@link AbstractMedium} bytes. Must be opened.
     * @param maxCacheRegionSize
     *           The maximum allowed size for a cache region. Must be bigger than 0.
     * @pre maxCacheRegionSize > 0
     * @pre accessor.isOpened()
     */
-   public StandardMediumCache(IMediumAccessor<?> accessor, int maxCacheRegionSize) {
+   public StandardMediumCache(MediumAccessor<?> accessor, int maxCacheRegionSize) {
 
       Reject.ifNull(accessor, "accessor");
       Reject.ifNegativeOrZero(maxCacheRegionSize, "maxCacheRegionSize");
@@ -76,17 +76,17 @@ public class StandardMediumCache implements IMediumCache {
     * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#createMediumReference(long)
     */
    @Override
-   public IMediumReference createMediumReference(long absoluteMediumOffset) {
+   public MediumReference createMediumReference(long absoluteMediumOffset) {
 
       // TODO implement for writing
       return new StandardMediumReference(getMedium(), absoluteMediumOffset);
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#discard(IMediumReference, long)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#discard(MediumReference, long)
     */
    @Override
-   public void discard(IMediumReference startReference, long size) {
+   public void discard(MediumReference startReference, long size) {
 
       Reject.ifNull(startReference, "startReference");
       Reject.ifNegative(size, "size");
@@ -98,7 +98,7 @@ public class StandardMediumCache implements IMediumCache {
 
       long freedSize = 0;
 
-      IMediumReference currentReference = firstRegion.getStartReference();
+      MediumReference currentReference = firstRegion.getStartReference();
 
       // The portion to free overlaps the end of an existing region
       if (firstRegion.getStartReference().before(startReference)) {
@@ -149,10 +149,10 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#getData(com.github.jmeta.library.media.api.types.IMediumReference, int)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#getData(com.github.jmeta.library.media.api.types.MediumReference, int)
     */
    @Override
-   public synchronized ByteBuffer getData(IMediumReference reference, int byteCount) {
+   public synchronized ByteBuffer getData(MediumReference reference, int byteCount) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNegative(byteCount, "size");
@@ -183,7 +183,7 @@ public class StandardMediumCache implements IMediumCache {
 
          returnedBuffer.put(bytes);
 
-         IMediumReference nextReference = nextRegion.calculateEndReference();
+         MediumReference nextReference = nextRegion.calculateEndReference();
 
          while (summedUpByteCount < byteCount) {
             nextRegion = m_cache.get(nextReference);
@@ -210,16 +210,16 @@ public class StandardMediumCache implements IMediumCache {
     * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#getMedium()
     */
    @Override
-   public IMedium<?> getMedium() {
+   public Medium<?> getMedium() {
 
       return m_accessor.getMedium();
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#getBufferedByteCountAt(IMediumReference)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#getBufferedByteCountAt(MediumReference)
     */
    @Override
-   public synchronized long getBufferedByteCountAt(IMediumReference reference) {
+   public synchronized long getBufferedByteCountAt(MediumReference reference) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifFalse(reference.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
@@ -231,7 +231,7 @@ public class StandardMediumCache implements IMediumCache {
 
       long summedUpSize = region.calculateEndReference().distanceTo(reference);
 
-      IMediumReference nextReference = region.calculateEndReference();
+      MediumReference nextReference = region.calculateEndReference();
 
       // Read all continuous regions and sum up their size
       while (m_cache.containsKey(nextReference)) {
@@ -246,15 +246,15 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.OLD.IMediumCache#getBufferedRegions()
+    * @see com.github.jmeta.library.media.impl.OLD.MediumCache#getBufferedRegions()
     */
    @Override
-   public Map<IMediumReference, Integer> getBufferedRegions() {
+   public Map<MediumReference, Integer> getBufferedRegions() {
 
-      Map<IMediumReference, Integer> returnedMap = new HashMap<>();
+      Map<MediumReference, Integer> returnedMap = new HashMap<>();
 
-      for (Iterator<IMediumReference> iterator = m_cache.keySet().iterator(); iterator.hasNext();) {
-         IMediumReference nextReference = iterator.next();
+      for (Iterator<MediumReference> iterator = m_cache.keySet().iterator(); iterator.hasNext();) {
+         MediumReference nextReference = iterator.next();
          MediumRegion nextRegion = m_cache.get(nextReference);
 
          returnedMap.put(nextReference, nextRegion.getSize());
@@ -264,11 +264,11 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#insertData(com.github.jmeta.library.media.api.types.IMediumReference,
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#insertData(com.github.jmeta.library.media.api.types.MediumReference,
     *      java.nio.ByteBuffer)
     */
    @Override
-   public MediumAction insertData(IMediumReference reference, ByteBuffer bytes) {
+   public MediumAction insertData(MediumReference reference, ByteBuffer bytes) {
 
       // TODO implement for writing
 
@@ -276,10 +276,10 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#isAtEndOfMedium(com.github.jmeta.library.media.api.types.IMediumReference)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumReference)
     */
    @Override
-   public boolean isAtEndOfMedium(IMediumReference reference) {
+   public boolean isAtEndOfMedium(MediumReference reference) {
 
       m_accessor.setCurrentPosition(reference);
 
@@ -296,10 +296,10 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#buffer(IMediumReference, long)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#buffer(MediumReference, long)
     */
    @Override
-   public synchronized void buffer(IMediumReference cacheReference, int size) throws EndOfMediumException {
+   public synchronized void buffer(MediumReference cacheReference, int size) throws EndOfMediumException {
 
       Reject.ifNull(cacheReference, "reference");
       Reject.ifNegativeOrZero(size, "size");
@@ -308,15 +308,15 @@ public class StandardMediumCache implements IMediumCache {
       if (getBufferedByteCountAt(cacheReference) >= size)
          return;
 
-      IMediumReference newStartReference = cacheReference;
+      MediumReference newStartReference = cacheReference;
       // Reference to the last byte before end of region
-      IMediumReference newEndReference = cacheReference.advance(size);
+      MediumReference newEndReference = cacheReference.advance(size);
 
-      for (Iterator<IMediumReference> iterator = m_cache.keySet().iterator(); iterator.hasNext();) {
-         final IMediumReference existingStartReference = iterator.next();
+      for (Iterator<MediumReference> iterator = m_cache.keySet().iterator(); iterator.hasNext();) {
+         final MediumReference existingStartReference = iterator.next();
          final MediumRegion existingCacheRegion = m_cache.get(existingStartReference);
 
-         final IMediumReference existingEndReference = existingCacheRegion.calculateEndReference();
+         final MediumReference existingEndReference = existingCacheRegion.calculateEndReference();
 
          /*
           * If the new region incorporates one or several complete existing regions, the existing regions are dropped
@@ -359,7 +359,7 @@ public class StandardMediumCache implements IMediumCache {
             actualSize++;
          }
 
-      IMediumReference nextReference = newStartReference;
+      MediumReference nextReference = newStartReference;
 
       try {
          for (int i = 0; i < actualSize / m_maxCacheRegionSize; i++) {
@@ -382,21 +382,21 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.IMediumReference, int)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.MediumReference, int)
     */
    @Override
-   public MediumAction removeData(IMediumReference reference, int byteCountToRemove) {
+   public MediumAction removeData(MediumReference reference, int byteCountToRemove) {
 
       // TODO implement for writing
       return null;
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.IMediumReference, int,
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.MediumReference, int,
     *      java.nio.ByteBuffer)
     */
    @Override
-   public MediumAction replaceData(IMediumReference reference, int byteCountToReplace, ByteBuffer bytes) {
+   public MediumAction replaceData(MediumReference reference, int byteCountToReplace, ByteBuffer bytes) {
 
       // TODO implement for writing
       return null;
@@ -412,23 +412,23 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * Finds the {@link MediumRegion} that contains the given {@link IMediumReference}. If there is no such
+    * Finds the {@link MediumRegion} that contains the given {@link MediumReference}. If there is no such
     * {@link MediumRegion}, then null is returned.
     * 
     * @param reference
-    *           The {@link IMediumReference}.
-    * @return The {@link MediumRegion} containing the given {@link IMediumReference} or null if there is no such
+    *           The {@link MediumReference}.
+    * @return The {@link MediumRegion} containing the given {@link MediumReference} or null if there is no such
     *         {@link MediumRegion}.
     */
-   private MediumRegion findContainingRegion(IMediumReference reference) {
+   private MediumRegion findContainingRegion(MediumReference reference) {
 
       if (m_cache.containsKey(reference))
          return m_cache.get(reference);
 
-      Iterator<IMediumReference> iterator = m_cache.keySet().iterator();
+      Iterator<MediumReference> iterator = m_cache.keySet().iterator();
 
       while (iterator.hasNext()) {
-         IMediumReference nextReference = iterator.next();
+         MediumReference nextReference = iterator.next();
          MediumRegion nextRegion = m_cache.get(nextReference);
 
          if (nextRegion.contains(reference))
@@ -439,16 +439,16 @@ public class StandardMediumCache implements IMediumCache {
    }
 
    /**
-    * Reads a new medium cache region into this {@link IMediumCache}.
+    * Reads a new medium cache region into this {@link MediumCache}.
     * 
     * @param reference
-    *           The {@link IMediumReference} pointing to the offset where the data is read from.
+    *           The {@link MediumReference} pointing to the offset where the data is read from.
     * @param size
     *           The number of byte to read.
     * @throws EndOfMediumException
     *            If end of medium occurs during read.
     */
-   private void readIntoCache(IMediumReference reference, int size) throws EndOfMediumException {
+   private void readIntoCache(MediumReference reference, int size) throws EndOfMediumException {
 
       ByteBuffer newBuffer = ByteBuffer.allocate(size);
 
@@ -470,11 +470,11 @@ public class StandardMediumCache implements IMediumCache {
     * {@link MediumAccessException}.
     * 
     * @param reference
-    *           The {@link IMediumReference} at which to start reading.
+    *           The {@link MediumReference} at which to start reading.
     * @param returnedBuffer
     *           The {@link ByteBuffer} to read bytes into, its remaining size is attempted to be read.
     */
-   private void uncheckedReadFromMedium(IMediumReference reference, ByteBuffer returnedBuffer) {
+   private void uncheckedReadFromMedium(MediumReference reference, ByteBuffer returnedBuffer) {
 
       m_accessor.setCurrentPosition(reference);
 

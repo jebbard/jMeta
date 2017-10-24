@@ -22,7 +22,7 @@ public class ReadOnlyMemoryMediumAccessorTest extends AbstractReadOnlyMediumAcce
    private byte[] memory;
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getExpectedMedium()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
     */
    @Override
    protected InMemoryMedium getExpectedMedium() {
@@ -30,7 +30,7 @@ public class ReadOnlyMemoryMediumAccessorTest extends AbstractReadOnlyMediumAcce
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getReadTestDataToUse()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataToUse()
     */
    @Override
    protected List<ReadTestData> getReadTestDataToUse() {
@@ -46,7 +46,7 @@ public class ReadOnlyMemoryMediumAccessorTest extends AbstractReadOnlyMediumAcce
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#getReadTestDataUntilEndOfMedium()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
@@ -54,15 +54,15 @@ public class ReadOnlyMemoryMediumAccessorTest extends AbstractReadOnlyMediumAcce
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#createImplementationToTest()
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#createImplementationToTest()
     */
    @Override
-   protected IMediumAccessor<?> createImplementationToTest() {
+   protected MediumAccessor<?> createImplementationToTest() {
       return new MemoryMediumAccessor(getExpectedMedium());
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractIMediumAccessorTest#prepareMediumData(byte[])
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#prepareMediumData(byte[])
     */
    @Override
    protected void prepareMediumData(byte[] testFileContents) {

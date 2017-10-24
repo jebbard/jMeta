@@ -19,16 +19,16 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.services.IMediaAPI;
-import com.github.jmeta.library.media.api.types.IMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.services.MediaAPI;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO stage2_002: Implement timeout when reading from stream-based medium
@@ -36,7 +36,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
-public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContainer> {
+public class TopLevelContainerIterator extends AbstractDataBlockIterator<Container> {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(TopLevelContainerIterator.class);
 
@@ -49,8 +49,8 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
     * @param readers
     * @param mediumFactory
     */
-   public TopLevelContainerIterator(IMedium<?> medium, List<DataFormat> dataFormatHints, boolean forceMediumReadOnly,
-      Map<DataFormat, IDataBlockReader> readers, IMediaAPI mediumFactory) {
+   public TopLevelContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints, boolean forceMediumReadOnly,
+      Map<DataFormat, DataBlockReader> readers, MediaAPI mediumFactory) {
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
@@ -81,7 +81,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
     * @see java.util.Iterator#next()
     */
    @Override
-   public IContainer next() {
+   public Container next() {
 
 	   Reject.ifFalse(hasNext(), "hasNext()");
 
@@ -91,7 +91,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
          throw new UnknownDataFormatException(m_currentReference,
             "Could not identify data format of next top-level block at " + m_currentReference);
 
-      IDataBlockReader reader = m_readerMap.get(dataFormat);
+      DataBlockReader reader = m_readerMap.get(dataFormat);
 
       List<DataBlockDescription> containerDescs = DataBlockDescription
          .getChildDescriptionsOfType(reader.getSpecification(), null, PhysicalDataBlockType.CONTAINER);
@@ -99,7 +99,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         IContainer container = reader.readContainerWithId(m_previousIdentificationReference, containerDesc.getId(),
+         Container container = reader.readContainerWithId(m_previousIdentificationReference, containerDesc.getId(),
             null, null, DataBlockDescription.UNKNOWN_SIZE);
 
          if (container != null) {
@@ -124,7 +124,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
       return new ArrayList<>(allFormats);
    }
 
-   private DataFormat identifyDataFormat(IMediumReference reference) {
+   private DataFormat identifyDataFormat(MediumReference reference) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(m_precedenceList, "setDataFormatHints() must have been called before");
@@ -151,7 +151,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
 
       for (Iterator<DataFormat> iterator = m_precedenceList.iterator(); iterator.hasNext();) {
          DataFormat dataFormat = iterator.next();
-         IDataBlockReader reader = m_readerMap.get(dataFormat);
+         DataBlockReader reader = m_readerMap.get(dataFormat);
 
          if (reader.identifiesDataFormat(m_previousIdentificationReference))
             return dataFormat;
@@ -181,28 +181,28 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<IContai
     * @param medium
     * @param forceMediumReadOnly
     */
-   private void setMedium(IMedium<?> medium, boolean forceMediumReadOnly) {
+   private void setMedium(Medium<?> medium, boolean forceMediumReadOnly) {
 
       for (Iterator<DataFormat> iterator = m_readerMap.keySet().iterator(); iterator.hasNext();) {
          DataFormat dataFormat = iterator.next();
-         IDataBlockReader reader = m_readerMap.get(dataFormat);
+         DataBlockReader reader = m_readerMap.get(dataFormat);
          m_mediumStore = m_mediumFactory.getMediumStore(medium);
 
          reader.setMediumCache(m_mediumStore);
       }
    }
 
-   private IMediumReference m_currentReference;
+   private MediumReference m_currentReference;
 
    private long m_longestHeaderSize = 0;
 
-   private final IMediaAPI m_mediumFactory;
+   private final MediaAPI m_mediumFactory;
 
    private IMediumStore_OLD m_mediumStore;
 
    private final List<DataFormat> m_precedenceList = new ArrayList<>();
 
-   private IMediumReference m_previousIdentificationReference;
+   private MediumReference m_previousIdentificationReference;
 
-   private final Map<DataFormat, IDataBlockReader> m_readerMap = new LinkedHashMap<>();
+   private final Map<DataFormat, DataBlockReader> m_readerMap = new LinkedHashMap<>();
 }

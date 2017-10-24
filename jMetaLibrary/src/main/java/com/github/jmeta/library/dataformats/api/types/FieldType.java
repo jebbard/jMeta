@@ -43,6 +43,11 @@ public class FieldType<T> {
     */
    public static final FieldType<?> ENUMERATED = new FieldType<>("ENUMERATED");
 
+   
+   public String getId() {
+      return id;
+   }
+
    /**
     *
     */

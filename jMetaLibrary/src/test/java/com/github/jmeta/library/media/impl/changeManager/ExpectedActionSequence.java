@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 import org.junit.Assert;
 
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -29,13 +29,13 @@ import junit.framework.AssertionFailedError;
  * expected as a result of a call to the {@link MediumChangeManager#createFlushPlan(int, long)} method. Each of the
  * subclasses represents one type of sequence that can occur, see the sub-classes for details.
  * 
- * Basically, each {@link ExpectedActionSequence} has a start {@link IMediumReference} that marks the start offset of
+ * Basically, each {@link ExpectedActionSequence} has a start {@link MediumReference} that marks the start offset of
  * processing. Furthermore, it has a number of equally sized blocks. Both the block count and size are given to the
  * constructor of this class.
  */
 public abstract class ExpectedActionSequence {
 
-   private final IMediumReference startRef;
+   private final MediumReference startRef;
    private final int blockCount;
    private final int blockSizeInBytes;
 
@@ -49,7 +49,7 @@ public abstract class ExpectedActionSequence {
     * @param blockSizeInBytes
     *           The size of each block in bytes, must not be 0 or negative
     */
-   public ExpectedActionSequence(IMediumReference startRef, int blockCount, int blockSizeInBytes) {
+   public ExpectedActionSequence(MediumReference startRef, int blockCount, int blockSizeInBytes) {
       Reject.ifNull(startRef, "startRef");
       Reject.ifTrue(blockCount < 1, "blockCount < 1");
       Reject.ifTrue(blockSizeInBytes < 1, "blockSizeInBytes < 1");
@@ -60,11 +60,11 @@ public abstract class ExpectedActionSequence {
    }
 
    /**
-    * Returns the start {@link IMediumReference} of this {@link ExpectedActionSequence}.
+    * Returns the start {@link MediumReference} of this {@link ExpectedActionSequence}.
     * 
-    * @return the start {@link IMediumReference} of this {@link ExpectedActionSequence}.
+    * @return the start {@link MediumReference} of this {@link ExpectedActionSequence}.
     */
-   public IMediumReference getStartRef() {
+   public MediumReference getStartRef() {
       return startRef;
    }
 
@@ -138,14 +138,14 @@ public abstract class ExpectedActionSequence {
     * @param actionIter
     *           The {@link Iterator} to check
     * @param expectedRef
-    *           The expected {@link IMediumReference} of the next {@link MediumAction}.
+    *           The expected {@link MediumReference} of the next {@link MediumAction}.
     * @param expectedSize
     *           The expected size of the next {@link MediumAction}.
     * @param expectedBytes
     *           The expected bytes contained in the next {@link MediumAction}. Note that not the position, limit or
     *           capacity of the {@link ByteBuffer}s are compared, but only their concrete byte content.
     */
-   protected static void expectWriteAction(Iterator<MediumAction> actionIter, IMediumReference expectedRef,
+   protected static void expectWriteAction(Iterator<MediumAction> actionIter, MediumReference expectedRef,
       int expectedSize, ByteBuffer expectedBytes) {
       MediumAction nextAction;
       // Check write block
@@ -164,11 +164,11 @@ public abstract class ExpectedActionSequence {
     * @param actionIter
     *           The {@link Iterator} to check
     * @param expectedRef
-    *           The expected {@link IMediumReference} of the next {@link MediumAction}.
+    *           The expected {@link MediumReference} of the next {@link MediumAction}.
     * @param expectedSize
     *           The expected size of the next {@link MediumAction}.
     */
-   protected static void expectReadAction(Iterator<MediumAction> actionIter, IMediumReference expectedRef,
+   protected static void expectReadAction(Iterator<MediumAction> actionIter, MediumReference expectedRef,
       int expectedSize) {
       // Check read block
       Assert.assertTrue(actionIter.hasNext());
@@ -187,7 +187,7 @@ public abstract class ExpectedActionSequence {
     * @param expectedType
     *           The expected {@link MediumActionType} of the {@link MediumAction}
     * @param expectedStartReference
-    *           The expected start {@link IMediumReference} of the {@link MediumAction}
+    *           The expected start {@link MediumReference} of the {@link MediumAction}
     * @param expectedRegionSize
     *           The expected region size of the {@link MediumAction}
     * @param expectedBytes
@@ -196,7 +196,7 @@ public abstract class ExpectedActionSequence {
     *           content.
     */
    protected static void assertMediumActionProperties(MediumAction actual, MediumActionType expectedType,
-      IMediumReference expectedStartReference, int expectedRegionSize, ByteBuffer expectedBytes) {
+      MediumReference expectedStartReference, int expectedRegionSize, ByteBuffer expectedBytes) {
       Assert.assertNotNull(actual);
       Assert.assertEquals(expectedType, actual.getActionType());
       Assert.assertEquals(expectedStartReference, actual.getRegion().getStartReference());

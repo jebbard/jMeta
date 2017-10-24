@@ -11,14 +11,14 @@ package com.github.jmeta.library.datablocks.api.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 
 /**
  * {@link AbstractDataService} provides a default implementation of {@link IDataFormatsExtension} that only returns a
  * {@link DataFormat}. Methods can be overridden to change its behavior.
  */
-public abstract class AbstractDataService implements IDataBlockService {
+public abstract class AbstractDataService implements DataBlockService {
 
    /**
     * Creates a new {@link AbstractDataService}.
@@ -30,27 +30,27 @@ public abstract class AbstractDataService implements IDataBlockService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getDataBlockFactory()
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockFactory()
     */
    @Override
-   public IExtendedDataBlockFactory getDataBlockFactory() {
+   public ExtendedDataBlockFactory getDataBlockFactory() {
 
       // Choose to use default IExtendedDataBlockFactory
       return null;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getDataBlockReader(IDataFormatSpecification, int)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockReader(DataFormatSpecification, int)
     */
    @Override
-   public IDataBlockReader getDataBlockReader(IDataFormatSpecification spec, int lazyFieldSize) {
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
 
       // Choose to use default IDataBlockReader
       return null;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getDataFormat()
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataFormat()
     */
    @Override
    public DataFormat getDataFormat() {
@@ -59,12 +59,12 @@ public abstract class AbstractDataService implements IDataBlockService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getTransformationHandlers(IDataFormatSpecification,
-    *      IDataBlockFactory)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getTransformationHandlers(DataFormatSpecification,
+    *      DataBlockFactory)
     */
    @Override
-   public List<ITransformationHandler> getTransformationHandlers(IDataFormatSpecification spec,
-      IDataBlockFactory dataBlockFactory) {
+   public List<TransformationHandler> getTransformationHandlers(DataFormatSpecification spec,
+      DataBlockFactory dataBlockFactory) {
 
       return new ArrayList<>();
    }

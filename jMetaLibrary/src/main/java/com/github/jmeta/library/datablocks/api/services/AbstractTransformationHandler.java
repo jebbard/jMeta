@@ -8,7 +8,7 @@
  */
 package com.github.jmeta.library.datablocks.api.services;
 
-import com.github.jmeta.library.datablocks.api.types.IContainer;
+import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -17,7 +17,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public abstract class AbstractTransformationHandler
-   implements ITransformationHandler {
+   implements TransformationHandler {
 
    /**
     * Creates a new {@link AbstractTransformationHandler}.
@@ -26,7 +26,7 @@ public abstract class AbstractTransformationHandler
     * @param dbFactory
     */
    public AbstractTransformationHandler(DataTransformationType type,
-      IDataBlockFactory dbFactory) {
+      DataBlockFactory dbFactory) {
       Reject.ifNull(type, "dtt");
       Reject.ifNull(dbFactory, "dbFactory");
 
@@ -35,7 +35,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#getTransformationType()
+    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#getTransformationType()
     */
    @Override
    public DataTransformationType getTransformationType() {
@@ -44,10 +44,10 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
-   public boolean requiresTransform(IContainer container) {
+   public boolean requiresTransform(Container container) {
 
       Reject.ifNull(container, "container");
 
@@ -56,10 +56,10 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ITransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.IContainer)
+    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
-   public boolean requiresUntransform(IContainer container) {
+   public boolean requiresUntransform(Container container) {
 
       Reject.ifNull(container, "container");
 
@@ -72,12 +72,12 @@ public abstract class AbstractTransformationHandler
     *
     * @return dbFactory
     */
-   protected IDataBlockFactory getDataBlockFactory() {
+   protected DataBlockFactory getDataBlockFactory() {
 
       return m_dbFactory;
    }
 
    private final DataTransformationType m_type;
 
-   private final IDataBlockFactory m_dbFactory;
+   private final DataBlockFactory m_dbFactory;
 }

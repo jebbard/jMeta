@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
 import com.github.jmeta.library.media.api.types.FileMedium;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -52,7 +52,7 @@ public class MediumReferenceFactoryTest {
    public void getAllReferences_afterCreatingReferences_returnsAllReferences() {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
-      List<IMediumReference> expectedReferences = createAndAddDefaultReferences(testling);
+      List<MediumReference> expectedReferences = createAndAddDefaultReferences(testling);
 
       Assert.assertEquals(expectedReferences, testling.getAllReferences());
    }
@@ -77,7 +77,7 @@ public class MediumReferenceFactoryTest {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
 
-      List<IMediumReference> allReferences = createAndAddDefaultReferences(testling);
+      List<MediumReference> allReferences = createAndAddDefaultReferences(testling);
 
       checkGetAllReferencesInRegion(testling, 0, 10, allReferences, new int[] { 0, 1, 2, 3, 4 });
 
@@ -102,7 +102,7 @@ public class MediumReferenceFactoryTest {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
 
-      List<IMediumReference> allReferences = createAndAddDefaultReferences(testling);
+      List<MediumReference> allReferences = createAndAddDefaultReferences(testling);
 
       checkGetAllReferencesInRegion(testling, 4, 15, allReferences, new int[] {});
 
@@ -118,7 +118,7 @@ public class MediumReferenceFactoryTest {
    }
 
    /**
-    * Tests {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(IMediumReference)}.
+    * Tests {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(MediumReference)}.
     */
    @Test
    public void getAllReferencesBehindOrEqual_noReferencesCreatedYet_returnsEmptyList() {
@@ -129,14 +129,14 @@ public class MediumReferenceFactoryTest {
    }
 
    /**
-    * Tests {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(IMediumReference)}.
+    * Tests {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(MediumReference)}.
     */
    @Test
    public void getAllReferencesBehindOrEqual_afterCreatingReferences_returnsOnlyReferencesBehindOrEqual() {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
 
-      List<IMediumReference> allReferences = createAndAddDefaultReferences(testling);
+      List<MediumReference> allReferences = createAndAddDefaultReferences(testling);
 
       checkGetAllReferencesBehindOrEqual(testling, 0, allReferences, new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
@@ -150,14 +150,14 @@ public class MediumReferenceFactoryTest {
    }
 
    /**
-    * Tests {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(IMediumReference)}.
+    * Tests {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(MediumReference)}.
     */
    @Test
    public void getAllReferencesBehindOrEqual_forOffsetAfterLastReference_returnsEmptyList() {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
 
-      List<IMediumReference> allReferences = createAndAddDefaultReferences(testling);
+      List<MediumReference> allReferences = createAndAddDefaultReferences(testling);
 
       checkGetAllReferencesBehindOrEqual(testling, 1001L, allReferences, new int[] {});
 
@@ -412,15 +412,15 @@ public class MediumReferenceFactoryTest {
    }
 
    /**
-    * Tests {@link MediumReferenceFactory#getAllReferences()} and {@link IMediumReference#advance(long)}.
+    * Tests {@link MediumReferenceFactory#getAllReferences()} and {@link MediumReference#advance(long)}.
     */
    @Test
    public void getAllReferences_advancedReference_returnsAdvancedReference() {
 
       MediumReferenceFactory testling = new MediumReferenceFactory(MEDIUM);
-      List<IMediumReference> expectedReferences = createAndAddDefaultReferences(testling);
+      List<MediumReference> expectedReferences = createAndAddDefaultReferences(testling);
 
-      IMediumReference advancedRef = expectedReferences.get(0).advance(10);
+      MediumReference advancedRef = expectedReferences.get(0).advance(10);
 
       Assert.assertTrue(testling.getAllReferences().contains(advancedRef));
       expectedReferences.add(advancedRef);
@@ -448,11 +448,11 @@ public class MediumReferenceFactoryTest {
       Reject.ifTrue(expectedDeltasPerReference.length != THE_REFERENCE_OFFSETS.length,
          "The deltas array must have the same size as the reference offset array");
 
-      List<IMediumReference> defaultReferences = createAndAddDefaultReferences(testling);
+      List<MediumReference> defaultReferences = createAndAddDefaultReferences(testling);
 
       testling.updateReferences(new MediumAction(type, region, 0, actionBytes));
 
-      List<IMediumReference> referencesAfterUpdate = testling.getAllReferences();
+      List<MediumReference> referencesAfterUpdate = testling.getAllReferences();
 
       // Due to the nature of the factory, all initial references must have been updated
       Assert.assertEquals(referencesAfterUpdate, defaultReferences);
@@ -479,18 +479,18 @@ public class MediumReferenceFactoryTest {
    }
 
    /**
-    * Creates and adds all the {@link IMediumReference}s given by {@link #THE_REFERENCE_OFFSETS}.
+    * Creates and adds all the {@link MediumReference}s given by {@link #THE_REFERENCE_OFFSETS}.
     * 
     * @param testling
     *           The {@link MediumReferenceFactory} under test.
-    * @return All {@link IMediumReference}s.
+    * @return All {@link MediumReference}s.
     */
-   private List<IMediumReference> createAndAddDefaultReferences(MediumReferenceFactory testling) {
+   private List<MediumReference> createAndAddDefaultReferences(MediumReferenceFactory testling) {
 
-      List<IMediumReference> allReferences = new ArrayList<>();
+      List<MediumReference> allReferences = new ArrayList<>();
 
       for (int i = 0; i < THE_REFERENCE_OFFSETS.length; i++) {
-         IMediumReference reference = testling.createMediumReference(THE_REFERENCE_OFFSETS[i]);
+         MediumReference reference = testling.createMediumReference(THE_REFERENCE_OFFSETS[i]);
          allReferences.add(reference);
       }
 
@@ -507,18 +507,18 @@ public class MediumReferenceFactoryTest {
     * @param regionSize
     *           The size of the {@link MediumRegion} to pass.
     * @param allReferences
-    *           All previously created {@link IMediumReference}s (return value of
+    *           All previously created {@link MediumReference}s (return value of
     *           {@link #createAndAddDefaultReferences(MediumReferenceFactory)}).
     * @param expectedReferenceIndices
-    *           The indices of all {@link IMediumReference}s (relative to {@link #THE_REFERENCE_OFFSETS}) that are
+    *           The indices of all {@link MediumReference}s (relative to {@link #THE_REFERENCE_OFFSETS}) that are
     *           expected as a result of a call to {@link MediumReferenceFactory#getAllReferencesInRegion(MediumRegion)}.
     */
    private void checkGetAllReferencesInRegion(MediumReferenceFactory testling, long regionStartOffset, int regionSize,
-      List<IMediumReference> allReferences, int[] expectedReferenceIndices) {
+      List<MediumReference> allReferences, int[] expectedReferenceIndices) {
 
       MediumRegion mediumRegion = new MediumRegion(new StandardMediumReference(MEDIUM, regionStartOffset), regionSize);
 
-      List<IMediumReference> expectedReferencesInRegion = new ArrayList<>();
+      List<MediumReference> expectedReferencesInRegion = new ArrayList<>();
 
       for (int i = 0; i < expectedReferenceIndices.length; i++) {
          expectedReferencesInRegion.add(allReferences.get(expectedReferenceIndices[i]));
@@ -528,25 +528,25 @@ public class MediumReferenceFactoryTest {
    }
 
    /**
-    * Checks {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(IMediumReference)}.
+    * Checks {@link MediumReferenceFactory#getAllReferencesBehindOrEqual(MediumReference)}.
     * 
     * @param testling
     *           The {@link MediumReferenceFactory} under test
     * @param startOffset
     *           The start offset to pass.
     * @param allReferences
-    *           All previously created {@link IMediumReference}s (return value of
+    *           All previously created {@link MediumReference}s (return value of
     *           {@link #createAndAddDefaultReferences(MediumReferenceFactory)}).
     * @param expectedReferenceIndices
-    *           The indices of all {@link IMediumReference}s (relative to {@link #THE_REFERENCE_OFFSETS}) that are
+    *           The indices of all {@link MediumReference}s (relative to {@link #THE_REFERENCE_OFFSETS}) that are
     *           expected as a result of a call to {@link MediumReferenceFactory#getAllReferencesInRegion(MediumRegion)}.
     */
    private void checkGetAllReferencesBehindOrEqual(MediumReferenceFactory testling, long startOffset,
-      List<IMediumReference> allReferences, int[] expectedReferenceIndices) {
+      List<MediumReference> allReferences, int[] expectedReferenceIndices) {
 
-      IMediumReference ref = new StandardMediumReference(MEDIUM, startOffset);
+      MediumReference ref = new StandardMediumReference(MEDIUM, startOffset);
 
-      List<IMediumReference> expectedReferencesBehindOrEqual = new ArrayList<>();
+      List<MediumReference> expectedReferencesBehindOrEqual = new ArrayList<>();
 
       for (int i = 0; i < expectedReferenceIndices.length; i++) {
          expectedReferencesBehindOrEqual.add(allReferences.get(expectedReferenceIndices[i]));

@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockService;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ChildOrder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -36,14 +36,14 @@ import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.extmanager.api.services.IExtension;
+import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
 /**
  * {@link Lyrics3v2Extension}
  *
  */
-public class Lyrics3v2Extension implements IExtension {
+public class Lyrics3v2Extension implements Extension {
 
    private static final String LYRICS3v2_MAGIC_FOOTER_STRING = "LYRICS200";
    private static final String LYRICS3v2_MAGIC_HEADER_STRING = "LYRICSBEGIN";
@@ -63,7 +63,7 @@ public class Lyrics3v2Extension implements IExtension {
       new ArrayList<String>(), "", new Date());
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionId()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
     */
    @Override
    public String getExtensionId() {
@@ -71,7 +71,7 @@ public class Lyrics3v2Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getExtensionDescription()
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
@@ -79,21 +79,21 @@ public class Lyrics3v2Extension implements IExtension {
    }
 
    /**
-    * @see com.github.jmeta.utility.extmanager.api.services.IExtension#getAllServiceProviders(java.lang.Class)
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();
 
-      if (serviceInterface == IDataFormatSpecification.class) {
+      if (serviceInterface == DataFormatSpecification.class) {
          serviceProviders.add((T) createSpecification());
-      } else if (serviceInterface == IDataBlockService.class) {
+      } else if (serviceInterface == DataBlockService.class) {
          serviceProviders.add((T) new Lyrics3v2DataBlocksService());
       }
       return serviceProviders;
    }
 
-   private IDataFormatSpecification createSpecification() {
+   private DataFormatSpecification createSpecification() {
 
       // Data blocks
       final DataBlockId lyrics3V2TagId = new DataBlockId(LYRICS3v2, "lyrics3v2");
@@ -381,7 +381,7 @@ public class Lyrics3v2Extension implements IExtension {
       genericDataBlocks.add(lyrics3V2GenericFieldHeaderId);
       genericDataBlocks.add(lyrics3V2GenericFieldPayloadId);
 
-      IDataFormatSpecification dummyLyrics3v2Spec = new StandardDataFormatSpecification(LYRICS3v2, descMap, topLevelIds,
+      DataFormatSpecification dummyLyrics3v2Spec = new StandardDataFormatSpecification(LYRICS3v2, descMap, topLevelIds,
          genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
          new ArrayList<DataTransformationType>());
 

@@ -1,4 +1,4 @@
-WRITE at 0 with size 160 with bytes java.nio.HeapByteBuffer[pos=0 lim=160 cap=160] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-INSERT at 0 with size 160 with bytes java.nio.HeapByteBuffer[pos=0 lim=160 cap=160] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-REMOVE at 0 with size 1140 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
-TRUNCATE at 160 with size 980 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\EasyTagCore\.\data\media\TestFile_1.txt
+WRITE at 0 with size 160 with bytes java.nio.HeapByteBuffer[pos=0 lim=160 cap=160] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+INSERT at 0 with size 160 with bytes java.nio.HeapByteBuffer[pos=0 lim=160 cap=160] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+REMOVE at 0 with size 1140 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+TRUNCATE at 160 with size 980 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt

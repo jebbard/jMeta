@@ -12,20 +12,20 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.types.IContainer;
-import com.github.jmeta.library.datablocks.api.types.IDataBlock;
-import com.github.jmeta.library.datablocks.api.types.IHeader;
-import com.github.jmeta.library.datablocks.api.types.IPayload;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.Header;
+import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *
  */
-public class StandardContainer extends AbstractDataBlock implements IContainer {
+public class StandardContainer extends AbstractDataBlock implements Container {
 
    /**
     * Creates a new {@link StandardContainer}.
@@ -38,9 +38,9 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
     * @param footers
     * @param dataBlockReader
     */
-   public StandardContainer(DataBlockId id, IDataBlock parent,
-      IMediumReference reference, List<IHeader> headers, IPayload payload,
-      List<IHeader> footers, IDataBlockReader dataBlockReader) {
+   public StandardContainer(DataBlockId id, DataBlock parent,
+      MediumReference reference, List<Header> headers, Payload payload,
+      List<Header> footers, DataBlockReader dataBlockReader) {
       super(id, parent, reference, dataBlockReader);
 
       Reject.ifNull(footers, "footers");
@@ -59,7 +59,7 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
    /**
     * @param footer
     */
-   private void addFooter(IHeader footer) {
+   private void addFooter(Header footer) {
 
       Reject.ifNull(footer, "footer");
 
@@ -71,7 +71,7 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
    /**
     * @param header
     */
-   private void addHeader(IHeader header) {
+   private void addHeader(Header header) {
 
       Reject.ifNull(header, "header");
 
@@ -80,7 +80,7 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
       m_headers.add(header);
    }
 
-   private void setPayload(IPayload payload) {
+   private void setPayload(Payload payload) {
 
       Reject.ifNull(payload, "payload");
 
@@ -89,50 +89,50 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IContainer#getHeaders()
+    * @see com.github.jmeta.library.datablocks.api.types.Container#getHeaders()
     */
    @Override
-   public List<IHeader> getHeaders() {
+   public List<Header> getHeaders() {
 
       return Collections.unmodifiableList(m_headers);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IContainer#getFooters()
+    * @see com.github.jmeta.library.datablocks.api.types.Container#getFooters()
     */
    @Override
-   public List<IHeader> getFooters() {
+   public List<Header> getFooters() {
 
       return Collections.unmodifiableList(m_footers);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IContainer#getPayload()
+    * @see com.github.jmeta.library.datablocks.api.types.Container#getPayload()
     */
    @Override
-   public IPayload getPayload() {
+   public Payload getPayload() {
 
       return m_payload;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {
 
       long totalSize = 0;
 
-      for (Iterator<IHeader> fieldIterator = m_headers.iterator(); fieldIterator
+      for (Iterator<Header> fieldIterator = m_headers.iterator(); fieldIterator
          .hasNext();) {
-         IHeader header = fieldIterator.next();
+         Header header = fieldIterator.next();
 
          totalSize += header.getTotalSize();
       }
 
-      for (Iterator<IHeader> fieldIterator = m_footers.iterator(); fieldIterator
+      for (Iterator<Header> fieldIterator = m_footers.iterator(); fieldIterator
          .hasNext();) {
-         IHeader footer = fieldIterator.next();
+         Header footer = fieldIterator.next();
 
          totalSize += footer.getTotalSize();
       }
@@ -142,9 +142,9 @@ public class StandardContainer extends AbstractDataBlock implements IContainer {
       return totalSize;
    }
 
-   private final List<IHeader> m_headers = new ArrayList<>();
+   private final List<Header> m_headers = new ArrayList<>();
 
-   private final List<IHeader> m_footers = new ArrayList<>();
+   private final List<Header> m_footers = new ArrayList<>();
 
-   private IPayload m_payload;
+   private Payload m_payload;
 }

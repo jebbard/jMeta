@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.services.ITransformationHandler;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -25,18 +25,18 @@ public class ID3v23DataBlocksService extends AbstractDataService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.IDataBlockService#getTransformationHandlers(IDataFormatSpecification,
-    *      IDataBlockFactory)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getTransformationHandlers(DataFormatSpecification,
+    *      DataBlockFactory)
     */
    @Override
-   public List<ITransformationHandler> getTransformationHandlers(IDataFormatSpecification spec,
-      IDataBlockFactory dataBlockFactory) {
+   public List<TransformationHandler> getTransformationHandlers(DataFormatSpecification spec,
+      DataBlockFactory dataBlockFactory) {
 
       Reject.ifNull(dataBlockFactory, "dataBlockFactory");
 
       List<DataTransformationType> transformationTypes = spec.getDataTransformations();
 
-      final ArrayList<ITransformationHandler> transformations = new ArrayList<>();
+      final ArrayList<TransformationHandler> transformations = new ArrayList<>();
 
       for (int i = 0; i < transformationTypes.size(); ++i) {
          DataTransformationType type = transformationTypes.get(i);
@@ -55,7 +55,7 @@ public class ID3v23DataBlocksService extends AbstractDataService {
     * @see com.github.jmeta.library.datablocks.api.services.AbstractDataService#getDataBlockFactory()
     */
    @Override
-   public IExtendedDataBlockFactory getDataBlockFactory() {
+   public ExtendedDataBlockFactory getDataBlockFactory() {
 
       return new ID3v23DataBlockFactory();
    }

@@ -13,22 +13,22 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.IDataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.IExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.types.IDataBlock;
-import com.github.jmeta.library.datablocks.api.types.IField;
-import com.github.jmeta.library.dataformats.api.services.IDataFormatSpecification;
+import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.media.api.types.IMediumReference;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link LazyField}
  *
  */
-public class LazyField extends AbstractDataBlock implements IField<Object> {
+public class LazyField extends AbstractDataBlock implements Field<Object> {
 
    @Override
    public String getStringRepresentation()
@@ -49,9 +49,9 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
     * @param byteOrder
     * @param characterEncoding
     */
-   public LazyField(DataBlockDescription fieldDesc, IMediumReference reference,
-      IDataBlock parent, long totalSize, IExtendedDataBlockFactory factory,
-      IDataBlockReader dataBlockReader, ByteOrder byteOrder,
+   public LazyField(DataBlockDescription fieldDesc, MediumReference reference,
+      DataBlock parent, long totalSize, ExtendedDataBlockFactory factory,
+      DataBlockReader dataBlockReader, ByteOrder byteOrder,
       Charset characterEncoding) {
       super(fieldDesc.getId(), parent, reference, dataBlockReader);
 
@@ -72,14 +72,14 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
     * @param characterEncoding
     * @param fieldByteCount
     */
-   public void convert(IDataFormatSpecification spec, ByteOrder byteOrder,
+   public void convert(DataFormatSpecification spec, ByteOrder byteOrder,
       Charset characterEncoding, long fieldByteCount) {
 
       // Do nothing. Wrapped fields are first converted when getInterpretedValue is called
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IField#getInterpretedValue()
+    * @see com.github.jmeta.library.datablocks.api.types.Field#getInterpretedValue()
     */
    @Override
    public Object getInterpretedValue() throws BinaryValueConversionException {
@@ -90,7 +90,7 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.IDataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
     */
    @Override
    public long getTotalSize() {
@@ -118,7 +118,7 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
 
          byte[][] binaryData = new byte[fragmentCount][];
 
-         IMediumReference mediumReference = getMediumReference();
+         MediumReference mediumReference = getMediumReference();
 
          int fragmentIndex = 0;
 
@@ -140,13 +140,13 @@ public class LazyField extends AbstractDataBlock implements IField<Object> {
       }
    }
 
-   private IField<Object> m_wrappedField = null;
+   private Field<Object> m_wrappedField = null;
 
    private final DataBlockDescription m_fieldDesc;
 
    private final long m_totalSize;
 
-   private final IExtendedDataBlockFactory m_dbFactory;
+   private final ExtendedDataBlockFactory m_dbFactory;
 
    private final ByteOrder m_byteOrder;
 

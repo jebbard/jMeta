@@ -9,7 +9,7 @@
 package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 
 import com.github.jmeta.defaultextensions.id3v23.impl.ID3v23DataBlockFactory;
-import com.github.jmeta.library.datablocks.impl.IFieldConverter;
+import com.github.jmeta.library.datablocks.impl.FieldConverter;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockFactory;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
@@ -25,11 +25,11 @@ public class Lyrics3v2DataBlockFactory extends StandardDataBlockFactory {
 
    @SuppressWarnings("unchecked")
    @Override
-   protected <T> IFieldConverter<T> getFieldConverter(DataBlockId fieldId) {
+   protected <T> FieldConverter<T> getFieldConverter(DataBlockId fieldId) {
 
       if (fieldId.getGlobalId().endsWith(".footer.size")
          || fieldId.getGlobalId().endsWith(".header.size"))
-         return (IFieldConverter<T>) STRING_SIZE_INTEGER_CONVERTER;
+         return (FieldConverter<T>) STRING_SIZE_INTEGER_CONVERTER;
 
       return super.getFieldConverter(fieldId);
    }

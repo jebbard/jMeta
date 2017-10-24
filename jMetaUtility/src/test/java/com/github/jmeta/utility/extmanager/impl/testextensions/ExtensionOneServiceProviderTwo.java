@@ -12,10 +12,10 @@ package com.github.jmeta.utility.extmanager.impl.testextensions;
 /**
  * {@link ExtensionOneServiceProviderTwo} is just a test service.
  */
-public class ExtensionOneServiceProviderTwo implements ITestExtensionServiceOne {
+public class ExtensionOneServiceProviderTwo implements TestExtensionServiceOne {
 
    /**
-    * @see com.github.jmeta.utility.extmanager.impl.testextensions.ITestExtensionServiceOne#testMethod()
+    * @see com.github.jmeta.utility.extmanager.impl.testextensions.TestExtensionServiceOne#testMethod()
     */
    @Override
    public void testMethod() {

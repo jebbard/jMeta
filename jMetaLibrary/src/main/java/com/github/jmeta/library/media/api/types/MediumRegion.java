@@ -15,7 +15,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * {@link MediumRegion} represents a part of an external medium. This part can either be cached or not. If it is cached,
  * it additionally contains a sequence of bytes stored in the region, i.e. bytes e.g. previously read from an
- * {@link IMedium}. This class does not support cases where the number of cached bytes does not equal the size of the
+ * {@link Medium}. This class does not support cases where the number of cached bytes does not equal the size of the
  * region. Saying this, if it contains cached data, the number of bytes always exactly equals the size of the region.
  * Either all or nothing is cached.
  * 
@@ -26,7 +26,7 @@ public class MediumRegion {
 
    /**
     * Summarizes all relevant cases for types of overlaps between two {@link MediumRegion}s located on the same
-    * {@link IMedium}.
+    * {@link Medium}.
     */
    public enum MediumRegionOverlapType {
       /**
@@ -71,7 +71,7 @@ public class MediumRegion {
       LEFT_OVERLAPS_RIGHT_AT_BACK,
    }
 
-   private IMediumReference startReference;
+   private MediumReference startReference;
 
    private ByteBuffer buffer;
 
@@ -81,12 +81,12 @@ public class MediumRegion {
     * Creates a new {@link MediumRegion} backed with cached bytes.
     * 
     * @param startReference
-    *           The start {@link IMediumReference} of the {@link MediumRegion}.
+    *           The start {@link MediumReference} of the {@link MediumRegion}.
     * @param buffer
     *           The bytes buffered in this {@link MediumRegion}. May be empty. The remaining bytes are considered as
     *           being cached.
     */
-   public MediumRegion(IMediumReference startReference, ByteBuffer buffer) {
+   public MediumRegion(MediumReference startReference, ByteBuffer buffer) {
 
       Reject.ifNull(buffer, "buffer");
       Reject.ifNull(startReference, "startReference");
@@ -100,11 +100,11 @@ public class MediumRegion {
     * medium.
     * 
     * @param startReference
-    *           The start {@link IMediumReference} of the {@link MediumRegion}.
+    *           The start {@link MediumReference} of the {@link MediumRegion}.
     * @param size
     *           The size of the region in bytes. May be 0 to represent the empty region.
     */
-   public MediumRegion(IMediumReference startReference, int size) {
+   public MediumRegion(MediumReference startReference, int size) {
 
       Reject.ifNegative(size, "size");
       Reject.ifNull(startReference, "startReference");
@@ -119,9 +119,9 @@ public class MediumRegion {
     * principle have all the overlap behaviors as described in the class {@link MediumRegionOverlapType}.
     * 
     * @param left
-    *           The left {@link MediumRegion}, must refer to the same {@link IMedium} as the right {@link MediumRegion}
+    *           The left {@link MediumRegion}, must refer to the same {@link Medium} as the right {@link MediumRegion}
     * @param right
-    *           The right {@link MediumRegion}, must refer to the same {@link IMedium} as the left {@link MediumRegion}
+    *           The right {@link MediumRegion}, must refer to the same {@link Medium} as the left {@link MediumRegion}
     * @return The determined {@link MediumRegionOverlapType} of the two regions
     */
    public static MediumRegionOverlapType determineOverlapWithOtherRegion(MediumRegion left, MediumRegion right) {
@@ -178,34 +178,34 @@ public class MediumRegion {
    }
 
    /**
-    * Returns the start {@link IMediumReference} of this {@link MediumRegion}.
+    * Returns the start {@link MediumReference} of this {@link MediumRegion}.
     * 
-    * @return The start {@link IMediumReference} of this {@link MediumRegion}.
+    * @return The start {@link MediumReference} of this {@link MediumRegion}.
     */
-   public IMediumReference getStartReference() {
+   public MediumReference getStartReference() {
 
       return startReference;
    }
 
    /**
-    * Calculates and returns the {@link IMediumReference} pointing to the first byte after this {@link MediumRegion}.
+    * Calculates and returns the {@link MediumReference} pointing to the first byte after this {@link MediumRegion}.
     * 
-    * @return the {@link IMediumReference} pointing to the first byte after this {@link MediumRegion}.
+    * @return the {@link MediumReference} pointing to the first byte after this {@link MediumRegion}.
     */
-   public IMediumReference calculateEndReference() {
+   public MediumReference calculateEndReference() {
 
       return startReference.advance(getSize());
    }
 
    /**
-    * Splits this {@link MediumRegion} at the given {@link IMediumReference} and returns two new {@link MediumRegion}
+    * Splits this {@link MediumRegion} at the given {@link MediumReference} and returns two new {@link MediumRegion}
     * instances in any case. This existing {@link MediumRegion} instance is kept unchanged.
     * 
     * @param at
-    *           The {@link IMediumReference} to split this {@link MediumRegion}. Must be behind the start reference of
+    *           The {@link MediumReference} to split this {@link MediumRegion}. Must be behind the start reference of
     *           this region, and must be smaller than the end reference of this {@link MediumRegion}.
     */
-   public MediumRegion[] split(IMediumReference at) {
+   public MediumRegion[] split(MediumReference at) {
       Reject.ifNull(at, "at");
       Reject.ifFalse(at.getMedium().equals(getStartReference().getMedium()),
          "at.getMedium().equals(getStartReference().getMedium())");
@@ -244,14 +244,14 @@ public class MediumRegion {
    }
 
    /**
-    * Returns whether the given {@link IMediumReference} is contained in the {@link MediumRegion}, i.e. is between
+    * Returns whether the given {@link MediumReference} is contained in the {@link MediumRegion}, i.e. is between
     * {@link #getStartReference()} inclusive and {@link #calculateEndReference()} exclusive.
     * 
     * @param reference
-    *           The {@link IMediumReference} to test for being contained.
+    *           The {@link MediumReference} to test for being contained.
     * @return true if it is contained, false otherwise.
     */
-   public boolean contains(IMediumReference reference) {
+   public boolean contains(MediumReference reference) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifFalse(reference.getMedium().equals(getStartReference().getMedium()),
@@ -261,14 +261,14 @@ public class MediumRegion {
    }
 
    /**
-    * Discards the back bytes of this {@link MediumRegion}, shortening it to a new end {@link IMediumReference}. Only
+    * Discards the back bytes of this {@link MediumRegion}, shortening it to a new end {@link MediumReference}. Only
     * allowed to be called for cached {@link MediumRegion}s.
     * 
     * @param newEndReference
-    *           The new end {@link IMediumReference}. Must be contained in the region. That said, it is not allowed to
+    *           The new end {@link MediumReference}. Must be contained in the region. That said, it is not allowed to
     *           pass in the end reference of this {@link MediumRegion}, because it is not contained in it.
     */
-   public void discardBytesAtEnd(IMediumReference newEndReference) {
+   public void discardBytesAtEnd(MediumReference newEndReference) {
 
       Reject.ifNull(newEndReference, "newEndReference");
       Reject.ifFalse(contains(newEndReference), "contains(newEndReference)");
@@ -290,13 +290,13 @@ public class MediumRegion {
 
    /**
     * Discards the front bytes of this {@link MediumRegion}, shortening it to begin at a new start
-    * {@link IMediumReference}. Only allowed to be called for cached {@link MediumRegion}s.
+    * {@link MediumReference}. Only allowed to be called for cached {@link MediumRegion}s.
     * 
     * @param newStartReference
-    *           The new start {@link IMediumReference}. Must be contained in the region. You can pass in the start
+    *           The new start {@link MediumReference}. Must be contained in the region. You can pass in the start
     *           reference of the {@link MediumRegion}, which changes nothing on this {@link MediumRegion}.
     */
-   public void discardBytesAtFront(IMediumReference newStartReference) {
+   public void discardBytesAtFront(MediumReference newStartReference) {
 
       Reject.ifNull(newStartReference, "newStartReference");
       Reject.ifFalse(contains(newStartReference), "contains(newStartReference)");
@@ -388,7 +388,7 @@ public class MediumRegion {
     * 
     * @param other
     *           The other {@link MediumRegion} checked for overlaps by this {@link MediumRegion}. Must refer to the same
-    *           {@link IMedium} as this {@link MediumRegion}.
+    *           {@link Medium} as this {@link MediumRegion}.
     * @return true if an overlap at back is detected, false otherwise.
     */
    public boolean overlapsOtherRegionAtBack(MediumRegion other) {
@@ -396,10 +396,10 @@ public class MediumRegion {
       Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
          "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
-      IMediumReference startRef = getStartReference();
-      IMediumReference otherStartRef = other.getStartReference();
-      IMediumReference endRef = calculateEndReference();
-      IMediumReference otherEndRef = other.calculateEndReference();
+      MediumReference startRef = getStartReference();
+      MediumReference otherStartRef = other.getStartReference();
+      MediumReference endRef = calculateEndReference();
+      MediumReference otherEndRef = other.calculateEndReference();
 
       return startRef.behindOrEqual(otherStartRef) && startRef.before(otherEndRef) && endRef.behindOrEqual(otherEndRef);
    }
@@ -462,7 +462,7 @@ public class MediumRegion {
     * 
     * @param other
     *           The other {@link MediumRegion} checked for overlaps by this {@link MediumRegion}. Must refer to the same
-    *           {@link IMedium} as this {@link MediumRegion}.
+    *           {@link Medium} as this {@link MediumRegion}.
     * @return true if an overlap at front is detected, false otherwise.
     */
    public boolean overlapsOtherRegionAtFront(MediumRegion other) {
@@ -470,10 +470,10 @@ public class MediumRegion {
       Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
          "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
-      IMediumReference startRef = getStartReference();
-      IMediumReference otherStartRef = other.getStartReference();
-      IMediumReference endRef = calculateEndReference();
-      IMediumReference otherEndRef = other.calculateEndReference();
+      MediumReference startRef = getStartReference();
+      MediumReference otherStartRef = other.getStartReference();
+      MediumReference endRef = calculateEndReference();
+      MediumReference otherEndRef = other.calculateEndReference();
 
       return otherStartRef.behindOrEqual(startRef) && otherStartRef.before(endRef) && otherEndRef.behindOrEqual(endRef);
    }
@@ -482,7 +482,7 @@ public class MediumRegion {
     * Returns the number of bytes present both in this {@link MediumRegion} and in another {@link MediumRegion}.
     * 
     * @param other
-    *           The other {@link MediumRegion} checked for shared bytes. Must refer to the same {@link IMedium} as this
+    *           The other {@link MediumRegion} checked for shared bytes. Must refer to the same {@link Medium} as this
     *           {@link MediumRegion}.
     * @return The number of shared bytes between the two {@link MediumRegion}s or 0 if there are none.
     */
@@ -491,10 +491,10 @@ public class MediumRegion {
       Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
          "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
-      IMediumReference startRef = getStartReference();
-      IMediumReference otherStartRef = other.getStartReference();
-      IMediumReference endRef = calculateEndReference();
-      IMediumReference otherEndRef = other.calculateEndReference();
+      MediumReference startRef = getStartReference();
+      MediumReference otherStartRef = other.getStartReference();
+      MediumReference endRef = calculateEndReference();
+      MediumReference otherEndRef = other.calculateEndReference();
 
       if (overlapsOtherRegionAtFront(other)) {
          return (int) endRef.distanceTo(otherStartRef);
