@@ -2,6 +2,5 @@
  "COMPutility"
  (lambda ()
    (LaTeX-add-labels
-    "sec:COMPutilityDesign"
-    "sec:ConfigurationAPI")))
+    "sec:COMPutilityDesign")))
 

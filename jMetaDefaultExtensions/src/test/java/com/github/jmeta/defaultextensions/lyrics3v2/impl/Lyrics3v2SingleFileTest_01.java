@@ -10,14 +10,14 @@ package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
 import com.github.jmeta.defaultextensions.multi.impl.MultiFileTest_01_TypicalMP3;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link Lyrics3v2SingleFileTest_01} tests reading a single Lyrics3v2 tag with header and footer.
  */
-public class Lyrics3v2SingleFileTest_01 extends AbstractDataBlockAccessorDefaultExtensionTest {
+public class Lyrics3v2SingleFileTest_01 extends AbstractDataBlockAccessorTest {
 
    /**
     * Creates a new {@link Lyrics3v2SingleFileTest_01}.

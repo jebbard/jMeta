@@ -10,13 +10,13 @@ package com.github.jmeta.defaultextensions.id3v1.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link ID3v1SingleFileTest_03} tests reading a single ID3v1 tag.
  */
-public class ID3v1SingleFileTest_03 extends AbstractDataBlockAccessorDefaultExtensionTest {
+public class ID3v1SingleFileTest_03 extends AbstractDataBlockAccessorTest {
 
    /**
     * Creates a new {@link ID3v1SingleFileTest_03}.

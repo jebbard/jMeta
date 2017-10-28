@@ -229,108 +229,139 @@ Keine bekannten Nachteile
 
 
 % -------------------------------------------------------------------------------------------------------
-%  Konfiguration
+%  Configuration
 % -------------------------------------------------------------------------------------------------------
-\section{Konfiguration}%
+\section{Configuration}%
 \label{sec:Konfiguration}%
 
-Unter dem Begriff \emph{Konfiguration} wird bei \LibName{} das Anpassen von bestimmten Parametern bezeichnet, die zur Laufzeit Einfluss auf die Funktionalität von \LibName{} haben. Dies ist sehr schwammig und die Abgrenzung zwischen settern und Konfiguration fällt mit dieser Definition erstmal schwer.
+With the term \emph{configuration} in \LibName{}, we understand the change of specific parameters, which customize the behaviour of \LibName{} at runtime. This is quite vague and the difference to usual specialized setters is unclear.
 
-Die wesentlichen Merkmale von Konfiguration sind jedoch:
+Thus we want to give some more criteria for configuration:
 \begin{itemize}
-\item Konfiguration ist Bestandteil der öffentlichen Schnittstelle von \LibName{}, kann also vom Anwender beliebig angepasst werden.
-\item Sie ist generisch und damit für weitere Releases erweiterbar, d.h. neue Konfigurationsparameter hinzufügen bedeutet in erster Linie tatsächlich für die API nur, dass eine neue Konstante hinzukommt; die API für das Setzen und Abfragen bleibt unverändert.
-\item Konfigurationsparameter werden i.d.R. einmalig beim ersten Laden der Library aktiv, sollen aber bei \LibName{} auch dynamisch geändert werden können, teilweise mit sofortiger Wirksamkeit
+\item Configuration is part of the public API of \LibName{}, i.e. it can be changed by the user.
+\item It is generic and thus extensible for further releases, i.e. adding new configuration parameters means to add a new constant to the API and update the documentation; the API for setting and retrieving the configuration parameter - as it is generic - does not change by adding new, changing existing or removing old parameters
+\item Configuration parameters usually have global effect and usually are just used once; but, of course in theory we could also make them dynamically changeable by users at runtime, and their scope could also be limited, e.g. to individual media
 \end{itemize}
 
-Wir halten folgende Designentscheidungen fest:
+For now it turned out that there is no need in \LibName{} for such dynamic configuration parameters a.k.a properties, neither globally, nor for individual components. We thus summarize as follows:
+
 %%%% DD --> %%%%
-\DD{dd:207}
+\DD{dd:207a}
 {% Titel
-\LibName{} bietet einen generischen und erweiterbaren Konfigurationsmechanismus über die öffentliche API an
+\LibName{} offers no generic mechanism for (global or local) configuration, especiall it currently defines no properties that influence the behaviour of the library
 }
 {% Kurzbeschreibung
-Die Library über ihre öffentliche API Mittel zum Setzen und Abfragen von Konfigurationsparametern an. Die verfügbaren Konfigurationsparameter werden über die API als Konstanten repräsentiert und in der Dokumentation aufgeführt.
-
-In \LibName{} kann prinzipiell jede Klasse einzeln konfigurierbar sein, d.h. der Sichtbarkeitsbereich der Konfigurationen muss in keinster Weise global sein.
+All necessary ``configurations'' for customizing the behaviour of a component are passed by the user via specialized (i.e. non-generic) setters or constructor  parameters.
 }
 {% Begründung
-Dies gewährt Flexibilität in vielerlei Hinsicht:
-\begin{itemize}
-\item Zukünftige Versionen von \LibName{} können einfach um weitere Konfigurationsmöglichkeiten erweitert werden, ohne die API anpassen zu müssen (bis auf die neue Konfigurationskonstante)
-\item Konfigurationen mit globaler Gültigkeit machen meist wenig Sinn, sondern sind eher hinderlich, häufig erzeugt die Library einzelne Objekte (z.B. pro Sitzung oder pro Medium), die unabhängig voneinander konfiguriert werden müssen.
-\end{itemize}
+There is no need for the bigger flexibility yet.
 }
 {% Nachteile
-Keine bekannten Nachteile
+No disadvantages known.
 }
 %%%% <-- DD %%%%
 
-Darüber hinaus gilt:
-%%%% DD --> %%%%
-\DD{dd:208}
-{% Titel
-Konfiguration zur Laufzeit, keine properties-Dateien
-}
-{% Kurzbeschreibung
-\LibName{} kann über Laufzeitaufrufe konfiguriert werden, und nicht über properties-Dateien
-}
-{% Begründung
-Properties-Dateien mögen in einigen Anwendungsfällen sinnvoll sein, aber nicht für eine dynamisch anpassbare Konfiguration. Sie sind eben nur statisch, und Änderungen erfordern i.d.R. den Neustart der Applikation. Natürlich können properties in Zukunft als Initial-Konfiguration dienen, die dann dynamisch nachjustiert werden kann. In der aktuellen \LibName{}-Version wird allerdings keine Notwendigkeit für statische Konfiguration gesehen.
-}
-{% Nachteile
-Keine bekannten Nachteile
-}
-%%%% <-- DD %%%%
 
-Für die Konfigurationsparameter selbst gilt:
-%%%% DD --> %%%%
-\DD{dd:209}
-{% Titel
-Jeder Konfigurationsparamater hat einen Gültigkeitsbereich und einen Standardwert
-}
-{% Kurzbeschreibung
-Jeder Konfigurationsparameter bei \LibName{} ist in dem Sinne verpflichtend, dass er immer einen Wert (in seinem Scope) hat. Dazu wird für jeden Parameter ein sinnvoller Standardwert definiert, der gilt, wenn kein explizites Setzen durchgeführt worden ist.
+% TODO: Old state with configuration, probably revive again 
 
-Zudem hat jeder Konfigurationsparameter einen gültigen Wertebereich, z.B. Minimum und Maximum bzw. gültige Werte.
-}
-{% Begründung
-Standardwerte sind immer wichtig, denn keiner will den Anwender zwingen, explizit zu konfigurieren. Die Standardwerte sollten so gewählt sein, dass das Verhalten der Library dem 80\%-Fall genügt und stabil funktioniert.
+% %%%% DD --> %%%%
+% \DD{dd:207}
+% {% Titel
+% \LibName{} bietet einen generischen und erweiterbaren Konfigurationsmechanismus über die öffentliche API an
+% }
+% {% Kurzbeschreibung
+% Die Library über ihre öffentliche API Mittel zum Setzen und Abfragen von Konfigurationsparametern an. Die verfügbaren Konfigurationsparameter werden über die API als Konstanten repräsentiert und in der Dokumentation aufgeführt.
 
-Wertebereiche kommunizieren dem Anwender bereits klar, welche Werte gültig sind und können für Plausibilitätsprüfungen genutzt werden.
-}
-{% Nachteile
-Keine bekannten Nachteile
-}
-%%%% <-- DD %%%%
+% In \LibName{} kann prinzipiell jede Klasse einzeln konfigurierbar sein, d.h. der Sichtbarkeitsbereich der Konfigurationen muss in keinster Weise global sein.
+% }
+% {% Begründung
+% Dies gewährt Flexibilität in vielerlei Hinsicht:
+% \begin{itemize}
+% \item Zukünftige Versionen von \LibName{} können einfach um weitere Konfigurationsmöglichkeiten erweitert werden, ohne die API anpassen zu müssen (bis auf die neue Konfigurationskonstante)
+% \item Konfigurationen mit globaler Gültigkeit machen meist wenig Sinn, sondern sind eher hinderlich, häufig erzeugt die Library einzelne Objekte (z.B. pro Sitzung oder pro Medium), die unabhängig voneinander konfiguriert werden müssen.
+% \end{itemize}
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
 
-Schließlich legen wir noch fest:
-%%%% DD --> %%%%
-\DD{dd:210}
-{% Titel
-Für Konfigurationen wird die Utility-API \SectionLink{sec:ConfigurationAPI} genutzt.
-}
-{% Kurzbeschreibung
-\LibName{} nutzt eine API der Komponente \COMPutility{}, die auch prinzipiell von beliebigen anderen Projekten verwendet werden kann, um Konfigurationen anzubieten.
-}
-{% Begründung
-Konfiguration kann über eine generische API erfolgen. Die Notwendigkeit von Konfiguration ist nichts \LibName{}-spezifisches, sondern generell von Bedeutung. Daher macht das Aufbauen von wiederverwendbaren Komponenten in einem Utility-Anteil Sinn. Dies fördert auch die Einheitlichkeit: Die API für Konfiguration sieht für alle Komponenten von \LibName{} gleich aus.
-}
-{% Nachteile
-%Keine bekannten Nachteile
-}
-%%%% <-- DD %%%%
+% Darüber hinaus gilt:
+% %%%% DD --> %%%%
+% \DD{dd:208}
+% {% Titel
+% Konfiguration zur Laufzeit, keine properties-Dateien
+% }
+% {% Kurzbeschreibung
+% \LibName{} kann über Laufzeitaufrufe konfiguriert werden, und nicht über properties-Dateien
+% }
+% {% Begründung
+% Properties-Dateien mögen in einigen Anwendungsfällen sinnvoll sein, aber nicht für eine dynamisch anpassbare Konfiguration. Sie sind eben nur statisch, und Änderungen erfordern i.d.R. den Neustart der Applikation. Natürlich können properties in Zukunft als Initial-Konfiguration dienen, die dann dynamisch nachjustiert werden kann. In der aktuellen \LibName{}-Version wird allerdings keine Notwendigkeit für statische Konfiguration gesehen.
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Für die Konfigurationsparameter selbst gilt:
+% %%%% DD --> %%%%
+% \DD{dd:209}
+% {% Titel
+% Jeder Konfigurationsparamater hat einen Gültigkeitsbereich und einen Standardwert
+% }
+% {% Kurzbeschreibung
+% Jeder Konfigurationsparameter bei \LibName{} ist in dem Sinne verpflichtend, dass er immer einen Wert (in seinem Scope) hat. Dazu wird für jeden Parameter ein sinnvoller Standardwert definiert, der gilt, wenn kein explizites Setzen durchgeführt worden ist.
+
+% Zudem hat jeder Konfigurationsparameter einen gültigen Wertebereich, z.B. Minimum und Maximum bzw. gültige Werte.
+% }
+% {% Begründung
+% Standardwerte sind immer wichtig, denn keiner will den Anwender zwingen, explizit zu konfigurieren. Die Standardwerte sollten so gewählt sein, dass das Verhalten der Library dem 80\%-Fall genügt und stabil funktioniert.
+
+% Wertebereiche kommunizieren dem Anwender bereits klar, welche Werte gültig sind und können für Plausibilitätsprüfungen genutzt werden.
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Schließlich legen wir noch fest:
+% %%%% DD --> %%%%
+% \DD{dd:210}
+% {% Titel
+% Für Konfigurationen wird die Utility-API \SectionLink{sec:ConfigurationAPI} genutzt.
+% }
+% {% Kurzbeschreibung
+% \LibName{} nutzt eine API der Komponente \COMPutility{}, die auch prinzipiell von beliebigen anderen Projekten verwendet werden kann, um Konfigurationen anzubieten.
+% }
+% {% Begründung
+% Konfiguration kann über eine generische API erfolgen. Die Notwendigkeit von Konfiguration ist nichts \LibName{}-spezifisches, sondern generell von Bedeutung. Daher macht das Aufbauen von wiederverwendbaren Komponenten in einem Utility-Anteil Sinn. Dies fördert auch die Einheitlichkeit: Die API für Konfiguration sieht für alle Komponenten von \LibName{} gleich aus.
+% }
+% {% Nachteile
+% %Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
 
 % -------------------------------------------------------------------------------------------------------
-%  Package Naming Conventions
+%  Naming Conventions and Project Structure
 % -------------------------------------------------------------------------------------------------------
-\section{Package Naming Conventions}%
+\section{Naming Conventions and Project Structure}%
+\label{sec:PackageNamingConventions}%
+
+% =======================================================================================================
+\subsection{Java Naming Conventions}%
+\label{sec:JavaNamingConventions}%
+
+We use the standard Java naming and formatting conventions as defined by Sun. Only small addition: If there is a service interface with only one implementation, this implementation is having the prefix \texttt{Standard}. E.g. the default implementation for the \texttt{MediumStore} interface is named \texttt{StandardMediumStore}.
+
+
+% =======================================================================================================
+\subsection{Package Naming Conventions}%
 \label{sec:PackageNamingConventions}%
 
 Here, we quickly define the package naming to be used for the library and extensions of the library.
 
 % =======================================================================================================
-\subsection{Core Library}%
+\subsubsection{Core Library}%
 \label{sec:CoreLibrary}%
 
 All packages for the core library start with \texttt{com.github.\LibNamePackage{}}, according to the Java naming conventions. The reason is that the library is hosted on Github. Below this core name, the following sub-packages are used:
@@ -352,12 +383,46 @@ Below these package names, there is another hierarchy:
 \end{itemize}
 
 % =======================================================================================================
-\subsection{Extensions}%
+\subsubsection{Extensions}%
 \label{sec:Extensions}%
 
 As mentioned already, the default extensions delivered together with \LibName{} of course also use a package naming convention quite similar to the core library package names. For any third party extensions, there is of course no definition of how the packages should be named, but it is up to the creators of the extension.
 
 However, extension providers should follow the standard Java package naming conventions, and they should ensure that their package names do not clash with package names of other \LibName{} extensions.
+
+
+% =======================================================================================================
+\subsection{Project Naming and Structure}%
+\label{sec:ProjectNamingandStructure}%
+
+Every IDE project containing code for \LibName{} starts has the form \texttt{\LibName{}<LibraryPart>[Extension]}, where \texttt{<LibraryPart>} is:
+\begin{itemize}
+\item \texttt{Library:} The core library with the main user API, without any extension specific parts
+\item \texttt{Utility:} Any utility the core library and extensions need, but no classes the library user must depend on, i.e. just internal library utility
+\item \texttt{DefaultExtension:} For all projects building an extension that is already bundled by default with the core library.
+\item \texttt{Tools:} For any supporting or testing tools, i.e. mostly Java applications that can either be used by library users or by library developers
+\item \texttt{Docs:} For any documentation of the library, no source code here (except for docs, e.g. tex files)
+\end{itemize}
+
+\texttt{[Extension]} is only used for the \texttt{DefaultExtension} library part. Each extensíon needs its own project and build unit. The reason is requirement \SectionLink{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}. This allows us to depoly individual JARs for each single extension.
+
+Below, you can see the actual projects currently existing and their allowed dependencies:
+TODO
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=1.00\textwidth]{Figures/Part_II/II_1_ProjectStructure.pdf}
+		\caption{Project structure of \LibName{}}
+	\label{fig:5_3_SCH_ProjStruct}
+\end{figure}
+
+
+% =======================================================================================================
+\subsection{Build Module Structure and Dependencies}%
+\label{sec:ModuleStructureandDependencies}%
+
+The Maven build module structure is of course aligned with the project structure: There is exactly one Maven module per project, having the same dependencies as depicted above. One exception might be the Docs project as it contains no sources. In addition, there is a single parent POM for general dependencies and aggregate builds.
+
 
 %###############################################################################################
 %###############################################################################################

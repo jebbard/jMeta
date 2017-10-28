@@ -10,6 +10,9 @@ package com.github.jmeta.library.media.impl.mediumAccessor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
 import com.github.jmeta.library.media.api.types.FileMedium;
 
@@ -17,6 +20,19 @@ import com.github.jmeta.library.media.api.types.FileMedium;
  * Tests the class {@FileMediumAccessor} for a read-only medium.
  */
 public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
+
+   /**
+    * Tests whether the creation of a new {@link FileMediumAccessor} on an already locked medium.
+    */
+   @Test(expected = MediumAccessException.class)
+   public void createNewFileMediumAccessor_forAlreadyLockedMedium_throwsException() {
+
+      // Make sure the first instance is created
+      getImplementationToTest();
+
+      // Create second instance on the same medium
+      new FileMediumAccessor(new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true));
+   }
 
    /**
     * @see AbstractMediumAccessorTest#getReadTestDataToUse()
@@ -65,4 +81,5 @@ public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccess
    @Override
    protected void prepareMediumData(byte[] testFileContents) {
    }
+
 }

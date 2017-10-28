@@ -719,8 +719,6 @@ A medium is represented as Java interface \IMedium{} and allows users of \LibNam
 A medium has the following properties:
 \begin{itemize}
 	\item Is random-access: Yes/No \-- \textbf{Motivation:} This property has strong impact on the read and write process, yet it is an intrinsic property of the \TERMmedium{} itself and not of the access mechanism. Thus it is directly available for at a \TERMmedium{}.
-	\item Is cacheable: Yes/No \-- \textbf{Motivation:} See \DesLink{dd:412a}. All media supported except byte arrays are cacheable.
-	\item Currently exists: Yes/No \-- \textbf{Motivation:} Checking existence in Java can be done at the \TERMmedium{} level itself.
 	\item Read-only: Yes/No \-- \textbf{Motivation:} This property disables writing in practice if set to ``Yes''. Some \TERMmedia{} can never be written (e.g. \texttt{InputStream}s), for others it is possible. This flag shall be used to also give the \LibName{} user a possibility to signal he wants to only access read-only.
 	\item Current lenght in bytes (only relevant for random-access) \-- \textbf{Motivation:} Java offers queries for each kind of \IMedium{} except \texttt{InputStream}. Thus this should be implemented directly in the \IMedium{} implementation. For \texttt{InputStream} and non-random-access media in general, terms like length to not make much sense. Thus here there is no value, but a constant indicating an unknown length. In spirit pf design decision \DesLink{dd:410}, it is a currently persisted lenght and not a length including any not-yet persisted changes.
 	\item A clear text name of the \TERMmedium{} \-- \textbf{Motivation:} This is helpful for identification purposes of the \IMedium{} e.g. in log output. It can be derived from e.g. a file name, depending on the medium type.
@@ -1193,8 +1191,6 @@ The following table summarizes all further error situations when working with \C
 	\hline
 	\rowcolor[gray]{.9}\textbf{Error Scenario} & \textbf{Description} & \textbf{Reaction \LibName{}} & \textbf{API method} \\
 	\endhead
-	\hline
-	Medium does not exist & The medium does not exist, in \LibName{} however it must be an existing medium. & It is an abnormal situation, thus a \texttt{MediumAccessException}runtime exception is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
 	\hline
 	Medium is already locked & The medium is already locked by another process. \LibName{} cannot work with the medium. It is the burden of the caller to ensure, that the medium is not used in parallel. & It is an abnormal situation, thus a \texttt{MediumAccessException} runtime exception is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
 	\hline
@@ -1856,29 +1852,29 @@ CF5 & Multiple \texttt{remove}s &\begin{enumerate}\item[a.] All removes at the s
 \end{landscape}
 
 % -------------------------------------------------------------------------------------------------------
-\subsubsection{Configuration Parameters}%
+\subsubsection{Configurating Medium Access}%
 \label{sec:Konfigurationsparameter}%
 
-Even if the parameters configurable by users belong to the public interface, they are only listed first here, as it was only clear after the implementation design, which of those parameters need to be exposed to the users.
+So far, we have identified several mechanisms the user can use to influence the behaviour of medium access: He can set the maximum cache size and maximum cache region size, he can disable caching alltogether, and he can also change the maximum read-write block size. But how? In \DesLink{dd:207a}, we explicitly said that for now, \LibName{} will not offer the possibility to change such parameters dynamically. Still we have to offer the user the corresponding API without exposing him to the internal details of the implementation.
 
-We first define:
+We thus first define:
 %%%% DD --> %%%%
 \DD{dd:441b}
 {% Titel
-The configuration of \COMPmedia{} is done per \IMedium{} instance
+The configuration of the medium access parameters is done per \IMedium{} instance
 }
 {% Kurzbeschreibung
-The configuration of \COMPmedia{} is done per \IMedium{} instance. By doing this, all configuration parameters correlate to an \IMedium{}, have the same lifetime and scope. Thus, there are \texttt{setProperty()} and \texttt{getProperty()} methods for a \IMedium{}.
+The configuration of \COMPmedia{} is done per \IMedium{} instance. By doing this, all configuration parameters correlate to an \IMedium{}, have the same lifetime and scope. The setting of the parameters is done by passing them directly to the constructor of the media created by the user, with constructors setting the parameters to sensitive defaults.
 }
 {% Begründung
-The whole internal implementation of the most important classes, i.e. \IMediumStore{}, \IMediumAccessor{}, \MediumCache{} and so on works on exactly one medium. The user can create \IMedium{} instances directly himself and configure them as needed, independent of other \IMedium{} instances.
+The whole internal implementation of the most important classes, i.e. \IMediumStore{}, \IMediumAccessor{}, \MediumCache{} and so on works on exactly one medium. The user can create \IMedium{} instances directly himself and configure them as needed, independent of other \IMedium{} instances. As these parameters must not change after creation of the medium, it is correct to pass them to the constructor and to not offer setters.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Now the question arises: Which configuration parameters are needed? Those listed in table \hyperref[tab:ConfigMedia]{\ref{tab:ConfigMedia}}.
+Now the question arises: Which configuration parameters are needed in detail? We summarize them again in detail in table \hyperref[tab:ConfigMedia]{\ref{tab:ConfigMedia}}.
 
 \begin{landscape}
 \begin{longtable}{|p{0.1\linewidth}|p{0.24\linewidth}|p{0.07\linewidth}|p{0.1\linewidth}|p{0.4\linewidth}|}
@@ -1886,15 +1882,15 @@ Now the question arises: Which configuration parameters are needed? Those listed
 	\rowcolor[gray]{.9}\textbf{Medium} & \textbf{Parameter Name} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\
 	\endhead
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{ENABLE\_CACHING} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. Setting this to \texttt{false} after creation of the \IMediumStore{} will clear the cache content directly. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{enableCaching} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. Setting this to \texttt{false} after creation of the \IMediumStore{} will clear the cache content directly. Implicitly set to \texttt{false} for \texttt{byte}-Array media according to \DesLink{dd:410c} \\
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_REGION\_SIZE} & int $> 0$ & \texttt{Integer} \texttt{.MAX\_VALUE} & Sets the maximum size of a cache region according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{maxCacheRegionSize} & int $> 0$ & 8192 & Sets the maximum size of a cache region according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{MAX\_CACHE\_SIZE} & long $> 0$ & Long \texttt{.MAX\_VALUE} & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
+	\texttt{File}, \texttt{InputStream} & \texttt{maxCacheSize} & long $> 0$ & 1 MB & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
-	\texttt{File}, \texttt{byte}-Array & \texttt{MAX\_WRITE\_BLOCK\_SIZE} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
+	\texttt{File}, \texttt{byte}-Array & \texttt{maxReadWriteBlockSize} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
 	\hline
-\caption{Configuration parameters of the component \COMPmedia{}}
+\caption{Configuration parameters of medium access}
 \label{tab:ConfigMedia}
 \end{longtable}
 \end{landscape}

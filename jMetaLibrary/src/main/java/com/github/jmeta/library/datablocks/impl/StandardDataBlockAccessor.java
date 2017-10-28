@@ -79,8 +79,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       LOGGER.info(LoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
       for (Extension iExtension2 : extBundles) {
-         List<DataBlockService> bundleDataBlocksExtensions = iExtension2
-            .getAllServiceProviders(DataBlockService.class);
+         List<DataBlockService> bundleDataBlocksExtensions = iExtension2.getAllServiceProviders(DataBlockService.class);
 
          for (DataBlockService dataBlocksExtension : bundleDataBlocksExtensions) {
             final DataFormat extensionDataFormat = dataBlocksExtension.getDataFormat();
@@ -167,8 +166,8 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
     * @see DataBlockAccessor#getContainerIterator
     */
    @Override
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium,
-      List<DataFormat> dataFormatHints, boolean forceMediumReadOnly) {
+   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints,
+      boolean forceMediumReadOnly) {
 
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
@@ -211,8 +210,8 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(DataFormat, DataTransformationType,
-    *      com.github.jmeta.library.datablocks.api.services.TransformationHandler)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(DataFormat,
+    *      DataTransformationType, com.github.jmeta.library.datablocks.api.services.TransformationHandler)
     */
    @Override
    public void setTransformationHandler(DataFormat dataFormat, DataTransformationType transformationType,
@@ -243,6 +242,6 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       Reject.ifNull(medium, "medium");
 
-      // m_mediumFactory.closeMedium(medium);
+      m_mediumFactory.getMediumStore(medium).close();
    }
 }

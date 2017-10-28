@@ -10,13 +10,13 @@ package com.github.jmeta.defaultextensions.apev2.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link APEv2SingleFileTest_01} tests reading a single APEv2 tag with header and footer.
  */
-public class APEv2SingleFileTest_01 extends AbstractDataBlockAccessorDefaultExtensionTest {
+public class APEv2SingleFileTest_01 extends AbstractDataBlockAccessorTest {
 
    /**
     * Creates a new {@link APEv2SingleFileTest_01}.

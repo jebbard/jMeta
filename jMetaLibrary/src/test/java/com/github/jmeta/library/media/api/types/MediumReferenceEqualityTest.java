@@ -15,7 +15,6 @@ import java.util.List;
 import com.github.jmeta.library.media.api.helper.DummyMediumCreator;
 import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**

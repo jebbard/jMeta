@@ -10,13 +10,13 @@ package com.github.jmeta.defaultextensions.ogg.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link OggSingleFileTest_01} tests reading a single ogg file.
  */
-public class OggSingleFileTest_01 extends AbstractDataBlockAccessorDefaultExtensionTest {
+public class OggSingleFileTest_01 extends AbstractDataBlockAccessorTest {
 
    /**
     * Creates a new {@link OggSingleFileTest_01}.

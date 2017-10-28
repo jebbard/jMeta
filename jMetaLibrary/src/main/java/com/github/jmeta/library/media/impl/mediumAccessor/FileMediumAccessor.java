@@ -56,14 +56,11 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
    @Override
    protected void mediumSpecificOpen() throws IOException {
 
-      if (getMedium().isReadOnly()) {
-         fileChannel = FileChannel.open(getMedium().getWrappedMedium(), StandardOpenOption.READ);
-      } else {
-         fileChannel = FileChannel.open(getMedium().getWrappedMedium(), StandardOpenOption.READ,
-            StandardOpenOption.WRITE);
+      // We always open the channel for writing, even if we have a read-only medium - The reason: We also want to
+      // lock the medium for reading
+      fileChannel = FileChannel.open(getMedium().getWrappedMedium(), StandardOpenOption.READ, StandardOpenOption.WRITE);
 
-         lockMedium();
-      }
+      lockMedium();
    }
 
    /**
@@ -77,7 +74,8 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumReference, ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumReference,
+    *      ByteBuffer)
     */
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
@@ -106,7 +104,8 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumReference, ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumReference,
+    *      ByteBuffer)
     */
    @Override
    protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {

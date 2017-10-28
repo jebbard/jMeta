@@ -13,6 +13,10 @@
     "sec:LoggingLibName"
     "sec:Konfiguration"
     "sec:PackageNamingConventions"
+    "sec:JavaNamingConventions"
     "sec:CoreLibrary"
-    "sec:Extensions")))
+    "sec:Extensions"
+    "sec:ProjectNamingandStructure"
+    "fig:5_3_SCH_ProjStruct"
+    "sec:ModuleStructureandDependencies")))
 

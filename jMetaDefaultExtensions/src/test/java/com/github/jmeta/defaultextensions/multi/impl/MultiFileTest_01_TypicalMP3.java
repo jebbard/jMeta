@@ -10,14 +10,14 @@ package com.github.jmeta.defaultextensions.multi.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.defaultextensions.AbstractDataBlockAccessorDefaultExtensionTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link MultiFileTest_01_TypicalMP3} tests reading a typical MP3 file with ID3v2.3 tag at the beginning, some MP3
  * frames in the middle and APEv2, Lyrics3v2 and ID3v1 tags at the end.
  */
-public class MultiFileTest_01_TypicalMP3 extends AbstractDataBlockAccessorDefaultExtensionTest {
+public class MultiFileTest_01_TypicalMP3 extends AbstractDataBlockAccessorTest {
 
    /**
     * Creates a new {@link MultiFileTest_01_TypicalMP3}.

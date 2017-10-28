@@ -1,5 +1,6 @@
 package com.github.jmeta.library.datablocks.api.services;
 
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
@@ -34,8 +37,8 @@ import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 // notion of data block instance ids OR saving parent IDataBlock reference...
 
 /**
- * {@link AbtractDataBlockAccessorTest} tests the {@link DataBlockAccessor} interface. Basically, a file medium contains the
- * data to read. Using the file contents, the three media types file, memory and stream are tested.
+ * {@link AbtractDataBlockAccessorTest} tests the {@link DataBlockAccessor} interface. Basically, a file medium contains
+ * the data to read. Using the file contents, the three media types file, memory and stream are tested.
  */
 public abstract class AbtractDataBlockAccessorTest {
 
@@ -84,7 +87,7 @@ public abstract class AbtractDataBlockAccessorTest {
       for (int i = 0; i < testedMedia.size(); ++i) {
          Medium<?> medium = testedMedia.get(i);
 
-         testling.closeMedium(medium);
+         // testling.closeMedium(medium);
       }
 
       // Check log files
@@ -111,28 +114,6 @@ public abstract class AbtractDataBlockAccessorTest {
          checkContainers(topLevelContainerIterator, null, false);
 
          getTestling().closeMedium(medium);
-      }
-   }
-
-   /**
-    * Tests {@link DataBlockAccessor#getContainerIterator} with the prior specification of a small lazy field size that
-    * is equal to the size of one field and smaller than several other fields, therefore provoking the creation of lazy
-    * fields.
-    *
-    * See {@link #getFieldSizesForTestingLazyFields()} for more details.
-    */
-   @Test
-   public void test_getContainerIterator_withLazyField() {
-
-      List<Integer> fieldSizesToTest = getFieldSizesForTestingLazyFields();
-
-      for (int i = 0; i < fieldSizesToTest.size(); ++i) {
-         Integer fieldSize = fieldSizesToTest.get(i);
-
-         getTestling().setLazyFieldSize(fieldSize);
-
-         // Call the usual test method
-         test_getContainerIterator();
       }
    }
 
@@ -204,7 +185,37 @@ public abstract class AbtractDataBlockAccessorTest {
     * @throws Exception
     *            If an exception occurs during medium creation.
     */
-   protected abstract List<Medium<?>> createMediaToCheck(Path baseFile) throws Exception;
+   protected List<Medium<?>> createMediaToCheck(Path baseFile) throws Exception {
+
+      List<Medium<?>> media = new ArrayList<>();
+
+      long size = Files.size(baseFile);
+
+      if (size > Integer.MAX_VALUE)
+         throw new TestDataException("Specified file " + baseFile + " is too big: " + size, null);
+
+      byte[] readMediumBytes = new byte[(int) size];
+
+      try (RandomAccessFile raf = new RandomAccessFile(baseFile.toFile(), "r")) {
+         int bytesRead = 0;
+
+         while (bytesRead < readMediumBytes.length) {
+            int readReturn = raf.read(readMediumBytes, bytesRead, readMediumBytes.length - bytesRead);
+
+            if (readReturn == -1)
+               throw new RuntimeException("Unexpected end of file");
+
+            bytesRead += readReturn;
+         }
+
+         media.add(new FileMedium(baseFile, true));
+         // TODO stage2_003: stream medium currently does not work
+         // media.add(new StreamMedium(new FileInputStream(theFile), null));
+         media.add(new InMemoryMedium(readMediumBytes, null, true));
+      }
+
+      return media;
+   }
 
    /**
     * Returns a single {@link Path} object that contains the relevant base data from which the data blocks are read. The

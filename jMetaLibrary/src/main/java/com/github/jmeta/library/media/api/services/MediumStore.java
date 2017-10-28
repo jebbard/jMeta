@@ -18,21 +18,40 @@ import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumReference;
 
 /**
- * {@link MediumStore}
+ * {@link MediumStore} provides reading and writing access to a single {@link Medium}.
+ * 
+ * For reading, you can first {@link #cache(MediumReference, int)} data and query the number of cached bytes at a given
+ * offset using {@link #getCachedByteCountAt(MediumReference)}. The caching allows you to pre-buffer data in an internal
+ * cache when you now how much data you need, but you do not yet want to get the data itself. The data itself can later
+ * be fetched using {@link #getData(MediumReference, int)}. Furthermore, you can query if a given offset is at end of
+ * {@link Medium} using {@link #isAtEndOfMedium(MediumReference)}. Note that the reading methods slightly differ in
+ * behavior regarding the type (random-access versus stream-based) of {@link Medium} used, see the individual methods
+ * for details.
+ * 
+ * For writing, all write-related methods throw a {@link ReadOnlyMediumException} if the underlying {@link Medium} is
+ * read-only, specifically for any stream-based {@link Medium}. The write protocol is two-stage: First you "schedule"
+ * changes using {@link #insertData(MediumReference, ByteBuffer)},
+ * {@link #replaceData(MediumReference, int, ByteBuffer)} and {@link #removeData(MediumReference, int)}, then you
+ * explicitly commit the changes and write the data to the external {@link Medium} persistently using {@link #flush()}.
+ * This also changes any {@link MediumReference}s you have created between the last flush and the current flush using
+ * {@link #createMediumReference(long)}, see this method for details. Using {@link #undo(MediumAction)}, you can revert
+ * not-yet-committed changes done since the last flush.
+ * 
+ * When done using the {@link MediumStore}, you have to explicitly {@link #close()} it to free all internal resources,
+ * especially the cached data. Note that after this, most methods of this class will throw a
+ * {@link MediumStoreClosedException} when called.
  *
  */
 public interface MediumStore {
-   // TODO: DES 048: Also lock medium if it is a read-only medium!
    // TODO: truncation during writing of data must also clear the corresponding bytes from the cache!
 
    /**
-    * Tells whether this {@link MediumStore} is opened (true) or already closed (false). On a closed
-    * {@link MediumStore}, all access methods cannot be used anymore and will throw a
-    * {@link MediumStoreClosedException}.
+    * Tells whether this {@link MediumStore} is opened (true) or already closed (false). On a closed {@link MediumStore}
+    * , all access methods cannot be used anymore and will throw a {@link MediumStoreClosedException}.
     * 
     * @return whether this {@link MediumStore} is opened (true) or already closed (false)
     */
@@ -191,10 +210,10 @@ public interface MediumStore {
     *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}, must not exceed
     *           the {@link Medium}'s length as returned by {@link Medium#getCurrentLength()}.
     * @param numberOfBytes
-    *           The number of bytes to read, must be bigger than 0. If the {@link Medium} is shorter than this range,
-    *           an {@link EndOfMediumException} is thrown; getting too much bytes might lead to an
-    *           {@link OutOfMemoryError}, so users should at least ensure to configure a maximum cache size if they need
-    *           to call this method with vast numbers of bytes
+    *           The number of bytes to read, must be bigger than 0. If the {@link Medium} is shorter than this range, an
+    *           {@link EndOfMediumException} is thrown; getting too much bytes might lead to an {@link OutOfMemoryError}
+    *           , so users should at least ensure to configure a maximum cache size if they need to call this method
+    *           with vast numbers of bytes
     * @return A read-only {@link ByteBuffer} containing the read bytes between its limit and position
     * 
     * @throws EndOfMediumException
@@ -251,8 +270,8 @@ public interface MediumStore {
    public MediumAction insertData(MediumReference offset, ByteBuffer dataToInsert);
 
    /**
-    * Removes the given number of bytes at the given {@link MediumReference} offset. This method does not actually
-    * write data to the underlying external medium. To trigger explicit writing of the changes, you must explicitly call
+    * Removes the given number of bytes at the given {@link MediumReference} offset. This method does not actually write
+    * data to the underlying external medium. To trigger explicit writing of the changes, you must explicitly call
     * {@link #flush()} after calling this method. Therefore a call to this method does not change the length of the
     * medium as returned by {@link Medium#getCurrentLength()}, and further calls to this method MUST NOT adjust their
     * {@link MediumReference}s according to already posted calls to {@link #removeData(MediumReference, int)},
