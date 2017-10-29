@@ -40,6 +40,12 @@
 			</dependency>
 			<dependency>
 				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetadefaultextensions</artifactId>
+				<version>0.1</version>
+				<scope>compile</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
 				<artifactId>jmetautility</artifactId>
 				<version>0.1</version>
 				<type>test-jar</type>

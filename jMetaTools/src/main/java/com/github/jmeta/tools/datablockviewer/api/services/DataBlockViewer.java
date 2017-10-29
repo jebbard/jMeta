@@ -7,9 +7,9 @@
  * @date 08.01.2009
  *
  */
-package de.je.jmeta.datablockViewer;
+package com.github.jmeta.tools.datablockviewer.api.services;
 
-import de.je.util.common.err.Reject;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link DataBlockViewer} tests the usability of the Audio Composition API. It provides a window where users may choose
