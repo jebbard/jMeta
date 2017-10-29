@@ -10,7 +10,7 @@
 		<groupId>com.github.jmeta</groupId>
 		<artifactId>jmetaparent</artifactId>
 		<version>0.1</version>
-		<relativePath>../EasyTag_Deployment/pom.xml</relativePath>
+		<relativePath>../jMeta/pom.xml</relativePath>
 	</parent>
 
 	<!-- ========================== Dependencies ========================== -->
