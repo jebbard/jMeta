@@ -17,6 +17,5 @@
     "sec:CoreLibrary"
     "sec:Extensions"
     "sec:ProjectNamingandStructure"
-    "fig:5_3_SCH_ProjStruct"
     "sec:ModuleStructureandDependencies")))
 
