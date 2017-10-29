@@ -73,7 +73,7 @@
 		by other projects are build first. -->
 	<modules>
 		<module>../jMetaLibrary</module>
-		<module>../jMetaDefaultExtensions</module>
+		<module>../jMetaDefaultExtensionID3v23</module>
 		<module>../jMetaUtility</module>
 		<module>../jMetaTools</module>
 	</modules>
