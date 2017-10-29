@@ -1,0 +1,1050 @@
+%===============================================================================================
+%		Requirements
+%===============================================================================================
+
+\part{Requirements}
+\label{sec:Analyse}
+
+This chapter defines the most important function and non-function requirements for \LibName{}.
+Most relevant input is the document \cite{MetaComp}.
+
+%===============================================================================================
+%		Scope
+%===============================================================================================
+
+\chapter{Umfang}
+
+\LibName{} ist eine Java-Library zum Lesen und Schreiben von beschreibenden Daten (Metadaten). \LibName{} hat folgende Ziele:
+\begin{itemize}
+	\item Eine generische, erweiterbare Schnittstelle zum Lesen und Schreiben von Metadaten zu definieren
+	\item Zu einem Standard in Sachen Metadatenverarbeitung für Audio-, Video- und Bildformate zu werden
+\end{itemize}
+
+Damit visiert \LibName{} als Verwender Applikationen im Multimedia-Editing-Bereich an, beispielsweise Software zur Verwaltung einer Audio- und Videosammlung.
+
+Besondere Stärke der Library soll ihre Vielseitigkeit (im Sinne unterstützter Formate) und Erweiterbarkeit sein. Gleichzeitig soll sie Zugriff auf alle Features der unterstützten Formate gewähren.
+
+Eine Applikation soll wahlweise sehr generisch auf Metadaten zugreifen können, oder aber die Spezifika eines speziellen Formates sehr konkret nutzen können.
+
+Andere Arten von Metadaten, die nicht für Audio-, Video- oder Bildformate gedacht sind, sind nicht Ziel von \LibName{}, insbesondere gilt dies für spezielle XML-Metadatenformate.
+
+%-----------------------------------------------------------------------------------------------
+%		Features der Version \LibVersion{}
+%-----------------------------------------------------------------------------------------------
+
+\section{Features der Version \LibVersion{}}
+\label{sec:FeaturesLibVersion}
+
+Neben den noch zu besprechenden Ausschlüssen (\SectionLink{sec:Requirements}), die ganz klar sagen, was NICHT unterstützt wird, geben wir hier einen Überblick, welche Features 
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Metadatenformate}
+\label{sec:UnterstuetzteMetadatenformate}
+
+Die aktuelle Version unterstützt folgende Metadatenformate:
+
+\begin{itemize}
+	\item ID3v1 und ID3v1.1
+	\item ID3v2.3
+	\item APEv2
+	\item Lyrics3v2
+\end{itemize}
+
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Containerformate}
+\label{sec:UnterstuetzteContainerformate}
+
+\begin{itemize}
+	\item MPEG-1 Audio (MP3)
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Eingabemedien}
+\label{sec:UnterstuetzteEingabemedien}
+
+Die aktuelle Version unterstützt folgende Eingabemedien:
+\begin{itemize}
+	\item Datei
+	\item Java \texttt{InputStream}
+	\item Java byte-Array
+\end{itemize}
+
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Unterstützte Ausgabemedien}
+\label{sec:UnterstuetzteAusgabemedien}
+
+Die aktuelle Version unterstützt folgende Eingabemedien:
+\begin{itemize}
+	\item Datei
+	\item Java byte-Array
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+%		Features für spätere Versionen
+%-----------------------------------------------------------------------------------------------
+
+\section{Features für spätere Versionen}
+\label{sec:FuerSpaeter}
+
+Die folgenden Features werden für Version \LibVersion{} der Library noch nicht umgesetzt, sondern in späteren Versionen hinzugefügt:
+\begin{itemize}
+	\item Die format-spezifischen High-Level APIs
+	\item ...
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+%		Related Libraries
+%-----------------------------------------------------------------------------------------------
+
+\section{Verwandte Libraries}
+\label{sec:RelatedLibraries}
+
+Hier werden Java libraries behandelt, die verwandt zu \LibName{} sind. Hierunter fallen existierende Java-Libraries im Umfeld Multimedia, die einerseits Konkurrenz darstellen, andererseits Anregungen liefern und ggf. Möglichkeiten für Integration und Adaption bieten.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Metadaten-Libraries}
+\label{sec:MetadataLibraries}
+
+Eine Auswahl von Libraries die Zugriff auf Multimedia-Metadaten ermöglichen - Eine Quelle dafür ist beispielsweise \url{http://id3.org/Implementations}:
+\begin{itemize}
+  \item \textbf{mp3agic (Java):} Lesen und Schreiben von ID3 Tags (1.0, 1.1, 2.3, 2.4), Lesen von ID3 v2.2, low-level Lesen von MP3-Dateien (inkl. VBR) - \url{https://github.com/mpatric/mp3agic}
+	\item \textbf{BeagleBuddy (Java):} Lesen und Schreiben von ID3 Tags (1.0, 1.1, 2.3, 2.4), Lyrics3v2, Lyrics3v1, APEv1, APEv2, Lesen von MP§-Dateien CBR und VBR, Xing, LAME, und VBRI Header - \url{http://www.beaglebuddy.com/}
+	\item \textbf{jaudiotagger (Java):} Audio-Metadaten - \url{http://www.jthink.net/jaudiotagger/}
+	\item \textbf{Entagged (Java):} Audio-Metadaten - \url{http://entagged.sourceforge.net/}
+	\item \textbf{MyID3 (Java):} Audio-Metadaten (ID3) - \url{http://www.fightingquaker.com/myid3/}
+	\item \textbf{JID3 (Java):} Audio-Metadaten (ID3) - \url{https://blinkenlights.org/jid3/}
+	\item \textbf{Javamusictag (Java):} Manchmal auch \textbf{jid3lib} für Audio-Metadaten (ID3) - \url{http://javamusictag.sourceforge.net/}, \url{https://java.net/projects/jid3lib}
+	\item \textbf{id3lib (C/C++):} Audio-Metadaten (ID3) - \url{http://id3lib.sourceforge.net/}
+	\item \textbf{Mutagen (Python):} Audio-Metadaten und -Container-Daten (ID3) - \url{http://pypi.python.org/pypi/mutagen/1.12}
+	\item \textbf{jFlac (Java):} Audiodaten und Metadaten des Flac-Formates - \url{http://jflac.sourceforge.net/apidocs/index.html?org/kc7bfi/jflac/metadata/VorbisComment.html}
+	\item \textbf{MPEG-7 Audio Encoder (Java):} Erzeugen von MPEG-7 Metadaten - \url{http://mpeg7audioenc.sourceforge.net/}
+	\item \textbf{JAI Image I/O (Java):} Kann EXIF-Tags aus unterschiedlichsten Formaten lesen und schreiben - \url{https://jai-imageio.dev.java.net/binary-builds.html}
+	\item \textbf{jmac (Java):} Library, die monkey audio codecs encoden und decoden kann, ebenso APE-Tags lesen unds schreiben - \url{http://sourceforge.net/projects/jmac/}
+	\item ... und einige andere
+\end{itemize}
+
+Als größte Konkurrenz werden derzeit mp3agic und BeagleBuddy betrachtet.
+
+%***********************************************************************************************
+
+\subsubsection{Nachteile existierender Metadaten-Libraries}
+\label{sec:DrawbacksofExistingMetadataLibraries}
+
+Jede der genannten Libraries spezialisiert sich auf nur wenige Formate. D.h. Applikationen wird das eben nur reichen, wenn sie auch nur auf diese Formate beschränkt sind. Ansonsten kann es sein, dass man mehrere völlig verschiedene Libraries nebeneinander nutzen muss.
+
+Die Architektur und Erweiterbarkeit einiger der existierenden Libraries ist nicht überzeugend.
+
+Die ID3 Libraries z.B. zeigen ihre Internas sehr offenherzig, was es für den Anwender unklar macht, was wirklich ``public API'' ist, und was nicht. Verwender der Library könnten daher versehentlich oder auch bewusst (um einen Fehler ``umschiffen'' oder eine Funktionalität besser nutzen zu können) Implementierungsklassen nutzen. Dies wiederum macht es für die Library-Entwickler potentiell gefährlich, die Implementierung der Libraries zu refaktorisieren oder gar auszutauschen, ohne die Anwender der Libraries mit solchen Migration zu belasten.
+
+Anwendungen, die viele unterschiedliche Formate benötigen, müssen eine generische Erweiterbarkeit selbst herstellen, da die Libraries dies nicht von Haus aus bieten.
+
+%***********************************************************************************************
+
+\subsubsection{Vorteile von \LibName{}}
+\label{sec:AdvantagesofLibName}
+
+Es gibt bereits so viele Libraries, die alle mehr oder weniger zu gebrauchen sind. Warum also \LibName{}?
+
+Hierfür gibt es mehrere Gründe:
+\begin{itemize}
+	\item Anwendungen, deren Kern-Eigenschaft die Erweiterbarkeit und Formatvielfalt ist, müssen nicht dutzende völlig verschiedenartige Libraries mit unterschiedlichen Programmiermodellen nutzen.
+	\item Zudem müssen solche Anwendungen kein eigenes Erweiterbarkeitsframework bauen, um die Formate zu unterstützen, sondern können sich auf das Framework von \LibName{} stützen.
+	\item \LibName{} bietet von Haus aus Implementierungen für eine Vielfalt an Multimedia-Formaten an, und ist nicht nur auf Audio-Formate wie MP3, oder Ogg oder FLAC oder WAV (Audio) beschränkt.
+  \item Dennoch ist es modular, es erfordert es nicht, dass Anwendungen, die lediglich Audio-Formate unterstützen wollen, Video- oder Bild-Formate der Library mitnutzen, sondern eine selektive AUswahl der benötigten Formate ist möglich.
+	\item \LibName{} bietet eine leicht erlernbare, bequeme aber gleichzeitig überschaubare Schnittstelle für verwendende Anwendungen an.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Multimedia Libraries}
+\label{sec:MultimediaLibraries}
+
+Kann \LibName{} mit einigen üblichen Java-Multimedia-Libraries kooperieren? Dies wird in den folgenden Abschnitten geklärt.
+
+%***********************************************************************************************
+
+\subsubsection{JMF}
+\label{sec:JMF}
+
+Das Java Media Framework ist eine offizielle Java library, die mit J2SE \emph{desktop} technology ausgeliefert wird. Die aktuelle Version 2.1.1e wurde 2001 veröffentlicht. JMF kann von Client- und Serveranwendungen verwendet werden. JMF wurde mit MP3 Decoder und Encoder bis 2002 geliefert, aber wegen Lizenzierungsproblemen wieder entfernt. Seit 2004 gibt es nur noch ein MP3 Playback-only Plug-in.\footnote{Siehe \cite{WikJMF}.}
+
+Inzwischen ist JMF aber arg in die Jahre gekommen und wird wegen der großen Konkurrenz (genannt werden Adobe Flex, Xuggler etc.) wohl nur noch selten verwendet. Allerdings gibt es FMJ als Open-Source-ALternative, die API kompatibel ist: \url{http://www.fmj-sf.net/}.
+
+JMF kommt in vier JAR-Dateien:\footnote{Siehe \cite{WikJMF}.}
+\begin{itemize}
+	\item JMStudio: Simple Multimedia-Player-Applikation
+	\item JMFRegistry: Eine Anwendung die das Verwalten verschiedenster JMF-Einstellungen und Plug-ins ermöglicht
+	\item JMFCustomizer: Erlaubt das Erzeugen einer einfacheren JMF-Jar-Datei, die nur diejenigen JMF-Klassen enthält, welche die Client-Applikation wirklich benötigt, deswegen die Auslieferungsgröße verringert
+	\item JMFInit: Inititialisiert eine JMF-Applikation
+\end{itemize}
+
+JMF enthält platform-spezifische \emph{performance packs}, d.h. optimierte Pakete füe Betriebssysteme wie Linux, Solaris oder Windows.
+
+%***********************************************************************************************
+
+\paragraph{Features:}
+\label{sec:Features}
+
+JMF kümmert sich um Zeit-basierte Medien. Die JMF features kann man wie folgt zusammenfassen:\footnote{Siehe \cite{JMFWeb}.}
+\begin{itemize}
+	\item Capture: Multimedia frame-Daten eines gegebenen Audio- oder Video-Signals lesen und es in einen spezifischen Codec in Echtzeit codieren.
+	\item Playback: Multimedia-Daten abspielen, d.h. deren Bytes auf dem Bildschirm darstellen oder an die Audio-Ausgabegeräte weitergeben.
+	\item Stream: Zugriff auf Stream-Inhalte
+	\item Transcode: Konvertieren von Medien-Daten eines gegebenen digitalen Codecs in einen anderen, ohne zuerst decodieren zu müssen.
+\end{itemize}
+
+%***********************************************************************************************
+
+\paragraph{Kritik:}
+\label{sec:Criticism}
+
+\cite{WikJMF} fasst einiges negatives Feedback zur JMF library zusammen:
+\begin{itemize}
+	\item Eine Menge Codecs wie MPEG-4, MPEG-2, RealAudio und WindowsMedia werden nicht unterstützt, MP3 nur über ein Plug-in
+	\item Keine Wartung und Weiterentwicklung der Library durch Sun oder Oracle
+	\item Keine Editing-Funktionalität\footnote{D.h. das Bearbeiten von Multimedia-Content.}
+	\item Performance packs nur für einige wenige Plattformen
+\end{itemize}
+
+%***********************************************************************************************
+
+\paragraph{Basiskonzepte der API}
+\label{sec:BasicAPIConcepts}
+
+Lesen der Multimediadaten wird in Form von \texttt{DataSources} abstrahiert, während Ausgaben in \texttt{DataSinks} geschrieben werden. Keine Spezifika unterstützter Formate werden bereitgestellt, vielmehr können unterstützte Formate abgespielt, verarbeitet und exportiert werden, wobei nicht alle Codecs Support für Verarbeitung und transcoding bieten. Eine \texttt{Manager}-Klasse ist die primäre API für JMF-Anwender.\footnote{Siehe \cite{WikJMF}.}
+
+Die API-Dokumentation zeigt, dass JMF sehr komplex und im Wesentlichen zeit- und event-basiert ist.\footnote{Siehe \cite{JMFDoc}.} Es gibt Möglichkeiten, rohe Bytedaten über die Methode \texttt{read} des interfaces \texttt{PullInputStream} zu lesen. Jedoch kontrolliert JMF die Verarbeitung ausgehend von der Quelle, z.B. entweder einer Datei oder einen Stream.
+
+%***********************************************************************************************
+
+\paragraph{Vergleich mit \LibName{}:}
+\label{sec:CooperationwithLibName1}
+
+Es scheint als gäbe es keine sinnvolle Kooperation zwischen \LibName{} und JMF. Es gibt Ähnlichkeiten und Unterschiede. Beide können Datenquellen und -Senken handhaben, also Mediendaten in verschiedensten Formaten lesen und schreiben. \LibName{} bringt zusätzlich weitgreifende Unterstützung für Metadaten-Formate und für nicht-audio-video Container-Formate mit. Jedoch ist sie im Vergleich zu JMF eher eine primitve Library, in dem SInne dass sie nur Zugriff auf die Daten liefert, ohne weiteres Framework für dessen Verarbeitung. \LibName{} liefert die raw bytes und Metadatn, die Anwendung kann sie verwenden wie gewünscht, z.B. diese abspielen, transcodieren oder was auch immer. JMF bietet diese Zusatzschritte und mag dafür holistischer erscheinen. \LibName{} ist mehr als Basisbilbiothek zu betrachten, die sich auf Metadaten spezialisiert, und man hätte \LibName{} zum Implementieren von JMF nutzen können.
+
+%***********************************************************************************************
+
+\subsubsection{JavaSound}
+\label{sec:JavaSound}
+
+JavaSound ist Oracle's Sound-Verarbeitungs-Library. Sie hat einige Gemeinsamkeiten mit JMF, kann aber als low-level betrachtet werden, da sie auch mehr Manipulations-Funktionalitäten für die Audio-Daten bietet. Sie unterstützt auch MIDI-Geräte.\footnote{Siehe \cite{WikJavaSound}.}
+
+%***********************************************************************************************
+
+\paragraph{Basiskonzepte:}
+\label{sec:BasicConcepts}
+
+JavaSound bietet im Wesentlichen die Klassen \texttt{Line}, die ein Element in der Audio-Pipeline repräsentiert, die abgeleiteten Klassen \texttt{Clip} für das Abspielen von Audio-Daten sowie \texttt{Mixer} für das Manipulieren der Audio-Daten an. Sie kann aus Streams ebenso wie aus Dateien oder rohen Bytes lesen. Sie unterstützt desgleichen Konvertierung zwischen verschiedenen Datei-Formaten.
+
+%***********************************************************************************************
+
+\paragraph{Vergleich mit \LibName{}:}
+\label{sec:CooperationwithLibName2}
+
+Wie JMF kümmert sich JavaSound um das Abspielen und Verarbeiten der Audio-Daten statt um das Lesen der verfügbaren Detailinformationen. Hier kommt \LibName{} ins Spiel. \LibName{} liest nahezu alle spetifischen Informationen, inklusive Metadaten. Jedoch liefert es lediglich rohe Audio-Nutzedaten, und überlässt es dem Nutzer, diese zu verarbeiten und abzuspielen. \LibName{} und JavaSound sind daher Wettbewerber im Sinne des Lesens und Schreibens von Audio-Daten. \LibName{} liefert deutlich mehr Detailinformationen aus den gelesenen Daten, inklusive jedweder eingebetteter Metadaten, während JavaSound die Medien abspielt - d.h. es fokussiert sich auf dessen eigentlichen Zweck. Jedoch gibt es einen Weg, über den beide kooperieren können - Das modell könnte so aussehen:
+\begin{itemize}
+	\item \LibName{} liest alle Informationen inklusive Audio-Frames und Metadaten.
+	\item Die Audio-Frames werden - wenn unterstützt - an JavaSound als Raw-Bytes gesendet, wie in Folgendem-Beispiel:\footnote{Das Beispiel ist aus \cite{JavaSoundSample} entnommen und leicht verkürzt worden.}
+
+\small
+\begin{lstlisting}[language=Java]
+<Read all tags here using jMeta>
+
+SourceDataLine	line = null;
+DataLine.Info	info = 
+   new DataLine.Info(SourceDataLine.class, audioFormat);
+
+try
+{
+   line = (SourceDataLine) AudioSystem.getLine(info);
+    
+   /*
+     The line is there, but it is not yet ready to
+     receive audio data. We have to open the line.
+   */
+   line.open(audioFormat);
+}
+catch (LineUnavailableException e)
+{
+   e.printStackTrace();
+   System.exit(1);
+}
+catch (Exception e)
+{
+   e.printStackTrace();
+   System.exit(1);
+}
+
+/*
+  Still not enough. The line now can receive data,
+  but will not pass them on to the audio output device
+  (which means to your sound card). This has to be
+  activated.
+*/
+line.start();
+
+while (<Read frames using jMeta>)
+{
+   int nBytesWritten = line.write(abData, 0, nBytesRead);
+}
+\end{lstlisting}
+\normalsize
+
+\end{itemize}
+
+Dieser Ansatz ist jedoch nicht sehr befriedigend, da er einen Performance-Overhead erzeugt, wenn es um das Abspielen oder transcoding von Multimedia-Inhalten geht. Daher scheinen JavaSound und \LibName{} nur entweder-oder einsetzbar zu sein.
+
+%===============================================================================================
+%		Basic Terms
+%===============================================================================================
+
+\chapter{Basic Terms}
+\label{sec:BasicTerms}
+
+%===============================================================================================
+%		Eigentlicher Start des Kapitels
+%===============================================================================================
+
+Here we define basic terms used throughout the whole design concept. Most of them come from \cite{MetaComp}, pages 19 to 29, where even more terms are defined.
+
+All terms are based on a a domain model for container and metadata, as defined in \cite{MetaComp}. A domain model extended for our needs is shown in the following figure - it shows all relevant terms and their relations as an overview:
+\OpenIssue{Add domain model figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Metadaten}
+\label{sec:Metadata}
+
+Metadata in this document is short for digital metadata that are not necessary to parse the actual described (audio, video or image) data. Metadata semantically and structurally describes other data. The goal of \LibName{} is especially reading of metadata for audio and video data sets, e.g. title, artist etc. The structure of metadata is defined by a \TERMmetadataFormat{}.
+
+If it is specifically about technical metadata needed to parse a data structure, e.g. in the container header,  we call it \emph{Parsing Metadata}.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{\TERMdataFormat{}e, \TERMmetadataFormat{}e und \TERMcontainerFormat{}e}
+\label{sec:DataFormats}
+
+A \TERMdataFormat{} specifies the structure and interpretation
+of data: Which bytes of which value and order have what kind of meaning?
+Usually, a data format describes how a consecutive block of bytes (i.e. a \TERMdataBlock{}) is built up by a number of so-called \TERMfield{} or child \TERMdataBlock{}.
+
+\TERMmetadataFormat{}s are data formats that define the structure of digital metadata. Examples include:
+\begin{itemize}
+	\item ID3v1
+	\item ID3v2.3
+	\item APEv1
+	\item MPEG-7
+	\item RDF/XML
+	\item VorbisComment
+	\item and others ...
+\end{itemize}
+
+\TERMcontainerFormat{}s are special \TERMdataFormat{}s optimized for storing, transporting, editing and seeking multimedia \TERMpayload{} data. Examples are:
+\begin{itemize}
+	\item MP3
+	\item Ogg
+	\item TIFF
+	\item QuickTime
+	\item JPEG 2000
+	\item PDF
+	\item and others...
+\end{itemize}
+
+An example for other \TERMdataFormat{}s is HTML. It is neither called a \TERMmetadataFormat{} nor a \TERMcontainerFormat{}. XML is a \TERMdataFormat{} that itself can be used to define further XML \TERMdataFormat{}s. Some XML \TERMdataFormat{}s are \TERMmetadataFormat{}s, e.g. MPEG-7, MPEG-21 or P\_Meta.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{\TERMtransformation{}en}
+\label{sec:DataTransformations}
+
+A \TERMdataFormat{} may define \TERMtransformation{}s. A \TERMtransformation{} describes a way how read or to be written data needs to be transformed to fulfill specific needs. You can envision this as kind of encoding of the data. In contrast to the fixed data format specification which describes in detail how binary data is coded and needs to be interpreted, \TERMtransformation{}s are optional features that are dynamically applied to certain areas of the data. Partly, \TERMtransformation{}s can also be defined by users of the data. Examples are the \TERMtransformation{}s defined by ID3v2: Unsynchronization, Encryption and Compression.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{\TERMdataBlocks{}}
+\label{sec:DataBlocks}
+
+A \TERMdataBlock{} is a sequence of bytes that together form a logical unit in terms of the underlying \TERMdataFormat{}. Each \TERMdataBlock{} belongs to exactly one \TERMdataFormat{}. It can be assigned a current length in bytes. There are several concrete types of \TERMdataBlock{}s that are described in the following sections.
+
+%***********************************************************************************************
+
+\subsection{\TERMcontainer{}: \TERMpayload{}, \TERMheader{}, \TERMfooter{}}
+\label{sec:Containers}
+
+An important type of \TERMdataBlock{} is a \TERMcontainer{}: It consists of an optional \TERMheader{}, exactly one \TERMpayload{} and maybe an optional \TERMfooter{}. All of these are \emph{child} \TERMdataBlock{}s, meaning that a \TERMcontainer{} is built-up by these three blocks.
+
+\TERMcontainer{}s are a common concept for container and metadata formats: The \TERMheader{} describes the \TERMcontainer{} in terms of its length, size and other properties. The \TERMpayload{} contains the interesting data, e.g. the multimedia data to be played. A \TERMfooter{} allows for backwards or reverse reading. Most of the time, a \TERMcontainer{} is typed with its id, i.e. the id defines the kind and structure of data block. Furthermore, most of \TERMdataFormat{}s specify a general structure of a \TERMcontainer{} so that user-defined new \TERMcontainer{}s can be added, i.e. the format is extensible.
+
+%***********************************************************************************************
+
+\subsection{\TERMtag{}}
+\label{sec:Tag}
+
+A \TERMtag{} is a special \TERMcontainer{} whose purpose is to store metadata. It can either belong to a standalone \TERMmetadataFormat{} ore to a more general \TERMcontainerFormat{}. Especially audio metadata formats use this term when talking about such a \TERMdataBlock{} in a file or \TERMmediaStream{}, e.g. the ID3 or APE \TERMtag{}s.
+
+The following figure shows the basic structure of a \TERMtag{}, showing other basic terms:
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_3_TagStructure.pdf}
+		\caption{Structure of a \TERMtag{}}
+	\label{fig:5_3_SCH_Tag}
+\end{figure}
+
+The most important parts of a \TERMtag{} are the \TERMattribute{}s.
+
+%***********************************************************************************************
+
+\subsection{\TERMattribute{}}
+\label{sec:Attribute}
+
+An \TERMattribute{} is a part of a \TERMtag{} that contains the valuable metadata information in a key-value manner. Common examples are artist, title, album, composer etc. of a piece of audio. Often, an \TERMattribute{} is also a \TERMcontainer{} in a sense that it has a \TERMheader{}. The \TERMheader{} may help to define the type (artist, title, album) of the \TERMattribute{} as well as the size of the payload. The \TERMpayload{} contains the actual information in an encoded way, e.g. the name of the artist or title of the piece of audio.
+
+Most of the \TERMattribute{}s have a simple main value that can be given. However, there are also more complex \TERMattribute{}s that consists of many values in form of child \TERMdataBlock{}s or \TERMfield{}s.
+
+In each metadata format, an \TERMattribute{} has a specific name, e.g.:
+\begin{itemize}
+	\item ID3v1, Lyrics3: Field
+	\item ID3v2: Frame
+	\item APE: Item
+	\item Matroska: SimpleTag
+	\item VorbisComment: User Comment
+\end{itemize}
+
+In \TERMcontainerFormat{}s, the \TERMattribute{}s are often \TERMcontainer{}s defined by the \TERMcontainerFormat{}.
+
+%***********************************************************************************************
+
+\subsection{\TERMfield{}s}
+\label{sec:Fields}
+
+A \TERMfield{} is a sequence of bits that together have a specific meaning in a given \TERMdataFormat{}. The \TERMdataFormat{} describes how a specific \TERMdataBlock{} is built up by a specific sequence of \TERMfield{}s. A \TERMfield{} has a range of possible values and
+interpretations of these values. Often, one part of the value range is defined as ``reserved'' to ensure a bit of flexibility in extending the data format.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{\TERMsubject{}}
+\label{sec:Subject}
+
+A \TERMsubject{} represents a thing a \TERMtag{} describes, i.e. a part of a file, a piece of audio, a web resource or even a thing existing in reality. Often, a \TERMtag{} contains metadata for the current \TERMmedium{}, not explicitly referring to a more specific \TERMsubject{}.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{\TERMmedium{}}
+\label{sec:Medium}
+
+A medium is the place where data \TERMdataBlock{}s are physically persisted and accessible. This may be a file, a \TERMmediaStream{} or even plain memory.
+
+%===============================================================================================
+%		Anforderungen
+%===============================================================================================
+
+\chapter{Anforderungen und Ausschlüsse}
+\label{sec:Requirements}
+
+Hier werden all expliziten Anforderungen an die Bibliothek \LibName{} in Version \LibVersion{} sowie auch explizite Ausschlüsse dargestellt. Ausschlüsse dienen dafür, explizit klarzumachen, welche Themen (auf potentiell bliebig lange Zeit) nicht unterstützt werden. Davon abzugrenzen sind bereits bekannte (ggf. sogar notwendige) Erweiterungen, die aber nicht in dieser Version verfügbar sind, sondern absehbar in einer folgenden Version umgesetzt werden sollen. Das sind (potentielle) Features, die auf eine spätere Version verschoben worden sind. Diese sind im Abschnitt \SectionLink{sec:FuerSpaeter} beschrieben.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 001
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 001: Metadaten Menschenlesbar lesen und schreiben}
+\label{sec:MetadatenLesenUndSchreiben}
+
+Metadaten sollen in \emph{menschenlesbarer Form} gelesen und geschrieben werden können. D.h. der Anwender der Library wird nicht genötigt, binäre Repräsentationen der Daten zu erzeugen, um sie schreiben zu können, bzw. binäre Daten zu interpretieren. 
+
+\textbf{Begründung:} Dies ist eine generelle Kernfunktionalität der Library.
+
+Eine Liste der unterstützten Formate findet sich in \SectionLink{sec:Features}.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 002
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 002: Containerformate lesen}
+\label{sec:ANF002ContainerformateLesen}
+
+Populäre bzw. verbreitete Containerformate müssen gelesen werden können.
+
+\textbf{Begründung:} Metadaten sind oft in Containerformaten eingebettet bzw. fest in deren Spezifikation verankert. Zudem müssen Container-Segmente erkannt werden können, um sie zu überspringen und den eigentlichen Anfang der Metadaten finden zu können.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 003
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 003: Spezifikation unterstützter Metadaten- und Containerformate erfüllen}
+\label{sec:ANF003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen}
+
+Sofern eine Spezifikation eines unterstützten Metadaten- bzw. Containerformates vorliegt, muss diese vollständig unterstützt werden. Es muss vollständigen Zugriff auf alle unterstützten Features des Datenformates möglich sein.
+
+\textbf{Begründung:} So wird sichergestellt, dass spezifikationskonforme Metadaten geschrieben werden, die auch von anderen Libraries bzw. Anwendungen wieder gelesen werden können. Zudem kann der Nutzer der Library alle Features des jeweiligen Formates ausnutzen, ohne wiederum allzu viel Eigenimplementierung leisten zu müssen. Dies ist auch eine Differenzierungsmöglichkeit gegenüber anderen Libraries.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 004
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 004: Zugriff auf alle Rohdaten über die Library}
+\label{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary}
+
+Zusätzlich zum Zugriff auf menschenlesbare Metadaten (\SectionLink{sec:MetadatenLesenUndSchreiben}) soll es ebenso möglich sein, alle Rohdaten aub Byteebene zu lesen. Es soll feingranularer Zugriff auf alle Felder der Binärdaten möglich sein.
+
+\textbf{Begründung:} So können Anwender selbst ein Parsing implementieren, ohne die high-level-Funktionen nutzen zu müssen. Sie können selbst auf Byte- und Bitebene Daten manipulieren und auslesen. Ein Zugriff auf die Binärdaten ist möglich (wenn nötig), ohne wiederum einen eigenen Umweg gehen zu müssen, z.B. durch erneutes Lesen und Parsen der Daten.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 005
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 005: Performance vergleichbar mit anderen Java-Metadaten-Libraries}
+\label{sec:ANF005PerformanceVergleichbarMitAnderenJavaMetadatenLibraries}
+
+Die Performance der Library soll gleichwertig oder besser als die anderen Java-Metadaten-Libraries sein. Hierfür müssen die Vergleichslibraries benannt und ein entsprechender Benchmark definiert und durchgeführt werden.
+
+\textbf{Begründung:} Die Library soll ähnlich performant wie bestehende Lösungen der idealerweise performanter sein, um hier kein Argument gegen ihren Einsatz zu liefern.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 006
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 006: Fehlererkennung, Fehlertoleranz, Fehlerkorrektur}
+\label{sec:ANF006FehlererkennungFehlertoleranzFehlerkorrektur}
+
+Ergänzend zur \SectionLink{sec:ANF003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen} muss die Library aber auch \emph{fehlertolerant} sein, so weit möglich. D.h. u.a., das Spezifikationsverstöße und fehlerhafte Parsing-Metadaten erkannt werden, und dies - soweit nicht unumgänglich - nicht zum Abbruch des Parsens mit einem Fehler endet. Verstöße werden protokolliert und wenn möglich automatisch korrigiert (optional, wenn es der Library-Anwender wünscht).
+
+\textbf{Begründung:} Altanwendungen oder andere Libraries schreiben Datenformate manchmal nicht 100\% spezifikationskonform. Zudem sind nicht alle Spezifikationen eindeutig oder genau genug, sodass Varianten entstehen könnten. Trotz Vorliegen fehlerhafter Daten soll der Anwender der Library in die Lage versetzt werden, Daten dennoch auslesen und ggf. sogar korrigieren zu können.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 007
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 007: Extensibility for new Metadata and Container Formats}
+\label{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}
+
+\LibName{} must be comfortably extensible with new container or metadata formats. As the minimum level, easy extensibility by the library developers must be possible. As the maximum level of extensibility, also end users with programming experience must be able to easily write extensions without too much configuration or boilerplate code.
+
+\textbf{Rationale:} New metadata formats are developed and are available over and over again. The extensibility ensures a longer life time of the library and allows easier maintenance by the library developers. In the maximum level ``Extensibility by end users'', this is a clear differntiation criterion to other libraries that do not offer this level of extensibility.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 008
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 008: Lesen und Schreiben großer Datenblöcke}
+\label{sec:ANF009LesenSchreibenGrosse}
+
+\LibName{} muss das Lesen und Schreiben sehr großer Datenmengen effizient unterstützen, und dabei Mechanismen verwenden, um OutOfMemoryErrors zu vermeiden.
+
+\textbf{Begründung:} Besonders im Video-Bereich können teilweise gigabyte-große Nutzdaten vorkommen. Die Länge der Nutztdaten muss korrekt interpretiert werden können. Wegen \SectionLink{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary} muss auch das Lesen und Schreiben der Nutzdaten unterstützt werden, ohne dass Speicher knapp wird, d.h. ein etappenweises Lesen und Schreiben o.ä. muss möglich sein. Dies ist auch ein Differenzierungsmerkmal zu anderen Libraries, die dies ggf. gar nicht unterstützen können.
+
+%-----------------------------------------------------------------------------------------------
+%		ANF 009
+%-----------------------------------------------------------------------------------------------
+
+\section{ANF 009: Selective Format Choice}
+\label{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}
+
+An application using \LibName{} must be able to selectively choose these formats that it wants to support. This is not only necessary for runtime, but also for the library extension packages it wants to use.
+
+\textbf{Rationale:} Audio applications do not need extensions for video or image formats. Applications can minimize the runtime and memory overhead by choosing as few extensions as really needed.
+
+%-----------------------------------------------------------------------------------------------
+%		AUS 001
+%-----------------------------------------------------------------------------------------------
+
+\section{AUS 001: Lesen aus Media Streams}
+\label{sec:AUS009LesenAusStreams}
+
+Ein Lesen von Metadaten oder Containerdaten aus Streams (streaming media) wird nicht explizit unterstützt. Es können im Design Möglichkeiten zur aktiven Unterstützung vorgesehen werden, dies ist aber nicht zwingend erforderlich.
+
+\textbf{Begründung:} Kombinierte Anwendungen (Recorder bzw. Player) machen für diesen Fall mehr Sinn und sind auch weitgehend verfügbar. Die zusätzliche Unterstützung für Streaming könnte das Design verkomplizieren. Es ist aktuell unklar, wie dies umzusetzen wäre.
+
+%-----------------------------------------------------------------------------------------------
+%		AUS 002
+%-----------------------------------------------------------------------------------------------
+
+\section{AUS 002: Lesen von XML-Metadaten}
+\label{sec:AUS010LesenVonXMLMetadaten}
+
+Es gibt auch XML-Metadatenformate. Üblicherweise werden diese aber nicht in Multimedia-Daten eingesetzt, da sie sehr ``verbos'' sein können. Hier sind weiterhin die binären Metadatenformate die Platzhirsche. Die Unterstützung von XML wird nicht im Kern der Library vorgesehen.
+
+\textbf{Begründung:} Der Versuch, sowohl binäre als auch XML-Formate über die gleiche API oder gar Implementierung zu unterstützen, kann zu einem sehr komplizierten Design führen. Java bietet viele sinnvolle Standard-Möglichkeiten zum Parsen und zum Schreiben von XML-Metadaten. Evtl. könnten diese in Ausbaustufen in einer Implementierung (hinter der gleichen API-Schnittstelle) in einer späteren Ausbaustufe unterstützt werden.
+
+%-----------------------------------------------------------------------------------------------
+%		AUS 003
+%-----------------------------------------------------------------------------------------------
+
+\section{AUS 003: No User Extensions for \LibName{} Media}
+\label{sec:AUS01220LesenVonXMLMetadaten}
+
+Extending \LibName{} with new media to support - on top of the out-of-the box supported media - is not supported.
+
+\textbf{Rationale:} The mechanisms available should cover 80 to 90 percent of the use cases. Extensibility by new media might increase the complexity of \LibName{} itself and the extension mechanism in specific, without adding real-world use cases really needing it. It is currently not clear which media beyond streams, byte arrays and files might be candidates for extending \LibName{}. Should new media make sense in future, a new core release can be created to also support media extensions.
+
+%===============================================================================================
+%		Reference Examples
+%===============================================================================================
+
+\chapter{Reference Examples}
+\label{sec:ReferenceExamples}
+
+To proof conformance with the \LibName{} requirements, a set of (mostly) real-life examples for all supported formats is used. The examples are used to illustrate design decisions and also to verify them. In this chapter, these examples are presented for short. The concrete detailed structures of each data format is described in \cite{MetadataCompendium}.
+
+Note that the sizes of the data blocks in the following illustrating example figures do not have any specific meaning.
+
+%-----------------------------------------------------------------------------------------------
+%		Example 1: MP3 File with ID3v2.3 and ID3v1.1
+%-----------------------------------------------------------------------------------------------
+
+\section{Example 1: MP3 File with ID3v2.3, ID3v1.1 and Lyrics3}
+\label{sec:Example1MP3FileWithID3v23AndID3v11}
+
+The following figure shows the first example, an MP3 file with three \TERMtag{}s, ID3v2.3, Lyrics3v2 and ID3v1.1. All are located at the end of the file:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example1.pdf}
+	\caption{Example 1: MP3 file with two tags}
+	\label{fig:Example1MP3filewithtwotags}
+\end{figure}
+
+The ID3v2.3 tag has several frames, including two \texttt{GEOB} frames. Furthermore, it has some padding within. Each of the MP3 frames corresponds to the MPEG-1 elementary stream audio format.
+
+%-----------------------------------------------------------------------------------------------
+%		Example 2: MP3 File with two ID3v2.4 Tags
+%-----------------------------------------------------------------------------------------------
+
+\section{Example 2: MP3 File with two ID3v2.4 Tags}
+\label{sec:Example2MP3FileWithID3v23AndID3v11}
+
+The following figure shows the second example, an MP3 file with two ID3v2.4 \TERMtag{}s, one at the beginning, the other one at the end of the file:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example2.pdf}
+	\caption{Example 2: MP3 file with two ID3v2.4 tags}
+	\label{fig:Example1MP3filewithtwoID3tags}
+\end{figure}
+
+The two ID3v2.4 tags are virtually connected by a \texttt{SEEK} frame. Both have several specialties described in \cite{MetadataCompendium}.
+
+%-----------------------------------------------------------------------------------------------
+%		Example 3: MP3 Media Stream with periodic ID3v2.3 Tags
+%-----------------------------------------------------------------------------------------------
+
+\section{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
+\label{sec:Example3MP3FileWithID3v23AndID3v11}
+
+The following figure shows the third example, an MP3 media stream with wildly scattered or periodic ID3v2.3 \TERMtag{}s. The figure shows that start of listening to the stream may also be in the middle of an MP3 block:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example3.pdf}
+	\caption{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
+	\label{fig:Example3MP3filewithtwoID3tags}
+\end{figure}
+
+%-----------------------------------------------------------------------------------------------
+%		Example 4: Ogg Bitstream with Theora and VorbisComment
+%-----------------------------------------------------------------------------------------------
+
+\section{Example 4: Ogg Bitstream with Theora and VorbisComment}
+\label{sec:Example4MP3FileWithID3v23AndID3v11}
+
+The following figure shows the fourth example, an Ogg bitstream that contains Theora payload data with a corresponding vorbis comment:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example4.pdf}
+	\caption{Example 4: Ogg Bitstream with Theora and VorbisComment}
+	\label{fig:Example4MP3filewithtwoID3tags}
+\end{figure}
+
+The example is complex on first sight. In an Ogg bitstream, physical and logical structure are not necessarily the same. The physical structure is built by pages, packets and segments, while the logical structure is the structure of the wrapped data. We took theora video data as an example, but its basically arbitrary, as the codec does not really matter. What matters is where the Vorbis Comment, one of the supported data formats, is stored. This unfortunately depends on the embedded codec. In this example, the vorbis comment starts in the second page and spans over two packets. The second of these packets spans over two Ogg pages.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 5: TIFF RGB image file
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 5: TIFF RGB image file with Exif IFD}
+% \label{sec:Example5MP3FileWithID3v23AndID3v11}
+
+% An example RGB image TIFF file with an Exif IFD is modelled in the following figure:\footnote{The example is based on the figure of \cite{ExifSpec}, page 9.}
+
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example5.pdf}
+% 	\caption{Example 5: TIFF RGB image file with Exif IFD}
+% 	\label{fig:Example5MP3filewithtwoID3tags}
+% \end{figure}
+
+% Note that Exif is \emph{not a supported format} for \LibName{} currently. However, the presence of an Exif IFD must not be a problem for \LibName{}, of course.
+
+% The example contains two image data parts, in this example stored after each other. The first image part is just a thumbnail image while the second one stores the real image data. The figure shows the pointered structure of the file as IFD fields often point to a byte offset in the file where the actual data is stored.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 6: RIFF WAVE File
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 6: RIFF WAVE File}
+% \label{sec:Example6MP3FileWithID3v23AndID3v11}
+
+% An example RIFF file with WAVE sound contents is shown in the following figure:
+
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example6.pdf}
+% 	\caption{Example 6: RIFF WAVE File}
+% 	\label{fig:Example6MP3filewithtwoID3tags}
+% \end{figure}
+
+% The top-level root chunk contains a fact chunk, a format chunk, a list of wave data chunks and finally a \texttt{LIST} info chunk in its payload. The \texttt{LIST} info chunk can be considered as \TERMtagBasic{}. It contains \texttt{INAM}, \texttt{IART} and \texttt{ICRD} sub-chunks.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 7: QuickTime File
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 7: QuickTime File}
+% \label{sec:Example7MP3FileWithID3v23AndID3v11}
+
+% An example QuickTime file is shown in the following figure:
+
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example7.pdf}
+% 	\caption{Example 7: QuickTime File}
+% 	\label{fig:Example7MP3filewithtwoID3tags}
+% \end{figure}
+
+% A QuickTime file can easily get very complex. The example contains the \texttt{ftyp}, \texttt{moov}, \texttt{mdat} and \texttt{free} atoms as top-level atoms. The \texttt{mdat} atom contains the media data and is not further detailed in the example. It is preceded by a wide atom to enable easy extension to a header indicating more than $2^{32}$ bytes media atom size.
+
+% The example defines two tracks in the movie atom. One of these contains a user data atom which contains key-value metadata. The other track contains the QuickTime \texttt{meta} atom also defining metadata, but in a different way.
+
+% The example shows that the \texttt{moov} atom itself additionally contains a \texttt{meta} and user data atom describing the whole file.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 8: Matroska File
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 8: Matroska File}
+% \label{sec:Example8MP3FileWithID3v23AndID3v11}
+
+% An example Matroska file is shown in the following figure:
+
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example8.pdf}
+% 	\caption{Example 8: Matroska File}
+% 	\label{fig:Example8MP3filewithtwoID3tags}
+% \end{figure}
+
+% The example has two Cluster elements that store the actual media data. These are not further detailed in the example. The metadata in the example is complex: There are two top-level Tags elements, the first one contains two Tag elements, the second one only a single Tag element. Each of the Tag elements has child SimpleTag elements. The first Tag contains a Targets sub-element that points to two tracks of the file. Tag 3 only contains SimpleTags. However, the first SimpleTag contains nested SimpleTags.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 9: Arbitrary XML
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 9: Arbitrary XML}
+% \label{sec:Example9MP3FileWithID3v23AndID3v11}
+
+% \LibName{} is required to handle arbitrary XML data, too. The following short file is taken as an example:
+
+% \begin{lstlisting}
+% <?xml version="1.0" encoding="UTF-8"?>
+% <!DOCTYPE ComponentConfiguration [ 
+
+% <!ELEMENT ComponentDescriptor (Service+)>
+
+% <!ATTLIST id NAME CDATA #REQUIRED>
+
+% ]> 
+% <cconf:ComponentConfiguration
+% xmlns:cconf="www.easytag.de/XMLSchema_v1_0"
+% 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+% 	xsi:schemaLocation="www.easytag.de/XMLSchema_v1_0 ComponentConfiguration.xsd">
+% 	<ComponentDescriptor id="a">
+% 		<ProviderPath>bin/</ProviderPath>
+% 		<Service>
+% 			<Interface>de.je.registry.export.compdummies.a.export.TestInterfaceCompA1</Interface>
+% 			<Provider>de.je.registry.compdummies.a.impl.TestImplCompA1</Provider>
+% 		</Service>
+% 		<Service>
+% 			<Interface>de.je.registry.export.compdummies.a.export.TestInterfaceCompA2</Interface>
+% 			<Provider>de.je.registry.compdummies.a.impl.TestImplCompA2</Provider>
+% 		</Service>
+% 	</ComponentDescriptor>
+% 	<ComponentDescriptor id="b">
+% 		<ProviderPath>bin/</ProviderPath>
+% 		<Service>
+% 			<Interface>de.je.registry.export.compdummies.b.export.TestInterfaceCompB1</Interface>
+% 			<Provider>de.je.registry.compdummies.b.impl.TestImplCompB1</Provider>
+% 		</Service>
+% 	</ComponentDescriptor>
+% 	<ComponentDescriptor id="c">
+% 		<ProviderPath>bin/</ProviderPath>
+% 		<Service>
+% 			<Interface>de.je.registry.export.compdummies.c.export.TestInterfaceCompC1</Interface>
+% 			<Provider>de.je.registry.compdummies.c.impl.TestImplCompC1</Provider>
+% 		</Service>
+% 	</ComponentDescriptor>
+% 	<ComponentDescriptor id="d">
+% 		<ProviderPath>bin/</ProviderPath>
+% 		<Service>
+% 			<Interface>de.je.registry.export.compdummies.d.export.XYZ</Interface>
+% 			<Provider>de.je.registry.compdummies.d.impl.XYZImpl</Provider>
+% 		</Service>
+% 	</ComponentDescriptor>
+% </cconf:ComponentConfiguration>
+% \end{lstlisting}
+
+% The example contains most XML elements: DTD, Elements, attributes, namespaces and of course the XML header.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 10: Arbitrary XHTML with Meta Elements and RDFa
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 10: Arbitrary XHTML with Meta Elements and RDFa}
+% \label{sec:Example10MP3FileWithID3v23AndID3v11}
+
+% \LibName{} is required to handle arbitrary XHTML data, and especially XHTML meta elements and embedded RDFa. All of this is contained in the following example:
+
+% \begin{lstlisting}
+% <?xml version="1.0" encoding="UTF-8"?>
+% <!DOCTYPE html
+%   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+%   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+% <html xmlns="http://www.w3.org/1999/xhtml"
+%     version="XHTML+RDFa 1.0"
+% 	 xmlns:biblio="http://example.org/"
+%     xmlns:dc="http://purl.org/dc/elements/1.1/"
+%     xmlns:cal="http://www.w3.org/2002/12/cal/ical#"
+%  	 xmlns:foaf="http://xmlns.com/foaf/0.1/"
+%     xml:lang="en"
+%      profile="http://example.org/profil.html">
+%   <head>
+%     <title>Books by Marco Pierre White</title>
+%     <!-- There is no about attribute here which means the predicate dc:creator with object (i.e. value) "Mark Birbeck" refers to the current document as a subject -->
+%     <meta property="dc:creator" content="Mark Birbeck" />
+%     <!-- Another example of a predicate that expresses a relationship "foaf:topic" to the specified URI. -->
+%     <link rel="foaf:topic" href="http://www.formsPlayer.com/#us" />
+% 	 <link rel="foaf:primaryTopic" href="#bbq" />
+% 	<title>Beschreibung der Seite</title>
+% 	<meta name="Typ" scheme="MIME-Type" content="image/svg+xml">
+% 	<meta name="author" content="Anna Lyse">
+% 	<meta http-equiv="expires" content="Sat , 01 Dec 2001 00:00:00 GMT">
+% 	<meta name="keywords" lang="de" content="Ferien , Griechenland ,
+% 		Sonnenschein">
+% 	<meta name="keywords" lang="en-us" content="vacation , Greece , sunshine">
+% 	<meta name="keywords" lang="en" content="holiday , Greece , sunshine">
+% 	<meta name="keywords" lang="fr" content="vacances , Gr&egrave;ce , soleil">
+% 	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+% 	<meta http-equiv="Content-Script-Type" content="text/javascript">
+
+% 	<meta http-equiv="PICS-Label" content='(PICS-1.1 "http://www.gcf.org/v2.5"
+% 		labels on "1994.11.05T08:15-0500"
+% 		unti l "1995.12.31T23:59-0000"
+% 		for "http://w3c.org/PICS/Overview.html"
+% 		ratings ( suds 0.5 density 0 color/hue 1) ) '>
+%   </head>
+%   <body>
+%     I think White's book
+%     <!-- Here comes the first subject embedded in a span element. It refers to a specific datatype using typeof. It is described with the predicate dc:title whose object (i.e. value) is
+%     the contents of the span element. -->
+%     '<span about="urn:ISBN:0091808189" typeof="biblio:book"
+%            property="dc:title">
+%       Canteen Cuisine
+%     </span>'
+%     is well worth getting since although it's quite advanced stuff, he
+%     makes it pretty easy to follow. You might also like
+%     <!-- The second subject whose dc:description is given. -->
+%     <span about="urn:ISBN:1596913614" typeof="biblio:book"
+%           property="dc:description">
+%       White's autobiography
+%     </span>.
+%     <!-- Another subject -->
+%     <p about="#bbq" typeof="cal:Vevent">
+%       I'm holding
+%       <span property="cal:summary">
+%         one last summer barbecue
+%       </span>,
+%       on
+%       <!-- Here the object is not the content of the span attribute but the value of the "content" attribute -->
+%       <span property="cal:dtstart" content="2007-09-16T16:00:00-05:00"
+%             datatype="xsd:dateTime">
+%         September 16th at 4pm
+%       </span>.
+%     </p>
+% </body>
+% </html>
+% \end{lstlisting}
+
+% The example is not real but constructed from various sources. It contains as much different elements as possible:
+% \begin{itemize}
+% 	\item Some meta elements with a @name attribute
+% 	\item Some meta elements with a @http-equiv attribute
+% 	\item A meta element containing PICS metadata. PICS is not directly supported in \Lib{}. However, the generic meta elements must be parsed correctly, no matter what they contain.
+% 	\item Some meta elements using specific namespaces or profiles
+% 	\item RDFa metadata
+% \end{itemize}
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 11: An RDF/XML File
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 11: An RDF/XML File}
+% \label{sec:Example11MP3FileWithID3v23AndID3v11}
+
+% \begin{lstlisting}
+% <?xml version="1.0" encoding="UTF-8"?>
+% <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+%          xmlns:pcv="http://prismstandard.org/namespaces/pcv/1.0/"
+%          xmlns:dc="http://purl.org/dc/elements/1.1/"
+%          xml:base="http://travel.example.com/"
+%          xmlns:s="http://example.org/students/vocab#"
+%          xmlns:exterms="http://www.example.org/terms/">
+
+%   <rdf:Description rdf:about="/2000/08/Corfu.jpg">
+%     <dc:identifier rdf:resource="/content/2357845" />
+%     <dc:creator>
+%       <pcv:Descriptor rdf:about="/emp3845">
+%         <pcv:label>John Peterson</pcv:label>
+%       </pcv:Descriptor>
+%     </dc:creator>
+%     <dc:coverage>
+%       <pcv:Descriptor
+%           rdf:about="http://prismstandard.org/vocabs/ISO-3166/GR">
+%         <pcv:label xml:lang="en">Greece</pcv:label>
+%         <pcv:label xml:lang="fr">Grece</pcv:label>
+%       </pcv:Descriptor>
+%     </dc:coverage>
+%   </rdf:Description>
+
+%   <rdf:Description rdf:about="/2000/08/Corfu.jpg">
+%     <dc:identifier rdf:resource="/content/2357845" />
+%     <dc:creator>
+%     	Michael
+%     </dc:creator>
+%   </rdf:Description>
+  
+%    <rdf:Description rdf:about="http://example.org/courses/6.001">
+%       <s:students rdf:parseType="Collection">
+%          <rdf:Description rdf:about="http://example.org/students/Amy"/>
+%          <rdf:Description rdf:about="http://example.org/students/Mohamed"/>
+%          <rdf:Description rdf:about="http://example.org/students/Johann"/>
+%       </s:students>
+%    </rdf:Description>
+
+%   <rdf:Description rdf:about="http://www.example.com/2002/04/products#item10245">
+%      <exterms:weight rdf:parseType="Resource">
+%        <rdf:value rdf:datatype="&xsd;decimal">2.4</rdf:value>
+%        <exterms:units rdf:resource="http://www.example.org/units/kilograms"/>
+%      </exterms:weight>
+%   </rdf:Description>
+
+% </rdf:RDF>
+% \end{lstlisting}
+
+% The example contains several rdf:Description elements, even two referring to the same subject. We also have applications of the rdf:parseType, rdf:datatype and rdf:resource attributes. There are also some nested descriptions.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 12: An XMP File
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 12: An XMP File}
+% \label{sec:Example12MP3FileWithID3v23AndID3v11}
+
+% The following listing shows the XMP reference example:
+
+% \begin{lstlisting}
+% <?xpacket begin='?' id='W5M0MpCehiHzreSzNTczkc9d'?>
+% <x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='XMPTk 2.8'>
+
+% <rdf:RDF 
+% 	xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' 
+% 	xmlns:iX='http://ns.adobe.com/iX/1.0/'>
+
+% 	<rdf:Description about=''
+% 		xmlns:xmp='http://ns.adobe.com/xap/1.0/' 
+% 		xmp:Author='Jane Doe'
+% 		xmp:BaseURL='http://mydoc'
+% 		xmp:CreateDate='2001-08-13T10:42:24Z'
+% 		xmp:CreatorTool='Microsoft Visual C++ for Windows'
+% 		xmp:Format='text/xml'
+% 		xmp:MetadataDate='2001-08-13T10:42:24Z'
+% 		xmp:ModifyDate='2001-08-13T11:02:13Z'
+% 		xmp:Nickname='sample'>
+    
+% 		<xmp:Advisory>
+% 			<rdf:Bag>    
+%  				<rdf:li>http://purl.org/dc/elements/1.1/ format</rdf:li>
+% 				<rdf:li>http://ns.adobe.com/xap/1.0/xap/g/ NumberOfColors</rdf:li>
+% 				<rdf:li>http://ns.adobe.com/xap/1.0/xap/g/img/ Resolution/stRes:units</rdf:li>
+% 			</rdf:Bag>
+% 		</xmp:Advisory>
+  
+% 		<xmp:Authors>  
+% 			<rdf:Seq>
+% 				<rdf:li>Jane Doe</rdf:li>
+% 				<rdf:li>John Doe</rdf:li>
+% 				<rdf:li>Jack Doe</rdf:li>
+% 			</rdf:Seq>
+% 		</xmp:Authors>
+% 		<xmp:Description>
+% 			<rdf:Alt>
+% 				<rdf:li xml:lang='en'>This document is a sample XML file</rdf:li>
+% 				<rdf:li xml:lang='fr'>Ce document est un fichier d`exemple XML</rdf:li>
+% 				<rdf:li xml:lang='de'>Dieses Dokument ist eine XML Beispieldatei</rdf:li>
+% 			</rdf:Alt>
+% 		</xmp:Description>
+  
+% 		<xmp:Keywords>
+% 			<rdf:Bag>
+% 				<rdf:li>XMP</rdf:li>
+% 				<rdf:li>Core</rdf:li>
+% 				<rdf:li>Schema</rdf:li>
+% 				<rdf:li>sample</rdf:li>
+% 			</rdf:Bag>
+% 		</xmp:Keywords>
+% 		<xmp:Locale>
+% 			<rdf:Bag>
+% 				<rdf:li>en</rdf:li>
+% 				<rdf:li>fr</rdf:li>
+% 				<rdf:li>de</rdf:li>
+% 			</rdf:Bag>
+% 		</xmp:Locale>
+  
+% 		<xmp:Title>
+% 			<rdf:Alt>
+% 				<rdf:li xml:lang='en'>XMP Core Schema Example</rdf:li>
+% 				<rdf:li xml:lang='fr'>XMP Core Schema Exemple</rdf:li>
+% 				<rdf:li xml:lang='de'>XMP Core Schema Beispiel</rdf:li>
+% 			</rdf:Alt>
+% 		</xmp:Title>
+  
+% 	</rdf:Description>
+
+% </rdf:RDF>
+
+% </x:xmpmeta>
+% <?xpacket end='r'?>
+
+% </top_level_element>
+% \end{lstlisting}
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "jMetaDesignConcept"
+%%% End:

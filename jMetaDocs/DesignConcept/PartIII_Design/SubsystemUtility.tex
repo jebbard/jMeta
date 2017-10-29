@@ -1,0 +1,332 @@
+\chapter{Subsystem \SUBSTechBase{}}
+\label{sec:SUBSUtilitydes}
+
+%-----------------------------------------------------------------------------------------------
+%		\COMPutility{} Design
+%-----------------------------------------------------------------------------------------------
+
+\section{\COMPutility{} Design}
+\label{sec:COMPutilityDesign}
+
+In diesem Abschnitt wird das Design der Komponente \COMPutility{} beschrieben. Grundaufgabe der Komponente ist das Anbieten genereller Querschnittsfunktionalität, die unabhängig von der Fachlichkeit ist, und so potentiell in mehreren Projekten Verwendung finden kann. Hier werden allerdings nur diejenigen Aspekte beschrieben, die für \LibName{} relevant sind.
+
+% TODO: If the need might arise later again, probably we need the Configuration API again
+
+% %-----------------------------------------------------------------------------------------------
+% %		Configuration API
+% %-----------------------------------------------------------------------------------------------
+
+% \subsection{Configuration API}
+% \label{sec:ConfigurationAPI}
+
+% Die Configuration API bietet allgemeine Funktionen für Laufzeit-Konfiguration von Software-Komponenten an. Wir entwickeln hier das Design der API.
+
+% %%%% DD --> %%%%
+% \DD{dd:211}
+% {% Titel
+% Ein Konfigurationsparameter wird durch eine generische Klasse \ConfigProp{} repräsentiert 
+% }
+% {% Kurzbeschreibung
+% Die Klasse \ConfigProp{} repräsentiert einen konkreten Konfigurationsparameter, nicht jedoch dessen Wert an sich. Der Typparameter T gibt die Klasse des Wertes der Property an, dabei gilt: \texttt{T extends Comparable}. Instanzen der Klasse \ConfigProp{} werden als Konstanten in konfigurierbaren Klassen definiert.
+% Die Klasse hat folgende Eigenschaften und Funktionen:
+% \begin{itemize}
+% \item \texttt{getName()}: Der Name des Konfigurationsparameters
+% \item \texttt{getDefaultValue()}: Der Default-Wert des Konfigurationsparameters
+% \item \texttt{getMaximumValue()}: Den Maximal-Wert des Konfigurationsparameters oder null, falls er keinen hat
+% \item \texttt{getMinimumValue()}: Den Minimal-Wert des Konfigurationsparameters oder null, falls er keinen hat
+% \item \texttt{getPossibleValues()}: Eine Auflistung der möglichen Werte, oder null falls er keine Auflistung fester Werte hat
+% \item \texttt{stringToValue()}: Konvertiert eine String-Repräsentation eines Konfigurationsparameterwertes in den eigentlichen Datentyp des Wertes
+% \item \texttt{valueToString()}: Konvertiert den Wert eines Konfigurationsparameterwertes in eine Stringrepräsentation
+% \end{itemize}
+% }
+% {% Begründung
+% Eine solche Repräsentation garantiert Typ-Sicherheit und eine bequeme Verwendung der API. Das Einschränken auf \texttt{Comparable} ist keine wirkliche Einschränkung, da so gut wie alle Wert-Klassen aus Java-SE, u.a. die numerischen Typen, Strings, Boolean, Character, Charset, Date, Calendar, diverse Buffer-Implementierungen usw. \texttt{Comparable} implementieren.
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Jede konfigurierbare Klasse soll möglichst eine einheitliche Schnittstelle bereitstellen, um Konfigurationsparameter zu setzen und abzufragen:
+
+% %%%% DD --> %%%%
+% \DD{dd:212}
+% {% Titel
+% Schnittstelle für das Handhaben von Konfigurationsparametern
+% }
+% {% Kurzbeschreibung
+% Jede konfigurierbare Klasse muss die Schnittstelle \IConfigurable{} implementieren, mit folgenden Methoden:
+% \begin{itemize}
+% \item \texttt{setConfigParam()}: Setzt den Wert eines Konfigurationsparameters
+% \item \texttt{getConfigParam()}: Liefert den aktuellen Wert eines Konfigurationsparameters
+% \item \texttt{getAllConfigParams()}: Liefert alle Konfigurationsparameter mit ihren aktuellen Werten
+% \item \texttt{getSupportedConfigParams()}: Liefert ein Set aller von dieser Klasse unterstützten Konfigurationsparameter
+% \item \texttt{getAllConfigParamsAsProperties()}: Liefert alle Konfigurationsparameter als eine \texttt{Properties}-Instanz.
+% \item \texttt{configureFromProperties()}: Setzt die Werte aller Konfigurationsparameter basierend auf einer \texttt{Properties}-Instanz
+% \item \texttt{resetConfigToDefault()}: Setzt die Werte aller Konfigurationsparameter auf ihre Default-Werte zurück
+% \end{itemize}
+
+% Dabei müssen alle unterstützten Konfigurationsparameter der Klasse unterschiedliche Namen haben.
+% }
+% {% Begründung
+% Damit wird eine einheitliche Schnittstelle für jede konfigurierbare Klasse ermöglicht. Die unterschiedlichen Namen sind zur eindeutigen Identifikation notwendig.
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Damit nun nicht jede Klasse selbst die Handhabung und Verifikation der Konfiguration implementieren muss, definieren wir:
+% %%%% DD --> %%%%
+% \DD{dd:213}
+% {% Titel
+% \ConfigurationHandler{} implementiert \IConfigurable{} und kann von jeder konfigurierbaren Klasse verwendet werden
+% }
+% {% Kurzbeschreibung
+% Die nicht-abstrakte Klasse \ConfigurationHandler{} implementiert \IConfigurable{} und übernimmt die gesamte Aufgabe der Konfiguration. Sie kann von konfigurierbaren Klassen entweder als Basisklasse oder aber als aggregierte Instanz verwendet werden, an die alle Aufrufe weitergeleitet werden.
+% }
+% {% Begründung
+% Keine Klasse muss die Konfigurationsverwaltung selbst implementieren
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Der Umgang mit fehlerhaften Konfiguration ist Teil der folgenden Designentscheidung:
+% %%%% DD --> %%%%
+% \DD{dd:214}
+% {% Titel
+% Fehlerhafte Konfigurationsparameterwerte führen zu einem Laufzeitfehler
+% }
+% {% Kurzbeschreibung
+% Wird ein fehlerhafter Wert für einen Konfigurationsparameter übergeben, reagiert die API mit einem Laufzeitfehler, einer \texttt{InvalidConfigParamException}. Hierfür wird eine öffentliche Methode \texttt{checkValue()} in \ConfigProp{} bereitgestellt.
+% }
+% {% Begründung
+% Die Wertebereiche der Parameter sind wohldefiniert und beschrieben, es handelt sich um einen Programmierfehler, wenn ein falscher Wert übergeben wird.
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Änderungen von Konfigurationsparametern müssen u.U. sofort wirksam werden, daher definieren wir:
+
+% %%%% DD --> %%%%
+% \DD{dd:215}
+% {% Titel
+% Observer-Mechanismus für Konfigurationsänderungen
+% }
+% {% Kurzbeschreibung
+% Es wird ein Observer-Mechanismus über \IConfigurationChangeListener{} bereitgestellt, sodass Klassen über dynamische Konfigurationsänderungen informiert werden. Dieses Interface hat lediglich eine Methode \texttt{configurationParameterValueChanged()}.
+
+% \IConfigurable{} erhält damit zwei weitere Methoden: \texttt{registerConfigurationChangeListener()} und \texttt{unregisterConfigurationChangeListener()}.
+% }
+% {% Begründung
+% Die konfigurierbaren Klassen müssen nicht immer diejenigen Klassen sein, welche mit den Konfigurationsänderungen umgehen müssen und die Konfigurationsparameter direkt verwenden. Stattdessen kann es sich um ein kompliziertes Klassengeflecht handeln, das zur Laufzeit keine direkte Beziehung hat. Daher ist ein entkoppelnder Listener-Mechanismus nötig.
+% }
+% {% Nachteile
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+
+%-----------------------------------------------------------------------------------------------
+%		\COMPcomponentRegistry{} Design
+%-----------------------------------------------------------------------------------------------
+
+\section{\COMPcomponentRegistry{} Design}
+\label{sec:COMPcomponentRegistryDesign}
+
+In this section, the design of the component \COMPcomponentRegistry{} is described. Basic task of this component is the implementation of design decisions \DesLink{dd:004} and \DesLink{dd:005}.
+
+We just give the basic design decisions here. Before the current solution, we used a relatively complex custom-made component mechanism with caching, XML configuration of interface and implementation as well as registration of the components at startup. This code was organized in an eclipse project named ``ComponentRegistry'', but was later a bit simplified later as ``SimpleComponentRegistry''. However, after realizing that the built-in Java SE \texttt{ServiceLoader} mechanism is fully suitable and even better than the ``SimpleComponentRegistry'', this mechanism is used now.
+
+According to \DesLink{dd:005}, a component is a ``Singleton''. However, its life cycle must also be clearly:
+%%%% DD --> %%%%
+\DD{dd:221}
+{% Titel
+\COMPcomponentRegistry{} uses Java's \texttt{ServiceLoader} mechanism
+}
+{% Kurzbeschreibung
+\COMPcomponentRegistry{} uses Java's \texttt{ServiceLoader} class to load the implementation for a given component interface. All component interfaces and their implementations need to be configured in META-INF configuration files as indicated by the Javadocs of \texttt{ServiceLoader}.
+}
+{% Begründung
+The \texttt{ServiceLoader} mechanism is quite easy to setup and requires nearly no specific coding. No code needs to be written to read corresponding configuration. A specific description / documentation mechanism of each component at runtime is not necessary, thus it was omitted (in contrast to previous implementation).
+}
+{% Nachteile
+Of course, \texttt{ServiceLoader} has its limitations: You might not be easily able to add components at runtime without writing additional code or not at all. And it does not have any idea of the term of a component, it just knows interfaces and implementations. But this is all not a requirement for \LibName{}.
+}
+%%%% <-- DD %%%%
+
+Here is just a short summary of small amount the self-written code in \COMPcomponentRegistry{}:
+%%%% DD --> %%%%
+\DD{dd:222}
+{% Titel
+\COMPcomponentRegistry{} consists of a single non-thread-safe class for looking up implementations and cache handling
+}
+{% Kurzbeschreibung
+\COMPcomponentRegistry{} solely consist of a single class. This class caches \texttt{ServiceLoader}s. It offers the following methods:
+\begin{itemize}
+\item \texttt{lookupService:} Loads a service implementation (if called the first time for an interface) and returns it, adds its \texttt{ServiceLoader} to the cache afterwards
+\item \texttt{clearServiceCache:} Clears the internal cache of \texttt{ServiceLoader}s such that the next call re-reads and re-instantiates new implementations again.
+\end{itemize}
+The class offers this as static methods, but it is not thread-safe.
+}
+{% Begründung
+Why do we cache \texttt{ServiceLoader}s? Because the \texttt{ServiceLoader.load} method always creates a new instance of the \texttt{ServiceLoader} class, which has the following effects:
+\begin{itemize}
+\item Components are singletons, thus, if two different other components need an implementation of the component at different points in time, they would get different instance of the service implementation, as they would always create a new \texttt{ServiceLoader} instance.
+\item \texttt{ServiceLoader.load} does file I/O, which is not what we want every time we request a new implementation.
+\end{itemize}
+
+The method \texttt{clearServiceCache} is necessary for test cases which might need to reset the \COMPcomponentRegistry{} state after each test case. As it is a static class, this method is necessary.
+
+Why static methods? Because we do not want to care about instantiating it, passing the same instance everywhere needed.
+
+Why is it not thread-safe? Because the whole library is not intending to the thread-safe.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+%-----------------------------------------------------------------------------------------------
+%		\COMPextensionManagement{} Design
+%-----------------------------------------------------------------------------------------------
+
+\section{\COMPextensionManagement{} Design}
+\label{sec:COMPextensionManagementDesign}
+
+This section describes the most important design decisions for the technical helper component \COMPextensionManagement{}. The main task of this component is discovery of extensions and to make their interfaces available to the whole library, preferably in a very generic way.
+
+In the first version of this components, extensions were loaded by a relatively complex \texttt{URLClassLoader} approach and used a main and an extension-specific XML configuration file. However, this was more complex than necessary, thus we define here a more lightweight approach:
+%%%% DD --> %%%%
+\DD{dd:240}
+{% Titel
+Extensions are discovered and loaded at library startup directly from the class path, no dynamic loading of extensions is required
+}
+{% Kurzbeschreibung
+When the library is first used in a Java application, it scans the class path for any available extensions. The extensions that are available at that time are available for further use. There is no possibility for the user itself to add extensions. Furthermore, it is not possible to add, exchange or update extensions at runtime in any way.
+}
+{% Begründung
+It is quite convenient for users to simply put extension onto the class path, e.g. using Maven or Gradle, and it is auto-detected. This fulfills the requirement \SectionLink{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}. Dynamic loading or updating of extensions automatically or triggered by the \LibName{} user is not necessary, as in most use cases it should be clear at compile-time which extensions are required. As extensions should not be introducing a big overhead, applications can easily provide all in total possible extensions at build-time already.
+
+Last but not least, for the \LibName{} implementation, complexity is largely reduced if we omit the requirement to load, update or exchange extensions at runtime.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+How does the library identify extensions on the class path?
+
+%%%% DD --> %%%%
+\DD{dd:241}
+{% Titel
+An extension is identified by implementing \texttt{IExtension} and being configured by the \texttt{ServiceLoader} facility
+}
+{% Kurzbeschreibung
+An extensions is identified by each implementation of the \texttt{IExtension} interface that is configured in a JAR file on the class path as a service provider. It is found on the class path by the library core by using the Java \texttt{ServiceLoader} class. It does not matter if the extensions is located in a separate JAR file or even already in the core, and how much extensions are in a single JAR file.
+}
+{% Begründung
+\texttt{ServiceLoader} is a quite convenient and very easy to use mechanism.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Regarding the configuration of extensions:
+%%%% DD --> %%%%
+\DD{dd:242}
+{% Titel
+There is no central configuration file listing available extensions; extensions themselves use code to provide a description of the extension and no config files
+}
+{% Kurzbeschreibung
+Extensions are just discovered via classpath. There is no central configuration file listing all available extensions for the \LibName{} core. Furthermore, extensions themselves might provide a description, but this description is also not contained in a configuration file, but rather returned by the \texttt{IExtension} implementation directly in Java code.
+}
+{% Begründung
+A central configuration of all available extensiosn for the \LibName{} core would be very inflexible. It would need to be extended anytime a new extension is available. And then, by whom? The end user, the developers of the extensions or even the \LibName{} developers? This would not make much sense.
+
+For the extension specific details, a configuration file could be used, but it again makes it harder to create an extension and we would need additional generic code to parse the configurations. Configurabilty for such things is not necessary at all. If a change in the description is necessary, it would be related to changes in the extension anyway and the JAR for the extension can be updated to have the updated description. An XML file embedded in the JAR file would not bring any differences or even advantages.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Which functional interfaces do extensions provide in which way?
+
+%%%% DD --> %%%%
+\DD{dd:243}
+{% Titel
+Extensions can be queried dynamically by the library core to provide 0 to $N$ implementations for an arbitrary Java interface
+}
+{% Kurzbeschreibung
+\COMPextensionManagement{} provides a generic method in \texttt{IExtension} where \LibName{} core components can get all implementations of any Java interface they request which are provided by the extension. The extension of course might not have such implementations. But it might also have more than one implementation.
+}
+{% Begründung
+Although in section \SectionLink{sec:KompExt}, specific cases for the extensibility of \LibName{} were mentioned, we do not want to hard-wire this into a generic component such as \COMPextensionManagement{}. If we would do this, there would be most probably a cyclic dependency from \COMPextensionManagement{} to these components of the \LibName{} core that are extensible and thus need to load extensions.
+
+Furthermore, we do not need to change the interface of \COMPextensionManagement{} whenever extensions might need to return implementations for any other interfaces that can be extended in future.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+What is the lifecycle of an extension, then, and is there anything else they should do?
+
+%%%% DD --> %%%%
+\DD{dd:241b}
+{% Titel
+An extension is instantiated just once and then used throughout the whole application, offering a method to retrieve implementations
+}
+{% Kurzbeschreibung
+According to \DesLink{dd:240}, an extension is loaded at \LibName{} startup. It can be considered as singleton, as just a single instance of it is loaded using \texttt{ServiceLoader}. Extensions should have the sole purpose of returning new implementation instances, for which they implement the method \texttt{IExtension.getExtensionProviders}. Anytime this method is called, they provide a list of new implementations they provide for the given interface. If they do not provide an implementation, they return an empty list. Besides that, there is a method \texttt{getExtensionDescription} where extensions can provide additional detail information for the extension.
+
+Extensions should not do anything else. Especially, they should not have any internal mutable state or perform any background processing.
+}
+{% Begründung
+There is no reason why extension providers should implement any special behaviour in addition to just returning implementations to use by the core, except, maybe harmful hacking code.
+
+Of course, \LibName{} cannot really prevent that, but at least it should be made clear.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+We should now go into more detail how the library core interacts with extensions. So far, we defined that extensions will be loaded once at startup using the \texttt{ServiceLoader} facility. But what is the public interface of the \COMPextensionManagement{} component?
+
+%%%% DD --> %%%%
+\DD{dd:244}
+{% Titel
+\COMPextensionManagement{} provides the interface \texttt{IExtensionsManagement} which provides access to all extensions found
+}
+{% Kurzbeschreibung
+\COMPextensionManagement{} provides the interface \texttt{IExtensionsManagement} for the library core with the method \texttt{getAllExtensions}. This method returns all available \texttt{IExtension} implementations found.
+}
+{% Begründung
+An easy to use \COMPextensionManagement{} without any surprises.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../jMetaDesignConcept"
+%%% End:
