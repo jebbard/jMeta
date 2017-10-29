@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: core/jMetaCore.jar core/jMetaExport.jar core/componentRegistry.jar core/utility.jar
-
