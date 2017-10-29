@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jmetatools</artifactId>
 	<packaging>jar</packaging>
 	<name>jMetaTools</name>
-  
+
 	<!-- ========================== Parent ========================== -->
 	<parent>
 		<groupId>com.github.jmeta</groupId>
@@ -11,9 +12,13 @@
 		<version>0.1</version>
 		<relativePath>../jMeta/pom.xml</relativePath>
 	</parent>
-	
+
 	<!-- ========================== Dependencies ========================== -->
 	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetalibrary</artifactId>

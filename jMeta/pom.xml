@@ -69,6 +69,7 @@
 		<module>../jMetaLibrary</module>
 		<module>../jMetaDefaultExtensions</module>
 		<module>../jMetaUtility</module>
+		<module>../jMetaTools</module>
 	</modules>
 
 
