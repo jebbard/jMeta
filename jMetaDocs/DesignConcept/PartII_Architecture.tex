@@ -91,10 +91,10 @@ Eine \emph{Komponente} in \LibName{} ist \emph{eine abgeschlossene Software-Einh
 Die folgende Abbildung zeigt schmeatisch eine \LibName{} Komponente:
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=1.00\textwidth]{Figures/Part_II/II_2_ComponentStructure.pdf}
-	\caption{Struktur einer Komponente}
-	\label{fig:5_3_SCH_Komponente}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/II_ComponentStructure.pdf}
+\caption{Struktur einer Komponente}
+\label{fig:5_3_SCH_Komponente}
 \end{figure}
 
 Die Komponentenschnittstelle besteht aus einem oder mehreren Java interfaces, exceptions und Datentypen.
@@ -283,10 +283,10 @@ Siehe Diskussion der Architektur im Detail in den nächsten Abschnitten.
 The technical infrastructure describes the environment required to work with \LibName{} as shown in the following figure:
 
 \begin{figure}[H]
-	\centering
-		\includegraphics[width=1.00\textwidth]{Figures/Part_II/II_1_TechnicalInfrastructure.pdf}
-		\caption{Technical infrastructure of \LibName{}}
-	\label{fig:5_3_SCH_TechnicalInfrastructure}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/II_TechnicalInfrastructure.pdf}
+\caption{Technical infrastructure of \LibName{}}
+\label{fig:5_3_SCH_TechnicalInfrastructure}
 \end{figure}
 
 The technical layers can be interpreted as dependency and communication structure. The application layer is based on \LibName{}, while \LibName{} as well as the application layer uses \JavaVersion{}. Thanks to this, the library and its using applications are platform-independent and can be used on any platform currently supported by Java. \JavaVersion{} accesses the operating system, which offers services to access the physical medium.
@@ -442,10 +442,10 @@ Die Unterteilung in Subsysteme zeigt bereits grob die wichtigsten Teile der Libr
 Das folgende Architekturbild zeigt die Subsysteme von \LibName{} und ihre Beziehungen zueinander. Ein Pfeil bedeutet dabei eine hier noch nicht näher konkretisierte Abhängigkeit, die sich entweder als Compile-Zeit- oder als Laufzeit-Abhängigkeit oder beides manifestieren kann.
 
 \begin{figure}[H]
-	\centering
-		\includegraphics[width=1.00\textwidth]{Figures/Part_II/II_1_FunctionalArchitecture.pdf}
-		\caption{Subsysteme von \LibName{}}
-	\label{fig:5_3_SCH_TechnicalArchitecture}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/II_FunctionalArchitecture.pdf}
+\caption{Subsysteme von \LibName{}}
+\label{fig:5_3_SCH_TechnicalArchitecture}
 \end{figure}
 
 Der Anwender der Library kann direkt auf die Subsysteme \SUBSBootstrap{}, \SUBSExtension{}, \SUBSHighLevel{} und \SUBSLowLevel{} zugreifen, während die \SUBSTechBase{} nicht zugreifbar ist.

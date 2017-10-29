@@ -392,10 +392,10 @@ A \TERMtag{} is a special \TERMcontainer{} whose purpose is to store metadata. I
 The following figure shows the basic structure of a \TERMtag{}, showing other basic terms:
 
 \begin{figure}[H]
-	\centering
-		\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_3_TagStructure.pdf}
-		\caption{Structure of a \TERMtag{}}
-	\label{fig:5_3_SCH_Tag}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/I_TagStructure.pdf}
+\caption{Structure of a \TERMtag{}}
+\label{fig:5_3_SCH_Tag}
 \end{figure}
 
 The most important parts of a \TERMtag{} are the \TERMattribute{}s.
@@ -606,10 +606,10 @@ Note that the sizes of the data blocks in the following illustrating example fig
 The following figure shows the first example, an MP3 file with three \TERMtag{}s, ID3v2.3, Lyrics3v2 and ID3v1.1. All are located at the end of the file:
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example1.pdf}
-	\caption{Example 1: MP3 file with two tags}
-	\label{fig:Example1MP3filewithtwotags}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/I_Example1.pdf}
+\caption{Example 1: MP3 file with two tags}
+\label{fig:Example1MP3filewithtwotags}
 \end{figure}
 
 The ID3v2.3 tag has several frames, including two \texttt{GEOB} frames. Furthermore, it has some padding within. Each of the MP3 frames corresponds to the MPEG-1 elementary stream audio format.
@@ -624,10 +624,10 @@ The ID3v2.3 tag has several frames, including two \texttt{GEOB} frames. Furtherm
 The following figure shows the second example, an MP3 file with two ID3v2.4 \TERMtag{}s, one at the beginning, the other one at the end of the file:
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example2.pdf}
-	\caption{Example 2: MP3 file with two ID3v2.4 tags}
-	\label{fig:Example1MP3filewithtwoID3tags}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/I_Example2.pdf}
+\caption{Example 2: MP3 file with two ID3v2.4 tags}
+\label{fig:Example1MP3filewithtwoID3tags}
 \end{figure}
 
 The two ID3v2.4 tags are virtually connected by a \texttt{SEEK} frame. Both have several specialties described in \cite{MetadataCompendium}.
@@ -642,10 +642,10 @@ The two ID3v2.4 tags are virtually connected by a \texttt{SEEK} frame. Both have
 The following figure shows the third example, an MP3 media stream with wildly scattered or periodic ID3v2.3 \TERMtag{}s. The figure shows that start of listening to the stream may also be in the middle of an MP3 block:
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example3.pdf}
-	\caption{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
-	\label{fig:Example3MP3filewithtwoID3tags}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/I_Example3.pdf}
+\caption{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
+\label{fig:Example3MP3filewithtwoID3tags}
 \end{figure}
 
 %-----------------------------------------------------------------------------------------------
@@ -658,10 +658,10 @@ The following figure shows the third example, an MP3 media stream with wildly sc
 The following figure shows the fourth example, an Ogg bitstream that contains Theora payload data with a corresponding vorbis comment:
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example4.pdf}
-	\caption{Example 4: Ogg Bitstream with Theora and VorbisComment}
-	\label{fig:Example4MP3filewithtwoID3tags}
+\centering
+\includegraphics[width=1.00\textwidth]{figures/I_Example4.pdf}
+\caption{Example 4: Ogg Bitstream with Theora and VorbisComment}
+\label{fig:Example4MP3filewithtwoID3tags}
 \end{figure}
 
 The example is complex on first sight. In an Ogg bitstream, physical and logical structure are not necessarily the same. The physical structure is built by pages, packets and segments, while the logical structure is the structure of the wrapped data. We took theora video data as an example, but its basically arbitrary, as the codec does not really matter. What matters is where the Vorbis Comment, one of the supported data formats, is stored. This unfortunately depends on the embedded codec. In this example, the vorbis comment starts in the second page and spans over two packets. The second of these packets spans over two Ogg pages.
@@ -676,10 +676,10 @@ The example is complex on first sight. In an Ogg bitstream, physical and logical
 % An example RGB image TIFF file with an Exif IFD is modelled in the following figure:\footnote{The example is based on the figure of \cite{ExifSpec}, page 9.}
 
 % \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example5.pdf}
-% 	\caption{Example 5: TIFF RGB image file with Exif IFD}
-% 	\label{fig:Example5MP3filewithtwoID3tags}
+%\centering
+%\includegraphics[width=1.00\textwidth]{figures/I_Example5.pdf}
+%\caption{Example 5: TIFF RGB image file with Exif IFD}
+%\label{fig:Example5MP3filewithtwoID3tags}
 % \end{figure}
 
 % Note that Exif is \emph{not a supported format} for \LibName{} currently. However, the presence of an Exif IFD must not be a problem for \LibName{}, of course.
@@ -696,10 +696,10 @@ The example is complex on first sight. In an Ogg bitstream, physical and logical
 % An example RIFF file with WAVE sound contents is shown in the following figure:
 
 % \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example6.pdf}
-% 	\caption{Example 6: RIFF WAVE File}
-% 	\label{fig:Example6MP3filewithtwoID3tags}
+%\centering
+%\includegraphics[width=1.00\textwidth]{figures/I_Example6.pdf}
+%\caption{Example 6: RIFF WAVE File}
+%\label{fig:Example6MP3filewithtwoID3tags}
 % \end{figure}
 
 % The top-level root chunk contains a fact chunk, a format chunk, a list of wave data chunks and finally a \texttt{LIST} info chunk in its payload. The \texttt{LIST} info chunk can be considered as \TERMtagBasic{}. It contains \texttt{INAM}, \texttt{IART} and \texttt{ICRD} sub-chunks.
@@ -714,10 +714,10 @@ The example is complex on first sight. In an Ogg bitstream, physical and logical
 % An example QuickTime file is shown in the following figure:
 
 % \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example7.pdf}
-% 	\caption{Example 7: QuickTime File}
-% 	\label{fig:Example7MP3filewithtwoID3tags}
+%\centering
+%\includegraphics[width=1.00\textwidth]{figures/I_Example7.pdf}
+%\caption{Example 7: QuickTime File}
+%\label{fig:Example7MP3filewithtwoID3tags}
 % \end{figure}
 
 % A QuickTime file can easily get very complex. The example contains the \texttt{ftyp}, \texttt{moov}, \texttt{mdat} and \texttt{free} atoms as top-level atoms. The \texttt{mdat} atom contains the media data and is not further detailed in the example. It is preceded by a wide atom to enable easy extension to a header indicating more than $2^{32}$ bytes media atom size.
@@ -736,10 +736,10 @@ The example is complex on first sight. In an Ogg bitstream, physical and logical
 % An example Matroska file is shown in the following figure:
 
 % \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[width=1.00\textwidth]{Figures/Part_I/I_5_Example8.pdf}
-% 	\caption{Example 8: Matroska File}
-% 	\label{fig:Example8MP3filewithtwoID3tags}
+%\centering
+%\includegraphics[width=1.00\textwidth]{figures/I_Example8.pdf}
+%\caption{Example 8: Matroska File}
+%\label{fig:Example8MP3filewithtwoID3tags}
 % \end{figure}
 
 % The example has two Cluster elements that store the actual media data. These are not further detailed in the example. The metadata in the example is complex: There are two top-level Tags elements, the first one contains two Tag elements, the second one only a single Tag element. Each of the Tag elements has child SimpleTag elements. The first Tag contains a Targets sub-element that points to two tracks of the file. Tag 3 only contains SimpleTags. However, the first SimpleTag contains nested SimpleTags.
