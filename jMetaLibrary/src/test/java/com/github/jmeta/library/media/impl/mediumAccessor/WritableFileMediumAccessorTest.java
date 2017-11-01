@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.FileMedium;
 
 /**
@@ -33,8 +33,8 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
     */
    private static int TEST_FILE_COUNTER = 0;
 
-   private Path copiedTestFile = MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR
-      .resolve(TEMP_FOLDER_NAME + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
+   private Path copiedTestFile = MediaTestFiles.TEST_FILE_DIRECTORY_PATH
+      .resolve(TEMP_FOLDER_NAME + MediaTestFiles.FIRST_TEST_FILE_NAME);
 
    /**
     * Tests whether the creation of a new {@link FileMediumAccessor} on an already locked medium.
@@ -79,7 +79,7 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(550, EXPECTED_FILE_CONTENTS.length - 550);
+      return new ReadTestData(550, getExpectedMediumContent().length - 550);
    }
 
    /**
@@ -96,16 +96,16 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
    @Override
    protected void prepareMediumData(byte[] testFileContents) {
 
-      copiedTestFile = MediaTestCaseConstants.TEST_FILE_OUTPUT_DIR
-         .resolve(TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE);
+      copiedTestFile = MediaTestFiles.TEST_FILE_DIRECTORY_PATH
+         .resolve(TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + MediaTestFiles.FIRST_TEST_FILE_NAME);
 
       TEST_FILE_COUNTER++;
 
-      String message = "Could not copy the test file " + MediaTestCaseConstants.STANDARD_TEST_FILE_RESOURCE + " to "
+      String message = "Could not copy the test file " + MediaTestFiles.FIRST_TEST_FILE_NAME + " to "
          + copiedTestFile;
 
       try {
-         Files.copy(MediaTestCaseConstants.STANDARD_TEST_FILE, copiedTestFile, StandardCopyOption.REPLACE_EXISTING);
+         Files.copy(MediaTestFiles.FIRST_TEST_FILE_PATH, copiedTestFile, StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException e) {
          throw new RuntimeException(message, e);
       }

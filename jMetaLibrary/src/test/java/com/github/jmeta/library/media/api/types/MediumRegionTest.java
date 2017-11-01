@@ -16,7 +16,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
@@ -27,7 +27,7 @@ public class MediumRegionTest {
 
    private static final int START_OFFSET = 15;
 
-   private static final FileMedium MEDIUM = new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true);
+   private static final FileMedium MEDIUM = new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
 
    private static final InMemoryMedium UNRELATED_MEDIUM = new InMemoryMedium(new byte[] {}, "Fake", false);
 

@@ -22,7 +22,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
  * {@link AbstractMediumExpectationProvider} provides expected test data for a single top-level data block of a single
@@ -61,7 +61,7 @@ public abstract class AbstractMediumExpectationProvider {
          raf = new RandomAccessFile(tempCopyFile.toFile(), "r");
          file = tempCopyFile;
       } catch (IOException e) {
-         throw new TestDataException("Could not create or open copy of test file <"
+         throw new InvalidTestDataException("Could not create or open copy of test file <"
             + testFile.toAbsolutePath().toString() + "> in destination file <" + tempCopyFile + ">.", e);
       }
    }
@@ -146,7 +146,7 @@ public abstract class AbstractMediumExpectationProvider {
       try {
          raf.getChannel().read(result, absoluteOffset);
       } catch (IOException e) {
-         throw new TestDataException("Could not read <" + size + "> expected block " + "bytes from file <"
+         throw new InvalidTestDataException("Could not read <" + size + "> expected block " + "bytes from file <"
             + file.toAbsolutePath().toString() + "> at offset <" + absoluteOffset + ">.", e);
       }
 
@@ -163,15 +163,15 @@ public abstract class AbstractMediumExpectationProvider {
          try {
             raf.close();
          } catch (IOException e) {
-            throw new TestDataException("Could not close file <" + file.toAbsolutePath().toString() + ">.", e);
+            throw new InvalidTestDataException("Could not close file <" + file.toAbsolutePath().toString() + ">.", e);
          }
 
       String message = "Could not delete file <" + file.toAbsolutePath().toString() + ">.";
       try {
          if (!Files.deleteIfExists(file))
-            throw new TestDataException(message, null);
+            throw new InvalidTestDataException(message, null);
       } catch (IOException e) {
-         throw new TestDataException(message, null);
+         throw new InvalidTestDataException(message, null);
       }
    }
 

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
@@ -54,43 +54,30 @@ public class FileMediumCacheTest extends IMediumCacheTest {
          m_expectedData.put(new StandardMediumReference(medium, 0),
             new byte[] { '0', '0', '0', 'S', 't', 'a', 'l', 'k', 'e', 'r' });
          m_expectedData.put(new StandardMediumReference(medium, 15),
-            new byte[] { 'B', 'i', 'o', 's', 'h', 'o', 'c', 'k', '\r', '\n',
-               '0', '2', '8', 'T', 'h', 'e', ' ', 'W', 'i', 't', 'c', 'h', 'e',
-               'r', '\r', '\n', '0', '4', '4', 'D', 'i', 'a', 'b', 'l', 'o',
-               '\r', '\n', '0', '5', '5', 'D', 'i', 'a', 'b', 'l', 'o', ' ',
-               'H', 'e', 'l' });
-         m_expectedData.put(new StandardMediumReference(medium, 17),
-            new byte[] { 'o', 's', 'h', 'o', 'c' });
+            new byte[] { 'B', 'i', 'o', 's', 'h', 'o', 'c', 'k', '\r', '\n', '0', '2', '8', 'T', 'h', 'e', ' ', 'W',
+               'i', 't', 'c', 'h', 'e', 'r', '\r', '\n', '0', '4', '4', 'D', 'i', 'a', 'b', 'l', 'o', '\r', '\n', '0',
+               '5', '5', 'D', 'i', 'a', 'b', 'l', 'o', ' ', 'H', 'e', 'l' });
+         m_expectedData.put(new StandardMediumReference(medium, 17), new byte[] { 'o', 's', 'h', 'o', 'c' });
          m_expectedData.put(new StandardMediumReference(medium, 65),
-            new byte[] { 'l', 'f', 'i', 'r', 'e', '\r', '\n', '0', '7', '5',
-               'D', 'i', 'a', 'b', 'l', 'o', ' ' });
+            new byte[] { 'l', 'f', 'i', 'r', 'e', '\r', '\n', '0', '7', '5', 'D', 'i', 'a', 'b', 'l', 'o', ' ' });
          m_expectedData.put(new StandardMediumReference(medium, 70),
-            new byte[] { '\r', '\n', '0', '7', '5', 'D', 'i', 'a', 'b', 'l',
-               'o', ' ', '2', '\r', '\n', '0', '8' });
-         m_expectedData.put(new StandardMediumReference(medium, 100),
-            new byte[] { 'o', 'n', ' ', 'd', 'e', 's', ' ', 'B', 'a', 'a', 'l',
-               '\r', '\n', '1', '1', '6', 'W', 'a', 'r', 'c' });
-         m_expectedData.put(new StandardMediumReference(medium, 121),
-            new byte[] { 'a' });
+            new byte[] { '\r', '\n', '0', '7', '5', 'D', 'i', 'a', 'b', 'l', 'o', ' ', '2', '\r', '\n', '0', '8' });
+         m_expectedData.put(new StandardMediumReference(medium, 100), new byte[] { 'o', 'n', ' ', 'd', 'e', 's', ' ',
+            'B', 'a', 'a', 'l', '\r', '\n', '1', '1', '6', 'W', 'a', 'r', 'c' });
+         m_expectedData.put(new StandardMediumReference(medium, 121), new byte[] { 'a' });
          m_expectedData.put(new StandardMediumReference(medium, 122),
-            new byte[] { 'f', 't', ' ', '3', '\r', '\n', '1', '3', '1', 'W',
-               'a', 'r', 'c', 'r', 'a', 'f', 't', ' ', '3', ' ', 'F', 'r', 'o',
-               'z', 'e', 'n', ' ', 'T', 'h', 'r', 'o', 'n', 'e', '\r', '\n',
-               '1', '4', '7', 'S', 't', 'a', 'r', 'c', 'r', 'a', 'f', 't', '\r',
-               '\n', '1', '6', '4', 'S', 't', 'a', 'r', 'c', 'r', 'a', 'f', 't',
-               ' ', 'B', 'r', 'o', 'o', 'd', ' ', 'W', 'a', 'r', '\r', '\n',
-               '1', '8', '8', 'B', 'l', 'a', 'c', 'k', ' ', 'M', 'i', 'r', 'r',
-               'o', 'r', '\r' });
+            new byte[] { 'f', 't', ' ', '3', '\r', '\n', '1', '3', '1', 'W', 'a', 'r', 'c', 'r', 'a', 'f', 't', ' ',
+               '3', ' ', 'F', 'r', 'o', 'z', 'e', 'n', ' ', 'T', 'h', 'r', 'o', 'n', 'e', '\r', '\n', '1', '4', '7',
+               'S', 't', 'a', 'r', 'c', 'r', 'a', 'f', 't', '\r', '\n', '1', '6', '4', 'S', 't', 'a', 'r', 'c', 'r',
+               'a', 'f', 't', ' ', 'B', 'r', 'o', 'o', 'd', ' ', 'W', 'a', 'r', '\r', '\n', '1', '8', '8', 'B', 'l',
+               'a', 'c', 'k', ' ', 'M', 'i', 'r', 'r', 'o', 'r', '\r' });
          m_expectedData.put(new StandardMediumReference(medium, 250),
-            new byte[] { 'l', 'a', 'n', 'd', ' ', '2', '\r', '\n', '2', '5',
-               '1', 'I', 'n', 'd', 'i', 'a', 'n', 'a', ' ', 'J', 'o', 'n', 'e',
-               's', ' ', '3', '\r', '\n', '2', '7', '1', 'I', 'n', 'd', 'i',
-               'a', 'n', 'a', ' ', 'J', 'o', 'n', 'e', 's', ' ', 'F', 'a', 't',
-               'e', ' ', 'o', 'f', ' ', 'A', 't', 'l', 'a', 'n', 't', 'i', 's',
-               '\r', '\n', '3', '0', '6', 'E', 'a', 'r', 't', 'h', ' ', '2',
-               '1', '4', '0', '\r', '\n', '3', '2', '1', 'S', 'i', 'l', 'v',
-               'e', 'r', '\r', '\n', '3', '3', '2', 'G', 'o', 't', 'h', 'i',
-               'c', '\r', '\n' });
+            new byte[] { 'l', 'a', 'n', 'd', ' ', '2', '\r', '\n', '2', '5', '1', 'I', 'n', 'd', 'i', 'a', 'n', 'a',
+               ' ', 'J', 'o', 'n', 'e', 's', ' ', '3', '\r', '\n', '2', '7', '1', 'I', 'n', 'd', 'i', 'a', 'n', 'a',
+               ' ', 'J', 'o', 'n', 'e', 's', ' ', 'F', 'a', 't', 'e', ' ', 'o', 'f', ' ', 'A', 't', 'l', 'a', 'n', 't',
+               'i', 's', '\r', '\n', '3', '0', '6', 'E', 'a', 'r', 't', 'h', ' ', '2', '1', '4', '0', '\r', '\n', '3',
+               '2', '1', 'S', 'i', 'l', 'v', 'e', 'r', '\r', '\n', '3', '3', '2', 'G', 'o', 't', 'h', 'i', 'c', '\r',
+               '\n' });
 
       }
 
@@ -103,12 +90,10 @@ public class FileMediumCacheTest extends IMediumCacheTest {
    @Override
    protected byte[] getExpectedDataBoundaryCases() {
 
-      return new byte[] { '0', '0', '0', 'S', 't', 'a', 'l', 'k', 'e', 'r',
-         '\r', '\n', '0', '1', '5', 'B', 'i', 'o', 's', 'h', 'o', 'c', 'k',
-         '\r', '\n', '0', '2', '8', 'T', 'h', 'e', ' ', 'W', 'i', 't', 'c', 'h',
-         'e', 'r', '\r', '\n', '0', '4', '4', 'D', 'i', 'a', 'b', 'l', 'o',
-         '\r', '\n', '0', '5', '5', 'D', 'i', 'a', 'b', 'l', 'o', ' ', 'H', 'e',
-         'l' };
+      return new byte[] { '0', '0', '0', 'S', 't', 'a', 'l', 'k', 'e', 'r', '\r', '\n', '0', '1', '5', 'B', 'i', 'o',
+         's', 'h', 'o', 'c', 'k', '\r', '\n', '0', '2', '8', 'T', 'h', 'e', ' ', 'W', 'i', 't', 'c', 'h', 'e', 'r',
+         '\r', '\n', '0', '4', '4', 'D', 'i', 'a', 'b', 'l', 'o', '\r', '\n', '0', '5', '5', 'D', 'i', 'a', 'b', 'l',
+         'o', ' ', 'H', 'e', 'l' };
    }
 
    /**
@@ -118,8 +103,8 @@ public class FileMediumCacheTest extends IMediumCacheTest {
    protected FileMedium getExpectedMedium() {
 
       if (m_theMedium == null)
-         m_theMedium = new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE,
-            true);
+         m_theMedium = new FileMedium(
+            MediaTestFiles.TEST_FILE_DIRECTORY_PATH.resolve("TestFile_MediumStore_OLD.txt"), true);
       return m_theMedium;
    }
 
@@ -153,27 +138,17 @@ public class FileMediumCacheTest extends IMediumCacheTest {
          Medium<?> medium = getExpectedMedium();
 
          // Must be put in order into this map!
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 0),
-            MEDIUM_LENGTH_IN_BYTES);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 15),
-            MEDIUM_LENGTH_IN_BYTES - 15);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 17),
-            MEDIUM_LENGTH_IN_BYTES - 17);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 65),
-            MEDIUM_LENGTH_IN_BYTES - 65);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 70),
-            MEDIUM_LENGTH_IN_BYTES - 70);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 100),
-            MEDIUM_LENGTH_IN_BYTES - 100);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 121),
-            MEDIUM_LENGTH_IN_BYTES - 121);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 122),
-            MEDIUM_LENGTH_IN_BYTES - 122);
-         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 250),
-            MEDIUM_LENGTH_IN_BYTES - 250);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 0), MEDIUM_LENGTH_IN_BYTES);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 15), MEDIUM_LENGTH_IN_BYTES - 15);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 17), MEDIUM_LENGTH_IN_BYTES - 17);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 65), MEDIUM_LENGTH_IN_BYTES - 65);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 70), MEDIUM_LENGTH_IN_BYTES - 70);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 100), MEDIUM_LENGTH_IN_BYTES - 100);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 121), MEDIUM_LENGTH_IN_BYTES - 121);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 122), MEDIUM_LENGTH_IN_BYTES - 122);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, 250), MEDIUM_LENGTH_IN_BYTES - 250);
          // One byte before EOM
-         m_cacheDistancesToEOM.put(
-            new StandardMediumReference(medium, MEDIUM_LENGTH_IN_BYTES - 1), 1);
+         m_cacheDistancesToEOM.put(new StandardMediumReference(medium, MEDIUM_LENGTH_IN_BYTES - 1), 1);
       }
 
       return m_cacheDistancesToEOM;
@@ -237,11 +212,9 @@ public class FileMediumCacheTest extends IMediumCacheTest {
    protected MediumCache getTestling() {
 
       if (m_theCache == null) {
-         final FileMediumAccessor accessor = new FileMediumAccessor(
-            getExpectedMedium());
+         final FileMediumAccessor accessor = new FileMediumAccessor(getExpectedMedium());
 
-         m_theCache = new StandardMediumCache(accessor,
-            MAXIMUM_CACHE_BLOCK_SIZE);
+         m_theCache = new StandardMediumCache(accessor, MAXIMUM_CACHE_BLOCK_SIZE);
       }
 
       return m_theCache;

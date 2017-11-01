@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.FileMedium;
 
 /**
@@ -31,7 +31,7 @@ public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccess
       getImplementationToTest();
 
       // Create second instance on the same medium
-      new FileMediumAccessor(new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true));
+      new FileMediumAccessor(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true));
    }
 
    /**
@@ -56,7 +56,7 @@ public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccess
     */
    @Override
    protected FileMedium getExpectedMedium() {
-      return new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true);
+      return new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
    }
 
    /**
@@ -64,7 +64,7 @@ public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccess
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(550, EXPECTED_FILE_CONTENTS.length - 550);
+      return new ReadTestData(550, getExpectedMediumContent().length - 550);
    }
 
    /**

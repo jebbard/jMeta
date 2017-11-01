@@ -1,0 +1,32 @@
+% Nur für die Titelseite: Zum exakten Zentrieren!
+\addtolength{\topmargin}{4.5cm}
+\addtolength{\oddsidemargin}{1cm}
+
+\begin{titlepage}
+
+	\begin{center}
+	
+	% Titel
+	{\huge \textbf{\textsf{\COMtitle{}}}\par}
+	{\Large \textbf{\COMsubtitle{}}\par}
+	
+	\vspace{2.5cm}
+	
+	{\large \COMversion{}\par}
+	{\large \COMstatus{}\par}
+	
+	\vspace{2.5cm}
+	
+	\end{center}
+	
+	\vspace{8.5cm}
+	
+	{\normalsize \textbf{\textsf{
+		\today
+	}}}
+
+\end{titlepage}
+
+% Nur für die Titelseite: "Exaktes Zentrieren" wieder rückgängig
+\addtolength{\topmargin}{-4.5cm}
+\addtolength{\oddsidemargin}{-1cm}

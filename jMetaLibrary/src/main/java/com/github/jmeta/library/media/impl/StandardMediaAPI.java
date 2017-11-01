@@ -25,7 +25,7 @@ import com.github.jmeta.library.media.impl.OLD.StandardMediumCache;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.MemoryMediumAccessor;
-import com.github.jmeta.library.media.impl.mediumAccessor.StreamMediumAccessor;
+import com.github.jmeta.library.media.impl.mediumAccessor.InputStreamMediumAccessor;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -66,7 +66,7 @@ public class StandardMediaAPI implements MediaAPI {
             mediumAccessor = new MemoryMediumAccessor((InMemoryMedium) medium);
 
          else if (medium.getClass() == InputStreamMedium.class)
-            mediumAccessor = new StreamMediumAccessor((InputStreamMedium) medium);
+            mediumAccessor = new InputStreamMediumAccessor((InputStreamMedium) medium);
 
          m_alreadyCreatedCaches.put(medium, new StandardMediumCache(mediumAccessor, maxCacheRegionSize));
       }

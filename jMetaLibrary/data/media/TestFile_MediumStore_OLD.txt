@@ -1,0 +1,49 @@
+000Stalker
+015Bioshock
+028The Witcher
+044Diablo
+055Diablo Hellfire
+075Diablo 2
+088Diablo 2 Thron des Baal
+116Warcraft 3
+131Warcraft 3 Frozen Throne
+147Starcraft
+164Starcraft Brood War
+188Black Mirror
+205Der Fluch der Druiden
+231Monkey Island 2
+251Indiana Jones 3
+271Indiana Jones Fate of Atlantis
+306Earth 2140
+321Silver
+332Gothic
+343Gothic 2
+356Gothic 2 Nacht des Raben
+385Gothic 3
+408Unreal
+419Unreal 2
+432Unreal Tournament
+454Unreal Torunament 2
+478Half Life
+492Dungeon Keeper
+511Dungeon Keeper 2
+532Severance - Blade of Darkness
+566Serious Sam
+582Serious Sam 2
+600Return to Castle Wolfenstein
+633- Startrek Armada
+655- Startrek Elite Forces
+683
+688Wanted:
+700- Max Payne 2
+718- Mafia
+730
+735
+740TBD:
+749
+754- Baldurs Gate 2: Thron of Baal
+790
+795Fraglich:
+809
+814Outcast?
+827Unreal return to Na pali?

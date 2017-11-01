@@ -14,7 +14,7 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
  * {@link AbstractReadOnlyMediumAccessorTest} is the base class for testing read-only {@link MediumAccessor} instances,
@@ -52,7 +52,7 @@ public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractMediumA
    @Override
    protected void validateTestMedium(Medium<?> theMedium) {
       if (!theMedium.isReadOnly()) {
-         throw new TestDataException("The test IMedium must be a read-only medium", null);
+         throw new InvalidTestDataException("The test IMedium must be a read-only medium", null);
       }
    }
 

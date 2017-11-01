@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
@@ -29,7 +29,7 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
 public class MediumActionComparatorTest {
 
    private static final ByteBuffer DEFAULT_BYTES = ByteBuffer.wrap(new byte[] { 0, 1, 2, 3, 4 });
-   private static final FileMedium MEDIUM = new FileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, true);
+   private static final FileMedium MEDIUM = new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
 
    /**
     * Tests {@link MediumActionComparator#compare(MediumAction, MediumAction)}.

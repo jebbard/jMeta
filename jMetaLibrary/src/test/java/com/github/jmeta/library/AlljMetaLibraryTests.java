@@ -1,6 +1,6 @@
 /**
  *
- * {@link AllMediumAccessorTests}.java
+ * {@link AllMediumStoreTests}.java
  *
  * @author Jens Ebert
  *

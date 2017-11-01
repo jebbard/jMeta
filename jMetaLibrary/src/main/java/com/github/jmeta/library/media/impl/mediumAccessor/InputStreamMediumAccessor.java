@@ -1,5 +1,5 @@
 /**
- * {@link StreamMediumAccessor}.java
+ * {@link InputStreamMediumAccessor}.java
  *
  * @author Jens Ebert
  * @date 09.12.10 21:18:22 (December 9, 2010)
@@ -13,26 +13,26 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * Represents a read-only streaming media {@link MediumAccessor} that may block when reading.
  */
-public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedium> {
+public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedium> {
 
    private static final ByteBuffer SINGLE_BYTE_BUFFER = ByteBuffer.allocate(1);
 
    private PushbackInputStream inputStream;
 
    /**
-    * Creates a new {@link StreamMediumAccessor}.
+    * Creates a new {@link InputStreamMediumAccessor}.
     * 
     * @param medium
     *           The {@link InputStreamMedium} this class works on
     */
-   public StreamMediumAccessor(InputStreamMedium medium) {
+   public InputStreamMediumAccessor(InputStreamMedium medium) {
       super(medium);
    }
 
@@ -114,7 +114,8 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumReference, ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumReference,
+    *      ByteBuffer)
     */
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
@@ -143,7 +144,8 @@ public class StreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedi
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumReference, ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumReference,
+    *      ByteBuffer)
     */
    @Override
    protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {

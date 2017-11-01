@@ -1,0 +1,29 @@
+
+% Kopf- und Fußzeilen via fancyhdr
+\pagestyle{fancy}
+
+% Linie im Footer
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Anderthalbfacher Zeilenabstand
+%\onehalfspacing
+
+% Seitenränder setzen {links}{oben}{rechts}{unten}{}{Abstand Kopfzeile-Fließtext}
+\setmarginsrb {25mm}{15mm}{50mm}{30mm}{15mm}{8mm}{20mm}{10mm}
+
+% Seitennumerierung bis zum eigentlichen Text in römischen Zahlen
+\pagenumbering{Roman}
+
+% Box-Insets setzen
+\setlength{\fboxsep}{0.1cm}
+
+% Fette Tabellen-Beschriftungen
+\addtokomafont{captionlabel}{\bfseries}
+
+% Des verhindert, dass im Abbildungsverzeichnis Strings entstehen wie : "10.34Abbildungsunterschrift"
+\makeatletter
+\renewcommand{\l@figure}{\@dottedtocline{1}{1.5em} {3.5em}}
+\renewcommand{\l@table}{\@dottedtocline{1}{1.5em} {3.5em}}
+\renewcommand{\l@lstlisting}{\@dottedtocline{1}{1.5em} {3.5em}}
+%\let\l@table\l@figure% ^^^^^ Stellschraube
+\makeatother

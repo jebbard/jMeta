@@ -1,7 +1,12 @@
-/**** MediumChangeManagerTest.java**@author Jens**@date 22.05.2016 **/
+/**
+ * {@link MediumChangeManagerTest}.java
+ * 
+ * @author Jens
+ * @date 22.05.2016
+ */
 package com.github.jmeta.library.media.impl.changeManager;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestHelper.at;
+import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -14,7 +19,7 @@ import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumActionException;
 import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
-import com.github.jmeta.library.media.api.helper.MediaTestHelper;
+import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -1208,7 +1213,7 @@ public class MediumChangeManagerTest {
     * @return an instance of a new {@link MediumChangeManager} for testing
     */
    private MediumChangeManager getTestling() {
-      return new MediumChangeManager(new MediumReferenceFactory(MediaTestHelper.getStandardMedium()));
+      return new MediumChangeManager(new MediumReferenceFactory(MediaTestUtility.DEFAULT_TEST_MEDIUM));
    }
 
    /**

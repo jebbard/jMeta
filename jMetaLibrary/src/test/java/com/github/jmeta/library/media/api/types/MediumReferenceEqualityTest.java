@@ -12,9 +12,9 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.media.api.helper.DummyMediumCreator;
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
@@ -85,7 +85,7 @@ public class MediumReferenceEqualityTest extends AbstractEqualsTest<MediumRefere
       // Create some more references with equal medium, using the passed offset
       for (int i = 0; i < 3; ++i) {
          mediumReferences.add(new StandardMediumReference(
-            DummyMediumCreator.createDummyFileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, false),
+            new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false),
             baseOffset + i * 10));
       }
 
@@ -101,9 +101,9 @@ public class MediumReferenceEqualityTest extends AbstractEqualsTest<MediumRefere
 
       // We must actually pass the IDENTICAL byte arrays and streams, because
       // they are compared bases on object identity
-      media.add(DummyMediumCreator.createDummyInMemoryMedium(BYTES, "Hallo4", true));
+      media.add(new InMemoryMedium(BYTES, "Hallo4", true));
       media.add(new InputStreamMedium(STREAM_MEDIUM, "Hallo"));
-      media.add(DummyMediumCreator.createDummyFileMedium(MediaTestCaseConstants.STANDARD_TEST_FILE, false));
+      media.add(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false));
 
       return media;
    }
@@ -115,10 +115,10 @@ public class MediumReferenceEqualityTest extends AbstractEqualsTest<MediumRefere
 
       List<Medium<?>> media = new ArrayList<>();
 
-      media.add(DummyMediumCreator.createDummyInMemoryMedium(new byte[] { 1 }, "Hallo4", true));
+      media.add(new InMemoryMedium(new byte[] { 1 }, "Hallo4", true));
       // We must create a new input stream here to achieve it is different
       media.add(new InputStreamMedium(new ByteArrayInputStream(BYTES), "Hallo"));
-      media.add(DummyMediumCreator.createDummyFileMedium(MediaTestCaseConstants.SECOND_TEST_FILE, false));
+      media.add(new FileMedium(MediaTestFiles.SECOND_TEST_FILE_PATH, false));
 
       return media;
    }

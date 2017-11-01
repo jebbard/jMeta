@@ -1,14 +1,13 @@
 package com.github.jmeta.library.media.impl.cache;
 
-import static com.github.jmeta.library.media.api.helper.TestMediumUtility.createCachedMediumRegion;
-import static com.github.jmeta.library.media.api.helper.TestMediumUtility.createUnCachedMediumRegion;
+import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.github.jmeta.library.media.api.helper.TestMediumUtility;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
@@ -62,7 +61,9 @@ class TestCacheBuilder {
        * @return this {@link TestCacheRegionInfo} converted to a cached {@link MediumRegion}
        */
       public MediumRegion asMediumRegion(Medium<?> medium) {
-         return createCachedMediumRegion(medium, getRegionStartOffset(), getRegionSize());
+         long offset = getRegionStartOffset();
+         return new MediumRegion(at(medium, offset),
+            ByteBuffer.wrap(regionBytesFromDistinctOffsetSequence(offset, getRegionSize())));
       }
 
       /**
@@ -203,7 +204,7 @@ class TestCacheBuilder {
       int regionSize = (int) (regionEndOffset - regionStartOffset);
 
       appendRegionInfo(new TestCacheRegionInfo(regionStartOffset,
-         TestMediumUtility.regionBytesFromDistinctOffsetSequence(regionEndOffset, regionSize)));
+         regionBytesFromDistinctOffsetSequence(regionEndOffset, regionSize)));
    }
 
    /**
@@ -220,7 +221,7 @@ class TestCacheBuilder {
       Reject.ifNull(region, "region");
 
       appendRegionInfo(new TestCacheRegionInfo(region.getStartReference().getAbsoluteMediumOffset(),
-         TestMediumUtility.regionBytesFromMediumRegion(region)));
+         regionBytesFromMediumRegion(region)));
    }
 
    /**
@@ -249,15 +250,13 @@ class TestCacheBuilder {
       int remainder = totalSize % maxSize;
 
       for (int i = 0; i < times; i++) {
-         appendRegionInfo(
-            new TestCacheRegionInfo(startOffset, TestMediumUtility.regionBytesFromFillByte(fillByte, maxSize)));
+         appendRegionInfo(new TestCacheRegionInfo(startOffset, regionBytesFromFillByte(fillByte, maxSize)));
 
          startOffset += maxSize;
       }
 
       if (remainder > 0) {
-         appendRegionInfo(
-            new TestCacheRegionInfo(startOffset, TestMediumUtility.regionBytesFromFillByte(fillByte, remainder)));
+         appendRegionInfo(new TestCacheRegionInfo(startOffset, regionBytesFromFillByte(fillByte, remainder)));
       }
    }
 
@@ -359,6 +358,63 @@ class TestCacheBuilder {
       }
 
       return resultingCache;
+   }
+
+   /**
+    * Creates a byte array with distinct bytes, starting at offset % Byte.MAX_VALUE, always increasing by 1 until
+    * wrapped around at Byte.MAX_VALUE again and so on, until the given size is reached.
+    * 
+    * Is used to ensure a byte array with distinctive content is created, and the content is also depending on the start
+    * offset.
+    * 
+    * @param offset
+    *           The offset to use
+    * @param size
+    *           The size of the returned array
+    * @return a byte array with distinct bytes
+    */
+   static byte[] regionBytesFromDistinctOffsetSequence(long offset, int size) {
+      byte[] content = new byte[size];
+   
+      for (int i = 0; i < content.length; i++) {
+         content[i] = (byte) ((offset + i) % Byte.MAX_VALUE);
+      }
+   
+      return content;
+   }
+
+   /**
+    * Creates bytes to be used as content of a {@link MediumRegion} of the given size filled all over with the same fill
+    * byte.
+    * 
+    * @param fillByte
+    *           The fill byte to use
+    * @param size
+    *           The size of the returned array
+    * @return byte array filled all over with the same fill byte
+    */
+   private static byte[] regionBytesFromFillByte(byte fillByte, int size) {
+      byte[] content = new byte[size];
+
+      Arrays.fill(content, fillByte);
+
+      return content;
+   }
+
+   /**
+    * Extracts bytes from the given cached {@link MediumRegion}.
+    * 
+    * @param region
+    *           The {@link MediumRegion} to extract bytes from
+    * @return The bytes extracted from the given {@link MediumRegion}
+    */
+   private static byte[] regionBytesFromMediumRegion(MediumRegion region) {
+      ByteBuffer bytes = region.getBytes();
+      byte[] content = new byte[bytes.remaining()];
+
+      bytes.get(content);
+
+      return content;
    }
 
    /**
@@ -485,7 +541,7 @@ class TestCacheBuilder {
 
          // Also build a non-cached gap region
          if (withGaps && lastRegionEndOffset != null && currentRegionStartOffset > lastRegionEndOffset) {
-            resultList.add(createUnCachedMediumRegion(regionMedium, lastRegionEndOffset,
+            resultList.add(new MediumRegion(at(regionMedium, lastRegionEndOffset),
                (int) (currentRegionStartOffset - lastRegionEndOffset)));
          }
 

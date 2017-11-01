@@ -15,8 +15,8 @@ import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.DummyMediumCreator;
 import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
@@ -27,7 +27,8 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  */
 public class StandardMediumReferenceTest {
 
-   private Medium<?> dummyMedium = DummyMediumCreator.createDefaultDummyInMemoryMedium();
+   private Medium<?> dummyMedium = (Medium<?>) new InMemoryMedium(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }, "the dummy",
+   false);
 
    /**
     * Tests {@link MediumReference#advance}.

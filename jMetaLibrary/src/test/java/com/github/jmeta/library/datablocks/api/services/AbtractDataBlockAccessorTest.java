@@ -28,7 +28,7 @@ import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 // TODO doItFirst005: write test case for "out of order" reading
@@ -67,13 +67,13 @@ public abstract class AbtractDataBlockAccessorTest {
       try {
          expectationProvider = createExpectationProvider();
       } catch (InvalidTestDataCsvFormatException e) {
-         throw new TestDataException("Could not read test data.", e);
+         throw new InvalidTestDataException("Could not read test data.", e);
       }
 
       testling = ComponentRegistry.lookupService(DataBlockAccessor.class);
 
       if (testling == null)
-         throw new TestDataException("Testdata must not be null", null);
+         throw new InvalidTestDataException("Testdata must not be null", null);
    }
 
    /**
@@ -192,7 +192,7 @@ public abstract class AbtractDataBlockAccessorTest {
       long size = Files.size(baseFile);
 
       if (size > Integer.MAX_VALUE)
-         throw new TestDataException("Specified file " + baseFile + " is too big: " + size, null);
+         throw new InvalidTestDataException("Specified file " + baseFile + " is too big: " + size, null);
 
       byte[] readMediumBytes = new byte[(int) size];
 
@@ -540,7 +540,7 @@ public abstract class AbtractDataBlockAccessorTest {
       Path theFile = getFileForMediaContents();
 
       if (theFile == null || !Files.exists(theFile))
-         throw new TestDataException("Invalid file returned by method getFileForMediaContents", null);
+         throw new InvalidTestDataException("Invalid file returned by method getFileForMediaContents", null);
 
       try {
          List<Medium<?>> media = createMediaToCheck(theFile);

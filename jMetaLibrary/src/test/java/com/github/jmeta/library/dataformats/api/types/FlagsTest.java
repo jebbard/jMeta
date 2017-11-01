@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
  * {@link FlagsTest} tests the {@link Flags} class.
@@ -43,7 +43,7 @@ public abstract class FlagsTest {
       }
 
       catch (PreconditionUnfullfilledException e) {
-         throw new TestDataException("Could not initialize flag specification.", e);
+         throw new InvalidTestDataException("Could not initialize flag specification.", e);
       }
    }
 
@@ -479,10 +479,10 @@ public abstract class FlagsTest {
     */
    private void checkTestData() {
       if (m_flagsBigEndian.getSpecification().getByteOrdering() != ByteOrder.BIG_ENDIAN)
-         throw new TestDataException("Byte ordering for the big endian spec must be ByteOrder.BIG_ENDIAN", null);
+         throw new InvalidTestDataException("Byte ordering for the big endian spec must be ByteOrder.BIG_ENDIAN", null);
 
       if (m_flagsLittleEndian.getSpecification().getByteOrdering() != ByteOrder.LITTLE_ENDIAN)
-         throw new TestDataException("Byte ordering for the little endian spec must be ByteOrder.LITTLE_ENDIAN", null);
+         throw new InvalidTestDataException("Byte ordering for the little endian spec must be ByteOrder.LITTLE_ENDIAN", null);
    }
 
    private Flags m_flagsLittleEndian;

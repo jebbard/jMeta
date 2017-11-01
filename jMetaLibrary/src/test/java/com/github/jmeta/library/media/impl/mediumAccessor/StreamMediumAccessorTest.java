@@ -7,7 +7,7 @@
 
 package com.github.jmeta.library.media.impl.mediumAccessor;
 
-import static com.github.jmeta.library.media.api.helper.TestMediumUtility.createReference;
+import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,7 +18,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
 
@@ -39,14 +39,14 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
       int newOffsetOne = 20;
-      MediumReference changeReferenceOne = createReference(mediumAccessor.getMedium(), newOffsetOne);
+      MediumReference changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
 
       mediumAccessor.setCurrentPosition(changeReferenceOne);
 
       Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
 
       int newOffsetTwo = 10;
-      MediumReference changeReferenceTwo = createReference(mediumAccessor.getMedium(), newOffsetTwo);
+      MediumReference changeReferenceTwo = at(mediumAccessor.getMedium(), newOffsetTwo);
 
       mediumAccessor.setCurrentPosition(changeReferenceTwo);
 
@@ -75,7 +75,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(0, EXPECTED_FILE_CONTENTS.length);
+      return new ReadTestData(0, getExpectedMediumContent().length);
    }
 
    /**
@@ -83,7 +83,7 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
     */
    @Override
    protected MediumAccessor<?> createImplementationToTest() {
-      return new StreamMediumAccessor(getExpectedMedium());
+      return new InputStreamMediumAccessor(getExpectedMedium());
    }
 
    /**
@@ -101,10 +101,10 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    protected void prepareMediumData(byte[] testFileContents) {
 
       try {
-         testStream = new FileInputStream(MediaTestCaseConstants.STANDARD_TEST_FILE.toFile());
+         testStream = new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile());
       } catch (FileNotFoundException e) {
          throw new RuntimeException("Could not find test file. Make sure it exists" + "on the hard drive: "
-            + MediaTestCaseConstants.STANDARD_TEST_FILE.toAbsolutePath().toString(), e);
+            + MediaTestFiles.FIRST_TEST_FILE_PATH.toAbsolutePath().toString(), e);
       }
    }
 }

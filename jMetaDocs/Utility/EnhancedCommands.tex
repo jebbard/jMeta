@@ -1,0 +1,210 @@
+%===============================================================================================
+%		Minipages for tables heavily containing text
+%===============================================================================================
+
+% Überschriften-Minipage für Tag-Vergleichstabelle
+\newenvironment{TAGcapt}{\begin{minipage}[t]{0.09\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+\newenvironment{TAGcrit}{\begin{minipage}[t]{0.11\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+
+% Überschriften-Minipage für ID3v2-Tag-Vergleichstabelle
+\newenvironment{IDTAGcapt}{\begin{minipage}[t]{0.24\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+\newenvironment{IDTAGcrit}{\begin{minipage}[t]{0.18\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+
+% Beschreibungsminipage für Use-Case-Eigenschafts-Überschrift (in einer Use-Case-Tabelle)
+\newenvironment{UCcapt}{\begin{minipage}[t]{0.26\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+% Minipage für Use-Case-Eigenschaften (in einer Use-Case-Tabelle)
+\newenvironment{UCdesc}{\begin{minipage}[t]{0.74\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+
+% Beschreibungsminipage für Standard-Tabellen (zweispaltig)
+\newenvironment{TABLEcapt}{\begin{minipage}[t]{0.32\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+% Minipage für Standard-Tabellen (zweispaltig)
+\newenvironment{TABLEdesc}{\begin{minipage}[t]{0.68\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+
+% Minipage für Package-Eigenschaften (in einer Package-Beschreibungs-Tabelle)
+\newenvironment{Packdesc}{\begin{minipage}[t]{0.36\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
+
+%===============================================================================================
+%		New Environments
+%===============================================================================================
+
+% Guideline-Environment
+\newenvironment{Guideline}[1]{\textbf{#1}: }{}
+
+%===============================================================================================
+%		Code Listing Environments
+%===============================================================================================
+
+% Color of XML comments
+\definecolor{XMLCommentColor}{rgb}{0.0,0.60,0.0}
+% Color of XML tags
+\definecolor{XMLTagColor}{rgb}{0.00,0.00,0.70}
+% Color of XML attribute content
+\definecolor{XMLAttributeContentColor}{rgb}{0.80,0.00,0.00}
+
+% XML Style definition. It is no float figure, but with a caption. This way, it can be arbitrary long and is correctly wrapped to multiple pages.
+\lstdefinestyle{XMLStyle}{language=XML,
+% print the listing
+print=true,		
+% tabs are printed as consisting of 3 spaces
+tabsize=3,		
+% Whitespace characters are not shown
+showspaces=false, showtabs=false,	
+% Empty lines at end of listing are not shown
+showlines=false,
+% Show line numbers
+numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=10pt, firstline=1, numberblanklines=true,
+% No spaces in strings
+showstringspaces=false,
+% XML tags are printed as keywords + their style
+usekeywordsintag=true, tagstyle=\color{XMLTagColor},
+% Smaller size
+basicstyle=\footnotesize,
+% Strings (=attribute contents) is printed in red
+stringstyle=\color{XMLAttributeContentColor}\textbf, 
+% XML comment, must stand at end of option list to get effective
+morecomment=[s][\color{XMLCommentColor}]{<!--}{-->},
+% Break lines that are too long and indent boken lines
+breaklines=true, breakautoindent=true, breakindent=20pt
+}
+
+% Other Style definition. It is no float figure, but with a caption. This way, it can be arbitrary long and is correctly wrapped to multiple pages.
+\lstdefinestyle{OtherStyle}{
+% print the listing
+print=true,		
+% tabs are printed as consisting of 3 spaces
+tabsize=3,		
+% Whitespace characters are not shown
+showspaces=false, showtabs=false,	
+% Empty lines at end of listing are not shown
+showlines=false,
+% Smaller size
+basicstyle=\footnotesize,
+% Show line numbers
+numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=10pt, firstline=1, numberblanklines=true,
+% Break lines that are too long and indent boken lines
+breaklines=true, breakautoindent=true, breakindent=20pt
+}
+
+%===============================================================================================
+%		Naming labels for referencing
+%===============================================================================================
+
+% Ensures that labels can be given arbitrary names which then
+% can be referred to
+% NOTES:
+%  (1) requires \usepackage{namref} to work
+%  (2) use \labelname right before \label, e.g. \labelname{XYZ 5000}\label{sec:XYZ}
+%  (3) then you can e.g. use \nameref{sec:XYZ} which will display "XYZ 5000"
+\makeatletter
+\newcommand{\labelname}[1]{% \labelname{<stuff>}
+  \def\@currentlabelname{#1}}%
+\makeatother
+
+
+%===============================================================================================
+%		Open Issue Command
+%===============================================================================================
+
+% Counter für offene Punkte, der pro Kapitel hochzählt
+\newcounter{OpenIssueCounter}[chapter]
+
+% Hintergrundfarbe für Boxen von offenen Punkten
+\definecolor{OpenIssueColor}{rgb}{0.97,0.97,0.71}
+
+% Einfügen offener Punkte in den Textfluss
+\newcommand{\OpenIssue}%
+[2]%
+{\addtocounter{OpenIssueCounter}{1}%
+	\vskip\baselineskip%
+	\fcolorbox{black}{OpenIssueColor}%
+	{%
+		\begin{minipage}[t]{1\textwidth}%
+			\begin{flushleft}%
+				\emph{\textbf{Open Issue \the\value{chapter}.\the\value{OpenIssueCounter}:}} \--- \textbf{#1} \\%
+			#2%
+		\end{flushleft}%
+	\end{minipage}%
+}%
+\index%
+{%
+	Open Issue \the\value{chapter}.\the\value{OpenIssueCounter}: \--- #1%
+}%
+\vskip\baselineskip%
+}
+
+%===============================================================================================
+%		Design decision command
+%===============================================================================================
+
+% Counter for design decisions
+\newcounter{DesignDecisionCounter}
+
+% Hintergrundfarbe für Boxen von Designentscheidungen
+\definecolor{DesignDecisionColor}{rgb}{0.85,0.95,0.95}
+
+% Einfügen von Designentscheidungen in den Textfluss
+\newcommand{\DES}{DES~\ifnum\value{DesignDecisionCounter}<100 0\fi\ifnum\value{DesignDecisionCounter}<10 0\fi\arabic{DesignDecisionCounter}}
+
+% #1 - The unique id of the design decision, to be used as a label, do not change after creation
+% #2 - The title of the design decision
+% #3 - The short description of the design decision
+% #4 - The rationale of the design decision
+% #5 - The disadvantages of the design decision
+\newcommand{\DD}[5]{
+\addtocounter{DesignDecisionCounter}{1}%
+\labelname{\DES{}}\phantomsection\label{#1}
+\vskip\baselineskip%
+\fcolorbox{black}{DesignDecisionColor}%
+{%
+\begin{minipage}[t]{1\textwidth}%
+   \begin{flushleft}%
+     \emph{\textbf{\DES{}:}} \textbf{#2} \\%
+     #3%
+   \end{flushleft}%
+   \begin{flushleft}%
+     \textbf{Begründung:} #4
+   \end{flushleft}%
+   \begin{flushleft}%
+     \textbf{Nachteile:} #5
+   \end{flushleft}%
+\end{minipage}%
+}%
+\vskip\baselineskip%
+}
+
+\newcommand{\DesLink}[1]{\hyperref[#1]{\nameref{#1}}}
+
+%===============================================================================================
+%		(Hyper)link Command
+%===============================================================================================
+
+\newcommand{\SectionLink}[1]%
+	{\hyperref[#1]{``\ref{#1}~\nameref{#1}''}}
+
+%===============================================================================================
+%		Basic Terms Command
+%===============================================================================================
+
+\newcommand{\BasicTermLink}[2]%
+	{\emph{\hyperref[#2]{$\Rightarrow$\nolinebreak[4] #1}}}
+
+%===============================================================================================
+%		Special Terms Command
+%===============================================================================================
+
+% Hervorhebung eines Spezialbegriffs ohne Verweis (für Überschriften und den Glossareintrag des
+% Begriffs).
+\newcommand{\SpecialTermBasic}[1]%
+	{\textsc{#1}}
+	
+% Hervorhebung und Link eines Spezialbegriffs
+\newcommand{\SpecialTerm}[2]%
+	{\hyperref[#2]{$\left[\rightarrow\right]$} \SpecialTermBasic{\SpecialTermBasic{#1}}}
+
+%###############################################################################################
+%###############################################################################################
+%
+%		Datei-Ende
+%
+%###############################################################################################
+%###############################################################################################

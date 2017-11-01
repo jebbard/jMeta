@@ -12,8 +12,8 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 

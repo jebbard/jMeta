@@ -1,23 +1,25 @@
 /**
  *
- * MediumChangeManagerCreateFlushPlanTest.java
+ * {@link MediumChangeManagerCreateFlushPlanTest}.java
  *
  * @author Jens
  *
  * @date 16.10.2016
- *
  */
 package com.github.jmeta.library.media.impl.changeManager;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestHelper.at;
+import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -26,13 +28,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import com.github.jmeta.library.media.api.helper.MediaTestHelper;
+import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.changeManager.ReadWriteActionSequence.ActionOrder;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
+import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 /**
@@ -109,7 +113,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 12;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
@@ -135,7 +139,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 200;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 0;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
@@ -163,7 +167,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 450;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 12;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
@@ -201,7 +205,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = totalMediumSizeInBytes;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
@@ -334,7 +338,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 350;
       int replacedByteCount1 = 35;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       int remainingWriteByteCount1 = replaceSize1 % writeBlockSizeInBytes;
       ByteBuffer remainingWriteBuffer1 = ByteBuffer.wrap(replacementBuffer1.array(), writeBlockSizeInBytes,
          remainingWriteByteCount1);
@@ -367,7 +371,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 500;
       int replaceSize1 = 50;
       int replacedByteCount1 = 35;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       int totalRWSizeInBytes1 = totalMediumSizeInBytes - replaceOffset1 - replacedByteCount1;
       int readWriteBlockCount1 = totalRWSizeInBytes1 / writeBlockSizeInBytes;
       int remainingWriteBlockSize1 = totalRWSizeInBytes1 % writeBlockSizeInBytes;
@@ -400,7 +404,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 1450;
       int replaceSize1 = 350;
       int replacedByteCount1 = 50;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
 
       int remainingWriteByteCount1 = replaceSize1 % writeBlockSizeInBytes;
       ByteBuffer remainingWriteBuffer1 = ByteBuffer.wrap(replacementBuffer1.array(), writeBlockSizeInBytes,
@@ -432,7 +436,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 100;
       int replacedByteCount1 = 300;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       int totalRWSizeInBytes1 = totalMediumSizeInBytes - replacedByteCount1;
       int readWriteBlockCount1 = totalRWSizeInBytes1 / writeBlockSizeInBytes;
 
@@ -465,7 +469,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 150;
       int replaceSize1 = 80;
       int replacedByteCount1 = 100;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       int totalRWSizeInBytes1 = totalMediumSizeInBytes - replaceOffset1 - replacedByteCount1;
 
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
@@ -497,7 +501,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 280;
       int replaceSize1 = 10;
       int replacedByteCount1 = 20;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
 
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
@@ -526,7 +530,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 150;
       int replaceSize1 = 80;
       int replacedByteCount1 = replaceSize1;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
 
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
@@ -552,7 +556,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 400;
       int replacedByteCount1 = totalMediumSizeInBytes;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
 
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
@@ -576,14 +580,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 0;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
       // Second insert
       int insertSize2 = 20;
-      ByteBuffer insertBuffer2 = MediaTestHelper.createTestByteBufferOfSize(insertSize2);
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       int insertOffset2 = 0;
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
          insertBuffer2);
@@ -617,14 +621,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 0;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
       // Second insert
       int insertSize2 = 450;
-      ByteBuffer insertBuffer2 = MediaTestHelper.createTestByteBufferOfSize(insertSize2);
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       int insertOffset2 = 0;
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
          insertBuffer2);
@@ -636,7 +640,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // Third insert
       int insertSize3 = 20;
-      ByteBuffer insertBuffer3 = MediaTestHelper.createTestByteBufferOfSize(insertSize3);
+      ByteBuffer insertBuffer3 = createTestByteBufferOfSize(insertSize3);
       int insertOffset3 = 0;
       MediumAction insertAction3 = testling.scheduleInsert(new MediumRegion(at(insertOffset3), insertSize3),
          insertBuffer3);
@@ -672,14 +676,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 200;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
       // Second insert
       int insertSize2 = 20;
-      ByteBuffer insertBuffer2 = MediaTestHelper.createTestByteBufferOfSize(insertSize2);
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       int insertOffset2 = 250;
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
          insertBuffer2);
@@ -707,14 +711,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 449;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
       // Second insert
       int insertSize2 = 20;
-      ByteBuffer insertBuffer2 = MediaTestHelper.createTestByteBufferOfSize(insertSize2);
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       int insertOffset2 = 450;
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
          insertBuffer2);
@@ -741,35 +745,35 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       // First insert
       int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       int insertOffset1 = 200;
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
       // Second insert
       int insertSize2 = 20;
-      ByteBuffer insertBuffer2 = MediaTestHelper.createTestByteBufferOfSize(insertSize2);
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       int insertOffset2 = 250;
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
          insertBuffer2);
 
       // Third insert
       int insertSize3 = 333;
-      ByteBuffer insertBuffer3 = MediaTestHelper.createTestByteBufferOfSize(insertSize3);
+      ByteBuffer insertBuffer3 = createTestByteBufferOfSize(insertSize3);
       int insertOffset3 = 500;
       MediumAction insertAction3 = testling.scheduleInsert(new MediumRegion(at(insertOffset3), insertSize3),
          insertBuffer3);
 
       // Fourth insert
       int insertSize4 = 250;
-      ByteBuffer insertBuffer4 = MediaTestHelper.createTestByteBufferOfSize(insertSize4);
+      ByteBuffer insertBuffer4 = createTestByteBufferOfSize(insertSize4);
       int insertOffset4 = 520;
       MediumAction insertAction4 = testling.scheduleInsert(new MediumRegion(at(insertOffset4), insertSize4),
          insertBuffer4);
 
       // Fifth insert
       int insertSize5 = 10;
-      ByteBuffer insertBuffer5 = MediaTestHelper.createTestByteBufferOfSize(insertSize5);
+      ByteBuffer insertBuffer5 = createTestByteBufferOfSize(insertSize5);
       int insertOffset5 = 521;
       MediumAction insertAction5 = testling.scheduleInsert(new MediumRegion(at(insertOffset5), insertSize5),
          insertBuffer5);
@@ -1015,7 +1019,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 50;
       int replacedByteCount1 = 35;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
 
@@ -1023,7 +1027,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset2 = 35;
       int replaceSize2 = 250;
       int replacedByteCount2 = 150;
-      ByteBuffer replacementBuffer2 = MediaTestHelper.createTestByteBufferOfSize(replaceSize2);
+      ByteBuffer replacementBuffer2 = createTestByteBufferOfSize(replaceSize2);
       MediumAction replaceAction2 = testling.scheduleReplace(new MediumRegion(at(replaceOffset2), replacedByteCount2),
          replacementBuffer2);
       int totalRWSizeInBytes2 = totalMediumSizeInBytes - replaceOffset2 - replacedByteCount2;
@@ -1060,7 +1064,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 100;
       int replaceSize1 = 50;
       int replacedByteCount1 = 35;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
 
@@ -1068,7 +1072,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset2 = 950;
       int replaceSize2 = 100;
       int replacedByteCount2 = 150;
-      ByteBuffer replacementBuffer2 = MediaTestHelper.createTestByteBufferOfSize(replaceSize2);
+      ByteBuffer replacementBuffer2 = createTestByteBufferOfSize(replaceSize2);
       MediumAction replaceAction2 = testling.scheduleReplace(new MediumRegion(at(replaceOffset2), replacedByteCount2),
          replacementBuffer2);
 
@@ -1076,7 +1080,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset3 = 600;
       int replaceSize3 = 100;
       int replacedByteCount3 = replaceSize3;
-      ByteBuffer replacementBuffer3 = MediaTestHelper.createTestByteBufferOfSize(replaceSize3);
+      ByteBuffer replacementBuffer3 = createTestByteBufferOfSize(replaceSize3);
       MediumAction replaceAction3 = testling.scheduleReplace(new MediumRegion(at(replaceOffset3), replacedByteCount3),
          replacementBuffer3);
 
@@ -1138,7 +1142,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 50;
       int replacedByteCount1 = 35;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
 
@@ -1146,7 +1150,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset2 = 350;
       int replaceSize2 = 35;
       int replacedByteCount2 = 50;
-      ByteBuffer replacementBuffer2 = MediaTestHelper.createTestByteBufferOfSize(replaceSize2);
+      ByteBuffer replacementBuffer2 = createTestByteBufferOfSize(replaceSize2);
       MediumAction replaceAction2 = testling.scheduleReplace(new MediumRegion(at(replaceOffset2), replacedByteCount2),
          replacementBuffer2);
 
@@ -1182,7 +1186,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 35;
       int replacedByteCount1 = 50;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
 
@@ -1190,7 +1194,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset2 = 350;
       int replaceSize2 = 50;
       int replacedByteCount2 = 35;
-      ByteBuffer replacementBuffer2 = MediaTestHelper.createTestByteBufferOfSize(replaceSize2);
+      ByteBuffer replacementBuffer2 = createTestByteBufferOfSize(replaceSize2);
       MediumAction replaceAction2 = testling.scheduleReplace(new MediumRegion(at(replaceOffset2), replacedByteCount2),
          replacementBuffer2);
 
@@ -1202,21 +1206,21 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset3 = 700;
       int replaceSize3 = 150;
       int replacedByteCount3 = 100;
-      ByteBuffer replacementBuffer3 = MediaTestHelper.createTestByteBufferOfSize(replaceSize3);
+      ByteBuffer replacementBuffer3 = createTestByteBufferOfSize(replaceSize3);
       MediumAction replaceAction3 = testling.scheduleReplace(new MediumRegion(at(replaceOffset3), replacedByteCount3),
          replacementBuffer3);
       // Fourth replace
       int replaceOffset4 = 800;
       int replaceSize4 = 20;
       int replacedByteCount4 = replaceSize4;
-      ByteBuffer replacementBuffer4 = MediaTestHelper.createTestByteBufferOfSize(replaceSize4);
+      ByteBuffer replacementBuffer4 = createTestByteBufferOfSize(replaceSize4);
       MediumAction replaceAction4 = testling.scheduleReplace(new MediumRegion(at(replaceOffset4), replacedByteCount4),
          replacementBuffer4);
       // Fifth replace
       int replaceOffset5 = 820;
       int replaceSize5 = 80;
       int replacedByteCount5 = 100;
-      ByteBuffer replacementBuffer5 = MediaTestHelper.createTestByteBufferOfSize(replaceSize5);
+      ByteBuffer replacementBuffer5 = createTestByteBufferOfSize(replaceSize5);
       MediumAction replaceAction5 = testling.scheduleReplace(new MediumRegion(at(replaceOffset5), replacedByteCount5),
          replacementBuffer5);
 
@@ -1268,7 +1272,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Insert
       int insertOffset1 = 140;
       int insertSize1 = 160;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
       // Bytes behind insert
@@ -1300,7 +1304,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Insert
       int insertOffset1 = removeOffset1;
       int insertSize1 = 160;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
@@ -1324,7 +1328,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Insert
       int insertOffset1 = 300;
       int insertSize1 = 160;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
@@ -1353,7 +1357,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // First insert
       int insertOffset1 = 140;
       int insertSize1 = 160;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
@@ -1365,7 +1369,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Second insert
       int insertOffset2 = 300;
       int insertSize2 = 360;
-      ByteBuffer insertBuffer2 = MediaTestHelper.createTestByteBufferOfSize(insertSize2);
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
          insertBuffer2);
 
@@ -1408,14 +1412,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // First insert
       int insertOffset1 = 900;
       int insertSize1 = 360;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
       // Second insert
       int insertOffset2 = 140;
       int insertSize2 = 130;
-      ByteBuffer insertBuffer2 = MediaTestHelper.createTestByteBufferOfSize(insertSize2);
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
          insertBuffer2);
 
@@ -1474,7 +1478,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Insert
       int insertOffset1 = removeOffset1;
       int insertSize1 = 160;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
@@ -1504,14 +1508,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 100;
       int replacedByteCount1 = 300;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
 
       // Insert
       int insertOffset1 = replaceOffset1 + replacedByteCount1;
       int insertSize1 = 200;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
@@ -1537,7 +1541,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Insert
       int insertOffset1 = 320;
       int insertSize1 = 200;
-      ByteBuffer insertBuffer1 = MediaTestHelper.createTestByteBufferOfSize(insertSize1);
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
       MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
          insertBuffer1);
 
@@ -1545,7 +1549,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replaceOffset1 = 0;
       int replaceSize1 = 100;
       int replacedByteCount1 = 300;
-      ByteBuffer replacementBuffer1 = MediaTestHelper.createTestByteBufferOfSize(replaceSize1);
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
 
@@ -1562,10 +1566,68 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
+    * Convenience version of {@link #createTestByteBufferOfSize(int, byte)}, starting at byte offset 0.
+    * 
+    * @param size
+    *           The total size of the buffer to create. Must be positive. If this parameter is 0, the empty
+    *           {@link ByteBuffer} is returned.
+    * @return see {@link #createTestByteBufferOfSize(int, byte)}.
+    */
+   private static ByteBuffer createTestByteBufferOfSize(int size) {
+      return createTestByteBufferOfSize(size, (byte) 0);
+   }
+
+   /**
+    * Creates a test byte buffer of the given size, filled with increasing byte values starting from the given start
+    * offset. The first goal of this method is to provide {@link ByteBuffer}s with non-uniform content (e.g. not only
+    * filled with zeroes). This ensures that during testing the correct portions of a ByteBuffer are checked against, so
+    * it avoids bugs. If you would instead always use {@link ByteBuffer} filled uniformly with the same byte, you would
+    * e.g. not find bugs related to wrongly copying contents of the buffer. The second goal of this method is to yet
+    * provide reproducible data. Thus it does not simply return a random content buffer, but you always know what you
+    * get, and subsequent calls with the same parameters return always the same {@link ByteBuffer}.
+    * 
+    * @param size
+    *           The total size of the buffer to create. Must be positive. If this parameter is 0, the empty
+    *           {@link ByteBuffer} is returned.
+    * @param startByteOffset
+    *           The start offset at which each byte sequence starts. Must be smaller than {@link Byte#MAX_VALUE}.
+    * @return A test {@link ByteBuffer} of the given size, filled with size / (Byte.MAX_VALUE - startByteOffset)
+    *         identical blocks of Bytes at front, each a sequence of length Byte.MAX_VALUE - startByteOffset, that
+    *         starts with startByteOffset as the first byte, and continues with startByteOffset+1 as second byte and so
+    *         on. At the end, there are size % (Byte.MAX_VALUE - startByteOffset) bytes that follow the same sequence.
+    */
+   private static ByteBuffer createTestByteBufferOfSize(int size, byte startByteOffset) {
+      Reject.ifTrue(size < 0, "size < 0");
+      Reject.ifNotInInterval(startByteOffset, 0, Byte.MAX_VALUE - 1, "startByteOffset");
+
+      if (size == 0) {
+         return ByteBuffer.allocate(0);
+      }
+
+      int blockSize = Byte.MAX_VALUE - startByteOffset;
+      int blockCount = size / blockSize;
+      int remainder = size % blockSize;
+
+      List<Byte> totalByteSequence = new ArrayList<>();
+
+      for (int j = 0; j < blockCount; j++) {
+         List<Byte> bytes = IntStream.rangeClosed(startByteOffset, blockSize - 1).mapToObj(i -> (byte) i)
+            .collect(Collectors.toList());
+
+         totalByteSequence.addAll(bytes);
+      }
+
+      totalByteSequence.addAll(
+         IntStream.rangeClosed(startByteOffset, remainder - 1).mapToObj(i -> (byte) i).collect(Collectors.toList()));
+
+      return ByteBuffer.wrap(ByteArrayUtils.toArray(totalByteSequence));
+   }
+
+   /**
     * @return an instance of a new {@link MediumChangeManager} for testing
     */
    private MediumChangeManager getTestling() {
-      return new MediumChangeManager(new MediumReferenceFactory(MediaTestHelper.getStandardMedium()));
+      return new MediumChangeManager(new MediumReferenceFactory(MediaTestUtility.DEFAULT_TEST_MEDIUM));
    }
 
    /**
@@ -1626,7 +1688,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
    /**
     * Prepares a new test file, returning a {@link PrintStream} that can be used to write output to it. Throws a
-    * {@link TestDataException} in case of any I/O problems during the operation.
+    * {@link InvalidTestDataException} in case of any I/O problems during the operation.
     * 
     * @param name
     *           The name of the test file, will be newly created, if it already exists it will be deleted first.
@@ -1639,17 +1701,17 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
          if (testFile.exists()) {
             if (!testFile.delete()) {
-               throw new TestDataException("IO error during setup: could not delete existing file", null);
+               throw new InvalidTestDataException("IO error during setup: could not delete existing file", null);
             }
          } else {
             if (!testFile.createNewFile()) {
-               throw new TestDataException("IO error during setup: could not create new test file", null);
+               throw new InvalidTestDataException("IO error during setup: could not create new test file", null);
             }
          }
 
          return new PrintStream(new FileOutputStream(testFile), false);
       } catch (IOException e) {
-         throw new TestDataException("IO error during setup: " + e, e);
+         throw new InvalidTestDataException("IO error during setup: " + e, e);
       }
    }
 

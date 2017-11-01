@@ -13,9 +13,9 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
 
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 

@@ -13,9 +13,9 @@ import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 
 /**

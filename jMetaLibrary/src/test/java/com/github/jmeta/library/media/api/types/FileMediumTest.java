@@ -13,14 +13,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.github.jmeta.library.media.api.helper.MediaTestCaseConstants;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 
 /**
  * {@link FileMediumTest} tests the {@link FileMedium} class with an existing file.
  */
 public class FileMediumTest extends AbstractMediumTest<Path> {
 
-   private static final Path WRAPPED_MEDIUM = MediaTestCaseConstants.STANDARD_TEST_FILE;
+   private static final Path WRAPPED_MEDIUM = MediaTestFiles.FIRST_TEST_FILE_PATH;
 
    private static final boolean READ_ONLY = false;
 

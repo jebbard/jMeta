@@ -50,7 +50,7 @@ public class ReadOnlyMemoryMediumAccessorTest extends AbstractReadOnlyMediumAcce
     */
    @Override
    protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(550, EXPECTED_FILE_CONTENTS.length - 550);
+      return new ReadTestData(550, getExpectedMediumContent().length - 550);
    }
 
    /**
