@@ -95,14 +95,14 @@
 				<version>2.3.2</version>
 				<configuration>
 					<!-- Java compiler and runtime version -->
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>9</source>
+					<target>9</target>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.2.201409121644</version>
+				<version>0.7.9</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -176,7 +176,7 @@
 											jacoco-maven-plugin
 										</artifactId>
 										<versionRange>
-											[0.7.2.201409121644,)
+											[0.7.9,)
 										</versionRange>
 										<goals>
 											<goal>prepare-agent</goal>
