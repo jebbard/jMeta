@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.logging.api.services.LoggingMessageConstants;
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 import junit.framework.AssertionFailedError;
 
@@ -53,7 +53,7 @@ public class LogUnitTest {
 
          m_logFileContent = buffer.toString();
       } catch (IOException e) {
-         throw new TestDataException("Could not read log file content due to exception", e);
+         throw new InvalidTestDataException("Could not read log file content due to exception", e);
       }
 
       m_currentFile = logFile;

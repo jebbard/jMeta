@@ -11,7 +11,7 @@ package com.github.jmeta.utility.numericutils.api.services;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
  * {@link NumericDataTypeHelperTest} tests the {@link NumericDataTypeUtil} class.
@@ -29,7 +29,7 @@ public class NumericDataTypeHelperTest {
       int[] expectedData = new int[] { 0, 1, 255, 128, 254, 252, 50, 201 };
 
       if (inputData.length != expectedData.length)
-         throw new TestDataException("Length of input data must match length of expected output data", null);
+         throw new InvalidTestDataException("Length of input data must match length of expected output data", null);
 
       for (int i = 0; i < inputData.length; i++)
          Assert.assertEquals(expectedData[i], NumericDataTypeUtil.unsignedValue(inputData[i]));
@@ -44,7 +44,7 @@ public class NumericDataTypeHelperTest {
       int[] expectedData = new int[] { 0, 1, 65535, 65408, 65534, 65532, 50, 65481, 32768, 32767 };
 
       if (inputData.length != expectedData.length)
-         throw new TestDataException("Length of input data must match length of expected output data", null);
+         throw new InvalidTestDataException("Length of input data must match length of expected output data", null);
 
       for (int i = 0; i < inputData.length; i++)
          Assert.assertEquals(expectedData[i], NumericDataTypeUtil.unsignedValue(inputData[i]));
@@ -60,7 +60,7 @@ public class NumericDataTypeHelperTest {
          MAX_UINT_PLUS_ONE - 55, MAX_UINT_PLUS_ONE - 32768, 32767, MAX_UINT_PLUS_ONE - 128 };
 
       if (inputData.length != expectedData.length)
-         throw new TestDataException("Length of input data must match length of expected output data", null);
+         throw new InvalidTestDataException("Length of input data must match length of expected output data", null);
 
       for (int i = 0; i < inputData.length; i++)
          Assert.assertEquals(expectedData[i], NumericDataTypeUtil.unsignedValue(inputData[i]));
@@ -75,7 +75,7 @@ public class NumericDataTypeHelperTest {
       byte[] expectedData = new byte[] { 0, 1, -1, -128, -2, -4, 50, -55 };
 
       if (expectedData.length != inputData.length)
-         throw new TestDataException("Length of input data must match length of expected output data", null);
+         throw new InvalidTestDataException("Length of input data must match length of expected output data", null);
 
       for (int i = 0; i < inputData.length; i++)
          Assert.assertEquals(expectedData[i], NumericDataTypeUtil.signedByteValue(inputData[i]));
@@ -90,7 +90,7 @@ public class NumericDataTypeHelperTest {
       short[] expectedData = new short[] { 0, 1, -1, -128, -2, -4, 50, -55, -32768, 32767 };
 
       if (expectedData.length != inputData.length)
-         throw new TestDataException("Length of input data must match length of expected output data", null);
+         throw new InvalidTestDataException("Length of input data must match length of expected output data", null);
 
       for (int i = 0; i < inputData.length; i++)
          Assert.assertEquals(expectedData[i], NumericDataTypeUtil.signedShortValue(inputData[i]));
@@ -106,7 +106,7 @@ public class NumericDataTypeHelperTest {
       int[] expectedData = new int[] { 0, 1, -1, -2, -4, 50, -55, -32768, 32767, -128 };
 
       if (inputData.length != expectedData.length)
-         throw new TestDataException("Length of input data must match length of expected output data", null);
+         throw new InvalidTestDataException("Length of input data must match length of expected output data", null);
 
       for (int i = 0; i < inputData.length; i++)
          Assert.assertEquals(expectedData[i], NumericDataTypeUtil.signedIntValue(inputData[i]));

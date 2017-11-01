@@ -18,7 +18,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
  * {@link AbstractEqualsTest} tests for the correct implementation of the {@link #equals(Object)} method, which includes
@@ -39,12 +39,12 @@ public abstract class AbstractEqualsTest<T> {
    public void checkTestData() {
       if (getObjects() == null || getEqualObjects() == null || getThirdEqualObjects() == null
          || getDifferentObjects() == null)
-         throw new TestDataException("Do not return null when implementing getObjects(), "
+         throw new InvalidTestDataException("Do not return null when implementing getObjects(), "
             + "getEqualObjects(), getThirdEqualObjects() or getDifferentObjects()!", null);
 
       if (getObjects().size() != getEqualObjects().size() || getObjects().size() != getThirdEqualObjects().size()
          || getDifferentObjects().size() != getEqualObjects().size())
-         throw new TestDataException("Tested vectors must be equal in size!", null);
+         throw new InvalidTestDataException("Tested vectors must be equal in size!", null);
    }
 
    /**

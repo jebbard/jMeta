@@ -22,7 +22,7 @@ import org.junit.Test;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.csv.api.exceptions.CsvRowFormatException;
 import com.github.jmeta.utility.namedio.api.services.NamedReader;
-import com.github.jmeta.utility.testsetup.api.exceptions.TestDataException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
  * {@link AbstractCsvReaderTest} tests the {@link CsvReader} class.
@@ -41,12 +41,12 @@ public abstract class AbstractCsvReaderTest {
          m_correctFileToUse = getCorrectFileToUse();
          m_incorrectFileToUse = getIncorrectFileToUse();
       } catch (Exception e) {
-         throw new TestDataException("Could not load test data files due to exception", e);
+         throw new InvalidTestDataException("Could not load test data files due to exception", e);
       }
 
       if (m_testlingFixedColumns == null || m_testlingVariableColumns == null || m_correctFileToUse == null
          || m_incorrectFileToUse == null)
-         throw new TestDataException("Test data may not be null", null);
+         throw new InvalidTestDataException("Test data may not be null", null);
 
       m_testlingFixedColumns.setQuote(getQuoteToUse());
       m_testlingFixedColumns.setSeparator(getSeparatorToUse());
@@ -278,7 +278,7 @@ public abstract class AbstractCsvReaderTest {
             String[] rowColumns = expectedLines.get(rowIndex);
 
             if (rowColumns.length != expectedColumns.size())
-               throw new TestDataException("Number of the columns for the csv file " + csvFile
+               throw new InvalidTestDataException("Number of the columns for the csv file " + csvFile
                   + " does not match number of expected columns for row index " + rowIndex, null);
 
             Assert.assertEquals(rowColumns.length, nextRow.size());
