@@ -39,6 +39,11 @@ public class ReadOnlyInMemoryMediumStoreTest extends AbstractReadOnlyMediumStore
    @Override
    protected InMemoryMedium createFilledMedium(String testMethodName, boolean enableCaching, long maxCacheSize,
       int maxCacheRegionSize, int maxReadWriteBlockSize) throws IOException {
+
+      if (enableCaching) {
+         return null;
+      }
+
       return new InMemoryMedium(MediaTestUtility.readFileContent(MediaTestFiles.FIRST_TEST_FILE_PATH),
          "Stream based filled medium", true, maxReadWriteBlockSize);
    }

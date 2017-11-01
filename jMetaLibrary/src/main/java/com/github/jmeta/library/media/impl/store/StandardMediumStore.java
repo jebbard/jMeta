@@ -13,11 +13,15 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
+import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.library.media.impl.cache.MediumCache;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
+import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -27,12 +31,19 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    private final MediumAccessor<T> mediumAccessor;
 
+   private final MediumCache cache;
+
+   private final MediumReferenceFactory referenceFactory;
+
    private boolean isOpened;
 
    public StandardMediumStore(MediumAccessor<T> mediumAccessor) {
       Reject.ifNull(mediumAccessor, "mediumAccessor");
 
       this.mediumAccessor = mediumAccessor;
+      T medium = mediumAccessor.getMedium();
+      cache = new MediumCache(medium, medium.getMaxCacheSizeInBytes(), medium.getMaxCacheRegionSizeInBytes());
+      referenceFactory = new MediumReferenceFactory(medium);
 
       isOpened = true;
    }
@@ -50,11 +61,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public void close() {
-      if (!isOpened()) {
-         throw new MediumStoreClosedException();
-      }
+      ensureOpened();
 
+      cache.clear();
       mediumAccessor.close();
+      referenceFactory.clear();
 
       isOpened = false;
    }
@@ -64,7 +75,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public Medium<?> getMedium() {
-      return null;
+      return mediumAccessor.getMedium();
    }
 
    /**
@@ -72,6 +83,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public boolean isAtEndOfMedium(MediumReference offset) {
+      Reject.ifNull(offset, "offset");
+      ensureOpened();
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
       return false;
    }
 
@@ -80,7 +95,9 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public MediumReference createMediumReference(long offset) {
-      return null;
+      ensureOpened();
+
+      return referenceFactory.createMediumReference(offset);
    }
 
    /**
@@ -89,6 +106,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public void cache(MediumReference offset, int numberOfBytes) throws EndOfMediumException {
+      Reject.ifNull(offset, "offset");
+      ensureOpened();
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
+      cache.addRegion(new MediumRegion(offset, ByteBuffer.allocate(numberOfBytes)));
    }
 
    /**
@@ -96,7 +118,9 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public long getCachedByteCountAt(MediumReference offset) {
-      return 0;
+      Reject.ifNull(offset, "offset");
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+      return cache.getCachedByteCountAt(offset);
    }
 
    /**
@@ -105,6 +129,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public ByteBuffer getData(MediumReference offset, int numberOfBytes) {
+      Reject.ifNull(offset, "offset");
+      ensureOpened();
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
       return null;
    }
 
@@ -114,6 +142,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public MediumAction insertData(MediumReference offset, ByteBuffer dataToInsert) {
+      Reject.ifNull(offset, "offset");
+      Reject.ifNull(dataToInsert, "dataToInsert");
+      ensureOpened();
+      ensureWritable();
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
       return null;
    }
 
@@ -123,6 +157,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public MediumAction removeData(MediumReference offset, int numberOfBytesToRemove) {
+      Reject.ifNull(offset, "offset");
+      ensureOpened();
+      ensureWritable();
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
       return null;
    }
 
@@ -132,6 +171,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public MediumAction replaceData(MediumReference offset, int numberOfBytesToReplace, ByteBuffer replacementData) {
+      Reject.ifNull(offset, "offset");
+      Reject.ifNull(replacementData, "replacementData");
+      ensureOpened();
+      ensureWritable();
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
       return null;
    }
 
@@ -140,6 +185,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public void undo(MediumAction mediumAction) {
+      Reject.ifNull(mediumAction, "mediumAction");
+      ensureOpened();
+      ensureWritable();
+      Reject.ifFalse(mediumAction.getRegion().getStartReference().getMedium().equals(getMedium()),
+         "mediumAction.getRegion().getStartReference().getMedium().equals(getMedium())");
+
    }
 
    /**
@@ -147,6 +198,27 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     */
    @Override
    public void flush() {
+      ensureOpened();
+      ensureWritable();
+
+   }
+
+   /**
+    * Ensures that this {@link MediumStore} is opened for most of the operations.
+    */
+   private void ensureOpened() {
+      if (!isOpened()) {
+         throw new MediumStoreClosedException();
+      }
+   }
+
+   /**
+    * Ensures that the underlying {@link Medium} is opened for writing and writable.
+    */
+   private void ensureWritable() {
+      if (getMedium().isReadOnly()) {
+         throw new ReadOnlyMediumException(getMedium(), null);
+      }
    }
 
 }

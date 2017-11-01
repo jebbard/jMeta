@@ -165,16 +165,13 @@ public interface MediumStore {
 
    /**
     * Returns the number of consecutively cached bytes at the given offset, or 0 if there are no cached bytes at this
-    * offset. Returns 0 if caching is disabled.
+    * offset. Returns 0 if caching is disabled or this medium store is already closed.
     * 
     * @param offset
     *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}; the offset given
     *           is allowed to be behind the current {@link Medium} length
     * @return the number of consecutively cached bytes at the given offset, or 0 if there are no cached bytes at this
     *         offset.
-    * 
-    * @throws MediumStoreClosedException
-    *            in case this {@link MediumStore} has already been closed
     */
    public long getCachedByteCountAt(MediumReference offset);
 
@@ -230,7 +227,7 @@ public interface MediumStore {
     * @throws MediumStoreClosedException
     *            in case this {@link MediumStore} has already been closed
     */
-   public ByteBuffer getData(MediumReference offset, int numberOfBytes);
+   public ByteBuffer getData(MediumReference offset, int numberOfBytes) throws EndOfMediumException;
 
    /**
     * Inserts the given bytes at the given {@link MediumReference} offset. This method does not actually write data to
