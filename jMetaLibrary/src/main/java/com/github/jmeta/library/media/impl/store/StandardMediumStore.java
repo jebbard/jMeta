@@ -45,7 +45,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       cache = new MediumCache(medium, medium.getMaxCacheSizeInBytes(), medium.getMaxCacheRegionSizeInBytes());
       referenceFactory = new MediumReferenceFactory(medium);
 
-      isOpened = true;
+      isOpened = false;
    }
 
    /**
@@ -87,7 +87,19 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
 
-      return false;
+      mediumAccessor.setCurrentPosition(offset);
+
+      return mediumAccessor.isAtEndOfMedium();
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.services.MediumStore#open()
+    */
+   @Override
+   public void open() {
+      mediumAccessor.open();
+
+      isOpened = true;
    }
 
    /**

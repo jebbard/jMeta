@@ -22,16 +22,17 @@ import com.github.jmeta.library.media.api.types.FileMedium;
 public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 
    /**
-    * Tests whether the creation of a new {@link FileMediumAccessor} on an already locked medium.
+    * Tests the creation and opening of a new {@link FileMediumAccessor} on an already locked medium.
     */
    @Test(expected = MediumAccessException.class)
    public void createNewFileMediumAccessor_forAlreadyLockedMedium_throwsException() {
 
-      // Make sure the first instance is created
-      getImplementationToTest();
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       // Create second instance on the same medium
-      new FileMediumAccessor(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true));
+      new FileMediumAccessor(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true)).open();
    }
 
    /**

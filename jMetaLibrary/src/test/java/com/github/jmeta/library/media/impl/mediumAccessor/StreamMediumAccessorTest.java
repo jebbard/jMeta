@@ -19,8 +19,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
+import com.github.jmeta.library.media.api.types.MediumReference;
 
 /**
  * Tests the class {@StreamMediumAccessor}.
@@ -30,13 +30,14 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    private InputStream testStream;
 
    /**
-    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)} and
-    * {@link MediumAccessor#getCurrentPosition()}.
+    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)} and {@link MediumAccessor#getCurrentPosition()}.
     */
    @Test
    public void setCurrentPosition_onStreamMedium_doesNotChangeCurrentPosition() {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       int newOffsetOne = 20;
       MediumReference changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);

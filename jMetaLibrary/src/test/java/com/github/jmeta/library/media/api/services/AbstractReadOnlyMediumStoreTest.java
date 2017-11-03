@@ -38,7 +38,9 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
    public void replaceData_onReadOnlyMedium_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.replaceData(at(emptyMedium, 10), 20, ByteBuffer.allocate(10));
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
    }
 
    /**
@@ -48,7 +50,9 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
    public void removeData_onReadOnlyMedium_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.removeData(at(emptyMedium, 10), 20);
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.removeData(at(currentMedium, 10), 20);
    }
 
    /**
@@ -58,7 +62,9 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
    public void insertData_onReadOnlyMedium_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.insertData(at(emptyMedium, 10), ByteBuffer.allocate(10));
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.insertData(at(currentMedium, 10), ByteBuffer.allocate(10));
    }
 
    /**
@@ -68,8 +74,10 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
    public void undo_onReadOnlyMedium_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
+      mediumStoreUnderTest.open();
+
       mediumStoreUnderTest
-         .undo(new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(emptyMedium, 10), 20), 0, null));
+         .undo(new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(currentMedium, 10), 20), 0, null));
    }
 
    /**
@@ -78,6 +86,8 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
    @Test(expected = ReadOnlyMediumException.class)
    public void flush_onReadOnlyMedium_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
+
+      mediumStoreUnderTest.open();
 
       mediumStoreUnderTest.flush();
    }

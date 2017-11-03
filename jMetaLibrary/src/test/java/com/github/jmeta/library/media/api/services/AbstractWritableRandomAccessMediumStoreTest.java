@@ -63,9 +63,7 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    public void replaceData_onClosedMediumStore_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.close();
-
-      mediumStoreUnderTest.replaceData(at(emptyMedium, 10), 20, ByteBuffer.allocate(10));
+      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
    }
 
    /**
@@ -74,6 +72,8 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    @Test(expected = PreconditionUnfullfilledException.class)
    public void replaceData_forInvalidReference_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
+
+      mediumStoreUnderTest.open();
 
       mediumStoreUnderTest.replaceData(at(MediaTestUtility.OTHER_MEDIUM, 10), 20, ByteBuffer.allocate(10));
    }
@@ -85,9 +85,7 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    public void removeData_onClosedMediumStore_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.close();
-
-      mediumStoreUnderTest.removeData(at(emptyMedium, 10), 20);
+      mediumStoreUnderTest.removeData(at(currentMedium, 10), 20);
    }
 
    /**
@@ -96,6 +94,8 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    @Test(expected = PreconditionUnfullfilledException.class)
    public void removeData_forInvalidReference_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
+
+      mediumStoreUnderTest.open();
 
       mediumStoreUnderTest.removeData(at(MediaTestUtility.OTHER_MEDIUM, 10), 20);
    }
@@ -107,9 +107,7 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    public void insertData_onClosedMediumStore_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.close();
-
-      mediumStoreUnderTest.insertData(at(emptyMedium, 10), ByteBuffer.allocate(10));
+      mediumStoreUnderTest.insertData(at(currentMedium, 10), ByteBuffer.allocate(10));
    }
 
    /**
@@ -118,6 +116,8 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    @Test(expected = PreconditionUnfullfilledException.class)
    public void insertData_forInvalidReference_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
+
+      mediumStoreUnderTest.open();
 
       mediumStoreUnderTest.insertData(at(MediaTestUtility.OTHER_MEDIUM, 10), ByteBuffer.allocate(10));
    }
@@ -129,10 +129,8 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    public void undo_onClosedMediumStore_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.close();
-
       mediumStoreUnderTest
-         .undo(new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(emptyMedium, 10), 20), 0, null));
+         .undo(new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(currentMedium, 10), 20), 0, null));
    }
 
    /**
@@ -141,6 +139,8 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    @Test(expected = PreconditionUnfullfilledException.class)
    public void undo_forInvalidReference_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
+
+      mediumStoreUnderTest.open();
 
       mediumStoreUnderTest.undo(new MediumAction(MediumActionType.REMOVE,
          new MediumRegion(at(MediaTestUtility.OTHER_MEDIUM, 10), 20), 0, null));
@@ -152,8 +152,6 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    @Test(expected = MediumStoreClosedException.class)
    public void flush_onClosedMediumStore_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.close();
 
       mediumStoreUnderTest.flush();
    }

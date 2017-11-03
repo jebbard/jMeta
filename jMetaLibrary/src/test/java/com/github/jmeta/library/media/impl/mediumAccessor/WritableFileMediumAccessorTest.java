@@ -37,16 +37,17 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
       .resolve(TEMP_FOLDER_NAME + MediaTestFiles.FIRST_TEST_FILE_NAME);
 
    /**
-    * Tests whether the creation of a new {@link FileMediumAccessor} on an already locked medium.
+    * Tests creation and opening of a new {@link FileMediumAccessor} on an already locked medium.
     */
    @Test(expected = MediumAccessException.class)
    public void createNewFileMediumAccessor_forAlreadyLockedMedium_throwsException() {
 
-      // Make sure the first instance is created
-      getImplementationToTest();
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       // Create second instance on the same medium
-      new FileMediumAccessor(new FileMedium(copiedTestFile, false));
+      new FileMediumAccessor(new FileMedium(copiedTestFile, false)).open();
    }
 
    /**
@@ -101,8 +102,7 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
 
       TEST_FILE_COUNTER++;
 
-      String message = "Could not copy the test file " + MediaTestFiles.FIRST_TEST_FILE_NAME + " to "
-         + copiedTestFile;
+      String message = "Could not copy the test file " + MediaTestFiles.FIRST_TEST_FILE_NAME + " to " + copiedTestFile;
 
       try {
          Files.copy(MediaTestFiles.FIRST_TEST_FILE_PATH, copiedTestFile, StandardCopyOption.REPLACE_EXISTING);

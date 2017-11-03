@@ -58,6 +58,16 @@ public interface MediumStore {
    public boolean isOpened();
 
    /**
+    * Opens this {@link MediumStore} for access. Only once a {@link MediumStore} is opened, all of its methods can be
+    * used, otherwise some will throw a {@link MediumStoreClosedException}. As a precondition, the {@link MediumStore}
+    * must not yet be opened.
+    * 
+    * @throws MediumAccessException
+    *            in case of any problems to perform this operation
+    */
+   public void open();
+
+   /**
     * Closes this {@link MediumStore} and frees any internally held resources such as cached data. Once an
     * {@link MediumStore} is closed, most of its methods cannot be used anymore and will throw a
     * {@link MediumStoreClosedException}.

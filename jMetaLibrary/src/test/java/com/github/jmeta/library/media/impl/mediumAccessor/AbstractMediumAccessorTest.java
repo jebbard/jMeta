@@ -106,9 +106,47 @@ public abstract class AbstractMediumAccessorTest {
    @After
    public void tearDown() {
 
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
       if (mediumAccessor.isOpened()) {
          mediumAccessor.close();
       }
+   }
+
+   /**
+    * Tests {@link MediumAccessor#close()}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void open_onOpenedMediumAccessor_throwsException() {
+
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+      mediumAccessor.open();
+   }
+
+   /**
+    * Tests {@link MediumAccessor#isOpened()}.
+    */
+   @Test
+   public void isOpened_forNewMediumAccessor_returnsFalse() {
+
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      Assert.assertFalse(mediumAccessor.isOpened());
+   }
+
+   /**
+    * Tests {@link MediumAccessor#isOpened()} and {@link MediumAccessor#open()}.
+    */
+   @Test
+   public void isOpened_forOpenedMediumAccessor_returnsTrue() {
+
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
+      Assert.assertTrue(mediumAccessor.isOpened());
    }
 
    /**
@@ -116,6 +154,10 @@ public abstract class AbstractMediumAccessorTest {
     */
    @Test
    public void close_onOpenedMediumAccessor_isOpenedReturnsFalse() {
+
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       mediumAccessor.close();
 
@@ -128,18 +170,13 @@ public abstract class AbstractMediumAccessorTest {
    @Test(expected = PreconditionUnfullfilledException.class)
    public void close_onClosedMediumAccessor_throwsException() {
 
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
       mediumAccessor.close();
       // Close twice
       mediumAccessor.close();
-   }
-
-   /**
-    * Tests {@link MediumAccessor#isOpened()}.
-    */
-   @Test
-   public void isOpened_forNewMediumAccessor_returnsTrue() {
-
-      Assert.assertTrue("IMediumAccessor must be opened", mediumAccessor.isOpened());
    }
 
    /**
@@ -148,7 +185,11 @@ public abstract class AbstractMediumAccessorTest {
    @Test
    public void getMedium_onOpenedMediumAccessor_returnsExpectedMedium() {
 
-      Assert.assertEquals(getExpectedMedium(), getImplementationToTest().getMedium());
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
+      Assert.assertEquals(getExpectedMedium(), mediumAccessor.getMedium());
    }
 
    /**
@@ -158,6 +199,8 @@ public abstract class AbstractMediumAccessorTest {
    public void getMedium_onClosedMediumAccessor_returnsExpectedMedium() {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       mediumAccessor.close();
 
@@ -172,6 +215,8 @@ public abstract class AbstractMediumAccessorTest {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
+      mediumAccessor.open();
+
       Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
       Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
    }
@@ -183,6 +228,8 @@ public abstract class AbstractMediumAccessorTest {
    public void getCurrentPosition_afterReadWithoutEOM_changedByNumberOfReadBytes() {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       int sizeToRead = 10;
       performReadNoEOMExpected(mediumAccessor, new ReadTestData(0, sizeToRead));
@@ -198,6 +245,8 @@ public abstract class AbstractMediumAccessorTest {
    public void getCurrentPosition_afterReadUntilEOM_changedByNumberOfReadBytesUntilEOM() {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       ReadTestData readTestData = getReadTestDataUntilEndOfMedium();
 
@@ -229,6 +278,9 @@ public abstract class AbstractMediumAccessorTest {
       final List<ReadTestData> readTestData = getReadTestDataToUse();
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
       Medium<?> medium = mediumAccessor.getMedium();
 
       long mediumSizeBeforeRead = medium.getCurrentLength();
@@ -253,6 +305,9 @@ public abstract class AbstractMediumAccessorTest {
       ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
       Medium<?> medium = mediumAccessor.getMedium();
 
       Integer readOffset = readOverEndOfMedium.offsetToRead;
@@ -284,6 +339,8 @@ public abstract class AbstractMediumAccessorTest {
    public void read_onClosedMediumAccessor_throwsException() {
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
+      mediumAccessor.open();
+
       mediumAccessor.close();
 
       performReadNoEOMExpected(mediumAccessor, new ReadTestData(0, 5));
@@ -298,6 +355,9 @@ public abstract class AbstractMediumAccessorTest {
       ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
       Medium<?> medium = mediumAccessor.getMedium();
 
       int readOffset = readOverEndOfMedium.offsetToRead;
@@ -324,6 +384,8 @@ public abstract class AbstractMediumAccessorTest {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
+      mediumAccessor.open();
+
       ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
       // The explicit read is only really necessary for stream media, see a similar test case without read for
@@ -341,6 +403,8 @@ public abstract class AbstractMediumAccessorTest {
    @Test(expected = PreconditionUnfullfilledException.class)
    public void isAtEndOfMedium_onClosedMediumAccessor_throwsException() {
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       mediumAccessor.close();
 

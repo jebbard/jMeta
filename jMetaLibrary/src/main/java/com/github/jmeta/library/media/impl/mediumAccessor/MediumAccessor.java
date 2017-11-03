@@ -38,14 +38,21 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  *
  * There should only be one {@link MediumAccessor} per process for the same {@link Medium}, i.e. when multithreading,
  * the same instance must be used by all threads for accessing the same {@link Medium}. This is because the locking
- * mechanism: When writing with two different {@link MediumAccessor} instances to the same {@link Medium}, an
- * exception is likely to occur or one thread will block. The implementations of {@link MediumAccessor} should prohibit
- * creating two instances for the same {@link Medium}.
+ * mechanism: When writing with two different {@link MediumAccessor} instances to the same {@link Medium}, an exception
+ * is likely to occur or one thread will block. The implementations of {@link MediumAccessor} should prohibit creating
+ * two instances for the same {@link Medium}.
  * 
  * @param <T>
  *           The type of {@link Medium}
  */
 public interface MediumAccessor<T extends Medium<?>> {
+
+   /**
+    * Opens this {@link MediumAccessor}. Only {@link #getMedium()}, {@link #getCurrentPosition()} and
+    * {@link #isOpened()} can be used if the {@link MediumAccessor} is closed. If this {@link MediumAccessor} is already
+    * opened, this method throws a {@link PreconditionUnfullfilledException}.
+    */
+   public void open();
 
    /**
     * Returns whether this {@link MediumAccessor} is currently opened or closed. A newly created instance of an
@@ -130,12 +137,12 @@ public interface MediumAccessor<T extends Medium<?>> {
 
    /**
     * Writes bytes to the {@link MediumAccessor} starting at the current position as returned by
-    * {@link #getCurrentPosition()}. This operation must only be called for a writable {@link Medium}, otherwise it
-    * will throw a {@link PreconditionUnfullfilledException}. This operation might block until all bytes are written
+    * {@link #getCurrentPosition()}. This operation must only be called for a writable {@link Medium}, otherwise it will
+    * throw a {@link PreconditionUnfullfilledException}. This operation might block until all bytes are written
     * successfully, possibly forever. The writing {@link Medium} length might extend if the current position plus the
     * remaining size of the written {@link ByteBuffer} is bigger than the current {@link Medium} length. The
-    * {@link Medium} is always only extended by this difference. This method advances the current position of the
-    * medium by the bytes written.
+    * {@link Medium} is always only extended by this difference. This method advances the current position of the medium
+    * by the bytes written.
     * 
     * The contents and properties of the specified {@link ByteBuffer} are not changed except for its position which is
     * increased by the number of bytes written.

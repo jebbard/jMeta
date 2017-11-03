@@ -32,6 +32,8 @@ public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractMediumA
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
+      mediumAccessor.open();
+
       mediumAccessor.write(ByteBuffer.wrap(new byte[1]));
    }
 
@@ -42,6 +44,8 @@ public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractMediumA
    public void truncate_onReadOnlyMedium_throwsException() {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
 
       mediumAccessor.truncate();
    }

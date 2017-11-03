@@ -46,11 +46,19 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 
       this.isOpened = false;
       this.medium = medium;
+      updateCurrentPosition(new StandardMediumReference(getMedium(), 0));
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#open()
+    */
+   @Override
+   public void open() {
+      Reject.ifTrue(isOpened(), "isOpened");
 
       try {
          mediumSpecificOpen();
          isOpened = true;
-         updateCurrentPosition(new StandardMediumReference(getMedium(), 0));
       } catch (IOException e) {
          throw new MediumAccessException("Could not open medium due to exception", e);
       }
