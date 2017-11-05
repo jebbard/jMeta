@@ -20,6 +20,7 @@ import com.github.jmeta.library.media.api.services.AbstractWritableRandomAccessM
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
+import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 
 /**
@@ -51,11 +52,11 @@ public class WritableFileMediumStoreTest extends AbstractWritableRandomAccessMed
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createMediumStoreToTest(com.github.jmeta.library.media.api.types.Medium)
+    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createMediumAccessor(com.github.jmeta.library.media.api.types.Medium)
     */
    @Override
-   protected MediumStore createMediumStoreToTest(FileMedium mediumToUse) {
-      return new StandardMediumStore<>(new FileMediumAccessor(mediumToUse));
+   protected MediumAccessor<FileMedium> createMediumAccessor(FileMedium mediumToUse) {
+      return new FileMediumAccessor(mediumToUse);
    }
 
    /**

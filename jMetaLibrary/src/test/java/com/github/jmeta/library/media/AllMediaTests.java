@@ -13,12 +13,12 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.github.jmeta.library.media.api.types.FileMediumTest;
-import com.github.jmeta.library.media.api.types.MediumEqualityTest;
-import com.github.jmeta.library.media.api.types.MediumReferenceEqualityTest;
 import com.github.jmeta.library.media.api.types.InMemoryMediumTest;
 import com.github.jmeta.library.media.api.types.InputStreamMediumTest;
 import com.github.jmeta.library.media.api.types.MediumActionEqualityTest;
 import com.github.jmeta.library.media.api.types.MediumActionTest;
+import com.github.jmeta.library.media.api.types.MediumEqualityTest;
+import com.github.jmeta.library.media.api.types.MediumReferenceEqualityTest;
 import com.github.jmeta.library.media.api.types.MediumRegionTest;
 import com.github.jmeta.library.media.impl.OLD.BlockWiseFileMediumCacheTest;
 import com.github.jmeta.library.media.impl.OLD.FileMediumCacheTest;
@@ -27,16 +27,22 @@ import com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerTest
 import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactoryTest;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
+import com.github.jmeta.library.media.impl.store.ReadOnlyFileMediumStoreTest;
+import com.github.jmeta.library.media.impl.store.ReadOnlyInMemoryMediumStoreTest;
+import com.github.jmeta.library.media.impl.store.StreamMediumStoreTest;
+import com.github.jmeta.library.media.impl.store.WritableFileMediumStoreTest;
+import com.github.jmeta.library.media.impl.store.WritableInMemoryMediumStoreTest;
 
 /**
  * {@link AllMediaTests} is used for running all test cases of the media component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ BlockWiseFileMediumCacheTest.class, FileMediumCacheTest.class, MediumRegionTest.class,
-   MediumEqualityTest.class, StandardMediumReferenceTest.class, MediumReferenceEqualityTest.class,
-   FileMediumTest.class, InMemoryMediumTest.class, InputStreamMediumTest.class, MediumActionTest.class,
-   MediumActionEqualityTest.class, MediumReferenceFactoryTest.class, MediumChangeManagerTest.class,
-   MediumChangeManagerCreateFlushPlanTest.class, AllMediumAccessorTests.class, })
+   MediumEqualityTest.class, StandardMediumReferenceTest.class, MediumReferenceEqualityTest.class, FileMediumTest.class,
+   InMemoryMediumTest.class, InputStreamMediumTest.class, MediumActionTest.class, MediumActionEqualityTest.class,
+   MediumReferenceFactoryTest.class, MediumChangeManagerTest.class, MediumChangeManagerCreateFlushPlanTest.class,
+   AllMediumAccessorTests.class, ReadOnlyFileMediumStoreTest.class, ReadOnlyInMemoryMediumStoreTest.class,
+   WritableFileMediumStoreTest.class, WritableInMemoryMediumStoreTest.class, StreamMediumStoreTest.class, })
 public class AllMediaTests {
    // Nothing necessary here
 }

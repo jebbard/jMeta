@@ -37,8 +37,27 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
-			<artifactId>jmetadefaultextensions</artifactId>
-			<scope>compile</scope>
+			<artifactId>jmetaAPEv2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaID3v1</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaID3v23</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaLyrics3v2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaMP3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaOGG</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -17,6 +17,7 @@ import com.github.jmeta.library.media.api.services.AbstractReadOnlyMediumStoreTe
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.library.media.impl.mediumAccessor.InputStreamMediumAccessor;
+import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 
 /**
  * {@link StreamMediumStoreTest} tests a {@link MediumStore} backed by {@link InputStreamMedium} instances.
@@ -47,11 +48,11 @@ public class StreamMediumStoreTest extends AbstractReadOnlyMediumStoreTest<Input
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createMediumStoreToTest(com.github.jmeta.library.media.api.types.Medium)
+    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createMediumAccessor(com.github.jmeta.library.media.api.types.Medium)
     */
    @Override
-   protected MediumStore createMediumStoreToTest(InputStreamMedium mediumToUse) {
-      return new StandardMediumStore<>(new InputStreamMediumAccessor(mediumToUse));
+   protected MediumAccessor<InputStreamMedium> createMediumAccessor(InputStreamMedium mediumToUse) {
+      return new InputStreamMediumAccessor(mediumToUse);
    }
 
    /**

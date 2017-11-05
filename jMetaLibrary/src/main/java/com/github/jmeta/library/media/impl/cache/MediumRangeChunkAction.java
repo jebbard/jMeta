@@ -10,8 +10,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * Represents an action to perform for a given chunk of a range within an {@link Medium}. A range is not a formal term,
- * but you can see it as a pre-stage of a {@link MediumRegion}, just referring to an {@link MediumReference} as start
- * of the range and a size in bytes as the size of the range.
+ * but you can see it as a pre-stage of a {@link MediumRegion}, just referring to an {@link MediumReference} as start of
+ * the range and a size in bytes as the size of the range.
  * 
  * It is a frequently occurring task to split an arbitrary range into regular equally-sized chunk and perform arbitrary
  * actions on each chunk. Despite writing the same integer division and modulo as well as looping code over and over
@@ -23,13 +23,15 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  * @param <T>
  *           The return type of {@link MediumRangeChunkAction#perform(MediumReference, int)}
+ * @param <E>
+ *           The type of exception thrown by the action, use RuntimeException if it does not throw anything
  */
 @FunctionalInterface
-public interface MediumRangeChunkAction<T> {
+public interface MediumRangeChunkAction<T, E extends Throwable> {
 
    /**
-    * Performs an arbitrary user-defined action based on the given start {@link MediumReference} and size of the
-    * current chunk. It can have an arbitrary return value which is collected and returned by
+    * Performs an arbitrary user-defined action based on the given start {@link MediumReference} and size of the current
+    * chunk. It can have an arbitrary return value which is collected and returned by
     * {@link #walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)}.
     * 
     * {@link #walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)} calls this method in strict
@@ -37,11 +39,14 @@ public interface MediumRangeChunkAction<T> {
     * 
     * @param chunkStartReference
     *           The start {@link MediumReference} of the current chunk.
-    * @param chunkSize
+    * @param chunkSizeInBytes
     *           The current chunk's size in bytes
     * @return An arbitrary result of the action
+    * 
+    * @throws E
+    *            An arbitrary checked or unchecked exception the action might throw
     */
-   public T perform(MediumReference chunkStartReference, int chunkSize);
+   public T perform(MediumReference chunkStartReference, int chunkSizeInBytes) throws E;
 
    /**
     * Implements the division of a given range into zero to N equally sized chunks of a given fixed chunk size and zero
@@ -56,9 +61,9 @@ public interface MediumRangeChunkAction<T> {
     *           The class of the return value
     * @param rangeStartReference
     *           The start {@link MediumReference} of the range to divide into chunks
-    * @param totalRangeSize
+    * @param totalRangeSizeInBytes
     *           The total size of the range to divide into chunks, must be bigger than 1
-    * @param chunkSize
+    * @param chunkSizeInBytes
     *           The fixed chunk size to use for dividing the range, must be bigger than 1. Might be bigger than the
     *           total range size which results in just one chunk covering the whole range, or it might be smaller than
     *           the total range size, thus more than one chunk covers the range.
@@ -70,28 +75,63 @@ public interface MediumRangeChunkAction<T> {
     *         first element, going on with the second chunk processing result and so on.
     */
    public static <T> List<T> walkDividedRange(Class<T> resultClass, MediumReference rangeStartReference,
-      int totalRangeSize, int chunkSize, MediumRangeChunkAction<T> action) {
+      int totalRangeSizeInBytes, int chunkSizeInBytes, MediumRangeChunkAction<T, RuntimeException> action) {
+      return walkDividedRangeWithException(resultClass, RuntimeException.class, rangeStartReference,
+         totalRangeSizeInBytes, chunkSizeInBytes, action);
+   }
+
+   /**
+    * Behaves the same way as {@link #walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)}, but
+    * supports actions that declare exactly one checked exception of type E that they might throw. If this is needed,
+    * you must use this method and specify the type of exception that might be thrown. If it is thrown, this method just
+    * redeclares it such that it is also thrown to the outside world as soon as it occurs.
+    * 
+    * @param resultClass
+    *           The class of the return value
+    * @param exceptionClass
+    *           This is just a class token to be able to perform actions that might throw a checked exception
+    * @param rangeStartReference
+    *           The start {@link MediumReference} of the range to divide into chunks
+    * @param totalRangeSizeInBytes
+    *           The total size of the range to divide into chunks, must be bigger than 1
+    * @param chunkSizeInBytes
+    *           The fixed chunk size to use for dividing the range, must be bigger than 1. Might be bigger than the
+    *           total range size which results in just one chunk covering the whole range, or it might be smaller than
+    *           the total range size, thus more than one chunk covers the range.
+    * @param action
+    *           The action to perform, the method {@link #perform(MediumReference, int)} is called on this reference,
+    *           which usually is a lambda expression or a method reference.
+    * @return The list of all result values returned by each invocation of the {@link #perform(MediumReference, int)}
+    *         method for each chunk, in strict call sequence, i.e. starting with the first chunk processing result as
+    *         first element, going on with the second chunk processing result and so on.
+    * @throws E
+    *            In case that any of the chunk actions threw such an exception
+    */
+   public static <T, E extends Throwable> List<T> walkDividedRangeWithException(Class<T> resultClass,
+      Class<E> exceptionClass, MediumReference rangeStartReference, int totalRangeSizeInBytes, int chunkSizeInBytes,
+      MediumRangeChunkAction<T, E> action) throws E {
 
       Reject.ifNull(action, "action");
       Reject.ifNull(rangeStartReference, "rangeStartReference");
       Reject.ifNull(resultClass, "resultClass");
-      Reject.ifNegativeOrZero(totalRangeSize, "totalRangeSize");
-      Reject.ifNegativeOrZero(chunkSize, "chunkSize");
+      Reject.ifNull(exceptionClass, "exceptionClass");
+      Reject.ifNegativeOrZero(totalRangeSizeInBytes, "totalRangeSizeInBytes");
+      Reject.ifNegativeOrZero(chunkSizeInBytes, "chunkSizeInBytes");
 
-      int fullChunkCount = totalRangeSize / chunkSize;
+      int fullChunkCount = totalRangeSizeInBytes / chunkSizeInBytes;
 
       ArrayList<T> resultList = new ArrayList<>(fullChunkCount + 1);
 
       MediumReference currentChunkStartReference = rangeStartReference;
 
       for (int chunkIndex = 0; chunkIndex < fullChunkCount; chunkIndex++) {
-         resultList.add(action.perform(currentChunkStartReference, chunkSize));
+         resultList.add(action.perform(currentChunkStartReference, chunkSizeInBytes));
 
-         currentChunkStartReference = currentChunkStartReference.advance(chunkSize);
+         currentChunkStartReference = currentChunkStartReference.advance(chunkSizeInBytes);
       }
 
-      if (totalRangeSize % chunkSize > 0) {
-         resultList.add(action.perform(currentChunkStartReference, totalRangeSize % chunkSize));
+      if (totalRangeSizeInBytes % chunkSizeInBytes > 0) {
+         resultList.add(action.perform(currentChunkStartReference, totalRangeSizeInBytes % chunkSizeInBytes));
       }
 
       return resultList;

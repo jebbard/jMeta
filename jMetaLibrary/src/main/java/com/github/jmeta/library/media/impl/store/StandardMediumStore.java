@@ -10,6 +10,7 @@
 package com.github.jmeta.library.media.impl.store;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
@@ -20,6 +21,7 @@ import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
+import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -37,13 +39,15 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    private boolean isOpened;
 
-   public StandardMediumStore(MediumAccessor<T> mediumAccessor) {
+   public StandardMediumStore(MediumAccessor<T> mediumAccessor, MediumCache cache,
+      MediumReferenceFactory referenceFactory) {
       Reject.ifNull(mediumAccessor, "mediumAccessor");
+      Reject.ifNull(referenceFactory, "referenceFactory");
+      Reject.ifNull(cache, "cache");
 
       this.mediumAccessor = mediumAccessor;
-      T medium = mediumAccessor.getMedium();
-      cache = new MediumCache(medium, medium.getMaxCacheSizeInBytes(), medium.getMaxCacheRegionSizeInBytes());
-      referenceFactory = new MediumReferenceFactory(medium);
+      this.cache = cache;
+      this.referenceFactory = referenceFactory;
 
       isOpened = false;
    }
@@ -122,7 +126,19 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
 
-      cache.addRegion(new MediumRegion(offset, ByteBuffer.allocate(numberOfBytes)));
+      if (getMedium().isCachingEnabled()) {
+
+         long cachedByteCountAt = cache.getCachedByteCountAt(offset);
+
+         if (cachedByteCountAt < numberOfBytes) {
+
+            List<MediumRegion> regionsToAdd = MediumRangeChunkAction.walkDividedRangeWithException(MediumRegion.class,
+               EndOfMediumException.class, offset, numberOfBytes, getMedium().getMaxReadWriteBlockSizeInBytes(),
+               this::readChunk);
+
+            regionsToAdd.forEach(cache::addRegion);
+         }
+      }
    }
 
    /**
@@ -131,7 +147,9 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    @Override
    public long getCachedByteCountAt(MediumReference offset) {
       Reject.ifNull(offset, "offset");
+      ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
       return cache.getCachedByteCountAt(offset);
    }
 
@@ -144,6 +162,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
+      try {
+         mediumAccessor.read(ByteBuffer.allocate(numberOfBytes));
+      } catch (EndOfMediumException e) {
+         throw new RuntimeException("", e);
+      }
 
       return null;
    }
@@ -213,6 +237,25 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
+   }
+
+   /**
+    * Reads a chunk of bytes from the external medium.
+    * 
+    * @param chunkOffset
+    *           The offset of the chunk
+    * @param chunkSizeInBytes
+    *           The size of the chunk
+    * @throws EndOfMediumException
+    */
+   private MediumRegion readChunk(MediumReference chunkOffset, int chunkSizeInBytes) throws EndOfMediumException {
+      ByteBuffer dataRead = ByteBuffer.allocate(chunkSizeInBytes);
+
+      mediumAccessor.setCurrentPosition(chunkOffset);
+
+      mediumAccessor.read(dataRead);
+
+      return new MediumRegion(chunkOffset, dataRead);
    }
 
    /**

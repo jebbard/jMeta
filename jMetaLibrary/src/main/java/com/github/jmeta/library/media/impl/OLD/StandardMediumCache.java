@@ -18,8 +18,8 @@ import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
@@ -55,9 +55,10 @@ public class StandardMediumCache implements MediumCache {
 
       Reject.ifNull(accessor, "accessor");
       Reject.ifNegativeOrZero(maxCacheRegionSize, "maxCacheRegionSize");
-      Reject.ifFalse(accessor.isOpened(), "accessor.isOpened()");
+      Reject.ifTrue(accessor.isOpened(), "accessor.isOpened()");
 
       m_accessor = accessor;
+      accessor.open();
       m_maxCacheRegionSize = maxCacheRegionSize;
    }
 
@@ -149,7 +150,8 @@ public class StandardMediumCache implements MediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#getData(com.github.jmeta.library.media.api.types.MediumReference, int)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#getData(com.github.jmeta.library.media.api.types.MediumReference,
+    *      int)
     */
    @Override
    public synchronized ByteBuffer getData(MediumReference reference, int byteCount) {
@@ -382,7 +384,8 @@ public class StandardMediumCache implements MediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.MediumReference, int)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.MediumReference,
+    *      int)
     */
    @Override
    public MediumAction removeData(MediumReference reference, int byteCountToRemove) {
@@ -392,8 +395,8 @@ public class StandardMediumCache implements MediumCache {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.MediumReference, int,
-    *      java.nio.ByteBuffer)
+    * @see com.github.jmeta.library.media.api.OLD.IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.MediumReference,
+    *      int, java.nio.ByteBuffer)
     */
    @Override
    public MediumAction replaceData(MediumReference reference, int byteCountToReplace, ByteBuffer bytes) {

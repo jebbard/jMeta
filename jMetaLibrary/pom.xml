@@ -16,10 +16,6 @@
 	<!-- ========================== Dependencies ========================== -->
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetautility</artifactId>
 			<scope>compile</scope>
@@ -37,6 +33,14 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
 		</dependency>
 	</dependencies>
 

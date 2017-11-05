@@ -127,15 +127,20 @@ public interface MediumStore {
     * also immediately returns without any action if caching is currently disabled, specifically for non-cacheable
     * media. This method might encounter the end of the {@link Medium} during reading, in which case it throws an
     * {@link EndOfMediumException}. Calling this method might lead to an internal auto-cleanup of the cache if the
-    * maximum configured cache size is exceeded. In this case, the data cached with the very first call to
+    * maximum configured cache size is exceeded. In this case, the data chunks cached with the very first call to
     * {@link #cache(MediumReference, int)} since opening the {@link Medium} is removed from the cache first, then the
-    * data of the second call and so on, until the current cache size plus the number of bytes to newly cache is again
-    * below the maximum cache size. In an extreme case, the number of bytes to cache passed to this method is itself
-    * already exceeding the maximum cache size, which adds only the cache regions with higher offsets to the cache. For
-    * example, if numberOfBytes = maxCacheSize + n, after calling this method, only bytes starting from offset + n until
-    * offset + n + maxCacheSize are actually cached such that the maximum cache size is not exceeded. To avoid this
-    * strange situation, code using this method should ensure a proper configuration of maximum cache size and to pass
-    * sizes that are much smaller than the maximum cache size as parameter to this method.
+    * data chunks of the second call and so on, as much chunks are freed such that the current cache size plus the
+    * number of bytes to newly cache is again below the maximum cache size. Each chunk has a maximum size of
+    * {@link Medium#getMaxCacheRegionSizeInBytes()}. In an extreme case, the number of bytes to cache passed to this
+    * method is itself already exceeding the maximum cache size, which adds only the cache regions with higher offsets
+    * to the cache. For example, if numberOfBytes = maxCacheSize + n, after calling this method, only bytes starting
+    * from offset + n until offset + n + maxCacheSize are actually cached such that the maximum cache size is not
+    * exceeded. To avoid this strange situation, code using this method should ensure a proper configuration of maximum
+    * cache size and to pass sizes that are much smaller than the maximum cache size as parameter to this method.
+    * 
+    * Note that if this method reads bytes from the {@link Medium}, it does so using
+    * {@link Medium#getMaxReadWriteBlockSizeInBytes()} as size. So it might perform multiple accesses to the external
+    * medium, if the given number of bytes exceeds the maximum configured read-write block size for the medium.
     * 
     * For non-random-access media, this method has a specialized behavior: If passing the already described initial
     * checks (data is not yet in the cache and caching is enabled), it compares the given offset with the last position
@@ -151,8 +156,7 @@ public interface MediumStore {
     * {@link #getData(MediumReference, int)}, if it is suitable to work with all the read data right away.
     * 
     * @param offset
-    *           The offset to start caching, must not be beyond the current medium length, must point to the same
-    *           {@link Medium} as this {@link MediumStore}
+    *           The offset to start caching, must point to the same {@link Medium} as this {@link MediumStore}
     * @param numberOfBytes
     *           The number of bytes to cache, must be bigger than zero; caching too much bytes might lead to an
     *           {@link OutOfMemoryError}, so users should ensure to configure a maximum cache size if they need to call
@@ -182,6 +186,8 @@ public interface MediumStore {
     *           is allowed to be behind the current {@link Medium} length
     * @return the number of consecutively cached bytes at the given offset, or 0 if there are no cached bytes at this
     *         offset.
+    * @throws MediumStoreClosedException
+    *            in case this {@link MediumStore} has already been closed
     */
    public long getCachedByteCountAt(MediumReference offset);
 
@@ -214,8 +220,7 @@ public interface MediumStore {
     * read offset, an {@link InvalidMediumReferenceException} is thrown, as with streams, you cannot go back.
     * 
     * @param offset
-    *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}, must not exceed
-    *           the {@link Medium}'s length as returned by {@link Medium#getCurrentLength()}.
+    *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}
     * @param numberOfBytes
     *           The number of bytes to read, must be bigger than 0. If the {@link Medium} is shorter than this range, an
     *           {@link EndOfMediumException} is thrown; getting too much bytes might lead to an {@link OutOfMemoryError}

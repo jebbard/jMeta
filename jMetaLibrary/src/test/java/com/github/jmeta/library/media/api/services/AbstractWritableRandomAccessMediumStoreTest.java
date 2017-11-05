@@ -13,8 +13,11 @@ import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
 import java.nio.ByteBuffer;
 
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
@@ -53,6 +56,62 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
 
       public String buildExpectedContent() {
          return expectedContent;
+      }
+   }
+
+   /**
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    */
+   @Test
+   public void isAtEndOfMedium_forRandomAccessMediumAtEOM_returnsTrue() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
+
+      int endOfMediumOffset = getCurrentMediumContentAsString(currentMedium).length();
+
+      mediumStoreUnderTest.open();
+
+      Assert.assertTrue(mediumStoreUnderTest.isAtEndOfMedium(at(currentMedium, endOfMediumOffset)));
+   }
+
+   /**
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    */
+   @Test
+   public void isAtEndOfMedium_forRandomAccessMediumBeforeEOM_returnsFalse() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
+
+      int endOfMediumOffset = getCurrentMediumContentAsString(currentMedium).length();
+
+      mediumStoreUnderTest.open();
+
+      Assert.assertFalse(mediumStoreUnderTest.isAtEndOfMedium(at(currentMedium, endOfMediumOffset / 2)));
+   }
+
+   /**
+    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    */
+   @Test
+   public void cache_forRandomAccessMediumFromOffsetuntilEOM_throwsEndOfMediumException() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      Assume.assumeNotNull(mediumStoreUnderTest);
+
+      int mediumSizeInBytes = getCurrentMediumContentAsString(currentMedium).length();
+
+      mediumStoreUnderTest.open();
+
+      MediumReference cacheReference = at(currentMedium, 59);
+
+      try {
+         mediumStoreUnderTest.cache(cacheReference, mediumSizeInBytes + 100);
+
+         Assert.fail("Expected end of medium exception, but it did not occur!");
+      }
+
+      catch (EndOfMediumException e) {
+         Assert.assertEquals(cacheReference, e.getMediumReference());
+         Assert.assertEquals(mediumSizeInBytes + 100, e.getByteCountTriedToRead());
+         Assert.assertEquals(mediumSizeInBytes - cacheReference.getAbsoluteMediumOffset(), e.getBytesReallyRead());
       }
    }
 

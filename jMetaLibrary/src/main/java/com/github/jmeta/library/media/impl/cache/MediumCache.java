@@ -42,8 +42,8 @@ public class MediumCache {
    private final int maximumCacheRegionSizeInBytes;
    private final Medium<?> medium;
 
-   private static final Comparator<MediumReference> OFFSET_ORDER_ASCENDING_COMPARATOR = (leftRef,
-      rightRef) -> new Long(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset());
+   private static final Comparator<MediumReference> OFFSET_ORDER_ASCENDING_COMPARATOR = (leftRef, rightRef) -> Long
+      .valueOf(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset());
 
    private final TreeMap<MediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(
       OFFSET_ORDER_ASCENDING_COMPARATOR);
@@ -148,8 +148,8 @@ public class MediumCache {
     * </ul>
     * 
     * @param startReference
-    *           The starting {@link MediumReference} of the range. Must refer to the same {@link Medium} as returned
-    *           by {@link #getMedium()}.
+    *           The starting {@link MediumReference} of the range. Must refer to the same {@link Medium} as returned by
+    *           {@link #getMedium()}.
     * @param rangeSizeInBytes
     *           The size of the range in bytes. Must not be negative and must not be zero.
     * @return {@link MediumRegion}s covering the whole range specified as input parameters. For details see the method
@@ -224,15 +224,15 @@ public class MediumCache {
    }
 
    /**
-    * Returns the number of consecutively cached bytes starting the the given start {@link MediumReference}. If there
-    * is no cached byte at the given start reference, returns 0L. THe methods stops at the first non cached byte behind
+    * Returns the number of consecutively cached bytes starting the the given start {@link MediumReference}. If there is
+    * no cached byte at the given start reference, returns 0L. THe methods stops at the first non cached byte behind
     * start reference, so whenever the first gap is detected.
     * 
     * @param startReference
     *           The starting {@link MediumReference}. Must refer to the same {@link Medium} as returned by
     *           {@link #getMedium()}.
-    * @return the number of consecutively cached bytes starting the the given start {@link MediumReference}. For
-    *         details see the method description above.
+    * @return the number of consecutively cached bytes starting the the given start {@link MediumReference}. For details
+    *         see the method description above.
     */
    public long getCachedByteCountAt(MediumReference startReference) {
 
@@ -359,8 +359,7 @@ public class MediumCache {
          int gapSizeInBytes = (int) currentRegionStartReference.distanceTo(previousRegionEndReference);
 
          gapRegions.addAll(MediumRangeChunkAction.walkDividedRange(MediumRegion.class, previousRegionEndReference,
-            gapSizeInBytes, getMaximumCacheRegionSizeInBytes(),
-            (chunkStartReference, chunkSize) -> new MediumRegion(chunkStartReference, chunkSize)));
+            gapSizeInBytes, getMaximumCacheRegionSizeInBytes(), MediumRegion::new));
       }
 
       return gapRegions;
