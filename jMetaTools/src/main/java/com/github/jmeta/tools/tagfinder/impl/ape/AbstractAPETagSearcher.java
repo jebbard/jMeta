@@ -8,13 +8,11 @@ import java.nio.ByteOrder;
 
 import com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher;
 
-public abstract class AbstractAPETagSearcher
-   extends AbstractMagicKeyTagSearcher {
+public abstract class AbstractAPETagSearcher extends AbstractMagicKeyTagSearcher {
 
    private static final int APE_TAG_HEADER_SIZE = 32;
 
-   public AbstractAPETagSearcher(byte[] magicKey, long[] possibleOffsets,
-      String tagName) {
+   public AbstractAPETagSearcher(byte[] magicKey, long[] possibleOffsets, String tagName) {
       super(magicKey, possibleOffsets, tagName);
    }
 
@@ -22,28 +20,25 @@ public abstract class AbstractAPETagSearcher
     * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getAdditionalInfo(java.nio.ByteBuffer)
     */
    @Override
-   protected String[] getAdditionalInfo(ByteBuffer tagBytes)
-      throws IOException {
+   protected String[] getAdditionalInfo(ByteBuffer tagBytes) throws IOException {
 
       APETagHeaderInfo info = getTagHeaderInfo(tagBytes);
 
       String itemCount = "Item Count: " + info.getItemCount();
       String isReadOnly = "Is Read Only: " + ((info.getFlags()[0] & 0x01) != 0);
-      String isTheHeader = "This is the header: "
-         + ((info.getFlags()[3] & 32) != 0);
+      String isTheHeader = "This is the header: " + ((info.getFlags()[3] & 32) != 0);
       String hasFooter = "Has footer: " + ((info.getFlags()[3] & 64) != 1);
       String hasHeader = "Has header: " + ((info.getFlags()[3] & 128) != 0);
 
-      return new String[] { itemCount, isReadOnly, isTheHeader, hasHeader,
-         hasFooter };
+      return new String[] { itemCount, isReadOnly, isTheHeader, hasHeader, hasFooter };
    }
 
    /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile, long)
+    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile,
+    *      long)
     */
    @Override
-   protected int getTotalTagSize(RandomAccessFile file, long possibleOffset)
-      throws IOException {
+   protected int getTotalTagSize(RandomAccessFile file, long possibleOffset) throws IOException {
 
       ByteBuffer bb = ByteBuffer.allocate(APE_TAG_HEADER_SIZE);
 
@@ -61,10 +56,6 @@ public abstract class AbstractAPETagSearcher
       return -tagSize + APE_TAG_HEADER_SIZE;
    }
 
-   /**
-    * @param bb
-    * @return
-    */
    private APETagHeaderInfo getTagHeaderInfo(ByteBuffer bb) {
 
       bb.rewind();

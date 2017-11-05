@@ -1,6 +1,6 @@
 /**
  *
- * {@link ID3v22TagSearcher}.java
+ * {@link ID3v24TailTagSearcher}.java
  *
  * @author jebert
  *
@@ -17,18 +17,13 @@ import java.nio.ByteBuffer;
 public class ID3v24TagSearcher extends ID3v23TagSearcher {
 
    /**
-    * Creates a new {@ID3v22TagSearcher}.
-    * 
-    * @param magicKey
-    * @param possibleOffsets
-    * @param tagName
+    * Creates a new {@link ID3v22TagSearcher}.
     */
    public ID3v24TagSearcher() {
       super(new byte[] { 'I', 'D', '3', 4, 0 }, new long[] { 0 }, "ID3v2.4");
    }
 
-   public ID3v24TagSearcher(byte[] magicKey, long[] possibleOffsets,
-      String tagName) {
+   public ID3v24TagSearcher(byte[] magicKey, long[] possibleOffsets, String tagName) {
       super(magicKey, possibleOffsets, tagName);
    }
 
@@ -42,8 +37,7 @@ public class ID3v24TagSearcher extends ID3v23TagSearcher {
 
       String[] additionalInfo = super.getAdditionalInfo(tagBytes);
 
-      String footer = "Has footer: "
-         + ((info.getFlags() & MASK_FOURTH_BIT) != 0);
+      String footer = "Has footer: " + ((info.getFlags() & MASK_FOURTH_BIT) != 0);
 
       String[] returnedInfo = new String[1 + additionalInfo.length];
 
@@ -57,24 +51,18 @@ public class ID3v24TagSearcher extends ID3v23TagSearcher {
 
    protected String getFlagSummary(ID3v2FrameInfo frameInfo) {
 
-      final boolean isTagAlterPreservation = (frameInfo.getFlags()[0]
-         & MASK_FIRST_BIT) != 0;
-      final boolean isFileAlterPreservation = (frameInfo.getFlags()[0]
-         & MASK_SECOND_BIT) != 0;
-      final boolean isReadOnly = (frameInfo.getFlags()[0]
-         & MASK_THIRD_BIT) != 0;
-      final boolean isCompressed = (frameInfo.getFlags()[1]
-         & MASK_SECOND_BIT) != 0;
+      final boolean isTagAlterPreservation = (frameInfo.getFlags()[0] & MASK_FIRST_BIT) != 0;
+      final boolean isFileAlterPreservation = (frameInfo.getFlags()[0] & MASK_SECOND_BIT) != 0;
+      final boolean isReadOnly = (frameInfo.getFlags()[0] & MASK_THIRD_BIT) != 0;
+      final boolean isCompressed = (frameInfo.getFlags()[1] & MASK_SECOND_BIT) != 0;
       final boolean isGrouped = (frameInfo.getFlags()[1] & 8) != 0;
       final boolean isEncrypted = (frameInfo.getFlags()[1] & 4) != 0;
       final boolean isUnsynchronised = (frameInfo.getFlags()[1] & 2) != 0;
       final boolean hasDataLengthIndicator = (frameInfo.getFlags()[1] & 1) != 0;
 
-      return ", Flags: (tag alter preservation = " + isTagAlterPreservation
-         + "; file alter preservation = " + isFileAlterPreservation
-         + "; read-only = " + isReadOnly + "; compressed = " + isCompressed
-         + "; encrypted = " + isEncrypted + "; grouped = " + isGrouped
-         + "; unsynchronised = " + isUnsynchronised
+      return ", Flags: (tag alter preservation = " + isTagAlterPreservation + "; file alter preservation = "
+         + isFileAlterPreservation + "; read-only = " + isReadOnly + "; compressed = " + isCompressed + "; encrypted = "
+         + isEncrypted + "; grouped = " + isGrouped + "; unsynchronised = " + isUnsynchronised
          + "; data length indicator = " + hasDataLengthIndicator + ")";
    }
 }

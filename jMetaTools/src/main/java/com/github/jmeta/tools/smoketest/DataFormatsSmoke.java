@@ -31,6 +31,26 @@ import com.github.jmeta.library.startup.api.services.LibraryJMeta;
  */
 public class DataFormatsSmoke {
 
+   private final static Map<File, DataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, DataFormat>();
+
+   static {
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"), ID3v23Extension.ID3v23);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_01.txt"), OggExtension.OGG);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_FILE_02.txt"), OggExtension.OGG);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_02.txt"), OggExtension.OGG);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_03.txt"), OggExtension.OGG);
+      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_04.txt"), OggExtension.OGG);
+   }
+
+   private static Logger PRIVATE_LOGGER;
+
+   private LibraryJMeta m_context;
+
    /**
     * Program entry point.
     *
@@ -76,9 +96,6 @@ public class DataFormatsSmoke {
       }
    }
 
-   /**
-    * @param m_context
-    */
    private void configureDataFormats() {
 
       DataFormatRepository repo = m_context.getDataFormatRepository();
@@ -149,24 +166,4 @@ public class DataFormatsSmoke {
          PRIVATE_LOGGER.info(prependWith + "Read Field: " + nextField);
       }
    }
-
-   private final static Map<File, DataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, DataFormat>();
-
-   static {
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"), ID3v23Extension.ID3v23);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_01.txt"), OggExtension.OGG);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_FILE_02.txt"), OggExtension.OGG);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_02.txt"), OggExtension.OGG);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_03.txt"), OggExtension.OGG);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_04.txt"), OggExtension.OGG);
-   }
-
-   private static Logger PRIVATE_LOGGER;
-
-   private LibraryJMeta m_context;
 }

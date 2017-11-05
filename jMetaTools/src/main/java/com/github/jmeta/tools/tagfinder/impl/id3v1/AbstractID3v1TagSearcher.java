@@ -6,16 +6,14 @@ import java.io.RandomAccessFile;
 import com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher;
 import com.github.jmeta.tools.tagfinder.api.types.TagInfo;
 
-public abstract class AbstractID3v1TagSearcher
-   extends AbstractMagicKeyTagSearcher {
+public abstract class AbstractID3v1TagSearcher extends AbstractMagicKeyTagSearcher {
 
    private static final int COMMENT_NULL_BYTE_OFFSET = 125;
 
    public static final int ID3V1_TAG_SIZE = 128;
 
    public AbstractID3v1TagSearcher(String tagName) {
-      super(new byte[] { 'T', 'A', 'G' }, new long[] { -ID3V1_TAG_SIZE },
-         tagName);
+      super(new byte[] { 'T', 'A', 'G' }, new long[] { -ID3V1_TAG_SIZE }, tagName);
    }
 
    /**
@@ -38,13 +36,11 @@ public abstract class AbstractID3v1TagSearcher
       return tagInfo;
    }
 
-   /**
-    * @param idBytes
-    */
    protected abstract boolean isTagPresent(byte[] idBytes);
 
    /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile, long)
+    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile,
+    *      long)
     */
    @Override
    protected int getTotalTagSize(RandomAccessFile file, long possibleOffset) {

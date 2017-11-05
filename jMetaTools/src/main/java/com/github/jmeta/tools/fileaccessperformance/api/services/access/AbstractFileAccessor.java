@@ -1,6 +1,6 @@
 /**
  *
- * {@link AbstractFileAccessTest}.java
+ * {@link AbstractFileAccessor}.java
  *
  * @author Jens Ebert
  *
@@ -20,6 +20,18 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractFileAccessor} implements the basic file access test performed.
  */
 public abstract class AbstractFileAccessor implements MeasuredCommand {
+
+   private final long m_initialLength;
+
+   private final File m_file;
+
+   private final byte[] m_bytesToWrite;
+
+   private final int m_bytesToRead;
+
+   private final int m_bytesAtEnd;
+
+   private final boolean m_deleteFileAfterClose;
 
    /**
     * Creates a new {@link AbstractFileAccessor}.
@@ -50,7 +62,7 @@ public abstract class AbstractFileAccessor implements MeasuredCommand {
    }
 
    /**
-    * @see com.github.jmeta.tools.benchmark.api.types.common.time.MeasuredCommand#getUniqueName()
+    * @see com.github.jmeta.tools.benchmark.api.types.MeasuredCommand#getUniqueName()
     */
    @Override
    public String getUniqueName() {
@@ -69,7 +81,7 @@ public abstract class AbstractFileAccessor implements MeasuredCommand {
    }
 
    /**
-    * @see com.github.jmeta.tools.benchmark.api.types.common.design.Command#execute()
+    * @see com.github.jmeta.tools.benchmark.api.types.Command#execute()
     */
    public void execute() {
 
@@ -145,16 +157,4 @@ public abstract class AbstractFileAccessor implements MeasuredCommand {
     *            whenever an I/O operation failed.
     */
    protected abstract void write(long offset, byte[] bytesToWrite) throws IOException;
-
-   private final long m_initialLength;
-
-   private final File m_file;
-
-   private final byte[] m_bytesToWrite;
-
-   private final int m_bytesToRead;
-
-   private final int m_bytesAtEnd;
-
-   private final boolean m_deleteFileAfterClose;
 }

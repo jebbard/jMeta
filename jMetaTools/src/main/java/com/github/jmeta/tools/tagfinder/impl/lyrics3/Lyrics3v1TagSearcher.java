@@ -19,19 +19,15 @@ import com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher
 public class Lyrics3v1TagSearcher extends AbstractMagicKeyTagSearcher {
 
    /**
-    * Creates a new {@Lyrics3v1TagSearcher}.
-    * 
-    * @param magicKey
-    * @param possibleOffsets
-    * @param tagName
+    * Creates a new {@link Lyrics3v1TagSearcher}.
     */
    public Lyrics3v1TagSearcher() {
-      super(new byte[] { 'L', 'Y', 'R', 'I', 'C', 'S', 'E', 'N', 'D' },
-         new long[] { -137 }, "Lyrics3v1");
+      super(new byte[] { 'L', 'Y', 'R', 'I', 'C', 'S', 'E', 'N', 'D' }, new long[] { -137 }, "Lyrics3v1");
    }
 
    /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile, long)
+    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile,
+    *      long)
     */
    @Override
    protected int getTotalTagSize(RandomAccessFile file, long possibleOffset) {

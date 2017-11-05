@@ -52,8 +52,48 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class TagFinder {
 
+   private final Map<String, Integer> m_foundTagCounts = new LinkedHashMap<String, Integer>();
+
+   private final File m_targetTagFolder;
+
+   private long m_previousRunStartTime;
+
+   private final Set<File> m_rootFolders;
+
+   private String[] m_fileExtensions;
+
+   private static final String COLUMN_SPACE = "    ";
+
+   private static final ITagSearcher[] TAG_SEARCH_LIST = new ITagSearcher[] { new ID3v1TagSearcher(),
+   new ID3v11TagSearcher(), new ID3v1EnhancedTagSearcher(), new APEv1TagSearcher(), new APEv2TagSearcher(),
+   new ID3v23TagSearcher(), new ID3v22TagSearcher(), new ID3v24TagSearcher(), new ID3v24TailTagSearcher(),
+   new Lyrics3v1TagSearcher(), new Lyrics3v2TagSearcher(), };
+
+   private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+   private static final String FILE_EXTENSION_SEPARATOR = "\\.";
+
+   private static final String TAG_FINDER_LOG_MARK = "#############################################";
+
+   private static final String ARGUMENT_SEPARATOR = ";";
+
+   private static final String ANY_WILDCARD = "?";
+
+   private static final int EXPECTED_ARG_COUNT = 3;
+
+   private final Logger m_logger;
+
+   private static final String PATH_SEPARATOR = System.getProperty("file.separator");
+
+   private static final int MILLIS_TO_HOURS = 3600000;
+
+   private static final int MILLIS_TO_MINUTES = 60000;
+
+   private static final int MILLIS_TO_SECONDS = 1000;
+
    /**
     * @param args
+    *           the arguments
     */
    public static void main(String[] args) {
 
@@ -71,6 +111,16 @@ public class TagFinder {
       finder.runTagFinding();
    }
 
+   /**
+    * Creates a new {@link TagFinder}.
+    * 
+    * @param rootFolders
+    *           The root folders to search
+    * @param fileExtensions
+    *           The file extensions to accept
+    * @param targetTagFolder
+    *           The target folder to store found tags
+    */
    public TagFinder(String[] rootFolders, String[] fileExtensions, File targetTagFolder) {
       Reject.ifNull(fileExtensions, "fileExtensions");
       Reject.ifNull(rootFolders, "rootFolder");
@@ -124,6 +174,7 @@ public class TagFinder {
    }
 
    /**
+    * Runs the finding routines for tags.
     */
    public void runTagFinding() {
 
@@ -238,9 +289,6 @@ public class TagFinder {
       return totalTagCount;
    }
 
-   /**
-    * @param fileExtensions
-    */
    private void printIntroMessage(String[] fileExtensions) {
 
       m_logger.info(TAG_FINDER_LOG_MARK);
@@ -257,10 +305,6 @@ public class TagFinder {
       m_logger.info(TAG_FINDER_LOG_MARK);
    }
 
-   /**
-    * @param fileList
-    * @return
-    */
    private int printTagSearching(List<File> fileList) {
 
       int totalTagCount = 0;
@@ -285,11 +329,6 @@ public class TagFinder {
       return totalTagCount;
    }
 
-   /**
-    * @param fileExtensions
-    * @param fileList
-    * @param totalTagCount
-    */
    private void printOutroMessage(String[] fileExtensions, List<File> fileList, int totalTagCount) {
 
       m_logger.info(LINE_SEPARATOR);
@@ -365,43 +404,4 @@ public class TagFinder {
          throw new IllegalStateException("Unexpected IO exception: " + e, e);
       }
    }
-
-   private final Map<String, Integer> m_foundTagCounts = new LinkedHashMap<String, Integer>();
-
-   private final File m_targetTagFolder;
-
-   private long m_previousRunStartTime;
-
-   private final Set<File> m_rootFolders;
-
-   private String[] m_fileExtensions;
-
-   private static final String COLUMN_SPACE = "    ";
-
-   private static final ITagSearcher[] TAG_SEARCH_LIST = new ITagSearcher[] { new ID3v1TagSearcher(),
-      new ID3v11TagSearcher(), new ID3v1EnhancedTagSearcher(), new APEv1TagSearcher(), new APEv2TagSearcher(),
-      new ID3v23TagSearcher(), new ID3v22TagSearcher(), new ID3v24TagSearcher(), new ID3v24TailTagSearcher(),
-      new Lyrics3v1TagSearcher(), new Lyrics3v2TagSearcher(), };
-
-   private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
-   private static final String FILE_EXTENSION_SEPARATOR = "\\.";
-
-   private static final String TAG_FINDER_LOG_MARK = "#############################################";
-
-   private static final String ARGUMENT_SEPARATOR = ";";
-
-   private static final String ANY_WILDCARD = "?";
-
-   private static final int EXPECTED_ARG_COUNT = 3;
-
-   private final Logger m_logger;
-
-   private static final String PATH_SEPARATOR = System.getProperty("file.separator");
-
-   private static final int MILLIS_TO_HOURS = 3600000;
-
-   private static final int MILLIS_TO_MINUTES = 60000;
-
-   private static final int MILLIS_TO_SECONDS = 1000;
 }

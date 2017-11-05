@@ -19,11 +19,7 @@ import java.util.List;
 public class ID3v22TagSearcher extends AbstractID3v2TagSearcher {
 
    /**
-    * Creates a new {@ID3v22TagSearcher}.
-    * 
-    * @param magicKey
-    * @param possibleOffsets
-    * @param tagName
+    * Creates a new {@link ID3v22TagSearcher}.
     */
    public ID3v22TagSearcher() {
       super(new byte[] { 'I', 'D', '3', 2, 0 }, new long[] { 0 }, "ID3v2.2");
@@ -85,7 +81,6 @@ public class ID3v22TagSearcher extends AbstractID3v2TagSearcher {
          size[i + 1] = tagBytes.get();
       }
 
-      return new ID3v2FrameInfo(idBytes, ByteBuffer.wrap(size).getInt(),
-         new byte[] {});
+      return new ID3v2FrameInfo(idBytes, ByteBuffer.wrap(size).getInt(), new byte[] {});
    }
 }

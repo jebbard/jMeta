@@ -252,41 +252,9 @@
 					<debug>true</debug>
 					<verbose>true</verbose>
 					<show>private</show>
-
 					<!-- NOTE: Inheriting projects only need to add the <subpackages> tag 
 						here to enable javadoc generation for the given packages. All other configurations 
 						can be skipped. -->
-
-					<tagletArtifact>
-						<groupId>de.je.util.docs</groupId>
-						<artifactId>PrePostJavadoc</artifactId>
-						<version>1.0-SNAPSHOT</version>
-					</tagletArtifact>
-					<taglets>
-						<taglet>
-							<tagletClass>de.je.util.docs.taglet.PreTaglet</tagletClass>
-						</taglet>
-						<taglet>
-							<tagletClass>de.je.util.docs.taglet.PostTaglet</tagletClass>
-						</taglet>
-					</taglets>
-					<tags>
-						<tag>
-							<name>params</name>
-						</tag>
-						<tag>
-							<name>pre</name>
-						</tag>
-						<tag>
-							<name>post</name>
-						</tag>
-						<tag>
-							<name>return</name>
-						</tag>
-						<tag>
-							<name>throws</name>
-						</tag>
-					</tags>
 				</configuration>
 			</plugin>
 		</plugins>

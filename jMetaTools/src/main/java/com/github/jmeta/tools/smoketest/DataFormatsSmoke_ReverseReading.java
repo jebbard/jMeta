@@ -81,9 +81,6 @@ public class DataFormatsSmoke_ReverseReading {
       }
    }
 
-   /**
-    * @param m_context
-    */
    private void configureDataFormats() {
 
       DataFormatRepository repo = m_context.getDataFormatRepository();

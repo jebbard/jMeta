@@ -1,6 +1,6 @@
 /**
  *
- * {@link ID3v2FrameProperties}.java
+ * {@link ID3v2FrameInfo}.java
  *
  * @author Jens Ebert
  *
@@ -14,10 +14,16 @@ import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link ID3v2FrameProperties}
+ * {@link ID3v2FrameInfo}
  *
  */
 public class ID3v2FrameInfo {
+
+   private final String m_id;
+
+   private final int m_size;
+
+   private final byte[] m_flags;
 
    public ID3v2FrameInfo(byte[] idBytes, int size, byte[] flags) {
       Reject.ifNull(idBytes, "idBytes");
@@ -70,10 +76,4 @@ public class ID3v2FrameInfo {
 
       return getId() + " - actual size: " + getSize();
    }
-
-   private final String m_id;
-
-   private final int m_size;
-
-   private final byte[] m_flags;
 }

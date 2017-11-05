@@ -25,8 +25,23 @@ import com.github.jmeta.utility.namedio.api.services.NamedWriter;
  */
 public class ResultsWriter {
 
+   private CsvWriter m_csvWriter;
+
+   private static final String OS_PLATFORM_INFO = System.getProperty("os.name") + " " + System.getProperty("os.version")
+      + " on " + System.getProperty("os.arch");
+
+   private static final String JAVA_VERSION_INFO = System.getProperty("java.version") + " by "
+      + System.getProperty("java.vendor") + " at " + System.getProperty("java.home");
+
+   private static final String CSV_FILE_NAME = "results.csv";
+
+   private static final Object[] FILE_HEADING = new String[] { "Measurement session name", "Session id", "Machine",
+      "Java version", "OS and platform", "Time of execution start", "Time of execution end", "Total duration",
+      "Duration unit", "Accessor name", "Orig. file path", "Orig. file name", "Orig. file size [byte]",
+      "No. of bytes read", "No. of bytes written", "No. of unchanged bytes at EOF" };
+
    /**
-    * Creates a new {@ResultsWriter}.
+    * Creates a new {@link ResultsWriter}.
     *
     * @param resultDir
     *           the directory the performance test results are stored.
@@ -40,14 +55,12 @@ public class ResultsWriter {
 
       if (!appendMode) {
          if (!csvFile.createNewFile())
-            throw new RuntimeException(
-               "Unable to create CSV file <" + csvFile + ">");
+            throw new RuntimeException("Unable to create CSV file <" + csvFile + ">");
       }
 
       m_csvWriter = new CsvWriter(FILE_HEADING.length);
 
-      m_csvWriter.setNewResource(NamedWriter.createFromFile(csvFile,
-         Charsets.CHARSET_ASCII, appendMode));
+      m_csvWriter.setNewResource(NamedWriter.createFromFile(csvFile, Charsets.CHARSET_ASCII, appendMode));
 
       // Write header only for newly created files
       if (!appendMode)
@@ -76,18 +89,15 @@ public class ResultsWriter {
     * @throws IOException
     *            in case writing fails
     */
-   public void writeResults(MeasuredCommand command, File testFile,
-      long bytesToRead, long bytesToWrite, long bytesAtEnd,
-      MeasurementSession session, MeasuredCommandExecution execution,
-      String machineString) throws IOException {
+   public void writeResults(MeasuredCommand command, File testFile, long bytesToRead, long bytesToWrite,
+      long bytesAtEnd, MeasurementSession session, MeasuredCommandExecution execution, String machineString)
+      throws IOException {
 
-      Object[] record = new Object[] { session.getClass().getSimpleName(),
-         session.getSessionId(), machineString, JAVA_VERSION_INFO,
-         OS_PLATFORM_INFO, execution.getStartTime(), execution.getStopTime(),
-         execution.getStopTime() - execution.getStartTime(),
-         session.getTimeProvider().getUnit(), command.getUniqueName(),
-         testFile.getParentFile().getAbsolutePath(), testFile.getName(),
-         testFile.length(), bytesToRead, bytesToWrite, bytesAtEnd, };
+      Object[] record = new Object[] { session.getClass().getSimpleName(), session.getSessionId(), machineString,
+         JAVA_VERSION_INFO, OS_PLATFORM_INFO, execution.getStartTime(), execution.getStopTime(),
+         execution.getStopTime() - execution.getStartTime(), session.getTimeProvider().getUnit(),
+         command.getUniqueName(), testFile.getParentFile().getAbsolutePath(), testFile.getName(), testFile.length(),
+         bytesToRead, bytesToWrite, bytesAtEnd, };
 
       m_csvWriter.writeNextRow(record);
    }
@@ -112,23 +122,4 @@ public class ResultsWriter {
 
       return m_csvWriter.getCurrentCsvResource().getName();
    }
-
-   private CsvWriter m_csvWriter;
-
-   private static final String OS_PLATFORM_INFO = System.getProperty("os.name")
-      + " " + System.getProperty("os.version") + " on "
-      + System.getProperty("os.arch");
-
-   private static final String JAVA_VERSION_INFO = System
-      .getProperty("java.version") + " by " + System.getProperty("java.vendor")
-      + " at " + System.getProperty("java.home");
-
-   private static final String CSV_FILE_NAME = "results.csv";
-
-   private static final Object[] FILE_HEADING = new String[] {
-      "Measurement session name", "Session id", "Machine", "Java version",
-      "OS and platform", "Time of execution start", "Time of execution end",
-      "Total duration", "Duration unit", "Accessor name", "Orig. file path",
-      "Orig. file name", "Orig. file size [byte]", "No. of bytes read",
-      "No. of bytes written", "No. of unchanged bytes at EOF" };
 }

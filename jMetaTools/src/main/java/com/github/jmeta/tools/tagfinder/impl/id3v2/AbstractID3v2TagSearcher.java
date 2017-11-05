@@ -10,6 +10,7 @@ import com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher
 
 public abstract class AbstractID3v2TagSearcher extends AbstractMagicKeyTagSearcher {
 
+   private static final int FROM_CONVERSION_MASK = 0x7F000000;
    protected static final int ID3V2_TAG_HEADER_SIZE = 10;
 
    public AbstractID3v2TagSearcher(byte[] magicKey, long[] possibleOffsets, String tagName) {
@@ -32,10 +33,6 @@ public abstract class AbstractID3v2TagSearcher extends AbstractMagicKeyTagSearch
       return info.getTagSize();
    }
 
-   /**
-    * @param bb
-    * @return
-    */
    protected ID3v2TagHeaderInfo getTagHeaderInfo(ByteBuffer bb) {
 
       bb.rewind();
@@ -70,6 +67,4 @@ public abstract class AbstractID3v2TagSearcher extends AbstractMagicKeyTagSearch
 
       return usualInteger;
    }
-
-   private static final int FROM_CONVERSION_MASK = 0x7F000000;
 }

@@ -1,6 +1,6 @@
 /**
  *
- * {@link APEv2TagSearcher}.java
+ * {@link APEv1TagSearcher}.java
  *
  * @author jebert
  *
@@ -15,15 +15,11 @@ package com.github.jmeta.tools.tagfinder.impl.ape;
 public class APEv1TagSearcher extends AbstractAPETagSearcher {
 
    /**
-    * Creates a new {@APEv2TagSearcher}.
-    * 
-    * @param magicKey
-    * @param possibleOffsets
-    * @param tagName
+    * Creates a new {@link APEv1TagSearcher}.
     */
    public APEv1TagSearcher() {
-      super(new byte[] { 'A', 'P', 'E', 'T', 'A', 'G', 'E', 'X', (byte) 0xE8,
-         (byte) 0x03, 0, 0 }, new long[] { -32, -160 }, "APEv1");
+      super(new byte[] { 'A', 'P', 'E', 'T', 'A', 'G', 'E', 'X', (byte) 0xE8, (byte) 0x03, 0, 0 },
+         new long[] { -32, -160 }, "APEv1");
    }
 
 }

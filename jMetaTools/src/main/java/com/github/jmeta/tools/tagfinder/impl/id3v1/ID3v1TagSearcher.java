@@ -15,11 +15,7 @@ package com.github.jmeta.tools.tagfinder.impl.id3v1;
 public class ID3v1TagSearcher extends AbstractID3v1TagSearcher {
 
    /**
-    * Creates a new {@ID3v1TagSearcher}.
-    * 
-    * @param magicKey
-    * @param possibleOffsets
-    * @param tagName
+    * Creates a new {@link ID3v1TagSearcher}.
     */
    public ID3v1TagSearcher() {
       super("ID3v1");

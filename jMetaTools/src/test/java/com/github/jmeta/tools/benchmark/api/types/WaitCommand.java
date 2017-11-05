@@ -1,7 +1,5 @@
 package com.github.jmeta.tools.benchmark.api.types;
 
-import com.github.jmeta.tools.benchmark.api.types.MeasuredCommand;
-
 /**
  * {@link WaitCommand} waits for a given time period.
  */
@@ -27,7 +25,7 @@ public class WaitCommand implements MeasuredCommand {
    }
 
    /**
-    * @see com.github.jmeta.tools.benchmark.api.types.design.Command#execute()
+    * @see com.github.jmeta.tools.benchmark.api.types.Command#execute()
     */
    @Override
    public void execute() {

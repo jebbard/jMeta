@@ -35,11 +35,7 @@ public class ID3v23TagSearcher extends AbstractID3v2TagSearcher {
    }
 
    /**
-    * Creates a new {@ID3v22TagSearcher}.
-    * 
-    * @param magicKey
-    * @param possibleOffsets
-    * @param tagName
+    * Creates a new {@link ID3v22TagSearcher}.
     */
    public ID3v23TagSearcher() {
       super(new byte[] { 'I', 'D', '3', 3, 0 }, new long[] { 0 }, "ID3v2.3");
@@ -106,9 +102,6 @@ public class ID3v23TagSearcher extends AbstractID3v2TagSearcher {
          + isEncrypted + "; grouped = " + isGrouped + ")";
    }
 
-   /**
-    * @param tagBytes
-    */
    private ID3v2FrameInfo getFrameInfo(ByteBuffer tagBytes) {
 
       byte[] idBytes = new byte[ID3V23_ID_LENGTH];

@@ -21,28 +21,23 @@ import com.github.jmeta.utility.charset.api.services.Charsets;
  */
 public class Lyrics3v2TagSearcher extends AbstractMagicKeyTagSearcher {
 
-   private static final byte[] LYRICS3V2_MAGIC_KEY = new byte[] { 'L', 'Y', 'R',
-      'I', 'C', 'S', '2', '0', '0' };
+   private static final byte[] LYRICS3V2_MAGIC_KEY = new byte[] { 'L', 'Y', 'R', 'I', 'C', 'S', '2', '0', '0' };
 
    private static final int LYRICS3V2_TAG_SIZE_LENGTH = 6;
 
    /**
-    * Creates a new {@Lyrics3v2TagSearcher}.
-    * 
-    * @param magicKey
-    * @param possibleOffsets
-    * @param tagName
+    * Creates a new {@link Lyrics3v2TagSearcher}.
     */
    public Lyrics3v2TagSearcher() {
       super(LYRICS3V2_MAGIC_KEY, new long[] { -137 }, "Lyrics3v2");
    }
 
    /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile, long)
+    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile,
+    *      long)
     */
    @Override
-   protected int getTotalTagSize(RandomAccessFile file, long possibleOffset)
-      throws IOException {
+   protected int getTotalTagSize(RandomAccessFile file, long possibleOffset) throws IOException {
 
       ByteBuffer bb = ByteBuffer.allocate(LYRICS3V2_TAG_SIZE_LENGTH);
 
@@ -50,11 +45,9 @@ public class Lyrics3v2TagSearcher extends AbstractMagicKeyTagSearcher {
 
       byte[] bytes = bb.array();
 
-      final int payloadSize = Integer
-         .parseInt(new String(bytes, Charsets.CHARSET_ASCII.name()));
+      final int payloadSize = Integer.parseInt(new String(bytes, Charsets.CHARSET_ASCII.name()));
 
-      return payloadSize + LYRICS3V2_TAG_SIZE_LENGTH
-         + LYRICS3V2_MAGIC_KEY.length;
+      return payloadSize + LYRICS3V2_TAG_SIZE_LENGTH + LYRICS3V2_MAGIC_KEY.length;
    }
 
    /**

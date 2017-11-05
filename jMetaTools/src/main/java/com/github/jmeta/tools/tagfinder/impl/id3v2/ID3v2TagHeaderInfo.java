@@ -1,6 +1,6 @@
 /**
  *
- * {@link ID3v2TagHeaderProperties}.java
+ * {@link ID3v2TagHeaderInfo}.java
  *
  * @author jebert
  *
@@ -9,13 +9,20 @@
 package com.github.jmeta.tools.tagfinder.impl.id3v2;
 
 /**
- * {@link ID3v2TagHeaderProperties}
+ * {@link ID3v2TagHeaderInfo}
  *
  */
 public class ID3v2TagHeaderInfo {
 
-   public ID3v2TagHeaderInfo(byte[] id, short version, byte flags,
-      int tagSize) {
+   private final short m_version;
+
+   private final int m_tagSize;
+
+   private final byte m_flags;
+
+   private final byte[] m_id;
+
+   public ID3v2TagHeaderInfo(byte[] id, short version, byte flags, int tagSize) {
       super();
       m_id = id;
       m_version = version;
@@ -62,12 +69,4 @@ public class ID3v2TagHeaderInfo {
 
       return m_id;
    }
-
-   private final short m_version;
-
-   private final int m_tagSize;
-
-   private final byte m_flags;
-
-   private final byte[] m_id;
 }
