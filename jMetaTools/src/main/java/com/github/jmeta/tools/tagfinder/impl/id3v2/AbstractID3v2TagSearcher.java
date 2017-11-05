@@ -8,22 +8,20 @@ import java.nio.ByteOrder;
 
 import com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher;
 
-public abstract class AbstractID3v2TagSearcher
-   extends AbstractMagicKeyTagSearcher {
+public abstract class AbstractID3v2TagSearcher extends AbstractMagicKeyTagSearcher {
 
    protected static final int ID3V2_TAG_HEADER_SIZE = 10;
 
-   public AbstractID3v2TagSearcher(byte[] magicKey, long[] possibleOffsets,
-      String tagName) {
+   public AbstractID3v2TagSearcher(byte[] magicKey, long[] possibleOffsets, String tagName) {
       super(magicKey, possibleOffsets, tagName);
    }
 
    /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile, long)
+    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile,
+    *      long)
     */
    @Override
-   protected int getTotalTagSize(RandomAccessFile file, long possibleOffset)
-      throws IOException {
+   protected int getTotalTagSize(RandomAccessFile file, long possibleOffset) throws IOException {
 
       ByteBuffer bb = ByteBuffer.allocate(ID3V2_TAG_HEADER_SIZE);
 
@@ -74,6 +72,4 @@ public abstract class AbstractID3v2TagSearcher
    }
 
    private static final int FROM_CONVERSION_MASK = 0x7F000000;
-
-   private static final int TO_CONVERSION_MASK = 0x7F;
 }

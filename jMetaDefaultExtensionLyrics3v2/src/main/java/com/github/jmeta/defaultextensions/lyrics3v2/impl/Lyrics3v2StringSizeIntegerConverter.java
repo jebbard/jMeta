@@ -22,21 +22,19 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link Lyrics3v2StringSizeIntegerConverter}
  *
  */
-public class Lyrics3v2StringSizeIntegerConverter
-   extends SignedNumericFieldConverter {
+public class Lyrics3v2StringSizeIntegerConverter extends SignedNumericFieldConverter {
 
    private static final int DECIMAL_RADIX = 10;
 
    private static final int MAX_LYRICS3v2_SIZE_FIELD_LENGTH = 6;
 
-   private static final int MAX_SIZE = DECIMAL_RADIX * DECIMAL_RADIX
-      * DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX - 1;
+   private static final int MAX_SIZE = DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX
+      * DECIMAL_RADIX - 1;
 
    // TODO primeRefactor005: Finalize and document this method
    @Override
-   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws BinaryValueConversionException {
+   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
@@ -45,11 +43,10 @@ public class Lyrics3v2StringSizeIntegerConverter
 
       if (binaryValue.getTotalSize() > MAX_LYRICS3v2_SIZE_FIELD_LENGTH)
          throw new BinaryValueConversionException(
-            "Total size of binary value containing Lyrics3v2 size information must not be bigger than 6 bytes",
-            null, desc, binaryValue, byteOrder, characterEncoding);
+            "Total size of binary value containing Lyrics3v2 size information must not be bigger than 6 bytes", null,
+            desc, binaryValue, byteOrder, characterEncoding);
 
-      byte[] lengthFieldBytes = binaryValue.getBytes(0,
-         (int) binaryValue.getTotalSize());
+      byte[] lengthFieldBytes = binaryValue.getBytes(0, (int) binaryValue.getTotalSize());
 
       int totalSize = 0;
       int digitMultiplier = 1;
@@ -58,9 +55,7 @@ public class Lyrics3v2StringSizeIntegerConverter
          int nextDigit = Character.digit(lengthFieldBytes[i], DECIMAL_RADIX);
 
          if (nextDigit == -1)
-            throw new BinaryValueConversionException(
-               "Size field's value <" + binaryValue
-                  + "> may contain digits only",
+            throw new BinaryValueConversionException("Size field's value <" + binaryValue + "> may contain digits only",
                null, desc, binaryValue, byteOrder, characterEncoding);
 
          totalSize += nextDigit * digitMultiplier;
@@ -68,13 +63,12 @@ public class Lyrics3v2StringSizeIntegerConverter
          digitMultiplier *= DECIMAL_RADIX;
       }
 
-      return new Long(totalSize);
+      return Long.valueOf(totalSize);
    }
 
    @Override
-   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws InterpretedValueConversionException {
+   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
@@ -82,14 +76,12 @@ public class Lyrics3v2StringSizeIntegerConverter
       Reject.ifNull(interpretedValue, "interpretedValue");
 
       if (interpretedValue > MAX_SIZE)
-         throw new InterpretedValueConversionException(
-            "Lyrics3v2 size fields may not be larger than " + MAX_SIZE, null,
+         throw new InterpretedValueConversionException("Lyrics3v2 size fields may not be larger than " + MAX_SIZE, null,
             desc, interpretedValue, byteOrder, characterEncoding);
 
       // TODO primeRefactor004: implement
 
-      return super.toBinary(interpretedValue, desc, byteOrder,
-         characterEncoding);
+      return super.toBinary(interpretedValue, desc, byteOrder, characterEncoding);
    }
 
 }

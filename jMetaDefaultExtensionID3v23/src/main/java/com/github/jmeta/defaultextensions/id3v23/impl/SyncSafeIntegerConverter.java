@@ -32,9 +32,8 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
    private static final int MAX_SYNC_SAFE_INTEGER = 2 >> 28;
 
    @Override
-   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws BinaryValueConversionException {
+   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
@@ -42,19 +41,17 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
       Reject.ifNull(binaryValue, "binaryValue");
       if (binaryValue.getTotalSize() != Integer.SIZE / Byte.SIZE)
          throw new BinaryValueConversionException(
-            "ID3v23 size fields must have integer (" + Integer.SIZE / Byte.SIZE
-               + " bytes) size",
-            null, desc, binaryValue, byteOrder, characterEncoding);
+            "ID3v23 size fields must have integer (" + Integer.SIZE / Byte.SIZE + " bytes) size", null, desc,
+            binaryValue, byteOrder, characterEncoding);
 
       int size = ByteBuffer.wrap(binaryValue.getFragment(0)).getInt();
 
-      return new Long(synchSafeToInt(size));
+      return Long.valueOf(synchSafeToInt(size));
    }
 
    @Override
-   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws InterpretedValueConversionException {
+   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
@@ -63,9 +60,8 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
 
       if (interpretedValue > MAX_SYNC_SAFE_INTEGER)
          throw new InterpretedValueConversionException(
-            "ID3v23 sync-safe integers may not be larger than "
-               + MAX_SYNC_SAFE_INTEGER,
-            null, desc, interpretedValue, byteOrder, characterEncoding);
+            "ID3v23 sync-safe integers may not be larger than " + MAX_SYNC_SAFE_INTEGER, null, desc, interpretedValue,
+            byteOrder, characterEncoding);
 
       long converted = intToSynchSafe(interpretedValue.intValue());
 

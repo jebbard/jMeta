@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
@@ -84,8 +83,7 @@ public class MediumReferenceEqualityTest extends AbstractEqualsTest<MediumRefere
 
       // Create some more references with equal medium, using the passed offset
       for (int i = 0; i < 3; ++i) {
-         mediumReferences.add(new StandardMediumReference(
-            new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false),
+         mediumReferences.add(new StandardMediumReference(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false),
             baseOffset + i * 10));
       }
 

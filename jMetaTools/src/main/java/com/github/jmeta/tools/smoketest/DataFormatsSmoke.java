@@ -72,7 +72,7 @@ public class DataFormatsSmoke {
          PRIVATE_LOGGER.info("All data blocks in the AbstractMedium: " + medium);
          PRIVATE_LOGGER.info("***********************************************************************");
 
-         printContainers(accessor.getContainerIterator(medium, new ArrayList<DataFormat>(), false), new Integer(1));
+         printContainers(accessor.getContainerIterator(medium, new ArrayList<DataFormat>(), false), Integer.valueOf(1));
       }
    }
 

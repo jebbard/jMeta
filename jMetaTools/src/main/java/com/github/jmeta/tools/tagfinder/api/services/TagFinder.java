@@ -97,7 +97,7 @@ public class TagFinder {
       m_fileExtensions = fileExtensions;
 
       for (int i = 0; i < TAG_SEARCH_LIST.length; i++) {
-         m_foundTagCounts.put(TAG_SEARCH_LIST[i].getTagName(), new Integer(0));
+         m_foundTagCounts.put(TAG_SEARCH_LIST[i].getTagName(), Integer.valueOf(0));
       }
    }
 

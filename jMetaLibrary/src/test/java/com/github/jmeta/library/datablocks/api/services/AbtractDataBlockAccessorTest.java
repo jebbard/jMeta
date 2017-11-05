@@ -84,12 +84,6 @@ public abstract class AbtractDataBlockAccessorTest {
 
       expectationProvider.cleanUp();
 
-      for (int i = 0; i < testedMedia.size(); ++i) {
-         Medium<?> medium = testedMedia.get(i);
-
-         // testling.closeMedium(medium);
-      }
-
       // Check log files
       JMetaTestBasics.performGeneralLogCheck(JMetaTestBasics.DEFAULT_LOG_FILE);
 

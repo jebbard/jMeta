@@ -67,7 +67,7 @@ public class NumericDataTypeUtil {
     * @return the signed byte value for the given parameter
     */
    public static byte signedByteValue(long n) {
-      return new Long(n).byteValue();
+      return Long.valueOf(n).byteValue();
    }
 
    /**
@@ -78,7 +78,7 @@ public class NumericDataTypeUtil {
     * @return the signed short value for the given parameter
     */
    public static short signedShortValue(long n) {
-      return new Long(n).shortValue();
+      return Long.valueOf(n).shortValue();
    }
 
    /**
@@ -89,7 +89,7 @@ public class NumericDataTypeUtil {
     * @return the signed int value for the given parameter
     */
    public static int signedIntValue(long n) {
-      return new Long(n).intValue();
+      return Long.valueOf(n).intValue();
    }
 
    /**

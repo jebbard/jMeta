@@ -77,7 +77,7 @@ public class DataFormatsSmoke_ReverseReading {
          System.out.println("***********************************************************************");
 
          printContainers(accessor.getReverseContainerIterator(medium, new ArrayList<DataFormat>(), false),
-            new Integer(1));
+            Integer.valueOf(1));
       }
    }
 

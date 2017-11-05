@@ -115,8 +115,8 @@ public abstract class IMediumCacheTest {
     */
    private void checkNoOverlappingRegions(MediumCache testling) {
 
-      Comparator<? super MediumReference> mediumReferenceComparator = (leftRef,
-         rightRef) -> new Long(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset());
+      Comparator<? super MediumReference> mediumReferenceComparator = (leftRef, rightRef) -> Long
+         .valueOf(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset());
 
       Map<MediumReference, Integer> sortedCachedRegions = new TreeMap<>(mediumReferenceComparator);
 
@@ -353,10 +353,11 @@ public abstract class IMediumCacheTest {
 
          // Reference to new region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(newRegionReference));
-         Assert.assertEquals(new Integer(newRegionSize - 1), cache.getBufferedRegions().get(newRegionReference));
+         Assert.assertEquals(Integer.valueOf(newRegionSize - 1), cache.getBufferedRegions().get(newRegionReference));
          // Reference to existing region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(existingRegionReference));
-         Assert.assertEquals(new Integer(existingRegionSize), cache.getBufferedRegions().get(existingRegionReference));
+         Assert.assertEquals(Integer.valueOf(existingRegionSize),
+            cache.getBufferedRegions().get(existingRegionReference));
       } catch (EndOfMediumException e) {
          Assert.fail(UNEXPECTED_END_OF_MEDIUM + e);
       }
@@ -413,10 +414,10 @@ public abstract class IMediumCacheTest {
 
          // Reference to new region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(newRegionReference));
-         Assert.assertEquals(new Integer(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
+         Assert.assertEquals(Integer.valueOf(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
          // Reference to existing region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(existingRegionReference));
-         Assert.assertEquals(new Integer(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
+         Assert.assertEquals(Integer.valueOf(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
       } catch (EndOfMediumException e) {
          Assert.fail(UNEXPECTED_END_OF_MEDIUM + e);
       }
@@ -466,13 +467,15 @@ public abstract class IMediumCacheTest {
 
          // Existing region is unchanged
          Assert.assertTrue(cache.getBufferedRegions().containsKey(existingRegionReference));
-         Assert.assertEquals(new Integer(existingRegionSize), cache.getBufferedRegions().get(existingRegionReference));
+         Assert.assertEquals(Integer.valueOf(existingRegionSize),
+            cache.getBufferedRegions().get(existingRegionReference));
 
          // The new region has been shifted to start 1 byte later
          Assert.assertFalse(cache.getBufferedRegions().containsKey(newRegionReference));
          final MediumReference shiftedNewRegionReference = newRegionReference.advance(1);
          Assert.assertTrue(cache.getBufferedRegions().containsKey(shiftedNewRegionReference));
-         Assert.assertEquals(new Integer(newRegionSize - 1), cache.getBufferedRegions().get(shiftedNewRegionReference));
+         Assert.assertEquals(Integer.valueOf(newRegionSize - 1),
+            cache.getBufferedRegions().get(shiftedNewRegionReference));
       } catch (EndOfMediumException e) {
          Assert.fail(UNEXPECTED_END_OF_MEDIUM + e);
       }
@@ -523,9 +526,10 @@ public abstract class IMediumCacheTest {
 
          // Reference to new and existing region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(newRegionReference));
-         Assert.assertEquals(new Integer(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
+         Assert.assertEquals(Integer.valueOf(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
          Assert.assertTrue(cache.getBufferedRegions().containsKey(existingRegionReference));
-         Assert.assertEquals(new Integer(existingRegionSize), cache.getBufferedRegions().get(existingRegionReference));
+         Assert.assertEquals(Integer.valueOf(existingRegionSize),
+            cache.getBufferedRegions().get(existingRegionReference));
       } catch (EndOfMediumException e) {
          Assert.fail(UNEXPECTED_END_OF_MEDIUM + e);
       }
@@ -576,18 +580,19 @@ public abstract class IMediumCacheTest {
 
          // Reference to new and existing region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(newRegionReference));
-         Assert.assertEquals(new Integer(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
+         Assert.assertEquals(Integer.valueOf(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
          Assert.assertTrue(cache.getBufferedRegions().containsKey(existingRegionReference));
-         Assert.assertEquals(new Integer(existingRegionSize), cache.getBufferedRegions().get(existingRegionReference));
+         Assert.assertEquals(Integer.valueOf(existingRegionSize),
+            cache.getBufferedRegions().get(existingRegionReference));
       } catch (EndOfMediumException e) {
          Assert.fail(UNEXPECTED_END_OF_MEDIUM + e);
       }
    }
 
    /**
-    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached
-    * is completely covered by an already cached region. => EXPECTED: The existing region remains unchanged, nothing at
-    * all changes in the cache.
+    * Tests {@link MediumCache#buffer(MediumReference, long)} for following boundary case: A new region to be cached is
+    * completely covered by an already cached region. => EXPECTED: The existing region remains unchanged, nothing at all
+    * changes in the cache.
     */
    @Test
    public void test_cacheBoundaryCase5_alreadyCached() {
@@ -629,7 +634,8 @@ public abstract class IMediumCacheTest {
 
          // Existing region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(existingRegionReference));
-         Assert.assertEquals(new Integer(existingRegionSize), cache.getBufferedRegions().get(existingRegionReference));
+         Assert.assertEquals(Integer.valueOf(existingRegionSize),
+            cache.getBufferedRegions().get(existingRegionReference));
 
          // New region is not in returned cache regions
          Assert.assertFalse(cache.getBufferedRegions().containsKey(newRegionReference));
@@ -686,10 +692,11 @@ public abstract class IMediumCacheTest {
          Assert.assertTrue(cache.getBufferedRegions().containsKey(newRegionReference));
 
          if (getMaximumCacheSize() >= newRegionSize)
-            Assert.assertEquals(new Integer(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
+            Assert.assertEquals(Integer.valueOf(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
 
          else
-            Assert.assertEquals(new Integer(getMaximumCacheSize()), cache.getBufferedRegions().get(newRegionReference));
+            Assert.assertEquals(Integer.valueOf(getMaximumCacheSize()),
+               cache.getBufferedRegions().get(newRegionReference));
 
          // Reference to existing region is not in returned cache regions
          Assert.assertFalse(cache.getBufferedRegions().containsKey(existingRegionReference));
@@ -746,10 +753,11 @@ public abstract class IMediumCacheTest {
          Assert.assertTrue(cache.getBufferedRegions().containsKey(newRegionReference));
 
          if (getMaximumCacheSize() >= newRegionSize)
-            Assert.assertEquals(new Integer(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
+            Assert.assertEquals(Integer.valueOf(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
 
          else
-            Assert.assertEquals(new Integer(getMaximumCacheSize()), cache.getBufferedRegions().get(newRegionReference));
+            Assert.assertEquals(Integer.valueOf(getMaximumCacheSize()),
+               cache.getBufferedRegions().get(newRegionReference));
 
          // Reference to existing region is not in returned cache regions
          Assert.assertFalse(cache.getBufferedRegions().containsKey(existingRegionReference));
@@ -803,10 +811,11 @@ public abstract class IMediumCacheTest {
          Assert.assertTrue(cache.getBufferedRegions().containsKey(newRegionReference));
 
          if (getMaximumCacheSize() >= newRegionSize)
-            Assert.assertEquals(new Integer(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
+            Assert.assertEquals(Integer.valueOf(newRegionSize), cache.getBufferedRegions().get(newRegionReference));
 
          else
-            Assert.assertEquals(new Integer(getMaximumCacheSize()), cache.getBufferedRegions().get(newRegionReference));
+            Assert.assertEquals(Integer.valueOf(getMaximumCacheSize()),
+               cache.getBufferedRegions().get(newRegionReference));
 
          // Reference to existing region is in returned cache regions
          Assert.assertTrue(cache.getBufferedRegions().containsKey(existingRegionReference));
@@ -947,8 +956,8 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#buffer(MediumReference, long)} and {@link MediumCache#getBufferedByteCountAt} in case
-    * of overlapping, larger regions.
+    * Tests {@link MediumCache#buffer(MediumReference, long)} and {@link MediumCache#getBufferedByteCountAt} in case of
+    * overlapping, larger regions.
     */
    @Test
    public void test_cacheIsCachedOverlapping() {
@@ -1119,8 +1128,8 @@ public abstract class IMediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#discard(MediumReference, long)} with multiple consecutive regions freed at once, while
-    * a bigger free size is specified, exceeding the consecutive regions and reaching up to another, non-consecutive
+    * Tests {@link MediumCache#discard(MediumReference, long)} with multiple consecutive regions freed at once, while a
+    * bigger free size is specified, exceeding the consecutive regions and reaching up to another, non-consecutive
     * region. Only the consecutive regions must get freed. The {@link StandardMediumReference} given to free is exactly
     * the start reference of an existing region.
     */

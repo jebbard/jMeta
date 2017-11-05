@@ -72,6 +72,7 @@ public class ID3v1Extension implements Extension {
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
+   @SuppressWarnings("unchecked")
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();
@@ -198,8 +199,7 @@ public class ID3v1Extension implements Extension {
 
       descMap.put(trackId,
          new DataBlockDescription(trackId, "track indicator", "The ID3v1 track", PhysicalDataBlockType.FIELD,
-            trackChildIds,
-            ChildOrder.SEQUENTIAL, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null,
+            trackChildIds, ChildOrder.SEQUENTIAL, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null,
                new byte[] { nullCharacter }, 1, 1, null, null, null, null, null, null, null, new ArrayList<>()),
             trackLocationProps, 1, 1, null, null));
 
@@ -234,8 +234,8 @@ public class ID3v1Extension implements Extension {
          new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       descMap.put(id3v1TagHeaderId,
-         new DataBlockDescription(id3v1TagHeaderId, "ID3v1 tag header id", "The ID3v1 tag header id",
-            PhysicalDataBlockType.FIELD,
+         new DataBlockDescription(
+            id3v1TagHeaderId, "ID3v1 tag header id", "The ID3v1 tag header id", PhysicalDataBlockType.FIELD,
             headerIdChildIds, ChildOrder.SEQUENTIAL, new FieldProperties<>(FieldType.STRING, ID3V1_TAG_ID_STRING,
                tagIdEnumerated, null, 3, 3, null, null, null, null, null, null, null, new ArrayList<>()),
             idLocationProps, 3, 3, null, null));

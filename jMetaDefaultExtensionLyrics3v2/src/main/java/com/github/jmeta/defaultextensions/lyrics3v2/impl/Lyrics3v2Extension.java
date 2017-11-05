@@ -80,6 +80,7 @@ public class Lyrics3v2Extension implements Extension {
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
     */
+   @SuppressWarnings("unchecked")
    @Override
    public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
       List<T> serviceProviders = new ArrayList<>();

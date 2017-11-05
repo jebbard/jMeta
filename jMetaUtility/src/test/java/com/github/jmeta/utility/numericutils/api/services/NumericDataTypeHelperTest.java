@@ -18,7 +18,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  */
 public class NumericDataTypeHelperTest {
 
-   private static final long MAX_UINT_PLUS_ONE = (new Long(Integer.MAX_VALUE) + 1) * 2;
+   private static final long MAX_UINT_PLUS_ONE = (Long.valueOf(Integer.MAX_VALUE) + 1) * 2;
 
    /**
     * Tests {@link NumericDataTypeUtil#unsignedValue(byte)}.
