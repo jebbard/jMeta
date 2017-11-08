@@ -57,10 +57,10 @@ public class WritableInMemoryMediumStoreTest extends AbstractWritableRandomAcces
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#getCurrentMediumContentAsString(com.github.jmeta.library.media.api.types.Medium)
+    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#getMediumContentAsString(com.github.jmeta.library.media.api.types.Medium)
     */
    @Override
-   protected String getCurrentMediumContentAsString(InMemoryMedium medium) {
+   protected String getMediumContentAsString(InMemoryMedium medium) {
       return new String(medium.getWrappedMedium(), Charsets.CHARSET_UTF8);
    }
 }

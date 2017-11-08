@@ -60,10 +60,10 @@ public class WritableFileMediumStoreTest extends AbstractWritableRandomAccessMed
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#getCurrentMediumContentAsString(com.github.jmeta.library.media.api.types.Medium)
+    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#getMediumContentAsString(com.github.jmeta.library.media.api.types.Medium)
     */
    @Override
-   protected String getCurrentMediumContentAsString(FileMedium medium) {
+   protected String getMediumContentAsString(FileMedium medium) {
       return new String(MediaTestUtility.readFileContent(medium.getWrappedMedium()), Charsets.CHARSET_UTF8);
    }
 

@@ -66,7 +66,7 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    public void isAtEndOfMedium_forRandomAccessMediumAtEOM_returnsTrue() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 
-      int endOfMediumOffset = getCurrentMediumContentAsString(currentMedium).length();
+      int endOfMediumOffset = getMediumContentAsString(currentMedium).length();
 
       mediumStoreUnderTest.open();
 
@@ -80,7 +80,7 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
    public void isAtEndOfMedium_forRandomAccessMediumBeforeEOM_returnsFalse() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 
-      int endOfMediumOffset = getCurrentMediumContentAsString(currentMedium).length();
+      int endOfMediumOffset = getMediumContentAsString(currentMedium).length();
 
       mediumStoreUnderTest.open();
 
@@ -96,7 +96,7 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
 
       Assume.assumeNotNull(mediumStoreUnderTest);
 
-      int mediumSizeInBytes = getCurrentMediumContentAsString(currentMedium).length();
+      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
 
       mediumStoreUnderTest.open();
 

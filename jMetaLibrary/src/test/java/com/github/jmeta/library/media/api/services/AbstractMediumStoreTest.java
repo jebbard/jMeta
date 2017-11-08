@@ -35,6 +35,7 @@ import com.github.jmeta.library.media.impl.cache.MediumCache;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
@@ -266,7 +267,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    public void isAtEndOfMedium_forFilledMediumAndGetDataUntilEOM_returnsTrue() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 
-      int mediumSizeInBytes = getCurrentMediumContentAsString(currentMedium).length();
+      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
 
       mediumStoreUnderTest.open();
 
@@ -355,7 +356,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * {@link MediumStore#cache(MediumReference, int)}.
     */
    @Test
-   public void getCachedByteCountAt_forFilledMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
+   public void getCachedByteCountAt_forFilledRandomAccessMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
       mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
 
       Assume.assumeNotNull(mediumStoreUnderTest);
@@ -378,7 +379,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    public void getCachedByteCountAt_forReferenceBehindMedium_returnsZero() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 
-      int mediumSizeInBytes = getCurrentMediumContentAsString(currentMedium).length();
+      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
 
       mediumStoreUnderTest.open();
 
@@ -437,7 +438,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeNotNull(mediumStoreUnderTest);
 
-      int mediumSizeInBytes = getCurrentMediumContentAsString(currentMedium).length();
+      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
 
       mediumStoreUnderTest.open();
 
@@ -465,7 +466,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeNotNull(mediumStoreUnderTest);
 
-      int mediumSizeInBytes = getCurrentMediumContentAsString(currentMedium).length();
+      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
 
       mediumStoreUnderTest.open();
 
@@ -510,11 +511,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       cacheNoEOMExpected(at(currentMedium, 20), 30);
       cacheNoEOMExpected(at(currentMedium, 22), 10);
 
-      try {
-         Mockito.verify(mediumAccessorSpy, Mockito.times(1)).read(Mockito.any());
-      } catch (EndOfMediumException e) {
-         throw new RuntimeException("Unexpected end of medium", e);
-      }
+      verifyExactlyNReads(1);
    }
 
    /**
@@ -532,11 +529,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       int byteCount = (expectedReadCount - 1) * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1;
       cacheNoEOMExpected(at(currentMedium, 20), byteCount);
 
-      try {
-         Mockito.verify(mediumAccessorSpy, Mockito.times(expectedReadCount)).read(Mockito.any());
-      } catch (EndOfMediumException e) {
-         throw new RuntimeException("Unexpected end of medium", e);
-      }
+      verifyExactlyNReads(expectedReadCount);
    }
 
    /**
@@ -559,6 +552,59 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       mediumStoreUnderTest.open();
 
       cacheNoEOMExpected(at(MediaTestUtility.OTHER_MEDIUM, 10), 10);
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forFilledMediumWithBigCache_rangeWithCacheGaps_returnsExpectedDataAndUpdatesCacheInGaps() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      Assume.assumeNotNull(mediumStoreUnderTest);
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      cacheNoEOMExpected(at(currentMedium, 10), 10);
+      cacheNoEOMExpected(at(currentMedium, 30), 100);
+      cacheNoEOMExpected(at(currentMedium, 135), 200);
+
+      long getDataStartOffset = 5;
+      int getDataSize = 400;
+
+      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
+
+      Assert.assertEquals(mediumStoreUnderTest.getCachedByteCountAt(getDataOffset), getDataSize);
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forFilledMediumWithBigCache_singleCacheBeforeRangeWithinCache_returnsExpectedDataAndDoesNotAccessMedium() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      Assume.assumeNotNull(mediumStoreUnderTest);
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      cacheNoEOMExpected(at(currentMedium, 30), 100);
+
+      verifyExactlyNReads(1);
+
+      long getDataStartOffset = 35;
+      int getDataSize = 80;
+
+      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
+
+      // No further read access after the initial cache happened!
+      verifyExactlyNReads(1);
    }
 
    /**
@@ -641,7 +687,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * 
     * @return the current content of the filled {@link Medium}
     */
-   protected abstract String getCurrentMediumContentAsString(T medium);
+   protected abstract String getMediumContentAsString(T medium);
 
    /**
     * Creates a test class implementation specific {@link MediumAccessor} to use for testing.
@@ -759,6 +805,29 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
+    * Tests {@link MediumStore#getData(MediumReference, int)} by comparing its result with the expected medium content.
+    * 
+    * @param offset
+    *           The offset to use for the method call
+    * @param readDataSize
+    *           The size to use for the method call
+    * @param currentMediumContent
+    *           The current medium content used to get the expected data
+    */
+   private void testGetData_returnsExpectedData(MediumReference offset, int readDataSize, String currentMediumContent) {
+      ByteBuffer returnedData = getDataNoEOMExpected(offset, readDataSize);
+
+      Assert.assertEquals(readDataSize, returnedData.remaining());
+      byte[] byteBufferData = new byte[readDataSize];
+      returnedData.get(byteBufferData);
+
+      String asString = new String(byteBufferData, Charsets.CHARSET_ASCII);
+
+      Assert.assertEquals(currentMediumContent.substring((int) offset.getAbsoluteMediumOffset(),
+         (int) (offset.getAbsoluteMediumOffset() + readDataSize)), asString);
+   }
+
+   /**
     * Calls {@link MediumStore#getData(MediumReference, int)} and expects no end of medium.
     * 
     * @param offset
@@ -782,9 +851,24 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param byteCount
     *           The number of bytes to cache
     */
-   private void cacheNoEOMExpected(MediumReference offset, int byteCount) {
+   protected void cacheNoEOMExpected(MediumReference offset, int byteCount) {
       try {
          mediumStoreUnderTest.cache(offset, byteCount);
+      } catch (EndOfMediumException e) {
+         throw new RuntimeException("Unexpected end of medium", e);
+      }
+   }
+
+   /**
+    * Verifies that there were exactly N calls to {@link MediumAccessor#read(ByteBuffer)} without
+    * {@link EndOfMediumException}, no matter which parameters used.
+    * 
+    * @param N
+    *           The number of expected calls
+    */
+   private void verifyExactlyNReads(int N) {
+      try {
+         Mockito.verify(mediumAccessorSpy, Mockito.times(N)).read(Mockito.any());
       } catch (EndOfMediumException e) {
          throw new RuntimeException("Unexpected end of medium", e);
       }

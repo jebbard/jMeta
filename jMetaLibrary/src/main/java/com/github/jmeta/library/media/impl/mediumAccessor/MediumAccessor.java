@@ -79,7 +79,7 @@ public interface MediumAccessor<T extends Medium<?>> {
    /**
     * Returns the current {@link MediumReference} position of this {@link MediumAccessor}. The current position is the
     * position used for the next calls to {@link #read(ByteBuffer)}, {@link #truncate(MediumReference)} and
-    * {@link #write(ByteBuffer)} as well as for * calls to {@link #isAtEndOfMedium(MediumReference)}.
+    * {@link #write(ByteBuffer)} as well as for calls to {@link #isAtEndOfMedium(MediumReference)}.
     * 
     * For random-access media, the current position can be changed using {@link #setCurrentPosition(MediumReference)},
     * {@link #write(ByteBuffer)} (changes by the number of written bytes) and {@link #read(ByteBuffer)} (changes by the

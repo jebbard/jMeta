@@ -128,17 +128,28 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
       if (getMedium().isCachingEnabled()) {
 
+         // Ensure to read any bytes necessary to be read before the given offset for stream-based media
+         if (!getMedium().isRandomAccess()) {
+            MediumReference currentMediumPosition = mediumAccessor.getCurrentPosition();
+
+            if (currentMediumPosition.before(offset)) {
+               cacheChunkWise(currentMediumPosition, (int) offset.distanceTo(currentMediumPosition));
+            }
+         }
+
          long cachedByteCountAt = cache.getCachedByteCountAt(offset);
 
          if (cachedByteCountAt < numberOfBytes) {
-
-            List<MediumRegion> regionsToAdd = MediumRangeChunkAction.walkDividedRangeWithException(MediumRegion.class,
-               EndOfMediumException.class, offset, numberOfBytes, getMedium().getMaxReadWriteBlockSizeInBytes(),
-               this::readChunk);
-
-            regionsToAdd.forEach(cache::addRegion);
+            cacheChunkWise(offset, numberOfBytes);
          }
       }
+   }
+
+   private void cacheChunkWise(MediumReference offset, int size) throws EndOfMediumException {
+      List<MediumRegion> regionsToAdd = MediumRangeChunkAction.walkDividedRangeWithException(MediumRegion.class,
+         EndOfMediumException.class, offset, size, getMedium().getMaxReadWriteBlockSizeInBytes(), this::readChunk);
+
+      regionsToAdd.forEach(cache::addRegion);
    }
 
    /**
@@ -158,18 +169,48 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     *      int)
     */
    @Override
-   public ByteBuffer getData(MediumReference offset, int numberOfBytes) {
+   public ByteBuffer getData(MediumReference offset, int numberOfBytes) throws EndOfMediumException {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
 
-      try {
-         mediumAccessor.read(ByteBuffer.allocate(numberOfBytes));
-      } catch (EndOfMediumException e) {
-         throw new RuntimeException("", e);
+      // Ensure to read any bytes necessary to be read before the given offset for stream-based media
+      if (!getMedium().isRandomAccess()) {
+         MediumReference currentMediumPosition = mediumAccessor.getCurrentPosition();
+
+         if (currentMediumPosition.before(offset)) {
+            cache(currentMediumPosition, (int) offset.distanceTo(currentMediumPosition));
+         }
       }
 
-      return null;
+      // Ensure cache is updated
+      cache(offset, numberOfBytes);
+
+      List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
+
+      ByteBuffer readBytes = ByteBuffer.allocate(numberOfBytes);
+
+      for (MediumRegion mediumRegion : cacheRegionsInRange) {
+         MediumReference regionStartReference = mediumRegion.getStartReference();
+         MediumReference regionEndReference = mediumRegion.calculateEndReference();
+         MediumReference rangeEndReference = offset.advance(numberOfBytes);
+
+         MediumRegion regionToUse = mediumRegion;
+
+         if (regionStartReference.before(offset)) {
+            regionToUse = regionToUse.split(offset)[1];
+         }
+
+         if (rangeEndReference.before(regionEndReference)) {
+            regionToUse = regionToUse.split(rangeEndReference)[0];
+         }
+
+         readBytes.put(regionToUse.getBytes());
+      }
+
+      readBytes.rewind();
+
+      return readBytes;
    }
 
    /**
