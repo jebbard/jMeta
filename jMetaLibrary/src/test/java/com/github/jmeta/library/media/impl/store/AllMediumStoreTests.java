@@ -16,8 +16,10 @@ import org.junit.runners.Suite.SuiteClasses;
  * {@link AllMediumStoreTests} is used for running all test cases of the extension management component.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ ReadOnlyFileMediumStoreTest.class, ReadOnlyInMemoryMediumStoreTest.class, StreamMediumStoreTest.class,
-   WritableFileMediumStoreTest.class, WritableInMemoryMediumStoreTest.class, })
+@SuiteClasses({ ReadOnlyFileMediumStoreTest.class, ReadOnlyInMemoryMediumStoreTest.class,
+   ReadOnlyStreamMediumStoreTest.class, CachedStreamMediumStoreTest.class, CachedWritableFileMediumStoreTest.class,
+   UnCachedStreamMediumStoreTest.class, UnCachedWritableFileMediumStoreTest.class,
+   UnCachedWritableInMemoryMediumStoreTest.class, })
 public class AllMediumStoreTests {
    // Nothing necessary here
 }

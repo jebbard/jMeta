@@ -11,32 +11,198 @@ package com.github.jmeta.library.media.api.services;
 
 import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
+import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.library.media.impl.cache.MediumCache;
+import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
+import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
+import com.github.jmeta.library.media.impl.store.StandardMediumStore;
+import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * {@link AbstractReadOnlyMediumStoreTest} contains negative tests for {@link MediumStore} write method on read-only
+ * {@link AbstractReadOnlyMediumStoreTest} contains negative tests for {@link MediumStore} write methods on read-only
  * {@link Medium} instances.
+ * 
+ * In addition it contains all general method tests for {@link MediumStore#open()}, {@link MediumStore#close()},
+ * {@link MediumStore#getMedium()} and {@link MediumStore#createMediumReference(long)}.
+ * 
+ * The reason for separating this class from others:
+ * <ul>
+ * <li>Read-only media only behave different than writable media for the write methods</li>
+ * <li>In addition, putting the general test cases at the top of the class hierarchy the other test class(es) would lead
+ * to a lot of duplicate test cases executed, here they are just run once per medium type</li>
+ * </ul>
+ * 
+ * The media used for testing all must contain {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}, a String fully containing
+ * only human-readable standard ASCII characters. This guarantees that 1 bytes = 1 character. Furthermore, all bytes
+ * inserted must also be standard human-readable ASCII characters with this property.
  *
  * @param <T>
  *           The type of {@link Medium} to test
  */
-public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> extends AbstractMediumStoreTest<T> {
+public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
+
+   protected MediumStore mediumStoreUnderTest;
+   protected T currentMedium;
+
+   /**
+    * Validates all test files needed in this test class
+    */
+   @BeforeClass
+   public static void validateTestFiles() {
+      MediaTestFiles.validateTestFiles();
+   }
+
+   /**
+    * Closes the {@link MediumStore} under test, if necessary.
+    */
+   @After
+   public void tearDown() {
+      if (mediumStoreUnderTest != null && mediumStoreUnderTest.isOpened()) {
+         mediumStoreUnderTest.close();
+      }
+   }
+
+   /**
+    * Tests {@link MediumStore#close()}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void open_onOpenedMediumStore_throwsException() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.open();
+      mediumStoreUnderTest.open();
+   }
+
+   /**
+    * Tests {@link MediumStore#close()}.
+    */
+   @Test
+   public void close_onOpenedMediumStore_closesStore() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.close();
+
+      Assert.assertFalse(mediumStoreUnderTest.isOpened());
+   }
+
+   /**
+    * Tests {@link MediumStore#close()}.
+    */
+   @Test(expected = MediumStoreClosedException.class)
+   public void close_onClosedMediumStore_throwsException() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.close();
+      mediumStoreUnderTest.close();
+   }
+
+   /**
+    * Tests {@link MediumStore#isOpened()}.
+    */
+   @Test
+   public void isOpened_onNewMediumStore_returnsFalse() {
+      mediumStoreUnderTest = createMediumStore();
+
+      Assert.assertFalse(mediumStoreUnderTest.isOpened());
+   }
+
+   /**
+    * Tests {@link MediumStore#isOpened()} and {@link MediumStore#open()}.
+    */
+   @Test
+   public void isOpened_onOpenedMediumStore_returnsTrue() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      Assert.assertTrue(mediumStoreUnderTest.isOpened());
+   }
+
+   /**
+    * Tests {@link MediumStore#getMedium()}.
+    */
+   @Test
+   public void getMedium_onOpenedMediumStore_returnsExpectedMedium() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
+   }
+
+   /**
+    * Tests {@link MediumStore#getMedium()}.
+    */
+   @Test
+   public void getMedium_onClosedMediumStore_returnsExpectedMedium() {
+      mediumStoreUnderTest = createMediumStore();
+
+      Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
+   }
+
+   /**
+    * Tests {@link MediumStore#createMediumReference(long)}.
+    */
+   @Test
+   public void createMediumReference_onOpenedMediumStore_returnsExpectedReference() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      int offset = 10;
+      MediumReference actualReference = mediumStoreUnderTest.createMediumReference(offset);
+
+      Assert.assertEquals(at(currentMedium, offset), actualReference);
+   }
+
+   /**
+    * Tests {@link MediumStore#createMediumReference(long)}.
+    */
+   @Test(expected = MediumStoreClosedException.class)
+   public void createMediumReference_onClosedMediumStore_throwsException() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.createMediumReference(10);
+   }
+
+   /**
+    * Tests {@link MediumStore#createMediumReference(long)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void createMediumReference_forInvalidOffset_throwsException() {
+      mediumStoreUnderTest = createMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.createMediumReference(-10);
+   }
 
    /**
     * Tests {@link MediumStore#replaceData(MediumReference, int, java.nio.ByteBuffer)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void replaceData_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+      mediumStoreUnderTest = createMediumStore();
 
       mediumStoreUnderTest.open();
 
@@ -48,7 +214,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void removeData_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+      mediumStoreUnderTest = createMediumStore();
 
       mediumStoreUnderTest.open();
 
@@ -60,7 +226,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void insertData_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+      mediumStoreUnderTest = createMediumStore();
 
       mediumStoreUnderTest.open();
 
@@ -72,7 +238,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void undo_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+      mediumStoreUnderTest = createMediumStore();
 
       mediumStoreUnderTest.open();
 
@@ -85,10 +251,56 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> exten
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void flush_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+      mediumStoreUnderTest = createMediumStore();
 
       mediumStoreUnderTest.open();
 
       mediumStoreUnderTest.flush();
+   }
+
+   /**
+    * Creates a {@link Medium} for testing.
+    * 
+    * @return a {@link Medium} for testing
+    * 
+    * @throws IOException
+    *            In case of any errors creating the {@link Medium}
+    */
+   protected abstract T createMedium() throws IOException;
+
+   /**
+    * Creates a test class implementation specific {@link MediumAccessor} to use for testing.
+    * 
+    * @param mediumToUse
+    *           The {@link Medium} to use for the {@link MediumStore}.
+    * @return a {@link MediumAccessor} to use based on a given {@link Medium}.
+    */
+   protected abstract MediumAccessor<T> createMediumAccessor(T mediumToUse);
+
+   /**
+    * Creates a {@link MediumStore} to test based on a given {@link Medium}.
+    * 
+    * @param mediumToUse
+    *           The {@link Medium} to use for the {@link MediumStore}.
+    * @return a {@link MediumStore} to test based on a given {@link Medium}.
+    */
+   protected MediumStore createMediumStoreToTest(T mediumToUse) {
+      return new StandardMediumStore<>(createMediumAccessor(mediumToUse), new MediumCache(mediumToUse),
+         new MediumReferenceFactory(mediumToUse));
+   }
+
+   /**
+    * Creates a {@link MediumStore} based on a default {@link Medium}.
+    * 
+    * @return a {@link MediumStore} based on a default {@link Medium}
+    */
+   protected MediumStore createMediumStore() {
+      try {
+         currentMedium = createMedium();
+
+         return createMediumStoreToTest(currentMedium);
+      } catch (IOException e) {
+         throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
+      }
    }
 }

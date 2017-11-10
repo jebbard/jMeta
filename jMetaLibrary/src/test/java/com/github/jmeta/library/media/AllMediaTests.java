@@ -29,9 +29,9 @@ import com.github.jmeta.library.media.impl.reference.MediumReferenceFactoryTest;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
 import com.github.jmeta.library.media.impl.store.ReadOnlyFileMediumStoreTest;
 import com.github.jmeta.library.media.impl.store.ReadOnlyInMemoryMediumStoreTest;
-import com.github.jmeta.library.media.impl.store.StreamMediumStoreTest;
-import com.github.jmeta.library.media.impl.store.WritableFileMediumStoreTest;
-import com.github.jmeta.library.media.impl.store.WritableInMemoryMediumStoreTest;
+import com.github.jmeta.library.media.impl.store.CachedStreamMediumStoreTest;
+import com.github.jmeta.library.media.impl.store.CachedWritableFileMediumStoreTest;
+import com.github.jmeta.library.media.impl.store.UnCachedWritableInMemoryMediumStoreTest;
 
 /**
  * {@link AllMediaTests} is used for running all test cases of the media component.
@@ -42,7 +42,7 @@ import com.github.jmeta.library.media.impl.store.WritableInMemoryMediumStoreTest
    InMemoryMediumTest.class, InputStreamMediumTest.class, MediumActionTest.class, MediumActionEqualityTest.class,
    MediumReferenceFactoryTest.class, MediumChangeManagerTest.class, MediumChangeManagerCreateFlushPlanTest.class,
    AllMediumAccessorTests.class, ReadOnlyFileMediumStoreTest.class, ReadOnlyInMemoryMediumStoreTest.class,
-   WritableFileMediumStoreTest.class, WritableInMemoryMediumStoreTest.class, StreamMediumStoreTest.class, })
+   CachedWritableFileMediumStoreTest.class, UnCachedWritableInMemoryMediumStoreTest.class, CachedStreamMediumStoreTest.class, })
 public class AllMediaTests {
    // Nothing necessary here
 }

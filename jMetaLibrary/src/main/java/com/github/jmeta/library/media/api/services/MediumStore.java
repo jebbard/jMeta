@@ -169,7 +169,8 @@ public interface MediumStore {
     *            the {@link EndOfMediumException#getBytesReallyRead()} method returns the actual number of bytes read up
     *            to the end of medium.
     * @throws InvalidMediumReferenceException
-    *            Only for stream media, if the given offset is before the highest previously read offset
+    *            Only for stream media, if the given offset is before the highest previously read offset and the data is
+    *            not yet cached
     * @throws MediumAccessException
     *            If any other errors occurred during accessing the medium
     * @throws MediumStoreClosedException

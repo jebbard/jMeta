@@ -1,6 +1,6 @@
 /**
  *
- * {@link AbstractWritableRandomAccessMediumStoreTest}.java
+ * {@link AbstractCachedAndWritableRandomAccessMediumStoreTest}.java
  *
  * @author Jens Ebert
  *
@@ -14,10 +14,8 @@ import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
@@ -28,36 +26,15 @@ import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
- * {@link AbstractWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable
- * random-access media. Thus it contains tests for all writing methods.
+ * {@link AbstractUnCachedAndWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable
+ * random-access and uncached media. It contains tests specializing on writing to uncached media. In addition, it
+ * contains all negative tests for writing methods.
  *
  * @param <T>
  *           The concrete type of {@link Medium} to use
  */
-public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medium<?>>
-   extends AbstractMediumStoreTest<T> {
-
-   private static class ExpectedMediumContentBuilder {
-
-      private final String originalContent;
-      private String expectedContent = "";
-
-      public ExpectedMediumContentBuilder(String originalContent) {
-         this.originalContent = originalContent;
-      }
-
-      public void appendFromOriginal(int offset, int size) {
-         expectedContent += originalContent.substring(offset, offset + size);
-      }
-
-      public void appendLiteralString(String literalString) {
-         expectedContent += literalString;
-      }
-
-      public String buildExpectedContent() {
-         return expectedContent;
-      }
-   }
+public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T extends Medium<?>>
+   extends AbstractUnCachedMediumStoreTest<T> {
 
    /**
     * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
@@ -85,34 +62,6 @@ public abstract class AbstractWritableRandomAccessMediumStoreTest<T extends Medi
       mediumStoreUnderTest.open();
 
       Assert.assertFalse(mediumStoreUnderTest.isAtEndOfMedium(at(currentMedium, endOfMediumOffset / 2)));
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forRandomAccessMediumFromOffsetuntilEOM_throwsEndOfMediumException() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
-
-      mediumStoreUnderTest.open();
-
-      MediumReference cacheReference = at(currentMedium, 59);
-
-      try {
-         mediumStoreUnderTest.cache(cacheReference, mediumSizeInBytes + 100);
-
-         Assert.fail("Expected end of medium exception, but it did not occur!");
-      }
-
-      catch (EndOfMediumException e) {
-         Assert.assertEquals(cacheReference, e.getMediumReference());
-         Assert.assertEquals(mediumSizeInBytes + 100, e.getByteCountTriedToRead());
-         Assert.assertEquals(mediumSizeInBytes - cacheReference.getAbsoluteMediumOffset(), e.getBytesReallyRead());
-      }
    }
 
    /**

@@ -16,7 +16,6 @@ import java.nio.ByteBuffer;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,9 +25,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
-import com.github.jmeta.library.media.api.helper.MediaTestUtility;
+import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
@@ -36,20 +34,39 @@ import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * {@link AbstractMediumStoreTest} is the base class for testing the {@link MediumStore} interface. Each subclass
- * corresponds to a specific {@link Medium} type, and all {@link Medium} instances returned by a subclass is either all
- * read-only or all read-write. Thus, this class only contains the common reading tests. Furthermore, there are some
- * media which in principle do not allow caching. For those, {@link #getFilledMediumWithCacheBiggerThanMedium()} and
- * {@link #getFilledMediumWithCacheSmallerThanMedium()} must return null. Note that in this case we use
- * {@link Assume#assumeNotNull(Object...)} to ensure those cases are skipped.
+ * {@link AbstractMediumStoreTest} is the base class for testing the {@link MediumStore} interface. In contrast to
+ * {@link AbstractReadOnlyMediumStoreTest}, it uses also writable media, and it does not contain the default test cases
+ * for {@link MediumStore#open()}, {@link MediumStore#close()}, {@link MediumStore#getMedium()} and
+ * {@link MediumStore#createMediumReference(long)}.
  * 
- * The filled media used for testing all must contain {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT} at the beginning, a
- * String fully containing only human-readable standard ASCII characters. This guarantees that 1 bytes = 1 character.
- * Furthermore, all bytes inserted must also be standard human-readable ASCII characters with this property.
+ * Each subclass corresponds to a specific {@link Medium} type, a read-only or writable {@link Medium} instance, as well
+ * as a cached or un-cached medium. The sub-class hierarchy is non-trivial, so here is the explanation of the purpose of
+ * each abstract subclass:
+ * <ul>
+ * <li>{@link AbstractCachedMediumStoreTest}: Tests based on a cached medium; most of the "normal" read test cases go
+ * here, no write test cases and no parameter negative tests</li>
+ * <li>{@link AbstractCachedAndWritableRandomAccessMediumStoreTest}: Tests based on a cached, writable and thus
+ * random-access medium; additional "normal" write test cases go here (these are NOT repeated in
+ * {@link AbstractUnCachedAndWritableRandomAccessMediumStoreTest}!), no negative write test cases and no parameter
+ * negative tests</li>
+ * <li>{@link AbstractUnCachedMediumStoreTest}: Tests based on an un-cached medium; only special read test cases
+ * specifically designed for an un-cached medium go here, no write test cases; in addition, all parameter negative tests
+ * for read methods go here</li>
+ * <li>{@link AbstractUnCachedAndWritableRandomAccessMediumStoreTest}: Tests based on an un-cached, writable and thus
+ * random-access medium; only special write test cases specifically designed for an un-cached medium go here; in
+ * addition, all parameter negative tests for write methods go here</li>
+ * </ul>
+ * 
+ * The reason for keeping negative tests only in the "Un-cached" versions of the class hierarchy is that thus, we also
+ * test the {@link InMemoryMedium} that is by definition un-cached. Furthermore, there is no benefit in repeating tests
+ * for the cached variants, as the behaviour is the same.
+ * 
+ * The filled media used for testing all must contain {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}, a String fully
+ * containing only human-readable standard ASCII characters. This guarantees that 1 bytes = 1 character. Furthermore,
+ * all bytes inserted must also be standard human-readable ASCII characters with this property.
  *
  * @param <T>
  *           The type of {@link Medium} to use
@@ -63,21 +80,15 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    @Rule
    public TestName testName = new TestName();
 
-   private static final int MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE = 10;
-
-   private static final int MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE = 5;
-
-   private static final int MAX_CACHE_SIZE_FOR_SMALL_CACHE = MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() / 2;
-
    protected MediumStore mediumStoreUnderTest;
 
    protected T currentMedium;
 
-   private MediumAccessor<T> mediumAccessorSpy;
+   protected MediumAccessor<T> mediumAccessorSpy;
 
-   private MediumCache mediumCacheSpy;
+   protected MediumCache mediumCacheSpy;
 
-   private MediumReferenceFactory mediumReferenceFactorySpy;
+   protected MediumReferenceFactory mediumReferenceFactorySpy;
 
    /**
     * Validates all test files needed in this test class
@@ -98,535 +109,18 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#close()}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void open_onOpenedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-      mediumStoreUnderTest.open();
-   }
-
-   /**
-    * Tests {@link MediumStore#close()}.
-    */
-   @Test
-   public void close_onOpenedMediumStore_closesStore() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.close();
-
-      Assert.assertFalse(mediumStoreUnderTest.isOpened());
-   }
-
-   /**
-    * Tests {@link MediumStore#close()}.
-    */
-   @Test
-   public void close_onMediumStoreWithCachedContent_freesResources() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(currentMedium, 0), 10);
-
-      mediumStoreUnderTest.close();
-
-      Mockito.verify(mediumCacheSpy).clear();
-      Mockito.verify(mediumAccessorSpy).close();
-      Mockito.verify(mediumReferenceFactorySpy).clear();
-   }
-
-   /**
-    * Tests {@link MediumStore#close()}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void close_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.close();
-      mediumStoreUnderTest.close();
-   }
-
-   /**
-    * Tests {@link MediumStore#isOpened()}.
-    */
-   @Test
-   public void isOpened_onNewMediumStore_returnsFalse() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      Assert.assertFalse(mediumStoreUnderTest.isOpened());
-   }
-
-   /**
-    * Tests {@link MediumStore#isOpened()} and {@link MediumStore#open()}.
-    */
-   @Test
-   public void isOpened_onOpenedMediumStore_returnsTrue() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      Assert.assertTrue(mediumStoreUnderTest.isOpened());
-   }
-
-   /**
-    * Tests {@link MediumStore#getMedium()}.
-    */
-   @Test
-   public void getMedium_onOpenedMediumStore_returnsExpectedMedium() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
-   }
-
-   /**
-    * Tests {@link MediumStore#getMedium()}.
-    */
-   @Test
-   public void getMedium_onClosedMediumStore_returnsExpectedMedium() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
-   }
-
-   /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
-    */
-   @Test
-   public void createMediumReference_onOpenedMediumStore_returnsExpectedReference() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      int offset = 10;
-      MediumReference actualReference = mediumStoreUnderTest.createMediumReference(offset);
-
-      Assert.assertEquals(at(currentMedium, offset), actualReference);
-   }
-
-   /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void createMediumReference_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.createMediumReference(10);
-   }
-
-   /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void createMediumReference_forInvalidOffset_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.createMediumReference(-10);
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
-    */
-   @Test
-   public void isAtEndOfMedium_forFilledMediumAndOffsetBeforeEnd_returnsFalse() {
-      mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      Assert.assertFalse(mediumStoreUnderTest.isAtEndOfMedium(at(currentMedium, 0)));
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
-    */
-   @Test
-   public void isAtEndOfMedium_forEmptyMediumAtStartOffset_returnsTrue() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      Assert.assertTrue(mediumStoreUnderTest.isAtEndOfMedium(at(currentMedium, 0)));
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
-    */
-   @Test
-   public void isAtEndOfMedium_forFilledMediumAndGetDataUntilEOM_returnsTrue() {
-      mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
-
-      mediumStoreUnderTest.open();
-
-      // Read all bytes until EOM such that even for streams, we are at end of medium
-      getDataNoEOMExpected(at(currentMedium, 0), mediumSizeInBytes);
-
-      Assert.assertTrue(mediumStoreUnderTest.isAtEndOfMedium(at(currentMedium, mediumSizeInBytes)));
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void isAtEndOfMedium_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.isAtEndOfMedium(at(currentMedium, 10));
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void isAtEndOfMedium_forInvalidReference_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.isAtEndOfMedium(at(MediaTestUtility.OTHER_MEDIUM, 10));
-   }
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
-    */
-   @Test
-   public void getCachedByteCountAt_forFilledMediumWithBigCache_noPriorCache_returnsZero() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 10)));
-   }
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
-    * {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void getCachedByteCountAt_forFilledMediumWithDisabledCache_priorCache_returnsZero() {
-      mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      MediumReference cacheOffset = at(currentMedium, 10);
-
-      cacheNoEOMExpected(cacheOffset, 20);
-
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(2)));
-   }
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
-    * {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void getCachedByteCountAt_forFilledMediumWithBigCache_priorCacheAndOffsetInCachedRegion_returnsExpectedCount() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      int byteCountToCache = 10;
-
-      MediumReference cacheOffset = at(currentMedium, 20);
-
-      cacheNoEOMExpected(cacheOffset, byteCountToCache);
-
-      Assert.assertEquals(byteCountToCache - 2, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(2)));
-   }
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
-    * {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void getCachedByteCountAt_forFilledRandomAccessMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      int byteCountToCache = 10;
-
-      MediumReference cacheOffset = at(currentMedium, 20);
-
-      cacheNoEOMExpected(cacheOffset, byteCountToCache);
-
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(-5)));
-   }
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
-    */
-   @Test
-   public void getCachedByteCountAt_forReferenceBehindMedium_returnsZero() {
-      mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
-
-      mediumStoreUnderTest.open();
-
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, mediumSizeInBytes + 5)));
-   }
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void getCachedByteCountAt_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 0)));
-   }
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void getCachedByteCountAt_forInvalidReference_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.getCachedByteCountAt(at(MediaTestUtility.OTHER_MEDIUM, 10));
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledMediumWithBigCache_multipleOverlappingAndDisconnectedRegions_cachesExpectedBytes() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(currentMedium, 20), 10);
-      cacheNoEOMExpected(at(currentMedium, 25), 100);
-      cacheNoEOMExpected(at(currentMedium, 200), 35);
-
-      Assert.assertEquals(103, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 20 + 2)));
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 20 - 1)));
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 25 + 100)));
-      Assert.assertEquals(24, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 200 + 11)));
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledMediumWithBigCache_untilEOM_throwsEndOfMediumException() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
-
-      mediumStoreUnderTest.open();
-
-      MediumReference cacheReference = at(currentMedium, 0);
-
-      try {
-         mediumStoreUnderTest.cache(cacheReference, mediumSizeInBytes + 100);
-
-         Assert.fail("Expected end of medium exception, but it did not occur!");
-      }
-
-      catch (EndOfMediumException e) {
-         Assert.assertEquals(cacheReference, e.getMediumReference());
-         Assert.assertEquals(mediumSizeInBytes + 100, e.getByteCountTriedToRead());
-         Assert.assertEquals(mediumSizeInBytes, e.getBytesReallyRead());
-      }
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledMediumWithSmallCache_moreThanMaxCacheSize_cachesOnlyUpToMaxCacheSize() {
-      mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      int mediumSizeInBytes = getMediumContentAsString(currentMedium).length();
-
-      mediumStoreUnderTest.open();
-
-      MediumReference cacheOffset = at(currentMedium, 20);
-      cacheNoEOMExpected(cacheOffset, mediumSizeInBytes - 21);
-
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
-      Assert.assertEquals(
-         MAX_CACHE_SIZE_FOR_SMALL_CACHE - MAX_CACHE_SIZE_FOR_SMALL_CACHE % MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE,
-         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 595)));
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledMediumWithDisabledCache_doesNotReadMediumAtAll() {
-      mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(currentMedium, 20), 5);
-
-      try {
-         Mockito.verify(mediumAccessorSpy, Mockito.never()).read(Mockito.any());
-      } catch (EndOfMediumException e) {
-         throw new RuntimeException("Unexpected end of medium", e);
-      }
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledMediumWithBigCache_cacheWithinPreviousCache_doesNotReadAgain() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(currentMedium, 20), 30);
-      cacheNoEOMExpected(at(currentMedium, 22), 10);
-
-      verifyExactlyNReads(1);
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledMediumWithSmallCache_readsBlockWise() {
-      mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      int expectedReadCount = 4;
-      int byteCount = (expectedReadCount - 1) * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1;
-      cacheNoEOMExpected(at(currentMedium, 20), byteCount);
-
-      verifyExactlyNReads(expectedReadCount);
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void cache_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      cacheNoEOMExpected(at(currentMedium, 10), 10);
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void cache_forInvalidReference_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(MediaTestUtility.OTHER_MEDIUM, 10), 10);
-   }
-
-   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
-   public void getData_forFilledMediumWithBigCache_rangeWithCacheGaps_returnsExpectedDataAndUpdatesCacheInGaps() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(currentMedium, 10), 10);
-      cacheNoEOMExpected(at(currentMedium, 30), 100);
-      cacheNoEOMExpected(at(currentMedium, 135), 200);
-
-      long getDataStartOffset = 5;
-      int getDataSize = 400;
-
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
-      testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
-
-      Assert.assertEquals(mediumStoreUnderTest.getCachedByteCountAt(getDataOffset), getDataSize);
-   }
-
-   /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
-    */
-   @Test
-   public void getData_forFilledMediumWithBigCache_singleCacheBeforeRangeWithinCache_returnsExpectedDataAndDoesNotAccessMedium() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(currentMedium, 30), 100);
-
-      verifyExactlyNReads(1);
-
-      long getDataStartOffset = 35;
-      int getDataSize = 80;
-
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
-      testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
-
-      // No further read access after the initial cache happened!
-      verifyExactlyNReads(1);
-   }
-
-   /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void getData_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      getDataNoEOMExpected(at(currentMedium, 10), 10);
-   }
-
-   /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void getData_forInvalidReference_throwsException() {
+   public void getData_forEmptyMedium_untilEOM_throwsEndOfMediumException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
       mediumStoreUnderTest.open();
 
-      getDataNoEOMExpected(at(MediaTestUtility.OTHER_MEDIUM, 10), 10);
+      long getDataStartOffset = 0;
+      int getDataSize = 1;
+
+      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize);
    }
 
    /**
@@ -730,81 +224,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
-    * as content, backed by a cache, where the cache is smaller than the overall {@link Medium} size, in detail, it has
-    * a size of {@link #MAX_CACHE_SIZE_FOR_SMALL_CACHE}. In line with that, max cach region size is set to
-    * {@link #MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE} and the maximum read write block size is set to
-    * {@link #MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE}. This method must be called at the beginning of a test case to
-    * create the {@link MediumStore} to test and its return value must be assigned to {@link #mediumStoreUnderTest}. It
-    * is used for testing cases where data is read into the cache but then automatically purged due to the limited cache
-    * size.
-    * 
-    * @return a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
-    *         as content, backed by a small cache, or null if the current implementation does not support this
-    */
-   protected MediumStore createFilledMediumStoreWithSmallCache() {
-      try {
-         currentMedium = createFilledMedium(testName.getMethodName(), true, MAX_CACHE_SIZE_FOR_SMALL_CACHE,
-            MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE, MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
-
-         if (currentMedium == null) {
-            return null;
-         }
-
-         return createMediumStoreToTest(currentMedium);
-      } catch (IOException e) {
-         throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
-      }
-   }
-
-   /**
-    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
-    * as content, backed by a cache, where the cache is (much) bigger than the overall {@link Medium} size. The
-    * read-write block size is set to same value (to ensure only single reads during the test cases when testing
-    * {@link MediumStore#cache(MediumReference, int)}) and an also quite big max cache region size. This method must be
-    * called at the beginning of a test case to create the {@link MediumStore} to test and its return value must be
-    * assigned to {@link #mediumStoreUnderTest}. It is used for testing cases where data read is expected to always end
-    * up in the cache due to its big size.
-    * 
-    * @return a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
-    *         as content, backed by a big cache, or null if the current implementation does not support this
-    */
-   protected MediumStore createFilledMediumStoreWithBigCache() {
-      try {
-         currentMedium = createFilledMedium(testName.getMethodName(), true,
-            MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() + 1000,
-            MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() - 20,
-            MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() + 1000);
-
-         if (currentMedium == null) {
-            return null;
-         }
-
-         return createMediumStoreToTest(currentMedium);
-      } catch (IOException e) {
-         throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
-      }
-   }
-
-   /**
-    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
-    * as content, with disabled caching. This method must be called at the beginning of a test case to create the
-    * {@link MediumStore} to test and its return value must be assigned to {@link #mediumStoreUnderTest}. It is used by
-    * tests that check that disabled caching really works as expected.
-    * 
-    * @return a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT} as content, with disabled
-    *         caching
-    */
-   protected MediumStore createFilledUncachedMediumStore() {
-      try {
-         currentMedium = createFilledMedium(testName.getMethodName(), false, 1, 1, 1);
-         return createMediumStoreToTest(currentMedium);
-      } catch (IOException e) {
-         throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
-      }
-   }
-
-   /**
     * Tests {@link MediumStore#getData(MediumReference, int)} by comparing its result with the expected medium content.
     * 
     * @param offset
@@ -814,7 +233,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param currentMediumContent
     *           The current medium content used to get the expected data
     */
-   private void testGetData_returnsExpectedData(MediumReference offset, int readDataSize, String currentMediumContent) {
+   protected void testGetData_returnsExpectedData(MediumReference offset, int readDataSize,
+      String currentMediumContent) {
       ByteBuffer returnedData = getDataNoEOMExpected(offset, readDataSize);
 
       Assert.assertEquals(readDataSize, returnedData.remaining());
@@ -828,6 +248,27 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
+    * Tests {@link MediumStore#getData(MediumReference, int)} to throw an end of medium exception when reaching it.
+    * 
+    * @param offset
+    *           The offset to use for the method call
+    * @param readDataSize
+    *           The size to use for the method call
+    */
+   protected void testGetData_throwsEndOfMediumException(long getDataStartOffset, int getDataSize) {
+      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+
+      try {
+         mediumStoreUnderTest.getData(getDataOffset, getDataSize);
+         Assert.fail(EndOfMediumException.class + "expected");
+      } catch (EndOfMediumException e) {
+         Assert.assertEquals(getDataOffset, e.getMediumReference());
+         Assert.assertEquals(getDataSize, e.getByteCountTriedToRead());
+         Assert.assertEquals((int) (getDataSize - getDataStartOffset), e.getBytesReallyRead());
+      }
+   }
+
+   /**
     * Calls {@link MediumStore#getData(MediumReference, int)} and expects no end of medium.
     * 
     * @param offset
@@ -835,7 +276,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param byteCount
     *           The number of bytes to cache
     */
-   private ByteBuffer getDataNoEOMExpected(MediumReference offset, int byteCount) {
+   protected ByteBuffer getDataNoEOMExpected(MediumReference offset, int byteCount) {
       try {
          return mediumStoreUnderTest.getData(offset, byteCount);
       } catch (EndOfMediumException e) {
@@ -866,11 +307,12 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param N
     *           The number of expected calls
     */
-   private void verifyExactlyNReads(int N) {
+   protected void verifyExactlyNReads(int N) {
       try {
          Mockito.verify(mediumAccessorSpy, Mockito.times(N)).read(Mockito.any());
       } catch (EndOfMediumException e) {
          throw new RuntimeException("Unexpected end of medium", e);
       }
    }
+
 }

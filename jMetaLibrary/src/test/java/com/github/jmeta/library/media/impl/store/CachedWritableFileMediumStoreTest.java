@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
-import com.github.jmeta.library.media.api.services.AbstractWritableRandomAccessMediumStoreTest;
+import com.github.jmeta.library.media.api.services.AbstractCachedAndWritableRandomAccessMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
@@ -24,9 +24,9 @@ import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 
 /**
- * {@link WritableFileMediumStoreTest} tests a {@link MediumStore} backed by {@link FileMedium} instances.
+ * {@link CachedWritableFileMediumStoreTest} tests a {@link MediumStore} backed by {@link FileMedium} instances.
  */
-public class WritableFileMediumStoreTest extends AbstractWritableRandomAccessMediumStoreTest<FileMedium> {
+public class CachedWritableFileMediumStoreTest extends AbstractCachedAndWritableRandomAccessMediumStoreTest<FileMedium> {
 
    /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createEmptyMedium(java.lang.String)
