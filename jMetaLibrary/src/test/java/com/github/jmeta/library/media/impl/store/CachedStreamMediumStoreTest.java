@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.services.AbstractCachedMediumStoreTest;
@@ -167,7 +168,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
-   @Test
+   @Test(expected = InvalidMediumReferenceException.class)
    public void getData_forFilledMediumWithSmallCache_offsetInPreviouslyFreedCacheRegion_throwsException() {
       mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
 
@@ -181,6 +182,28 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    }
 
    /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forFilledStreamMediumWithBigCache_referenceBehindEOM_throwsEndOfMediumException() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      long getDataStartOffset = currentMediumContent.length() + 15;
+      int getDataSize = 10;
+
+      try {
+         mediumStoreUnderTest.getData(at(currentMedium, getDataStartOffset), getDataSize);
+         Assert.fail("Expected " + EndOfMediumException.class);
+      } catch (EndOfMediumException e) {
+         // as expected
+      }
+   }
+
+   /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createEmptyMedium(java.lang.String)
     */
    @Override
@@ -191,13 +214,12 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
 
    /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createFilledMedium(java.lang.String,
-    *      boolean, long, int, int)
+    *      long, int)
     */
    @Override
-   protected InputStreamMedium createFilledMedium(String testMethodName, boolean enableCaching, long maxCacheSize,
-      int maxCacheRegionSize, int maxReadWriteBlockSize) throws IOException {
+   protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize) throws IOException {
       return new InputStreamMedium(new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile()),
-         STREAM_BASED_FILLED_MEDIUM_NAME, enableCaching, maxCacheSize, maxCacheRegionSize, maxReadWriteBlockSize);
+         STREAM_BASED_FILLED_MEDIUM_NAME, maxCacheSize, maxReadWriteBlockSize);
    }
 
    /**

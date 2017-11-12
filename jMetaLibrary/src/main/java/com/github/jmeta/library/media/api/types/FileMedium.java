@@ -24,13 +24,12 @@ public class FileMedium extends AbstractMedium<Path> {
     * Creates a new {@link FileMedium} with default values for all properties that influence reading and writing.
     * 
     * @param medium
-    *           see {@link #FileMedium(Path, boolean, boolean, long, int, int)}
+    *           see {@link #FileMedium(Path, boolean, long, int)}
     * @param isReadOnly
-    *           see {@link #FileMedium(Path, boolean, boolean, long, int, int)}
+    *           see {@link #FileMedium(Path, boolean, long, int)}
     */
    public FileMedium(Path medium, boolean isReadOnly) {
-      this(medium, isReadOnly, true, DEFAULT_MAX_CACHE_SIZE_IN_BYTES, DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES,
-         DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      this(medium, isReadOnly, DEFAULT_MAX_CACHE_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
    }
 
    /**
@@ -41,19 +40,14 @@ public class FileMedium extends AbstractMedium<Path> {
     *           The {@link Path} to use, must not be null, must be a file and must exist
     * @param isReadOnly
     *           true to make this {@link FileMedium} read-only, false enables read and write.
-    * @param cachingEnabled
-    *           see {@link #isCachingEnabled()}
     * @param maxCacheSizeInBytes
-    *           see #getMaxCacheSizeInBytes()
-    * @param maxCacheRegionSizeInBytes
-    *           see #getMaxCacheRegionSizeInBytes()
+    *           see #getMaxCacheSizeInBytes(), set to 0 to disable caching for this medium
     * @param maxReadWriteBlockSizeInBytes
     *           see #getMaxReadWriteBlockSizeInBytes()
     */
-   public FileMedium(Path medium, boolean isReadOnly, boolean cachingEnabled, long maxCacheSizeInBytes,
-      int maxCacheRegionSizeInBytes, int maxReadWriteBlockSizeInBytes) {
-      super(medium, medium.toAbsolutePath().toString(), true, isReadOnly, cachingEnabled, maxCacheSizeInBytes,
-         maxCacheRegionSizeInBytes, maxReadWriteBlockSizeInBytes);
+   public FileMedium(Path medium, boolean isReadOnly, long maxCacheSizeInBytes, int maxReadWriteBlockSizeInBytes) {
+      super(medium, medium.toAbsolutePath().toString(), true, isReadOnly, maxCacheSizeInBytes,
+         maxReadWriteBlockSizeInBytes);
 
       Reject.ifFalse(Files.isRegularFile(medium), "Files.isRegularFile(medium)");
    }

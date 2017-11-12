@@ -45,8 +45,7 @@ public class InMemoryMedium extends AbstractMedium<byte[]> {
     *           see #getMaxReadWriteBlockSizeInBytes()
     */
    public InMemoryMedium(byte[] medium, String name, boolean isReadOnly, int maxReadWriteBlockSizeInBytes) {
-      super(medium, name, true, isReadOnly, false, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-         DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES, maxReadWriteBlockSizeInBytes);
+      super(medium, name, true, isReadOnly, 0, maxReadWriteBlockSizeInBytes);
    }
 
    /**

@@ -41,14 +41,13 @@ public class CachedWritableFileMediumStoreTest extends AbstractCachedAndWritable
 
    /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createFilledMedium(java.lang.String,
-    *      boolean, long, int, int)
+    *      long, int)
     */
    @Override
-   protected FileMedium createFilledMedium(String testMethodName, boolean enableCaching, long maxCacheSize,
-      int maxCacheRegionSize, int maxReadWriteBlockSize) throws IOException {
+   protected FileMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize) throws IOException {
 
       Path copiedFile = getCopiedFile(MediaTestFiles.FIRST_TEST_FILE_PATH, "FIRST_TEST_FILE_MEDIUM_", testMethodName);
-      return new FileMedium(copiedFile, false, enableCaching, maxCacheSize, maxCacheRegionSize, maxReadWriteBlockSize);
+      return new FileMedium(copiedFile, false, maxCacheSize, maxReadWriteBlockSize);
    }
 
    /**

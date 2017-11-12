@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
  * {@link AbstractCachedAndWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable
@@ -136,5 +137,22 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
 
       verifyExactlyNReads(2);
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void getData_forFilledRandomAccessMediumWithBigCache_referenceBehindEOM_throwsException() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      long getDataStartOffset = currentMediumContent.length() + 15;
+      int getDataSize = 10;
+
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
    }
 }

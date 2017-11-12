@@ -37,15 +37,11 @@ public class UnCachedWritableInMemoryMediumStoreTest
 
    /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createFilledMedium(java.lang.String,
-    *      boolean, long, int, int)
+    *      long, int)
     */
    @Override
-   protected InMemoryMedium createFilledMedium(String testMethodName, boolean enableCaching, long maxCacheSize,
-      int maxCacheRegionSize, int maxReadWriteBlockSize) throws IOException {
-
-      if (enableCaching) {
-         return null;
-      }
+   protected InMemoryMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
+      throws IOException {
       return new InMemoryMedium(MediaTestUtility.readFileContent(MediaTestFiles.FIRST_TEST_FILE_PATH),
          "Stream based filled medium", false, maxReadWriteBlockSize);
    }

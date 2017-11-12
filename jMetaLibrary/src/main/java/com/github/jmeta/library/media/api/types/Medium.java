@@ -21,9 +21,9 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  * <li>Has a wrapped underlying {@link Medium} object</li>
  * </ul>
  * 
- * In addition, there are several configuration values that can be used to configure the {@link Medium} for later
- * access by an {@link MediumStore}. These need to be set in the corresponding implementation classes. This interface
- * only offers methods for reading them: See {@link #getMaxReadWriteBlockSizeInBytes()},
+ * In addition, there are several configuration values that can be used to configure the {@link Medium} for later access
+ * by an {@link MediumStore}. These need to be set in the corresponding implementation classes. This interface only
+ * offers methods for reading them: See {@link #getMaxReadWriteBlockSizeInBytes()},
  * {@link #getMaxCacheRegionSizeInBytes()}, {@link #getMaxCacheSizeInBytes()} and {@link #isCacheable()}.
  * 
  * @param <T>
@@ -40,25 +40,13 @@ public interface Medium<T> {
     * The default maximum read-write block size in bytes, if no values are explicitly set. See
     * {@link #getMaxReadWriteBlockSizeInBytes()} for more details.
     */
-   public static int DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES = 8192;
-
-   /**
-    * The default maximum cache region size in bytes, if no values are explicitly set. See
-    * {@link #getMaxCacheRegionSizeInBytes()} for more details.
-    */
-   public static int DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES = DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES;
+   public static int DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES = 16384;
 
    /**
     * The default maximum cache size in bytes, if no values are explicitly set. See {@link #getMaxCacheSizeInBytes()}
     * for more details.
     */
    public static long DEFAULT_MAX_CACHE_SIZE_IN_BYTES = 1_048_576L;
-
-   /**
-    * The default value for caching enabled, if no values are explicitly set. See {@link #isCachingEnabled()} for more
-    * details.
-    */
-   public static boolean DEFAULT_CACHING_ENABLED = true;
 
    /**
     * Returns whether this {@link Medium} supports random-access or not.
@@ -96,29 +84,34 @@ public interface Medium<T> {
    public T getWrappedMedium();
 
    /**
-    * Returns the currently configured maximum read-write block size. The read-write block size is used during flushing
-    * of any writing actions to the {@link Medium} and influences how much bytes at max are read and written at once
-    * during a flush. This configuration must only be changed before accessing the {@link Medium} using an
-    * {@link MediumStore} the first time. Changes to it after opening an {@link MediumStore} are ignored.
+    * Returns the currently configured maximum read-write block size. This essentially influences the behavior of medium
+    * access, i.e. how often it is done and what the maximum number of bytes read from or written to the medium at once.
+    * There are two aspects to it: First of all, you want to read as much bytes as possible at once, on the other hand
+    * this size should not get too big to ensure you are not wasting too much heap, especially for temporary "garbage"
+    * reads that occur e.g. during flushing. Second, you want this size to be bigger than the usual header sizes.
+    * Headers play a very important role when processing data formats. You do not want to read multiple times to get
+    * headers into memory. So choose a size that is bigger than the headers you need.
+    * 
+    * The read-write block size is used at several places:
+    * <ol>
+    * <li>When reading bytes during {@link MediumStore#getData(MediumReference, int)} or
+    * {@link MediumStore#cache(MediumReference, int)}, at max this number of bytes is read at once. Thus a chunk-wise
+    * read is done in case more bytes need to be read from the medium.</li>
+    * <li>It is also used as the maximum size of cache segments created during
+    * {@link MediumStore#getData(MediumReference, int)} or {@link MediumStore#cache(MediumReference, int)} for a cached
+    * medium.</li>
+    * <li>When the need arises to read and write bytes before a written change in the medium during
+    * {@link MediumStore#flush()}</li>
+    * </ol>
+    * 
+    * This configuration must only be changed before accessing the {@link Medium} using an {@link MediumStore} the first
+    * time. Changes to it after opening an {@link MediumStore} are ignored.
     * 
     * The default value if it is not explicitly set is {@link #DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES}.
     * 
     * @return the currently configured maximum read-write block size
     */
    public int getMaxReadWriteBlockSizeInBytes();
-
-   /**
-    * Returns the currently configured maximum cache region size in bytes. If caching is enabled, this value is used
-    * when data read from the {@link Medium} is stored in an internal cache by an {@link MediumStore}. The cache
-    * consists of regions which must not exceed this maximum size. This size must not exceed the currently configured
-    * maximum cache size in bytes. If caching is disabled, this value must not be used or interpreted in any way.
-    * 
-    * The default value, if caching is enabled and if it is not explicitly set is
-    * {@link #DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES}.
-    * 
-    * @return the currently configured maximum cache region size in bytes
-    */
-   public int getMaxCacheRegionSizeInBytes();
 
    /**
     * Returns the currently configured maximum cache size in bytes. If caching is enabled, this value is used when data

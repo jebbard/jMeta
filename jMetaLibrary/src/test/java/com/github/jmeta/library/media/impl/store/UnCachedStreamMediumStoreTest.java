@@ -14,10 +14,9 @@ import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.services.AbstractUnCachedMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -36,6 +35,28 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    private static final String STREAM_BASED_EMPTY_MEDIUM_NAME = "Stream based empty medium";
 
    /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test(expected = InvalidMediumReferenceException.class)
+   public void getData_forFilledUncachedMedium_twiceInEnclosingRegion_throwsException() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      long getDataStartOffset = 0;
+      int getDataSize = 200;
+
+      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+
+      // Read again in range fully enclosed by first read
+      // - Must throw exception here because the previous data read was returned and advanced the stream, but it
+      // was not added to the cache. Accessing the same offset again for an uncached stream is not possible
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+   }
+
+   /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createEmptyMedium(java.lang.String)
     */
    @Override
@@ -46,13 +67,12 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
 
    /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createFilledMedium(java.lang.String,
-    *      boolean, long, int, int)
+    *      long, int)
     */
    @Override
-   protected InputStreamMedium createFilledMedium(String testMethodName, boolean enableCaching, long maxCacheSize,
-      int maxCacheRegionSize, int maxReadWriteBlockSize) throws IOException {
+   protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize) throws IOException {
       return new InputStreamMedium(new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile()),
-         STREAM_BASED_FILLED_MEDIUM_NAME, enableCaching, maxCacheSize, maxCacheRegionSize, maxReadWriteBlockSize);
+         STREAM_BASED_FILLED_MEDIUM_NAME, maxCacheSize, maxReadWriteBlockSize);
    }
 
    /**

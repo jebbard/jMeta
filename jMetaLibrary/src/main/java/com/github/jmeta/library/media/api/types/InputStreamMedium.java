@@ -37,8 +37,7 @@ public class InputStreamMedium extends AbstractMedium<InputStream> {
     *           A name of the {@link InputStream} to be able to identify it. Optional, null may be passed
     */
    public InputStreamMedium(InputStream medium, String name) {
-      this(medium, name, DEFAULT_CACHING_ENABLED, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-         DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      this(medium, name, DEFAULT_MAX_CACHE_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
    }
 
    /**
@@ -49,19 +48,14 @@ public class InputStreamMedium extends AbstractMedium<InputStream> {
     *           The {@link InputStream} to use, must not be null
     * @param name
     *           A name of the {@link InputStream} to be able to identify it. Optional, null may be passed
-    * @param cachingEnabled
-    *           see {@link #isCachingEnabled()}
     * @param maxCacheSizeInBytes
-    *           see #getMaxCacheSizeInBytes()
-    * @param maxCacheRegionSizeInBytes
-    *           see #getMaxCacheRegionSizeInBytes()
+    *           see #getMaxCacheSizeInBytes(), set to 0 to disable caching
     * @param maxReadWriteBlockSizeInBytes
     *           see #getMaxReadWriteBlockSizeInBytes()
     */
-   public InputStreamMedium(InputStream medium, String name, boolean cachingEnabled, long maxCacheSizeInBytes,
-      int maxCacheRegionSizeInBytes, int maxReadWriteBlockSizeInBytes) {
-      super(medium, name, false, true, cachingEnabled, maxCacheSizeInBytes, maxCacheRegionSizeInBytes,
-         maxReadWriteBlockSizeInBytes);
+   public InputStreamMedium(InputStream medium, String name, long maxCacheSizeInBytes,
+      int maxReadWriteBlockSizeInBytes) {
+      super(medium, name, false, true, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
    }
 
    /**

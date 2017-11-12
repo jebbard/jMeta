@@ -28,11 +28,7 @@ public abstract class AbstractMedium<T> implements Medium<T> {
 
    private final boolean isReadOnly;
 
-   private final boolean cachingEnabled;
-
    private final long maxCacheSizeInBytes;
-
-   private final int maxCacheRegionSizeInBytes;
 
    private final int maxReadWriteBlockSizeInBytes;
 
@@ -51,8 +47,8 @@ public abstract class AbstractMedium<T> implements Medium<T> {
     *           see #AbstractMedium(Object, String, boolean, boolean, boolean, long, int, int)
     */
    public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly) {
-      this(medium, name, isRandomAccess, isReadOnly, true, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-         DEFAULT_MAX_CACHE_REGION_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      this(medium, name, isRandomAccess, isReadOnly, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
+         DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
    }
 
    /**
@@ -67,29 +63,22 @@ public abstract class AbstractMedium<T> implements Medium<T> {
     *           true if the medium is random-access, false otherwise
     * @param isReadOnly
     *           true to make this a read-only {@link Medium}, false otherwise.
-    * @param cachingEnabled
-    *           see {@link #isCachingEnabled()}
     * @param maxCacheSizeInBytes
-    *           see #getMaxCacheSizeInBytes()
-    * @param maxCacheRegionSizeInBytes
-    *           see #getMaxCacheRegionSizeInBytes()
+    *           see #getMaxCacheSizeInBytes(), specify 0 here to disable caching
     * @param maxReadWriteBlockSizeInBytes
     *           see #getMaxReadWriteBlockSizeInBytes()
     */
-   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, boolean cachingEnabled,
-      long maxCacheSizeInBytes, int maxCacheRegionSizeInBytes, int maxReadWriteBlockSizeInBytes) {
+   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, long maxCacheSizeInBytes,
+      int maxReadWriteBlockSizeInBytes) {
       Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
-      Reject.ifNegativeOrZero(maxCacheSizeInBytes, "maxCacheSizeInBytes");
+      Reject.ifNegative(maxCacheSizeInBytes, "maxCacheSizeInBytes");
       Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
-      Reject.ifTrue(maxCacheRegionSizeInBytes > maxCacheSizeInBytes, "maxCacheRegionSizeInBytes > maxCacheSizeInBytes");
 
       this.medium = medium;
       this.name = name;
       this.isRandomAccess = isRandomAccess;
       this.isReadOnly = isReadOnly;
-      this.cachingEnabled = cachingEnabled;
       this.maxCacheSizeInBytes = maxCacheSizeInBytes;
-      this.maxCacheRegionSizeInBytes = maxCacheRegionSizeInBytes;
       this.maxReadWriteBlockSizeInBytes = maxReadWriteBlockSizeInBytes;
    }
 
@@ -137,8 +126,7 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    @Override
    public String toString() {
       return "AbstractMedium [medium=" + medium + ", name=" + name + ", isRandomAccess=" + isRandomAccess
-         + ", isReadOnly=" + isReadOnly + ", cachingEnabled=" + cachingEnabled + ", maxCacheSizeInBytes="
-         + maxCacheSizeInBytes + ", maxCacheRegionSizeInBytes=" + maxCacheRegionSizeInBytes
+         + ", isReadOnly=" + isReadOnly + ", maxCacheSizeInBytes=" + maxCacheSizeInBytes
          + ", maxReadWriteBlockSizeInBytes=" + maxReadWriteBlockSizeInBytes + "]";
    }
 
@@ -183,7 +171,7 @@ public abstract class AbstractMedium<T> implements Medium<T> {
     */
    @Override
    public boolean isCachingEnabled() {
-      return cachingEnabled;
+      return maxCacheSizeInBytes > 0;
    }
 
    /**
@@ -192,14 +180,6 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    @Override
    public long getMaxCacheSizeInBytes() {
       return maxCacheSizeInBytes;
-   }
-
-   /**
-    * @see com.github.jmeta.library.media.api.types.Medium#getMaxCacheRegionSizeInBytes()
-    */
-   @Override
-   public int getMaxCacheRegionSizeInBytes() {
-      return maxCacheRegionSizeInBytes;
    }
 
    /**

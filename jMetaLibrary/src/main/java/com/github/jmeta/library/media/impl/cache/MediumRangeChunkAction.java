@@ -16,7 +16,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * It is a frequently occurring task to split an arbitrary range into regular equally-sized chunk and perform arbitrary
  * actions on each chunk. Despite writing the same integer division and modulo as well as looping code over and over
  * again, this function interface offers the static method
- * {@link #walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)} that standardizes the split
+ * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} that standardizes the split
  * process and delegates to an arbitrary {@link #perform(MediumReference, int)} method implementing this interface. The
  * method {@link #perform(MediumReference, int)} can be a implemented as lambda, or reference to a an arbitrary private
  * or static method with the same signature. It gets the corresponding chunk start and size parameters.
@@ -32,9 +32,9 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
    /**
     * Performs an arbitrary user-defined action based on the given start {@link MediumReference} and size of the current
     * chunk. It can have an arbitrary return value which is collected and returned by
-    * {@link #walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)}.
+    * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)}.
     * 
-    * {@link #walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)} calls this method in strict
+    * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} calls this method in strict
     * ascending sequence for each chunk of the given chunk size.
     * 
     * @param chunkStartReference
@@ -74,14 +74,14 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
     *         method for each chunk, in strict call sequence, i.e. starting with the first chunk processing result as
     *         first element, going on with the second chunk processing result and so on.
     */
-   public static <T> List<T> walkDividedRange(Class<T> resultClass, MediumReference rangeStartReference,
+   public static <T> List<T> performActionOnChunksInRange(Class<T> resultClass, MediumReference rangeStartReference,
       int totalRangeSizeInBytes, int chunkSizeInBytes, MediumRangeChunkAction<T, RuntimeException> action) {
-      return walkDividedRangeWithException(resultClass, RuntimeException.class, rangeStartReference,
+      return performActionOnChunksInRange(resultClass, RuntimeException.class, rangeStartReference,
          totalRangeSizeInBytes, chunkSizeInBytes, action);
    }
 
    /**
-    * Behaves the same way as {@link #walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)}, but
+    * Behaves the same way as {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)}, but
     * supports actions that declare exactly one checked exception of type E that they might throw. If this is needed,
     * you must use this method and specify the type of exception that might be thrown. If it is thrown, this method just
     * redeclares it such that it is also thrown to the outside world as soon as it occurs.
@@ -107,8 +107,8 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
     * @throws E
     *            In case that any of the chunk actions threw such an exception
     */
-   public static <T, E extends Throwable> List<T> walkDividedRangeWithException(Class<T> resultClass,
-      Class<E> exceptionClass, MediumReference rangeStartReference, int totalRangeSizeInBytes, int chunkSizeInBytes,
+   public static <T, E extends Throwable> List<T> performActionOnChunksInRange(Class<T> resultClass,
+      Class<E> exceptionClass, MediumReference rangeStartReference, long totalRangeSizeInBytes, int chunkSizeInBytes,
       MediumRangeChunkAction<T, E> action) throws E {
 
       Reject.ifNull(action, "action");
@@ -118,7 +118,14 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
       Reject.ifNegativeOrZero(totalRangeSizeInBytes, "totalRangeSizeInBytes");
       Reject.ifNegativeOrZero(chunkSizeInBytes, "chunkSizeInBytes");
 
-      int fullChunkCount = totalRangeSizeInBytes / chunkSizeInBytes;
+      long fullChunkCountLong = totalRangeSizeInBytes / chunkSizeInBytes;
+
+      if (fullChunkCountLong > Integer.MAX_VALUE) {
+         throw new RuntimeException(
+            "Overflow in total range size, as the chunk count is bigger than " + Integer.MAX_VALUE);
+      }
+
+      int fullChunkCount = (int) fullChunkCountLong;
 
       ArrayList<T> resultList = new ArrayList<>(fullChunkCount + 1);
 
@@ -131,7 +138,7 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
       }
 
       if (totalRangeSizeInBytes % chunkSizeInBytes > 0) {
-         resultList.add(action.perform(currentChunkStartReference, totalRangeSizeInBytes % chunkSizeInBytes));
+         resultList.add(action.perform(currentChunkStartReference, (int) (totalRangeSizeInBytes % chunkSizeInBytes)));
       }
 
       return resultList;

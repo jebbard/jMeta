@@ -304,7 +304,7 @@ public class MediumCache {
 
       // Then we ensure the new region is divided into subregions with max region size, if necessary
       // and we add all divided subregions into the cache
-      List<MediumRegion> regionsToAdd = MediumRangeChunkAction.walkDividedRange(MediumRegion.class,
+      List<MediumRegion> regionsToAdd = MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class,
          regionToAdd.getStartReference(), regionToAdd.getSize(), getMaximumCacheRegionSizeInBytes(),
          (chunkStartReference, chunkSize) -> splitRegionExceedingMaxCacheRegionSize(regionToAdd, chunkStartReference,
             chunkSize));
@@ -358,7 +358,7 @@ public class MediumCache {
       if (previousRegionEndReference.before(currentRegionStartReference)) {
          int gapSizeInBytes = (int) currentRegionStartReference.distanceTo(previousRegionEndReference);
 
-         gapRegions.addAll(MediumRangeChunkAction.walkDividedRange(MediumRegion.class, previousRegionEndReference,
+         gapRegions.addAll(MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, previousRegionEndReference,
             gapSizeInBytes, getMaximumCacheRegionSizeInBytes(), MediumRegion::new));
       }
 
@@ -368,7 +368,7 @@ public class MediumCache {
    /**
     * This method performs the actual splitting of a {@link MediumRegion} according to the maximum allowed cache region
     * size. It is used with
-    * {@link MediumRangeChunkAction#walkDividedRange(Class, MediumReference, int, int, MediumRangeChunkAction)} and is
+    * {@link MediumRangeChunkAction#performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} and is
     * called for each chunk the original {@link MediumRegion} is split into. It returns the {@link MediumRegion}
     * corresponding to the current chunk.
     * 

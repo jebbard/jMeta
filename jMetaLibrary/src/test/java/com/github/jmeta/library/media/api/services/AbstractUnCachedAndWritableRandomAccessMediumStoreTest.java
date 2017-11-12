@@ -65,102 +65,25 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
    }
 
    /**
-    * Tests {@link MediumStore#replaceData(MediumReference, int, java.nio.ByteBuffer)}.
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
-   @Test(expected = MediumStoreClosedException.class)
-   public void replaceData_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+   @Test
+   public void getData_forFilledUncachedMedium_twiceInEnclosingRegion_reReadsData() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
 
-      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void replaceData_forInvalidReference_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+      String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.replaceData(at(MediaTestUtility.OTHER_MEDIUM, 10), 20, ByteBuffer.allocate(10));
-   }
+      long getDataStartOffset = 0;
+      int getDataSize = 200;
 
-   /**
-    * Tests {@link MediumStore#removeData(MediumReference, int)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void removeData_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
+      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+      // Read again in range fully enclosed by first read
+      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset).advance(5), getDataSize - 3,
+         currentMediumContent);
 
-      mediumStoreUnderTest.removeData(at(currentMedium, 10), 20);
-   }
-
-   /**
-    * Tests {@link MediumStore#removeData(MediumReference, int)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void removeData_forInvalidReference_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.removeData(at(MediaTestUtility.OTHER_MEDIUM, 10), 20);
-   }
-
-   /**
-    * Tests {@link MediumStore#insertData(MediumReference, ByteBuffer)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void insertData_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.insertData(at(currentMedium, 10), ByteBuffer.allocate(10));
-   }
-
-   /**
-    * Tests {@link MediumStore#insertData(MediumReference, ByteBuffer)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void insertData_forInvalidReference_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.insertData(at(MediaTestUtility.OTHER_MEDIUM, 10), ByteBuffer.allocate(10));
-   }
-
-   /**
-    * Tests {@link MediumStore#undo(com.github.jmeta.library.media.api.types.MediumAction)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void undo_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest
-         .undo(new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(currentMedium, 10), 20), 0, null));
-   }
-
-   /**
-    * Tests {@link MediumStore#undo(com.github.jmeta.library.media.api.types.MediumAction)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void undo_forInvalidReference_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.undo(new MediumAction(MediumActionType.REMOVE,
-         new MediumRegion(at(MediaTestUtility.OTHER_MEDIUM, 10), 20), 0, null));
-   }
-
-   /**
-    * Tests {@link MediumStore#flush()}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void flush_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.flush();
+      // Data as read block-wise, twice
+      verifyExactlyNReads(2 * getDataSize / MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM);
    }
 }

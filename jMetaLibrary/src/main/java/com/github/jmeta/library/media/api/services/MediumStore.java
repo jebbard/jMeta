@@ -156,7 +156,8 @@ public interface MediumStore {
     * {@link #getData(MediumReference, int)}, if it is suitable to work with all the read data right away.
     * 
     * @param offset
-    *           The offset to start caching, must point to the same {@link Medium} as this {@link MediumStore}
+    *           The offset to start caching, must point to the same {@link Medium} as this {@link MediumStore}, must not
+    *           be beyond the current medium size for random-access media
     * @param numberOfBytes
     *           The number of bytes to cache, must be bigger than zero; caching too much bytes might lead to an
     *           {@link OutOfMemoryError}, so users should ensure to configure a maximum cache size if they need to call
@@ -221,7 +222,8 @@ public interface MediumStore {
     * read offset, an {@link InvalidMediumReferenceException} is thrown, as with streams, you cannot go back.
     * 
     * @param offset
-    *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}
+    *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}, must not be beyond
+    *           the current medium size for random-access media
     * @param numberOfBytes
     *           The number of bytes to read, must be bigger than 0. If the {@link Medium} is shorter than this range, an
     *           {@link EndOfMediumException} is thrown; getting too much bytes might lead to an {@link OutOfMemoryError}

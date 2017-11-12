@@ -28,8 +28,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  */
 public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends AbstractMediumStoreTest<T> {
 
-   protected static final int MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE = 10;
-   protected static final int MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE = 5;
+   protected static final int MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE = 5;
    protected static final int MAX_CACHE_SIZE_FOR_SMALL_CACHE = MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() / 2;
 
    /**
@@ -166,7 +165,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
       Assert.assertEquals(
-         MAX_CACHE_SIZE_FOR_SMALL_CACHE - MAX_CACHE_SIZE_FOR_SMALL_CACHE % MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE,
+         MAX_CACHE_SIZE_FOR_SMALL_CACHE - MAX_CACHE_SIZE_FOR_SMALL_CACHE % MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE,
          mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 595)));
    }
 
@@ -260,7 +259,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
       // Read again in range fully enclosed by first read
-      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset).advance(5), getDataSize - 3,
+      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset).advance(5), getDataSize - 8,
          currentMediumContent);
 
       // Still only one read done
@@ -281,24 +280,8 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       long getDataStartOffset = 15;
       int getDataSize = currentMediumContent.length();
 
-      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize);
-   }
-
-   /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
-    */
-   @Test
-   public void getData_forFilledMediumWithBigCache_referenceBehingEOM_throwsEndOfMediumException() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      mediumStoreUnderTest.open();
-
-      long getDataStartOffset = currentMediumContent.length() + 15;
-      int getDataSize = 10;
-
-      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize);
+      testGetData_forFullRangeRead_throwsEndOfMediumException(getDataStartOffset, getDataSize,
+         currentMediumContent.length());
    }
 
    /**
@@ -345,15 +328,22 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(getDataOffset));
       Assert.assertEquals(
-         MAX_CACHE_SIZE_FOR_SMALL_CACHE - MAX_CACHE_SIZE_FOR_SMALL_CACHE % MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE,
+         MAX_CACHE_SIZE_FOR_SMALL_CACHE - MAX_CACHE_SIZE_FOR_SMALL_CACHE % MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE,
          mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 595)));
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createDafaulFilledMediumStore()
+    */
+   @Override
+   protected MediumStore createDafaulFilledMediumStore() {
+      return createFilledMediumStoreWithBigCache();
    }
 
    /**
     * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
     * as content, backed by a cache, where the cache is smaller than the overall {@link Medium} size, in detail, it has
-    * a size of {@link #MAX_CACHE_SIZE_FOR_SMALL_CACHE}. In line with that, max cach region size is set to
-    * {@link #MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE} and the maximum read write block size is set to
+    * a size of {@link #MAX_CACHE_SIZE_FOR_SMALL_CACHE}. In line with that, the maximum read write block size is set to
     * {@link #MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE}. This method must be called at the beginning of a test case to
     * create the {@link MediumStore} to test and its return value must be assigned to {@link #mediumStoreUnderTest}. It
     * is used for testing cases where data is read into the cache but then automatically purged due to the limited cache
@@ -364,8 +354,8 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
     */
    protected MediumStore createFilledMediumStoreWithSmallCache() {
       try {
-         currentMedium = createFilledMedium(testName.getMethodName(), true, MAX_CACHE_SIZE_FOR_SMALL_CACHE,
-            MAX_CACHE_REGION_SIZE_FOR_SMALL_CACHE, MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
+         currentMedium = createFilledMedium(testName.getMethodName(), MAX_CACHE_SIZE_FOR_SMALL_CACHE,
+            MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
 
          return createMediumStoreToTest(currentMedium);
       } catch (IOException e) {
@@ -387,9 +377,8 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
     */
    protected MediumStore createFilledMediumStoreWithBigCache() {
       try {
-         currentMedium = createFilledMedium(testName.getMethodName(), true,
+         currentMedium = createFilledMedium(testName.getMethodName(),
             MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() + 1000,
-            MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() - 20,
             MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() + 1000);
 
          return createMediumStoreToTest(currentMedium);
