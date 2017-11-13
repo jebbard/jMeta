@@ -5,117 +5,122 @@
 \part{Requirements}
 \label{sec:Analyse}
 
-This chapter defines the most important function and non-function requirements for \LibName{}.
+This chapter defines the most important functional and non-functional requirements for \LibName{}.
 Most relevant input is the document \cite{MetaComp}.
 
 %===============================================================================================
 %		Scope
 %===============================================================================================
 
-\chapter{Umfang}
+\chapter{Scope}
 
-\LibName{} ist eine Java-Library zum Lesen und Schreiben von beschreibenden Daten (Metadaten). \LibName{} hat folgende Ziele:
+
+% -------------------------------------------------------------------------------------------------------
+%  In Scope
+% -------------------------------------------------------------------------------------------------------
+\section{In Scope}%
+\label{sec:InScope}%
+
+\LibName{} is a Java library for reading and writing container and metadata formats. \LibName{} has the following goals:
 \begin{itemize}
-	\item Eine generische, erweiterbare Schnittstelle zum Lesen und Schreiben von Metadaten zu definieren
-	\item Zu einem Standard in Sachen Metadatenverarbeitung für Audio-, Video- und Bildformate zu werden
+\item Define a robust, easy to use and generic API for reading and writing multimedia (i.e. audio, video and image) metadata
+\item In addition, define a way to also parse and change typical container formats that embed or surround multimedia metadata
+\item Be easily extensible with additional metadata or container formats, also by third party
 \end{itemize}
 
-Damit visiert \LibName{} als Verwender Applikationen im Multimedia-Editing-Bereich an, beispielsweise Software zur Verwaltung einer Audio- und Videosammlung.
+Thus, clearly, \LibName{} targets applications and users in the multimedia editing area, e.g. software to manage an audio, video or image collection.
 
-Besondere Stärke der Library soll ihre Vielseitigkeit (im Sinne unterstützter Formate) und Erweiterbarkeit sein. Gleichzeitig soll sie Zugriff auf alle Features der unterstützten Formate gewähren.
+Special strenght of the library should be its versatility (in a sense of supported formats and generality) as well as its extensibility. At the same time, it targets to offer access to ALL features of each specific format, even the low-level ones, and thus does not want to hide anything from expert users who need fine-grained control.
 
-Eine Applikation soll wahlweise sehr generisch auf Metadaten zugreifen können, oder aber die Spezifika eines speziellen Formates sehr konkret nutzen können.
+Using \LibName{}, an application is allowed to access metadata quite generically and comfortably, or it can also explore deep specifics of each format down to the bit and byte level.
 
-Andere Arten von Metadaten, die nicht für Audio-, Video- oder Bildformate gedacht sind, sind nicht Ziel von \LibName{}, insbesondere gilt dies für spezielle XML-Metadatenformate.
+% -------------------------------------------------------------------------------------------------------
+%  Out of Scope
+% -------------------------------------------------------------------------------------------------------
+\section{Out of Scope}%
+\label{sec:OutofScope}%
+
+Metadata not in the audio, video or image domain are not directly in scope of \LibName{} and thus the library might not offer the right abstractions for those. However, it is at least likely that other binary or textual formats can also be parsed quite the same way using \LibName{}.
+
+Furthermore, \LibName{} clearly is no encoding or decoding library, it cannot understand codecs. It might however help to encode or decode by providing access to the low-level details of the container formats. It might be used as basis for extensible encoders or decoders, however, not exactly in high-performance areas where speed is of most importance. 
+
+Further things out of scope of specific versions are treated in \SectionLink{sec:Requirements}.
 
 %-----------------------------------------------------------------------------------------------
-%		Features der Version \LibVersion{}
+%		Features of version \LibVersion{}
 %-----------------------------------------------------------------------------------------------
 
-\section{Features der Version \LibVersion{}}
+\section{Features of version \LibVersion{}}
 \label{sec:FeaturesLibVersion}
 
-Neben den noch zu besprechenden Ausschlüssen (\SectionLink{sec:Requirements}), die ganz klar sagen, was NICHT unterstützt wird, geben wir hier einen Überblick, welche Features 
+Here we give a brief overview of the features the library needs to offer in version \LibVersion{}. It is the first version of the library, so its goal is the bare minimum: Implement all core features and support some of the most important data formats. Image and video formats are not yet in scope of this version. 
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Unterstützte Metadatenformate}
+\subsection{Supported Metadata Formats}
 \label{sec:UnterstuetzteMetadatenformate}
 
-Die aktuelle Version unterstützt folgende Metadatenformate:
+This version adds support for the following audio metadata formats:
 
 \begin{itemize}
-	\item ID3v1 und ID3v1.1
-	\item ID3v2.3
-	\item APEv2
-	\item Lyrics3v2
+\item ID3v1 and ID3v1.1
+\item ID3v2.3
+\item APEv2
+\item Lyrics3v2
 \end{itemize}
-
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Unterstützte Containerformate}
+\subsection{Supported Container Formate}
 \label{sec:UnterstuetzteContainerformate}
 
+This version adds support for the following audio container formats:
+
 \begin{itemize}
-	\item MPEG-1 Audio (MP3)
+\item MPEG-1 Audio Layer 3 (MP3)
 \end{itemize}
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Unterstützte Eingabemedien}
+\subsection{Supported Input Media}
 \label{sec:UnterstuetzteEingabemedien}
 
-Die aktuelle Version unterstützt folgende Eingabemedien:
+This version adds support for the following data sources for reading data:
 \begin{itemize}
-	\item Datei
-	\item Java \texttt{InputStream}
-	\item Java byte-Array
+\item Files
+\item Java \texttt{InputStream}s
+\item Java byte arrays
 \end{itemize}
-
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Unterstützte Ausgabemedien}
+\subsection{Supported Output Media}
 \label{sec:UnterstuetzteAusgabemedien}
 
-Die aktuelle Version unterstützt folgende Eingabemedien:
+This version adds support for the following output media for writing data:
 \begin{itemize}
-	\item Datei
-	\item Java byte-Array
-\end{itemize}
-
-%-----------------------------------------------------------------------------------------------
-%		Features für spätere Versionen
-%-----------------------------------------------------------------------------------------------
-
-\section{Features für spätere Versionen}
-\label{sec:FuerSpaeter}
-
-Die folgenden Features werden für Version \LibVersion{} der Library noch nicht umgesetzt, sondern in späteren Versionen hinzugefügt:
-\begin{itemize}
-	\item Die format-spezifischen High-Level APIs
-	\item ...
+\item Files
+\item Java byte arrays
 \end{itemize}
 
 %-----------------------------------------------------------------------------------------------
 %		Related Libraries
 %-----------------------------------------------------------------------------------------------
 
-\section{Verwandte Libraries}
+\section{Related Libraries}
 \label{sec:RelatedLibraries}
 
-Hier werden Java libraries behandelt, die verwandt zu \LibName{} sind. Hierunter fallen existierende Java-Libraries im Umfeld Multimedia, die einerseits Konkurrenz darstellen, andererseits Anregungen liefern und ggf. Möglichkeiten für Integration und Adaption bieten.
+Here, related Java libraries are treated that are related to what \LibName{} offers. This includes existing productive Java libraries in the area of multimedia, which can be considered as open source competitors to \LibName{} on the one hand, on the other hand, they provide inspiration, possible reuse and also warning examples how to not do it.
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Metadaten-Libraries}
+\subsection{Metadata Libraries}
 \label{sec:MetadataLibraries}
 
-Eine Auswahl von Libraries die Zugriff auf Multimedia-Metadaten ermöglichen - Eine Quelle dafür ist beispielsweise \url{http://id3.org/Implementations}:
+A selection of libraries offering access to multimedia metadata, mostly audio metadata - One source for this e.g. is \url{http://id3.org/Implementations}:
 \begin{itemize}
-  \item \textbf{mp3agic (Java):} Lesen und Schreiben von ID3 Tags (1.0, 1.1, 2.3, 2.4), Lesen von ID3 v2.2, low-level Lesen von MP3-Dateien (inkl. VBR) - \url{https://github.com/mpatric/mp3agic}
-	\item \textbf{BeagleBuddy (Java):} Lesen und Schreiben von ID3 Tags (1.0, 1.1, 2.3, 2.4), Lyrics3v2, Lyrics3v1, APEv1, APEv2, Lesen von MP§-Dateien CBR und VBR, Xing, LAME, und VBRI Header - \url{http://www.beaglebuddy.com/}
+  \item \textbf{mp3agic (Java):} Reads and writes ID3 Tags (1.0, 1.1, 2.3, 2.4), reads ID3 v2.2, low-level reading of MP3 files (incl. VBR) - \url{https://github.com/mpatric/mp3agic}
+	\item \textbf{BeagleBuddy (Java):} Reads and writes ID3 Tags (1.0, 1.1, 2.3, 2.4), Lyrics3v2, Lyrics3v1, APEv1, APEv2, reads MP3 files CBR and VBR, Xing, LAME, and VBRI Header - \url{http://www.beaglebuddy.com/}
 	\item \textbf{jaudiotagger (Java):} Audio-Metadaten - \url{http://www.jthink.net/jaudiotagger/}
 	\item \textbf{Entagged (Java):} Audio-Metadaten - \url{http://entagged.sourceforge.net/}
 	\item \textbf{MyID3 (Java):} Audio-Metadaten (ID3) - \url{http://www.fightingquaker.com/myid3/}
@@ -123,25 +128,26 @@ Eine Auswahl von Libraries die Zugriff auf Multimedia-Metadaten ermöglichen - Ei
 	\item \textbf{Javamusictag (Java):} Manchmal auch \textbf{jid3lib} für Audio-Metadaten (ID3) - \url{http://javamusictag.sourceforge.net/}, \url{https://java.net/projects/jid3lib}
 	\item \textbf{id3lib (C/C++):} Audio-Metadaten (ID3) - \url{http://id3lib.sourceforge.net/}
 	\item \textbf{Mutagen (Python):} Audio-Metadaten und -Container-Daten (ID3) - \url{http://pypi.python.org/pypi/mutagen/1.12}
-	\item \textbf{jFlac (Java):} Audiodaten und Metadaten des Flac-Formates - \url{http://jflac.sourceforge.net/apidocs/index.html?org/kc7bfi/jflac/metadata/VorbisComment.html}
-	\item \textbf{MPEG-7 Audio Encoder (Java):} Erzeugen von MPEG-7 Metadaten - \url{http://mpeg7audioenc.sourceforge.net/}
-	\item \textbf{JAI Image I/O (Java):} Kann EXIF-Tags aus unterschiedlichsten Formaten lesen und schreiben - \url{https://jai-imageio.dev.java.net/binary-builds.html}
-	\item \textbf{jmac (Java):} Library, die monkey audio codecs encoden und decoden kann, ebenso APE-Tags lesen unds schreiben - \url{http://sourceforge.net/projects/jmac/}
+	\item \textbf{jFlac (Java):} Reads and writes audio data and meta data for the flac format only - \url{http://jflac.sourceforge.net/apidocs/index.html?org/kc7bfi/jflac/metadata/VorbisComment.html}
+	\item \textbf{MPEG-7 Audio Encoder (Java):} Creates MPEG-7 metadata - \url{http://mpeg7audioenc.sourceforge.net/}
+	\item \textbf{JAI Image I/O (Java):} Can read and write EXIF tags from a variety of embedding formats - \url{https://jai-imageio.dev.java.net/binary-builds.html}
+	\item \textbf{jmac (Java):} Library to encode and decode Monkey audio codecs, it can also read and write APE tags - \url{http://sourceforge.net/projects/jmac/}
 	\item ... und einige andere
 \end{itemize}
 
-Als größte Konkurrenz werden derzeit mp3agic und BeagleBuddy betrachtet.
+Biggers competitors to be considered as of now are mp3agic and BeagleBuddy.
 
 %***********************************************************************************************
 
-\subsubsection{Nachteile existierender Metadaten-Libraries}
+\subsubsection{Drawbacks of Existing Metadata Libraries}
 \label{sec:DrawbacksofExistingMetadataLibraries}
 
-Jede der genannten Libraries spezialisiert sich auf nur wenige Formate. D.h. Applikationen wird das eben nur reichen, wenn sie auch nur auf diese Formate beschränkt sind. Ansonsten kann es sein, dass man mehrere völlig verschiedene Libraries nebeneinander nutzen muss.
+Each of the mentioned libraries specialices to just a few formats. Saying this, applications are only likely to be satisfied with them, if they just need to support those formats. If they do require more, they need to use multiple libraries or extend the existing ones or wait for new features from the existing ones.
 
-Die Architektur und Erweiterbarkeit einiger der existierenden Libraries ist nicht überzeugend.
+Second, the architecture and extensibility of the existing libraries is not convincing. Most of the ID3 libraries e.g. open-heartedly show their very internals
+TODO
 
-Die ID3 Libraries z.B. zeigen ihre Internas sehr offenherzig, was es für den Anwender unklar macht, was wirklich ``public API'' ist, und was nicht. Verwender der Library könnten daher versehentlich oder auch bewusst (um einen Fehler ``umschiffen'' oder eine Funktionalität besser nutzen zu können) Implementierungsklassen nutzen. Dies wiederum macht es für die Library-Entwickler potentiell gefährlich, die Implementierung der Libraries zu refaktorisieren oder gar auszutauschen, ohne die Anwender der Libraries mit solchen Migration zu belasten.
+ z.B. zeigen ihre Internas sehr offenherzig, was es für den Anwender unklar macht, was wirklich ``public API'' ist, und was nicht. Verwender der Library könnten daher versehentlich oder auch bewusst (um einen Fehler ``umschiffen'' oder eine Funktionalität besser nutzen zu können) Implementierungsklassen nutzen. Dies wiederum macht es für die Library-Entwickler potentiell gefährlich, die Implementierung der Libraries zu refaktorisieren oder gar auszutauschen, ohne die Anwender der Libraries mit solchen Migration zu belasten.
 
 Anwendungen, die viele unterschiedliche Formate benötigen, müssen eine generische Erweiterbarkeit selbst herstellen, da die Libraries dies nicht von Haus aus bieten.
 
