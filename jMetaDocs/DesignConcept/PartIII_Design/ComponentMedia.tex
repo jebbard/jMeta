@@ -672,6 +672,23 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+For efficiency reasons, we define the following:
+%%%% DD --> %%%%
+\DD{dd:412f}
+{% Titel
+Handle reading from a single already cached region or a size smaller than the maximum read-write block size as special case
+}
+{% Kurzbeschreibung
+If a read offset and size for \emph{getData} is exactly hitting a single cache region, and this single region fully contains the range to read, the \texttt{ByteBuffer} corresponding to this region with adapted position and limit is returned instead of allocating a new \texttt{ByteBuffer} and copying bytes, which will happen in any other case. Similarly, if a range is not cached and needs to be read, and if the range's size is below the maximum read-write block size, again no copying happens, but the read \texttt{ByteBuffer} is directly returned.
+}
+{% Begründung
+The case of an already cached region fully covering the range to read can be considered as at least the use case covering 80\% of the typical uses. The reason is: Usually, the users should use cached media. And usually, they should call \emph{cache} before \emph{getData}, covering e.g. a whole header. Thus, reading individual fields later with \texttt{getData} will always hit the cache. Thus, for this 80\% case, we could optimize the library performance a lot by simply not copying.
+}
+{% Nachteile
+Slightly more complexity and testing effort involved
+}
+%%%% <-- DD %%%%
+
 Let's discuss the topic of timeouts. In Java, each reading and writing I/O call might block. How to deal with this? The following design decision clearly states it.
 
 %%%% DD --> %%%%
@@ -1857,7 +1874,7 @@ CF5 & Multiple \texttt{remove}s &\begin{enumerate}\item[a.] All removes at the s
 \subsubsection{Configurating Medium Access}%
 \label{sec:Konfigurationsparameter}%
 
-So far, we have identified several mechanisms the user can use to influence the behaviour of medium access: He can set the maximum cache size and maximum cache region size, he can disable caching alltogether, and he can also change the maximum read-write block size. But how? In \DesLink{dd:207a}, we explicitly said that for now, \LibName{} will not offer the possibility to change such parameters dynamically. Still we have to offer the user the corresponding API without exposing him to the internal details of the implementation.
+So far, we have identified several mechanisms the user can use to influence the behaviour of medium access: He can set the maximum cache size, he can disable caching alltogether, and he can also change the maximum read-write block size. But how? In \DesLink{dd:207a}, we explicitly said that for now, \LibName{} will not offer the possibility to change such parameters dynamically. Still we have to offer the user the corresponding API without exposing him to the internal details of the implementation.
 
 We thus first define:
 %%%% DD --> %%%%
@@ -1878,6 +1895,24 @@ No disadvantages known
 
 Now the question arises: Which configuration parameters are needed in detail? We summarize them again in detail in table \hyperref[tab:ConfigMedia]{\ref{tab:ConfigMedia}}.
 
+First of all, we exclude one potential parameter:
+%%%% DD --> %%%%
+\DD{dd:441c}
+{% Titel
+The maximum cache region size is not configurable by the user, but is automatically set to the maximum read-write block size
+}
+{% Kurzbeschreibung
+The user can only configure the maximum read-write block size, but not the maximum cache region size which is just set to the configured maximum read-write block size.
+}
+{% Begründung
+For a usual user, it is not clear what the maximum cache region size really is and which size it should have; there is not much ``tuning'' potential in setting it to another value than the maximum read-write block size. By doing so, we have usually a one to one match betwen a read block of bytes and the medium region added to the cache. This is good performance-wise, as it does not require to e.g. read the content of a not-yet-cached medium region below maximum cache region size block-wise, in case the maximum read-write block size is smaller than the maximum cache region size. Instead, we just automatically set them to the same value, the user can only influence the maximum read-write block size. It is clearly documented to the user what it does. As additional plus, the configuration interface of a medium gets easier.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+
 \begin{landscape}
 \begin{longtable}{|p{0.1\linewidth}|p{0.24\linewidth}|p{0.07\linewidth}|p{0.1\linewidth}|p{0.4\linewidth}|}
 	\hline
@@ -1885,8 +1920,6 @@ Now the question arises: Which configuration parameters are needed in detail? We
 	\endhead
 	\hline
 	\texttt{File}, \texttt{InputStream} & \texttt{enableCaching} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. Setting this to \texttt{false} after creation of the \IMediumStore{} will clear the cache content directly. Implicitly set to \texttt{false} for \texttt{byte}-Array media according to \DesLink{dd:410c} \\
-	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{maxCacheRegionSize} & int $> 0$ & 8192 & Sets the maximum size of a cache region according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
 	\texttt{File}, \texttt{InputStream} & \texttt{maxCacheSize} & long $> 0$ & 1 MB & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
 	\hline
