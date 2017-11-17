@@ -10,6 +10,7 @@
 package com.github.jmeta.library.media.impl.store;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
@@ -128,63 +129,32 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
 
       if (getMedium().isCachingEnabled()) {
-
          if (getMedium().isRandomAccess()) {
-        	 boolean cacheMightChange = cache.calculateCurrentCacheSizeInBytes() + numberOfBytes > cache.getMaximumCacheSizeInBytes();
-        	 
-        	 List<MediumRegion> regionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
-        	 
-        	 for (MediumRegion nextRegion : regionsInRange) {
-                 MediumReference regionStartReference = nextRegion.getStartReference();
-                 MediumReference regionEndReference = nextRegion.calculateEndReference();
-                 MediumReference rangeEndReference = offset.advance(numberOfBytes);
+            long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
 
-                 MediumRegion regionToUse = nextRegion;
+            List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
 
-                 if (regionStartReference.before(offset)) {
-                    regionToUse = regionToUse.split(offset)[1];
-                 }
+            for (MediumRegion cacheRegion : cacheRegionsInRange) {
+               cacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
 
-                 if (rangeEndReference.before(regionEndReference)) {
-                    regionToUse = regionToUse.split(rangeEndReference)[0];
-                 }
-            	 
-  				if (!regionToUse.isCached()) {
-					MediumRegion regionWithBytes = readChunk(regionToUse.getStartReference(), regionToUse.getSize());
-					cache.addRegion(regionWithBytes);
-				} else if (cacheMightChange && cache.getCachedByteCountAt(regionToUse.getStartReference()) < regionToUse.getSize()) {
-					cache.addRegion(regionToUse);
-				}
-			}
-         } else {
-             MediumReference offsetToUse = offset;
-             long numberOfBytesToUse = numberOfBytes;
-
-             long cachedByteCountAt = cache.getCachedByteCountAt(offset);
-
-             // Ensure to read any bytes necessary to be read before the given offset for stream-based media
-            MediumReference currentMediumPosition = mediumAccessor.getCurrentPosition();
-
-            long gapBetweenOffsetAndHighestReadOffset = offset.distanceTo(currentMediumPosition);
-
-            // Read all bytes between last read end and current offset
-            if (gapBetweenOffsetAndHighestReadOffset > 0) {
-               cacheChunkWise(currentMediumPosition, gapBetweenOffsetAndHighestReadOffset);
-            } else {
-               if (-gapBetweenOffsetAndHighestReadOffset > cachedByteCountAt) {
-                  throw new InvalidMediumReferenceException(offset,
-                     "Cannot cache data in already read medium range for a non-random access medium");
-               } else {
-                  // Here we ensure that we do not re-read for random-access media
-                  offsetToUse = currentMediumPosition;
-                  numberOfBytesToUse = numberOfBytes + gapBetweenOffsetAndHighestReadOffset;
-                  cachedByteCountAt += gapBetweenOffsetAndHighestReadOffset;
+               if (!cacheRegion.isCached()) {
+                  MediumRegion regionWithBytes = readRegion(cacheRegion.getStartReference(), cacheRegion.getSize());
+                  cache.addRegion(regionWithBytes);
+               } else if (isPreviouslyCachedRegionNowUncached(cacheRegion, initialCacheSize, numberOfBytes)) {
+                  cache.addRegion(cacheRegion);
                }
             }
+         } else {
+            List<MediumRegion> regionsToAdd = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
 
-            if (numberOfBytesToUse > cachedByteCountAt) {
-               cacheChunkWise(offsetToUse, numberOfBytesToUse);
+            MediumReference offsetToUse = mediumAccessor.getCurrentPosition();
+            int numberOfBytesToUse = numberOfBytes - (int) offsetToUse.distanceTo(offset);
+
+            if (numberOfBytesToUse > getCachedByteCountAt(offsetToUse)) {
+               regionsToAdd.addAll(readRegionWise(offsetToUse, numberOfBytesToUse));
             }
+
+            regionsToAdd.forEach(cache::addRegion);
          }
       }
    }
@@ -211,99 +181,65 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
 
-      ByteBuffer bytesToReturn = null;
-
       if (getMedium().isCachingEnabled()) {
-     	 boolean cacheMightChange = cache.calculateCurrentCacheSizeInBytes() + numberOfBytes > cache.getMaximumCacheSizeInBytes();
-    	 
+         long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
+
          List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
 
          MediumRegion firstRegion = cacheRegionsInRange.get(0);
-         
-//         if (cacheRegionsInRange.size() == 1 && firstRegion.isCached() && firstRegion.getOverlappingByteCount(new MediumRegion(offset, numberOfBytes)) == numberOfBytes) {
-//
-//        	 bytesToReturn = firstRegion.getBytes();
-//        	 bytesToReturn.position(bytesToReturn.position() + (int) firstRegion.getStartReference().distanceTo(offset));
-//        	 bytesToReturn.limit(bytesToReturn.position() + numberOfBytes);
-//         } else {
-             ByteBuffer cachedBytes = ByteBuffer.allocate(numberOfBytes);
-             
-             for (MediumRegion mediumRegion : cacheRegionsInRange) {
-                MediumReference regionStartReference = mediumRegion.getStartReference();
-                MediumReference regionEndReference = mediumRegion.calculateEndReference();
-                MediumReference rangeEndReference = offset.advance(numberOfBytes);
 
-                MediumRegion regionToAdd = mediumRegion;
+         // This "if" is just an optimization for the 80% case in which we just take the original ByteBuffer as view,
+         // tailored to the requested range. This safes us new memory allocation and copying of bytes.
+         if (cacheRegionsInRange.size() == 1 && firstRegion.isCached()
+            && firstRegion.getOverlappingByteCount(new MediumRegion(offset, numberOfBytes)) == numberOfBytes) {
 
-                if (regionStartReference.before(offset)) {
-                   regionToAdd = regionToAdd.split(offset)[1];
-                }
+            ByteBuffer firstRegionCachedBytes = firstRegion.getBytes();
+            firstRegionCachedBytes
+               .position(firstRegionCachedBytes.position() + (int) offset.distanceTo(firstRegion.getStartReference()));
+            firstRegionCachedBytes.limit(firstRegionCachedBytes.position() + numberOfBytes);
 
-                if (rangeEndReference.before(regionEndReference)) {
-                   regionToAdd = regionToAdd.split(rangeEndReference)[0];
-                }
+            return firstRegionCachedBytes;
+         } else {
+            ByteBuffer cachedBytes = ByteBuffer.allocate(numberOfBytes);
 
-                if (regionToAdd.isCached() && (!cacheMightChange || cache.getCachedByteCountAt(regionToAdd.getStartReference()) >= regionToAdd.getSize())) {
-                   cachedBytes.put(regionToAdd.getBytes());
-                } else {
-                	if (!getMedium().isRandomAccess()) {
-                		if (regionToAdd.getStartReference().before(mediumAccessor.getCurrentPosition())) {
-                			throw new InvalidMediumReferenceException(offset,
-                	                  "Cannot re-read data of alread passed offsets for uncached non-random-access media");
-                		}
-                		
-                		if (mediumAccessor.getCurrentPosition().before(regionToAdd.getStartReference())) {
-                			List<MediumRegion> regionsToCache = MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, EndOfMediumException.class,
-                					mediumAccessor.getCurrentPosition(), offset.distanceTo(mediumAccessor.getCurrentPosition()),
-                                    getMedium().getMaxReadWriteBlockSizeInBytes(), this::readChunk);
+            for (MediumRegion cacheRegion : cacheRegionsInRange) {
+               cacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
 
-                			regionsToCache.forEach((region) -> cache.addRegion(region));
-                		}
-                	}
-                	
-                	mediumAccessor.setCurrentPosition(regionToAdd.getStartReference());
-                	
-                	ByteBuffer regionToAddBytes = ByteBuffer.allocate(regionToAdd.getSize());
-                	mediumAccessor.read(regionToAddBytes);
-                	
-                	cachedBytes.put(regionToAddBytes);
-                	
-                	regionToAddBytes.rewind();
-                	
-                	cache.addRegion(new MediumRegion(regionToAdd.getStartReference(), regionToAddBytes));
-                }
-             }
-             
-             bytesToReturn = cachedBytes;
-//         }
+               if (cacheRegion.isCached()
+                  && !isPreviouslyCachedRegionNowUncached(cacheRegion, initialCacheSize, numberOfBytes)) {
+                  cachedBytes.put(cacheRegion.getBytes());
+               } else {
+                  List<MediumRegion> regionsRead = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(
+                     cacheRegion.getStartReference());
+
+                  MediumRegion regionToAddWithBytes = readRegion(cacheRegion.getStartReference(),
+                     cacheRegion.getSize());
+
+                  cachedBytes.put(regionToAddWithBytes.getBytes());
+
+                  regionsRead.add(regionToAddWithBytes);
+
+                  regionsRead.forEach((region) -> cache.addRegion(region));
+               }
+            }
+
+            cachedBytes.rewind();
+
+            return cachedBytes;
+         }
       } else {
-    	  if (!getMedium().isRandomAccess()) {
-    	  		if (offset.before(mediumAccessor.getCurrentPosition())) {
-    				throw new InvalidMediumReferenceException(offset,
-    		                  "Cannot re-read data of alread passed offsets for uncached non-random-access media");
-    			}
-    	        
-    			if (mediumAccessor.getCurrentPosition().before(offset)) {
-    				MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, EndOfMediumException.class,
-    						mediumAccessor.getCurrentPosition(), offset.distanceTo(mediumAccessor.getCurrentPosition()),
-    		                getMedium().getMaxReadWriteBlockSizeInBytes(), this::readChunk);
-    				}
-    	  }
-		
-        ByteBuffer readBytes = ByteBuffer.allocate(numberOfBytes);
-    	  
-		List<MediumRegion> regionsRead = MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, EndOfMediumException.class,
-				offset, numberOfBytes,
-                getMedium().getMaxReadWriteBlockSizeInBytes(), this::readChunk);
+         readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
 
-		regionsRead.forEach((region) -> readBytes.put(region.getBytes()));
-		
-		bytesToReturn = readBytes;
+         ByteBuffer readBytes = ByteBuffer.allocate(numberOfBytes);
+
+         List<MediumRegion> regionsRead = readRegionWise(offset, numberOfBytes);
+
+         regionsRead.forEach((region) -> readBytes.put(region.getBytes()));
+
+         readBytes.rewind();
+
+         return readBytes;
       }
-      
-    bytesToReturn.rewind();
-
-    return bytesToReturn;
    }
 
    /**
@@ -373,30 +309,135 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    }
 
-   private void cacheChunkWise(MediumReference offset, long size) throws EndOfMediumException {
-      List<MediumRegion> regionsToAdd = MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class,
-         EndOfMediumException.class, offset, size, getMedium().getMaxReadWriteBlockSizeInBytes(), this::readChunk);
+   /**
+    * In case of {@link MediumRegion}s overlapping just front or back of a given range, they need to be clipped, which
+    * is done by this method. It returns a clipped region that is guaranteed to start at or behind the range start
+    * offset and end at or before the range end offset.
+    * 
+    * @param region
+    *           The {@link MediumRegion} to clip
+    * @param rangeOffset
+    *           The start offset of the range
+    * @param rangeSize
+    *           The size of the range in bytes
+    * @return a {@link MediumRegion} clipped against the given range
+    */
+   private MediumRegion clipRegionAgainstRange(MediumRegion region, MediumReference rangeOffset, int rangeSize) {
+      MediumReference regionStartReference = region.getStartReference();
+      MediumReference regionEndReference = region.calculateEndReference();
+      MediumReference rangeEndReference = rangeOffset.advance(rangeSize);
 
-      regionsToAdd.forEach(cache::addRegion);
+      MediumRegion regionToUse = region;
+
+      if (regionStartReference.before(rangeOffset)) {
+         regionToUse = regionToUse.split(rangeOffset)[1];
+      }
+
+      if (rangeEndReference.before(regionEndReference)) {
+         regionToUse = regionToUse.split(rangeEndReference)[0];
+      }
+      return regionToUse;
    }
 
    /**
-    * Reads a chunk of bytes from the external medium.
+    * Determines if a given cached {@link MediumRegion}, that was still cached at point in time
+    * {@link MediumCache#getRegionsInRange(MediumReference, int)} was meanwhile has become uncached as new regions have
+    * been added after this initial call which forced the cache to remove previously cached {@link MediumRegion}s to
+    * keep its size below the maximum allowed cache size.
     * 
-    * @param chunkOffset
-    *           The offset of the chunk
-    * @param chunkSizeInBytes
-    *           The size of the chunk
-    * @throws EndOfMediumException
+    * If the region is now uncached, it can nevertheless be used for caching again or retrieving data. This way we also
+    * avoid unneeded medium accesses even in this corner case.
+    * 
+    * @param cachedRegion
+    *           The cached {@link MediumRegion} to check
+    * @param initialCacheSizeInBytes
+    *           The cache size at point in time when {@link MediumCache#getRegionsInRange(MediumReference, int)} was
+    *           called
+    * @param maxNumberOfBytesToAdd
+    *           The maximum number of bytes that might get added to the cache in total
+    * 
+    * @return true if the given {@link MediumRegion} has now become uncached, false otherwise
     */
-   private MediumRegion readChunk(MediumReference chunkOffset, int chunkSizeInBytes) throws EndOfMediumException {
-      ByteBuffer dataRead = ByteBuffer.allocate(chunkSizeInBytes);
+   private boolean isPreviouslyCachedRegionNowUncached(MediumRegion cachedRegion, long initialCacheSizeInBytes,
+      int maxNumberOfBytesToAdd) {
+      return initialCacheSizeInBytes + maxNumberOfBytesToAdd > cache.getMaximumCacheSizeInBytes()
+         && cache.getCachedByteCountAt(cachedRegion.getStartReference()) < cachedRegion.getSize();
+   }
 
-      mediumAccessor.setCurrentPosition(chunkOffset);
+   /**
+    * Only for non-random access media: If the medium's current position is smaller than the given offset, it reads all
+    * bytes between these offsets chunk-wise and returns the corresponding {@link MediumRegion}s. If the medium's
+    * current position is bigger than the given offset, it throws an {@link InvalidMediumReferenceException}. If the
+    * offsets are equal, it returns an empty list. For random-access media it also returns an empty list.
+    * 
+    * @param offset
+    *           The target offset
+    * @return The {@link MediumRegion}s of maximum size {@link Medium#getMaxReadWriteBlockSizeInBytes()} between the
+    *         current position and the given offset, if any
+    * @throws EndOfMediumException
+    *            if the end of the medium is reached during reading
+    */
+   private List<MediumRegion> readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(MediumReference offset)
+      throws EndOfMediumException {
+      List<MediumRegion> regionsRead = new ArrayList<>();
+
+      if (!getMedium().isRandomAccess()) {
+         MediumReference currentPosition = mediumAccessor.getCurrentPosition();
+
+         if (offset.before(currentPosition)) {
+            long cachedByteCountAtOffset = cache.getCachedByteCountAt(offset);
+
+            if (cachedByteCountAtOffset < currentPosition.distanceTo(offset)) {
+               throw new InvalidMediumReferenceException(offset,
+                  "Cannot re-read data of  non-random-access media for already passed ranges that are not fully cached");
+            }
+         }
+
+         if (currentPosition.before(offset)) {
+            regionsRead = readRegionWise(currentPosition, offset.distanceTo(currentPosition));
+         }
+      }
+      return regionsRead;
+   }
+
+   /**
+    * Determines chunked {@link MediumRegion}s filled with data read from the medium in the given range based on the
+    * maximum read-write block size configured for the medium.
+    * 
+    * @param rangeOffset
+    *           The range start offset
+    * @param rangeSize
+    *           The range's size in bytes
+    * @return The list of all {@link MediumRegion}s of maximum size {@link Medium#getMaxReadWriteBlockSizeInBytes()}
+    *         covering the whole range.
+    * @throws EndOfMediumException
+    *            if the end of the medium is reached during reading
+    */
+   private List<MediumRegion> readRegionWise(MediumReference rangeOffset, long rangeSize) throws EndOfMediumException {
+      List<MediumRegion> regionsRead;
+      regionsRead = MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, EndOfMediumException.class,
+         rangeOffset, rangeSize, getMedium().getMaxReadWriteBlockSizeInBytes(), this::readRegion);
+      return regionsRead;
+   }
+
+   /**
+    * Reads a region of bytes from the external medium.
+    * 
+    * @param regionOffset
+    *           The offset of the region
+    * @param regionSize
+    *           The size of the region
+    * @throws EndOfMediumException
+    *            in case of EOM was reached during reading
+    */
+   private MediumRegion readRegion(MediumReference regionOffset, int regionSize) throws EndOfMediumException {
+      ByteBuffer dataRead = ByteBuffer.allocate(regionSize);
+
+      mediumAccessor.setCurrentPosition(regionOffset);
 
       mediumAccessor.read(dataRead);
 
-      return new MediumRegion(chunkOffset, dataRead);
+      return new MediumRegion(regionOffset, dataRead);
    }
 
    /**
