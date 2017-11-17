@@ -18,12 +18,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
-import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
-import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
@@ -126,7 +123,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
       }
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
@@ -137,7 +134,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
 
       long getDataStartOffset = 15;
       int getDataSize = 200;
-      
+
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       Mockito.verifyNoMoreInteractions(mediumCacheSpy);
@@ -154,7 +151,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
 
       long getDataStartOffset = 0;
       int getDataSize = 3 * MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM + 4;
-      
+
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       verifyExactlyNReads(4);
@@ -171,7 +168,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
 
       long getDataStartOffset = 0;
       int getDataSize = MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM / 2;
-      
+
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       verifyExactlyNReads(1);

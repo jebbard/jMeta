@@ -105,12 +105,12 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
-	mediumStoreUnderTest.open();
+      mediumStoreUnderTest.open();
 
       testCache_throwsEndOfMediumException(59, currentMediumContent.length() + 100, currentMediumContent.length());
    }
 
-/**
+   /**
     * Tests {@link MediumStore#cache(MediumReference, int)}.
     */
    @Test
@@ -167,7 +167,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       int cacheSize = 30;
-	cacheNoEOMExpected(at(currentMedium, 0), cacheSize);
+      cacheNoEOMExpected(at(currentMedium, 0), cacheSize);
       cacheNoEOMExpected(at(currentMedium, 2), 10);
 
       verifyExactlyNReads(cacheSize / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
@@ -185,10 +185,10 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       int expectedReadCount = 4;
       int cacheSize = (expectedReadCount - 1) * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1;
       MediumReference cacheOffset = at(currentMedium, 0);
-	cacheNoEOMExpected(cacheOffset, cacheSize);
+      cacheNoEOMExpected(cacheOffset, cacheSize);
 
       verifyExactlyNReads(expectedReadCount);
-      
+
       Assert.assertEquals(cacheSize, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
    }
 
@@ -203,10 +203,10 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       int cacheStartOffset = 500;
       MediumReference cacheOffset = at(currentMedium, 0);
-	cacheNoEOMExpected(cacheOffset, cacheStartOffset);
+      cacheNoEOMExpected(cacheOffset, cacheStartOffset);
 
       verifyExactlyNReads(1);
-      
+
       Assert.assertEquals(cacheStartOffset, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
    }
 
@@ -225,10 +225,10 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       int cacheSize = 500;
       MediumReference cacheOffset = at(currentMedium, 0);
-	cacheNoEOMExpected(cacheOffset, cacheSize);
+      cacheNoEOMExpected(cacheOffset, cacheSize);
 
-      verifyExactlyNReads(3+4);
-      
+      verifyExactlyNReads(3 + 4);
+
       Assert.assertEquals(cacheSize, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
    }
 
@@ -249,9 +249,10 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       int getDataSize = 400;
 
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
-      
-      Assert.assertEquals(getDataSize, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, getDataStartOffset)));
-      
+
+      Assert.assertEquals(getDataSize,
+         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, getDataStartOffset)));
+
       verifyExactlyNReads(3 + 4);
    }
 
@@ -292,7 +293,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       int blocksRead = 10;
-	cacheNoEOMExpected(at(currentMedium, 0), blocksRead * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
+      cacheNoEOMExpected(at(currentMedium, 0), blocksRead * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
 
       verifyExactlyNReads(blocksRead);
 
@@ -306,7 +307,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       verifyExactlyNReads(blocksRead);
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
@@ -352,7 +353,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       verifyExactlyNReads(getDataSize / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
@@ -367,14 +368,14 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       int getDataSize = 300;
 
       MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
-	testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
-      
+      testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
+
       Assert.assertEquals(getDataSize, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
 
       verifyExactlyNReads(1);
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
@@ -389,8 +390,8 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       int getDataSize = 3 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 4;
 
       MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
-	testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
-      
+      testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
+
       Assert.assertEquals(getDataSize, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
 
       verifyExactlyNReads(4);
@@ -419,10 +420,10 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
          mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 595)));
    }
 
-protected void testCache_throwsEndOfMediumException(long cacheOffset, int cacheSize, int mediumTotalSize) {
-    MediumReference cacheReference = at(currentMedium, cacheOffset);
-	try {
-		mediumStoreUnderTest.cache(cacheReference, cacheSize);
+   protected void testCache_throwsEndOfMediumException(long cacheOffset, int cacheSize, int mediumTotalSize) {
+      MediumReference cacheReference = at(currentMedium, cacheOffset);
+      try {
+         mediumStoreUnderTest.cache(cacheReference, cacheSize);
 
          Assert.fail("Expected end of medium exception, but it did not occur!");
       }
@@ -432,9 +433,9 @@ protected void testCache_throwsEndOfMediumException(long cacheOffset, int cacheS
          Assert.assertEquals(cacheSize, e.getByteCountTriedToRead());
          Assert.assertEquals(mediumTotalSize - cacheReference.getAbsoluteMediumOffset(), e.getBytesReallyRead());
       }
-}
+   }
 
-/**
+   /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createDefaultFilledMediumStore()
     */
    @Override

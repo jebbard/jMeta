@@ -11,19 +11,11 @@ package com.github.jmeta.library.media.api.services;
 
 import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
-import java.nio.ByteBuffer;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
-import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumAction;
-import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumReference;
-import com.github.jmeta.library.media.api.types.MediumRegion;
-import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
  * {@link AbstractUnCachedAndWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable

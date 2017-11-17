@@ -58,14 +58,14 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
-      
+
       mediumStoreUnderTest.open();
 
       MediumReference cacheOffset = at(currentMedium, 10);
       int cacheSize = 20;
 
       cacheNoEOMExpected(cacheOffset, currentMediumContent.length() - 10);
-	cacheNoEOMExpected(cacheOffset, cacheSize);
+      cacheNoEOMExpected(cacheOffset, cacheSize);
 
       Assert.assertEquals(cacheSize, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
    }
@@ -113,19 +113,19 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       mediumStoreUnderTest.open();
 
       int firstCacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 6 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
-	cacheNoEOMExpected(at(currentMedium, 10), firstCacheSize);
-    
-    verifyExactlyNReads(firstCacheSize / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1);
-	
-    long secondCacheStartOffset = 5;
-    int secondCacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE;
-    
-	MediumReference secondCacheStartReference = at(currentMedium, secondCacheStartOffset);
-	
-	cacheNoEOMExpected(secondCacheStartReference, secondCacheSize);
-    
-    Assert.assertEquals(secondCacheSize, mediumStoreUnderTest.getCachedByteCountAt(secondCacheStartReference));
-      
+      cacheNoEOMExpected(at(currentMedium, 10), firstCacheSize);
+
+      verifyExactlyNReads(firstCacheSize / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1);
+
+      long secondCacheStartOffset = 5;
+      int secondCacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE;
+
+      MediumReference secondCacheStartReference = at(currentMedium, secondCacheStartOffset);
+
+      cacheNoEOMExpected(secondCacheStartReference, secondCacheSize);
+
+      Assert.assertEquals(secondCacheSize, mediumStoreUnderTest.getCachedByteCountAt(secondCacheStartReference));
+
       verifyExactlyNReads((firstCacheSize + 35) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1);
    }
 
@@ -180,17 +180,19 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       long getDataStartOffset = 10;
       int getDataSize = 20;
-      
+
       int cacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 6 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
-	cacheNoEOMExpected(at(currentMedium, 0), cacheSize);
-	
-	MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
-	testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
-    
-    Assert.assertEquals(getDataSize, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
-    Assert.assertEquals(MAX_CACHE_SIZE_FOR_SMALL_CACHE - 25, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 55)));
-      
-      verifyExactlyNReads((MAX_CACHE_SIZE_FOR_SMALL_CACHE + getDataSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
+      cacheNoEOMExpected(at(currentMedium, 0), cacheSize);
+
+      MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
+      testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
+
+      Assert.assertEquals(getDataSize, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
+      Assert.assertEquals(MAX_CACHE_SIZE_FOR_SMALL_CACHE - 25,
+         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 55)));
+
+      verifyExactlyNReads(
+         (MAX_CACHE_SIZE_FOR_SMALL_CACHE + getDataSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
    }
 
    /**
@@ -205,17 +207,18 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       mediumStoreUnderTest.open();
 
       int cacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 6 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
-	cacheNoEOMExpected(at(currentMedium, 10), cacheSize);
-	
-    long getDataStartOffset = 5;
-    int getDataSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE;
-    
-	MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
-	testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
-    
-    Assert.assertEquals(getDataSize, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
-      
-      verifyExactlyNReads((MAX_CACHE_SIZE_FOR_SMALL_CACHE + getDataSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
+      cacheNoEOMExpected(at(currentMedium, 10), cacheSize);
+
+      long getDataStartOffset = 5;
+      int getDataSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE;
+
+      MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
+      testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
+
+      Assert.assertEquals(getDataSize, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
+
+      verifyExactlyNReads(
+         (MAX_CACHE_SIZE_FOR_SMALL_CACHE + getDataSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
    }
 
    /**
@@ -231,15 +234,15 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       long getDataStartOffset = 15 + 7 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
       int getDataSize = 10;
-      
+
       int cacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 6 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
-	cacheNoEOMExpected(at(currentMedium, 10), cacheSize);
-	
-	MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
-	testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
-    
-    Assert.assertEquals(583, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
-      
+      cacheNoEOMExpected(at(currentMedium, 10), cacheSize);
+
+      MediumReference getDataStartReference = at(currentMedium, getDataStartOffset);
+      testGetData_returnsExpectedData(getDataStartReference, getDataSize, currentMediumContent);
+
+      Assert.assertEquals(583, mediumStoreUnderTest.getCachedByteCountAt(getDataStartReference));
+
       verifyExactlyNReads(MAX_CACHE_SIZE_FOR_SMALL_CACHE / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
    }
 
@@ -256,9 +259,9 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       int getDataSize = 100;
 
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
-      
+
       verifyExactlyNReads(1);
-      
+
       Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 5)));
    }
 

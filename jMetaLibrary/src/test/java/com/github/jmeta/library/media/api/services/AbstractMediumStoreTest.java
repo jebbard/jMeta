@@ -234,28 +234,29 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
    public void getData_forEmptyMedium_fromStart_throwsEOMException() {
       mediumStoreUnderTest = createEmptyMediumStore();
-      
-    String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
       int getDataSize = 1;
 
-      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize, currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent.length());
+      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize,
+         currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent.length());
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
-@Test
-public void getData_forFilledMedium_fromMiddleToBeyondEOMAndNoCacheBefore_throwsEOMException() {
+   @Test
+   public void getData_forFilledMedium_fromMiddleToBeyondEOMAndNoCacheBefore_throwsEOMException() {
       mediumStoreUnderTest = createDefaultFilledMediumStore();
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
@@ -269,7 +270,7 @@ public void getData_forFilledMedium_fromMiddleToBeyondEOMAndNoCacheBefore_throws
          currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent.length());
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test(expected = MediumStoreClosedException.class)
@@ -536,8 +537,8 @@ public void getData_forFilledMedium_fromMiddleToBeyondEOMAndNoCacheBefore_throws
     * @param mediumSize
     *           The total size of the medium used in bytes
     */
-   protected void testGetData_throwsEndOfMediumException(long getDataStartOffset, int getDataSize,
-      int chunkSizeToUse, long mediumSize) {
+   protected void testGetData_throwsEndOfMediumException(long getDataStartOffset, int getDataSize, int chunkSizeToUse,
+      long mediumSize) {
       MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
 
       try {

@@ -29,11 +29,6 @@ import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactoryTest;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
 import com.github.jmeta.library.media.impl.store.AllMediumStoreTests;
-import com.github.jmeta.library.media.impl.store.ReadOnlyFileMediumStoreTest;
-import com.github.jmeta.library.media.impl.store.ReadOnlyInMemoryMediumStoreTest;
-import com.github.jmeta.library.media.impl.store.CachedStreamMediumStoreTest;
-import com.github.jmeta.library.media.impl.store.CachedWritableFileMediumStoreTest;
-import com.github.jmeta.library.media.impl.store.UnCachedWritableInMemoryMediumStoreTest;
 
 /**
  * {@link AllMediaTests} is used for running all test cases of the media component.
