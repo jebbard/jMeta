@@ -181,18 +181,95 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
-   public void getData_forEmptyMedium_untilEOM_throwsEndOfMediumException() {
+   public void getData_forFilledMedium_noCacheBefore_returnsExpectedData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      long getDataStartOffset = 5;
+      int getDataSize = 400;
+
+      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forFilledMedium_partlyCacheBeforeWithGaps_returnsExpectedData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      cacheNoEOMExpected(at(currentMedium, 10), 10);
+      cacheNoEOMExpected(at(currentMedium, 30), 100);
+      cacheNoEOMExpected(at(currentMedium, 135), 200);
+
+      long getDataStartOffset = 5;
+      int getDataSize = 400;
+
+      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forFilledMedium_fullMediumCacheBefore_returnsExpectedData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      cacheNoEOMExpected(at(currentMedium, 0), currentMediumContent.length());
+
+      long getDataStartOffset = 5;
+      int getDataSize = 400;
+
+      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+   }
+
+/**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forEmptyMedium_fromStart_throwsEOMException() {
       mediumStoreUnderTest = createEmptyMediumStore();
+      
+    String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
       int getDataSize = 1;
 
-      testGetData_forFullRangeRead_throwsEndOfMediumException(getDataStartOffset, getDataSize, 0);
+      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize, currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent.length());
    }
 
-   /**
+/**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+@Test
+public void getData_forFilledMedium_fromMiddleToBeyondEOMAndNoCacheBefore_throwsEOMException() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      long getDataStartOffset = 15;
+      int getDataSize = currentMediumContent.length();
+
+      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize,
+         currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent.length());
+   }
+
+/**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test(expected = MediumStoreClosedException.class)
@@ -421,7 +498,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * 
     * @return a {@link MediumStore} based on a filled {@link Medium}
     */
-   protected abstract MediumStore createDafaulFilledMediumStore();
+   protected abstract MediumStore createDefaultFilledMediumStore();
 
    /**
     * Tests {@link MediumStore#getData(MediumReference, int)} by comparing its result with the expected medium content.
@@ -450,37 +527,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    /**
     * Tests {@link MediumStore#getData(MediumReference, int)} to throw an end of medium exception when reaching it.
     * 
-    * This method is only for cases where it is guaranteed that the read action reads all data at once until end of
-    * medium, i.e. with caching for max cache size bigger than medium size and with a max read-write block size bigger
-    * than the given getDataSize.
-    * 
-    * @param getDataStartOffset
-    *           The offset to use for the method call
-    * @param getDataSize
-    *           The size to use for the method call
-    * @param mediumSize
-    *           The total size of the medium used in bytes
-    */
-   protected void testGetData_forFullRangeRead_throwsEndOfMediumException(long getDataStartOffset, int getDataSize,
-      long mediumSize) {
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
-
-      try {
-         mediumStoreUnderTest.getData(getDataOffset, getDataSize);
-         Assert.fail(EndOfMediumException.class + "expected");
-      } catch (EndOfMediumException e) {
-         Assert.assertEquals(getDataOffset, e.getMediumReference());
-         Assert.assertEquals(getDataSize, e.getByteCountTriedToRead());
-         Assert.assertEquals((int) (mediumSize - getDataStartOffset), e.getBytesReallyRead());
-      }
-   }
-
-   /**
-    * Tests {@link MediumStore#getData(MediumReference, int)} to throw an end of medium exception when reaching it.
-    * 
-    * Needed to check EOM conditions for uncached media or media that use a small cache and/or a read-write block size
-    * smaller than get given getDataSize.
-    * 
     * @param getDataStartOffset
     *           The offset to use for the method call
     * @param getDataSize
@@ -490,7 +536,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param mediumSize
     *           The total size of the medium used in bytes
     */
-   protected void testGetData_forChunkedRead_throwsEndOfMediumException(long getDataStartOffset, int getDataSize,
+   protected void testGetData_throwsEndOfMediumException(long getDataStartOffset, int getDataSize,
       int chunkSizeToUse, long mediumSize) {
       MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
 
@@ -503,7 +549,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
             getDataStartOffset + chunkSizeToUse * (int) ((mediumSize - getDataStartOffset) / chunkSizeToUse));
 
          Assert.assertEquals(expectedReadOffset, e.getMediumReference());
-         Assert.assertEquals(chunkSizeToUse, e.getByteCountTriedToRead());
+         Assert.assertEquals(getDataSize < chunkSizeToUse ? getDataSize : chunkSizeToUse, e.getByteCountTriedToRead());
          Assert.assertEquals((int) (mediumSize - getDataStartOffset) % chunkSizeToUse, e.getBytesReallyRead());
       }
    }

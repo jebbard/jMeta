@@ -37,22 +37,54 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
-   @Test(expected = InvalidMediumReferenceException.class)
-   public void getData_forFilledUncachedMedium_twiceInEnclosingRegion_throwsException() {
+   @Test
+   public void getData_forFilledUncachedStreamMedium_fromMiddleAndMoreBytesThanMaxRWBlockSize_readsRangeAndBytesBeforeBlockWise() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 
-      String currentMediumContent = getMediumContentAsString(currentMedium);
+      mediumStoreUnderTest.open();
+
+      long getDataStartOffset = MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM * 3 + 5;
+      int getDataSize = 3 * MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM;
+
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+
+      verifyExactlyNReads(4 + 3);
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test(expected = InvalidMediumReferenceException.class)
+   public void getData_forFilledUncachedStreamMedium_twiceInEnclosingRegion_throwsException() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
 
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
       int getDataSize = 200;
 
-      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       // Read again in range fully enclosed by first read
       // - Must throw exception here because the previous data read was returned and advanced the stream, but it
       // was not added to the cache. Accessing the same offset again for an uncached stream is not possible
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test(expected = InvalidMediumReferenceException.class)
+   public void getData_forFilledUncachedStreamMedium_forOffsetBeforeCurrentPosition_throwsException() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      getDataNoEOMExpected(at(currentMedium, 20), 100);
+
+      long getDataStartOffset = 0;
+      int getDataSize = 200;
+
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
    }
 

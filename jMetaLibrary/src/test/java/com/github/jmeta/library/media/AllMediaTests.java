@@ -22,11 +22,13 @@ import com.github.jmeta.library.media.api.types.MediumReferenceEqualityTest;
 import com.github.jmeta.library.media.api.types.MediumRegionTest;
 import com.github.jmeta.library.media.impl.OLD.BlockWiseFileMediumCacheTest;
 import com.github.jmeta.library.media.impl.OLD.FileMediumCacheTest;
+import com.github.jmeta.library.media.impl.cache.MediumCacheTest;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerCreateFlushPlanTest;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerTest;
 import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactoryTest;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReferenceTest;
+import com.github.jmeta.library.media.impl.store.AllMediumStoreTests;
 import com.github.jmeta.library.media.impl.store.ReadOnlyFileMediumStoreTest;
 import com.github.jmeta.library.media.impl.store.ReadOnlyInMemoryMediumStoreTest;
 import com.github.jmeta.library.media.impl.store.CachedStreamMediumStoreTest;
@@ -41,8 +43,7 @@ import com.github.jmeta.library.media.impl.store.UnCachedWritableInMemoryMediumS
    MediumEqualityTest.class, StandardMediumReferenceTest.class, MediumReferenceEqualityTest.class, FileMediumTest.class,
    InMemoryMediumTest.class, InputStreamMediumTest.class, MediumActionTest.class, MediumActionEqualityTest.class,
    MediumReferenceFactoryTest.class, MediumChangeManagerTest.class, MediumChangeManagerCreateFlushPlanTest.class,
-   AllMediumAccessorTests.class, ReadOnlyFileMediumStoreTest.class, ReadOnlyInMemoryMediumStoreTest.class,
-   CachedWritableFileMediumStoreTest.class, UnCachedWritableInMemoryMediumStoreTest.class, CachedStreamMediumStoreTest.class, })
+   AllMediumAccessorTests.class, AllMediumStoreTests.class, MediumCacheTest.class, })
 public class AllMediaTests {
    // Nothing necessary here
 }

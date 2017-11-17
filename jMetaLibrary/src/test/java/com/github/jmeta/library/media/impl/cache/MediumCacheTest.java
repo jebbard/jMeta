@@ -325,11 +325,15 @@ public class MediumCacheTest {
     * Tests {@link MediumCache#getRegionsInRange(MediumReference, int)}.
     */
    @Test
-   public void getRegionsInRange_forEmptyCache_returnsEmptyList() {
-      MediumCache emptyCache = new MediumCache(DEFAULT_TEST_MEDIUM);
+   public void getRegionsInRange_forEmptyCache_returnsSingleUncachedRegion() {
+	      MediumCache emptyCache = new MediumCache(DEFAULT_TEST_MEDIUM);
+	      MediumReference startOffset = at(0L);
+		int rangeSizeInBytes = 10;
+		List<MediumRegion> regionsInRange = emptyCache.getRegionsInRange(startOffset, rangeSizeInBytes);
 
-      Assert.assertEquals(0, emptyCache.getRegionsInRange(at(DEFAULT_CACHE_OFFSET_BEFORE_FIRST_REGION), 10).size());
-      Assert.assertEquals(0, emptyCache.getRegionsInRange(at(DEFAULT_CACHE_OFFSET_IN_FIRST_GAP), 10).size());
+      Assert.assertEquals(1, regionsInRange.size());
+
+      Assert.assertEquals(new MediumRegion(startOffset, rangeSizeInBytes), regionsInRange.get(0));
    }
 
    /**
@@ -1208,7 +1212,5 @@ public class MediumCacheTest {
 
       Assert.assertEquals(0L, cache.calculateCurrentCacheSizeInBytes());
       Assert.assertEquals(0, cache.getAllCachedRegions().size());
-      Assert.assertEquals(0,
-         cache.getRegionsInRange(at(0L), (int) Math.min(cache.getMaximumCacheSizeInBytes(), Integer.MAX_VALUE)).size());
    }
 }

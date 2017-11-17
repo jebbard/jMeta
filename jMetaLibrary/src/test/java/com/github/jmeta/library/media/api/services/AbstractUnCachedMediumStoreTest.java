@@ -112,7 +112,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
     * Tests {@link MediumStore#cache(MediumReference, int)}.
     */
    @Test
-   public void cache_forFilledMediumWithDisabledCache_doesNotReadMediumAtAll() {
+   public void cache_forFilledUncachedMedium_doesNotCacheAnything() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 
       mediumStoreUnderTest.open();
@@ -126,39 +126,19 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
       }
    }
 
-   /**
+/**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
-   public void getData_forFilledUncachedMedium_untilEOM_throwsEndOfMediumException() {
+   public void getData_forFilledUncachedMedium_doesNotAddAnythingToCache() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      mediumStoreUnderTest.open();
-
-      long getDataStartOffset = 15;
-      int getDataSize = currentMediumContent.length();
-
-      testGetData_forChunkedRead_throwsEndOfMediumException(getDataStartOffset, getDataSize,
-         MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM, currentMediumContent.length());
-   }
-
-   /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
-    */
-   @Test
-   public void getData_forFilledUncachedMedium_returnsExpectedDataAndDoesNotUpdateCache() {
-      mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 15;
       int getDataSize = 200;
-
-      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+      
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       Mockito.verifyNoMoreInteractions(mediumCacheSpy);
    }
@@ -167,26 +147,41 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
-   public void getData_forFilledUncachedMedium_returnsExpectedDataAndReadsBlockWise() {
+   public void getData_forFilledUncachedMedium_fromStartAndMoreBytesThanMaxRWBlockSize_readsBlockWise() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
       int getDataSize = 3 * MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM + 4;
-
-      testGetData_returnsExpectedData(at(currentMedium, getDataStartOffset), getDataSize, currentMediumContent);
+      
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       verifyExactlyNReads(4);
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createDafaulFilledMediumStore()
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forFilledUncachedMedium_fromStartAndLessBytesThanMaxRWBlockSize_readsOnce() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      long getDataStartOffset = 0;
+      int getDataSize = MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM / 2;
+      
+      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+
+      verifyExactlyNReads(1);
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createDefaultFilledMediumStore()
     */
    @Override
-   protected MediumStore createDafaulFilledMediumStore() {
+   protected MediumStore createDefaultFilledMediumStore() {
       return createFilledUncachedMediumStore();
    }
 

@@ -138,7 +138,8 @@ public class MediumCache {
     * <li>If the cache does not contain any {@link MediumRegion}s overlapping the given range, nevertheless it returns
     * non-cached {@link MediumRegion} instances without data, covering the whole range. If rangeSize is smaller then the
     * configured {@link #getMaximumCacheRegionSizeInBytes()}, it returns as much {@link MediumRegion}s with the maximum
-    * configured size as required to cover the range.</li>
+    * configured size as required to cover the range. This is even true if the cache is empty or the given range exceeds
+    * the current cache</li>
     * <li>If the cache e.g. contains two {@link MediumRegion}s within the given range (starting behind the start
     * reference and ending before start reference + range size), but between both there is a gap, overall the methods
     * returns five {@link MediumRegion} instances. The first covering the region up to the start of the cached region,
@@ -164,6 +165,9 @@ public class MediumCache {
       List<MediumRegion> regionsInRange = new ArrayList<>();
 
       if (cachedRegionsInOffsetOrder.isEmpty()) {
+         regionsInRange.addAll(
+                  getGapsBetweenCurrentAndPreviousCachedRegion(startReference, startReference.advance(rangeSizeInBytes)));
+    	  
          return regionsInRange;
       }
 
