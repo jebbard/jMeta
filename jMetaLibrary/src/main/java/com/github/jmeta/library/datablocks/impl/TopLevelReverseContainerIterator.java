@@ -171,7 +171,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
                         // bytes really read are ignored as the read ByteBuffers.remaining() contains
                         // the read byte count
                         LOGGER.info("End of medium exception occurred during data format identification (see below).");
-                        LOGGER.info("Read " + e.getBytesReallyRead() + " of " + e.getByteCountTriedToRead()
+                        LOGGER.info("Read " + e.getByteCountActuallyRead() + " of " + e.getByteCountTriedToRead()
                            + " bytes tried to read.");
                         LOGGER.error("identifyDataFormat", e);
                      }

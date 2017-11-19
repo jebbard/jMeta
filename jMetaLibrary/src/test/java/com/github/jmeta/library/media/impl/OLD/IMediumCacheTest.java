@@ -947,10 +947,10 @@ public abstract class IMediumCacheTest {
          }
 
          catch (EndOfMediumException e) {
-            Assert.assertEquals(size, e.getBytesReallyRead());
+            Assert.assertEquals(size, e.getByteCountActuallyRead());
             Assert.assertEquals(size, cache.getBufferedByteCountAt(reference));
             Assert.assertEquals(size * 2, e.getByteCountTriedToRead());
-            Assert.assertEquals(reference, e.getMediumReference());
+            Assert.assertEquals(reference, e.getReadStartReference());
          }
       }
    }

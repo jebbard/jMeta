@@ -28,6 +28,7 @@ import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
+import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
@@ -285,8 +286,9 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
     * @return a {@link MediumStore} to test based on a given {@link Medium}.
     */
    protected MediumStore createMediumStoreToTest(T mediumToUse) {
+      MediumReferenceFactory mediumReferenceFactory = new MediumReferenceFactory(mediumToUse);
       return new StandardMediumStore<>(createMediumAccessor(mediumToUse), new MediumCache(mediumToUse),
-         new MediumReferenceFactory(mediumToUse));
+         mediumReferenceFactory, new MediumChangeManager(mediumReferenceFactory));
    }
 
    /**

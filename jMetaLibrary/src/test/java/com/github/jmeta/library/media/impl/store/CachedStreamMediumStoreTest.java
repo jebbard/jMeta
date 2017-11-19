@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
@@ -38,92 +37,6 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    private static final String STREAM_BASED_EMPTY_MEDIUM_NAME = "Stream based empty medium";
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledStreamMediumWithBigCache_fromMiddle_cachesUpToStartOffset() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      Assume.assumeNotNull(mediumStoreUnderTest);
-
-      mediumStoreUnderTest.open();
-
-      int cacheStartOffsetPos = 20;
-      MediumReference cacheStartOffset = at(currentMedium, cacheStartOffsetPos);
-      int bytesToCache = 10;
-      cacheNoEOMExpected(cacheStartOffset, bytesToCache);
-
-      Assert.assertEquals(bytesToCache,
-         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, cacheStartOffsetPos)));
-      Assert.assertEquals(bytesToCache + cacheStartOffsetPos,
-         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 0)));
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledStreamMediumWithBigCache_multipleOverlappingAndDisconnectedRegions_cachesExpectedBytes() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(at(currentMedium, 20), 10);
-      cacheNoEOMExpected(at(currentMedium, 25), 100);
-      cacheNoEOMExpected(at(currentMedium, 200), 35);
-
-      Assert.assertEquals(213, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 20 + 2)));
-      Assert.assertEquals(216, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 20 - 1)));
-      Assert.assertEquals(110, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 25 + 100)));
-      Assert.assertEquals(24, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 200 + 11)));
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 235)));
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test
-   public void cache_forFilledStreamMediumWithSmallCache_middleOffset_readsBlockWiseUpToStartOffsetAndCachesOnlyLastRegions() {
-      mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
-
-      mediumStoreUnderTest.open();
-
-      // Cache more bytes than max cache size such that regions cached at the beginning of the medium need to be freed
-      // automatically
-      MediumReference cacheOffset = at(currentMedium, 20);
-	int cacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 100;
-	
-	cacheNoEOMExpected(cacheOffset, cacheSize);
-      
-      verifyExactlyNReads((int) (cacheOffset.getAbsoluteMediumOffset() + cacheSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1);
-
-      Assert.assertEquals(0,
-         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 0)));
-      Assert.assertEquals(0,
-         mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
-      Assert.assertEquals(0,
- 	         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 119)));
-      Assert.assertEquals(MAX_CACHE_SIZE_FOR_SMALL_CACHE,
-    	         mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 120)));
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
-    */
-   @Test(expected = InvalidMediumReferenceException.class)
-   public void cache_forFilledStreamMediumWithSmallCache_offsetInPreviouslyFreedCacheRegion_throwsException() {
-      mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
-
-      mediumStoreUnderTest.open();
-
-      // Cache more bytes than max cache size such that regions cached at the beginning of the medium need to be freed
-      // automatically
-      cacheNoEOMExpected(at(currentMedium, 20), MAX_CACHE_SIZE_FOR_SMALL_CACHE + 100);
-
-      cacheNoEOMExpected(at(currentMedium, 10), 20);
-   }
-
-   /**
     * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
     * {@link MediumStore#cache(MediumReference, int)}.
     */
@@ -144,6 +57,117 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    }
 
    /**
+    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    */
+   @Test
+   public void cache_forFilledStreamMediumWithBigCache_fromMiddle_cachesUpToStartOffset() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      MediumReference mediumStartOffset = at(currentMedium, 0);
+      MediumReference cacheOffset = at(currentMedium, 20);
+      int cacheSize = 10;
+
+      cacheNoEOMExpected(cacheOffset, cacheSize);
+
+      Assert.assertEquals(cacheSize, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
+      Assert.assertEquals(cacheSize + cacheOffset.getAbsoluteMediumOffset(),
+         mediumStoreUnderTest.getCachedByteCountAt(mediumStartOffset));
+
+      assertRangeIsCached(mediumStartOffset, (int) cacheOffset.getAbsoluteMediumOffset(), currentMediumContent);
+      assertRangeIsCached(cacheOffset, cacheSize, currentMediumContent);
+      assertRangeIsNotCached(cacheOffset.advance(cacheSize), currentMediumContent.length());
+   }
+
+   /**
+    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    */
+   @Test
+   public void cache_forFilledStreamMediumWithBigCache_multipleOverlappingAndDisconnectedRegions_cachesExpectedBytes() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      MediumReference firstCacheOffset = at(currentMedium, 20);
+      int firstCacheSize = 10;
+      MediumReference secondCacheOffset = at(currentMedium, 25);
+      int secondCacheSize = 100;
+      MediumReference thirdCacheOffset = at(currentMedium, 200);
+      int thirdCacheSize = 35;
+
+      cacheNoEOMExpected(firstCacheOffset, firstCacheSize);
+      cacheNoEOMExpected(secondCacheOffset, secondCacheSize);
+      cacheNoEOMExpected(thirdCacheOffset, thirdCacheSize);
+
+      Assert.assertEquals(213, mediumStoreUnderTest.getCachedByteCountAt(firstCacheOffset.advance(2)));
+      Assert.assertEquals(216, mediumStoreUnderTest.getCachedByteCountAt(firstCacheOffset.advance(-1)));
+      Assert.assertEquals(110, mediumStoreUnderTest.getCachedByteCountAt(secondCacheOffset.advance(secondCacheSize)));
+      Assert.assertEquals(24, mediumStoreUnderTest.getCachedByteCountAt(thirdCacheOffset.advance(11)));
+      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(thirdCacheOffset.advance(thirdCacheSize)));
+
+      assertRangeIsCached(at(currentMedium, 0), (int) thirdCacheOffset.getAbsoluteMediumOffset() + thirdCacheSize,
+         currentMediumContent);
+      assertRangeIsNotCached(thirdCacheOffset.advance(thirdCacheSize), currentMediumContent.length());
+   }
+
+   /**
+    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    */
+   @Test
+   public void cache_forFilledStreamMediumWithSmallCache_middleOffset_readsBlockWiseUpToStartOffsetAndCachesOnlyLastRegions() {
+      mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      // Cache more bytes than max cache size such that regions cached at the beginning of the medium need to be freed
+      // automatically
+      MediumReference cacheOffset = at(currentMedium, 20);
+      int expectedActualCacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE;
+      int cacheSize = expectedActualCacheSize + 100;
+
+      MediumReference expectedActualCacheStartOffset = at(currentMedium, 120);
+
+      cacheNoEOMExpected(cacheOffset, cacheSize);
+
+      verifyExactlyNReads(
+         (int) (cacheOffset.getAbsoluteMediumOffset() + cacheSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1);
+
+      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 0)));
+      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
+      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 119)));
+      Assert.assertEquals(expectedActualCacheSize,
+         mediumStoreUnderTest.getCachedByteCountAt(expectedActualCacheStartOffset));
+
+      assertRangeIsNotCached(at(currentMedium, 0), (int) expectedActualCacheStartOffset.getAbsoluteMediumOffset());
+      assertRangeIsCached(expectedActualCacheStartOffset, expectedActualCacheSize, currentMediumContent);
+      assertRangeIsNotCached(expectedActualCacheStartOffset.advance(expectedActualCacheSize),
+         currentMediumContent.length());
+   }
+
+   /**
+    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    */
+   @Test(expected = InvalidMediumReferenceException.class)
+   public void cache_forFilledStreamMediumWithSmallCache_offsetInPreviouslyFreedCacheRegion_throwsException() {
+      mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
+
+      mediumStoreUnderTest.open();
+
+      // Cache more bytes than max cache size such that regions cached at the beginning of the medium need to be freed
+      // automatically
+      cacheNoEOMExpected(at(currentMedium, 20), MAX_CACHE_SIZE_FOR_SMALL_CACHE + 100);
+
+      cacheNoEOMExpected(at(currentMedium, 10), 20);
+   }
+
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test(expected = InvalidMediumReferenceException.class)
@@ -159,7 +183,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       getDataNoEOMExpected(at(currentMedium, 10), 20);
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
@@ -177,13 +201,18 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
          mediumStoreUnderTest.getData(at(currentMedium, getDataStartOffset), getDataSize);
          Assert.fail("Expected " + EndOfMediumException.class);
       } catch (EndOfMediumException e) {
-          Assert.assertEquals(at(currentMedium, 0), e.getMediumReference());
-          Assert.assertEquals(getDataStartOffset, e.getByteCountTriedToRead());
-          Assert.assertEquals(currentMediumContent.length(), e.getBytesReallyRead());
-        }
+         Assert.assertEquals(at(currentMedium, 0), e.getReadStartReference());
+         Assert.assertEquals(getDataStartOffset, e.getByteCountTriedToRead());
+         Assert.assertEquals(currentMediumContent.length(), e.getByteCountActuallyRead());
+
+         assertByteBufferMatchesMediumRange(e.getBytesReadSoFar(), e.getReadStartReference(),
+            e.getByteCountActuallyRead(), currentMediumContent);
+      }
+
+      assertRangeIsCached(at(currentMedium, 0), currentMediumContent.length(), currentMediumContent);
    }
 
-/**
+   /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
    @Test
@@ -194,17 +223,20 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
 
       mediumStoreUnderTest.open();
 
-      long getDataStartOffset = 15;
+      MediumReference getDataOffset = at(currentMedium, (long) 15);
       int getDataSize = 80;
 
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
 
       // Two read calls due to big read-write block size and stream medium
       verifyExactlyNReads(2);
 
-      Assert.assertEquals(getDataSize + getDataStartOffset,
+      Assert.assertEquals(getDataSize + getDataOffset.getAbsoluteMediumOffset(),
          mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 0)));
+
+      assertRangeIsCached(at(currentMedium, 0), (int) getDataOffset.getAbsoluteMediumOffset() + getDataSize,
+         currentMediumContent);
+      assertRangeIsNotCached(getDataOffset.advance(getDataSize), currentMediumContent.length());
    }
 
    /**
@@ -218,7 +250,10 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
 
       mediumStoreUnderTest.open();
 
-      cacheNoEOMExpected(at(currentMedium, 100), 100);
+      MediumReference cacheOffset = at(currentMedium, 100);
+      int cacheSize = 100;
+
+      cacheNoEOMExpected(cacheOffset, cacheSize);
 
       // One read to read up to start offset, second read for the explicit cache call
       verifyExactlyNReads(2);
@@ -231,6 +266,10 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
 
       // No additional reads, as everything was already cached
       verifyExactlyNReads(2);
+
+      assertRangeIsCached(at(currentMedium, 0), (int) cacheOffset.getAbsoluteMediumOffset() + cacheSize,
+         currentMediumContent);
+      assertRangeIsNotCached(cacheOffset.advance(cacheSize), currentMediumContent.length());
    }
 
    /**
@@ -247,7 +286,8 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
     *      long, int)
     */
    @Override
-   protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize) throws IOException {
+   protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
+      throws IOException {
       return new InputStreamMedium(new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile()),
          STREAM_BASED_FILLED_MEDIUM_NAME, maxCacheSize, maxReadWriteBlockSize);
    }

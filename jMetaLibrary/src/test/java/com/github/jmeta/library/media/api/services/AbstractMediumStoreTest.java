@@ -34,6 +34,7 @@ import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
+import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
@@ -92,6 +93,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected MediumCache mediumCacheSpy;
 
    protected MediumReferenceFactory mediumReferenceFactorySpy;
+
+   protected MediumChangeManager mediumChangeManagerSpy;
 
    /**
     * Validates all test files needed in this test class
@@ -245,11 +248,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      long getDataStartOffset = 0;
-      int getDataSize = 1;
-
-      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize,
-         currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent.length());
+      testGetData_throwsEndOfMediumException(at(currentMedium, 0), 1, currentMedium.getMaxReadWriteBlockSizeInBytes(),
+         currentMediumContent);
    }
 
    /**
@@ -263,11 +263,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      long getDataStartOffset = 15;
-      int getDataSize = currentMediumContent.length();
-
-      testGetData_throwsEndOfMediumException(getDataStartOffset, getDataSize,
-         currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent.length());
+      testGetData_throwsEndOfMediumException(at(currentMedium, 15), currentMediumContent.length(),
+         currentMedium.getMaxReadWriteBlockSizeInBytes(), currentMediumContent);
    }
 
    /**
@@ -356,6 +353,23 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       mediumStoreUnderTest.open();
 
       mediumStoreUnderTest.insertData(at(MediaTestUtility.OTHER_MEDIUM, 10), ByteBuffer.allocate(10));
+   }
+
+   /**
+    * Tests {@link MediumStore#undo(com.github.jmeta.library.media.api.types.MediumAction)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void undo_forNonPendingAction_throwsException() {
+      mediumStoreUnderTest = createEmptyMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      MediumAction mediumAction = new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(currentMedium, 10), 20),
+         0, null);
+
+      mediumAction.setDone();
+
+      mediumStoreUnderTest.undo(mediumAction);
    }
 
    /**
@@ -475,8 +489,10 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       mediumCacheSpy = Mockito
          .spy(new MediumCache(mediumToUse, mediumToUse.getMaxCacheSizeInBytes(), maxCacheRegionSize));
       mediumReferenceFactorySpy = Mockito.spy(new MediumReferenceFactory(mediumToUse));
+      mediumChangeManagerSpy = Mockito.spy(new MediumChangeManager(mediumReferenceFactorySpy));
 
-      return new StandardMediumStore<>(mediumAccessorSpy, mediumCacheSpy, mediumReferenceFactorySpy);
+      return new StandardMediumStore<>(mediumAccessorSpy, mediumCacheSpy, mediumReferenceFactorySpy,
+         mediumChangeManagerSpy);
    }
 
    /**
@@ -504,54 +520,75 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    /**
     * Tests {@link MediumStore#getData(MediumReference, int)} by comparing its result with the expected medium content.
     * 
-    * @param offset
+    * @param getDataOffset
     *           The offset to use for the method call
-    * @param readDataSize
+    * @param getDataSize
     *           The size to use for the method call
     * @param currentMediumContent
     *           The current medium content used to get the expected data
     */
-   protected void testGetData_returnsExpectedData(MediumReference offset, int readDataSize,
+   protected void testGetData_returnsExpectedData(MediumReference getDataOffset, int getDataSize,
       String currentMediumContent) {
-      ByteBuffer returnedData = getDataNoEOMExpected(offset, readDataSize);
+      ByteBuffer returnedData = getDataNoEOMExpected(getDataOffset, getDataSize);
 
-      Assert.assertEquals(readDataSize, returnedData.remaining());
-      byte[] byteBufferData = new byte[readDataSize];
-      returnedData.get(byteBufferData);
+      assertByteBufferMatchesMediumRange(returnedData, getDataOffset, getDataSize, currentMediumContent);
+   }
+
+   /**
+    * Checks whether the given {@link ByteBuffer} matches the medium content in the specified range
+    * 
+    * @param returnedData
+    *           The {@link ByteBuffer} to check
+    * @param rangeStartOffset
+    *           The start offset of the compared range
+    * @param rangeSize
+    *           The size of the compared range
+    * @param currentMediumContent
+    *           The current content of the {@link Medium}
+    */
+   protected void assertByteBufferMatchesMediumRange(ByteBuffer returnedData, MediumReference rangeStartOffset,
+      int rangeSize, String currentMediumContent) {
+      Assert.assertEquals(rangeSize, returnedData.remaining());
+      byte[] byteBufferData = new byte[rangeSize];
+      returnedData.asReadOnlyBuffer().get(byteBufferData);
 
       String asString = new String(byteBufferData, Charsets.CHARSET_ASCII);
 
-      Assert.assertEquals(currentMediumContent.substring((int) offset.getAbsoluteMediumOffset(),
-         (int) (offset.getAbsoluteMediumOffset() + readDataSize)), asString);
+      Assert.assertEquals(currentMediumContent.substring((int) rangeStartOffset.getAbsoluteMediumOffset(),
+         (int) (rangeStartOffset.getAbsoluteMediumOffset() + rangeSize)), asString);
    }
 
    /**
     * Tests {@link MediumStore#getData(MediumReference, int)} to throw an end of medium exception when reaching it.
     * 
-    * @param getDataStartOffset
-    *           The offset to use for the method call
     * @param getDataSize
     *           The size to use for the method call
     * @param chunkSizeToUse
     *           The size of the read-write block chunks
-    * @param mediumSize
-    *           The total size of the medium used in bytes
+    * @param currentMediumContent
+    *           The current content of the medium
+    * @param getDataStartOffset
+    *           The offset to use for the method call
     */
-   protected void testGetData_throwsEndOfMediumException(long getDataStartOffset, int getDataSize, int chunkSizeToUse,
-      long mediumSize) {
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+   protected void testGetData_throwsEndOfMediumException(MediumReference getDataOffset, int getDataSize,
+      int chunkSizeToUse, String currentMediumContent) {
 
       try {
          mediumStoreUnderTest.getData(getDataOffset, getDataSize);
          Assert.fail(EndOfMediumException.class + " expected, but was not thrown");
       } catch (EndOfMediumException e) {
+         long getDataStartOffset = getDataOffset.getAbsoluteMediumOffset();
 
-         MediumReference expectedReadOffset = at(currentMedium,
-            getDataStartOffset + chunkSizeToUse * (int) ((mediumSize - getDataStartOffset) / chunkSizeToUse));
+         MediumReference expectedReadOffset = at(currentMedium, getDataStartOffset
+            + chunkSizeToUse * (int) ((currentMediumContent.length() - getDataStartOffset) / chunkSizeToUse));
 
-         Assert.assertEquals(expectedReadOffset, e.getMediumReference());
+         Assert.assertEquals(expectedReadOffset, e.getReadStartReference());
          Assert.assertEquals(getDataSize < chunkSizeToUse ? getDataSize : chunkSizeToUse, e.getByteCountTriedToRead());
-         Assert.assertEquals((int) (mediumSize - getDataStartOffset) % chunkSizeToUse, e.getBytesReallyRead());
+         Assert.assertEquals((int) (currentMediumContent.length() - getDataStartOffset) % chunkSizeToUse,
+            e.getByteCountActuallyRead());
+
+         assertByteBufferMatchesMediumRange(e.getBytesReadSoFar(), expectedReadOffset, e.getByteCountActuallyRead(),
+            currentMediumContent);
       }
    }
 
@@ -600,6 +637,14 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       } catch (EndOfMediumException e) {
          throw new RuntimeException("Unexpected end of medium", e);
       }
+   }
+
+   /**
+    * Verifies that the medium cache is currently empty.
+    */
+   protected void assertCacheIsEmpty() {
+      Assert.assertEquals(0, mediumCacheSpy.getAllCachedRegions().size());
+      Assert.assertEquals(0, mediumCacheSpy.calculateCurrentCacheSizeInBytes());
    }
 
 }

@@ -126,17 +126,20 @@ public interface MediumStore {
     * returning the data. If data is already cached in the provided range, the method returns without doing anything. It
     * also immediately returns without any action if caching is currently disabled, specifically for non-cacheable
     * media. This method might encounter the end of the {@link Medium} during reading, in which case it throws an
-    * {@link EndOfMediumException}. Calling this method might lead to an internal auto-cleanup of the cache if the
-    * maximum configured cache size is exceeded. In this case, the data chunks cached with the very first call to
-    * {@link #cache(MediumReference, int)} since opening the {@link Medium} is removed from the cache first, then the
-    * data chunks of the second call and so on, as much chunks are freed such that the current cache size plus the
-    * number of bytes to newly cache is again below the maximum cache size. Each chunk has a maximum size of
-    * {@link Medium#getMaxCacheRegionSizeInBytes()}. In an extreme case, the number of bytes to cache passed to this
-    * method is itself already exceeding the maximum cache size, which adds only the cache regions with higher offsets
-    * to the cache. For example, if numberOfBytes = maxCacheSize + n, after calling this method, only bytes starting
-    * from offset + n until offset + n + maxCacheSize are actually cached such that the maximum cache size is not
-    * exceeded. To avoid this strange situation, code using this method should ensure a proper configuration of maximum
-    * cache size and to pass sizes that are much smaller than the maximum cache size as parameter to this method.
+    * {@link EndOfMediumException}. If the medium is backed by a cache, even in case of an {@link EndOfMediumException}
+    * thrown, all bytes read until the end of the medium will nevertheless be added to the cache.
+    * 
+    * Calling this method might lead to an internal auto-cleanup of the cache if the maximum configured cache size is
+    * exceeded. In this case, the data chunks cached with the very first call to {@link #cache(MediumReference, int)}
+    * since opening the {@link Medium} is removed from the cache first, then the data chunks of the second call and so
+    * on, as much chunks are freed such that the current cache size plus the number of bytes to newly cache is again
+    * below the maximum cache size. Each chunk has a maximum size of {@link Medium#getMaxCacheRegionSizeInBytes()}. In
+    * an extreme case, the number of bytes to cache passed to this method is itself already exceeding the maximum cache
+    * size, which adds only the cache regions with higher offsets to the cache. For example, if numberOfBytes =
+    * maxCacheSize + n, after calling this method, only bytes starting from offset + n until offset + n + maxCacheSize
+    * are actually cached such that the maximum cache size is not exceeded. To avoid this strange situation, code using
+    * this method should ensure a proper configuration of maximum cache size and to pass sizes that are much smaller
+    * than the maximum cache size as parameter to this method.
     * 
     * Note that if this method reads bytes from the {@link Medium}, it does so using
     * {@link Medium#getMaxReadWriteBlockSizeInBytes()} as size. So it might perform multiple accesses to the external
@@ -166,9 +169,10 @@ public interface MediumStore {
     * @throws EndOfMediumException
     *            If the method encounters the end of the medium before reading all bytes. The method
     *            {@link EndOfMediumException#getByteCountTriedToRead()} returns the value of the size parameter, the
-    *            {@link EndOfMediumException#getMediumReference()} method returns the value of the offset parameter and
-    *            the {@link EndOfMediumException#getBytesReallyRead()} method returns the actual number of bytes read up
-    *            to the end of medium.
+    *            {@link EndOfMediumException#getReadStartReference()} method returns the value of the offset parameter
+    *            and the {@link EndOfMediumException#getByteCountActuallyRead()} method returns the actual number of
+    *            bytes read up to the end of medium. In addition, {@link EndOfMediumException#getBytesReadSoFar()}
+    *            returns all bytes that have been read during the last read attempt until end of medium.
     * @throws InvalidMediumReferenceException
     *            Only for stream media, if the given offset is before the highest previously read offset and the data is
     *            not yet cached
@@ -204,18 +208,22 @@ public interface MediumStore {
     * This might only happen if the medium was changed by another process meanwhile. You should throw a runtime
     * exception in this case, wrapping the original exception.</li>
     * <li>Otherwise, you should re-call {@link #getData(MediumReference, int)} using
-    * {@link EndOfMediumException#getBytesReallyRead()} as the new number of bytes to read.</li>
+    * {@link EndOfMediumException#getByteCountActuallyRead()} as the new number of bytes to read.</li>
     * </ol>
+    * 
+    * If the medium is backed by a cache, even in case of an {@link EndOfMediumException} thrown, all bytes read until
+    * the end of the medium will nevertheless be added to the cache.
     * 
     * The returned data is provided in a read-only {@link ByteBuffer} between its position and limit, i.e.
     * {@link ByteBuffer#remaining()} equals the read byte count, which equals the input parameter numberOfBytes.
     * 
     * As already indicated, one model of working with this API is to call {@link #cache(MediumReference, int)} as soon
     * as you know the number of bytes you need to work with ahead, then call {@link #getData(MediumReference, int)}
-    * portion-wise for the same range at places where you need the actually work with the data. ANother option is to not
+    * portion-wise for the same range at places where you need the actually work with the data. Another option is to not
     * use {@link #cache(MediumReference, int)} and directly call {@link #getData(MediumReference, int)} if your code
-    * structure allows to directly work with the data. In this case you should re-read with fewer bytes if an
-    * {@link EndOfMediumException} occurs.
+    * structure allows to directly work with the data. If an {@link EndOfMediumException} occurs in this case, you do
+    * not necessarily have to again call this method with fewer bytes, but you can also obtain all bytes until end of
+    * medium using {@link EndOfMediumException#getBytesReadSoFar()}.
     * 
     * For random-access media, this method does not throw an exception if it finds that the data is not cached. For
     * stream-based media, if parts of the range are not found in the cache, and the range is before the current highest
@@ -234,9 +242,11 @@ public interface MediumStore {
     * @throws EndOfMediumException
     *            If the method encounters the end of the medium before reading all bytes. To be handles as described
     *            above in the method description. The method {@link EndOfMediumException#getByteCountTriedToRead()}
-    *            returns the value of the size parameter, the {@link EndOfMediumException#getMediumReference()} method
-    *            returns the value of the offset parameter and the {@link EndOfMediumException#getBytesReallyRead()}
-    *            method returns the actual number of bytes read up to the end of medium.
+    *            returns the value of the size parameter, the {@link EndOfMediumException#getReadStartReference()}
+    *            method returns the value of the offset parameter and the
+    *            {@link EndOfMediumException#getByteCountActuallyRead()} method returns the actual number of bytes read
+    *            up to the end of medium. In addition, {@link EndOfMediumException#getBytesReadSoFar()} returns all
+    *            bytes that have been read during the last read attempt until end of medium.
     * @throws InvalidMediumReferenceException
     *            Only for stream media, if the given offset is before the highest previously read offset, and the data
     *            was not found to be cached

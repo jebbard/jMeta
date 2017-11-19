@@ -90,7 +90,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
       if (readBeyondEOF) {
          buffer.limit(initialPosition + bytesReallyRead);
          updateCurrentPosition(currentPosition.advance(bytesReallyRead));
-         throw new EndOfMediumException(bytesReallyRead, currentPosition, bytesToRead);
+         throw new EndOfMediumException(currentPosition, bytesToRead, bytesReallyRead, buffer);
       }
 
       updateCurrentPosition(currentPosition.advance(bytesReallyRead));

@@ -94,7 +94,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
 
             updateCurrentPosition(readOffsetRef.advance(bytesRead));
 
-            throw new EndOfMediumException(bytesRead, readOffsetRef, size);
+            throw new EndOfMediumException(readOffsetRef, size, bytesRead, buffer);
          }
 
          bytesRead += returnCode;

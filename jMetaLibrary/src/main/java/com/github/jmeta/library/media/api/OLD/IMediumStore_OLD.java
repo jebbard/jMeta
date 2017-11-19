@@ -248,8 +248,8 @@ public interface IMediumStore_OLD {
     *            If during reading from the {@link Medium}, the end of the {@link Medium} is hit before having read
     *            all bytes into the pre-load store. The {@link EndOfMediumException}'s
     *            {@link EndOfMediumException#getByteCountTriedToRead()} method will return the value of the size
-    *            parameter, the {@link EndOfMediumException#getMediumReference()} method will return the value of the
-    *            reference parameter and the {@link EndOfMediumException#getBytesReallyRead()} method will return the
+    *            parameter, the {@link EndOfMediumException#getReadStartReference()} method will return the value of the
+    *            reference parameter and the {@link EndOfMediumException#getByteCountActuallyRead()} method will return the
     *            number of bytes read up to the end of medium.
     * @throws ReadTimedOutException
     *            If during reading from the {@link Medium}, a timeout for reading has expired.
@@ -263,9 +263,9 @@ public interface IMediumStore_OLD {
     * 
     * @post without EndOfMediumException: {@link #getBufferedByteCountAt(MediumReference)} == true for the given
     *       {@link MediumReference} and size
-    * @post with EndOfMediumException: if {@link EndOfMediumException#getBytesReallyRead()} > 0,
+    * @post with EndOfMediumException: if {@link EndOfMediumException#getByteCountActuallyRead()} > 0,
     *       {@link #getBufferedByteCountAt(MediumReference)} == true for the given {@link MediumReference} and
-    *       {@link EndOfMediumException#getBytesReallyRead()}
+    *       {@link EndOfMediumException#getByteCountActuallyRead()}
     */
    public void buffer(MediumReference reference, int size) throws EndOfMediumException;
 

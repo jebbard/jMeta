@@ -17,7 +17,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
@@ -116,11 +115,9 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
 
       cacheNoEOMExpected(at(currentMedium, 20), 5);
 
-      try {
-         Mockito.verify(mediumAccessorSpy, Mockito.never()).read(Mockito.any());
-      } catch (EndOfMediumException e) {
-         throw new RuntimeException("Unexpected end of medium", e);
-      }
+      verifyExactlyNReads(0);
+
+      assertCacheIsEmpty();
    }
 
    /**
@@ -138,6 +135,8 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       Mockito.verifyNoMoreInteractions(mediumCacheSpy);
+
+      assertCacheIsEmpty();
    }
 
    /**
@@ -155,6 +154,8 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       verifyExactlyNReads(4);
+
+      assertCacheIsEmpty();
    }
 
    /**
@@ -172,6 +173,8 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       verifyExactlyNReads(1);
+
+      assertCacheIsEmpty();
    }
 
    /**

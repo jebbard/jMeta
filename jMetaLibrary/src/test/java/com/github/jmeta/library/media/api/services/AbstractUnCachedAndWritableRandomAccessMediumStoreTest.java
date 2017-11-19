@@ -77,5 +77,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
 
       // Data as read block-wise, twice
       verifyExactlyNReads(2 * getDataSize / MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM);
+
+      assertCacheIsEmpty();
    }
 }

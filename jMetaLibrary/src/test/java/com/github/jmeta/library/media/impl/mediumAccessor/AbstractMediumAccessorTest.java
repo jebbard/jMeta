@@ -265,7 +265,7 @@ public abstract class AbstractMediumAccessorTest {
 
       catch (EndOfMediumException e) {
          Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
-         Assert.assertEquals(initialPosition.advance(e.getBytesReallyRead()), mediumAccessor.getCurrentPosition());
+         Assert.assertEquals(initialPosition.advance(e.getByteCountActuallyRead()), mediumAccessor.getCurrentPosition());
       }
    }
 
@@ -326,9 +326,9 @@ public abstract class AbstractMediumAccessorTest {
       }
 
       catch (EndOfMediumException e) {
-         Assert.assertEquals(readReference, e.getMediumReference());
+         Assert.assertEquals(readReference, e.getReadStartReference());
          Assert.assertEquals(readSize, e.getByteCountTriedToRead());
-         Assert.assertEquals(getExpectedMediumContent().length - readOffset, e.getBytesReallyRead());
+         Assert.assertEquals(getExpectedMediumContent().length - readOffset, e.getByteCountActuallyRead());
       }
    }
 

@@ -56,7 +56,7 @@ public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStrea
             if (returnCode == -1) {
                SINGLE_BYTE_BUFFER.limit(initialPosition + bytesRead);
                updateCurrentPosition(getCurrentPosition().advance(bytesRead));
-               throw new EndOfMediumException(bytesRead, getCurrentPosition(), size);
+               throw new EndOfMediumException(getCurrentPosition(), size, bytesRead, SINGLE_BYTE_BUFFER);
             }
 
             bytesRead += returnCode;
@@ -131,8 +131,9 @@ public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStrea
 
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
+            // buffer.rewind();
             updateCurrentPosition(currentPosition.advance(bytesRead));
-            throw new EndOfMediumException(bytesRead, currentPosition, size);
+            throw new EndOfMediumException(currentPosition, size, bytesRead, buffer);
          }
 
          bytesRead += returnCode;

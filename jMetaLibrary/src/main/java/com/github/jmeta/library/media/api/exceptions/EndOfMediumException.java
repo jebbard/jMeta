@@ -9,6 +9,8 @@
 
 package com.github.jmeta.library.media.api.exceptions;
 
+import java.nio.ByteBuffer;
+
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -18,35 +20,50 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class EndOfMediumException extends Exception {
 
-   private final int bytesReallyRead;
+   private final int byteCountActuallyRead;
+
+   private final ByteBuffer bytesReadSoFar;
 
    private final int byteCountTriedToRead;
 
-   private final MediumReference mediumReference;
+   private final MediumReference readStartReference;
 
    private static final long serialVersionUID = 1L;
 
    /**
     * Creates a new {@link EndOfMediumException}.
     * 
-    * @param bytesRead
-    *           The number of bytes read before the exception was thrown.
-    * @param mediumReference
-    *           The start {@link MediumReference} of the read attempt.
+    * @param readStartReference
+    *           The start {@link MediumReference} of the read attempt
     * @param byteCountTriedToRead
-    *           The number of bytes initially tried to read.
-    * 
-    * @pre bytesRead >= 0
-    * @pre byteCountTriedToRead > 0
+    *           The number of bytes initially tried to read
+    * @param byteCountActuallyRead
+    *           The number of bytes read before the exception was thrown
+    * @param bytesReadSoFar
+    *           The actual bytes read so far
     */
-   public EndOfMediumException(int bytesRead, MediumReference mediumReference, int byteCountTriedToRead) {
+   public EndOfMediumException(MediumReference readStartReference, int byteCountTriedToRead, int byteCountActuallyRead,
+      ByteBuffer bytesReadSoFar) {
 
-      Reject.ifNegative(bytesRead, "bytesRead");
+      Reject.ifNull(readStartReference, "mediumReference");
+      Reject.ifNull(bytesReadSoFar, "bytesReadSoFar");
+      Reject.ifNegative(byteCountActuallyRead, "byteCountActuallyRead");
       Reject.ifNegativeOrZero(byteCountTriedToRead, "byteCountTriedToRead");
 
-      this.bytesReallyRead = bytesRead;
+      this.byteCountActuallyRead = byteCountActuallyRead;
       this.byteCountTriedToRead = byteCountTriedToRead;
-      this.mediumReference = mediumReference;
+      this.readStartReference = readStartReference;
+      this.bytesReadSoFar = bytesReadSoFar;
+   }
+
+   /**
+    * Returns the {@link MediumReference} that was the starting point for the causing read attempt.
+    * 
+    * @return the {@link MediumReference} that was the starting point for the causing read attempt.
+    */
+   public MediumReference getReadStartReference() {
+
+      return readStartReference;
    }
 
    /**
@@ -64,19 +81,18 @@ public class EndOfMediumException extends Exception {
     * 
     * @return the number of bytes successfully read until the exception was thrown.
     */
-   public int getBytesReallyRead() {
+   public int getByteCountActuallyRead() {
 
-      return bytesReallyRead;
+      return byteCountActuallyRead;
    }
 
    /**
-    * Returns the {@link MediumReference} that was the starting point for the causing read attempt.
+    * Returns the bytes read by the last read attempt until the {@link EndOfMediumException} occurred.
     * 
-    * @return the {@link MediumReference} that was the starting point for the causing read attempt.
+    * @return the bytes read by the last read attempt until the {@link EndOfMediumException} occurred.
     */
-   public MediumReference getMediumReference() {
-
-      return mediumReference;
+   public ByteBuffer getBytesReadSoFar() {
+      return bytesReadSoFar;
    }
 
    /**
@@ -85,7 +101,7 @@ public class EndOfMediumException extends Exception {
    @Override
    public String toString() {
 
-      return getClass().getName() + "[m_mediumReference=" + mediumReference + ", m_byteCountTriedToRead="
-         + byteCountTriedToRead + ", m_bytesReallyRead=" + bytesReallyRead + "]";
+      return getClass().getName() + "[readStartReference=" + readStartReference + ", byteCountTriedToRead="
+         + byteCountTriedToRead + ", byteCountActuallyRead=" + byteCountActuallyRead + "]";
    }
 }

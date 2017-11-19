@@ -24,6 +24,7 @@ import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
 import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
+import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -41,8 +42,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    private boolean isOpened;
 
+   private final MediumChangeManager changeManager;
+
    public StandardMediumStore(MediumAccessor<T> mediumAccessor, MediumCache cache,
-      MediumReferenceFactory referenceFactory) {
+      MediumReferenceFactory referenceFactory, MediumChangeManager changeManager) {
       Reject.ifNull(mediumAccessor, "mediumAccessor");
       Reject.ifNull(referenceFactory, "referenceFactory");
       Reject.ifNull(cache, "cache");
@@ -50,6 +53,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       this.mediumAccessor = mediumAccessor;
       this.cache = cache;
       this.referenceFactory = referenceFactory;
+      this.changeManager = changeManager;
 
       isOpened = false;
    }
@@ -254,7 +258,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
-      return null;
+      return changeManager.scheduleInsert(new MediumRegion(offset, dataToInsert.capacity()), dataToInsert);
    }
 
    /**
@@ -268,7 +272,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
-      return null;
+      return changeManager.scheduleRemove(new MediumRegion(offset, numberOfBytesToRemove));
    }
 
    /**
@@ -283,7 +287,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
-      return null;
+      return changeManager.scheduleReplace(new MediumRegion(offset, numberOfBytesToReplace), replacementData);
    }
 
    /**
@@ -294,9 +298,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifNull(mediumAction, "mediumAction");
       Reject.ifFalse(mediumAction.getRegion().getStartReference().getMedium().equals(getMedium()),
          "mediumAction.getRegion().getStartReference().getMedium().equals(getMedium())");
+      Reject.ifFalse(mediumAction.isPending(), "mediumAction.isPending()");
       ensureOpened();
       ensureWritable();
 
+      changeManager.undo(mediumAction);
    }
 
    /**
@@ -435,7 +441,17 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
       mediumAccessor.setCurrentPosition(regionOffset);
 
-      mediumAccessor.read(dataRead);
+      try {
+         mediumAccessor.read(dataRead);
+      } catch (EndOfMediumException e) {
+         if (getMedium().isCachingEnabled()) {
+            if (e.getByteCountActuallyRead() > 0) {
+               cache.addRegion(new MediumRegion(e.getReadStartReference(), e.getBytesReadSoFar()));
+            }
+         }
+
+         throw e;
+      }
 
       return new MediumRegion(regionOffset, dataRead);
    }

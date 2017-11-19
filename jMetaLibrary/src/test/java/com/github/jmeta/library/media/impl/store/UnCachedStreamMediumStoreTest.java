@@ -49,6 +49,8 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
 
       verifyExactlyNReads(4 + 3);
+
+      assertCacheIsEmpty();
    }
 
    /**
@@ -69,6 +71,8 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
       // - Must throw exception here because the previous data read was returned and advanced the stream, but it
       // was not added to the cache. Accessing the same offset again for an uncached stream is not possible
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+
+      assertCacheIsEmpty();
    }
 
    /**
@@ -86,6 +90,8 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
       int getDataSize = 200;
 
       getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+
+      assertCacheIsEmpty();
    }
 
    /**
@@ -102,7 +108,8 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
     *      long, int)
     */
    @Override
-   protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize) throws IOException {
+   protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
+      throws IOException {
       return new InputStreamMedium(new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile()),
          STREAM_BASED_FILLED_MEDIUM_NAME, maxCacheSize, maxReadWriteBlockSize);
    }

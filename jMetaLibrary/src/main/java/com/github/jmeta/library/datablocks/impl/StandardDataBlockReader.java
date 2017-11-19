@@ -29,9 +29,9 @@ import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionE
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -176,8 +176,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
-    * {@link MediumReference} or null. If the {@link Container}s presence is optional, its actual presence is
-    * determined
+    * {@link MediumReference} or null. If the {@link Container}s presence is optional, its actual presence is determined
     * 
     * @param parent
     */
@@ -210,8 +209,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < headerDescs.size(); ++i) {
          DataBlockDescription headerDesc = headerDescs.get(i);
 
-         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers,
-            theContext);
+         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers, theContext);
 
          long totalHeaderSize = 0;
 
@@ -253,8 +251,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
-            theContext);
+         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers, theContext);
 
          long totalFooterSize = 0;
 
@@ -309,8 +306,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
-            theContext);
+         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers, theContext);
 
          @SuppressWarnings("unused")
          long totalFooterSize = 0;
@@ -359,8 +355,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          // TODO primeRefactor003: expects static header size?
          nextReference = nextReference.advance(-headerDesc.getMaximumByteLength());
 
-         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers,
-            theContext);
+         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers, theContext);
 
          @SuppressWarnings("unused")
          long totalHeaderSize = 0;
@@ -425,10 +420,10 @@ public class StandardDataBlockReader implements DataBlockReader {
     *           The {@link DataBlockId} of the assumed {@link Header}.
     * @param parentId
     * @param previousHeaders
-    *           The {@link List} of previous {@link Header}s belonging to the same {@link Container}. Have been
-    *           already read beforehand. These {@link Header}s can be used to determine the presence of the currently
-    *           requested {@link Header}. If there are no {@link Header}s that have been read beforehand, this
-    *           {@link List} must be empty.
+    *           The {@link List} of previous {@link Header}s belonging to the same {@link Container}. Have been already
+    *           read beforehand. These {@link Header}s can be used to determine the presence of the currently requested
+    *           {@link Header}. If there are no {@link Header}s that have been read beforehand, this {@link List} must
+    *           be empty.
     * @return The {@link Header} with the given {@link DataBlockId} with its {@link StandardField}s read from the given
     *         {@link MediumReference}.
     */
@@ -450,7 +445,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       int actualOccurrences = determineActualOccurrences(parentId, headerDesc, context);
 
       long staticHeaderLength = (headerDesc.getMaximumByteLength() == headerDesc.getMinimumByteLength())
-         ? headerDesc.getMaximumByteLength() : DataBlockDescription.UNKNOWN_SIZE;
+         ? headerDesc.getMaximumByteLength()
+         : DataBlockDescription.UNKNOWN_SIZE;
 
       // Read all header occurrences
       for (int i = 0; i < actualOccurrences; i++) {
@@ -480,7 +476,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       int actualOccurrences = determineActualOccurrences(parentId, footerDesc, context);
 
       long staticFooterLength = (footerDesc.getMaximumByteLength() == footerDesc.getMinimumByteLength())
-         ? footerDesc.getMaximumByteLength() : DataBlockDescription.UNKNOWN_SIZE;
+         ? footerDesc.getMaximumByteLength()
+         : DataBlockDescription.UNKNOWN_SIZE;
 
       // Read all footer occurrences
       for (int i = 0; i < actualOccurrences; i++) {
@@ -787,7 +784,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          }
       } catch (EndOfMediumException e) {
          throw new IllegalStateException(
-            buildEOFExceptionMessage(reference, e.getByteCountTriedToRead(), e.getBytesReallyRead()));
+            buildEOFExceptionMessage(reference, e.getByteCountTriedToRead(), e.getByteCountActuallyRead()));
       }
 
       // A lazy field is created if the field size exceeds a maximum size
@@ -1005,7 +1002,7 @@ public class StandardDataBlockReader implements DataBlockReader {
             if (m_cache.getBufferedByteCountAt(currentReference) < bytesToRead)
                m_cache.buffer(currentReference, bytesToRead);
          } catch (EndOfMediumException e) {
-            bytesToRead = (int) e.getBytesReallyRead();
+            bytesToRead = (int) e.getByteCountActuallyRead();
             // End condition for the loop
             endOfMediumReached = true;
          }
@@ -1201,7 +1198,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null);
    }
 
-   private String buildEOFExceptionMessage(MediumReference reference, long byteCount, final long bytesRead) {
+   private String buildEOFExceptionMessage(MediumReference reference, long byteCount, final int bytesRead) {
 
       return "Unexpected EOF occurred during read from medium " + reference.getMedium() + " [offset="
          + reference.getAbsoluteMediumOffset() + ", byteCount=" + byteCount + "]. Only " + bytesRead

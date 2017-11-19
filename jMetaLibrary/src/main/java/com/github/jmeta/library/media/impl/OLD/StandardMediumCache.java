@@ -374,10 +374,10 @@ public class StandardMediumCache implements MediumCache {
             readIntoCache(nextReference, (int) actualSize % m_maxCacheRegionSize);
       } catch (EndOfMediumException e) {
          if (getMedium().isRandomAccess())
-            if (!e.getMediumReference().equals(cacheReference) || e.getByteCountTriedToRead() != size)
-               throw new EndOfMediumException(
-                  (int) (getMedium().getCurrentLength() - cacheReference.getAbsoluteMediumOffset()), cacheReference,
-                  size);
+            if (!e.getReadStartReference().equals(cacheReference) || e.getByteCountTriedToRead() != size)
+               throw new EndOfMediumException(cacheReference, size,
+                  (int) (getMedium().getCurrentLength() - cacheReference.getAbsoluteMediumOffset()),
+                  ByteBuffer.allocate(0));
 
          throw e;
       }
