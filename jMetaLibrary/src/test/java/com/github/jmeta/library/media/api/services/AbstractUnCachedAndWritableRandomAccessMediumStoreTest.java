@@ -80,4 +80,43 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
 
       assertCacheIsEmpty();
    }
+
+   /**
+    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    */
+   @Test
+   public void cache_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      MediumReference cacheOffset = at(currentMedium, currentMediumContent.length() + 15);
+      int cacheSize = 10;
+
+      testCache_throwsEndOfMediumException(cacheOffset, cacheSize, currentMediumContent);
+
+      assertCacheIsEmpty();
+   }
+
+   /**
+    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    */
+   @Test
+   public void getData_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
+      mediumStoreUnderTest = createFilledUncachedMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      MediumReference getDataOffset = at(currentMedium, (long) (currentMediumContent.length() + 15));
+      int getDataSize = 10;
+
+      testGetData_throwsEndOfMediumException(getDataOffset, getDataSize, currentMediumContent.length(),
+         currentMediumContent);
+
+      assertCacheIsEmpty();
+   }
 }

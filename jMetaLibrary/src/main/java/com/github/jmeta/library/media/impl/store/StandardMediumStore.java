@@ -20,6 +20,7 @@ import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
@@ -132,6 +133,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
 
+      if (getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH) {
+         if (getMedium().getCurrentLength() < offset.getAbsoluteMediumOffset()) {
+            throw new EndOfMediumException(offset, numberOfBytes, 0, ByteBuffer.allocate(0));
+         }
+      }
+
       if (getMedium().isCachingEnabled()) {
          if (getMedium().isRandomAccess()) {
             long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
@@ -184,6 +191,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+
+      if (getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH) {
+         if (getMedium().getCurrentLength() < offset.getAbsoluteMediumOffset()) {
+            throw new EndOfMediumException(offset, numberOfBytes, 0, ByteBuffer.allocate(0));
+         }
+      }
 
       if (getMedium().isCachingEnabled()) {
          long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
@@ -313,6 +326,58 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
+      List<MediumAction> flushPlan = changeManager.createFlushPlan(getMedium().getMaxReadWriteBlockSizeInBytes(),
+         getMedium().getCurrentLength());
+
+      ByteBuffer lastReadBytes = null;
+
+      MediumActionType previousActionType = null;
+
+      for (MediumAction mediumAction : flushPlan) {
+         switch (mediumAction.getActionType()) {
+            case READ:
+               try {
+                  MediumRegion regionRead = readRegion(mediumAction.getRegion().getStartReference(),
+                     mediumAction.getRegion().getSize());
+                  lastReadBytes = regionRead.getBytes();
+               } catch (EndOfMediumException e) {
+                  throw new IllegalStateException(
+                     "Unexpected end of medium, maybe the external medium was changed by another process? Medium: "
+                        + getMedium(),
+                     e);
+               }
+            break;
+
+            case WRITE:
+               if (mediumAction.getActionBytes() != null) {
+                  mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartReference());
+                  mediumAccessor.write(mediumAction.getActionBytes());
+               } else {
+
+                  if (previousActionType != MediumActionType.READ || lastReadBytes == null
+                     || lastReadBytes.remaining() != mediumAction.getRegion().getSize()) {
+                     throw new IllegalStateException(
+                        "A WRITE action was given, but there was no READ action directly before reading the exact amount of bytes indicated by the current action: "
+                           + mediumAction);
+                  }
+
+                  mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartReference());
+                  mediumAccessor.write(lastReadBytes);
+               }
+            break;
+
+            case INSERT:
+               changeManager.undo(mediumAction);
+            break;
+
+            default:
+               throw new IllegalStateException("Unexpected medium action type for action: " + mediumAction);
+         }
+
+         previousActionType = mediumAction.getActionType();
+      }
+
+      int x = 5;
    }
 
    /**

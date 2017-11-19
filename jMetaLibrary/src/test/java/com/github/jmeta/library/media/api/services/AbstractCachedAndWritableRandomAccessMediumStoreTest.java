@@ -20,7 +20,6 @@ import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteExce
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
-import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
  * {@link AbstractCachedAndWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable
@@ -31,28 +30,6 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  */
 public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T extends Medium<?>>
    extends AbstractCachedMediumStoreTest<T> {
-
-   private static class ExpectedMediumContentBuilder {
-
-      private final String originalContent;
-      private String expectedContent = "";
-
-      public ExpectedMediumContentBuilder(String originalContent) {
-         this.originalContent = originalContent;
-      }
-
-      public void appendFromOriginal(int offset, int size) {
-         expectedContent += originalContent.substring(offset, offset + size);
-      }
-
-      public void appendLiteralString(String literalString) {
-         expectedContent += literalString;
-      }
-
-      public String buildExpectedContent() {
-         return expectedContent;
-      }
-   }
 
    /**
     * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
@@ -195,18 +172,18 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    /**
     * Tests {@link MediumStore#cache(MediumReference, int)}.
     */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void cache_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsException() {
+   @Test
+   public void cache_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
       mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
 
-      long getDataStartOffset = currentMediumContent.length() + 15;
-      int getDataSize = 10;
+      MediumReference cacheOffset = at(currentMedium, currentMediumContent.length() + 15);
+      int cacheSize = 10;
 
-      cacheNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+      testCache_throwsEndOfMediumException(cacheOffset, cacheSize, currentMediumContent);
 
       assertCacheIsEmpty();
    }
@@ -343,18 +320,19 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    /**
     * Tests {@link MediumStore#getData(MediumReference, int)}.
     */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void getData_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsException() {
+   @Test
+   public void getData_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
       mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
 
-      long getDataStartOffset = currentMediumContent.length() + 15;
+      MediumReference getDataOffset = at(currentMedium, (long) (currentMediumContent.length() + 15));
       int getDataSize = 10;
 
-      getDataNoEOMExpected(at(currentMedium, getDataStartOffset), getDataSize);
+      testGetData_throwsEndOfMediumException(getDataOffset, getDataSize, currentMediumContent.length(),
+         currentMediumContent);
 
       assertCacheIsEmpty();
    }

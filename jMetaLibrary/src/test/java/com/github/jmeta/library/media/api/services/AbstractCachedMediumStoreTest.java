@@ -19,7 +19,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumReference;
@@ -556,36 +555,6 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       for (MediumRegion mediumRegion : regions) {
          Assert.assertFalse(mediumRegion.isCached());
-      }
-   }
-
-   /**
-    * Tests {@link MediumStore#cache(MediumReference, int)} for throwing an {@link EndOfMediumException} as expected.
-    * 
-    * @param cacheOffset
-    *           The offset to start caching
-    * @param cacheSize
-    *           The size to cache
-    * @param currentMediumContent
-    *           The current content of the medium
-    */
-   protected void testCache_throwsEndOfMediumException(MediumReference cacheOffset, int cacheSize,
-      String currentMediumContent) {
-
-      try {
-         mediumStoreUnderTest.cache(cacheOffset, cacheSize);
-
-         Assert.fail("Expected end of medium exception, but it did not occur!");
-      }
-
-      catch (EndOfMediumException e) {
-         Assert.assertEquals(cacheOffset, e.getReadStartReference());
-         Assert.assertEquals(cacheSize, e.getByteCountTriedToRead());
-         Assert.assertEquals(currentMediumContent.length() - cacheOffset.getAbsoluteMediumOffset(),
-            e.getByteCountActuallyRead());
-
-         assertByteBufferMatchesMediumRange(e.getBytesReadSoFar(), cacheOffset, e.getByteCountActuallyRead(),
-            currentMediumContent);
       }
    }
 

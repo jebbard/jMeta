@@ -96,12 +96,12 @@ public interface MediumAccessor<T extends Medium<?>> {
 
    /**
     * Sets the current position of this {@link MediumAccessor}. Only has an effect for random-access media. See
-    * {@link #getCurrentPosition()} for more details. Positions set must not be behind the current medium length.
-    * However, you can call this method with a position just behind the last byte of the medium, e.g. for extending it.
+    * {@link #getCurrentPosition()} for more details. Positions set are allowed to be behind the current medium length,
+    * e.g. to write new bytes at the indicated position.
     * 
     * @param position
-    *           The new {@link MediumReference} position to set. Must not be behind the current medium length. Must
-    *           refer to the same {@link Medium} as this {@link MediumAccessor}.
+    *           The new {@link MediumReference} position to set. May be behind the current medium length. Must refer to
+    *           the same {@link Medium} as this {@link MediumAccessor}.
     */
    public void setCurrentPosition(MediumReference position);
 

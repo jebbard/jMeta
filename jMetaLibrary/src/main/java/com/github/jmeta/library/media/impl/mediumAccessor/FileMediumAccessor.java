@@ -112,7 +112,7 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
 
       int bytesWritten = 0;
 
-      while (bytesWritten < buffer.capacity()) {
+      while (bytesWritten < buffer.remaining()) {
          bytesWritten += fileChannel.write(buffer, getCurrentPosition().getAbsoluteMediumOffset() + bytesWritten);
       }
 
@@ -132,9 +132,6 @@ public class FileMediumAccessor extends AbstractMediumAccessor<FileMedium> {
     */
    @Override
    protected void mediumSpecificSetCurrentPosition(MediumReference position) throws IOException {
-      Reject.ifTrue(position.getAbsoluteMediumOffset() > getMedium().getCurrentLength(),
-         "position.getAbsoluteMediumOffset() > getMedium().getCurrentLength()");
-
       updateCurrentPosition(position);
    }
 

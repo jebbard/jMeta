@@ -143,9 +143,6 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
     */
    @Override
    protected void mediumSpecificSetCurrentPosition(MediumReference position) throws IOException {
-      Reject.ifTrue(position.getAbsoluteMediumOffset() > getMedium().getCurrentLength(),
-         "position.getAbsoluteMediumOffset() > getMedium().getCurrentLength()");
-
       updateCurrentPosition(position);
    }
 }

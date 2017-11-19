@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumActionException;
 import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
@@ -32,17 +32,16 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * {@link MediumChangeManager} performs all tasks of handling and consolidating {@link MediumAction}s.
  * {@link MediumAction}s are created by the methods
- * {@link IMediumStore_OLD#insertData(com.github.jmeta.library.media.api.types.MediumReference, ByteBuffer)},
- * {@link IMediumStore_OLD#removeData(com.github.jmeta.library.media.api.types.MediumReference, int)} and
- * {@link IMediumStore_OLD#replaceData(com.github.jmeta.library.media.api.types.MediumReference, int, ByteBuffer)} by calling one of the
- * corresponding schedule methods of {@link MediumChangeManager}.
+ * {@link MediumStore#insertData(com.github.jmeta.library.media.api.types.MediumReference, ByteBuffer)},
+ * {@link MediumStore#removeData(com.github.jmeta.library.media.api.types.MediumReference, int)} and
+ * {@link MediumStore#replaceData(com.github.jmeta.library.media.api.types.MediumReference, int, ByteBuffer)} by calling
+ * one of the corresponding schedule methods of {@link MediumChangeManager}.
  * 
- * {@link MediumAction}s represent an open action that is still to be performed before a
- * {@link IMediumStore_OLD#flush()}.
+ * {@link MediumAction}s represent an open action that is still to be performed before a {@link MediumStore#flush()}.
  * 
  * {@link MediumChangeManager} ensures that these {@link MediumAction}s are created consistently and maintains them in a
- * specific order such that later {@link IMediumStore_OLD#flush()} can be more easier implemented. It does this by using
- * a {@link TreeSet} as internal data structure and the {@link MediumActionComparator} as sorting criterion.
+ * specific order such that later {@link MediumStore#flush()} can be more easier implemented. It does this by using a
+ * {@link TreeSet} as internal data structure and the {@link MediumActionComparator} as sorting criterion.
  */
 public class MediumChangeManager {
 
@@ -214,6 +213,7 @@ public class MediumChangeManager {
       mediumActions.remove(action);
    }
 
+   // TODO add javadocs
    public List<MediumAction> createFlushPlan(int writeBlockSizeInBytes, long totalMediumSizeInBytes) {
 
       Reject.ifTrue(writeBlockSizeInBytes <= 0, "writeBlockSizeInBytes must be strictly positive");

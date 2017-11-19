@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -77,6 +78,28 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  */
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
+
+   private static class ExpectedMediumContentBuilder {
+
+      private final String originalContent;
+      private String expectedContent = "";
+
+      public ExpectedMediumContentBuilder(String originalContent) {
+         this.originalContent = originalContent;
+      }
+
+      public void appendFromOriginal(int offset, int size) {
+         expectedContent += originalContent.substring(offset, offset + size);
+      }
+
+      public void appendLiteralString(String literalString) {
+         expectedContent += literalString;
+      }
+
+      public String buildExpectedContent() {
+         return expectedContent;
+      }
+   }
 
    /**
     * For getting the current test case's name, must be public
@@ -397,6 +420,44 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
+    * Tests {@link MediumStore#flush()} CF 1 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF1aSingleInsertAtStart_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      String textToInsert = "___CF1aSingleInsertAtStart___";
+
+      byte[] insertionBytes = textToInsert.getBytes(Charsets.CHARSET_ASCII);
+
+      MediumAction insertAction = mediumStoreUnderTest.insertData(at(currentMedium, 0),
+         ByteBuffer.wrap(insertionBytes));
+
+      mediumStoreUnderTest.flush();
+
+      Assert.assertFalse(insertAction.isPending());
+
+      mediumStoreUnderTest.close();
+
+      ExpectedMediumContentBuilder expectationBuilder = new ExpectedMediumContentBuilder(currentMediumContent);
+
+      expectationBuilder.appendLiteralString(textToInsert);
+      expectationBuilder.appendFromOriginal(0, currentMediumContent.length());
+
+      String expectedMediumContent = expectationBuilder.buildExpectedContent();
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+   }
+
+   /**
     * Tests {@link MediumStore#flush()}.
     */
    @Test(expected = MediumStoreClosedException.class)
@@ -548,14 +609,17 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    protected void assertByteBufferMatchesMediumRange(ByteBuffer returnedData, MediumReference rangeStartOffset,
       int rangeSize, String currentMediumContent) {
+
       Assert.assertEquals(rangeSize, returnedData.remaining());
       byte[] byteBufferData = new byte[rangeSize];
       returnedData.asReadOnlyBuffer().get(byteBufferData);
 
-      String asString = new String(byteBufferData, Charsets.CHARSET_ASCII);
+      String returnedDataAsString = new String(byteBufferData, Charsets.CHARSET_ASCII);
 
-      Assert.assertEquals(currentMediumContent.substring((int) rangeStartOffset.getAbsoluteMediumOffset(),
-         (int) (rangeStartOffset.getAbsoluteMediumOffset() + rangeSize)), asString);
+      String expectedReturnedData = rangeStartOffset.getAbsoluteMediumOffset() > currentMediumContent.length() ? ""
+         : currentMediumContent.substring((int) rangeStartOffset.getAbsoluteMediumOffset(),
+            (int) (rangeStartOffset.getAbsoluteMediumOffset() + rangeSize));
+      Assert.assertEquals(expectedReturnedData, returnedDataAsString);
    }
 
    /**
@@ -582,11 +646,16 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
          MediumReference expectedReadOffset = at(currentMedium, getDataStartOffset
             + chunkSizeToUse * (int) ((currentMediumContent.length() - getDataStartOffset) / chunkSizeToUse));
 
+         long expectedByteCountActuallyRead = (currentMediumContent.length() - getDataStartOffset) % chunkSizeToUse;
+
+         // For cases where the cache offset is beyond the medium end
+         if (expectedByteCountActuallyRead < 0) {
+            expectedByteCountActuallyRead = 0;
+         }
+
          Assert.assertEquals(expectedReadOffset, e.getReadStartReference());
          Assert.assertEquals(getDataSize < chunkSizeToUse ? getDataSize : chunkSizeToUse, e.getByteCountTriedToRead());
-         Assert.assertEquals((int) (currentMediumContent.length() - getDataStartOffset) % chunkSizeToUse,
-            e.getByteCountActuallyRead());
-
+         Assert.assertEquals(expectedByteCountActuallyRead, e.getByteCountActuallyRead());
          assertByteBufferMatchesMediumRange(e.getBytesReadSoFar(), expectedReadOffset, e.getByteCountActuallyRead(),
             currentMediumContent);
       }
@@ -645,6 +714,41 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected void assertCacheIsEmpty() {
       Assert.assertEquals(0, mediumCacheSpy.getAllCachedRegions().size());
       Assert.assertEquals(0, mediumCacheSpy.calculateCurrentCacheSizeInBytes());
+   }
+
+   /**
+    * Tests {@link MediumStore#cache(MediumReference, int)} for throwing an {@link EndOfMediumException} as expected.
+    * 
+    * @param cacheOffset
+    *           The offset to start caching
+    * @param cacheSize
+    *           The size to cache
+    * @param currentMediumContent
+    *           The current content of the medium
+    */
+   protected void testCache_throwsEndOfMediumException(MediumReference cacheOffset, int cacheSize, String currentMediumContent) {
+   
+      try {
+         mediumStoreUnderTest.cache(cacheOffset, cacheSize);
+   
+         Assert.fail("Expected end of medium exception, but it did not occur!");
+      }
+   
+      catch (EndOfMediumException e) {
+         Assert.assertEquals(cacheOffset, e.getReadStartReference());
+         Assert.assertEquals(cacheSize, e.getByteCountTriedToRead());
+         long expectedByteCountActuallyRead = currentMediumContent.length() - cacheOffset.getAbsoluteMediumOffset();
+   
+         // For cases where the cache offset is beyond the medium end
+         if (expectedByteCountActuallyRead < 0) {
+            expectedByteCountActuallyRead = 0;
+         }
+   
+         Assert.assertEquals(expectedByteCountActuallyRead, e.getByteCountActuallyRead());
+   
+         assertByteBufferMatchesMediumRange(e.getBytesReadSoFar(), cacheOffset, e.getByteCountActuallyRead(),
+            currentMediumContent);
+      }
    }
 
 }

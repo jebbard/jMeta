@@ -11,12 +11,12 @@ package com.github.jmeta.library.media.api.types;
 
 import java.nio.ByteBuffer;
 
-import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediumAction} represents an action performed on a given {@link Medium}, either a reading or a writing action.
- * A {@link MediumAction} belonging to an {@link IMediumStore_OLD} gets invalid as soon as the store is flushed or it is
+ * A {@link MediumAction} belonging to an {@link MediumStore} gets invalid as soon as the store is flushed or it is
  * undone. The validity of a {@link MediumAction} is represented by its {@link MediumAction#isPending} method. See the
  * methods description for more details.
  * 
@@ -60,13 +60,12 @@ public class MediumAction {
             + " must be specified in the actionBytes parameter");
       Reject.ifTrue(sequenceNumber < 0, "sequenceNumber must be zero or positive");
 
+      // actionBytes must only be non-null for all INSERTs and for all REPLACEs, as well as for some WRITEs
+      // (i.e., for WRITE actions, both null and non-null action bytes are allowed
       if (actionType == MediumActionType.INSERT || actionType == MediumActionType.REPLACE) {
          Reject.ifNull(actionBytes, "actionBytes");
       } else if (actionType != MediumActionType.WRITE) {
-         Reject.ifTrue(actionBytes != null,
-            "actionBytes must only be non-null for " + MediumActionType.class.getSimpleName() + "."
-               + MediumActionType.INSERT + " and " + MediumActionType.class.getSimpleName() + "."
-               + MediumActionType.REPLACE);
+         Reject.ifNotNull(actionBytes, "actionBytes");
       }
 
       if (actionType == MediumActionType.INSERT) {
@@ -125,7 +124,9 @@ public class MediumAction {
     * <ul>
     * <li>For {@link MediumActionType#INSERT}: The bytes to be inserted</li>
     * <li>For {@link MediumActionType#REPLACE}: The replacement bytes to be written</li>
-    * <li>For {@link MediumActionType#WRITE}: null</li>
+    * <li>For {@link MediumActionType#WRITE}: null in case that the bytes to write are provided by a previous
+    * {@link MediumActionType#READ} action, or non-null in case that this write comes from an
+    * {@link MediumActionType#INSERT} or {@link MediumActionType#REPLACE}</li>
     * <li>For {@link MediumActionType#REMOVE}: null</li>
     * <li>For {@link MediumActionType#TRUNCATE}: null</li>
     * <li>For {@link MediumActionType#READ}: null</li>
@@ -168,6 +169,35 @@ public class MediumAction {
    public boolean isPending() {
 
       return isPending;
+   }
+
+   /**
+    * Returns the number of bytes by which the size of an external medium would increase or decrease if this
+    * {@link MediumAction} would be applied to the medium. This method returns a positive integer for
+    * {@link MediumAction}s of type {@link MediumActionType#INSERT}, as well as for {@link MediumAction}s of type
+    * {@link MediumActionType#REPLACE}, if the number of replacement bytes is bigger than the number of replaced bytes.
+    * It returns a negative integer for {@link MediumAction}s of types {@link MediumActionType#REMOVE} and
+    * {@link MediumActionType#TRUNCATE}, which is the number of bytes removed or truncated, as well as for type
+    * {@link MediumActionType#REPLACE}, if the number of replacement bytes is smaller than the number of replaced bytes.
+    * It returns 0 for any other {@link MediumActionType} and for the special case of a {@link MediumActionType#REPLACE}
+    * , if the number of replacement bytes equals the number of replaced bytes.
+    * 
+    * @return the number of bytes by which the size of an external medium would increase or decrease if this
+    *         {@link MediumAction} would be applied to the medium.
+    */
+   public int getSizeDelta() {
+      if (actionType == MediumActionType.INSERT) {
+         return +getRegion().getSize();
+      } else if (actionType == MediumActionType.REMOVE || actionType == MediumActionType.TRUNCATE) {
+         return -getRegion().getSize();
+      } else if (actionType == MediumActionType.REPLACE) {
+         // NOTE: In case of an "inserting" replace, the number of replacement bytes is bigger than the number
+         // of bytes to replace, i.e. a positive int will be returned. If it is in turn a "removing" replace,
+         // a negative int will be returned.
+         return getActionBytes().remaining() - getRegion().getSize();
+      }
+   
+      return 0;
    }
 
    /**
@@ -223,34 +253,5 @@ public class MediumAction {
       } else if (!region.equals(other.region))
          return false;
       return true;
-   }
-
-   /**
-    * Returns the number of bytes by which the size of an external medium would increase or decrease if this
-    * {@link MediumAction} would be applied to the medium. This method returns a positive integer for
-    * {@link MediumAction}s of type {@link MediumActionType#INSERT}, as well as for {@link MediumAction}s of type
-    * {@link MediumActionType#REPLACE}, if the number of replacement bytes is bigger than the number of replaced bytes.
-    * It returns a negative integer for {@link MediumAction}s of types {@link MediumActionType#REMOVE} and
-    * {@link MediumActionType#TRUNCATE}, which is the number of bytes removed or truncated, as well as for type
-    * {@link MediumActionType#REPLACE}, if the number of replacement bytes is smaller than the number of replaced bytes.
-    * It returns 0 for any other {@link MediumActionType} and for the special case of a {@link MediumActionType#REPLACE}
-    * , if the number of replacement bytes equals the number of replaced bytes.
-    * 
-    * @return the number of bytes by which the size of an external medium would increase or decrease if this
-    *         {@link MediumAction} would be applied to the medium.
-    */
-   public int getSizeDelta() {
-      if (actionType == MediumActionType.INSERT) {
-         return +getRegion().getSize();
-      } else if (actionType == MediumActionType.REMOVE || actionType == MediumActionType.TRUNCATE) {
-         return -getRegion().getSize();
-      } else if (actionType == MediumActionType.REPLACE) {
-         // NOTE: In case of an "inserting" replace, the number of replacement bytes is bigger than the number
-         // of bytes to replace, i.e. a positive int will be returned. If it is in turn a "removing" replace,
-         // a negative int will be returned.
-         return getActionBytes().remaining() - getRegion().getSize();
-      }
-
-      return 0;
    }
 }

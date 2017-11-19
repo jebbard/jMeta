@@ -51,16 +51,31 @@ public final class Reject {
    }
 
    /**
-    * Checks an object to be null. If it is null, an {@link PreconditionUnfullfilledException} is thrown.
+    * Checks an object to be non-null. If it is null, an {@link PreconditionUnfullfilledException} is thrown.
+    *
+    * @param object
+    *           The object to check
+    * @param objectName
+    *           The name of the object expected to be not null
+    */
+   public static void ifNull(final Object object, String objectName) {
+      if (object == null) {
+         String exceptionMessage = wrapTokenForMessage(objectName) + " must not be null";
+         throw new PreconditionUnfullfilledException(exceptionMessage);
+      }
+   }
+
+   /**
+    * Checks an object to be null. If it is not null, an {@link PreconditionUnfullfilledException} is thrown.
     *
     * @param object
     *           The object to check
     * @param objectName
     *           The name of the object expected to be null
     */
-   public static void ifNull(final Object object, String objectName) {
-      if (object == null) {
-         String exceptionMessage = wrapTokenForMessage(objectName) + " must not be null";
+   public static void ifNotNull(final Object object, String objectName) {
+      if (object != null) {
+         String exceptionMessage = wrapTokenForMessage(objectName) + " must be null";
          throw new PreconditionUnfullfilledException(exceptionMessage);
       }
    }

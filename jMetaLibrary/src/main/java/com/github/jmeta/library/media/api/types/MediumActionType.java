@@ -14,24 +14,24 @@ package com.github.jmeta.library.media.api.types;
  */
 public enum MediumActionType {
    /**
-    * The {@link MediumAction} is a remove action of n>0 bytes on the external medium
+    * The {@link MediumAction} is a remove action of n &gt; 0 bytes on the external medium
     */
    REMOVE,
    /**
-    * The {@link MediumAction} is a replace action of n>0 bytes on the external medium by m>0 new bytes ( m != n is
-    * possible)
+    * The {@link MediumAction} is a replace action of n &gt; 0 bytes on the external medium by m &gt; 0 new bytes ( m !=
+    * n is possible)
     */
    REPLACE,
    /**
-    * The {@link MediumAction} is an insert action of n>0 bytes on the external medium
+    * The {@link MediumAction} is an insert action of n &gt; 0 bytes on the external medium
     */
    INSERT,
    /**
-    * The {@link MediumAction} is a read action of n>0 bytes on the external medium
+    * The {@link MediumAction} is a read action of n &gt; 0 bytes on the external medium
     */
    READ,
    /**
-    * The {@link MediumAction} is a write action of n>0 bytes on the external medium
+    * The {@link MediumAction} is a write action of n &gt; 0 bytes on the external medium
     */
    WRITE,
    /**
