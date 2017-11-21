@@ -103,25 +103,27 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    @Override
    protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
 
-      final int bytesToWrite = buffer.remaining();
+      final int numberOfBytesToWrite = buffer.remaining();
 
-      final byte[] bytes = (buffer.hasArray() ? buffer.array() : new byte[bytesToWrite]);
+      final byte[] bytesToWrite = new byte[numberOfBytesToWrite];
+
+      buffer.get(bytesToWrite);
 
       // Note: setCurrentPosition prevents offsets bigger than Integert.MAX_VALUE
       int absoluteMediumOffset = (int) getCurrentPosition().getAbsoluteMediumOffset();
 
-      if (absoluteMediumOffset + bytes.length >= memory.length) {
-         byte[] finalMediumBytes = new byte[absoluteMediumOffset + bytes.length];
+      if (absoluteMediumOffset + bytesToWrite.length >= memory.length) {
+         byte[] finalMediumBytes = new byte[absoluteMediumOffset + bytesToWrite.length];
          System.arraycopy(memory, 0, finalMediumBytes, 0, memory.length);
          memory = finalMediumBytes;
          getMedium().setBytes(finalMediumBytes);
       }
 
-      System.arraycopy(bytes, buffer.position(), memory, absoluteMediumOffset, bytesToWrite);
+      System.arraycopy(bytesToWrite, 0, memory, absoluteMediumOffset, numberOfBytesToWrite);
 
       buffer.position(buffer.limit());
 
-      updateCurrentPosition(getCurrentPosition().advance(bytesToWrite));
+      updateCurrentPosition(getCurrentPosition().advance(numberOfBytesToWrite));
    }
 
    /**

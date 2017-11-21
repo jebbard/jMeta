@@ -124,7 +124,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       MediumReference writeReference = at(mediumAccessor.getMedium(), getExpectedMediumContent().length / 2);
 
-      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference);
+      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference, false);
 
       Assert.assertEquals(writeReference.advance(dataWritten.capacity()), mediumAccessor.getCurrentPosition());
    }
@@ -142,7 +142,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       MediumReference writeReference = at(mediumAccessor.getMedium(),
          getExpectedMediumContent().length - startBeforeEndOfMedium);
 
-      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference);
+      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference, false);
 
       Assert.assertEquals(writeReference.advance(dataWritten.capacity()), mediumAccessor.getCurrentPosition());
    }
@@ -181,7 +181,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       long mediumLengthBeforeWrite = mediumAccessor.getMedium().getCurrentLength();
 
-      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference);
+      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference, false);
 
       Assert.assertEquals(mediumLengthBeforeWrite, mediumAccessor.getMedium().getCurrentLength());
 
@@ -208,7 +208,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       long mediumLengthBeforeWrite = mediumAccessor.getMedium().getCurrentLength();
 
-      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference);
+      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference, false);
 
       long extendedLength = dataWritten.capacity() - startBeforeEndOfMedium;
 
@@ -217,6 +217,34 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       assertSameDataWrittenIsReadAgain(mediumAccessor, writeReference, dataWritten);
       // Ensure the medium did not change before the written range
       assertMediumDidNotChangeInRange(mediumAccessor, at(mediumAccessor.getMedium(), 0), writeReference);
+   }
+
+   /**
+    * Tests {@link MediumAccessor#write(ByteBuffer)}.
+    */
+   @Test
+   public void write_startOfWriteAfterEndOfFileWithReadOnlyBuffer_overwritesWithExpectedBytesExtendsFileAndLeavesOtherBytesUnchanged() {
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
+      int distFromEOM = 5;
+      long startOffset = getExpectedMediumContent().length + distFromEOM;
+      MediumReference writeReference = at(mediumAccessor.getMedium(), startOffset);
+
+      long mediumLengthBeforeWrite = mediumAccessor.getMedium().getCurrentLength();
+
+      ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference, true);
+
+      long extendedLength = dataWritten.capacity() + distFromEOM;
+
+      Assert.assertEquals(mediumLengthBeforeWrite + extendedLength, mediumAccessor.getMedium().getCurrentLength());
+
+      assertSameDataWrittenIsReadAgain(mediumAccessor, writeReference, dataWritten);
+      // Ensure the medium did not change before the written range
+      MediumReference mediumStartOfs = at(mediumAccessor.getMedium(), 0);
+      assertMediumDidNotChangeInRange(mediumAccessor, mediumStartOfs,
+         mediumStartOfs.advance(getExpectedMediumContent().length));
    }
 
    /**
@@ -245,7 +273,8 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       mediumAccessor.setCurrentPosition(writeReference);
       mediumAccessor.write(dataToWrite);
 
-      Assert.assertEquals(0, dataToWrite.remaining());
+      Assert.assertEquals(startPosition, dataToWrite.position());
+      Assert.assertEquals(endLimit, dataToWrite.limit());
 
       Assert.assertEquals(mediumLengthBeforeWrite, mediumAccessor.getMedium().getCurrentLength());
 
@@ -413,16 +442,24 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
     *           The {@link MediumAccessor} to test
     * @param writeReference
     *           The {@link MediumReference} to write to
+    * @param useReadOnlyBuffer
+    *           true to use a read-only buffer when writing, false otherwise
     * @return The written {@link ByteBuffer}.
     */
-   private static ByteBuffer performWrite(MediumAccessor<?> mediumAccessor, MediumReference writeReference) {
+   private static ByteBuffer performWrite(MediumAccessor<?> mediumAccessor, MediumReference writeReference,
+      boolean useReadOnlyBuffer) {
       ByteBuffer dataToWrite = ByteBuffer
          .wrap(new byte[] { 'T', 'E', 'S', 'T', ' ', 'B', 'U', 'F', ' ', '1', '0', '0', '0', '0', '0', '3' });
+
+      if (useReadOnlyBuffer) {
+         dataToWrite = dataToWrite.asReadOnlyBuffer();
+      }
 
       mediumAccessor.setCurrentPosition(writeReference);
       mediumAccessor.write(dataToWrite);
 
-      Assert.assertEquals(0, dataToWrite.remaining());
+      Assert.assertEquals(0, dataToWrite.position());
+      Assert.assertEquals(dataToWrite.capacity(), dataToWrite.limit());
       return dataToWrite;
    }
 
@@ -440,20 +477,10 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    private static void assertSameDataWrittenIsReadAgain(MediumAccessor<?> mediumAccessor,
       MediumReference writeReference, ByteBuffer dataWritten) {
 
-      dataWritten.mark();
-
       ByteBuffer reread = performReadNoEOMExpected(mediumAccessor,
          new ReadTestData((int) writeReference.getAbsoluteMediumOffset(), dataWritten.remaining()));
 
-      // Reset position to previously marked position
-      dataWritten.reset();
-
-      ByteBuffer compactedDataWritten = ByteBuffer.allocate(dataWritten.remaining());
-
-      compactedDataWritten.put(dataWritten);
-      compactedDataWritten.rewind();
-
-      Assert.assertEquals(compactedDataWritten, reread);
+      Assert.assertEquals(dataWritten, reread);
    }
 
    /**

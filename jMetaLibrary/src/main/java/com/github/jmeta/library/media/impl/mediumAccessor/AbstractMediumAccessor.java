@@ -163,11 +163,17 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
       preventWriteOnReadyOnlyMedium();
 
       try {
+         buffer.mark();
+
          mediumSpecificWrite(buffer);
       }
 
       catch (IOException e) {
          throw new MediumAccessException("Could not not write to " + getMedium(), e);
+      }
+
+      finally {
+         buffer.reset();
       }
    }
 

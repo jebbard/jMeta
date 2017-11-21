@@ -271,7 +271,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
-      return changeManager.scheduleInsert(new MediumRegion(offset, dataToInsert.capacity()), dataToInsert);
+      return changeManager.scheduleInsert(new MediumRegion(offset, dataToInsert.remaining()), dataToInsert);
    }
 
    /**
@@ -370,14 +370,25 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                changeManager.undo(mediumAction);
             break;
 
+            case REMOVE:
+               changeManager.undo(mediumAction);
+            break;
+
+            case REPLACE:
+               changeManager.undo(mediumAction);
+            break;
+
+            case TRUNCATE:
+               mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartReference());
+               mediumAccessor.truncate();
+            break;
+
             default:
                throw new IllegalStateException("Unexpected medium action type for action: " + mediumAction);
          }
 
          previousActionType = mediumAction.getActionType();
       }
-
-      int x = 5;
    }
 
    /**

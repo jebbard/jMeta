@@ -118,6 +118,8 @@ public interface MediumAccessor<T extends Medium<?>> {
     * {@link #getCurrentPosition()}. This method may block until the number of bytes requested are available
     * (potentially forever). This method advances the current position of the medium by the bytes really read.
     * 
+    * The position and the limit of the provided {@link ByteBuffer} will be the same after the method returns.
+    * 
     * @param buffer
     *           The {@link ByteBuffer} to be filled with read bytes. The buffer is filled starting with its current
     *           position up to its limit, i.e. the read byte count, at maximum, is buffer.remaining() at the moment of
@@ -144,8 +146,8 @@ public interface MediumAccessor<T extends Medium<?>> {
     * {@link Medium} is always only extended by this difference. This method advances the current position of the medium
     * by the bytes written.
     * 
-    * The contents and properties of the specified {@link ByteBuffer} are not changed except for its position which is
-    * increased by the number of bytes written.
+    * The contents and properties of the specified {@link ByteBuffer} are not changed, especially for its limit and
+    * position which are the same as before the write.
     * 
     * @param buffer
     *           The {@link ByteBuffer} to be written. It is written starting from its current position up to its limit.

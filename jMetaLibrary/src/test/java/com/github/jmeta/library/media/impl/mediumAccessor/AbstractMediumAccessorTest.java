@@ -265,7 +265,8 @@ public abstract class AbstractMediumAccessorTest {
 
       catch (EndOfMediumException e) {
          Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
-         Assert.assertEquals(initialPosition.advance(e.getByteCountActuallyRead()), mediumAccessor.getCurrentPosition());
+         Assert.assertEquals(initialPosition.advance(e.getByteCountActuallyRead()),
+            mediumAccessor.getCurrentPosition());
       }
    }
 
@@ -273,7 +274,7 @@ public abstract class AbstractMediumAccessorTest {
     * Tests {@link MediumAccessor#read(ByteBuffer)}.
     */
    @Test
-   public void read_forAnyOffsetAndSize_returnsExpectedBytes() {
+   public void read_forAnyOffsetAndSize_returnsExpectedBytesAndLeavesLimitPositionOfBufferUnchanged() {
 
       final List<ReadTestData> readTestData = getReadTestDataToUse();
 
@@ -287,6 +288,9 @@ public abstract class AbstractMediumAccessorTest {
 
       for (ReadTestData readTestDataRecord : readTestData) {
          ByteBuffer readContent = performReadNoEOMExpected(mediumAccessor, readTestDataRecord);
+
+         Assert.assertEquals(0, readContent.position());
+         Assert.assertEquals(readTestDataRecord.sizeToRead, readContent.limit());
 
          // Reads the correct contents
          assertEqualsFileContent(readContent, readTestDataRecord.expectedBytesOffset);

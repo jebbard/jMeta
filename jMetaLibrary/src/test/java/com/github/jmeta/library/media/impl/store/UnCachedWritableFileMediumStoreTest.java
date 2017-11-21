@@ -10,9 +10,7 @@
 package com.github.jmeta.library.media.impl.store;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
@@ -36,7 +34,8 @@ public class UnCachedWritableFileMediumStoreTest
    @Override
    protected FileMedium createEmptyMedium(String testMethodName) throws IOException {
 
-      Path copiedFile = getCopiedFile(MediaTestFiles.EMPTY_TEST_FILE_PATH, "EMPTY_MEDIUM_", testMethodName);
+      Path copiedFile = getCopiedFile(MediaTestFiles.EMPTY_TEST_FILE_PATH,
+         "EMPTY_MEDIUM_" + getClass().getSimpleName() + "_", testMethodName);
 
       return new FileMedium(copiedFile, false);
    }
@@ -46,7 +45,8 @@ public class UnCachedWritableFileMediumStoreTest
     *      long, int)
     */
    @Override
-   protected FileMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize) throws IOException {
+   protected FileMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
+      throws IOException {
 
       Path copiedFile = getCopiedFile(MediaTestFiles.FIRST_TEST_FILE_PATH, "FIRST_TEST_FILE_MEDIUM_", testMethodName);
       return new FileMedium(copiedFile, false, maxCacheSize, maxReadWriteBlockSize);
@@ -66,12 +66,5 @@ public class UnCachedWritableFileMediumStoreTest
    @Override
    protected String getMediumContentAsString(FileMedium medium) {
       return new String(MediaTestUtility.readFileContent(medium.getWrappedMedium()), Charsets.CHARSET_UTF8);
-   }
-
-   private Path getCopiedFile(Path pathToFile, String prefix, String testMethodName) throws IOException {
-      Path copiedFile = Files.copy(pathToFile,
-         MediaTestFiles.TEST_FILE_TEMP_OUTPUT_DIRECTORY_PATH.resolve(prefix + testMethodName + ".txt"),
-         StandardCopyOption.REPLACE_EXISTING);
-      return copiedFile;
    }
 }
