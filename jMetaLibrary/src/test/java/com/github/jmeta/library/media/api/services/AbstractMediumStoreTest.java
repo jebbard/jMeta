@@ -46,6 +46,7 @@ import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
@@ -70,9 +71,9 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * random-access medium; only special write test cases specifically designed for an un-cached medium go here</li>
  * </ul>
  * 
- * The filled media used for testing all must contain {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}, a String fully
- * containing only human-readable standard ASCII characters. This guarantees that 1 bytes = 1 character. Furthermore,
- * all bytes inserted must also be standard human-readable ASCII characters with this property.
+ * The filled media used for testing all must contain {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT} a String fully
+ * containing only human-readable standard ASCII characters, and must be UTF-8 encoded. This guarantees that 1 bytes = 1
+ * character. Furthermore, all bytes inserted must also be standard human-readable ASCII characters with this property.
  * 
  * There are specific naming conventions for testing {@link MediumStore#getData(MediumReference, int)} and
  * {@link MediumStore#cache(MediumReference, int)}: [method name]_[medium type]_[parameter values, esp. offset
@@ -433,7 +434,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
          new MediumAction[] { createInsertAction(at(currentMedium, 0), "___CF1aSingleInsertAtStart___"), });
    }
 
@@ -446,7 +447,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
          new MediumAction[] { createInsertAction(at(currentMedium, 200), "___CF1aSingleInsertInMiddle___"), });
    }
 
@@ -461,7 +462,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
-      testFlush_writesExpectedDataAndUndosActions(new MediumAction[] {
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(new MediumAction[] {
          createInsertAction(at(currentMedium, currentMediumContent.length()), "___CF1aSingleInsertAtTheEnd___"), });
    }
 
@@ -474,7 +475,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(new MediumAction[] { createRemoveAction(at(currentMedium, 0), 35), });
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+         new MediumAction[] { createRemoveAction(at(currentMedium, 0), 35), });
    }
 
    /**
@@ -486,7 +488,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
          new MediumAction[] { createRemoveAction(at(currentMedium, 100), 142), });
    }
 
@@ -501,7 +503,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
-      testFlush_writesExpectedDataAndUndosActions(
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
          new MediumAction[] { createRemoveAction(at(currentMedium, currentMediumContent.length() - 17), 17), });
    }
 
@@ -516,7 +518,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
-      testFlush_writesExpectedDataAndUndosActions(
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
          new MediumAction[] { createRemoveAction(at(currentMedium, 0), currentMediumContent.length()), });
    }
 
@@ -529,7 +531,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(new MediumAction[] {
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(new MediumAction[] {
          createReplaceAction(at(currentMedium, 0), 5, "___CF3aSingleInsertingReplacementAtStart___"), });
    }
 
@@ -542,7 +544,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(new MediumAction[] {
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(new MediumAction[] {
          createReplaceAction(at(currentMedium, 900), 21, "___CF3bSingleInsertingReplacementInTheMiddle___"), });
    }
 
@@ -555,7 +557,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(new MediumAction[] {
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(new MediumAction[] {
          createReplaceAction(at(currentMedium, 600), 400, "___CF3cSingleRemovingReplacementInTheMiddle___"), });
    }
 
@@ -570,8 +572,9 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
-      testFlush_writesExpectedDataAndUndosActions(new MediumAction[] { createReplaceAction(at(currentMedium, 600),
-         currentMediumContent.length() - 600, "___CF3dSingleRemovingReplacementUntilTheEnd___"), });
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+         new MediumAction[] { createReplaceAction(at(currentMedium, 600), currentMediumContent.length() - 600,
+            "___CF3dSingleRemovingReplacementUntilTheEnd___"), });
    }
 
    /**
@@ -584,7 +587,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
       String replacementText = "___CF3eSingleOverwritingReplacementAtStart___";
-      testFlush_writesExpectedDataAndUndosActions(
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
          new MediumAction[] { createReplaceAction(at(currentMedium, 0), replacementText.length(), replacementText), });
    }
 
@@ -599,12 +602,13 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
-      testFlush_writesExpectedDataAndUndosActions(new MediumAction[] { createReplaceAction(at(currentMedium, 0),
-         currentMediumContent.length(), "___CF3fSingleInsertingReplacementWholeMedium___"), });
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+         new MediumAction[] { createReplaceAction(at(currentMedium, 0), currentMediumContent.length(),
+            "___CF3fSingleInsertingReplacementWholeMedium___"), });
    }
 
    /**
-    * Tests {@link MediumStore#flush()} CF 3 (see Design Concept).
+    * Tests {@link MediumStore#flush()} CF 4 (see Design Concept).
     */
    @Test
    public void flush_forFilledWritableMedium_CF4aMultipleInsertsAtSameOffset_writesCorrectData() {
@@ -612,9 +616,194 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      testFlush_writesExpectedDataAndUndosActions(
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
          new MediumAction[] { createInsertAction(at(currentMedium, 10), "___CF4aMultipleInsertsAtSameOffset[1]___"),
             createInsertAction(at(currentMedium, 10), "____CF4aMultipleInsertsAtSameOffset[2]____"), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 4 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF4bMultipleInsertsAtDifferentOffsets_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(new MediumAction[] {
+         createInsertAction(at(currentMedium, 0), "___CF4bMultipleInsertsAtDifferentOffset[1]___"),
+         createInsertAction(at(currentMedium, 23),
+            "____CF4bMultipleInsertsAtDifferentOffset[2.1]____############################################################"),
+         createInsertAction(at(currentMedium, 23), "_CF4b[2.2]_"), createInsertAction(
+            at(currentMedium, currentMediumContent.length()), "CF4bMultipleInsertsAtDifferentOffset[3]"), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 5 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF5aMultipleRemovesAtDifferentOffsets_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+         new MediumAction[] { createRemoveAction(at(currentMedium, 0), 5),
+            createRemoveAction(at(currentMedium, 23), 11), createRemoveAction(at(currentMedium, 34), 450),
+            createRemoveAction(at(currentMedium, 1000), currentMediumContent.length() - 1000), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 5 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF5bMultipleRemovesWholeMedium_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+         new MediumAction[] { createRemoveAction(at(currentMedium, 0), 999),
+            createRemoveAction(at(currentMedium, 999), currentMediumContent.length() - 999), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 6 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF6aMultipleReplacesAtDifferentOffsets_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(new MediumAction[] {
+         createReplaceAction(at(currentMedium, 0), 5, "___CF6aMultipleReplacesAtDifferentOffset[1]___"),
+         createReplaceAction(at(currentMedium, 23), 11, "CF6a[2]"),
+         createReplaceAction(at(currentMedium, 34), 10, "__CF6a[3]_"),
+         createReplaceAction(at(currentMedium, 800), currentMediumContent.length() - 800,
+            "#############################################################################CF6a[4]#############################################################################"), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 6 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF6bMultipleMutuallyEliminatingReplacesAtDifferentOffsets_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String firstReplacementText = "___CF6bMultipleMutuallyEliminatingReplacesAtDifferentOffset[1]___";
+      String secondReplacementText = "CF6b[2]";
+
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(new MediumAction[] {
+         createReplaceAction(at(currentMedium, 0), secondReplacementText.length(), firstReplacementText),
+         createReplaceAction(at(currentMedium, 666), firstReplacementText.length(), secondReplacementText), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 7 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF7aMutuallyEliminatingInsertsAndRemoves_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String insertText = "___CF7aMultipleMutuallyEliminatingInsertsAndRemoves[1]___";
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+         new MediumAction[] { createInsertAction(at(currentMedium, 0), insertText),
+            createRemoveAction(at(currentMedium, 700), insertText.length()), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 7 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF7bMultipleInsertsAndRemovesAtDifferentOffsets_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(
+         createFlushExpectationPath("expectation_flush_CF7b.txt"),
+         new MediumAction[] {
+            createInsertAction(at(currentMedium, 5), "___CF7bMultipleInsertsAndRemovesAtDifferentOffsets[1]___"),
+            createRemoveAction(at(currentMedium, 4), 200), createInsertAction(at(currentMedium, 6), "===CF7b[2]==="),
+            createRemoveAction(at(currentMedium, 304), currentMediumContent.length() - 304),
+            createInsertAction(at(currentMedium, currentMediumContent.length() - 1), "###CF7b[3]###"),
+            createInsertAction(at(currentMedium, currentMediumContent.length()), "x"),
+            createRemoveAction(at(currentMedium, 204), 10), createInsertAction(at(currentMedium, 205), "TEST"), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 8 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF8aMutuallyEliminatingInsertsAndReplaces_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String insertText = "___CF8aMultipleMutuallyEliminatingInsertsAndReplaces[1]___";
+      String replacementText = "___CF8aMultipleMutuallyEliminatingInsertsAndReplaces[2]_______";
+
+      testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+         new MediumAction[] { createInsertAction(at(currentMedium, 11), insertText), createReplaceAction(
+            at(currentMedium, 11), replacementText.length() + insertText.length(), replacementText), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 8b (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF8bReplaceThanInsertAtSameOffset_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(
+         createFlushExpectationPath("expectation_flush_CF8b.txt"), new MediumAction[] {
+
+            createReplaceAction(at(currentMedium, 4), 50, "===CF9[000000000000]==="), createInsertAction(
+               at(currentMedium, 4), "___CF9MultipleInsertsRemovesAndReplacesAtDifferentOffsets[2]___"), });
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} CF 9 (see Design Concept).
+    */
+   @Test
+   public void flush_forFilledWritableMedium_CF9MultipleInsertsRemovesAndReplacesAtDifferentOffsets_writesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(
+         createFlushExpectationPath("expectation_flush_CF9.txt"), new MediumAction[] {
+
+            createReplaceAction(at(currentMedium, 4), 50, "===CF9[000000000000]==="),
+         // createInsertAction(at(currentMedium, 56), "===CF9[1]==="),
+         // createReplaceAction(at(currentMedium, 304), currentMediumContent.length() - 304,
+         // ">>>>הההההההההההההה<<<<"),
+         // createInsertAction(at(currentMedium, 4), "___CF9MultipleInsertsRemovesAndReplacesAtDifferentOffsets[2]___"),
+         // createInsertAction(at(currentMedium, currentMediumContent.length()), "###CF9[3]###"),
+         // createReplaceAction(at(currentMedium, 215), 1, "REPLACEMENT #2"),
+         // createRemoveAction(at(currentMedium, 204), 10),
+         // createInsertAction(at(currentMedium, 205), "TEST"),
+
+         });
    }
 
    /**
@@ -699,6 +888,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @return a {@link MediumStore} to test based on a given {@link Medium}.
     */
    protected MediumStore createMediumStoreToTest(T mediumToUse) {
+      Reject.ifNull(mediumToUse, "mediumToUse");
+
       mediumAccessorSpy = Mockito.spy(createMediumAccessor(mediumToUse));
 
       int maxCacheRegionSize = 0;
@@ -750,6 +941,9 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    protected void testGetData_returnsExpectedData(MediumReference getDataOffset, int getDataSize,
       String currentMediumContent) {
+      Reject.ifNull(currentMediumContent, "currentMediumContent");
+      Reject.ifNull(getDataOffset, "getDataOffset");
+
       ByteBuffer returnedData = getDataNoEOMExpected(getDataOffset, getDataSize);
 
       assertByteBufferMatchesMediumRange(returnedData, getDataOffset, getDataSize, currentMediumContent);
@@ -770,11 +964,15 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected void assertByteBufferMatchesMediumRange(ByteBuffer returnedData, MediumReference rangeStartOffset,
       int rangeSize, String currentMediumContent) {
 
+      Reject.ifNull(currentMediumContent, "currentMediumContent");
+      Reject.ifNull(rangeStartOffset, "rangeStartOffset");
+      Reject.ifNull(returnedData, "returnedData");
+
       Assert.assertEquals(rangeSize, returnedData.remaining());
       byte[] byteBufferData = new byte[rangeSize];
       returnedData.asReadOnlyBuffer().get(byteBufferData);
 
-      String returnedDataAsString = new String(byteBufferData, Charsets.CHARSET_ASCII);
+      String returnedDataAsString = new String(byteBufferData, Charsets.CHARSET_UTF8);
 
       String expectedReturnedData = rangeStartOffset.getAbsoluteMediumOffset() > currentMediumContent.length() ? ""
          : currentMediumContent.substring((int) rangeStartOffset.getAbsoluteMediumOffset(),
@@ -796,6 +994,9 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    protected void testGetData_throwsEndOfMediumException(MediumReference getDataOffset, int getDataSize,
       int chunkSizeToUse, String currentMediumContent) {
+
+      Reject.ifNull(currentMediumContent, "currentMediumContent");
+      Reject.ifNull(getDataOffset, "getDataOffset");
 
       try {
          mediumStoreUnderTest.getData(getDataOffset, getDataSize);
@@ -889,6 +1090,9 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected void testCache_throwsEndOfMediumException(MediumReference cacheOffset, int cacheSize,
       String currentMediumContent) {
 
+      Reject.ifNull(currentMediumContent, "currentMediumContent");
+      Reject.ifNull(cacheOffset, "cacheOffset");
+
       try {
          mediumStoreUnderTest.cache(cacheOffset, cacheSize);
 
@@ -926,6 +1130,12 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     *            if anything bad happens during I/O
     */
    protected Path getCopiedFile(Path pathToFile, String mediumType, String testMethodName) throws IOException {
+      Reject.ifNull(testMethodName, "testMethodName");
+      Reject.ifNull(mediumType, "mediumType");
+      Reject.ifNull(pathToFile, "pathToFile");
+
+      Reject.ifFalse(Files.isRegularFile(pathToFile), "Files.isRegularFile(pathToFile)");
+
       Path copiedFile = Files.copy(pathToFile,
          MediaTestFiles.TEST_FILE_TEMP_OUTPUT_DIRECTORY_PATH
             .resolve(getClass().getSimpleName() + "_" + mediumType + testMethodName + ".txt"),
@@ -944,7 +1154,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    protected static MediumAction createInsertAction(MediumReference offset, String insertText) {
       return new MediumAction(MediumActionType.INSERT, new MediumRegion(offset, insertText.length()), 0,
-         ByteBuffer.wrap(insertText.getBytes(Charsets.CHARSET_ASCII)));
+         ByteBuffer.wrap(insertText.getBytes(Charsets.CHARSET_UTF8)));
    }
 
    /**
@@ -974,17 +1184,27 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected static MediumAction createReplaceAction(MediumReference offset, int replacedByteCount,
       String replacementText) {
       return new MediumAction(MediumActionType.REPLACE, new MediumRegion(offset, replacedByteCount), 0,
-         ByteBuffer.wrap(replacementText.getBytes(Charsets.CHARSET_ASCII)));
+         ByteBuffer.wrap(replacementText.getBytes(Charsets.CHARSET_UTF8)));
    }
 
    /**
     * Tests {@link MediumStore#flush()} to write changes as expected and to undo all given actions
     * 
-    * @param actionsInOrder
+    * IMPORTANT NOTE: This method must only be used for action offsets that are increasing, i.e. actions with index i in
+    * the specified array must have equal or bigger start offset than actions with offset j, if j > i. I.e. all actions
+    * in the specified array must be sorted in offset order, and they are also executed this way. If you test cases
+    * where the execution order differs from the offset order (which is allowed), this method MUST NOT be used. Use
+    * {@link #testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(MediumAction...)} instead.
+    * 
+    * @param actionsInOffsetAndExecutionOrder
     *           The {@link MediumAction}s to apply in the given order; they are also used to derive the expectations for
     *           the written data in the end
     */
-   protected void testFlush_writesExpectedDataAndUndosActions(MediumAction... actionsInOrder) {
+   protected void testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(
+      MediumAction... actionsInOffsetAndExecutionOrder) {
+
+      Reject.ifNull(actionsInOffsetAndExecutionOrder, "actionsInOffsetAndExecutionOrder");
+
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
       mediumStoreUnderTest.open();
@@ -995,11 +1215,21 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       List<MediumAction> scheduledActions = new ArrayList<>();
 
-      for (int i = 0; i < actionsInOrder.length; i++) {
-         MediumAction currentAction = actionsInOrder[i];
+      MediumReference previousReference = null;
+
+      for (int i = 0; i < actionsInOffsetAndExecutionOrder.length; i++) {
+         MediumAction currentAction = actionsInOffsetAndExecutionOrder[i];
 
          MediumReference startReference = currentAction.getRegion().getStartReference();
          int startReferenceAsInt = (int) startReference.getAbsoluteMediumOffset();
+
+         if (previousReference != null) {
+            if (startReference.before(previousReference)) {
+               throw new InvalidTestDataException(
+                  "This method must only be used with MediumAction arrays whose entries are sorted by offset, ascending",
+                  null);
+            }
+         }
 
          if (startReferenceAsInt > lastStringIndex) {
             expectationBuilder.appendFromOriginal(lastStringIndex, startReferenceAsInt - lastStringIndex);
@@ -1013,7 +1243,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
             actionBytes.mark();
             actionBytes.get(actionByteArray);
             actionBytes.reset();
-            String actionBytesAsString = new String(actionByteArray, Charsets.CHARSET_ASCII);
+            String actionBytesAsString = new String(actionByteArray, Charsets.CHARSET_UTF8);
 
             expectationBuilder.appendLiteralString(actionBytesAsString);
          }
@@ -1058,4 +1288,83 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       Assert.assertEquals(expectedMediumContent, actualMediumContent);
    }
 
+   /**
+    * Tests {@link MediumStore#flush()} to write changes as expected and to undo all given actions. This method is for
+    * complex change sets where offset order does not need to be equal to execution order.
+    * 
+    * For easier cases, you can also consider using
+    * {@link #testFlushWithOrderedOffsets_writesExpectedDataAndUndosActions(MediumAction...)} where you do not need to
+    * use an expectation file.
+    * 
+    * @param expectedFinalMediumContentFile
+    *           A {@link Path} pointing to an existing UTF8-encoded file only containing standard (ideally only
+    *           printable) ASCII characters; it contains the expected final state of the medium after all changes have
+    *           been applied using {@link MediumStore#flush()}.
+    * @param actionsInExecutionOrder
+    *           The {@link MediumAction}s to execute in the given order; they are not used to derive the expectations
+    *           for the written data
+    */
+   protected void testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(Path expectedFinalMediumContentFile,
+      MediumAction... actionsInExecutionOrder) {
+      Reject.ifNull(actionsInExecutionOrder, "actionsInExecutionOrder");
+      Reject.ifNull(expectedFinalMediumContentFile, "expectedFinalMediumContentFile");
+
+      Reject.ifFalse(Files.isRegularFile(expectedFinalMediumContentFile),
+         "Files.isRegularFile(expectedFinalMediumContentFile)");
+
+      mediumStoreUnderTest.open();
+
+      List<MediumAction> scheduledActions = new ArrayList<>();
+
+      for (int i = 0; i < actionsInExecutionOrder.length; i++) {
+         MediumAction currentAction = actionsInExecutionOrder[i];
+
+         MediumReference startReference = currentAction.getRegion().getStartReference();
+
+         ByteBuffer actionBytes = currentAction.getActionBytes();
+
+         switch (currentAction.getActionType()) {
+            case INSERT:
+               scheduledActions.add(mediumStoreUnderTest.insertData(startReference, actionBytes));
+            break;
+
+            case REMOVE:
+               scheduledActions
+                  .add(mediumStoreUnderTest.removeData(startReference, currentAction.getRegion().getSize()));
+            break;
+
+            case REPLACE:
+               scheduledActions.add(
+                  mediumStoreUnderTest.replaceData(startReference, currentAction.getRegion().getSize(), actionBytes));
+            break;
+
+            default:
+               throw new RuntimeException("Only types INSERT, REMOVE and REPLACE can be used");
+         }
+      }
+
+      mediumStoreUnderTest.flush();
+
+      scheduledActions.forEach(action -> Assert.assertFalse(action.isPending()));
+
+      mediumStoreUnderTest.close();
+
+      String expectedMediumContent = new String(MediaTestUtility.readFileContent(expectedFinalMediumContentFile),
+         Charsets.CHARSET_UTF8);
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+   }
+
+   /**
+    * Creates a {@link Path} pointing to the given file containing expectations for flush testing.
+    * 
+    * @param fileName
+    *           The file name
+    * @return a {@link Path} pointing to the given file containing expectations for flush testing.
+    */
+   protected Path createFlushExpectationPath(String fileName) {
+      return MediaTestFiles.TEST_FILE_DIRECTORY_PATH.resolve("MediumStoreTests").resolve(fileName);
+   }
 }

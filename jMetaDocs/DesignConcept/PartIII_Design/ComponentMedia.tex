@@ -275,14 +275,18 @@ Based on these requirements, we can first define the following basic design deci
 %%%% DD --> %%%%
 \DD{dd:410d}
 {% Titel
-\COMPmedia{} offers the writing operations \emph{insert}, \emph{replace} and \emph{remove}
+\COMPmedia{} offers the writing operations \emph{insert}, \emph{remove} and \emph{replace}
 }
 {% Kurzbeschreibung
 The user can:
 \begin{itemize}
-\item \emph{insert} $N$ bytes at a given offset
-\item \emph{replace} $N$ bytes at a given offset by $M$ new bytes
-\item \emph{remove} $N$ bytes at a given offset
+\item \emph{insert} $N$ bytes at a given offset (adresses requirement \texttt{AMed01})
+\item \emph{remove} $N$ bytes at a given offset (adresses requirement \texttt{AMed02})
+\item \emph{replace} $N$ bytes at a given offset by $M$ new bytes (adresses requirement \texttt{AMed03}). Thus, replace has two flavors:
+\begin{enumerate}
+\item replace $N$ bytes by $M>N$ new bytes actually behaves like an insertion, replacing the first $N$ bytes with new ones, and inserting additional $M-N$ bytes behind. We call it an \emph{inserting replace}.
+\item replace $N$ bytes by $M<N$ new bytes actually behaves like a removal, replacing the first $M$ bytes with new ones, and removing additional $N-M$ existing bytes behind. We call it a \emph{removing replace}.
+\end{enumerate}
 \end{itemize}
 }
 {% Begründung
@@ -295,12 +299,34 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+How is the padding requirement adressed? Like this:
+%%%% DD --> %%%%
+\DD{dd:410d2}
+{% Titel
+Requirement \texttt{AMed06} must be adressed by components using \COMPmedia{}, it is not built into \COMPmedia{} itself
+}
+{% Kurzbeschreibung
+\COMPmedia{} does not implement \texttt{AMed06} itself, it does not know something like ``Padding'', but just the three primitive change operations. Using them, a third party component can do the following using \COMPmedia{}:
+\begin{itemize}
+\item If a new field is added to the ID3v2 tag (with an \emph{insert}) and padding that is longer than the newly inserted content is present, the 3rd party component has to do a \texttt{remove} of a corresponding number of padding bytes, or a \texttt{replace} of old padding bytes by new (shorter) padding bytes.
+\item If a field is removed from the ID3v2 tag (with a \emph{remove}), the 3rd party component can do an \texttt{insert} of a corresponding number of padding bytes at the end of the tag, or a \texttt{replace} of old padding bytes (if present) by new (longer) padding bytes.
+\end{itemize}
+}
+{% Begründung
+\COMPmedia{} should stay clean of any ``functional'' terms defined by some formats, but it should just stick to the primitives it offers to modify media content. As shown above, the requirement can quite easily be implemented by tag-specific logic on top of \COMPmedia{}.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+
 As we have a two-stage write protocol, the \emph{undo} of not yet flushed changes is possible, and according to the requirements also necessary.
 
 %%%% DD --> %%%%
 \DD{dd:420}
 {% Titel
-Writing operations on a medium can be undone with \emph{undo} before a \emph{flush}
+Writing operations on a medium can be undone with \emph{undo} before a \emph{flush}, adressing requirement \texttt{AMed07}
 }
 {% Kurzbeschreibung
 Writing operations lead to pending changes according to \DesLink{dd:410}. These can be undone according to the requirements defined above.
@@ -313,6 +339,7 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+This leaves open \texttt{AMed04} and \texttt{AMed05} which we will adress later when discussing the details of the two-stage write protocol.
 
 %-----------------------------------------------------------------------------------------------
 
@@ -888,20 +915,18 @@ To formulate the following design decision a bit easier, the vague term of ``Obj
 {% Kurzbeschreibung
 All \IMediumReference{} instances ever created for a medium must be updated automatically whenever this medium changes. The kind of update needed is more complex than you would think on first glance. 
 
-Let $y$ be the insert or remove offset and $k$ the number of bytes to insert or remove. Let $\overline{x}$ be the offset of the \IMediumReference{} instance after updating. Then the following detailed rules apply:
+Let $x$ be the start offset of a collection of $n$ bytes (an ``object''), let $y$ be the insert or remove offset and $k$ the number of bytes to insert or remove. Let $\overline{x}$ be the offset of the \IMediumReference{} instance after updating. Then the following detailed rules apply:
 \begin{itemize}
-\item \emph{\texttt{insert} before the object start offset:} Is $y\leq x$, then $\overline{x}:=x+k$. I.e. this includes the case that new bytes are inserted exactly at offset $x$.
-\item \emph{\texttt{insert} behind the object start offset:} Is $y>x$, then $\overline{x}:=x$, i.e. it does not change the start offset of the object, and this even in the case that $y<x+n$, i.e. the action happens \emph{within} the object. If and how this changes the object semantically is lying in the hands of the user and cannot be recognized or interpreted by \LibName{}.
-\item \emph{\texttt{remove} before the object start offset without overlap:} Is $y+k \leq x$, then $\overline{x}:=x-k$. Thus $k$ bytes are removed before the object, however the removed region does not overlap with the object.
-\item \emph{\texttt{remove} before the object start offset with overlap:} Is $y \leq x$, but $y+k > x$, then the removed region overlaps the object. It is thus a \emph{truncation} of the object starting at front, and it might even reduce the object to length 0. Thus the start offset of the object shifts $x-y$ to be equal to $y$, thus it follows that $\overline{x}:=y$. If and how this changes the object semantically is lying in the hands of the user and cannot be recognized or interpreted by \LibName{}.
-\item \emph{\texttt{remove} behind the object start offset:} Is $y>x$, then $\overline{x}:=x$, i.e. the object start offset remains unchanged, of course also in the case that $y<x+n$. In the latter case, however, the object is truncated at its end. If and how this changes the object semantically is lying in the hands of the user and cannot be recognized or interpreted by \LibName{}.
-\item \emph{\texttt{replace}:} Replacing $n$ bytes by $m>n$ bytes has the same effect to existing objects as an \texttt{insert}, with the very same case distinctions. Likewise, \texttt{replace} behaves like \texttt{remove} if $m<n$. The case $m=n$, i.e. an \emph{overwrite} operation does not lead to any offset changes of existing objects.
+\item \texttt{insert} \emph{before the object start offset $x$:} Is $y\leq x$, then $\overline{x}:=x+k$, including the case $y=x$.
+\item \texttt{insert} \emph{behind the object start offset $x$:} Is $y>x$, then $\overline{x}:=x$, i.e. such insertions of course do not change the offset of byte $x$. Insertions might happen before $x+n$, essentially splitting the object.
+\item \texttt{remove} \emph{before the object start offset $x$ without overlap:} Is $y+k \leq x$, then $\overline{x}:=x-k$. Thus $k$ bytes are removed before the object, however the removed region does not overlap with the object.
+\item \texttt{remove} \emph{before the object start offset $x$ with overlap:} Is $y \leq x$, but $y+k > x$, then the removed region overlaps the object. It is thus a \emph{truncation} of the object starting at front, and it might even reduce the object to length 0. Thus the start offset of the object shifts $x-y$ to be equal to $y$, i.e. $\overline{x}:=y$.
+\item \texttt{remove} \emph{behind the object start offset $x$:} Is $y>x$, then $\overline{x}:=x$, i.e. the object start offset remains unchanged, of course also in the case that $y<x+n$. In the latter case, however, the object is truncated at its end.
+\item \texttt{replace}: Replacing $n$ bytes by $m>n$ bytes has the same effect to existing objects as an \texttt{insert}, with the very same case distinctions. Likewise, \texttt{replace} behaves like \texttt{remove} if $m<n$. The case $m=n$, i.e. an \emph{overwrite} operation does not lead to any offset changes of existing objects.
 \end{itemize}
 }
 {% Begründung
-The connection between an \IMediumReference{} instance and an object is a viable picture and quite illustrates the real use case behind manipulating raw binary data. Due to this design decision, this connection persists - from point of view of the caller - even in case of writing changes to the medium. We cannot burden the user with keeping track of these changes as he would need to manage \IMediumReference{} himself in a complex way, listing which operations he has done. This complex book-keeping is what you would expec from a component such as \COMPmedia{}.
-
-If all bytes of the object are removed, then the \IMediumReference{} instance still refers to the ``previous'' location of the object. The user must not ensure that the \IMediumReference{} instance still refers to the same object.
+\IMediumReference{}s are both handed out to the user as well as used to manage cache objects. If changes to the medium happens, all \IMediumReference{}s that are already in user hands or are internally used to manage data are rendered invalid. Thus, we would need to write code to detect such \IMediumReference{}s as invalid whenever used, or to invalidate the current cache content. Instead of doing so, we simply update all \IMediumReference{}s previously created according to the kind of change, thus practically still letting them point to the same ``object'' es before (despite deletion of the whole medium bytes as special case). The \IMediumReference{}s can thus be used further on.
 }
 {% Nachteile
 A central management of \IMediumReference{} instances must be implemented (see \DesLink{dd:419}).
@@ -979,76 +1004,138 @@ We start with the operation \emph{insert}:
 %%%% DD --> %%%%
 \DD{dd:422}
 {% Titel
-\emph{insert} concatenates insertions in call order, the operation is not influenced by any other writing operations
+\emph{insert} concatenates insertions in call order
 }
 {% Kurzbeschreibung
-The temporal order of calls have the following semantics:
 \begin{enumerate}
-\item Step 1: \emph{insert}, Step 2: \emph{insert} at the same offset: \emph{insert} concats, each call with the same offset determines a new, consecutive insertion, i.e. insertions at the same medium location are done with increasing offsets. Let's take two calls to \emph{insert} at the same offset $x$. Let ``Call 1'' be the earlier call with insertion length $n_1$, ``Call 2'' the later call at $x$ with insertion length $n_2$. The end result on the medium after \emph{flush} is:
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{insert} at different offset: Do not influence each other
+\item Step 1: \emph{insert}, Step 2: \emph{insert} at the same offset: \emph{insert} concats, each call with the same offset determines a new, consecutive insertion, i.e. insertions at the same medium location are done with increasing offsets. Let ``Call 1'' be the earlier call with insertion length $n_1$, ``Call 2'' the later call at $x$ with insertion length $n_2$. The end result on the medium after \emph{flush} is:
 \begin{itemize}
 \item At offset $x$, the insertion data of ``Call 1'' is located
 \item At offset $x+n_2$, the insertion data of ``Call 2'' is located
 \end{itemize}
-\item Step 1: \emph{insert}, Step 2: \emph{remove} at same offset: Do not influence each other.
-\item Step 1: \emph{insert}, Step 2: \emph{replace} at same offset: Do not influence each other.
-\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} $m$ bytes by $n$, starting at offset $y$, where $x>y+m$, i.e. the insertion does not happen within the replacement region, but behind: These operations do not influence each other. This includes the case that $m>n$, i.e. an override operation with a removal, and $x\in[y,y+m)$, i.e. the insertion does not happen within the replacement region, but behind.
-\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} $m$ bytes by an arbitrary number of new bytes, starting at offset $y$, where $x\in (y,y+m)$: Put in other words, the bytes to replace contain the prior insertion. Here, the second call is invalid and rejected with an exception.
-\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{insert} at offset $y\neq x$: Do not influence each other.
 \end{enumerate}
 }
 {% Begründung
-For (1): You could alternatively interpret ``insert'' as such that the second call inserts data \emph{before} the previous earlier one. However, the design decision says that ``insert'' inserts before the currently persisted medium byte at the insertion offset. Concatenating allows user code to linearly insert stuff with increasing offsets, which is in most cases the convenient and expected behavior. For (2), (3) and (4): As offsets refer to offsets on the external medium according to \DesLink{dd:410b}, \emph{remove} and \emph{replace} only affect bytes that are currently persisted on the external medium, they thus cannot remove any pending content of a prior \emph{insert} not yet \emph{flush}ed. For (5): Otherwise complex logic is necessary to mix insertion bytes into replacement bytes. The user can achieve the same by simply including the insertion bytes in the replacement bytes starting at offset $y$.
+You could alternatively interpret ``insert'' as such that the second call inserts data \emph{before} the previous earlier one. However, the design decision says that ``insert'' inserts before the currently persisted medium byte at the insertion offset. Concatenating allows user code to linearly insert stuff with increasing offsets, which is in most cases the convenient and expected behavior.
 }
 {% Nachteile
-For (1): You could alternatively interpret ``insert'' as such that the second call inserts data \emph{before} the previous earlier one. However, the design decision says that ``insert'' inserts before the currently persisted medium byte at the insertion offset. With concatenating, user code can linearly insert stuff with increasing offsets, which is mostly the expected behavior.
+You could alternatively interpret ``insert'' as such that the second call inserts data \emph{before} the previous earlier one, which might lead to surprises in a few use scenarios.
 }
 %%%% <-- DD %%%%
 
-The operation \emph{remove} behaves as follows:
+%%%% DD --> %%%%
+\DD{dd:422b}
+{% Titel
+\emph{insert} and \emph{remove} do not interact with each other in any way
+}
+{% Kurzbeschreibung
+The following cases can be identified:
+\begin{enumerate}
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} at same offset: Do not influence each other
+\item Step 1: \emph{remove} at offset $x$, Step 2: \emph{insert} at same offset: Do not influence each other
+\item Step 1: \emph{remove} $n=10$ bytes at offset $x$, Step 2: \emph{insert} at offset $x+5$: Do not influence each other
+\item Step 1: \emph{insert} at offset $x+5$, Step 2: \emph{remove} $n=10$ bytes at offset $x$: Do not influence each other
+\end{enumerate}
+Thus, \emph{insert} and \emph{remove} do not at all influence each other, no matter in which order the calls are done and if their offsets or ranges overlap or not. Thus, especially, it is not possible to \emph{remove} content that was earlier inserted.
+}
+{% Begründung
+The formal reason is based on \DesLink{dd:421}. As \emph{remove} never can refer to offsets that are not yet persisted on the medium, it cannot refer to data pending to be inserted. So how can we interpret the overlap case? If you remove a range on the external medium, and (afterwards or before) insert new bytes in the middle of the range, this means: The inserted bytes will be inserted after the first byte located before the beginning of the removed range. You can imagine the inserted bytes ``falling'' back to the offset where the removal starts.
+}
+{% Nachteile
+Then, how to implement write requirement \texttt{AMed04}? See \DesLink{dd:422c}.
+}
+%%%% <-- DD %%%%
+
+Now we are left with clarifying how \emph{insert} interacts with \emph{replace}.
+
+%%%% DD --> %%%%
+\DD{dd:422d}
+{% Titel
+\emph{insert}s within a replaced range are forbidden, \emph{insert}s within a range practically removed by a replace action are still allowed
+}
+{% Kurzbeschreibung
+First of all, it is clear that if the insertion offset is completely outside of the replaced range and the range of the replacement bytes, there are no interactions. Now we have to consider the following special cases:
+\begin{enumerate}
+\item Step 1: \emph{insert} $n_{1}$ bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $n_{2}$ new bytes at same offset: This must behave the same way as multiple inserts, actually concatenating the data in call order. The final result after flush: 
+\begin{itemize}
+\item At offset $x$, the insertion data of the first operation (insert)
+\item At offset $x+n_{1}$, the replacement data of the second operation (replace)
+\end{itemize}
+\item Step 1: \emph{replace} $m$ bytes by $n_{1}$ new bytes at offset $x$, Step 2: \emph{insert} $n_{2}$ new bytes at same offset: Like in the previous case, the final result after flush is: 
+\begin{itemize}
+\item At offset $x$, the replacement data of the first operation (replace)
+\item At offset $x+n_{2}$, the inserted data of the second operation (insert)
+\end{itemize}
+\item Step 1: \emph{replace} $m$ bytes by $n_{1}<m$ new bytes at offset $x$, Step 2: \emph{insert} new bytes at offset $x+n_{1}+1$: For a removing \emph{replace}, it is allowed to insert new bytes in the removed range
+\item Step 1: \emph{insert} new bytes at offset $x+n_{1}+1$, Step 2: \emph{replace} $m$ bytes by $n_{1}<m$ new bytes at offset $x$: For a removing \emph{replace}, it is allowed to insert new bytes in the removed range
+\item Step 1: \emph{insert} at offset $x+5$, Step 2: \emph{replace} of $n=10$ bytes at offset $x$, especially for inserting replaces: Is not allowed and leads to a runtime exception
+\item Step 1: \emph{replace} $n=10$ bytes at offset $x$, Step 2: \emph{insert} at offset $x+5$: Same as previous case
+\end{enumerate}
+}
+{% Begründung
+For (1) and (2): This way, the user can do replacements and insertion as if linearly adding stuff to e.g. a tag. E.g. he can first replace the content of an existing field, then insert a new field, or the other way round. The result will reflect the order of invocations.
+For (3) and (4): This is the same interaction as between insert and remove.
+For (5) and (6): How to make sense of ``insert bytes in the middle of a range that has to be replaced with new bytes''? Of course we could say, exactly this is what happens. But it turned out that complex logic is necessary to mix insertion bytes into replacement bytes. The user can achieve the same by simply including the insertion bytes in the replacement bytes starting at offset $x+5$.
+}
+{% Nachteile
+For (5) and (6): This does not make things possible like: The user first replaces a range of bytes, then wants to additionally insert something within the block of replacement bytes. Or the user inserts a new child field  into a parent tag, and then replaces the entire tag by something else.
+}
+
+Saying all this, it is not possible to implement \texttt{AMed04} (``it is possible to change or remove parts of an already done insertion before a flush'') and  \texttt{AMed05} (``it is possible to change or remove parts of an already done replacement before a flush'') by using subsequent inserts, removes and replaces. Then how is this requirement met? An example of this case is: We insert a new ID3v2 tag which already lead to scheduling an \emph{insert} with the corresponding bytes. Then afterwards and before a flush, the using code needs to change some flag values in the header of the ID3v2 tag. This must also change the inserted bytes of course. Here is how this could be done:
+
+%%%% DD --> %%%%
+\DD{dd:422c}
+{% Titel
+Meeting requirements \texttt{AMed04} and  \texttt{AMed05} is done outside of \COMPmedia{}, yet using its \emph{undo} feature
+}
+{% Kurzbeschreibung
+\texttt{AMed04} can only be met outside \COMPmedia{}. Using code must detect that a parent of the changed field was already scheduled for insertion or replacment. If that is the case, they have to ``re-compute'' the overall insertion or replacment bytes, undo the previous insertion or replacement using \COMPmedia{} and finally schedule a new insertion or replacement containing the changed bytes.
+}
+{% Begründung
+\COMPmedia{} could somehow support here by offering modification functions for already done \emph{insert}s or \emph{replace}s. However, this would also at least require the using code to detect the change in a parent, and also recompute. It would make the API of \MediumAction{} more complex and it would refuse to be a mostly constant class. Using \emph{undo}, the using code has just slightly more work to do.
+}
+{% Nachteile
+No disadvantages known
+}
+
+We already clarified how insert interacts with remove and replace, in any other. We are now only left to clarify how multiple removes and replaces interact with each other. The operation \emph{remove} behaves as follows:
 
 %%%% DD --> %%%%
 \DD{dd:424}
 {% Titel
-\emph{remove} allows no overlaps, only later calls with bigger region make earlier calls obsolete
+\emph{remove} allows no overlaps by other \emph{remove}s, only later calls with bigger region make earlier calls obsolete
 }
 {% Kurzbeschreibung
 The following temporal order of calls have the described semantics:
 \begin{enumerate}
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m$ bytes at offset $y\leq x$ with $y+m\geq x+n$: When calling \emph{remove} twice or first \emph{remove}, then \emph{replace}, where the second call fully contains the offset region of the first, the earlier call is declared as invalid and is not processed during a \emph{flush}. Of course this is also true for all earlier calls, not only the last one.
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} at offset $y$ without any overlaps to $[x,x+n)$: Do not influence each other.
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m\geq n$ bytes at offset $y\leq x$ with $y+m\geq x+n$: If a call to \emph{remove} or \emph{replace} fully encloses the removed range of a previous \emph{remove} call, such a previous call is considered obsolete and is not processed during a \emph{flush}.
 \item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m$ bytes at offset $y\in (x,x+n)$ with $y+m<x+n$: The first call fully contains the region of the second call. The second call is invalid and rejected with an exception.
 \item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m$ bytes at offset $y\in (x,x+n)$ with $y+m\geq x+n$: The second call is an overlapping call, that probably removes additional bytes behind the first remove call, but still includes the end of the first call. The second call is invalid and rejected with an exception.
 \item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m$ bytes at offset $y \leq x$ with $y+m<x+n$: In this case there is an overlap from the start. The second call is invalid and rejected with an exception.
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{insert} at offset $y\in [x,x+n)$: As the insert call according to \DesLink{dd:410b} refers to offsets on the external medium, here first $n$ bytes present on the medium are removed, then the new bytes are inserted after the last byte persisted, i.e. at offset $x$.
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} at offset $y$ without any overlaps to $[x,x+n)$: Do not influence each other.
 \end{enumerate}
 }
 {% Begründung
-There are no accidental multiple removals or replaces. For (1): It may happen that the user first removes a chield field, and additionally still before the flush \texttt{flush}, he removes the parent block. For (2) to (4): Would we allow the second calls, we would need to change the remove areas of the first calls. This leads to a more complex logic, that is not necessary according to the requirements stated in \SectionLink{sec:AnforderungenandaszweistufigeSchreibprotokoll}. A very important reason to not allow this is implementation of \texttt{undo}: Would we allow later changes of already made calls, then \texttt{undo} would be quite complex, because it would need to also undo such changes to removed regions, what basically means keeping a history of all changes made for the same region.
+There are no accidental multiple removals or replaces. For (2): It may happen that the user first removes a chield field, and additionally still before the flush \texttt{flush}, he removes the parent block. For (3) to (5): Would we allow the second calls, we would need to change the remove areas of the first calls. This leads to a more complex logic, that is not necessary according to the requirements stated in \SectionLink{sec:AnforderungenandaszweistufigeSchreibprotokoll}. A very important reason to not allow this is implementation of \texttt{undo}: Would we allow later changes of already made calls, then \texttt{undo} would be quite complex, because it would need to also undo such changes to removed or replaced regions, what basically means keeping a history of all changes made for the same region.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-The operation \emph{replace} behaves like this:
+Now we are just left to clarify how multiple \emph{replace} operations interact with each other:
 
 %%%% DD --> %%%%
 \DD{dd:424a}
 {% Titel
-\emph{replace} does not allow overlaps, only later calls with bigger reagions make earlier calls obsolete
+\emph{replace} does not allow overlaps, only later calls with bigger regions make earlier calls obsolete
 }
 {% Kurzbeschreibung
-The behaviour of \emph{replace} mostly matches the behavior of \emph{remove}, as described in cases 1 to 4 of \DesLink{dd:424}. You only have to replace \emph{remove} by \emph{replace} in the description of \DesLink{dd:424} :-). \emph{replace} interacts with an insert the same way as described in \DesLink{dd:422} for the inverse order which are cases 5 to 7:
-\begin{enumerate}
-\item[1.] to 4. Exactly the same as described in \DesLink{dd:424} with \emph{replace} as first step.
-\item[5.] Step 1: \emph{replace}, Step 2: \emph{insert} at the same offset: These operations do not influence each other.
-\item[6.] Step 1: \emph{replace} $m$ bytes by $n$, starting at offset $y$, Step 2: \emph{insert} at offset $x$, where $x>y+m$, i.e. the insertion does not happen within the replacement region, but behind: These operations do not influence each other. This includes the case that $m>n$, i.e. an override operation with a removal, and $x\in[y,y+m)$, i.e. the insertion does not happen within the replacement region, but behind.
-\item[7.] Step 1: \emph{replace} $m$ bytes by an arbitrary number of new bytes, starting at offset $y$, Step 2: \emph{insert} at offset $x$, where $x\in (y,y+m)$: Put in other words, the bytes to replace contain the later insertion. Here, the second call is invalid and rejected with an exception.
-\item[8.] Step 1: \emph{replace} at offset $x$, Step 2: \emph{remove} or \emph{replace} at offset $y$ without any overlaps: Do not influence each other.
-\end{enumerate}
+The behaviour of \emph{replace} matches the behavior of \emph{remove} in terms of earlier calls. That means: If the replacement region of a \emph{replace} fully contains the replacement region of a previous call to \emph{replace}, this previous call is considered obsolete and not executed during \emph{flush}. Second, if the replacement region of a call is fully contained in the replacement region of a previous call, this is rejected with an exception. Third, whenever the replacement region of a call overlaps the replacement region of any previous call to \emph{replace} at front or back, the new call is rejected with an exception.
 }
 {% Begründung
-See \DesLink{dd:422}, cases 1 to 4 and \DesLink{dd:422}, cases 3 to 5
+See \DesLink{dd:424}
 }
 {% Nachteile
 No disadvantages known
@@ -1745,6 +1832,108 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+Next, we should clarify how the cache is involved in \texttt{flush()}. In case caching is enabled for the medium, we have the following points to look at:
+\begin{itemize}
+\item If bytes are added to the medium with \texttt{INSERT} or \texttt{REPLACE}, these bytes must also be added to the cache
+\item If bytes are removed from the medium with \texttt{REMOVE} or \texttt{REPLACE}, these bytes must also be removed from the cache
+\item Is specific handling of \texttt{TRUNCATE} necessary?
+\item If bytes behind a change must be read (and written), they should also be directly added to the cache to save future medium accesses in these ranges
+\item Furthermore, if bytes behind a change must be read, it must also be checked if they are already contained in the cache, such that an explicit \texttt{READ} on the external medium is only necessary if these bytes are not cached
+\end{itemize}
+
+For the last point, we define the following:
+%%%% DD --> %%%%
+\DD{dd:439b}
+{% Titel
+\texttt{READ} operations in \texttt{flush} prefer cached data and update the cache if not already contained 
+}
+{% Kurzbeschreibung
+Whenever \texttt{flush} processes a \texttt{READ} action coming from the flush plan, it first checks if the data to read is fully cached. If it is, it takes the data from the cache. If it is not, it reads the data directly from the external medium and adds it to the cache.
+}
+{% Begründung
+We want to use cached data as much as possible and avoid unnecessary medium accesses.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Correspondingly, this is how we treat \texttt{INSERT} and inserting \texttt{REPLACE} in \texttt{flush} regarding caching:
+
+%%%% DD --> %%%%
+\DD{dd:439c}
+{% Titel
+\texttt{INSERT} and inserting \texttt{REPLACE} operations in \texttt{flush} add their data to the cache
+}
+{% Kurzbeschreibung
+Whenever \texttt{flush} processes an \texttt{INSERT} or inserting \texttt{REPLACE} action coming from the flush plan, it adds all bytes to insert or replacement bytes from these actions to the cache.
+}
+{% Begründung
+We want to use cached data as much as possible and avoid unnecessary medium accesses.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Very similar for \texttt{REMOVE} and removing \texttt{REPLACE}:
+%%%% DD --> %%%%
+\DD{dd:439d}
+{% Titel
+\texttt{REMOVE} and removing \texttt{REPLACE} operations in \texttt{flush} remove their ranges from the cache
+}
+{% Kurzbeschreibung
+Whenever \texttt{flush} processes a \texttt{REMOVE} or removing \texttt{REPLACE} action coming from the flush plan, it removes all bytes to remove or replace from the cache. Of course, the replacement bytes of a \texttt{REPLACE} action are still newly added to the cache.
+}
+{% Begründung
+Avoid cache corruption if old data is still present. In best case, the code directly fails when trying to add new data, in worst case the stale removed data remains in the cache and is later returned by read operations despite the medium already changed.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Do we have to do anything with the cache regarding a \texttt{TRUNCATE} action? This is answered in the following design decision:
+%%%% DD --> %%%%
+\DD{dd:439e}
+{% Titel
+For a \texttt{TRUNCATE}, nothing is to be done related to caching
+}
+{% Kurzbeschreibung
+The cache does not require any updates when processing a \texttt{TRUNCATE} action in \texttt{flush}.
+}
+{% Begründung
+Although it first might seem that, because \texttt{TRUNCATE} shortens the medium, no cache updates are necessary for any cached bytes at the end of the medium. This is because the cache is implicitly cleaned by handling the \texttt{REMOVE} that leads to the truncate. This consists of removing cached bytes for the removed region as well as updating \IMediumReference{}s of any data cached behind the removed region.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+We still have the topic to update any already created \IMediumReference{}s when processing \texttt{INSERT}s, \texttt{REMOVE}s and \texttt{REPLACE}s according to design decision \DesLink{dd:418b}. When do we need to perform these changes? This actually depends on the action type:
+%%%% DD --> %%%%
+\DD{dd:439e}
+{% Titel
+For \texttt{INSERT}s and inserting \texttt{REPLACE}s, \IMediumReference{}s are updated \emph{BEFORE} the cache is updated, for \texttt{REMOVE}s and removing \texttt{REPLACE}s they are updated \emph{AFTERWARDS}
+}
+{% Kurzbeschreibung
+For \texttt{INSERT}s and inserting \texttt{REPLACE}s, any \IMediumReference{}s already created and maintained in the \MediumReferenceRepository{} are updated first, which essentially increases the offsets of any \IMediumReference{}s behind the insertion offset by the number of bytes inserted. Only after this, the data newly inserted or replaced can be added to the cache.
+
+In contrast to this, when \texttt{REMOVE}s and removing \texttt{REPLACE}s are processed, first of all, the bytes to remove, if present in the cache, need to be removed from it. Only then, all \IMediumReference{}s behind the remove offset need to be decreased by the number of removed bytes (or fall back to remove offset, if within the removed range). 
+}
+{% Begründung
+For \texttt{INSERT}s and inserting \texttt{REPLACE}s: If we add the inserted data to the cache before updating reference, the following would happen: Assume there are bytes already cached directly starting at the insertion offset. They would be superseded by the inserted data, i.e. thrown out of the cache. Then only all remaining data with higher offsets in the cache would be updated. This way, we would essentially lose cached data unnecessary and increase the complexity of cache management needed at runtime a bit.
+
+For \texttt{REMOVE}s and removing \texttt{REPLACE}s: If we would first update the \IMediumReference{}s here, the following could happen: Assume we have two consecutive cached regions within the region to remove. For both regions, its offset would be updated to point to the remove offset. So we would have two regions cached with the same start offset, which leaves the cache inconsistent. Instead, we first remove all cached regions within the removed range, then we update any remaining regions (those behind the removed range).
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+TODO hier weiter
+
+
 Now we have all credentials to implement writing in \texttt{flush()}:
 \begin{enumerate}
 \item Create the read-write-plan according to \DesLink{dd:439}
@@ -1753,14 +1942,16 @@ Now we have all credentials to implement writing in \texttt{flush()}:
 \begin{itemize}
 \item If action = \texttt{READ}: Read $n$ bytes \-- that are written in the subsequent action \-- where $n$ is smaller than the maximum write block size and bigger than 0. For that, first all regions are determined using \MediumCache{}\texttt{.getData()}. Those that are not cached are read by direct access to the medium via \IMediumAccessor{}. Then a corresponding \texttt{ByteBuffer} is built up step-wise. If an \texttt{EndOfMediumException} occurs, this is considered as impossible and an \texttt{IllegalStateException} is thrown.
 \item If action = \texttt{WRITE}: If the \texttt{WRITE} action contains bytes already, it as associated to an \texttt{INSERT} or \texttt{REPLACE}. In this case, directly write the contained bytes with direct access to the medium via \IMediumAccessor{}. If the action does not contain any bytes, the previous action must have been a \texttt{READ} reading exactly the same amount of bytes to write. If this is not the case, an \texttt{IllegalStateException} is thrown. Otherwise these previously read bytes are written with direct access to the medium via \IMediumAccessor{}.
-\item If action = \texttt{REPLACE} or \texttt{INSERT}: Do nothing, as these operations are implicitly implemented via \texttt{WRITE} operations.
-\item If action = \texttt{REMOVE}: Do nothing, as \texttt{REMOVE} it implicitly gets implemented by \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE}.
 \item If action = \texttt{TRUNCATE}: Execute an explicit truncation of the medium.
+\item If action = \texttt{INSERT}, \texttt{REPLACE} or \texttt{REMOVE}: Do nothing, as these operations are implicitly implemented via \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE} operations.
 \end{itemize}
-\item Update the cache (part 1): If action = \texttt{REMOVE}, then call \MediumCache{}\texttt{.discardData()} to remove the bytes from the cache.
-\item Only if action = \texttt{INSERT} or if action = \texttt{REMOVE}: Call \MediumReferenceRepository{}\texttt{.updateReferences()} for the region, such that all consecutive  \IMediumReference{} instances are updated.
-\item Update the cache (part 2): If action = \texttt{WRITE}, \texttt{INSERT} or \texttt{REPLACE}, then call \MediumCache{}\texttt{.addRegion()} to add the bytes to the cache.
-\item If action = \texttt{INSERT}, \texttt{REMOVE} or \texttt{REPLACE}: Call \MediumChangeManager{}\texttt{.undo()} to remove the action
+\item If action = \texttt{INSERT}, \texttt{REPLACE} or \texttt{REMOVE}: Call \MediumReferenceRepository{}\texttt{.updateReferences()} for the region, such that all consecutive  \IMediumReference{} instances are updated.
+\item Update the cache:
+\begin{itemize}
+\item If action = \texttt{WRITE}, then call \MediumCache{}\texttt{.addRegion()} to add the bytes written to the cache.
+\item If action = \texttt{REMOVE}, then call \MediumCache{}\texttt{.removeRegion()} to remove the bytes also from the cache.
+\end{itemize}
+\item If action = \texttt{INSERT}, \texttt{REMOVE} or \texttt{REPLACE}: Call \MediumChangeManager{}\texttt{.undo()} to undo the action
 \end{enumerate}
 
 %%%% DD --> %%%%

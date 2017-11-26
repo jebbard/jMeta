@@ -222,47 +222,51 @@ public class MediumChangeManager {
       List<MediumAction> flushPlan = new ArrayList<>();
       List<ShiftedMediumBlock> mediumBlocks = new ArrayList<>();
 
+      /*
+       * delta is the current change of the total medium size as indicated by the already processed MediumActions, (i.e.
+       * delta > 0 means the medium would grow by "delta" number of bytes, delta < 0 means the medium would shrink by
+       * "delta" number of bytes).
+       */
       int delta = 0;
 
       Iterator<MediumAction> actionIterator = iterator();
 
       while (actionIterator.hasNext()) {
-         MediumAction nextAction = actionIterator.next();
-         MediumRegion nextRegion = nextAction.getRegion();
+         MediumAction currentAction = actionIterator.next();
+         MediumRegion currentRegion = currentAction.getRegion();
 
          ShiftedMediumBlock lastBlock = null;
-
          if (mediumBlocks.size() > 0) {
             lastBlock = mediumBlocks.get(mediumBlocks.size() - 1);
             if (delta == 0) {
                lastBlock.setEndReferenceOfMediumBytes(lastBlock.getStartReferenceOfFollowUpBytes());
             } else {
                if (lastBlock.getCausingAction().getSizeDelta() > 0
-                  || !lastBlock.getCausingAction().getRegion().contains(nextRegion.getStartReference())) {
-                  lastBlock.setEndReferenceOfMediumBytes(nextRegion.getStartReference());
+                  || !lastBlock.getCausingAction().getRegion().contains(currentRegion.getStartReference())) {
+                  lastBlock.setEndReferenceOfMediumBytes(currentRegion.getStartReference());
                }
             }
          }
 
-         delta += nextAction.getSizeDelta();
+         delta += currentAction.getSizeDelta();
 
-         if (lastBlock != null && lastBlock.getCausingAction().getSizeDelta() < 0
-            && lastBlock.getCausingAction().getRegion().contains(nextRegion.getStartReference())) {
+         if (mediumBlocks.size() > 0 && lastBlock.getCausingAction().getSizeDelta() < 0
+            && lastBlock.getCausingAction().getRegion().contains(currentRegion.getStartReference())) {
             int newBlockShift = (int) (delta + lastBlock.getCausingAction().getRegion().getSize()
-               - nextRegion.getStartReference().getAbsoluteMediumOffset()
+               - currentRegion.getStartReference().getAbsoluteMediumOffset()
                + lastBlock.getCausingAction().getRegion().getStartReference().getAbsoluteMediumOffset());
 
-            ShiftedMediumBlock newBlock = new ShiftedMediumBlock(nextAction, newBlockShift);
+            ShiftedMediumBlock newBlock = new ShiftedMediumBlock(currentAction, newBlockShift);
             newBlock.setEndReferenceOfMediumBytes(newBlock.getStartReferenceOfFollowUpBytes());
             mediumBlocks.add(mediumBlocks.size() - 1, newBlock);
 
             if (lastBlock.getCausingAction().getActionType() == MediumActionType.REPLACE) {
-               lastBlock.setTotalShiftOfMediumBytes(delta - nextAction.getSizeDelta());
+               lastBlock.setTotalShiftOfMediumBytes(delta - currentAction.getSizeDelta());
             } else {
                lastBlock.setTotalShiftOfMediumBytes(delta);
             }
          } else {
-            mediumBlocks.add(new ShiftedMediumBlock(nextAction, delta));
+            mediumBlocks.add(new ShiftedMediumBlock(currentAction, delta));
          }
       }
 
@@ -282,9 +286,9 @@ public class MediumChangeManager {
       mediumBlocks.sort(new ShiftedMediumBlockComparator());
 
       for (int i = 0; i < mediumBlocks.size(); ++i) {
-         ShiftedMediumBlock element = mediumBlocks.get(i);
+         ShiftedMediumBlock currentBlockInSortOrder = mediumBlocks.get(i);
 
-         flushPlan.addAll(element.computeResultingActions(writeBlockSizeInBytes));
+         flushPlan.addAll(currentBlockInSortOrder.computeResultingActions(writeBlockSizeInBytes));
       }
 
       // Add a truncate action to ensure the file is shortened, if necessary

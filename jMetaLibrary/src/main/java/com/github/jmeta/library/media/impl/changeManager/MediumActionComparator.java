@@ -11,9 +11,9 @@ package com.github.jmeta.library.media.impl.changeManager;
 
 import java.util.Comparator;
 
-import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -26,15 +26,13 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * smaller than the sequence number of Y</li>
  * </ul>
  * 
- * That said, it does not matter what the values of the other attributes of a {@link MediumAction}, especially the
- * {@link MediumActionType}, is to determine if it is smaller.
+ * That said, it does not matter what the values of the other attributes of a {@link MediumAction} are, especially the
+ * {@link MediumActionType}.
  * 
  * Two {@link MediumAction}s are equal if and only if all of their attributes are equal (see implementation of
- * {@link MediumAction#equals(Object)}.
- * 
- * A {@link MediumAction} X is bigger than another {@link MediumAction} Y, if it is neither smaller nor equal. That
- * means in case of equal {@link MediumReference} and equal sequence number, X is always considered bigger than Y if
- * any other attribute differs.
+ * {@link MediumAction#equals(Object)}. Thus a {@link MediumAction} X is bigger than another {@link MediumAction} Y, if
+ * it is neither smaller nor equal. That means in case of equal {@link MediumReference}s and equal sequence numbers, X
+ * is always considered bigger than Y if any other attribute differs.
  */
 public class MediumActionComparator implements Comparator<MediumAction> {
 

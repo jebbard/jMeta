@@ -1,0 +1,15 @@
+READ at 315 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 115 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 515 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 315 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 715 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 515 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 915 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 715 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 1115 with size 25 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 915 with size 25 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 15 with size 100 with bytes java.nio.HeapByteBuffer[pos=0 lim=100 cap=100] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+REPLACE at 15 with size 300 with bytes java.nio.HeapByteBuffer[pos=0 lim=100 cap=100] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 115 with size 140 with bytes java.nio.HeapByteBuffer[pos=0 lim=140 cap=140] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+INSERT at 15 with size 140 with bytes java.nio.HeapByteBuffer[pos=0 lim=140 cap=140] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+TRUNCATE at 1080 with size 60 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt

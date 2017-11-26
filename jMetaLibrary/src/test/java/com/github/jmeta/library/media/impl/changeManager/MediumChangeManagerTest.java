@@ -44,137 +44,10 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 1 of design decision 079 of "EasyTag_DesignConcept - Media.pdf"
+    * Checks case 1 of design decision 078 of "EasyTag_DesignConcept.pdf"
     */
    @Test
-   public void dd079case1_scheduleInsertThenInsert_sameOfs_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
-      MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_B.remaining()); // Identical with region 0
-      MediumRegion region2 = new MediumRegion(at(1), BUFFER_SIZE_5.remaining()); // Starts with region 0 & 1, but ends
-      // earlier
-      MediumRegion region3 = new MediumRegion(at(20), BUFFER_SIZE_10_A.remaining()); // No relation to any other region
-      MediumRegion region4 = new MediumRegion(at(2), BUFFER_SIZE_40.remaining()); // Overlapping all other regions,
-      // includes region
-      // 3
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_B, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_5, 2),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region4, BUFFER_SIZE_40, 0));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 4, 3 },
-         Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 2 of design decision 079 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd079case2_scheduleInsertThenRemove_sameOrOverlappingOfs_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
-      MediumRegion region1 = new MediumRegion(at(1), 5);
-      MediumRegion region2 = new MediumRegion(at(20), BUFFER_SIZE_10_A.remaining());
-      MediumRegion region3 = new MediumRegion(at(20), 55);
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 1));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 3 },
-         Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 3 of design decision 079 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd079case3_scheduleInsertThenReplace_sameOfs_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
-      MediumRegion region1 = new MediumRegion(at(1), 5);
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 1));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 4 of design decision 079 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd079case4_scheduleInsertThenReplace_insertOfsBehindReplacementBytes_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
-      MediumRegion region1 = new MediumRegion(at(1), 5);
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20, 0));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0 }, Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 5 of design decision 079 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd079case5_scheduleInsertThenReplace_replacementBytesOverlapInsertOfs_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
-      MediumRegion region1 = new MediumRegion(at(1), 20);
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0));
-
-      checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 1));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0 }, Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)} and
-    * {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 6 of design decision 079 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd079case6_scheduleInsertThenInsert_increasingOfs_mediumActionsIteratedAsExpected() {
+   public void dd078case1_scheduleInsertThenInsert_increasingOfs_iteratedUnchangedInOffsetOrder() {
 
       MediumChangeManager testling = getTestling();
 
@@ -197,13 +70,297 @@ public class MediumChangeManagerTest {
    }
 
    /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)} and
+    * {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 2 of design decision 078 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd078case2_scheduleInsertThenInsert_sameOfs_iteratedUnchangedInScheduleOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
+      MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_B.remaining()); // Identical with region 0
+      MediumRegion region2 = new MediumRegion(at(1), BUFFER_SIZE_5.remaining()); // Starts with region 0 & 1, but ends
+      // earlier
+      MediumRegion region3 = new MediumRegion(at(20), BUFFER_SIZE_10_A.remaining()); // No relation to any other region
+      MediumRegion region4 = new MediumRegion(at(2), BUFFER_SIZE_40.remaining()); // Overlapping all other regions,
+      // includes region 3
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_B, 1),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_5, 2),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region4, BUFFER_SIZE_40, 0));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 4, 3 },
+         Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks cases 1 and 4 of design decision 079 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd079cases1And4_scheduleInsertThenRemove_sameOrOverlappingOfs_iteratedUnchangedInOffsetOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
+      MediumRegion region1 = new MediumRegion(at(1), 5);
+      MediumRegion region2 = new MediumRegion(at(25), BUFFER_SIZE_10_A.remaining());
+      MediumRegion region3 = new MediumRegion(at(20), 55);
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 1),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 3, 2 },
+         Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks cases 2 and 3 of design decision 079 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd079cases2And3_scheduleRemoveThenInsert_sameOrOverlappingOfs_iteratedUnchangedInOffsetOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(1), 5);
+      MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
+      MediumRegion region2 = new MediumRegion(at(200), 100);
+      MediumRegion region3 = new MediumRegion(at(250), 5);
+      MediumRegion region4 = new MediumRegion(at(600), 100);
+      MediumRegion region5 = new MediumRegion(at(800), 5);
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_5, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region5, BUFFER_SIZE_5, 0));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 3, 4, 5 },
+         Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 1 of design decision 080 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd080case1_scheduleInsertThenReplace_sameOfs_iteratedUnchangedInScheduleOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
+      MediumRegion region1 = new MediumRegion(at(1), 5);
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 1));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 2 of design decision 080 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd080case2_scheduleReplaceThenInsert_sameOfs_iteratedUnchangedInScheduleOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(1), 5);
+      MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 3 of design decision 080 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd080case3_scheduleInsertThenReplace_insertOfsBehindReplacedBytes_iteratedUnchangedInOffsetOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
+      MediumRegion region1 = new MediumRegion(at(1), 5);
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20, 0));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0 }, Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 4 of design decision 080 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd080case4_scheduleReplaceThenInsert_insertOfsBehindReplacedBytes_iteratedUnchangedInOffsetOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(1), 5);
+      MediumRegion region1 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 0));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 5 of design decision 080 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd080case5_scheduleInsertThenReplace_replacedBytesContainInsertOfs_throwsException() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
+      MediumRegion region1 = new MediumRegion(at(1), 20);
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0));
+
+      checkExceptionOnSchedule(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 1));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0 }, Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 6 of design decision 080 of "EasyTag_DesignConcept.pdf"
+    */
+   @Test
+   public void dd080case6_scheduleReplaceThenInsert_replacedBytesContainInsertOfs_throwsException() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(1), 20);
+      MediumRegion region1 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0));
+
+      checkExceptionOnSchedule(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0 }, Arrays.asList());
+   }
+
+   /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 1 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 1 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd080case1_scheduleRemoveThenRemove_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
+   public void dd082case1_scheduleRemoveThenRemove_noOverlaps_iteratedUnchangedInOffsetOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(11), 10);
+      MediumRegion region1 = new MediumRegion(at(35), 5);
+      MediumRegion region2 = new MediumRegion(at(220), 10);
+      MediumRegion region3 = new MediumRegion(at(0), 10);
+      MediumRegion region4 = new MediumRegion(at(2000), 1110);
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3, 0, 1, 2, 4 },
+         Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)},
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 1 of design decision 082 of "EasyTag_DesignConcept.pdf" for
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
+    */
+   @Test
+   public void dd082case1_scheduleRemoveThenReplace_noOverlaps_iteratedUnchangedInOffsetOrder() {
+
+      MediumChangeManager testling = getTestling();
+
+      // Regions are listed in order of scheduling
+      MediumRegion region0 = new MediumRegion(at(11), 10);
+      MediumRegion region1 = new MediumRegion(at(0), 10); // Only 10 bytes replaced
+      MediumRegion region2 = new MediumRegion(at(100), 10);
+      MediumRegion region3 = new MediumRegion(at(90), 10); // 10 bytes to replace
+
+      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
+         // But replacement region overlaps 30 Bytes at front
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
+         // 10 new bytes
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_A, 0));
+
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0, 3, 2 },
+         Arrays.asList());
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
+    *
+    * Checks case 2 of design decision 082 of "EasyTag_DesignConcept.pdf" for
+    * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
+    */
+   @Test
+   public void dd082case2_scheduleRemoveThenRemove_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
 
       MediumChangeManager testling = getTestling();
 
@@ -238,11 +395,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 1 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 2 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd080case1_scheduleRemoveThenReplace_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
+   public void dd082case2_scheduleRemoveThenReplace_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
 
       MediumChangeManager testling = getTestling();
 
@@ -277,11 +434,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 1 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 2 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd080case1_scheduleRemoveThenRemove_secondRegionFullyEnclosesMultiplePreviousRegions_invalidatesAllPreviousActions() {
+   public void dd082case2_scheduleRemoveThenRemove_secondRegionFullyEnclosesMultiplePreviousRegions_invalidatesAllPreviousActions() {
 
       MediumChangeManager testling = getTestling();
 
@@ -305,11 +462,11 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 1 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 2 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd080case1_scheduleRemoveThenReplace_secondRegionFullyEnclosesMultiplePreviousRegions_invalidatesAllPreviousActions() {
+   public void dd082case2_scheduleRemoveThenReplace_secondRegionFullyEnclosesMultiplePreviousRegions_invalidatesAllPreviousActions() {
 
       MediumChangeManager testling = getTestling();
 
@@ -332,11 +489,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 2 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 3 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd080case2_scheduleRemoveThenRemove_firstRegionFullyEnclosesSecond_throwsException() {
+   public void dd082case3_scheduleRemoveThenRemove_firstRegionFullyEnclosesSecond_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -361,11 +518,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 2 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 3 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd080case2_scheduleRemoveThenReplace_firstRegionFullyEnclosesSecond_throwsException() {
+   public void dd082case3_scheduleRemoveThenReplace_firstRegionFullyEnclosesSecond_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -389,11 +546,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 3 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 4 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd080case3_scheduleRemoveThenRemove_secondRegionOverlapsFirstAtBack_throwsException() {
+   public void dd082case4_scheduleRemoveThenRemove_secondRegionOverlapsFirstAtBack_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -422,11 +579,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 3 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 4 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd080case3_scheduleRemoveThenReplace_secondRegionOverlapsFirstAtBack_throwsException() {
+   public void dd082case4_scheduleRemoveThenReplace_secondRegionOverlapsFirstAtBack_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -455,11 +612,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 4 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 5 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd080case4_scheduleRemoveThenRemove_secondRegionOverlapsFirstAtFront_throwsException() {
+   public void dd082case5_scheduleRemoveThenRemove_secondRegionOverlapsFirstAtFront_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -490,44 +647,13 @@ public class MediumChangeManagerTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 5 of design decision 081 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd080case5_scheduleRemoveThenInsert_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(1), 5);
-      MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
-      MediumRegion region2 = new MediumRegion(at(200), 100);
-      MediumRegion region3 = new MediumRegion(at(250), 5);
-      MediumRegion region4 = new MediumRegion(at(600), 100);
-      MediumRegion region5 = new MediumRegion(at(800), 5);
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region5, BUFFER_SIZE_5, 0));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 3, 4, 5 },
-         Arrays.asList());
-   }
-
-   /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 4 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 5 of design decision 082 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd080case4_scheduleRemoveThenReplace_secondRegionOverlapsFirstAtFront_throwsException() {
+   public void dd082case5_scheduleRemoveThenReplace_secondRegionOverlapsFirstAtFront_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -558,31 +684,34 @@ public class MediumChangeManagerTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
+    * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
+    * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 6 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
-    * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
+    * Checks case 1 of design decision 083 of "EasyTag_DesignConcept.pdf" for
+    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd080case6_scheduleRemoveThenRemove_noOverlaps_mediumActionsIteratedAsExpected() {
+   public void dd083case1_scheduleReplaceThenReplace_noOverlaps_iteratedInOffsetOrder() {
 
       MediumChangeManager testling = getTestling();
 
       // Regions are listed in order of scheduling
       MediumRegion region0 = new MediumRegion(at(11), 10);
       MediumRegion region1 = new MediumRegion(at(35), 5);
-      MediumRegion region2 = new MediumRegion(at(220), 10);
+      MediumRegion region2 = new MediumRegion(at(220), 5);
       MediumRegion region3 = new MediumRegion(at(0), 10);
       MediumRegion region4 = new MediumRegion(at(2000), 1110);
+      MediumRegion region5 = new MediumRegion(at(225), 10);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_20, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_40, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20, 0));
 
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3, 0, 1, 2, 4 },
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3, 0, 1, 2, 5, 4 },
          Arrays.asList());
    }
 
@@ -590,40 +719,38 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)},
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 6 of design decision 080 of "EasyTag_DesignConcept - Media.pdf" for
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
+    * Checks case 1 of design decision 083 of "EasyTag_DesignConcept.pdf" for
+    * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd080case6_scheduleRemoveThenReplace_noOverlaps_mediumActionsIteratedAsExpected() {
+   public void dd083case1_scheduleReplaceThenRemove_noOverlaps_iteratedInOffsetOrder() {
 
       MediumChangeManager testling = getTestling();
 
       // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(11), 10);
-      MediumRegion region1 = new MediumRegion(at(0), 10); // Only 10 bytes replaced
+      MediumRegion region0 = new MediumRegion(at(0), 10);
+      MediumRegion region1 = new MediumRegion(at(11), 10);
       MediumRegion region2 = new MediumRegion(at(100), 10);
-      MediumRegion region3 = new MediumRegion(at(90), 10); // 10 bytes to replace
+      MediumRegion region3 = new MediumRegion(at(110), 10);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         // But replacement region overlaps 30 Bytes at front
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         // 10 new bytes
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_A, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_40, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_A, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
 
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0, 3, 2 },
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 3 },
          Arrays.asList());
    }
 
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 1 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 2 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd081case1_scheduleReplaceThenReplace_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
+   public void dd083case2_scheduleReplaceThenReplace_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
 
       MediumChangeManager testling = getTestling();
 
@@ -658,11 +785,11 @@ public class MediumChangeManagerTest {
    /**
     * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 1 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 2 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd081case1_scheduleReplaceThenRemove_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
+   public void dd083case2_scheduleReplaceThenRemove_secondRegionFullyEnclosesFirst_invalidatesFirstAction() {
 
       MediumChangeManager testling = getTestling();
 
@@ -698,11 +825,11 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 2 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 3 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd081case2_scheduleReplaceThenReplace_firstRegionFullyEnclosesSecond_throwsException() {
+   public void dd083case3_scheduleReplaceThenReplace_firstRegionFullyEnclosesSecond_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -727,11 +854,11 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 2 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 3 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd081case2_scheduleReplaceThenRemove_firstRegionFullyEnclosesSecond_throwsException() {
+   public void dd083case3_scheduleReplaceThenRemove_firstRegionFullyEnclosesSecond_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -756,11 +883,11 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 3 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 4 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd081case3_scheduleReplaceThenRemove_secondRegionOverlapsFirstAtBack_throwsException() {
+   public void dd083case4_scheduleReplaceThenRemove_secondRegionOverlapsFirstAtBack_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -790,11 +917,11 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 3 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 4 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd081case3_scheduleReplaceThenReplace_secondRegionOverlapsFirstAtBack_throwsException() {
+   public void dd083case4_scheduleReplaceThenReplace_secondRegionOverlapsFirstAtBack_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -824,11 +951,11 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 4 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 5 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
     */
    @Test
-   public void dd081case4_scheduleReplaceThenRemove_secondRegionOverlapsFirstAtFront_throwsException() {
+   public void dd083case5_scheduleReplaceThenRemove_secondRegionOverlapsFirstAtFront_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -862,11 +989,11 @@ public class MediumChangeManagerTest {
     * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
     * {@link MediumChangeManager#iterator()}.
     *
-    * Checks case 4 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
+    * Checks case 5 of design decision 083 of "EasyTag_DesignConcept.pdf" for
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
     */
    @Test
-   public void dd081case4_scheduleReplaceThenReplace_secondRegionOverlapsFirstAtFront_throwsException() {
+   public void dd083case5_scheduleReplaceThenReplace_secondRegionOverlapsFirstAtFront_throwsException() {
 
       MediumChangeManager testling = getTestling();
 
@@ -893,134 +1020,6 @@ public class MediumChangeManagerTest {
          new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_20, 0));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0, 3 },
-         Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 5 of design decision 081 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd081case5_scheduleReplaceThenInsert_sameOfs_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(1), 5);
-      MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 6 of design decision 081 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd081case6_scheduleReplaceThenInsert_insertOfsBehindReplacementBytes_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(1), 5);
-      MediumRegion region1 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 0));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleInsert(MediumRegion, ByteBuffer)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 7 of design decision 081 of "EasyTag_DesignConcept - Media.pdf"
-    */
-   @Test
-   public void dd081case7_scheduleReplaceThenInsert_replacementBytesOverlapInsertOfs_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(1), 20);
-      MediumRegion region1 = new MediumRegion(at(10), BUFFER_SIZE_10_A.remaining());
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0));
-
-      checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0 }, Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and
-    * {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 8 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} as the second operation.
-    */
-   @Test
-   public void dd081case8_scheduleReplaceThenReplace_noOverlaps_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(11), 10);
-      MediumRegion region1 = new MediumRegion(at(35), 5);
-      MediumRegion region2 = new MediumRegion(at(220), 5);
-      MediumRegion region3 = new MediumRegion(at(0), 10);
-      MediumRegion region4 = new MediumRegion(at(2000), 1110);
-      MediumRegion region5 = new MediumRegion(at(225), 10);
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20, 0));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3, 0, 1, 2, 5, 4 },
-         Arrays.asList());
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#scheduleRemove(MediumRegion)},
-    * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
-    *
-    * Checks case 8 of design decision 081 of "EasyTag_DesignConcept - Media.pdf" for
-    * {@link MediumChangeManager#scheduleRemove(MediumRegion)} as the second operation.
-    */
-   @Test
-   public void dd081case8_scheduleReplaceThenRemove_noOverlaps_mediumActionsIteratedAsExpected() {
-
-      MediumChangeManager testling = getTestling();
-
-      // Regions are listed in order of scheduling
-      MediumRegion region0 = new MediumRegion(at(0), 10);
-      MediumRegion region1 = new MediumRegion(at(11), 10);
-      MediumRegion region2 = new MediumRegion(at(100), 10);
-      MediumRegion region3 = new MediumRegion(at(110), 10);
-
-      List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
-
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 3 },
          Arrays.asList());
    }
 

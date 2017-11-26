@@ -179,8 +179,8 @@ public class MediumAction {
     * It returns a negative integer for {@link MediumAction}s of types {@link MediumActionType#REMOVE} and
     * {@link MediumActionType#TRUNCATE}, which is the number of bytes removed or truncated, as well as for type
     * {@link MediumActionType#REPLACE}, if the number of replacement bytes is smaller than the number of replaced bytes.
-    * It returns 0 for any other {@link MediumActionType} and for the special case of a {@link MediumActionType#REPLACE}
-    * , if the number of replacement bytes equals the number of replaced bytes.
+    * It returns 0 for any other {@link MediumActionType} and for the special case of an overwriting
+    * {@link MediumActionType#REPLACE}, i.e. if the number of replacement bytes equals the number of replaced bytes.
     * 
     * @return the number of bytes by which the size of an external medium would increase or decrease if this
     *         {@link MediumAction} would be applied to the medium.
@@ -196,7 +196,7 @@ public class MediumAction {
          // a negative int will be returned.
          return getActionBytes().remaining() - getRegion().getSize();
       }
-   
+
       return 0;
    }
 
