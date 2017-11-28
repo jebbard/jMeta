@@ -241,30 +241,42 @@ No disadvantages known
 \subsubsection{Requirements for the Two-Stage Write Protocol }%
 \label{sec:AnforderungenandaszweistufigeSchreibprotokoll}%
 
-Which writing operations must be offered? One method write() \-- at the end it is the only really writing primitive of the Java File I/O \-- is not sufficient. How do you remove with this method? write() equals \textit{overwriting}, which is not convenient at all. \COMPmedia{} must offer a better API, taken some of the burdens of I/O from the user. Here, we only specify the necessary operations, without going into details with their  implementation - this will be done later.
+Which writing operations must be offered? One method write() \-- at the end it is the only really writing primitive of the Java File I/O \-- is not sufficient. How do you remove with this method? write() equals \textit{overwriting}, which means you have to do a lot of manual work to implement insertion, removal and replacement with this operation, it is not convenient at all. \COMPmedia{} must offer a better API, taken some of the burdens of I/O from the user. Here, we only specify the necessary operations, without going into details with their implementation - this will be done later.
 
 To develop a good design, however, you must first list down the user's requirements to \COMPmedia{}. This especially includes the requirements for a two-stage write protocol. Main users of the component is definitely the component \COMPdataPartManagement{}. It uses \COMPmedia{} to extract and write metadata from and into tags. Without going into the design details of \COMPdataPartManagement{}, here we nevertheless list detailed requirements that \COMPdataPartManagement{} has for \COMPmedia{} regarding two-stage writing, see table \hyperref[tab:AnfDBlocks]{\ref{tab:AnfDBlocks}}.
 
 \begin{landscape}
-\begin{longtable}{|p{0.07\linewidth}|p{0.44\linewidth}|p{0.44\linewidth}|}
-	\hline
-	\rowcolor[gray]{.9}\textbf{ID} & \textbf{Requirement} & \textbf{Motivation} \\
-	\endhead
-	\hline
-	\texttt{AMed01} & It must be possible to insert bytes & Formats such as ID3v2 can be dynamically extended and have a payload of flexible length. Before an already present data block, it must be possible to insert another one. There is especially a need for an insertion operation in the case when metadata with dynamic length need to be written at the beginning of a file. \\
-	\hline
-	\texttt{AMed02} & It must be possible to remove bytes & With the same motivation as for insertion. It must be especially possible to remove entire metadata tags. \\
-	\hline
-	\texttt{AMed03} & It must be possible to replace bytes and not only overwrite, but also grow or shrink an existing byte area with replacement bytes & In metadata formats, there are both static fields with fixed length as well as dynamic fields such as null-terminated strings. If bytes are already present, it must be possible to overwrite them to save costly remove and insert operations. The growing and shrinking is especially useful and represents a higher level of abstration. If this would not be possible, replacing a previous small string value by a new longer or shorte one would need to be implemented with two operations (overwrite and insert or remove, respectively). \\
-	\hline
-	\texttt{AMed04} & Inserted data (Anforderung \texttt{AMed01}) must be changeable before a \texttt{flush} e.g. by extending, overwriting or removing of child fields inside the inserted data block & Based on the two-stage write protocol, an arbitrary number of writing changes can be made before a \texttt{flush}, and these might correct each other. E.g. a new ID3v2 tag footer is inserted, that stores the length of the tag. Assume that after this, a new frame is inserted into the tag, before the flush. This requires the \texttt{size} field in the firstly inserted footer to be changed afterwards again, before the flush. \\
-	\hline
-	\texttt{AMed05} & Replaced data (Anforderung \texttt{AMed03}) must be changeable before a \texttt{flush} e.g. by extending, overwriting or removing of child fields inside the replaced data block & A prominent example is insertion of and step-by-step extension of a frame into an ID3v2 tag: For the first creation as well as each extension, the \texttt{size} field of the tag must be changed, which induces a replace operation each time. E.g. it is allowed that users first only create and insert the new frame, and then insert new child fields afterwards, step by step. \\
-	\hline
-	\texttt{AMed06} & The padding feature of several data formats should be used by \LibName{} & Formats such as ID3v2 allow padding, i.e. using an overwrite buffer are to avoid newly writing the whole file. \LibName{} must use this feature when writing data, such that e.g. an insert only affects the file content until the padding area, effectively decreasing the padding, while a remove increases the padding, but the overall tag size remains the same. It is rather an indirect requirement which needs not necessarily be implemented by \COMPmedia{} only. \\
-	\hline
-	\texttt{AMed07} & The operations replace, remove and insert must be undoable before a \texttt{flush} & This allows to avoid unnecessary accesses to the medium and to undo mistakes by end users. \\
-	\hline
+\begin{longtable}{|p{0.07\linewidth}|p{0.34\linewidth}|p{0.54\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{ID} & \textbf{Requirement} & \textbf{Motivation} \\
+\endhead
+\hline
+\texttt{AMed01} & It must be possible to insert bytes & Formats such as ID3v2 can be dynamically extended and have a payload of flexible length. Before an already present data block, it must be possible to insert another one. There is especially a need for an insertion operation in the case when metadata with dynamic length need to be written at the beginning of a file. \\
+\hline
+\texttt{AMed02} & It must be possible to remove bytes & With the same motivation as for insertion. It must be especially possible to remove entire metadata tags. \\
+\hline
+\texttt{AMed03} & It must be possible to replace bytes and not only overwrite, but also grow or shrink an existing byte area with replacement bytes & In metadata formats, there are both static fields with fixed length as well as dynamic fields such as null-terminated strings. If bytes are already present, it must be possible to overwrite them to save costly remove and insert operations. The growing and shrinking is especially useful and represents a higher level of abstration. If this would not be possible, replacing a previous small string value by a new longer or shorte one would need to be implemented with two operations (overwrite and insert or remove, respectively). \\
+\hline
+\texttt{AMed04} & Inserted data (requirement \texttt{AMed01}) must be changeable before a \texttt{flush} e.g. by extending, overwriting or removing of child fields inside the inserted data block & Based on the two-stage write protocol, an arbitrary number of writing changes can be made before a \texttt{flush}, and these might correct each other. E.g. a new ID3v2 tag footer is inserted, that stores the length of the tag. Assume that after this, a new frame is inserted into the tag, before the flush. This requires the \texttt{size} field in the firstly inserted footer to be changed afterwards again, before the flush. \\
+\hline
+\texttt{AMed05} & Replaced data (requirement \texttt{AMed03}) must be changeable before a \texttt{flush} e.g. by extending, overwriting or removing of child fields inside the replaced data block & A prominent example is insertion of and step-by-step extension of a frame into an ID3v2 tag: For the first creation as well as each extension, the \texttt{size} field of the tag must be changed, which induces a replace operation each time. E.g. it is allowed that users first only create and insert the new frame, and then insert new child fields afterwards, step by step. \\
+\hline
+\texttt{AMed06} & The padding feature of several data formats should be used by \LibName{} & Formats such as ID3v2 allow padding, i.e. using an overwrite buffer are to avoid newly writing the whole file. \LibName{} must use this feature when writing data, such that e.g. an insert only affects the file content until the padding area, effectively decreasing the padding, while a remove increases the padding, but the overall tag size remains the same. It is rather an indirect requirement which needs not necessarily be implemented by \COMPmedia{} only. \\
+\hline
+\texttt{AMed07} & The operations replace, remove and insert must be undoable before a \texttt{flush} & This allows to avoid unnecessary accesses to the medium and to undo mistakes by end users. \\
+\hline
+\texttt{AMed08} & It must be possible to insert multiple consecutive blocks of data & E.g. you want to add an APEv2 tag first, then an ID3v2.3 tag and then an ID3v1 tag. \\
+\hline
+\texttt{AMed09} & It must be possible to insert a block of data before an existing block, then replace or remove this existing block with something else; the same must be possible for first remove or replace, then insert (i.e., the inverse order) & E.g. you want to add an APEv2 tag first, then replace the follow-up, already existing ID3v1 tag with some different content. \\
+\hline
+\texttt{AMed10} & It must be possible to modify (remove, insert, replace) a block of data, then remove an  enclosing block of data & E.g. the code flow first decides it is necessary to add a new frame to an existing ID3v2.3 tag, modify some of its frames, remove another one; but then due to some decision in the code, it becomes necessary to remove the entire tag. \\
+\hline
+\texttt{AMed11} & It must be possible to modify (remove, insert, replace) a block of data, then replace an  enclosing block of data & E.g. the code flow first decides it is necessary to add a new frame to an existing ID3v2.3 tag, modify some of its frames, remove another one; but then due to some decision in the code, it becomes necessary to replace the entire tag with different content. \\
+\hline
+\texttt{AMed12} & Except \texttt{AMed10}, \COMPmedia{} does not need to support overlapping removes or replaces & Data blocks are never overlapping, except \texttt{AMed10}, there is no such case that you remove a block, then remove an overlapping portion of it. \\
+\hline
+\texttt{AMed13} & \COMPmedia{} does not need to support modifications (remove, insert, replace) within an already removed or replaced block of data & It is not clear how to treat changes in an already removed or replaced parent object consistently, so we just reject them. \\
+\hline
 \caption{Requirements for the two-stage write protocol by \COMPdataPartManagement{}}
 \label{tab:AnfDBlocks}
 \end{longtable}
@@ -282,17 +294,16 @@ The user can:
 \begin{itemize}
 \item \emph{insert} $N$ bytes at a given offset (adresses requirement \texttt{AMed01})
 \item \emph{remove} $N$ bytes at a given offset (adresses requirement \texttt{AMed02})
-\item \emph{replace} $N$ bytes at a given offset by $M$ new bytes (adresses requirement \texttt{AMed03}). Thus, replace has two flavors:
+\item \emph{replace} $N$ bytes at a given offset by $M$ new bytes (adresses requirement \texttt{AMed03}). Thus, replace has three flavors:
 \begin{enumerate}
 \item replace $N$ bytes by $M>N$ new bytes actually behaves like an insertion, replacing the first $N$ bytes with new ones, and inserting additional $M-N$ bytes behind. We call it an \emph{inserting replace}.
 \item replace $N$ bytes by $M<N$ new bytes actually behaves like a removal, replacing the first $M$ bytes with new ones, and removing additional $N-M$ existing bytes behind. We call it a \emph{removing replace}.
+\item replace $N$ bytes by $M=N$ new bytes actually behaves like a usual write. We call it an \emph{overwriting replace}.
 \end{enumerate}
 \end{itemize}
 }
 {% Begründung
-These are operations, that are in principle already necessary for a metadata library: \texttt{replace} is needed for formats with static length (such as ID3v1) and those allowing a padding mechanism or similar (such as ID3v2). For dynamically extensible formats such as ID3v2, additional possibilities to \texttt{insert} and \texttt{remove} data blocks are necessary. A dynamic replacement (replace $N$ bytes by $M=N$ or $M\neq N$ bytes) is necessary to easily change fields with dynamic lengths, without the need to inconveniently call several different operations (e.g. first \texttt{replace}, then \texttt{remove} when decreasing the length of a string by setting a new value).
-
-The burden to implemen these convenient operations using the Java File I/O, which essentially only offers write() and truncate(), is taken over by \COMPmedia{}, such that the user need not care.
+See requirements \texttt{AMed01}, \texttt{AMed02} and \texttt{AMed03}. The burden to implemen these convenient operations using the Java File I/O, which essentially only offers write() and truncate(), is taken over by \COMPmedia{}, such that the user need not care.
 }
 {% Nachteile
 No disadvantages known
@@ -320,7 +331,6 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-
 As we have a two-stage write protocol, the \emph{undo} of not yet flushed changes is possible, and according to the requirements also necessary.
 
 %%%% DD --> %%%%
@@ -339,7 +349,7 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-This leaves open \texttt{AMed04} and \texttt{AMed05} which we will adress later when discussing the details of the two-stage write protocol.
+This leaves open \texttt{AMed04} and \texttt{AMed05} as well as \texttt{AMed08} to \texttt{AMed13} which we will adress later when discussing the details of the two-stage write protocol.
 
 %-----------------------------------------------------------------------------------------------
 
@@ -994,12 +1004,12 @@ No disadvantages known
 
 %-----------------------------------------------------------------------------------------------
 
-\subsubsection{Semantic of Writing Operations}
+\subsubsection{Semantics of Writing Operations}
 \label{sec:SemantikSchreib}
 
 In \DesLink{dd:410d}, we have defined the primitive writing operations \emph{insert}, \emph{replace} and \emph{remove} that are essential for \COMPmedia{}. In the same section, we have listed basic requirements for writing that lead to these operations. The API of \COMPmedia{} includes their guaranteed behavior. It is very important to define interrelations between these operations, especially how they behave for overlapping offset areas of the medium. These things are defined by the following design decisions. The behaviors are part of the API contract and must be documented as such for the API users.
 
-We start with the operation \emph{insert}:
+We start with how multiple \emph{insert} operations behave:
 
 %%%% DD --> %%%%
 \DD{dd:422}
@@ -1008,81 +1018,93 @@ We start with the operation \emph{insert}:
 }
 {% Kurzbeschreibung
 \begin{enumerate}
-\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{insert} at different offset: Do not influence each other
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{insert} at different offset:  Both calls are allowed, they do not influence each other.
 \item Step 1: \emph{insert}, Step 2: \emph{insert} at the same offset: \emph{insert} concats, each call with the same offset determines a new, consecutive insertion, i.e. insertions at the same medium location are done with increasing offsets. Let ``Call 1'' be the earlier call with insertion length $n_1$, ``Call 2'' the later call at $x$ with insertion length $n_2$. The end result on the medium after \emph{flush} is:
 \begin{itemize}
 \item At offset $x$, the insertion data of ``Call 1'' is located
-\item At offset $x+n_2$, the insertion data of ``Call 2'' is located
+\item At offset $x+n_2$, the insertion data of ``Call 2'' is located.
 \end{itemize}
 \end{enumerate}
 }
 {% Begründung
+\begin{enumerate}
+\item See requirement \texttt{AMed01}
+\item See requirement \texttt{AMed08}
+\end{enumerate}
+
 You could alternatively interpret ``insert'' as such that the second call inserts data \emph{before} the previous earlier one. However, the design decision says that ``insert'' inserts before the currently persisted medium byte at the insertion offset. Concatenating allows user code to linearly insert stuff with increasing offsets, which is in most cases the convenient and expected behavior.
 }
 {% Nachteile
-You could alternatively interpret ``insert'' as such that the second call inserts data \emph{before} the previous earlier one, which might lead to surprises in a few use scenarios.
+The second possible interpretation sketched above might lead to surprises in a few use scenarios.
 }
 %%%% <-- DD %%%%
+
+We now look at how \emph{insert} and \emph{remove} interact with each other:
 
 %%%% DD --> %%%%
 \DD{dd:422b}
 {% Titel
-\emph{insert} and \emph{remove} do not interact with each other in any way
+\emph{insert} is revoked by overlapping \emph{remove}s, \emph{insert}s within already removed regions are not allowed
 }
 {% Kurzbeschreibung
 The following cases can be identified:
 \begin{enumerate}
-\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} at same offset: Do not influence each other
-\item Step 1: \emph{remove} at offset $x$, Step 2: \emph{insert} at same offset: Do not influence each other
-\item Step 1: \emph{remove} $n=10$ bytes at offset $x$, Step 2: \emph{insert} at offset $x+5$: Do not influence each other
-\item Step 1: \emph{insert} at offset $x+5$, Step 2: \emph{remove} $n=10$ bytes at offset $x$: Do not influence each other
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} $n$ bytes at offset $y$, where $x$ is not located within the removed range $[y,y+n)$: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{remove} $n$ bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is not located within the removed range $[y,y+n)$: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} at same offset: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{remove} at offset $x$, Step 2: \emph{insert} at same offset: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} $n$ bytes at offset $y$, where $x$ is contained in the removed range $[y,y+n)$: The insert is revoked by the remove, i.e. will not be executed during a \emph{flush}.
+\item Step 1: \emph{remove} $n$ bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is contained in the removed range $[y,y+n)$: The second call is rejected with an exception, as it is pointing into an already removed region.
 \end{enumerate}
-Thus, \emph{insert} and \emph{remove} do not at all influence each other, no matter in which order the calls are done and if their offsets or ranges overlap or not. Thus, especially, it is not possible to \emph{remove} content that was earlier inserted.
 }
 {% Begründung
-The formal reason is based on \DesLink{dd:421}. As \emph{remove} never can refer to offsets that are not yet persisted on the medium, it cannot refer to data pending to be inserted. So how can we interpret the overlap case? If you remove a range on the external medium, and (afterwards or before) insert new bytes in the middle of the range, this means: The inserted bytes will be inserted after the first byte located before the beginning of the removed range. You can imagine the inserted bytes ``falling'' back to the offset where the removal starts.
+\begin{enumerate}
+\item See requirement \texttt{AMed01} and \texttt{AMed02}
+\item See requirement \texttt{AMed01} and \texttt{AMed02}
+\item See requirement \texttt{AMed09}
+\item See requirement \texttt{AMed09}
+\item See requirement \texttt{AMed10}
+\item See requirement \texttt{AMed13}
+\end{enumerate}
 }
 {% Nachteile
 Then, how to implement write requirement \texttt{AMed04}? See \DesLink{dd:422c}.
 }
 %%%% <-- DD %%%%
 
-Now we are left with clarifying how \emph{insert} interacts with \emph{replace}.
+Now we are left with clarifying how \emph{insert} and \emph{replace} interact with each other. This is essentially the same as between \emph{insert} and \emph{remove}:
 
 %%%% DD --> %%%%
 \DD{dd:422d}
 {% Titel
-\emph{insert}s within a replaced range are forbidden, \emph{insert}s within a range practically removed by a replace action are still allowed
+\emph{insert} is revoked by overlapping \emph{replace}s, \emph{insert}s within already replaced regions are not allowed
 }
 {% Kurzbeschreibung
-First of all, it is clear that if the insertion offset is completely outside of the replaced range and the range of the replacement bytes, there are no interactions. Now we have to consider the following special cases:
+The following cases can be identified:
 \begin{enumerate}
-\item Step 1: \emph{insert} $n_{1}$ bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $n_{2}$ new bytes at same offset: This must behave the same way as multiple inserts, actually concatenating the data in call order. The final result after flush: 
-\begin{itemize}
-\item At offset $x$, the insertion data of the first operation (insert)
-\item At offset $x+n_{1}$, the replacement data of the second operation (replace)
-\end{itemize}
-\item Step 1: \emph{replace} $m$ bytes by $n_{1}$ new bytes at offset $x$, Step 2: \emph{insert} $n_{2}$ new bytes at same offset: Like in the previous case, the final result after flush is: 
-\begin{itemize}
-\item At offset $x$, the replacement data of the first operation (replace)
-\item At offset $x+n_{2}$, the inserted data of the second operation (insert)
-\end{itemize}
-\item Step 1: \emph{replace} $m$ bytes by $n_{1}<m$ new bytes at offset $x$, Step 2: \emph{insert} new bytes at offset $x+n_{1}+1$: For a removing \emph{replace}, it is allowed to insert new bytes in the removed range
-\item Step 1: \emph{insert} new bytes at offset $x+n_{1}+1$, Step 2: \emph{replace} $m$ bytes by $n_{1}<m$ new bytes at offset $x$: For a removing \emph{replace}, it is allowed to insert new bytes in the removed range
-\item Step 1: \emph{insert} at offset $x+5$, Step 2: \emph{replace} of $n=10$ bytes at offset $x$, especially for inserting replaces: Is not allowed and leads to a runtime exception
-\item Step 1: \emph{replace} $n=10$ bytes at offset $x$, Step 2: \emph{insert} at offset $x+5$: Same as previous case
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, where $x$ is not located within the replaced range $[y,y+n)$: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is not located within the replaced range $[y,y+n)$: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} at same offset: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{replace} at offset $x$, Step 2: \emph{insert} at same offset: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, where $x$ is contained in the replaced range $[y,y+n)$: The insert is revoked by the replace, i.e. will not be executed during a \emph{flush}.
+\item Step 1: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is contained in the replaced range $[y,y+n)$: The second call is rejected with an exception, as it is pointing into an already replaced region.
 \end{enumerate}
 }
 {% Begründung
-For (1) and (2): This way, the user can do replacements and insertion as if linearly adding stuff to e.g. a tag. E.g. he can first replace the content of an existing field, then insert a new field, or the other way round. The result will reflect the order of invocations.
-For (3) and (4): This is the same interaction as between insert and remove.
-For (5) and (6): How to make sense of ``insert bytes in the middle of a range that has to be replaced with new bytes''? Of course we could say, exactly this is what happens. But it turned out that complex logic is necessary to mix insertion bytes into replacement bytes. The user can achieve the same by simply including the insertion bytes in the replacement bytes starting at offset $x+5$.
+\begin{enumerate}
+\item See requirement \texttt{AMed01} and \texttt{AMed03}
+\item See requirement \texttt{AMed01} and \texttt{AMed03}
+\item See requirement \texttt{AMed09}
+\item See requirement \texttt{AMed09}
+\item See requirement \texttt{AMed11}
+\item See requirement \texttt{AMed13}
+\end{enumerate}
 }
 {% Nachteile
-For (5) and (6): This does not make things possible like: The user first replaces a range of bytes, then wants to additionally insert something within the block of replacement bytes. Or the user inserts a new child field  into a parent tag, and then replaces the entire tag by something else.
+Then, how to implement write requirement \texttt{AMed05}? See \DesLink{dd:422c}.
 }
 
-Saying all this, it is not possible to implement \texttt{AMed04} (``it is possible to change or remove parts of an already done insertion before a flush'') and  \texttt{AMed05} (``it is possible to change or remove parts of an already done replacement before a flush'') by using subsequent inserts, removes and replaces. Then how is this requirement met? An example of this case is: We insert a new ID3v2 tag which already lead to scheduling an \emph{insert} with the corresponding bytes. Then afterwards and before a flush, the using code needs to change some flag values in the header of the ID3v2 tag. This must also change the inserted bytes of course. Here is how this could be done:
+Saying all this, it is not possible to implement \texttt{AMed04} (``it is possible to change or remove parts of an already done insertion before a flush'') and  \texttt{AMed05} (``it is possible to change or remove parts of an already done replacement before a flush'') by using subsequent inserts, removes and replaces to modify an already inserted or replaced block of data before a flush. This is of cause already clear when looking at \DesLink{dd:421}: Offets of these operations always only refer to currently persisted data, so you e.g. cannot change a prior insert not yet flushed with a remove. Then how are these requirements met? Here is how it could be done:
 
 %%%% DD --> %%%%
 \DD{dd:422c}
@@ -1090,16 +1112,16 @@ Saying all this, it is not possible to implement \texttt{AMed04} (``it is possib
 Meeting requirements \texttt{AMed04} and  \texttt{AMed05} is done outside of \COMPmedia{}, yet using its \emph{undo} feature
 }
 {% Kurzbeschreibung
-\texttt{AMed04} can only be met outside \COMPmedia{}. Using code must detect that a parent of the changed field was already scheduled for insertion or replacment. If that is the case, they have to ``re-compute'' the overall insertion or replacment bytes, undo the previous insertion or replacement using \COMPmedia{} and finally schedule a new insertion or replacement containing the changed bytes.
+\texttt{AMed04} and \texttt{AMed05} can only be met outside \COMPmedia{}. Using code must detect that a parent of the changed field was already scheduled for insertion or replacement. If that is the case, they have to ``re-compute'' the overall insertion or replacment bytes, undo the previous insertion or replacement using \COMPmedia{} and finally schedule a new insertion or replacement containing the changed bytes. Alternatively, the implementation using \COMPmedia{} might freeze a data block for change once its scheduled for insertion or replacement and throws an exception if someone tries to modify it afterwards. The details of this are defined in the design of \COMPdataPartManagement{}.
 }
 {% Begründung
-\COMPmedia{} could somehow support here by offering modification functions for already done \emph{insert}s or \emph{replace}s. However, this would also at least require the using code to detect the change in a parent, and also recompute. It would make the API of \MediumAction{} more complex and it would refuse to be a mostly constant class. Using \emph{undo}, the using code has just slightly more work to do.
+\COMPmedia{} could somehow support here by offering modification functions for already done \emph{insert}s or \emph{replace}s. However, this would also at least require the using code to detect the change in a parent, and also recompute. It would make the API more complex. Using \emph{undo}, the using code has just slightly more work to do.
 }
 {% Nachteile
 No disadvantages known
 }
 
-We already clarified how insert interacts with remove and replace, in any other. We are now only left to clarify how multiple removes and replaces interact with each other. The operation \emph{remove} behaves as follows:
+We already clarified how insert interacts with insert, remove and replace, in any order. We are now only left to clarify how multiple removes and replaces interact with each other. Multiple \emph{remove}s interact with each other as follows:
 
 %%%% DD --> %%%%
 \DD{dd:424}
@@ -1107,17 +1129,52 @@ We already clarified how insert interacts with remove and replace, in any other.
 \emph{remove} allows no overlaps by other \emph{remove}s, only later calls with bigger region make earlier calls obsolete
 }
 {% Kurzbeschreibung
-The following temporal order of calls have the described semantics:
+The following cases can be identified:
 \begin{enumerate}
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} at offset $y$ without any overlaps to $[x,x+n)$: Do not influence each other.
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m\geq n$ bytes at offset $y\leq x$ with $y+m\geq x+n$: If a call to \emph{remove} or \emph{replace} fully encloses the removed range of a previous \emph{remove} call, such a previous call is considered obsolete and is not processed during a \emph{flush}.
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m$ bytes at offset $y\in (x,x+n)$ with $y+m<x+n$: The first call fully contains the region of the second call. The second call is invalid and rejected with an exception.
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m$ bytes at offset $y\in (x,x+n)$ with $y+m\geq x+n$: The second call is an overlapping call, that probably removes additional bytes behind the first remove call, but still includes the end of the first call. The second call is invalid and rejected with an exception.
-\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} or \emph{replace} $m$ bytes at offset $y \leq x$ with $y+m<x+n$: In this case there is an overlap from the start. The second call is invalid and rejected with an exception.
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} $m$ bytes at offset $y$ without any overlaps to $[x,x+n)$: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} $m\geq n$ bytes at offset $y\leq x$ with $[x,x+n)\subseteq [y,y+m)$: The second call to \emph{remove} fully encloses the removed range of the previous \emph{remove} call, so the previous call is revoked, i.e. it will not be executed during a \emph{flush}.
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} $m$ bytes at offset $y$ with $[y,y+m)\subseteq [x,x+m)$: The second region to be removed is fully contained in the region already removed by the previous call. The second call is rejected with an exception.
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} $m$ bytes at offset $y\in (x,x+n)$ with $y+m>x+n$: The second call is an overlapping call, that removes additional bytes behind the first remove call, but still includes some bytes of the region removed with the first call. The second call is rejected with an exception.
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} $m$ bytes at offset $y<x$ with $y>x, y+m<x+n$: The second call is an overlapping call, that removes additional bytes before the first remove call, but still includes some bytes of the region removed with the first call. The second call is rejected with an exception.
 \end{enumerate}
 }
 {% Begründung
-There are no accidental multiple removals or replaces. For (2): It may happen that the user first removes a chield field, and additionally still before the flush \texttt{flush}, he removes the parent block. For (3) to (5): Would we allow the second calls, we would need to change the remove areas of the first calls. This leads to a more complex logic, that is not necessary according to the requirements stated in \SectionLink{sec:AnforderungenandaszweistufigeSchreibprotokoll}. A very important reason to not allow this is implementation of \texttt{undo}: Would we allow later changes of already made calls, then \texttt{undo} would be quite complex, because it would need to also undo such changes to removed or replaced regions, what basically means keeping a history of all changes made for the same region.
+\begin{enumerate}
+\item See requirement \texttt{AMed02}
+\item See requirement \texttt{AMed10}
+\item See requirement \texttt{AMed13}
+\item See requirement \texttt{AMed12}
+\item See requirement \texttt{AMed12}
+\end{enumerate}
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Interactions between \emph{remove} and \emph{replace} are identical to this, as defined in the following design decision:
+%%%% DD --> %%%%
+\DD{dd:424bb}
+{% Titel
+\emph{remove} allows no overlaps by \emph{replace}s, only later calls with bigger region make earlier calls obsolete
+}
+{% Kurzbeschreibung
+The following cases can be identified:
+\begin{enumerate}
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r$ new bytes at offset $y$ without any overlaps to $[x,x+n)$: Both calls are allowed, they do not influence each other.
+\item Previous case, exchange order of \emph{remove} and \emph{replace}: Same result
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{replace} $m\geq n$ bytes by $r$ new bytes at offset $y\leq x$ with $[x,x+n)\subseteq [y,y+m)$: The replaced region of \emph{replace} fully encloses the removed range of the previous \emph{remove} call, so the previous call is revoked, i.e. it will not be executed during a \emph{flush}.
+\item Previous case, exchange order of \emph{remove} and \emph{replace}: Same result
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r$ new bytes at offset $y$ with $[y,y+m)\subseteq [x,x+m)$: The second region to be replaced is fully contained in the region already removed by the previous call. The second call is rejected with an exception.
+\item Previous case, exchange order of \emph{remove} and \emph{replace}: Same result
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r$ new bytes at offset $y\in (x,x+n)$ with $y+m>x+n$: The second call is an overlapping call, that replaces additional bytes behind the first remove call, but still includes some bytes of the region removed with the first call. The second call is rejected with an exception.
+\item Previous case, exchange order of \emph{remove} and \emph{replace}: Same result
+\item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r$ new bytes at offset $y<x$ with $y>x, y+m<x+n$: The second call is an overlapping call, that replaces additional bytes before the first remove call, but still includes some bytes of the region removed with the first call. The second call is rejected with an exception.
+\item Previous case, exchange order of \emph{remove} and \emph{replace}: Same result
+\end{enumerate}
+}
+{% Begründung
+For (1.) and (2.): See requirement \texttt{AMed02} and \texttt{AMed03}. For (3.): See requirement \texttt{AMed11}; For (4.): See requirement \texttt{AMed10}. For (5.) and (6.): See requirement \texttt{AMed13}. For (7.) to (10.): See requirement \texttt{AMed12}.
 }
 {% Nachteile
 No disadvantages known
@@ -1129,13 +1186,26 @@ Now we are just left to clarify how multiple \emph{replace} operations interact 
 %%%% DD --> %%%%
 \DD{dd:424a}
 {% Titel
-\emph{replace} does not allow overlaps, only later calls with bigger regions make earlier calls obsolete
+\emph{replace} allows no overlaps by other \emph{replace}s, only later calls with bigger region make earlier calls obsolete
 }
 {% Kurzbeschreibung
-The behaviour of \emph{replace} matches the behavior of \emph{remove} in terms of earlier calls. That means: If the replacement region of a \emph{replace} fully contains the replacement region of a previous call to \emph{replace}, this previous call is considered obsolete and not executed during \emph{flush}. Second, if the replacement region of a call is fully contained in the replacement region of a previous call, this is rejected with an exception. Third, whenever the replacement region of a call overlaps the replacement region of any previous call to \emph{replace} at front or back, the new call is rejected with an exception.
+The following cases can be identified:
+\begin{enumerate}
+\item Step 1: \emph{replace} $n$ bytes by $r_{1}$ new bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r_{2}$ new bytes at offset $y$ without any overlaps to $[x,x+n)$: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{replace} $n$ bytes by $r_{1}$ new bytes at offset $x$, Step 2: \emph{replace} $m\geq n$ bytes by $r_{2}$ new bytes at offset $y\leq x$ with $[x,x+n)\subseteq [y,y+m)$: The second call to \emph{replace} fully encloses the replaced range of the previous \emph{replace} call, so the previous call is revoked, i.e. it will not be executed during a \emph{flush}.
+\item Step 1: \emph{replace} $n$ bytes by $r_{1}$ new bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r_{2}$ new bytes at offset $y$ with $[y,y+m)\subseteq [x,x+m)$: The second region to be replaced is fully contained in the region already replaced by the previous call. The second call is rejected with an exception.
+\item Step 1: \emph{replace} $n$ bytes by $r_{1}$ new bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r_{2}$ new bytes at offset $y\in (x,x+n)$ with $y+m>x+n$: The second call is an overlapping call, that replaces additional bytes behind the first replace call, but still includes some bytes of the region replaced with the first call. The second call is rejected with an exception.
+\item Step 1: \emph{replace} $n$ bytes by $r_{1}$ new bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r_{2}$ new bytes at offset $y<x$ with $y>x, y+m<x+n$: The second call is an overlapping call, that replaces additional bytes before the first replace call, but still includes some bytes of the region replaced with the first call. The second call is rejected with an exception.
+\end{enumerate}
 }
 {% Begründung
-See \DesLink{dd:424}
+\begin{enumerate}
+\item See requirement \texttt{AMed02}
+\item See requirement \texttt{AMed11}
+\item See requirement \texttt{AMed13}
+\item See requirement \texttt{AMed12}
+\item See requirement \texttt{AMed12}
+\end{enumerate}
 }
 {% Nachteile
 No disadvantages known
@@ -1157,7 +1227,7 @@ This class contains following data:
 \item \IMediumReference{} of the action; \textbf{Motivation:} It must be clear where the change happened or must happen
 \item Data of the action (length or bytes to write); \textbf{Motivation:} It must be clear what needs to be changed.
 \item Number of actually affected medium bytes (0 for \emph{insert}, number of bytes to remove for \emph{remove}, number of bytes to replace for \emph{replace}; \textbf{Motivation:} For \texttt{replace} only one length is not enough as the number of bytes to replace may be different from the length of the replacement bytes.
-\item Validty: Handle is already persisted by a \emph{flush} or still pending; \textbf{Motivation:} Thus it can be clearly state from outside whether the data must still be persisted and thus must be taken from the instance of the user requires to read them, or the data has already been written to the external medium.
+\item Validity: Handle is already persisted by a \emph{flush} or still pending; \textbf{Motivation:} Thus it can be clearly state from outside whether the data must still be persisted and thus must be taken from the instance of the user requires to read them, or the data has already been written to the external medium.
 \end{itemize}
 }
 {% Begründung
@@ -1222,38 +1292,38 @@ No disadvantages known
 \small
 \begin{landscape}
 \begin{longtable}{|p{0.2\linewidth}|p{0.25\linewidth}|p{0.25\linewidth}|p{0.25\linewidth}|}
-	\hline
-	\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} & \textbf{Features and motivation random-access} & \textbf{Features and motivation \texttt{InputStream}} \\
-	\endhead
-	\hline
-	\texttt{cache(x, n)} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. If caching is disabled (specifically for byte array media, see \DesLink{dd:412a}), this call is ignored. The method might reach the end of medium which it signals as an exception. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is bigger than the last read end position, the bytes up to the new offset are read and possibly cached. If $x$ is smaller instead, a \texttt{InvalidMediumReferenceException} is thrown. The last read end position is advanced correspondingly. \\
-	\hline
-	\texttt{getCachedByteCountAt(x)} & According to \DesLink{dd:409} and \DesLink{dd:412b}, it provides the number of bytes that are consecutively cached at offset $x$. & See \texttt{cache}. User (and test) code must be able to additionally check whether enough data is already buffered or not. & See random-access.\\
-	\hline
-	\texttt{getMedium()} & Returns the \IMedium{} instance this \IMediumStore{} is associated with. &  & \\
-	\hline
-    	\texttt{getData(x, n)} & Reads $n$ bytes at offset $x$ according to \DesLink{dd:410c}, \DesLink{dd:412c}, \DesLink{dd:412d}. & Calls \texttt{cache} to ensure all bytes are cached, then returns the data in a consolidated \texttt{ByteBuffer}. & Same as for random-access media. This indicates that this method also might throw an \texttt{InvalidMediumReferenceException}. \\
-	\hline
-	\texttt{isAtEndOfMedium(x)} & Checks if offset $x$ is at the end of the \TERMmedium{}. & Based on this knowledge, the user code can skip further reading and does not need to check for exceptions. & The provided offset is ignored, it is tried to read bytes from current offset. Is this resulting in return code -1, we are at the end of the stream, otherwise the byte is added to the cache. \\
-	\hline
-	\texttt{insertData(x, data)} & Implements the writing operation \emph{insert} according to \DesLink{dd:410}, \DesLink{dd:410d} and  \DesLink{dd:422}: Adds data at the given offset $x$, consecutive bytes are shifted ``to the back'', the changes first get written only with \texttt{flush()}. & The insertion of new metadata is a common case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
-	\hline
-	\texttt{removeData(x, n)} & Implements the writing operation \emph{remove} according to \DesLink{dd:410}, \DesLink{dd:410d} and \DesLink{dd:424}: Removes $n$ bytes at offset $x$. Consecutive bytes are shifted ``to front'', the changes first get written only with \texttt{flush()} & Removing existing metadata is a standard case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
-	\hline
-	\texttt{replaceData(x, n, data)} & Implements the writing operation \emph{replace} according to \DesLink{dd:410}, \DesLink{dd:410d} and  \DesLink{dd:422}: Replaces $n$ bytes at offset $x$ with new bytes of length $m$. The changes first get written only with \texttt{flush()} & It often happens that \--- instead of entirely removing or newly inserting data \--- existing data must be overwritten. This is - especially at the beginning of a file - a much more efficient operation than insertion and deletion and must thus directly be supported. & \texttt{ReadOnlyMediumException}\\
-	\hline
-	\texttt{flush()} & Implements the writing operation \emph{flush} according to \DesLink{dd:410}: All \emph{changed} data currently in the temporary buffer are written in a suitable way to the external medium. It cannot be guaranteed that this operation is atomic. & This is a practical implementation of \DesLink{dd:410}: While \texttt{insertData()}, \texttt{removeData()} and \texttt{replaceData()} only write into a temporary buffer, this call directly writes to the external medium. & \texttt{ReadOnlyMediumException} \\
-	\hline
-	\texttt{createMediumReference(x)} & Creates a new \IMediumReference{} instance for the given offset $x$ according to \DesLink{dd:419} & Is needed for random-access & Is needed for \texttt{InputStream}s \\
-	\hline
-	\texttt{undo(mediumAction)} & Undoes the changes of the given \MediumAction{} according to \DesLink{dd:420}, as far as it is still pending. & Is needed for random-access & \texttt{InvalidMediumActionException} \\
-	\hline
-	\texttt{open()} & Opens access to the medium & Explicit open instead of constructor better for testing & Explicit open instead of constructor better for testing \\
-	\hline
-	\texttt{close()} & Closes all internal resources according to \DesLink{dd:419ac}, clears the complete cache contents and other internal data structures & See \DesLink{dd:419ac} & See \DesLink{dd:419ac} \\
-	\hline
-	\texttt{isClosed()} & Allows users to check if the medium is already closed and thus cannot be accessed anymore (returns true), or it is still accessible (returns false). & See \DesLink{dd:419ac} & See \DesLink{dd:419ac} \\
-	\hline
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} & \textbf{Features and motivation random-access} & \textbf{Features and motivation \texttt{InputStream}} \\
+\endhead
+\hline
+\texttt{cache(x, n)} & Buffers $n$ bytes according to \DesLink{dd:409} and \DesLink{dd:412b} permanently in the internal cache, starting at the given offset $x$. If caching is disabled (specifically for byte array media, see \DesLink{dd:412a}), this call is ignored. The method might reach the end of medium which it signals as an exception. & User code can prefetch data to work on it later, he himself gets the possibility to efficiently read and process data. & If $x$ is bigger than the last read end position, the bytes up to the new offset are read and possibly cached. If $x$ is smaller instead, a \texttt{InvalidMediumReferenceException} is thrown. The last read end position is advanced correspondingly. \\
+\hline
+\texttt{getCachedByteCountAt(x)} & According to \DesLink{dd:409} and \DesLink{dd:412b}, it provides the number of bytes that are consecutively cached at offset $x$. & See \texttt{cache}. User (and test) code must be able to additionally check whether enough data is already buffered or not. & See random-access.\\
+\hline
+\texttt{getMedium()} & Returns the \IMedium{} instance this \IMediumStore{} is associated with. &  & \\
+\hline
+\texttt{getData(x, n)} & Reads $n$ bytes at offset $x$ according to \DesLink{dd:410c}, \DesLink{dd:412c}, \DesLink{dd:412d}. & Calls \texttt{cache} to ensure all bytes are cached, then returns the data in a consolidated \texttt{ByteBuffer}. & Same as for random-access media. This indicates that this method also might throw an \texttt{InvalidMediumReferenceException}. \\
+\hline
+\texttt{isAtEndOfMedium(x)} & Checks if offset $x$ is at the end of the \TERMmedium{}. & Based on this knowledge, the user code can skip further reading and does not need to check for exceptions. & The provided offset is ignored, it is tried to read bytes from current offset. Is this resulting in return code -1, we are at the end of the stream, otherwise the byte is added to the cache. \\
+\hline
+\texttt{insertData(x, data)} & Implements the writing operation \emph{insert} according to \DesLink{dd:410}, \DesLink{dd:410d}, \DesLink{dd:422}, \DesLink{dd:422b}, \DesLink{dd:422d}: Adds data at the given offset $x$, consecutive bytes are shifted ``to the back'', the changes first get written only with \texttt{flush()}. & The insertion of new metadata is a common case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
+\hline
+\texttt{removeData(x, n)} & Implements the writing operation \emph{remove} according to \DesLink{dd:410}, \DesLink{dd:410d}, \DesLink{dd:422b}, \DesLink{dd:424}, \DesLink{dd:424bb}: Removes $n$ bytes at offset $x$. Consecutive bytes are shifted ``to front'', the changes first get written only with \texttt{flush()} & Removing existing metadata is a standard case in \LibName{} and must be supported. & \texttt{ReadOnlyMediumException} \\
+\hline
+\texttt{replaceData(x, n, data)} & Implements the writing operation \emph{replace} according to \DesLink{dd:410}, \DesLink{dd:410d}, \DesLink{dd:422d}, \DesLink{dd:424bb}, \DesLink{dd:424a}: Replaces $n$ bytes at offset $x$ with new bytes of length $m$. The changes first get written only with \texttt{flush()} & It often happens that \--- instead of entirely removing or newly inserting data \--- existing data must be overwritten. This is - especially at the beginning of a file - a much more efficient operation than insertion and deletion and must thus directly be supported. & \texttt{ReadOnlyMediumException}\\
+\hline
+\texttt{flush()} & Implements the writing operation \emph{flush} according to \DesLink{dd:410}: All \emph{changed} data currently in the temporary buffer are written in a suitable way to the external medium. It cannot be guaranteed that this operation is atomic. & This is a practical implementation of \DesLink{dd:410}: While \texttt{insertData()}, \texttt{removeData()} and \texttt{replaceData()} only write into a temporary buffer, this call directly writes to the external medium. & \texttt{ReadOnlyMediumException} \\
+\hline
+\texttt{createMediumReference(x)} & Creates a new \IMediumReference{} instance for the given offset $x$ according to \DesLink{dd:419} & Is needed for random-access & Is needed for \texttt{InputStream}s \\
+\hline
+\texttt{undo(mediumAction)} & Undoes the changes of the given \MediumAction{} according to \DesLink{dd:420}, as far as it is still pending. & Is needed for random-access & \texttt{InvalidMediumActionException} \\
+\hline
+\texttt{open()} & Opens access to the medium & Explicit open instead of constructor better for testing & Explicit open instead of constructor better for testing \\
+\hline
+\texttt{close()} & Closes all internal resources according to \DesLink{dd:419ac}, clears the complete cache contents and other internal data structures & See \DesLink{dd:419ac} & See \DesLink{dd:419ac} \\
+\hline
+\texttt{isClosed()} & Allows users to check if the medium is already closed and thus cannot be accessed anymore (returns true), or it is still accessible (returns false). & See \DesLink{dd:419ac} & See \DesLink{dd:419ac} \\
+\hline
 \caption{Operations of the \COMPmedia{} API}
 \label{tab:MediaOps}
 \end{longtable}
@@ -1294,30 +1364,30 @@ The following table summarizes all further error situations when working with \C
 
 \begin{landscape}
 \begin{longtable}{|p{0.15\linewidth}|p{0.31\linewidth}|p{0.31\linewidth}|p{0.18\linewidth}|}
-	\hline
-	\rowcolor[gray]{.9}\textbf{Error Scenario} & \textbf{Description} & \textbf{Reaction \LibName{}} & \textbf{API method} \\
-	\endhead
-	\hline
-	Medium is already locked & The medium is already locked by another process. \LibName{} cannot work with the medium. It is the burden of the caller to ensure, that the medium is not used in parallel. & It is an abnormal situation, thus a \texttt{MediumAccessException} runtime exception is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
-	\hline
-	Unknowm media type & A \IMedium{} implementation is specified by the caller which is unsupported. & This is an abnormal situation violating the interface contract, thus the same exception as for contract violations is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
-	\hline
-	End of medium during reading & Of course each medium has an end sometimes. When reading, this end can be reached. When writing, this is not actually possible - there, we assume that all output media virtually are unlimited. If there is no more memory for writing, \COMPmedia{} usually reacts with a \texttt{MediumAccessException} following an \texttt{IOException}. It cannot be requested from the calling code during reading, that it knows where the end of the input medium is. Reaching its end during reading can be an error, but it needs not - this depends on the current usage situation. The calling code thus must handle this depending on current context. & Because it is not necessarily an abnormal situation, a \texttt{EndOfMediumException} checked exception is thrown. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()} \\
-	\hline
-	Write to read-only medium & The user-provided \IMedium{} implementation is read-only, thus it only allowes read access. & If the user nevertheless tries to write, this is an abnormal sitation and is signalled by a \texttt{ReadOnlyMediumException} runtime exception. & \IMediumStore{} \texttt{.flush()}, \IMediumStore{} \texttt{.insertData()}, \IMediumStore{} \texttt{.removeData()}, \IMediumStore{} \texttt{.replaceData()}\\
-	\hline
-	Consecutive write calls overlap & Concecutive calls to \texttt{removeData} or \texttt{replaceData} before a \texttt{flush} overlap in an invalid way (see \DesLink{dd:424} and \DesLink{dd:424a}) & Is acquitted with an \texttt{InvalidOverlappingWriteException} runtime exception. & \IMediumStore{} \texttt{.removeData()}, \IMediumStore{} \texttt{.replaceData()}\\
-	\hline
-	Invalid cache offset & With \texttt{cache()} it is tried for an \texttt{InputStream} to cache an offset that is smaller than the last read offset. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException} runtime exception. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()} \\
-	\hline
-	Stream data not available & Data requested with \texttt{getData()} for a given offset is not available (anymore) in the cache, and the underlying medium is an \texttt{InputStream}. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException}, a runtime exception. & \IMediumStore{} \texttt{.getData()} \\
-	\hline
-	Unknown or invalid \MediumAction{} & The user passes an unknown or invalid \MediumAction{} to any operation & This is an abnormal situation and is acquitted with the runtime exception \texttt{InvalidMediumActionException}  & \IMediumStore{}\texttt{.undo()} \\
-	\hline
-	\texttt{IOException} in the implementation & The Java implementation use throws an \texttt{IOException}, at any place where none of the already presented error situations are involved. & It is an abnormal situation, thus a \texttt{MediumAccessException} runtime exception is thrown. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()}, \IMediumStore{} \texttt{.isAtEndOfMedium()}, \IMediumStore{} \texttt{.flush()} \\
-	\hline
-	The \IMediumStore{} was already closed using \texttt{close()} & \texttt{MediumStoreClosedException}, a runtime exception & \texttt{MediumStoreClosedException}, a runtime exception & all \\
-	\hline
+\hline
+\rowcolor[gray]{.9}\textbf{Error Scenario} & \textbf{Description} & \textbf{Reaction \LibName{}} & \textbf{API method} \\
+\endhead
+\hline
+Medium is already locked & The medium is already locked by another process. \LibName{} cannot work with the medium. It is the burden of the caller to ensure, that the medium is not used in parallel. & It is an abnormal situation, thus a \texttt{MediumAccessException} runtime exception is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
+\hline
+Unknowm media type & A \IMedium{} implementation is specified by the caller which is unsupported. & This is an abnormal situation violating the interface contract, thus the same exception as for contract violations is thrown. & \IMediaAPI{} \texttt{.createMediumStore()} \\
+\hline
+Write to read-only medium & The user-provided \IMedium{} implementation is read-only, thus it only allowes read access. & If the user nevertheless tries to write, this is an abnormal sitation and is signalled by a \texttt{ReadOnlyMediumException} runtime exception. & \IMediumStore{} \texttt{.flush()}, \IMediumStore{} \texttt{.insertData()}, \IMediumStore{} \texttt{.removeData()}, \IMediumStore{} \texttt{.replaceData()}\\
+\hline
+Consecutive write calls overlap & Concecutive calls to \texttt{insertData}, \texttt{removeData} or \texttt{replaceData} before a \texttt{flush} overlap in an invalid way, see \DesLink{dd:422b}, \DesLink{dd:422d}, \DesLink{dd:424}, \DesLink{dd:424bb}, \DesLink{dd:424a} & Is acquitted with an \texttt{InvalidOverlappingWriteException} runtime exception. & \IMediumStore{} \texttt{.removeData()}, \IMediumStore{} \texttt{.replaceData()}\\
+\hline
+Invalid cache offset & With \texttt{cache()} it is tried for an \texttt{InputStream} to cache an offset that is smaller than the last read offset. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException} runtime exception. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()} \\
+\hline
+End of medium during reading & Of course each medium has an end sometimes. When reading, this end can be reached. When writing, this is not actually possible - there, we assume that all output media virtually are unlimited. If there is no more memory for writing, \COMPmedia{} usually reacts with a \texttt{MediumAccessException} following an \texttt{IOException}. It cannot be requested from the calling code during reading, that it knows where the end of the input medium is. Reaching its end during reading can be an error, but it needs not - this depends on the current usage situation. The calling code thus must handle this depending on current context. & Because it is not necessarily an abnormal situation, a \texttt{EndOfMediumException} checked exception is thrown. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()} \\
+\hline
+Stream data not available & Data requested with \texttt{getData()} for a given offset is not available (anymore) in the cache, and the underlying medium is an \texttt{InputStream}. & This is a wrong usage of the API, thus it results in an \texttt{InvalidMediumReferenceException}, a runtime exception. & \IMediumStore{} \texttt{.getData()} \\
+\hline
+Unknown or invalid \MediumAction{} & The user passes an unknown or invalid \MediumAction{} to any operation & This is an abnormal situation and is acquitted with the runtime exception \texttt{InvalidMediumActionException}  & \IMediumStore{}\texttt{.undo()} \\
+\hline
+\texttt{IOException} in the implementation & The Java implementation use throws an \texttt{IOException}, at any place where none of the already presented error situations are involved. & It is an abnormal situation, thus a \texttt{MediumAccessException} runtime exception is thrown. & \IMediumStore{} \texttt{.cache()}, \IMediumStore{} \texttt{.getData()}, \IMediumStore{} \texttt{.isAtEndOfMedium()}, \IMediumStore{} \texttt{.flush()} \\
+\hline
+The \IMediumStore{} was already closed using \texttt{close()} & \texttt{MediumStoreClosedException}, a runtime exception & \texttt{MediumStoreClosedException}, a runtime exception & all \\
+\hline
 \caption{Error handling in the component \COMPmedia{}}
 \label{tab:FBMedia}
 \end{longtable}
@@ -2010,52 +2080,176 @@ No disadvantages known
 \subsubsection{Implementation of \texttt{createFlushPlan}}
 \label{sec:flushingPlan}
 
-The next step is to go into more detail regarding implementation of \texttt{createFlushPlan}, as it is anything but trivial. Here we develop a general algorithm that creates based on operations \texttt{insert}, \texttt{remove} and \texttt{replace} a sequence of necessary read and write operations to transform the current medium state into the target state.
+The implementation of \texttt{createFlushPlan} is anything but trivial. The general algorithm is formally described in a separate paper (including examples), see \cite{CFPPaper}.
 
-Before that, we list some testcases that should be implemented to demonstrate the intended behaviour:
+Here, we only list some testcases that should be implemented to demonstrate the intended behaviour, see table \ref{tab:createFlushPlan}. If we say
+
+\emph{contains read/write-blocks from \texttt{<startOfs>} to \texttt{<endOfs>} \texttt{<backwards|forwards>}}
+
+in the table, we are referring to the following:
+\begin{itemize}
+\item The generated flush plan contains a sequence of \texttt{READ} and \texttt{WRITE} pairs starting at \texttt{start offset}, each \texttt{WRITE} following a \texttt{READ} with the same size.
+\item Each \texttt{READ} and each \texttt{WRITE} have a maximum size $s\leq m$, where $m$ is the configured maximum read-write block size according to \DesLink{dd:438}
+\item With $N:=\text{endOfs} - \text{startOfs}$, there are exactly \[\frac{N}{m}+N\text{ mod }m\] such pairs present
+\item They are either read ``backward'', i.e. chunk-wise starting at highest offset down to the lowest offset of the range, or ``forward'', i.e. chunk-wise starting at lowest offset up to the highest offset of the range
+\end{itemize}
+
+Also note that these tests do not contain any negative cases for scheduling actions that are overlapping in any invalid way. This must already be tested for the schedule operations of \MediumChangeManager{}.
 
 \begin{landscape}
 \begin{longtable}{|p{0.03\linewidth}|p{0.08\linewidth}|p{0.45\linewidth}|p{0.35\linewidth}|}
-	\hline
-	\rowcolor[gray]{.9}\textbf{ID} & \textbf{Testcase} & \textbf{Variations} & \textbf{Expectation} \\
-	\endhead
-	\hline
+\hline
+\rowcolor[gray]{.9}\textbf{ID} & \textbf{Testcase} & \textbf{Variations} & \textbf{Expectation} \\
+\endhead
+\hline
 CF0 & No operation & - & The plan created is empty \\
-	\hline
-CF1 & Single \texttt{insert} &\begin{enumerate}\item[a.] At start, intermediate or end offset of the medium
-\item[b.] bytes behind: None, or whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
+\hline
+CF1 & Single \texttt{insert} $n$ bytes at offset $x$ &
+\begin{enumerate}
+\item[a.] $x$ is start, intermediate or end offset of the medium
+\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
 \item[c.] Insertion bytes: The same cases as for the bytes behind
 \end{enumerate}
-& No read/write operations before insert offset; bytes behind remain unchanged and get shifted by $k$ bytes towards increasing offsets, such that medium length grows by $k$ bytes; The CFP contains $N$ pairs of read/ write operations for the bytes behind, where $N$ is the number of started blocks of at most ``maximum write block size'' bytes that are located behind the insert offset; the read/write pairs start from the last block backwards down to the first block after the insert offset, where the writes occur exactly $k$ bytes behind the reads; After this sequence, for the insertion bytes, there are $X$ corresponding write operations (one per starting block) with increasing offsets starting at the insert offset; The \texttt{insert} action follows after these actions in the plan \\
-	\hline
-CF2 & Single \texttt{remove} &\begin{enumerate}\item[a.] At start, intermediate or towards the end offset of the medium
-\item[b.] bytes behind: None, or whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
-\item[c.] Removed byte count: The same cases as for the bytes behind
-\item[d.] Extreme case: All bytes of the medium are removed
+& 
+\begin{itemize}
+\item No read/write operations before insert offset
+\item Bytes behind remain unchanged and get shifted by $n$ towards higher offsets, such that medium length grows by $n$
+\item Contains read/write-blocks from $x$ to the end of medium backwards
+\item The \texttt{insert} action follows after these actions in the plan
+\end{itemize}
+\\
+\hline
+CF2 & Single \texttt{remove} $n$ bytes at offset $x$ &
+\begin{enumerate}
+\item[a.] $x$ is start, intermediate offset or $x+n$ is the end offset of the medium
+\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[c.] Extreme case: All bytes of the medium are removed
 \end{enumerate}
-& No read/write operations before remove offset; bytes behind remain unchanged and get shifted by $k$ bytes towards decreasing offsets, such that medium length shrinks by $k$ bytes; the CFP contains $N$ pairs of read/ write operations for the bytes behind, where $N$ is the number of started blocks of at most ``maximum write block size'' bytes that are located behind the last removed byte; the read/write pairs start from the first block after the last removed byte forward up to the last block of the medium, where the writes occur exactly $k$ bytes before the reads; the \texttt{remove} action follows after these actions in the plan; at the end there is a \texttt{truncate} operation \\
-	\hline
-CF3 & Single \texttt{replace} &\begin{enumerate}\item[a.] At start, intermediate or towards the end offset of the medium
-\item[b.] bytes behind: None, or whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
-\item[c.] bytes to replace: The same cases as for the bytes behind
-\item[d.] Replacement bytes: The same cases as for the bytes behind
-\item[e.] Number of bytes to replace ($:=m$) smaller, equal to or bigger than the number of replacement bytes ($:=n$)
-\item[f.] Extreme case: All bytes of the medium are replaced
+& 
+\begin{itemize}
+\item No read/write operations before remove offset
+\item Bytes behind remain unchanged and get shifted by $n$ towards smaller offsets, such that medium length shrinks by $n$
+\item Contains read/write-blocks from $x$ to the end of medium forwards
+\item The \texttt{remove} action follows after these actions in the plan
+\item At the end there is a \texttt{truncate} operation
+\end{itemize}
+\\
+\hline
+CF3 & Single \texttt{replace} of $n$ bytes by $r$ new bytes at offset $x$ &
+\begin{enumerate}
+\item[a.] $x$ is start, intermediate offset or $x+n$ is the end offset of the medium
+\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[c.] Replacement bytes: Same cases as for bytes behind
+\item[d.] $r$ smaller, equal to or bigger than $n$
+\item[e.] Extreme case: All bytes of the medium are replaced
 \end{enumerate}
-& No read/write operations before remove offset; If $m>n$: Behaves like a \emph{remove} of $m-n$ bytes; If $m<n$: Behaves like an \emph{insert} of $n-m$ bytes; If $m=n$: No read/write pairs for bytes behind; In every case there, there are $X$ corresponding write operations (one per starting block) for the replacement bytes with increasing offsets starting at the replacement offset; The \texttt{replace} action follows after these actions in the plan \\
-	\hline
-CF4 & Multiple \texttt{insert}s &\begin{enumerate}\item[a.] All inserts directly subsequent, or with gaps between
-\item[b.] bytes in-between/behind: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
-\item[c.] Bytes to remove: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
+& 
+\begin{itemize}
+\item No read/write operations before replace offset
+\item If $n>r$: Bytes behind remain unchanged and get shifted by $n-r$ towards smaller offsets, such that medium length shrinks by $n-r$, 
+\item If $r\geq n$: Bytes behind remain unchanged and get shifted by $r-n$ towards higher offsets, such that medium length grows by $r-n$, 
+\item Contains read/write-blocks from $x+n$ to the end of medium forwards (if $n>r$) or backwards (if $r>n$)
+\item The \texttt{replace} action follows after these actions in the plan
+\item If $n>r$: At the end there is a \texttt{truncate} operation
+\end{itemize}
+\\
+\hline
+CF4 & Multiple \texttt{insert}s of in total $n$ bytes &
+\begin{enumerate}
+\item[a.] At same or different offsets
+\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[c.] Bytes to insert: Same cases as for bytes behind
 \end{enumerate}
-& No read/write operations before the first insertion; bytes behind the last insertion: They remain unchanged and are shifted by $k$ bytes to the back, such that the overall length of the medium increases by $k$ bytes; bytes in between insertions: remain unchanged and are shifted to the back by the number of up-to-then inserted bytes; For these bytes, $N$ read/write operations are returned, where $N$ is the number of at least started blocks of maximum write block size, that are behind or between the insert operation on the medium; the \texttt{insert} action follows after these actions in the plan \\
-	\hline
-CF5 & Multiple \texttt{remove}s &\begin{enumerate}\item[a.] All removes at the same offset or at different offsets
-\item[b.] bytes in-between/behind: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
-\item[c.] Bytes to insert: None, whole-numbered multiple of the maximum write block size, or no whole-numbered multiple, or fewer bytes than the maximum write block size
+& 
+\begin{itemize}
+\item No read/write operations before the first insert offset
+\item Bytes behind last insertion remain unchanged and get shifted by $n$ towards higher offsets, such that medium length grows by $n$
+\item Bytes in between insertions: remain unchanged and are shifted to the back by the number of up-to-then inserted bytes
+\item Each range between or behind inserts contains read/write-blocks from insertion offset $x_{i}$ to the start of the next insertion (or end of medium) backwards
+\item Each \texttt{insert} action follows after these block actions in the plan
+\end{itemize}
+\\
+\hline
+CF5 & Multiple \texttt{remove}s of in total $n$ bytes &
+\begin{enumerate}
+\item[a.] All removes refer to consecutive regions or have gaps between
+\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[c.] Extreme case: All bytes of the medium are removed
 \end{enumerate}
-& No read/write operations before the first remove; bytes behind: Remain unchanged and are shifted to the front by $k$ bytes, such that the overall medium length decreases by exactly $k$ bytes; $N$ read/write operations are returned for these operations, where $N$ is the number of at least started blocks of maximum write block size, that are behind the remove operation on the medium; a \texttt{truncate} operation follows in the plan \\
-	\hline
+&
+\begin{itemize}
+\item No read/write operations before the first remove offset
+\item Bytes behind last remove remain unchanged and get shifted by $n$ towards smaller offsets, such that medium length shrinks by $n$
+\item Bytes in between removes: remain unchanged and are shifted to the front by the number of up-to-then removed bytes
+\item Each range between or behind removes contains read/write-blocks from offset $x_{r}+n_{r}$ up to the start of the next remove (or end of medium) forwards
+\item Each \texttt{remove} action follows after these block actions in the plan
+\item At the end there is a \texttt{truncate} operation
+\end{itemize}\\
+\hline
+CF6 & Multiple \texttt{replace}s of in total $n$ bytes by in total $r$ new bytes &
+\begin{enumerate}
+\item[a.] All replaces refer to consecutive regions or have gaps between
+\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[c.] Replacement bytes: Same cases as for bytes behind
+\item[d.] $r$ smaller, equal to or bigger than $n$
+\item[e.] Extreme case: All bytes of the medium are replaced
+\end{enumerate}
+&
+\begin{itemize}
+\item No read/write operations before the first replace offset
+\item If $n>r$: Bytes behind remain unchanged and get shifted by $n-r$ towards smaller offsets, such that medium length shrinks by $n-r$, 
+\item If $r\geq n$: Bytes behind remain unchanged and get shifted by $r-n$ towards higher offsets, such that medium length grows by $r-n$, 
+\item Bytes in between replaces: remain unchanged and are shifted to the front or back by the number of up-to-then replaced minus inserted bytes
+\item Each range between or behind replaces contains read/write-blocks from offset $x_{r}+n_{r}$ up to the start of the next replace (or end of medium) forwards or backwards
+\item Each \texttt{replace} action follows after these block actions in the plan
+\item If $n>r$: At the end there is a \texttt{truncate} operation
+\end{itemize}\\
+\hline
+CF7 & Multiple \texttt{remove}s and \texttt{insert}s &
+\begin{enumerate}
+\item[a.] At same offsets, remove first then consecutive insert or at different offsets
+\item[b.] Mutually compensating or not
+\item[c.] First \texttt{remove}, then \texttt{insert}, or first \texttt{insert}, then \texttt{remove} - Note that remove and insert in any order at the same offset can be considered consective
+\item[d.] Extreme case: All bytes of the medium are removed, then new bytes inserted
+\end{enumerate}
+&
+\begin{itemize}
+\item For read/write blocks and bytes between and behind: Same behaviour as for other test cases
+\item For mutually compensating actions: Bytes behind the last action must not be read or written
+\item The order of actions does not matter
+\item For the extreme case: All bytes are actually ``replaced'' by the new inserted bytes
+\end{itemize}\\
+\hline
+CF8 & Multiple \texttt{replace}s and \texttt{insert}s &
+\begin{enumerate}
+\item[a.] At same offsets, replace first then consecutive insert or at different offsets
+\item[b.] Mutually compensating or not
+\item[c.] First \texttt{replace}, then \texttt{insert}, or first \texttt{insert}, then \texttt{replace} - Note that remove and insert in any order at the same offset can be considered consective
+\item[d.] $r$ smaller, equal to or bigger than $n$
+\item[e.] Extreme case: All bytes of the medium are replaced, then new bytes inserted
+\end{enumerate}
+&
+\begin{itemize}
+\item For read/write blocks and bytes between and behind: Same behaviour as for other test cases
+\item For mutually compensating actions: Bytes behind the last action must not be read or written
+\item The order of actions does not matter
+\item For the extreme case: All bytes are actually ``replaced'' by the replacement bytes as well as the new inserted bytes
+\end{itemize}\\
+\hline
+CF9 & Multiple \texttt{removes}s, \texttt{replace}s and \texttt{insert}s &
+\begin{enumerate}
+\item[a.] At same offsets
+\item[b.] Mutually compensating or not
+\item[c.] In different orders
+\item[d.] Growing or shrinking the medium
+\end{enumerate}
+&
+\begin{itemize}
+\item For read/write blocks and bytes between and behind: Same behaviour as for other test cases
+\item For mutually compensating actions: Bytes behind the last action must not be read or written
+\item The order of actions does not matter
+\end{itemize}\\
+\hline
 \caption{Test cases for checking \texttt{createFlushPlan}}
 \label{tab:createFlushPlan}
 \end{longtable}

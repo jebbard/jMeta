@@ -47,6 +47,7 @@ public class MediumChangeManager {
 
    private TreeSet<MediumAction> mediumActions = new TreeSet<>(new MediumActionComparator());
    private final MediumReferenceFactory mediumReferenceFactory;
+   private static final Set<MediumActionType> EXISTING_ACTION_TYPES_TO_CHECK = new HashSet<>();
 
    /**
     * Creates a new {@link MediumChangeManager}.
@@ -80,12 +81,9 @@ public class MediumChangeManager {
 
       Reject.ifNull(removedRegion, "removedRegion");
 
-      Set<MediumActionType> typeSet = new HashSet<>();
+      handleExistingInsertsContainedInRegion(removedRegion);
 
-      typeSet.add(MediumActionType.REMOVE);
-      typeSet.add(MediumActionType.REPLACE);
-
-      int nextSequenceNumber = handleExistingActionsOfTypes(typeSet, removedRegion, MediumActionType.REMOVE);
+      int nextSequenceNumber = handleOverlappingExistingRemovesAndReplaces(removedRegion, MediumActionType.REMOVE);
 
       MediumAction returnedAction = new MediumAction(MediumActionType.REMOVE, removedRegion, nextSequenceNumber, null);
       mediumActions.add(returnedAction);
@@ -118,25 +116,9 @@ public class MediumChangeManager {
 
       Reject.ifNull(replacedRegion, "replacedRegion");
 
-      // Check if any INSERTs get in the way (case 5 in design decision DES 079 of design concept)
-      // Note that getNextAction() will never return an INSERT at the same offset as the replace
-      MediumAction nextAction = getNextAction(replacedRegion);
+      handleExistingInsertsContainedInRegion(replacedRegion);
 
-      if (nextAction != null && nextAction.getActionType() == MediumActionType.INSERT) {
-         MediumRegion nextRegion = nextAction.getRegion();
-
-         if (replacedRegion.contains(nextRegion.getStartReference())) {
-            throw new InvalidOverlappingWriteException(nextAction, MediumActionType.INSERT, replacedRegion);
-         }
-      }
-
-      // Check against existing removes and replaces
-      Set<MediumActionType> typeSet = new HashSet<>();
-
-      typeSet.add(MediumActionType.REMOVE);
-      typeSet.add(MediumActionType.REPLACE);
-
-      int nextSequenceNumber = handleExistingActionsOfTypes(typeSet, replacedRegion, MediumActionType.REPLACE);
+      int nextSequenceNumber = handleOverlappingExistingRemovesAndReplaces(replacedRegion, MediumActionType.REPLACE);
 
       MediumAction returnedAction = new MediumAction(MediumActionType.REPLACE, replacedRegion, nextSequenceNumber,
          replacementBytes);
@@ -168,17 +150,7 @@ public class MediumChangeManager {
 
       MediumAction previousAction = getPreviousAction(insertionRegion);
 
-      // Check if any REPLACEs get in the way (case 7 in design decision DES 079 of design concept)
-      // Note that getPreviousAction() will also return a REPLACE at the same offset as the insert
-
-      if (previousAction != null && previousAction.getActionType() == MediumActionType.REPLACE) {
-         MediumRegion previousRegion = previousAction.getRegion();
-
-         if (previousRegion.contains(insertionRegion.getStartReference())
-            && !insertionRegion.getStartReference().equals(previousRegion.getStartReference())) {
-            throw new InvalidOverlappingWriteException(previousAction, MediumActionType.REPLACE, insertionRegion);
-         }
-      }
+      verifyExistingRemoveOrReplaceNotContainingInsertOffset(insertionRegion, previousAction);
 
       int nextSequenceNumber = determineNextSequenceNumber(insertionRegion, previousAction);
 
@@ -364,42 +336,44 @@ public class MediumChangeManager {
    }
 
    /**
-    * Checks and possibly invalidates any existing {@link MediumAction}s that were already scheduled against the
-    * {@link MediumAction} to be newly created, identified by its {@link MediumActionType} and its {@link MediumRegion}.
-    * Only a specific subset of existing {@link MediumAction}s is treated by this method, those having one of the given
-    * types.
+    * Checks and possibly invalidates any existing (already scheduled) {@link MediumAction}s of types
+    * {@link MediumActionType#REMOVE} or {@link MediumActionType#REPLACE} against the {@link MediumAction} to be newly
+    * created, identified by its {@link MediumActionType} and its {@link MediumRegion}.
     * 
-    * The cases that can occur:
+    * This method basically ensures that {@link MediumActionType#REMOVE} or {@link MediumActionType#REPLACE} do not
+    * overlap each other, and if they do, either throw an exception or undo the previous action, depending on the
+    * specific scenario.
+    * 
+    * This implements the following design decisions from the design concept:
     * <ul>
-    * <li>Case 1: An existing region is fully contained in the new region, and thus the existing region will be undone
-    * </li>
-    * <li>Case 2: The new region is fully contained in an existing region, the new region is invalid and an
-    * {@link InvalidOverlappingWriteException} is thrown</li>
-    * <li>Case 3: An existing region is overlapped at its back by the new region, the new region is invalid and an
-    * {@link InvalidOverlappingWriteException} is thrown</li>
-    * <li>Case 4: An existing region is overlapped at its front by the new region, the new region is invalid and an
-    * {@link InvalidOverlappingWriteException} is thrown</li>
+    * <li>DD 082, cases 2, 3, 4 and 5</li>
+    * <li>DD 083, cases 3, 4, 5, 6, 7, 8, 9, 10</li>
+    * <li>DD 084, cases 2, 3, 4, 5</li>
     * </ul>
     * 
-    * @param actionTypesToHandle
-    *           Only existing {@link MediumAction}s of the {@link MediumActionType}s contained in this {@link Set} are
-    *           checked or invalidated.
     * @param newRegion
     *           The new {@link MediumRegion} for which a new {@link MediumAction} is scheduled.
     * @param newActionType
-    *           The {@link MediumActionType} of the new {@link MediumAction} to be scheduled.
+    *           The {@link MediumActionType} of the new {@link MediumAction} to be scheduled, either
+    *           {@link MediumActionType#REMOVE} or {@link MediumActionType#REPLACE}.
+    * 
     * @return The next sequence number to take for the {@link MediumAction} to be scheduled.
     */
-   private int handleExistingActionsOfTypes(Set<MediumActionType> actionTypesToHandle, MediumRegion newRegion,
-      MediumActionType newActionType) {
+   private int handleOverlappingExistingRemovesAndReplaces(MediumRegion newRegion, MediumActionType newActionType) {
+
+      EXISTING_ACTION_TYPES_TO_CHECK.add(MediumActionType.REMOVE);
+      EXISTING_ACTION_TYPES_TO_CHECK.add(MediumActionType.REPLACE);
+
+      Reject.ifFalse(EXISTING_ACTION_TYPES_TO_CHECK.contains(newActionType),
+         "actionTypesToHandle.contains(newActionType)");
 
       // NOTE: The previousAction may be one of the following:
       // - null, if there is no action that is smaller according to the MediumActionComparator OR
-      // - the existing action with next smaller IMediumReference as the newRegion OR
-      // - the existing action with next identical IMediumReference as the newRegion
+      // - the existing action with next smaller MediumReference as the newRegion OR
+      // - the existing action with next identical MediumReference as the newRegion
       MediumAction previousAction = getPreviousAction(newRegion);
 
-      while (previousAction != null && actionTypesToHandle.contains(previousAction.getActionType())) {
+      while (previousAction != null && EXISTING_ACTION_TYPES_TO_CHECK.contains(previousAction.getActionType())) {
 
          MediumRegion previousRegion = previousAction.getRegion();
 
@@ -426,7 +400,7 @@ public class MediumChangeManager {
 
       MediumAction nextAction = getNextAction(newRegion);
 
-      while (nextAction != null && actionTypesToHandle.contains(nextAction.getActionType())
+      while (nextAction != null && EXISTING_ACTION_TYPES_TO_CHECK.contains(nextAction.getActionType())
          && !nextAction.equals(previousAction)) {
 
          MediumRegion nextRegion = nextAction.getRegion();
@@ -444,12 +418,65 @@ public class MediumChangeManager {
             // Case 4: New region overlaps an existing region at its front
             throw new InvalidOverlappingWriteException(nextAction, newActionType, newRegion);
          } else {
-            // The next region is not enclosed or overlapping, but simply has bigger start offset than end of new region
+            // The next region is not enclosed or overlapping, but simply has bigger start offset than end of new
+            // region
             break;
          }
       }
 
       return determineNextSequenceNumber(newRegion, previousAction);
+   }
+
+   /**
+    * Checks if any existing {@link MediumAction} with type {@link MediumActionType#INSERT} have an insertion offset
+    * contained in the new region passed. If so, they are undone.
+    * 
+    * This implements the following design decisions from the design concept:
+    * <ul>
+    * <li>DD 079, case 5</li>
+    * <li>DD 080, case 5</li>
+    * </ul>
+    * 
+    * @param newRegion
+    *           The new {@link MediumRegion} for which a new {@link MediumAction} is scheduled.
+    */
+   private void handleExistingInsertsContainedInRegion(MediumRegion newRegion) {
+      MediumAction nextAction = null;
+
+      // Note that getNextAction() will NOT return a INSERTs at the same offset as the new region start offset
+      while ((nextAction = getNextAction(newRegion)) != null && nextAction.getActionType() == MediumActionType.INSERT
+         && newRegion.contains(nextAction.getRegion().getStartReference())) {
+         undo(nextAction);
+      }
+   }
+
+   /**
+    * Checks if any existing {@link MediumAction} with type {@link MediumActionType#REMOVE} or
+    * {@link MediumActionType#REPLACE} have a removed or replaced region containing the start offset of the given
+    * region. If so, an {@link InvalidOverlappingWriteException} is thrown.
+    * 
+    * This implements the following design decisions from the design concept:
+    * <ul>
+    * <li>DD 079, case 6</li>
+    * <li>DD 080, case 6</li>
+    * </ul>
+    * 
+    * @param newRegion
+    *           The new {@link MediumRegion} for which a new {@link MediumAction} is scheduled.
+    * @param previousAction
+    *           The previous {@link MediumAction}, might be null
+    */
+   private void verifyExistingRemoveOrReplaceNotContainingInsertOffset(MediumRegion newRegion,
+      MediumAction previousAction) {
+      // Note that getPreviousAction() will also return a REPLACE or REMOVE at the same offset as the insert
+      if (previousAction != null && EXISTING_ACTION_TYPES_TO_CHECK.contains(previousAction.getActionType())) {
+         MediumRegion previousRegion = previousAction.getRegion();
+
+         if (previousRegion.contains(newRegion.getStartReference())
+            && !newRegion.getStartReference().equals(previousRegion.getStartReference())) {
+            throw new InvalidOverlappingWriteException(previousAction, previousAction.getActionType(), newRegion);
+         }
+      }
    }
 
    /**

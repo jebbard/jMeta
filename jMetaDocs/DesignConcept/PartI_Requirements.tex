@@ -57,6 +57,17 @@ Here we give a brief overview of the features the library needs to offer in vers
 
 %-----------------------------------------------------------------------------------------------
 
+\subsection{Supported Platforms}
+\label{sec:SupportedPlatforms}
+
+In general, \LibName{} in its current version \LibVersion{} can be used with any platform that also supports Java SE in \JavaVersion{}. However, it needs to be specified for which platforms tests were run explicitly and thus it is proven that specific features work on these platforms. We target to support the following platforms like this:
+\begin{itemize}
+\item Windows 10
+\item Ubuntu 16.04
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
 \subsection{Supported Metadata Formats}
 \label{sec:UnterstuetzteMetadatenformate}
 
@@ -117,7 +128,6 @@ Here, related Java libraries are treated that are related to what \LibName{} off
 \subsection{Metadata Libraries}
 \label{sec:MetadataLibraries}
 
-
 A selection of libraries offering access to multimedia metadata as of end of 2017, mostly audio metadata - One source for this e.g. is \url{http://id3.org/Implementations} and Google:
 
 \begin{landscape}
@@ -176,7 +186,7 @@ Users / software needing to support a broad variety of formats - when using thes
 
 %***********************************************************************************************
 
-\subsubsection{Advantages of  \LibName{}}
+\subsubsection{Advantages of \LibName{}}
 \label{sec:AdvantagesofLibName}
 
 There are alreads so much library - why do we need \LibName{}? If it wants to do things better, a lot of effort is required. Is that worth it?
@@ -318,56 +328,30 @@ JavaSound essentiall offers the classes \texttt{Line} (representing an element i
 \chapter{Basic Terms}
 \label{sec:BasicTerms}
 
-%===============================================================================================
-%		Eigentlicher Start des Kapitels
-%===============================================================================================
-
-Here we define basic terms used throughout the whole design concept. Most of them come from \cite{MetaComp}, pages 19 to 29, where even more terms are defined.
-
-All terms are based on a a domain model for container and metadata, as defined in \cite{MetaComp}. A domain model extended for our needs is shown in the following figure - it shows all relevant terms and their relations as an overview:
-\OpenIssue{Add domain model figure}
+Here we define basic terms used throughout the whole design concept.
 
 %-----------------------------------------------------------------------------------------------
 
-\section{Metadaten}
+\section{Metadata}
 \label{sec:Metadata}
 
 Metadata in this document is short for digital metadata that are not necessary to parse the actual described (audio, video or image) data. Metadata semantically and structurally describes other data. The goal of \LibName{} is especially reading of metadata for audio and video data sets, e.g. title, artist etc. The structure of metadata is defined by a \TERMmetadataFormat{}.
 
-If it is specifically about technical metadata needed to parse a data structure, e.g. in the container header,  we call it \emph{Parsing Metadata}.
+If it is specifically about technical metadata needed to parse a data structure, e.g. in the container header, we call it \emph{Parsing Metadata}.
 
 %-----------------------------------------------------------------------------------------------
 
-\section{\TERMdataFormat{}e, \TERMmetadataFormat{}e und \TERMcontainerFormat{}e}
+\section{\TERMdataFormat{}s, \TERMmetadataFormat{}s and \TERMcontainerFormat{}s}
 \label{sec:DataFormats}
 
-A \TERMdataFormat{} specifies the structure and interpretation
-of data: Which bytes of which value and order have what kind of meaning?
-Usually, a data format describes how a consecutive block of bytes (i.e. a \TERMdataBlock{}) is built up by a number of so-called \TERMfield{} or child \TERMdataBlock{}.
+A \TERMdataFormat{} defines the structure and interpretation of data: Which bytes or characters of which value and in which order have what kind of meaning?
+Usually, a data format describes how a consecutive block of bytes (i.e. a \TERMdataBlock{}) is built up by a number of so-called \TERMfield{}s or child \TERMdataBlock{}s.
 
-\TERMmetadataFormat{}s are data formats that define the structure of digital metadata. Examples include:
-\begin{itemize}
-	\item ID3v1
-	\item ID3v2.3
-	\item APEv1
-	\item MPEG-7
-	\item RDF/XML
-	\item VorbisComment
-	\item and others ...
-\end{itemize}
+\TERMmetadataFormat{}s are data formats that define the structure of digital metadata. Examples include: ID3v1, ID3v2.3, APEv1, MPEG-7, RDF/XML, VorbisComment and others.
 
-\TERMcontainerFormat{}s are special \TERMdataFormat{}s optimized for storing, transporting, editing and seeking multimedia \TERMpayload{} data. Examples are:
-\begin{itemize}
-	\item MP3
-	\item Ogg
-	\item TIFF
-	\item QuickTime
-	\item JPEG 2000
-	\item PDF
-	\item and others...
-\end{itemize}
+\TERMcontainerFormat{}s are a more general forn of \TERMdataFormat{} optimized for storing, transporting, editing and seeking multimedia \TERMpayload{} data. Examples are: MP3, Ogg, TIFF, QuickTime, JPEG 2000, PDF and others. Metadata formats can also be considered as container formats.
 
-An example for other \TERMdataFormat{}s is HTML. It is neither called a \TERMmetadataFormat{} nor a \TERMcontainerFormat{}. XML is a \TERMdataFormat{} that itself can be used to define further XML \TERMdataFormat{}s. Some XML \TERMdataFormat{}s are \TERMmetadataFormat{}s, e.g. MPEG-7, MPEG-21 or P\_Meta.
+An example for other \TERMdataFormat{}s is HTML. You can argue that it is neither a \TERMmetadataFormat{} nor a \TERMcontainerFormat{}. XML is a \TERMdataFormat{} that itself can be used to define further XML \TERMdataFormat{}s. Some XML \TERMdataFormat{}s are \TERMmetadataFormat{}s, e.g. MPEG-7, MPEG-21 or P\_Meta.
 
 %-----------------------------------------------------------------------------------------------
 
@@ -381,23 +365,23 @@ A \TERMdataFormat{} may define \TERMtransformation{}s. A \TERMtransformation{} d
 \section{\TERMdataBlocks{}}
 \label{sec:DataBlocks}
 
-A \TERMdataBlock{} is a sequence of bytes that together form a logical unit in terms of the underlying \TERMdataFormat{}. Each \TERMdataBlock{} belongs to exactly one \TERMdataFormat{}. It can be assigned a current length in bytes. There are several concrete types of \TERMdataBlock{}s that are described in the following sections.
+A \TERMdataBlock{} is a sequence of bytes that together form a logical unit (i.e. an object or entity with a specific meaning) in terms of the underlying \TERMdataFormat{}. Each \TERMdataBlock{} belongs to exactly one \TERMdataFormat{}. It can be assigned a current length in bytes. There are several concrete types of \TERMdataBlock{}s that are described in the following sections.
+
+The actual detailed meta model of \TERMdataBlock{}s is defined later in the detailed \LibName{} design sections of this document for %\COMPdataFormatManagement{}.
 
 %***********************************************************************************************
 
 \subsection{\TERMcontainer{}: \TERMpayload{}, \TERMheader{}, \TERMfooter{}}
 \label{sec:Containers}
 
-An important type of \TERMdataBlock{} is a \TERMcontainer{}: It consists of an optional \TERMheader{}, exactly one \TERMpayload{} and maybe an optional \TERMfooter{}. All of these are \emph{child} \TERMdataBlock{}s, meaning that a \TERMcontainer{} is built-up by these three blocks.
-
-\TERMcontainer{}s are a common concept for container and metadata formats: The \TERMheader{} describes the \TERMcontainer{} in terms of its length, size and other properties. The \TERMpayload{} contains the interesting data, e.g. the multimedia data to be played. A \TERMfooter{} allows for backwards or reverse reading. Most of the time, a \TERMcontainer{} is typed with its id, i.e. the id defines the kind and structure of data block. Furthermore, most of \TERMdataFormat{}s specify a general structure of a \TERMcontainer{} so that user-defined new \TERMcontainer{}s can be added, i.e. the format is extensible.
+An important type of \TERMdataBlock{} is a \TERMcontainer{}: It consists of zero, one or several \TERMheader{}s, exactly one \TERMpayload{} and zero, one or several \TERMfooter{}s. All of these are \emph{child} \TERMdataBlock{}s. \TERMcontainer{}s are a common concept for container formats: The \TERMheader{}s and \TERMfooter{}s describe the \TERMcontainer{} in terms of its length, size and other properties. The \TERMpayload{} contains the interesting data, e.g. the multimedia data to be extracted, played or viewed. \TERMfooter{} essentially allow for backward or reverse reading. Most of the \TERMdataFormat{}s specify a generic structure of a \TERMcontainer{}, with specific containers with specific purpose, but allowing user-defined new \TERMcontainer{}s at the same time, i.e. the format is extensible.
 
 %***********************************************************************************************
 
 \subsection{\TERMtag{}}
 \label{sec:Tag}
 
-A \TERMtag{} is a special \TERMcontainer{} whose purpose is to store metadata. It can either belong to a standalone \TERMmetadataFormat{} ore to a more general \TERMcontainerFormat{}. Especially audio metadata formats use this term when talking about such a \TERMdataBlock{} in a file or \TERMmediaStream{}, e.g. the ID3 or APE \TERMtag{}s.
+A \TERMtag{} is a special \TERMcontainer{} whose purpose is to store metadata. It can either belong to a standalone \TERMmetadataFormat{} ore to a more general \TERMcontainerFormat{}. Especially audio, video and image metadata formats use this term when talking about such a \TERMdataBlock{} in a file or \TERMmediaStream{}, e.g. the ID3 or APE \TERMtag{}s. It term originates from ``tagging'' something with additional meta-information, as you'd attach a label to describe the song, video or image.
 
 The following figure shows the basic structure of a \TERMtag{}, showing other basic terms:
 
@@ -415,185 +399,188 @@ The most important parts of a \TERMtag{} are the \TERMattribute{}s.
 \subsection{\TERMattribute{}}
 \label{sec:Attribute}
 
-An \TERMattribute{} is a part of a \TERMtag{} that contains the valuable metadata information in a key-value manner. Common examples are artist, title, album, composer etc. of a piece of audio. Often, an \TERMattribute{} is also a \TERMcontainer{} in a sense that it has a \TERMheader{}. The \TERMheader{} may help to define the type (artist, title, album) of the \TERMattribute{} as well as the size of the payload. The \TERMpayload{} contains the actual information in an encoded way, e.g. the name of the artist or title of the piece of audio.
+An \TERMattribute{} is a part of a \TERMtag{} that contains the valuable metadata information in a key-value manner. Common examples are artist, title, album, composer etc. of a piece of audio. Often, an \TERMattribute{} is also a \TERMcontainer{} in a sense that it has a \TERMheader{} and \TERMpayload{}. The \TERMheader{} may help to define the type (artist, title, album) of the \TERMattribute{} as well as the size of the \TERMpayload{}. The \TERMpayload{} contains the actual information in an encoded way, e.g. the name of the artist or title of the piece of audio.
 
-Most of the \TERMattribute{}s have a simple main value that can be given. However, there are also more complex \TERMattribute{}s that consists of many values in form of child \TERMdataBlock{}s or \TERMfield{}s.
+Most of the \TERMattribute{}s have a simple main value that can be given. However, there are also more complex \TERMattribute{}s that consist of many values in form of child \TERMcontainer{}s or \TERMfield{}s.
 
-In each metadata format, an \TERMattribute{} has a specific name, e.g.:
+In each metadata format, an \TERMattribute{} has a format-specific name, e.g.:
 \begin{itemize}
-	\item ID3v1, Lyrics3: Field
-	\item ID3v2: Frame
-	\item APE: Item
-	\item Matroska: SimpleTag
-	\item VorbisComment: User Comment
+\item ID3v1, Lyrics3: Field
+\item ID3v2: Frame
+\item APE: Item
+\item Matroska: SimpleTag
+\item VorbisComment: User Comment
 \end{itemize}
-
-In \TERMcontainerFormat{}s, the \TERMattribute{}s are often \TERMcontainer{}s defined by the \TERMcontainerFormat{}.
 
 %***********************************************************************************************
 
 \subsection{\TERMfield{}s}
 \label{sec:Fields}
 
-A \TERMfield{} is a sequence of bits that together have a specific meaning in a given \TERMdataFormat{}. The \TERMdataFormat{} describes how a specific \TERMdataBlock{} is built up by a specific sequence of \TERMfield{}s. A \TERMfield{} has a range of possible values and
-interpretations of these values. Often, one part of the value range is defined as ``reserved'' to ensure a bit of flexibility in extending the data format.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\TERMsubject{}}
-\label{sec:Subject}
-
-A \TERMsubject{} represents a thing a \TERMtag{} describes, i.e. a part of a file, a piece of audio, a web resource or even a thing existing in reality. Often, a \TERMtag{} contains metadata for the current \TERMmedium{}, not explicitly referring to a more specific \TERMsubject{}.
+A \TERMfield{} is a sequence of bits that together have a specific meaning in a given \TERMdataFormat{}. They form the leafs of the data block hierarchy by ultimately containg the raw data. A \TERMdataFormat{} describes how a specific \TERMdataBlock{} is built up by a specific sequence of \TERMfield{}s. A \TERMfield{} has a range of possible values and
+interpretations of these values. Often, one part of the value range is defined as ``reserved'' to ensure a bit of flexibility in extending the data format. Fields can be fixed-size or of variable length. If they have a variable length, there is often either another field specifying its length, or it is terminated by a specific sequence of bytes or characters.
 
 %-----------------------------------------------------------------------------------------------
 
 \section{\TERMmedium{}}
 \label{sec:Medium}
 
-A medium is the place where data \TERMdataBlock{}s are physically persisted and accessible. This may be a file, a \TERMmediaStream{} or even plain memory.
+A \TERMmedium{} incorporates both the physical location of the data containing \TERMdataBlock{}s to read and write as well as the way of accessing this data. It may be a file, a stream or even plain memory.
 
 %===============================================================================================
-%		Anforderungen
+%		Requirements and Exclusions
 %===============================================================================================
 
-\chapter{Anforderungen und Ausschlüsse}
+\chapter{Requirements and Exclusions}
 \label{sec:Requirements}
 
-Hier werden all expliziten Anforderungen an die Bibliothek \LibName{} in Version \LibVersion{} sowie auch explizite Ausschlüsse dargestellt. Ausschlüsse dienen dafür, explizit klarzumachen, welche Themen (auf potentiell bliebig lange Zeit) nicht unterstützt werden. Davon abzugrenzen sind bereits bekannte (ggf. sogar notwendige) Erweiterungen, die aber nicht in dieser Version verfügbar sind, sondern absehbar in einer folgenden Version umgesetzt werden sollen. Das sind (potentielle) Features, die auf eine spätere Version verschoben worden sind. Diese sind im Abschnitt \SectionLink{sec:FuerSpaeter} beschrieben.
+Here, all explicit high-level requirements for \LibName{} in version \LibVersion{} are listed, including some explicit exclusions. Exclusions have the meaning that a given feature is explicitly not supported in the current version, and it might be like that also in future versions. No design is made for supporting them. However, it might well be that for future versions of the library, these decisions are changed and previously excluded features are then supported. The question is: Why listing exclusions at all? How far do they go, so will there be an exclusing stating that \LibName{} is not an operating system, e.g.? Not that far. Exclusions are only meant to demonstrate lack of features that popped up during the design phase and that could be desirable for \LibName{} users.
+
+In contrast to exclusions, there are potential features such as new metadata or container formats to support. These are neither explicitly excluded nor already planned for future releases.
 
 %-----------------------------------------------------------------------------------------------
-%		ANF 001
+%		REQ 001
 %-----------------------------------------------------------------------------------------------
 
-\section{ANF 001: Metadaten Menschenlesbar lesen und schreiben}
+\section{REQ 001: Reading and writing of human-readable meta data}
 \label{sec:MetadatenLesenUndSchreiben}
 
-Metadaten sollen in \emph{menschenlesbarer Form} gelesen und geschrieben werden können. D.h. der Anwender der Library wird nicht genötigt, binäre Repräsentationen der Daten zu erzeugen, um sie schreiben zu können, bzw. binäre Daten zu interpretieren. 
+\LibName{} can read and write meta data in a \emph{human-readable format}. That means librar users do not have to read (and interpret) or write raw binary data. 
 
-\textbf{Begründung:} Dies ist eine generelle Kernfunktionalität der Library.
+\textbf{Rationale:} This is the general core functionality of the library and must be supported.
 
-Eine Liste der unterstützten Formate findet sich in \SectionLink{sec:Features}.
-
-%-----------------------------------------------------------------------------------------------
-%		ANF 002
-%-----------------------------------------------------------------------------------------------
-
-\section{ANF 002: Containerformate lesen}
-\label{sec:ANF002ContainerformateLesen}
-
-Populäre bzw. verbreitete Containerformate müssen gelesen werden können.
-
-\textbf{Begründung:} Metadaten sind oft in Containerformaten eingebettet bzw. fest in deren Spezifikation verankert. Zudem müssen Container-Segmente erkannt werden können, um sie zu überspringen und den eigentlichen Anfang der Metadaten finden zu können.
+A list of supported data formats in the current version is given in \SectionLink{sec:Features}.
 
 %-----------------------------------------------------------------------------------------------
-%		ANF 003
+%		REQ 002
 %-----------------------------------------------------------------------------------------------
 
-\section{ANF 003: Spezifikation unterstützter Metadaten- und Containerformate erfüllen}
-\label{sec:ANF003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen}
+\section{REQ 002: Read container formats}
+\label{sec:REQ002ContainerformateLesen}
 
-Sofern eine Spezifikation eines unterstützten Metadaten- bzw. Containerformates vorliegt, muss diese vollständig unterstützt werden. Es muss vollständigen Zugriff auf alle unterstützten Features des Datenformates möglich sein.
+\LibName{} must be at least able to read popular and wide-spread container formats. Writing support is optional.
 
-\textbf{Begründung:} So wird sichergestellt, dass spezifikationskonforme Metadaten geschrieben werden, die auch von anderen Libraries bzw. Anwendungen wieder gelesen werden können. Zudem kann der Nutzer der Library alle Features des jeweiligen Formates ausnutzen, ohne wiederum allzu viel Eigenimplementierung leisten zu müssen. Dies ist auch eine Differenzierungsmöglichkeit gegenüber anderen Libraries.
-
-%-----------------------------------------------------------------------------------------------
-%		ANF 004
-%-----------------------------------------------------------------------------------------------
-
-\section{ANF 004: Zugriff auf alle Rohdaten über die Library}
-\label{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary}
-
-Zusätzlich zum Zugriff auf menschenlesbare Metadaten (\SectionLink{sec:MetadatenLesenUndSchreiben}) soll es ebenso möglich sein, alle Rohdaten aub Byteebene zu lesen. Es soll feingranularer Zugriff auf alle Felder der Binärdaten möglich sein.
-
-\textbf{Begründung:} So können Anwender selbst ein Parsing implementieren, ohne die high-level-Funktionen nutzen zu müssen. Sie können selbst auf Byte- und Bitebene Daten manipulieren und auslesen. Ein Zugriff auf die Binärdaten ist möglich (wenn nötig), ohne wiederum einen eigenen Umweg gehen zu müssen, z.B. durch erneutes Lesen und Parsen der Daten.
+\textbf{Rationale:} Multimedia meta data is often embedded in container formats or an integral part of their specification. \LibName{} must be able to identify and parse container segments in order to skip them to find the actual start of a meta data tag, or to read their meta data content. Writing is optional because \LibName{} cannot offer encoding functionality, so just writing header information and raw binary data that has been encoded by another library could be offered.
 
 %-----------------------------------------------------------------------------------------------
-%		ANF 005
+%		REQ 003
 %-----------------------------------------------------------------------------------------------
 
-\section{ANF 005: Performance vergleichbar mit anderen Java-Metadaten-Libraries}
-\label{sec:ANF005PerformanceVergleichbarMitAnderenJavaMetadatenLibraries}
+\section{REQ 003: Fulfill specification of supported data formats}
+\label{sec:REQ003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen}
 
-Die Performance der Library soll gleichwertig oder besser als die anderen Java-Metadaten-Libraries sein. Hierfür müssen die Vergleichslibraries benannt und ein entsprechender Benchmark definiert und durchgeführt werden.
+As far as there is an official specification for a supported data format, this specification must be fully supported by \LibName{}, that means all encoding types, optional headers, data transformations (e.g. encryption), padding and other features that are included in the specification, as well as any generic attributes or containers must be readable and writable. It is not necessary that \LibName{} explicitly supports unspecified attribute types that might be popular but not defined by the specification. Such attributes should however be accessible using the generic attribute mechanism offered by most data formats.
 
-\textbf{Begründung:} Die Library soll ähnlich performant wie bestehende Lösungen der idealerweise performanter sein, um hier kein Argument gegen ihren Einsatz zu liefern.
-
-%-----------------------------------------------------------------------------------------------
-%		ANF 006
-%-----------------------------------------------------------------------------------------------
-
-\section{ANF 006: Fehlererkennung, Fehlertoleranz, Fehlerkorrektur}
-\label{sec:ANF006FehlererkennungFehlertoleranzFehlerkorrektur}
-
-Ergänzend zur \SectionLink{sec:ANF003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen} muss die Library aber auch \emph{fehlertolerant} sein, so weit möglich. D.h. u.a., das Spezifikationsverstöße und fehlerhafte Parsing-Metadaten erkannt werden, und dies - soweit nicht unumgänglich - nicht zum Abbruch des Parsens mit einem Fehler endet. Verstöße werden protokolliert und wenn möglich automatisch korrigiert (optional, wenn es der Library-Anwender wünscht).
-
-\textbf{Begründung:} Altanwendungen oder andere Libraries schreiben Datenformate manchmal nicht 100\% spezifikationskonform. Zudem sind nicht alle Spezifikationen eindeutig oder genau genug, sodass Varianten entstehen könnten. Trotz Vorliegen fehlerhafter Daten soll der Anwender der Library in die Lage versetzt werden, Daten dennoch auslesen und ggf. sogar korrigieren zu können.
+\textbf{Rationale:} This ensures that all meta data or container format blocks that adhere to their specification can be read by \LibName{}, and furthermore, that \LibName{} itself generates data that is compliant to the specification. Second, the user can use \LibName{} to use specific data format features in a convenient way without needing to implement this himself.
 
 %-----------------------------------------------------------------------------------------------
-%		ANF 007
+%		REQ 004
 %-----------------------------------------------------------------------------------------------
 
-\section{ANF 007: Extensibility for new Metadata and Container Formats}
-\label{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}
+\section{REQ 004: Access to raw data via \LibName{}}
+\label{sec:REQ004ZugriffAufAlleRohdatenUeberDieLibrary}
+
+In addtion to the access to human-readable meta data (\SectionLink{sec:MetadatenLesenUndSchreiben}), it must be possible to explicitly read and write raw data on byte level. \LibName{} must offer fine-grained access to fields of binary data.
+
+\textbf{Rationale:} Thus, user could implement parsing themselves without needing to use high-level functions. In some rare cases this might be necessary to circumvent some issues with the data written by some other tool. This channel of access is offered to users such that they are not forced to completely skip \LibName{} and implement raw access to supported media themselves, leading to also sync and consistency issues when doing this in parallel to the access by \LibName{}.
+
+%-----------------------------------------------------------------------------------------------
+%		REQ 005
+%-----------------------------------------------------------------------------------------------
+
+\section{REQ 005: Performance as good as other Java meta data libraries}
+\label{sec:REQ005PerformanceVergleichbarMitAnderenJavaMetadatenLibraries}
+
+The performance of \LibName{} on all supported platforms must be as least as good as the performance of competitor Java meta data libraries such as jaudiotagger, mp3agic or BeagleBuddy. A corresponding reasonable benchmark needs to be set up with published code to demonstrate this. It is out of scope to make \LibName{} as fast as high-performance encoding or decoding libraries on C++ basis such as gstreamer of ffmpeg.
+
+\textbf{Rationale:} \LibName{} targets to be a good replacement for any existing Java multimedia tagging library, and thus it is clear it should at least perform at the same level or even better.
+
+%-----------------------------------------------------------------------------------------------
+%		REQ 006
+%-----------------------------------------------------------------------------------------------
+
+\section{REQ 006: Fehlererkennung, Fehlertoleranz, Fehlerkorrektur}
+\label{sec:REQ006FehlererkennungFehlertoleranzFehlerkorrektur}
+
+Ergänzend zur \SectionLink{sec:REQ003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen} muss die Library aber auch \emph{fehlertolerant} sein, so weit möglich. D.h. u.a., das Spezifikationsverstöße und fehlerhafte Parsing-Metadaten erkannt werden, und dies - soweit nicht unumgänglich - nicht zum Abbruch des Parsens mit einem Fehler endet. Verstöße werden protokolliert und wenn möglich automatisch korrigiert (optional, wenn es der Library-Anwender wünscht).
+
+\textbf{Rationale:} Altanwendungen oder andere Libraries schreiben Datenformate manchmal nicht 100\% spezifikationskonform. Zudem sind nicht alle Spezifikationen eindeutig oder genau genug, sodass Varianten entstehen könnten. Trotz Vorliegen fehlerhafter Daten soll der Anwender der Library in die Lage versetzt werden, Daten dennoch auslesen und ggf. sogar korrigieren zu können.
+
+%-----------------------------------------------------------------------------------------------
+%		REQ 007
+%-----------------------------------------------------------------------------------------------
+
+\section{REQ 007: Extensibility for new Metadata and Container Formats}
+\label{sec:REQ007ErweiterbarkeitUmNeueMetadatenUndContainerformate}
 
 \LibName{} must be comfortably extensible with new container or metadata formats. As the minimum level, easy extensibility by the library developers must be possible. As the maximum level of extensibility, also end users with programming experience must be able to easily write extensions without too much configuration or boilerplate code.
 
-\textbf{Rationale:} New metadata formats are developed and are available over and over again. The extensibility ensures a longer life time of the library and allows easier maintenance by the library developers. In the maximum level ``Extensibility by end users'', this is a clear differntiation criterion to other libraries that do not offer this level of extensibility.
+\textbf{Rationale:} A wealth of already existing meta data and container formats is yet out there. Just the formats with major importance are supported as of now by \LibName{}. Furthermore, we might expect new meta data or container formats in future. The extensibility mechanism first of all guarantees an easy extensibility by a 3rd party, e.g. lib name users or also other vendors. The extensibility also ensures a longer life time of the library. In the maximum level ``Extensibility by end users'', this is a clear differntiation criterion to other libraries that do not offer this level of extensibility. Last but not least, this allows easier maintenance (i.e. extension) by the library developers itself if they decide to bundle additional format support extensions with the core library in a new release.
 
 %-----------------------------------------------------------------------------------------------
-%		ANF 008
+%		REQ 008
 %-----------------------------------------------------------------------------------------------
 
-\section{ANF 008: Lesen und Schreiben großer Datenblöcke}
-\label{sec:ANF009LesenSchreibenGrosse}
+\section{REQ 008: Read and write large data blocks}
+\label{sec:REQ009LesenSchreibenGrosse}
 
-\LibName{} muss das Lesen und Schreiben sehr großer Datenmengen effizient unterstützen, und dabei Mechanismen verwenden, um OutOfMemoryErrors zu vermeiden.
+\LibName{} must be able to read and write large amounts of data efficiently. With ``large'' we mean that \LibName{} must support data blocks with maximum size of $2^{63}-1$ bytes. The length of payloads must be interpreted correctly. Because of \SectionLink{sec:REQ004ZugriffAufAlleRohdatenUeberDieLibrary}, also reading and writing of raw data must be supported without necessarily causing scarcity of available memory, e.g. by chunk-wise reading possibilities. In general, \LibName{} must use mechanisms to avoid \texttt{OutOfMemoryError}s, unless the user forces this by reading the whole binary data of a block into memory. 
 
-\textbf{Begründung:} Besonders im Video-Bereich können teilweise gigabyte-große Nutzdaten vorkommen. Die Länge der Nutztdaten muss korrekt interpretiert werden können. Wegen \SectionLink{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary} muss auch das Lesen und Schreiben der Nutzdaten unterstützt werden, ohne dass Speicher knapp wird, d.h. ein etappenweises Lesen und Schreiben o.ä. muss möglich sein. Dies ist auch ein Differenzierungsmerkmal zu anderen Libraries, die dies ggf. gar nicht unterstützen können.
-
-%-----------------------------------------------------------------------------------------------
-%		ANF 009
-%-----------------------------------------------------------------------------------------------
-
-\section{ANF 009: Selective Format Choice}
-\label{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}
-
-An application using \LibName{} must be able to selectively choose these formats that it wants to support. This is not only necessary for runtime, but also for the library extension packages it wants to use.
-
-\textbf{Rationale:} Audio applications do not need extensions for video or image formats. Applications can minimize the runtime and memory overhead by choosing as few extensions as really needed.
+\textbf{Rationale:} Especially in the domain of video container formats, payloads or at least files with multiple gigabytes are very common. Yet, still $2^{63}-1$ bytes as upper limit should suffice for some years or decades to come. Supporting this is for sure also a plus compared to other competitor libraries that might not explicitly support large files.
 
 %-----------------------------------------------------------------------------------------------
-%		AUS 001
+%		REQ 009
 %-----------------------------------------------------------------------------------------------
 
-\section{AUS 001: Lesen aus Media Streams}
-\label{sec:AUS009LesenAusStreams}
+\section{REQ 009: Selective Format Choice}
+\label{sec:REQ010SchreibenInAnderesAusgabemediumUnterstützt}
 
-Ein Lesen von Metadaten oder Containerdaten aus Streams (streaming media) wird nicht explizit unterstützt. Es können im Design Möglichkeiten zur aktiven Unterstützung vorgesehen werden, dies ist aber nicht zwingend erforderlich.
+An application using \LibName{} must be able to selectively choose those formats that it wants to support. This is not only necessary for runtime, but also for the library extension packages it wants to use.
 
-\textbf{Begründung:} Kombinierte Anwendungen (Recorder bzw. Player) machen für diesen Fall mehr Sinn und sind auch weitgehend verfügbar. Die zusätzliche Unterstützung für Streaming könnte das Design verkomplizieren. Es ist aktuell unklar, wie dies umzusetzen wäre.
-
-%-----------------------------------------------------------------------------------------------
-%		AUS 002
-%-----------------------------------------------------------------------------------------------
-
-\section{AUS 002: Lesen von XML-Metadaten}
-\label{sec:AUS010LesenVonXMLMetadaten}
-
-Es gibt auch XML-Metadatenformate. Üblicherweise werden diese aber nicht in Multimedia-Daten eingesetzt, da sie sehr ``verbos'' sein können. Hier sind weiterhin die binären Metadatenformate die Platzhirsche. Die Unterstützung von XML wird nicht im Kern der Library vorgesehen.
-
-\textbf{Begründung:} Der Versuch, sowohl binäre als auch XML-Formate über die gleiche API oder gar Implementierung zu unterstützen, kann zu einem sehr komplizierten Design führen. Java bietet viele sinnvolle Standard-Möglichkeiten zum Parsen und zum Schreiben von XML-Metadaten. Evtl. könnten diese in Ausbaustufen in einer Implementierung (hinter der gleichen API-Schnittstelle) in einer späteren Ausbaustufe unterstützt werden.
+\textbf{Rationale:} Audio applications do not need extensions for video or image formats. Applications can minimize the runtime and memory (both HDD and RAM) overhead by choosing as few extensions as really needed.
 
 %-----------------------------------------------------------------------------------------------
-%		AUS 003
+%		EXCL 001
 %-----------------------------------------------------------------------------------------------
 
-\section{AUS 003: No User Extensions for \LibName{} Media}
-\label{sec:AUS01220LesenVonXMLMetadaten}
+\section{EXCL 001: Reading media streams}
+\label{sec:EXCL009LesenAusStreams}
+
+\LibName{} in its current version \LibVersion{} does not explicitly support reading meta data or containers from media streams consumed e.g. from the internet. It might offer optional starting points for this by e.g. in principle supporting access to \texttt{InputStream}s. But it does not offer an explicit API or examples, nor do we create specific test cases for media streams. Furthermore, media stream specific tag formats such as \texttt{IcyTag} are not in scope of the current library version. 
+
+\textbf{Rationale:} Combined applications such as recorders or players whose main task is playing make more sense for this, as they are not only interested in meta data. Supporting streaming media in addition might overly complicate the design and API of the current library version, so this might be left for future versions to come.
+
+%-----------------------------------------------------------------------------------------------
+%		EXCL 002
+%-----------------------------------------------------------------------------------------------
+
+\section{EXCL 002: Support for  XML meta data}
+\label{sec:EXCL010LesenVonXMLMetadaten}
+
+There are also XML meta data formats out in the wild. They are not used very often for multimedia meta data, but cases exist. \LibName{} does not support reading and writing of XML meta data format in the current version, but only specializes to binary formats.
+\textbf{Rationale:} Binary meta data formats still seem to rule the scene due to their compactness. It would be absurd to design a generic library that can parse both XML and binary formats with the same code, as XML is usually efficiently read and written using streaming parsers and validated using schemas, where excellent APIs already exist. It is left for the future to offer built-in support for XML metadata in \LibName{} via an easy API.
+
+%-----------------------------------------------------------------------------------------------
+%		EXCL 003
+%-----------------------------------------------------------------------------------------------
+
+\section{EXCL 003: No user extensions for \LibName{} media}
+\label{sec:EXCL01220LesenVonXMLMetadaten}
 
 Extending \LibName{} with new media to support - on top of the out-of-the box supported media - is not supported.
 
 \textbf{Rationale:} The mechanisms available should cover 80 to 90 percent of the use cases. Extensibility by new media might increase the complexity of \LibName{} itself and the extension mechanism in specific, without adding real-world use cases really needing it. It is currently not clear which media beyond streams, byte arrays and files might be candidates for extending \LibName{}. Should new media make sense in future, a new core release can be created to also support media extensions.
+
+%-----------------------------------------------------------------------------------------------
+%		EXCL 004
+%-----------------------------------------------------------------------------------------------
+
+\section{EXCL 004: \LibName{} is not a (high-performance) encoder or decoder}
+\label{sec:EXCL01220LesenVonXMLMetadaten}
+
+Even though it would be tempting, \LibName{} currently is not a encoder or decoder for multimedia content, especially not a high-performance one. It is not the target to extend this library to be that, but you never know. However, it can be the basis for a Java-based encoder or decoder pack, as it offers bit-wise parsing and other raw data access functionality for container formats. But there is no specific design into that direction, especially no means for specific multi-threading built-in support, means users are left to leverage multiple cores themselves as necessary.
+
+\textbf{Rationale:} Audio, video and image formats as well as corresponding encoders are extensively complex. A huge variety of great libraries and tools is already existing. For high-performance needs, especially GStreamer and FFMPEG seem to rule the scene. \LibName{} can never compete with that and it would mean to \emph{just stop} the project when trying to do just that. Instead, we can offer the primitives for Java developers who might want to develop their own (probably not very high-performance) codecs. Maybe in the very far future, \LibName{} could offer integration functionality to plug-in existing codec implementations somehow conveniently, such that it can be used on its own as a basis for Java transcoding and player/viewer applications.
 
 %===============================================================================================
 %		Reference Examples
@@ -643,26 +630,10 @@ The following figure shows the second example, an MP3 file with two ID3v2.4 \TER
 The two ID3v2.4 tags are virtually connected by a \texttt{SEEK} frame. Both have several specialties described in \cite{MetadataCompendium}.
 
 %-----------------------------------------------------------------------------------------------
-%		Example 3: MP3 Media Stream with periodic ID3v2.3 Tags
+%		Example 3: Ogg Bitstream with Theora and VorbisComment
 %-----------------------------------------------------------------------------------------------
 
-\section{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
-\label{sec:Example3MP3FileWithID3v23AndID3v11}
-
-The following figure shows the third example, an MP3 media stream with wildly scattered or periodic ID3v2.3 \TERMtag{}s. The figure shows that start of listening to the stream may also be in the middle of an MP3 block:
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=1.00\textwidth]{figures/I_Example3.pdf}
-\caption{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
-\label{fig:Example3MP3filewithtwoID3tags}
-\end{figure}
-
-%-----------------------------------------------------------------------------------------------
-%		Example 4: Ogg Bitstream with Theora and VorbisComment
-%-----------------------------------------------------------------------------------------------
-
-\section{Example 4: Ogg Bitstream with Theora and VorbisComment}
+\section{Example 3: Ogg Bitstream with Theora and VorbisComment}
 \label{sec:Example4MP3FileWithID3v23AndID3v11}
 
 The following figure shows the fourth example, an Ogg bitstream that contains Theora payload data with a corresponding vorbis comment:
@@ -675,6 +646,22 @@ The following figure shows the fourth example, an Ogg bitstream that contains Th
 \end{figure}
 
 The example is complex on first sight. In an Ogg bitstream, physical and logical structure are not necessarily the same. The physical structure is built by pages, packets and segments, while the logical structure is the structure of the wrapped data. We took theora video data as an example, but its basically arbitrary, as the codec does not really matter. What matters is where the Vorbis Comment, one of the supported data formats, is stored. This unfortunately depends on the embedded codec. In this example, the vorbis comment starts in the second page and spans over two packets. The second of these packets spans over two Ogg pages.
+
+% %-----------------------------------------------------------------------------------------------
+% %		Example 4: MP3 Media Stream with periodic ID3v2.3 Tags
+% %-----------------------------------------------------------------------------------------------
+
+% \section{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
+% \label{sec:Example3MP3FileWithID3v23AndID3v11}
+
+% The following figure shows the third example, an MP3 media stream with wildly scattered or periodic ID3v2.3 \TERMtag{}s. The figure shows that start of listening to the stream may also be in the middle of an MP3 block:
+
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=1.00\textwidth]{figures/I_Example3.pdf}
+% \caption{Example 3: MP3 Media Stream with periodic ID3v2.3 Tags}
+% \label{fig:Example3MP3filewithtwoID3tags}
+% \end{figure}
 
 % %-----------------------------------------------------------------------------------------------
 % %		Example 5: TIFF RGB image file

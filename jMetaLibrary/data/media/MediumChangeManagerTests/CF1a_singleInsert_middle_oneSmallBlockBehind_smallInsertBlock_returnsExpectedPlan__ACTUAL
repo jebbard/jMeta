@@ -1,4 +1,0 @@
-READ at 12 with size 8 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
-WRITE at 52 with size 8 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
-WRITE at 12 with size 40 with bytes java.nio.HeapByteBuffer[pos=0 lim=40 cap=40] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
-INSERT at 12 with size 40 with bytes java.nio.HeapByteBuffer[pos=0 lim=40 cap=40] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt

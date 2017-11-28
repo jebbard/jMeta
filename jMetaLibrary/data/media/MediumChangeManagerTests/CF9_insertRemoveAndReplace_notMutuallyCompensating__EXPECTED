@@ -1,0 +1,28 @@
+READ at 690 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 1229 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 490 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 1029 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 391 with size 99 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 930 with size 99 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 840 with size 90 with bytes java.nio.HeapByteBuffer[pos=0 lim=90 cap=90] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+REPLACE at 301 with size 90 with bytes java.nio.HeapByteBuffer[pos=0 lim=90 cap=90] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 300 with size 1 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 839 with size 1 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 836 with size 3 with bytes java.nio.HeapByteBuffer[pos=0 lim=3 cap=3] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+INSERT at 300 with size 3 with bytes java.nio.HeapByteBuffer[pos=0 lim=3 cap=3] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 380 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=456] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 580 with size 200 with bytes java.nio.HeapByteBuffer[pos=200 lim=400 cap=456] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 780 with size 56 with bytes java.nio.HeapByteBuffer[pos=0 lim=56 cap=456] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+INSERT at 300 with size 456 with bytes java.nio.HeapByteBuffer[pos=0 lim=456 cap=456] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 273 with size 27 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 353 with size 27 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+REMOVE at 23 with size 250 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 22 with size 1 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 352 with size 1 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 212 with size 140 with bytes java.nio.HeapByteBuffer[pos=0 lim=140 cap=140] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+INSERT at 22 with size 140 with bytes java.nio.HeapByteBuffer[pos=0 lim=140 cap=140] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+READ at 10 with size 12 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 200 with size 12 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 0 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+REPLACE at 0 with size 10 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+REMOVE at 890 with size 250 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt

@@ -50,6 +50,15 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * {@link ExpectedActionSequence}s. They encapsulate sequences of {@link MediumAction}s that form a logical block. See
  * javadocs of {@link ReadWriteActionSequence}, {@link WriteActionSequence} and {@link SingleActionSequence} for
  * details.
+ * 
+ * All test cases start with "CF" = "create flush plan" and a number, which is the test case number from the design
+ * concept.
+ * 
+ * Note that this test class dumps expected and actual flush plan created in files for easier comparison, the files are
+ * stored in a sub-folder of {@link MediaTestFiles#TEST_FILE_DIRECTORY_PATH}.
+ * 
+ * Here, we only have positive tests for creation of flush plans, all negative tests for invalid scheduling sequences
+ * can be found in {@link MediumChangeManagerTest}.
  */
 public class MediumChangeManagerCreateFlushPlanTest {
 
@@ -101,37 +110,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
-    */
-   @Test
-   public void CF1a_singleInsert_middle_oneSmallBlockBehind_smallInsertBlock_returnsExpectedPlan() {
-
-      MediumChangeManager testling = getTestling();
-
-      int totalMediumSizeInBytes = 20;
-      int writeBlockSizeInBytes = 200;
-
-      // First insert
-      int insertSize1 = 40;
-      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
-      int insertOffset1 = 12;
-      MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
-         insertBuffer1);
-      // Bytes behind first insert
-      int totalRWSizeInBytes1 = totalMediumSizeInBytes - insertOffset1;
-
-      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         ReadWriteActionSequence.createSingleBlock(at(insertOffset1), totalRWSizeInBytes1, insertSize1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
-         new SingleActionSequence(insertAction1));
-   }
-
-   /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF1b_singleInsert_start_onlyFullBlocksBehind_fullBlockSizeInsertBlock_returnsExpectedPlan() {
+   public void CF1a_singleInsert_atStart_multipleFullBlocksBehind_oneFullInsertedBlock() {
 
       MediumChangeManager testling = getTestling();
 
@@ -159,7 +141,33 @@ public class MediumChangeManagerCreateFlushPlanTest {
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF1c_singleInsert_middle_multiBlocksWithRemainder_multiInsertBlocksWithRemainder_returnsExpectedPlan() {
+   public void CF1b_singleInsert_inMiddle_oneSmallBlockBehind_oneSmallInsertedBlock() {
+
+      MediumChangeManager testling = getTestling();
+
+      int totalMediumSizeInBytes = 20;
+      int writeBlockSizeInBytes = 200;
+
+      // First insert
+      int insertSize1 = 40;
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
+      int insertOffset1 = 12;
+      MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
+         insertBuffer1);
+      // Bytes behind first insert
+      int totalRWSizeInBytes1 = totalMediumSizeInBytes - insertOffset1;
+
+      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
+         ReadWriteActionSequence.createSingleBlock(at(insertOffset1), totalRWSizeInBytes1, insertSize1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new SingleActionSequence(insertAction1));
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
+    */
+   @Test
+   public void CF1c_singleInsert_inMiddle_multipleFullAndRemainderBlockBehind_multipleFullAndRemainderInsertedBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -193,11 +201,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF1d_singleInsert_end_smallInsertBlock_returnsExpectedPlan() {
+   public void CF1d_singleInsert_atEnd_noBlocksBehind_oneSmallInsertedBlock() {
 
       MediumChangeManager testling = getTestling();
 
@@ -217,37 +224,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF2a_singleRemove_middle_oneSmallBlockBehind_smallRemoveSize_returnsExpectedPlan() {
-
-      MediumChangeManager testling = getTestling();
-
-      int totalMediumSizeInBytes = 150;
-      int writeBlockSizeInBytes = 200;
-
-      // First remove
-      int removeOffset1 = 12;
-      int removeSize1 = 35;
-      MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
-
-      MediumAction expectedTruncateAction = new MediumAction(MediumActionType.TRUNCATE,
-         new MediumRegion(at(totalMediumSizeInBytes - removeSize1), removeSize1), 0, null);
-
-      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         ReadWriteActionSequence.createSingleBlock(at(removeOffset1 + removeSize1),
-            totalMediumSizeInBytes - removeOffset1 - removeSize1, -removeSize1),
-         new SingleActionSequence(removeAction1), new SingleActionSequence(expectedTruncateAction));
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
-    */
-   @Test
-   public void CF2b_singleRemove_start_largerBlockBehind_biggerRemoveSize_returnsExpectedPlan() {
+   public void CF2a_singleRemove_atStart_oneFullAndRemainderBlockBehind() {
 
       MediumChangeManager testling = getTestling();
 
@@ -276,35 +256,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF2c_singleRemove_end_NoBytesBehind_biggerRemoveSize_returnsExpectedPlan() {
-
-      MediumChangeManager testling = getTestling();
-
-      int totalMediumSizeInBytes = 1140;
-      int writeBlockSizeInBytes = 200;
-
-      // First remove
-      int removeSize1 = 400;
-      int removeOffset1 = totalMediumSizeInBytes - removeSize1;
-      MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
-
-      MediumAction expectedTruncateAction = new MediumAction(MediumActionType.TRUNCATE,
-         new MediumRegion(at(totalMediumSizeInBytes - removeSize1), removeSize1), 0, null);
-
-      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new SingleActionSequence(removeAction1), new SingleActionSequence(expectedTruncateAction));
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
-    */
-   @Test
-   public void CF2d_singleRemove_removeWholeMedium_returnsExpectedPlan() {
+   public void CF2b_singleRemove_coveringWholeMedium_noBlocksBehind() {
 
       MediumChangeManager testling = getTestling();
 
@@ -324,11 +279,58 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF3a_singleInsertingReplace_start_oneSmallBlockBehind_returnsExpectedPlan() {
+   public void CF2c_singleRemove_inMiddle_oneSmallBlockBehind() {
+
+      MediumChangeManager testling = getTestling();
+
+      int totalMediumSizeInBytes = 150;
+      int writeBlockSizeInBytes = 200;
+
+      // First remove
+      int removeOffset1 = 12;
+      int removeSize1 = 35;
+      MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
+
+      MediumAction expectedTruncateAction = new MediumAction(MediumActionType.TRUNCATE,
+         new MediumRegion(at(totalMediumSizeInBytes - removeSize1), removeSize1), 0, null);
+
+      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
+         ReadWriteActionSequence.createSingleBlock(at(removeOffset1 + removeSize1),
+            totalMediumSizeInBytes - removeOffset1 - removeSize1, -removeSize1),
+         new SingleActionSequence(removeAction1), new SingleActionSequence(expectedTruncateAction));
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
+    */
+   @Test
+   public void CF2d_singleRemove_atEnd_noBlocksBehind() {
+
+      MediumChangeManager testling = getTestling();
+
+      int totalMediumSizeInBytes = 1140;
+      int writeBlockSizeInBytes = 200;
+
+      // First remove
+      int removeSize1 = 400;
+      int removeOffset1 = totalMediumSizeInBytes - removeSize1;
+      MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
+
+      MediumAction expectedTruncateAction = new MediumAction(MediumActionType.TRUNCATE,
+         new MediumRegion(at(totalMediumSizeInBytes - removeSize1), removeSize1), 0, null);
+
+      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
+         new SingleActionSequence(removeAction1), new SingleActionSequence(expectedTruncateAction));
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
+    */
+   @Test
+   public void CF3a_singleInsertingReplace_atStart_oneSmallBlockBehind_multipleFullAndRemainderReplacementBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -357,76 +359,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF3b_singleInsertingReplace_middle_biggerBlocksBehind_returnsExpectedPlan() {
-
-      MediumChangeManager testling = getTestling();
-
-      int totalMediumSizeInBytes = 1500;
-      int writeBlockSizeInBytes = 200;
-
-      // First replace
-      int replaceOffset1 = 500;
-      int replaceSize1 = 50;
-      int replacedByteCount1 = 35;
-      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
-      int totalRWSizeInBytes1 = totalMediumSizeInBytes - replaceOffset1 - replacedByteCount1;
-      int readWriteBlockCount1 = totalRWSizeInBytes1 / writeBlockSizeInBytes;
-      int remainingWriteBlockSize1 = totalRWSizeInBytes1 % writeBlockSizeInBytes;
-
-      MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
-         replacementBuffer1);
-
-      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount1, writeBlockSizeInBytes,
-            replaceSize1 - replacedByteCount1, ActionOrder.BACKWARD),
-         ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1), remainingWriteBlockSize1,
-            replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
-         new SingleActionSequence(replaceAction1));
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
-    */
-   @Test
-   public void CF3c_singleInsertingReplace_end_returnsExpectedPlan() {
-
-      MediumChangeManager testling = getTestling();
-
-      int totalMediumSizeInBytes = 1500;
-      int writeBlockSizeInBytes = 200;
-
-      // First replace
-      int replaceOffset1 = 1450;
-      int replaceSize1 = 350;
-      int replacedByteCount1 = 50;
-      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
-
-      int remainingWriteByteCount1 = replaceSize1 % writeBlockSizeInBytes;
-      ByteBuffer remainingWriteBuffer1 = ByteBuffer.wrap(replacementBuffer1.array(), writeBlockSizeInBytes,
-         remainingWriteByteCount1);
-
-      MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
-         replacementBuffer1);
-
-      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(replaceOffset1), 1, writeBlockSizeInBytes, replacementBuffer1),
-         new WriteActionSequence(at(replaceOffset1 + writeBlockSizeInBytes), 1, remainingWriteByteCount1,
-            remainingWriteBuffer1),
-         new SingleActionSequence(replaceAction1));
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
-    */
-   @Test
-   public void CF3d_singleRemovingReplace_start_multipleWholeBlocksBehind_returnsExpectedPlan() {
+   public void CF3b_singleRemovingReplace_atStart_multipleFullBlocksBehind_oneSmallReplacementBlock() {
 
       MediumChangeManager testling = getTestling();
 
@@ -455,11 +391,42 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF3e_singleRemovingReplace_middle_smallBlockBehind_returnsExpectedPlan() {
+   public void CF3c_singleInsertingReplace_inMiddle_multipleFullAndRemainderBlockBehind_oneSmallReplacementBlock() {
+
+      MediumChangeManager testling = getTestling();
+
+      int totalMediumSizeInBytes = 1500;
+      int writeBlockSizeInBytes = 200;
+
+      // First replace
+      int replaceOffset1 = 500;
+      int replaceSize1 = 50;
+      int replacedByteCount1 = 35;
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
+      int totalRWSizeInBytes1 = totalMediumSizeInBytes - replaceOffset1 - replacedByteCount1;
+      int readWriteBlockCount1 = totalRWSizeInBytes1 / writeBlockSizeInBytes;
+      int remainingWriteBlockSize1 = totalRWSizeInBytes1 % writeBlockSizeInBytes;
+
+      MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
+         replacementBuffer1);
+
+      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
+         new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount1, writeBlockSizeInBytes,
+            replaceSize1 - replacedByteCount1, ActionOrder.BACKWARD),
+         ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1), remainingWriteBlockSize1,
+            replaceSize1 - replacedByteCount1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new SingleActionSequence(replaceAction1));
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
+    */
+   @Test
+   public void CF3d_singleRemovingReplace_inMiddle_oneSmallBlockBehind_oneSmallReplacementBlock() {
 
       MediumChangeManager testling = getTestling();
 
@@ -487,11 +454,41 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF3f_singleRemovingReplace_end_returnsExpectedPlan() {
+   public void CF3e_singleInsertingReplace_atEnd_noBlocksBehind_multipleFullReplacementBlocks() {
+
+      MediumChangeManager testling = getTestling();
+
+      int totalMediumSizeInBytes = 1500;
+      int writeBlockSizeInBytes = 200;
+
+      // First replace
+      int replaceOffset1 = 1450;
+      int replaceSize1 = 350;
+      int replacedByteCount1 = 50;
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
+
+      int remainingWriteByteCount1 = replaceSize1 % writeBlockSizeInBytes;
+      ByteBuffer remainingWriteBuffer1 = ByteBuffer.wrap(replacementBuffer1.array(), writeBlockSizeInBytes,
+         remainingWriteByteCount1);
+
+      MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
+         replacementBuffer1);
+
+      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
+         new WriteActionSequence(at(replaceOffset1), 1, writeBlockSizeInBytes, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + writeBlockSizeInBytes), 1, remainingWriteByteCount1,
+            remainingWriteBuffer1),
+         new SingleActionSequence(replaceAction1));
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
+    */
+   @Test
+   public void CF3f_singleRemovingReplace_atEnd_noBlocksBehind_oneSmallReplacementBlock() {
 
       MediumChangeManager testling = getTestling();
 
@@ -516,11 +513,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF3g_singleOverwritingReplace_middle_smallBlockBehind_returnsExpectedPlan() {
+   public void CF3g_singleOverwritingReplace_inMiddle_oneSmallBlockBehind_oneSmallReplacementBlock() {
 
       MediumChangeManager testling = getTestling();
 
@@ -542,11 +538,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF3h_singleInsertingReplace_replaceWholeMedium_returnsExpectedPlan() {
+   public void CF3h_singleInsertingReplace_coveringWholeMedium_mutipleFullReplacementBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -568,11 +563,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF4a_multiInsert_start_allSameOffset_smallInsertBlockSizes_returnsExpectedPlan() {
+   public void CF4a_multipleInserts_allSameOffsetAtStart_multipleSmallInsertedBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -609,11 +603,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF4b_multiInsert_start_allSameOffset_differentInsertBlockSizes_returnsExpectedPlan() {
+   public void CF4b_multipleInserts_allSameOffsetAtStart_multipleSmallAndFullInsertedBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -664,11 +657,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF4c_multiInsert_middle_differentOffsets_returnsExpectedPlan() {
+   public void CF4c_multipleInserts_atDifferentOffsetsInMiddle_smallInsertedBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -699,11 +691,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF4d_multiInsert_untilEnd_differentOffsets_returnsExpectedPlan() {
+   public void CF4d_multipleInserts_atDifferentOffsetsAtEnd_smallInsertedBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -733,11 +724,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF4e_multiInsert_middle_differentOffsets_variousInsertAndBehindSizes_returnsExpectedPlan() {
+   public void CF4e_multipleInserts_atDifferentOffsetsInMiddle_multipleSmallAndFullInsertedBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -818,11 +808,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF5a_multiRemove_start_consecutive_returnsExpectedPlan() {
+   public void CF5a_multipleRemoves_allConsecutiveAtStart_multipleFullAndRemainderBlocksBehind() {
 
       MediumChangeManager testling = getTestling();
 
@@ -858,11 +847,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF5b_multiRemove_middle_nonConsecutive_returnsExpectedPlan() {
+   public void CF5b_multipleRemoves_nonConsecutiveInMiddle_multipleFullAndRemainderBlocksBetween() {
 
       MediumChangeManager testling = getTestling();
 
@@ -910,11 +898,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF5c_multiRemove_untilEnd_partlyConsecutive_returnsExpectedPlan() {
+   public void CF5c_multipleRemoves_partlyConsecutiveOneUntilEnd_multipleFullAndRemainderBlocksBetween() {
 
       MediumChangeManager testling = getTestling();
 
@@ -969,11 +956,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF5d_multiRemove_removeWholeMedium_returnsExpectedPlan() {
+   public void CF5d_multipleRemoves_allConsecutiveCoveringWholeMedium_noBlocksBehind() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1004,11 +990,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF6a_multiInsertingReplace_start_consecutive_returnsExpectedPlan() {
+   public void CF6a_multipleInsertingReplaces_allConsecutiveAtStart_multipleSmallAndFullReplacementBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1049,11 +1034,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF6b_multiReplace_middle_nonconsecutive_returnsExpectedPlan() {
+   public void CF6b_multipleReplaces_nonConsecutiveInMiddle_multipleSmallAndFullReplacementBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1127,11 +1111,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF6c_multiMutuallyEliminatingReplace_middle_returnsExpectedPlan() {
+   public void CF6c_multipleMutuallyCompensatingReplaces_nonConsectuiveInMiddle_oneSmallAndOneFullBlockBetween() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1171,11 +1154,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF6d_multiComplexReplace_middle_returnsExpectedPlan() {
+   public void CF6d_multipleReplaces_partlyConsecutiveInMiddle_multipleSmallAndFullReplacementBlocks() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1253,11 +1235,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF7a_removeAndInsert_mutuallyEliminatingDifferentOffsets_returnsExpectedPlan() {
+   public void CF7a_removeThenInsert_nonConsectuiveAtDifferentOffsets_mutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1285,11 +1266,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF7b_removeAndInsert_mutuallyEliminatingSameOffsetRemoveFirst_returnsExpectedPlan() {
+   public void CF7b_removeThenInsert_allSameOffset_mutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1314,11 +1294,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF7c_removeAndInsert_mutuallyEliminatingSameOffsetInsertFirst_returnsExpectedPlan() {
+   public void CF7c_insertThenRemove_allSameOffset_mutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1343,61 +1322,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF7d_removeAndInsert_insertsInRemovedArea_returnsExpectedPlan() {
-
-      MediumChangeManager testling = getTestling();
-
-      int totalMediumSizeInBytes = 1140;
-      int writeBlockSizeInBytes = 200;
-
-      // First insert
-      int insertOffset1 = 140;
-      int insertSize1 = 160;
-      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
-      MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
-         insertBuffer1);
-
-      // Remove
-      int removeOffset1 = 100;
-      int removeSize1 = 500;
-      MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
-
-      // Second insert
-      int insertOffset2 = 300;
-      int insertSize2 = 360;
-      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
-      MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
-         insertBuffer2);
-
-      // Bytes behind
-      int totalRWSizeInBytes1 = totalMediumSizeInBytes - removeOffset1 - removeSize1;
-      int readWriteBlockCount1 = totalRWSizeInBytes1 / writeBlockSizeInBytes;
-      int readWriteRemainderSizeInBytes1 = totalRWSizeInBytes1 % writeBlockSizeInBytes;
-
-      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(removeOffset1), 1, insertSize1, insertBuffer1),
-         new SingleActionSequence(insertAction1),
-         new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount1, writeBlockSizeInBytes,
-            insertSize1 + insertSize2 - removeSize1, ActionOrder.BACKWARD),
-         ReadWriteActionSequence.createSingleBlock(at(removeOffset1 + removeSize1), readWriteRemainderSizeInBytes1,
-            insertSize1 + insertSize2 - removeSize1),
-         new SingleActionSequence(removeAction1),
-         new WriteActionSequence(at(removeOffset1 + insertSize1), 1, writeBlockSizeInBytes, insertBuffer2),
-         new WriteActionSequence(at(removeOffset1 + insertSize1 + writeBlockSizeInBytes), 1,
-            insertSize2 % writeBlockSizeInBytes, insertBuffer2),
-         new SingleActionSequence(insertAction2));
-   }
-
-   /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
-    */
-   @Test
-   public void CF7e_removeAndInsert_insertsInRemovedAreaAfterOtherNonRelatedActions_returnsExpectedPlan() {
+   public void CF7d_removeThenInsert_nonConsecutiveAtDifferentOffsets_notMutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1417,7 +1345,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          insertBuffer1);
 
       // Second insert
-      int insertOffset2 = 140;
+      int insertOffset2 = 99;
       int insertSize2 = 130;
       ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
       MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
@@ -1433,13 +1361,18 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int readWriteBlockCount2 = totalRWSizeInBytes2 / writeBlockSizeInBytes;
       int readWriteRemainderSizeInBytes2 = totalRWSizeInBytes2 % writeBlockSizeInBytes;
 
+      // Bytes between remove and second insert
+      int totalRWSizeInBytes3 = removeOffset1 - insertOffset2;
+      int readWriteRemainderSizeInBytes3 = totalRWSizeInBytes3 % writeBlockSizeInBytes;
+
       int truncatedBytes = insertSize1 + insertSize2 - removeSize1;
 
       MediumAction expectedTruncateAction = new MediumAction(MediumActionType.TRUNCATE,
          new MediumRegion(at(totalMediumSizeInBytes + truncatedBytes), -truncatedBytes), 0, null);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(removeOffset1), 1, insertSize2, insertBuffer2),
+         ReadWriteActionSequence.createSingleBlock(at(insertOffset2), readWriteRemainderSizeInBytes3, insertSize2),
+         new WriteActionSequence(at(insertOffset2), 1, insertSize2, insertBuffer2),
          new SingleActionSequence(insertAction2),
          new ReadWriteActionSequence(at(removeOffset1 + removeSize1), readWriteBlockCount2, writeBlockSizeInBytes,
             insertSize2 - removeSize1, ActionOrder.FORWARD),
@@ -1459,11 +1392,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF7f_removeAndInsert_removeWholeMedium_returnsExpectedPlan() {
+   public void CF7e_removeWholeMediumThenInsert_atSameOffset() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1493,11 +1425,57 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
+    */
+   // TODO: Hinweis: Hier ist EVTL. createFlushPlan fehlerhaft (Position der WRITEs für das INSERT)
+   @Test
+   public void CF7f_removeThenInsert_consecutiveAtDifferentOffsets_notMutuallyCompensating() {
+
+      MediumChangeManager testling = getTestling();
+
+      int totalMediumSizeInBytes = 1140;
+      int writeBlockSizeInBytes = 200;
+
+      // Remove
+      int removeOffset1 = 300;
+      int removeSize1 = 160;
+      MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
+
+      // Insert
+      int insertOffset1 = removeOffset1 + removeSize1;
+      int insertSize1 = 100;
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
+      MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
+         insertBuffer1);
+      // Bytes behind insert
+      int totalRWSizeInBytes1 = totalMediumSizeInBytes - insertOffset1;
+      int readWriteBlockCount1 = totalRWSizeInBytes1 / writeBlockSizeInBytes;
+      int readWriteRemainderSizeInBytes1 = totalRWSizeInBytes1 % writeBlockSizeInBytes;
+
+      int truncatedBytes = insertSize1 - removeSize1;
+
+      MediumAction expectedTruncateAction = new MediumAction(MediumActionType.TRUNCATE,
+         new MediumRegion(at(totalMediumSizeInBytes + truncatedBytes), -truncatedBytes), 0, null);
+
+      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
+         new SingleActionSequence(removeAction1),
+         new WriteActionSequence(at(removeOffset1), 1, insertSize1, insertBuffer1),
+         new SingleActionSequence(insertAction1),
+         new ReadWriteActionSequence(at(removeOffset1 + removeSize1), readWriteBlockCount1, writeBlockSizeInBytes,
+            insertSize1 - removeSize1, ActionOrder.FORWARD),
+         ReadWriteActionSequence.createSingleBlock(
+            at(removeOffset1 + removeSize1 + readWriteBlockCount1 * writeBlockSizeInBytes),
+            readWriteRemainderSizeInBytes1, insertSize1 - removeSize1),
+         new SingleActionSequence(expectedTruncateAction)
+
+      );
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF8a_replaceAndInsert_mutuallyEliminatingConsecutive_returnsExpectedPlan() {
+   public void CF8a_replaceThenInsert_consecutiveAtDifferentOffsets_mutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1527,11 +1505,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    @Test
-   public void CF8b_replaceAndInsert_mutuallyEliminatingWithGap_returnsExpectedPlan() {
+   public void CF8b_insertThenRemovingReplace_nonConsecutiveAtDifferentOffsets_mutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1566,11 +1543,11 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
+   // TODO: Hinweis: Hier ist createFlushPlan fehlerhaft
    @Test
-   public void CF8c_removingReplaceThenInsert_atSameOffset_returnsPlanWithFirstReplaceThenInsert() {
+   public void CF8c_removingReplaceThenInsert_allSameOffset_notMutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1615,11 +1592,11 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
+   // TODO: Hinweis: Hier ist createFlushPlan fehlerhaft
    @Test
-   public void CF8d_insertingReplaceThenInsert_atSameOffset_returnsPlanWithFirstReplaceThenInsert() {
+   public void CF8d_insertingReplaceThenInsert_allSameOffset_notMutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1658,11 +1635,11 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
+   // TODO: Hinweis: Hier ist EVTL. createFlushPlan fehlerhaft (Position der WRITEs für das INSERT und REPLACE)
    @Test
-   public void CF8e_insertThenRemovingReplace_atSameOffset_returnsPlanWithFirstInsertThenReplace() {
+   public void CF8e_insertThenRemovingReplace_allSameOffset_notMutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1707,11 +1684,11 @@ public class MediumChangeManagerCreateFlushPlanTest {
    }
 
    /**
-    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}. See design concept for the testcase IDs starting
-    * with CF.
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
+   // TODO: Hinweis: Hier ist createFlushPlan fehlerhaft (u.a. evtl. Position der WRITEs für das INSERT)
    @Test
-   public void CF8f_insertThenInsertingReplace_atSameOffset_returnsPlanWithFirstInsertThenReplace() {
+   public void CF8f_insertThenInsertingReplace_allSameOffset_notMutuallyCompensating() {
 
       MediumChangeManager testling = getTestling();
 
@@ -1747,6 +1724,132 @@ public class MediumChangeManagerCreateFlushPlanTest {
          new SingleActionSequence(insertAction1),
          new WriteActionSequence(at(replaceOffset1 + replaceSize1), 1, replaceSize1, replacementBuffer1),
          new SingleActionSequence(replaceAction1));
+   }
+
+   /**
+    * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
+    */
+   // TODO kleinen Bug bei BB Position in Remainder WriteSequence raus so dass DIFFs auch immer übereinstimmen!
+   @Test
+   public void CF9_insertRemoveAndReplace_notMutuallyCompensating() {
+
+      MediumChangeManager testling = getTestling();
+
+      int totalMediumSizeInBytes = 1140;
+      int writeBlockSizeInBytes = 200;
+
+      // First Insert
+      int insertOffset1 = 22;
+      int insertSize1 = 140;
+      ByteBuffer insertBuffer1 = createTestByteBufferOfSize(insertSize1);
+      MediumAction insertAction1 = testling.scheduleInsert(new MediumRegion(at(insertOffset1), insertSize1),
+         insertBuffer1);
+
+      // First replace
+      int replaceOffset1 = 301;
+      int replaceSize1 = 90;
+      int replacedByteCount1 = replaceSize1;
+      ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
+      MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
+         replacementBuffer1);
+
+      // Second replace
+      int replaceOffset2 = 0;
+      int replaceSize2 = 200;
+      int replacedByteCount2 = 10;
+      ByteBuffer replacementBuffer2 = createTestByteBufferOfSize(replaceSize2);
+      MediumAction replaceAction2 = testling.scheduleReplace(new MediumRegion(at(replaceOffset2), replacedByteCount2),
+         replacementBuffer2);
+
+      // First remove
+      int removeOffset1 = 23;
+      int removeSize1 = 250;
+      MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
+
+      // Second Insert
+      int insertOffset2 = 300;
+      int insertSize2 = 456;
+      ByteBuffer insertBuffer2 = createTestByteBufferOfSize(insertSize2);
+      MediumAction insertAction2 = testling.scheduleInsert(new MediumRegion(at(insertOffset2), insertSize2),
+         insertBuffer2);
+
+      // Third Insert
+      int insertOffset3 = insertOffset2;
+      int insertSize3 = 3;
+      ByteBuffer insertBuffer3 = createTestByteBufferOfSize(insertSize3);
+      MediumAction insertAction3 = testling.scheduleInsert(new MediumRegion(at(insertOffset3), insertSize3),
+         insertBuffer3);
+
+      // Second remove
+      int removeOffset2 = 890;
+      int removeSize2 = 250;
+      MediumAction removeAction2 = testling.scheduleRemove(new MediumRegion(at(removeOffset2), removeSize2));
+
+      // Bytes between second replace and first insert
+      int totalRWSizeInBytes0 = insertOffset1 - replaceOffset2 - replacedByteCount2;
+      int readWriteRemainderSizeInBytes0 = totalRWSizeInBytes0 % writeBlockSizeInBytes;
+      int relativeWriteShiftInBytes0 = replaceSize2 - replacedByteCount2;
+
+      // Bytes between first insert and first remove
+      int totalRWSizeInBytes1 = removeOffset1 - insertOffset1;
+      int readWriteRemainderSizeInBytes1 = totalRWSizeInBytes1 % writeBlockSizeInBytes;
+      int relativeWriteShiftInBytes1 = insertSize1 + replaceSize2 - replacedByteCount2;
+
+      // Bytes between first remove and second insert
+      int totalRWSizeInBytes2 = insertOffset2 - removeOffset1 - removeSize1;
+      int readWriteRemainderSizeInBytes2 = totalRWSizeInBytes2 % writeBlockSizeInBytes;
+      int relativeWriteShiftInBytes2 = insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1;
+
+      // Bytes between second insert and first replace
+      int totalRWSizeInBytes3 = replaceOffset1 - insertOffset2;
+      int readWriteRemainderSizeInBytes3 = totalRWSizeInBytes3 % writeBlockSizeInBytes;
+      int relativeWriteShiftInBytes3 = insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1 + insertSize2
+         + insertSize3;
+
+      // Bytes between first replace and second remove
+      int totalRWSizeInBytes4 = removeOffset2 - replaceOffset1 - replaceSize1;
+      int readWriteBlockCount4 = totalRWSizeInBytes4 / writeBlockSizeInBytes;
+      int readWriteRemainderSizeInBytes4 = totalRWSizeInBytes4 % writeBlockSizeInBytes;
+      int relativeWriteShiftInBytes4 = insertSize1 - replacedByteCount1 + replaceSize1 - replacedByteCount2
+         + replaceSize2 - removeSize1 + insertSize2 + insertSize3;
+
+      checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
+         // Bytes between first replace and second remove
+         new ReadWriteActionSequence(at(removeOffset2), readWriteBlockCount4, writeBlockSizeInBytes,
+            relativeWriteShiftInBytes4, ActionOrder.BACKWARD),
+         ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
+            readWriteRemainderSizeInBytes4, relativeWriteShiftInBytes4),
+         new WriteActionSequence(at(replaceOffset1 + relativeWriteShiftInBytes4), 1, replaceSize1, replacementBuffer1),
+         new SingleActionSequence(replaceAction1),
+         // Bytes between second insert and first replace
+         ReadWriteActionSequence.createSingleBlock(at(insertOffset2), readWriteRemainderSizeInBytes3,
+            relativeWriteShiftInBytes3),
+         // Third insert
+         new WriteActionSequence(
+            at(insertOffset3 + insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1 + insertSize2), 1,
+            insertSize3, insertBuffer3),
+         new SingleActionSequence(insertAction3),
+         // Second insert
+         new WriteActionSequence(at(insertOffset2 + insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1), 2,
+            writeBlockSizeInBytes, insertBuffer2),
+         new WriteActionSequence(at(
+            insertOffset2 + insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1 + 2 * writeBlockSizeInBytes),
+            1, insertSize2 % writeBlockSizeInBytes, insertBuffer2),
+         new SingleActionSequence(insertAction2),
+         // Bytes between first remove and second insert
+         ReadWriteActionSequence.createSingleBlock(at(removeOffset1 + removeSize1), readWriteRemainderSizeInBytes2,
+            relativeWriteShiftInBytes2),
+         new SingleActionSequence(removeAction1),
+         // Bytes between first insert and second replace
+         ReadWriteActionSequence.createSingleBlock(at(insertOffset1), readWriteRemainderSizeInBytes1,
+            relativeWriteShiftInBytes1),
+         new WriteActionSequence(at(insertOffset1 + replaceSize2 - replacedByteCount2), 1, insertSize1, insertBuffer1),
+         new SingleActionSequence(insertAction1),
+         // Bytes between second replace and first insert
+         ReadWriteActionSequence.createSingleBlock(at(replaceOffset2 + replacedByteCount2),
+            readWriteRemainderSizeInBytes0, relativeWriteShiftInBytes0),
+         new WriteActionSequence(at(replaceOffset2), 1, replaceSize2, replacementBuffer2),
+         new SingleActionSequence(replaceAction2), new SingleActionSequence(removeAction2));
    }
 
    /**
