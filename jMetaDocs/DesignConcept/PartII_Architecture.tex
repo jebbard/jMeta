@@ -1,171 +1,150 @@
 \part{Architecture}
 \label{sec:Architeture}
 
-In this part, the high-level structure of \LibName{} is defined. This is done in two refinement levels and an additional perspective:
+In this part, the high-level structure of \LibName{} is defined. This is done in two refinement levels:
 \begin{itemize}
-	\item The technical architecture shows the technical environment and parts of \LibName{}
-	\item The functional architecture shows and describes the functional components of \LibName{}
+\item The technical architecture shows the technical environment and parts of \LibName{}
+\item The functional architecture shows and describes the functional components of \LibName{}
 \end{itemize}
 
 %===============================================================================================
 %		General Design Decisions
 %===============================================================================================
 
-\chapter{Allgemeine Designentscheidungen}
+\chapter{General Design Decisions}
 \label{sec:GeneralDesignDecisions}
 
-In diesem Kapitel werden allgemeine Designentscheidungen getroffen, die einen unumkehrbaren Einfluss auf die Architektur der Gesamt-Library haben. Sie definieren die Rahmenbedingungen für die Library, und dienen als Basis zur Definition ihrer technischen und vorallem fachlichen Architektur. Sie bilden auch generell und übergreifend die Basis zur Erfüllung der Anforderungen, haben daher noch keinen Bezug zu einer spezifischen Anforderung.
-
-Die Erfüllung der spezifischen Anforderungen wird durch die detaillierten Designentscheidungen ermöglicht, die im Kapitel \SectionLink{sec:FunctionalArchitectureChap} und im Teil \SectionLink{sec:Design} definiert sind.
+This chapter presents all general design decisions that have a big impact on the overall architecture. It is usually very hard to revert any of those design decisions. As they generally affect the whole library, they have no direct relation to specific requirements, but build the framework to be able to fullfill those requirements.
 
 %-----------------------------------------------------------------------------------------------
-%		Design Decision: Java SE 8
+%		Design Decision: \JavaVersion
 %-----------------------------------------------------------------------------------------------
 
-\section{Verwendung von Java}
+\section{Using \JavaVersion{}}
 \label{sec:VerwendungVonJava}
 
 \DD{dd:001}
 {% Titel
-	\LibName{} basiert auf Java SE 8%
+\LibName{} is based on \JavaVersion{}%
 }
 {% Kurzbeschreibung
-	\LibName{} wird basierend auf dem ``latest update'' von Java SE 8 entwickelt. Ein Umstieg auf neuere Java-Versionen wird im Rahmen des Lebenszyklus der Library wiederholt in Erwägung gezogen.
+\LibName{} is developed based on the ``latest update'' of \JavaVersion{}. Migrating \LibName{} towards newer Java versions is considered on a regular basis.
 }
 {% Begründung
-Java als Programmiersprache ist etabliert und weit verbreitet sowie plattformunabhängig. Prinzipiell ist der Portierungsaufwand zu anderen  Betriebssystemen, Java ME sowie Java für Smartphones (z.B. Android) damit weitaus geringer als bei Verwendung von beispielsweise C/C++. Da der Autor langjährige Erfahrung mit Java hat, stellt deren Verwendung eine höchstmögliche Produktivität sicher. Die Konkurrenzlibraries im Java-Umfeld sind überschaubar. Die aktuell (Stand 15. März 2016) neueste Version Java 8 wird ganz klar deshalb genutzt, weil die neuesten verfügbaren Features von Sprache und Library genutzt werden sollen. Java 7 hingegen wird ab voraussichtlich April 2015 von Oracle nicht mehr mit öffentlichen Updates versorft, Support ist aber weiterhin einkaufbar. Somit kann es sein, dass öffentliche Fixes für bekannte Bugs nicht mehr für Java 7 erscheinen werden.
+Java as programming language is well established and in wide use by a big number of world-wide developers. Furthermore, Java is platform-independent. In principle, porting \LibName{} to other platforms, to Java ME or to Java for  e.g. smart phones (e.g. Android) should be less effort than porting an equivalent C/C++ library. The author has long experience with Java programming, so this should facilitate productivity. The competitor libraries in the Java environment are good, but \LibName{} can be even better. The current (state 28th of November 2017) version \JavaVersion{} is used, because we want to create a modern library using the newest language features, libraries and programming models in the Java world. Furthermore, it is guaranteed that we get longer support for this Java version than for the previous ones.
 }
 {% Nachteile
-Anwendungen, die auf Java 7 oder älter basieren, werden von \LibName{} nicht mehr unterstützt. Das träfe dann insbesondere auf Java-EE-Anwendungen zu, die vielfach noch auf so innovative Produkte wie Websphere 8.0 (oder älter!) aufsetzen.
+Applications being based on Java 7, Java 8 or older are not supported by \LibName{}. This would especially effect Java EE applications where it seems not yet possible to use \JavaVersion{} for some application servers.
 }
 
 %-----------------------------------------------------------------------------------------------
-%		Design Decision: keine Dritt-Libraries
+%		Design Decision: Use of 3rd Party Libraries
 %-----------------------------------------------------------------------------------------------
 
-\section{Verwendung anderer Libraries}
+\section{Use of 3rd Party Libraries}
 \label{sec:VerwendungAndLib}
 
 \DD{dd:002}
 {% Titel
-	\LibName{} setzt so wenig wie möglich Dritt-Libraries ein
+\LibName{} uses as few 3rd party libraries as possible
 }
 {% Kurzbeschreibung
-	\LibName{} setzt weitestgehend allein auf die Libraries von Java SE auf. Es werden - im produktiven Code - keine Abhängigkeiten zu dritten Libraries genutzt.
+\LibName{} uses mostly only the libraries offered by Java SE. In the productive code of the library, no dependencies to other 3rd party libraries are used except for logging.
 }
 {% Begründung
-Zusätzliche Abhängigkeiten können zu Mehraufwänden bei der Verwaltung (Build, Deployment, Versionsmanagement) führen. Letztlich ist \LibName{} dann auch von der Lizenzierung, vom Release- und Bug-Management und den ``Launen'' der Library-Entwickler abhängig, was hiermit vermieden wird. Zudem wird die Anwendung insgesamt leichtgewichtiger, sowohl zur Laufzeit als auch im Hinblick auf die Auslieferungsgröße.
+Additional dependencies could create overhead or question marks when it comes to building, shipping, testing or licensing. Furthermore, you might at one point in time reuse a well-tested and documented 3rd party library, and in the next year, it might get abandoned or bugs show up that do not get fixed. We ensure that bugs are just bugs that we can fix ourselves and we do not depend on other library developers.
 }
 {% Nachteile
-Evtl. höherer Entwicklungsaufwand, weil das Rad ab und an ``neu erfunden'' wird.
+Sometimes this might mean ``do it yourself'' instead of reuse.
 }
 
 %-----------------------------------------------------------------------------------------------
-%		Design Decision: komponentenbasiert
+%		Design Decision: Component-based Library
 %-----------------------------------------------------------------------------------------------
 
-\section{Komponentenbasierte Library}
+\section{Component-based Library}
 \label{sec:KomponentenbasierteLibrary}
 
 \DD{dd:003}
 {% Titel
-	\LibName{} ist komponentenbasiert
+\LibName{} is component-based
 }
 {% Kurzbeschreibung
-	\LibName{} besteht aus sogenannten Komponenten (Definition siehe nächsten Abschnitt), die sich gegenseitig nur über klar definierte Schnittstellen verwenden.
+\LibName{} is consisting of so-called components as defined in the follow-up sub-section. Each component has a well defined responsibility, a public API that can be used by all other components as well as a private implementation part that must not be used by other components. 
 }
 {% Begründung
-Die Untergliederung in Komponenten ermöglicht es, die Komplexität der Library über ihren gesamten Lebenszyklus hinweg besser zu beherrschen. Durch eine sinnvolle Komponentengliederung wird eine klare Aufgabentrennung, Entkopplung und eine bessere Erweiterbarkeit sichergestellt. Änderungen an einer Implementierung einer Komponente haben ein deutlich geringeres Risiko, sich auf weite Teile der Library auszuwirken, sondern werden lokal auf die Komponentenimplementierung beschränkt bleiben.
+Structuring a big library into modular parts helps to manage the complexity of the library during planning, design, implementation and maintenance. By using a reasonable component structure, clear responsibilities, dependencies and decoupling of unrelated parts is achievable. Changes in implementation parts of a component do have less probability to affect other components, as they do only depend on the API of the component.
 }
 {% Nachteile
-Ggf. etwas mehr overhead und mehr Komplexität, da Mechanismen zur Entkopplung eingesetzt werden müssen.
+Probably a little bit more overhead due to sometimes following ``conventions'' where an easier structure would be possible
 }
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Definition des Komponentenbegriffs}
+\subsection{Definition of the component term}
 \label{sec:ComponentTermDefinition}
 
-Eine \emph{Komponente} in \LibName{} ist \emph{eine abgeschlossene Software-Einheit mit klar definierter Aufgabe}. Sie bietet \emph{Services} an, die über eine klar \emph{definierte Schnittstelle} genutzt werden können. Diese Services werden sowohl von den Anwendern der Library als auch von anderen Komponenten der Library genutzt. Eine Komponente hat ggf. \emph{Datenhoheit} über bestimmte Daten, d.h. nur die Komponente selbst darf diese Daten lesen und modifizieren. Andere Komponenten müssen diese spezielle Komponente nutzen, um diese Daten zu verwenden. 
+A \emph{component} in \LibName{} is \emph{a self-contained software module with clearly defined task}. It offers \emph{services} the can be used via a \emph{well-defined interface (API)}. These services are used both by the users of \LibName{} as well as by other components of the library. 
 
-Die folgende Abbildung zeigt schmeatisch eine \LibName{} Komponente:
+The following figure shows a component in \LibName{} schematically:
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1.00\textwidth]{figures/II_ComponentStructure.pdf}
-\caption{Struktur einer Komponente}
+\caption{Structure of a component}
 \label{fig:5_3_SCH_Komponente}
 \end{figure}
 
-Die Komponentenschnittstelle besteht aus einem oder mehreren Java interfaces, exceptions und Datentypen.
+A component interface consists of one or more Java interfaces, the so-called service interfaces, exceptions as well as data types.
 \begin{itemize}
-	\item \emph{Java interfaces} stellen die funktionalen API der Komponente dar, jede Methode entspricht einem Service der Komponente. Ein Java interface wird für eine klar definierte Unteraufgabe der Komponente genutzt. Manche Interfaces haben Erzeugungscharakter, geben also Zugriff auf andere Interfaces der Komponente.
-	\item \emph{Datentypen} sind konstante Java-Klassen, die direkt in implementierungsform zur Verfügung gestellt werden. Meist dienen sie dazu, Daten zu halten, die als Eingabe oder Rückgabe verwendet werden.
-	\item \emph{Exceptions} sind Fehler die auf funktionelle Fehler hindeuten. Es handelt sich um geprüfte Exceptions, die an der Service-Schnittstelle definiert werden und vom Anwender behandelt werden müssen.
+\item \emph{Service interfaces} offer the functional API of the component, each method corresponds to a service of the component. A single Java interface is use for a clear defined subtask of the component. Some service interface have factory methods that provide access to further service interfaces of the component.
+\item \emph{Data types} are (mostly) constant Java classes that are usually used to hold data for service input and output parameters. Usually they are value types, but sometimes they are also representing a specific entity such as a medium.
+\item \emph{Exceptions} are functional errors. These are mostly unchecked exceptions signaling a specific error condition, in rare cases we use unchecked exceptions if the caller can handle the situation.
 \end{itemize}
 
-%-----------------------------------------------------------------------------------------------
-%		Design Decision: Keine Schichtenarchitektur in Komponenten
+In addition, a component might have data ownership for a specific kind of relevant data. This means that this data can only be read or manipulated via using the public API of this component, and by no other means.
+
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Designentscheidungen zur Verwendung von Komponenten}
+\subsection{Design Decision for using components}
 \label{sec:DesVerwKomp}
 
 %-----------------------------------------------------------------------------------------------
-%		Design Decision: Entkoppeln von Komponenten über ein leichtgewichtiges Service-Locator-Pattern
+%		Design Decision: Components decoupled by a light-weight service locator pattern
 %-----------------------------------------------------------------------------------------------
 \DD{dd:004}
 {% Titel
-	Entkoppeln von Komponenten über ein leichtgewichtiges Service-Locator-Pattern
+Components decoupled by a light-weight service locator pattern
 }
 {% Kurzbeschreibung
-	Um geringe Kopplung zwischen den Komponenten zu erreichen, dürfen sich diese nur über ihre Komponentenschnittstellen kennen. Dies trifft auch für das Erzeugen anderer Komponenten bzw. das Erlangen einer Referenz auf ein anderes Komponenteninterface zu. Um dies zu erreichen, wird ein leichtgewichtiges Service-Locator-Pattern in Form einer eigenen Utility verwendet.
+To ensure low coupling between components, they must know each other only via their interfaces. A component can obtain a reference to a service implementation without directly depending on the implementation class itself by using a service locator pattern, specifically the Java SE \texttt{ServiceLoader}.
 }
 {% Begründung
-Wir wollen vernünftige Entkopplung zwischen Komponenten, und daher brauchen wir eine entsprechende Utility. Diese soll leichtgewichtig sein, damit scheiden Java EE und Spring aus, Drittlibraries wie Google Guice ebenso wegen \DesLink{dd:002}.
+We want to decouple components. To achieve this, it must not be allowed for components to instantiate service implentations of other components directly, because service implementations are not part of the public interface of a component. A service locator exactly offers to obtain a service implementation reference without depending on it. For a library such as \LibName{}, neither JavaEE nor Spring or CDI dependency injection are valid options. Google Guice is not chosen because of \DesLink{dd:002}. Java SE \texttt{ServiceLoader} is a very easy to use and fully sufficient facility.
 }
 {% Nachteile
- Keine erkennbar
+No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
-%		Singleton Components
+%		Design Decision: Singleton Components
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:005}
 {% Titel
-	Singleton-Komponenten
+Singleton Components
 }
 {% Kurzbeschreibung
-	Jede Komponente hat eine einzelnes \emph{Zugriffs-Java-interface}, das wiederum Zugriff auf all Services der Komponente gewährt. Dazu kann das Zugriffsinterface Instanzen vefschiedener anderer Klassen oder Interfaces zurückliefern, mit denen der Aufrufer dann arbeiten kann.
+Each component offers a single \emph{main API service interface} that itself offers access to any other service interface the component provides.
 
-Aus einer Laufzeit- und Implementierungsperspetive hat jedes der Zugriffs-Java-Interfaces eine Art ``singleton''-Implementierung. Es darf also nur eine Instanz der Zugriffs-Java-Interfaces einer Komponente geben. Natürlich darf es im Kontrast dazu mehrere Instanzen jedes anderen Interfaces geben, dass die Komponente definiert.
+From a runtime perspective, each main API service interface thus has a single (ideally stateless) implementation, which you could refer to as ``singleton''.
 }
 {% Begründung
-Die Zugriffs-Java-Interfaces sind nur funktional, und da es nur genau eine Komponentenimplementierung in \LibName{} je Komponente gibt, hat man immer nur eine implementierende Klasse. Für diese ist zur Laufzeit nur eine Instanz erforderlich, da sie keine Zustände hält. Dies spart Speicherplatz und Initialisierungsaufwand.
+A main API service interfaces is purely procedural. There is just one implementation of component allowed at runtime. We just need one instance for each component at runtime, as it is stateless. This safes memory and initialization overhead.
 }
 {% Nachteile
- Keine erkennbar
+No disadvantages known
 }
-
-%-----------------------------------------------------------------------------------------------
-%		Design Decision: Entkoppeln von Komponenten über ein leichtgewichtiges Service-Locator-Pattern
-%-----------------------------------------------------------------------------------------------
-
-\DD{dd:006}
-{% Titel
-	Unterteilung in Subsysteme
-}
-{% Kurzbeschreibung
-	Eine Ebene über den Komponenten untergliedern wir \LibName{} noch in sogenannten \emph{Subsysteme}. Ein Subsystem zerfällt in Komponenten, und hat sonst keine anderen Inhalte. Es ist also nur eine weitere Gliederungsebene. Generell ist es Komponenten innerhalb desselben Subsystems erlaubt, stärker an andere Komponenten gekoppelt zu sein, während Subsysteme untereinander eher über eine geringere Kopplung verfügen sollten. Um dies zu gewährleisten, können Subsysteme sogenannte Fassadenkomponenten anbieten.
-}
-{% Begründung
-Anhand dieser Untergliederung können wir bereits eine grobe Architektursicht mit den wichtigsten Elementen und Abhängigkeiten definieren und auf dieser Basis die Library schrittweise weiter verfeinern.
-}
-{% Nachteile
- Keine erkennbar
-}
-
 
 %-----------------------------------------------------------------------------------------------
 %		Design Decision: API and Implementation Layers
@@ -173,55 +152,55 @@ Anhand dieser Untergliederung können wir bereits eine grobe Architektursicht mit
 
 \DD{dd:007}
 {% Titel
-	API- und Implementierungs-Layer
+API and Implementation Layers
 }
 {% Kurzbeschreibung
-	Jede Komponente bietet ihre Dienste, Exceptions und Datentypen über einen API-Layer an. Dieser stellt die öffentliche Schnittstelle der Komponente dar. Andere Komponenten ebenso wie der \LibName{}-Anwender dürfen die Komponente nur über diese API-Klassen verwenden. Der Implementierungs-Layer der Komponente implementiert den API-Layer und ist privat. Insbesondere sind compile-Zeit-Abhängigkeiten zu dessen Klassen von anderen Komponenten oder Anwender-Klassen aus verboten.
+Each component offers its services, exceptions and data types on an \emph{API layer}. This layer is a horizontal layer cutting through the whole library and representing the public API of the library. Also per component, it is the public API of a component. Compile-time dependencies from user code to \LibName{} as well as between components are only allowed via this API layer. The implementation layer depends on the API layer and contains any private classes. An outside component and user code is not allowed to have a compile-time dependency to implementation layer classes
 }
 {% Begründung
-  Es gibt eine Klare Trennung zwischen privaten und öffentlichen Anteilen, was die Kopplung und das Risiko von Fehlerpropagation sowie Inkompatibilitäten verringert, weil sich interne Änderungen an der Komponente idealerweise gar nicht auf nutzende Komponenten auswirken.
+Clear separation of concerns and information hiding. What implementation layer classes do is their private business, nobody from the outside world is allowed to directly work with and depend on them.
 }
 {% Nachteile
- Keine erkennbar
+No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
-%		Keine Schichtenarchitektur in der Komponenten-Implementierung
+%		Design Decision: No further subdivision of implementation layers
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:008}
 {% Titel
-	Keine Schichtenarchitektur in der Komponenten-Implementierung
+No further subdivision of implementation layer
 }
 {% Kurzbeschreibung
-	Die Implementierungs-Schicht einer Komponente in \LibName{} wird nicht weiter in Unter-Schichten gegliedert (wie dies in EE-Anwendungen häufig der Fall ist). Die innere Struktur einer Komponente wird durch keine Architekturvorgaben standardisiert, sondern zweckdienlich implementiert. Eine Schichtenarchitektur wäre beispielsweise: Eine Schicht kümmert sich um das Prüfen von Vorbedingungen, eine zweite implemeniert die Funktionalität, eine dritte kümmert sich um den Zugriff auf externe Daten.
+It is not necessary to further subdivide the implementation layer into sublayers. Instead, each component can have an arbitrary package structure in its implementation layer code.
 }
 {% Begründung
-Eine Schichtenarchitektur in der Komponentenimplementierung ist für \LibName{} nicht notwendig und verkompliziert dessen Architektur. Es handelt sich um keine klassische ``3-tier''-Anwendung, sondern eine Hilfslibrary, in welcher nur wenige Komponenten Datenzugriffe durchführen. Eine Schichtenarchitektur würde zu einer Verringerung der Übersichtlichkeit und mehr Redundanz führen, ohne nennenswerte Vorteile bei ``separation of concerns'' oder Entkopplung zu bringen.
+We do not see any reasonable sublayers for \LibName{} that could be relevant for all components of the library.
 }
 {% Nachteile
- Keine erkennbar
+No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
-%		Design Decision: Entwicklungsumgebung
+%		Design Decision: Development Environment
 %-----------------------------------------------------------------------------------------------
 
-\section{Entwicklungsumgebung}
+\section{Development Environment}
 \label{sec:entw}
 
 \DD{dd:009}
 {% Titel
-	Entwicklungsumgebung
+Development Environment
 }
 {% Kurzbeschreibung
-	Als Entwicklungsumgebung wird eine Kombination aus Eclipse, Maven und Subversion genutzt.
+As development environment, we use Maven, Eclipse and SubVersion for \LibName{}.
 }
 {% Begründung
-Bekannte und kostenloste Toolsuite.
+Amazing toolset that leaves not much else to wish for.
 }
 {% Nachteile
- Keine erkennbar
+No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
@@ -233,37 +212,37 @@ Bekannte und kostenloste Toolsuite.
 
 \DD{dd:010}
 {% Titel
-	\LibName{} ist nicht thread-safe
+\LibName{} is not thread-safe
 }
 {% Kurzbeschreibung
-	\LibName{} ist keine thread-safe Library und verwendet keine Java-APIs, die thread-safe sind.
+\LibName{} is not a thread-safe library and (usually) does not use any Java APIs that are thread-safe.
 }
 {% Begründung
-Thread-Sicherheit bedeutet ggf. Performance-Verringerung durch Erzeugung von Synchronisationspunkten und Erhöhung der Gesamtkomplexität. Single-thread-Anwendungen werden benachteiligt. Es ist schwierig, thread-safety \emph{korrekt} umzusetzen. Anwender können selbst dafür Sorge tragen, dass ihre multi-threaded-Anwendung thread-safe ist.
+In some cases, thread-safety means performance degradation due to synchronisation points. In addition, it almost always means higher complexity. In a non-functional programming language such as Java with a lot of mutable state, it is hard to get thread-safety right. If users need to work with \LibName{} in multiple threads, they have to ensure thread-safety themselves.
 }
 {% Nachteile
-Keine erkennbar
+No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
-%		Design Decision: Architektur
+%		Design Decision: Architecture
 %-----------------------------------------------------------------------------------------------
 
-\section{Architektur}
+\section{Architecture}
 \label{sec:arch}
 
 \DD{dd:011}
 {% Titel
-	Architektur von \LibName{}
+Architecture of \LibName{}
 }
 {% Kurzbeschreibung
-	\LibName{} basiert auf der technischen und fachlichen Architektur, wie sie in den Kapiteln \SectionLink{sec:TechnicalArchitectureChap} und \SectionLink{sec:FunctionalArchitectureChap} definiert wird.
+\LibName{}'s architecture adheres to the technical and functional architecture as descrived in chapters \SectionLink{sec:TechnicalArchitectureChap} and \SectionLink{sec:FunctionalArchitectureChap}.
 }
 {% Begründung
-Siehe Diskussion der Architektur im Detail in den nächsten Abschnitten.
+See architecture discussion in detail in the next chapters
 }
 {% Nachteile
-Siehe Diskussion der Architektur im Detail in den nächsten Abschnitten.
+See architecture discussion in detail in the next chapters
 }
 
 %===============================================================================================
@@ -272,6 +251,8 @@ Siehe Diskussion der Architektur im Detail in den nächsten Abschnitten.
 
 \chapter{Technical Architecture}
 \label{sec:TechnicalArchitectureChap}
+
+The technical architecture allows functional components (i.e. components offering the actual functionality of \LibName{}) to operate in their technical infrastructure. In addition, the technical architecture consists of the layers of each component. We have a component-based layered architecture as defined in \SectionLink{sec:KomponentenbasierteLibrary}. The layering has already been defined in the design decisions \DesLink{dd:007} and \DesLink{dd:008}. Thus, we just concentrate on a brief overview of the technical infrastructure and the technical base components here.
 
 %-----------------------------------------------------------------------------------------------
 %		Technische Infrastruktur
@@ -296,7 +277,7 @@ However, \LibName{} is only developed for \JavaVersion{} and cannot be used by a
 Each layer only accesses the neighouring layer.
 
 %-----------------------------------------------------------------------------------------------
-%		Technische Basiskomponenten
+%		Technical Base Components
 %-----------------------------------------------------------------------------------------------
 
 \section{Technical Base Components}
@@ -304,421 +285,276 @@ Each layer only accesses the neighouring layer.
 
 Technical base components are just helpers providing a framework and basis for the functional components of \LibName{}. With ``functional'' we are referring to the tasks of the library, i.e. reading and writing metadata and reading container data. The necessary base components are:
 \begin{itemize}
-	\item Logging
-	\item Service-Locator to achieve a component oriented architecture
-	\item Utility
-	\item Maintaining extensions
+\item Logging
+\item Service-Locator to achieve a component oriented architecture
+\item Utility
+\item Maintaining extensions
 \end{itemize}
 
 Details of these components are given in \SectionLink{sec:Design}.
 
 %===============================================================================================
-%		Fachliche Architektur
+%		Functional Architecture
 %===============================================================================================
 
-\chapter{Fachliche Architektur}
+\chapter{Functional Architecture}
 \label{sec:FunctionalArchitectureChap}
 
-Die fachliche Architektur umfasst die Gliederung der Library-Funktionalität in fachliche Einheiten. Auf detaillierter Ebene sind dies die bereits definierten Komponenten. Auch wenn diese rein technische Funktionen umsetzen, beispielsweise Logging, werden sie in der fachlichen Architektur aufgeführt.
-
-Hier noch einige detaillierte Designentscheidungen, die sich auf die fachliche Architektur beziehen.
+The functional Architecture defines the structuring of the library into functional units, so called functional components according to \SectionLink{sec:KomponentenbasierteLibrary}. For completeness, also the dependencies of the functional components with the technical base components is shown in functional architecture diagrams. In addition, the functional architecture also contains basic functional design decisions influencing the direction of the whole library.
 
 %-----------------------------------------------------------------------------------------------
-%		Grundlegende Designentscheidungen zur fachlichen Architektur
+%		Fundamental design decisions of \LibName{} functionality
 %-----------------------------------------------------------------------------------------------
 
-\section{Grundlegende Designentscheidungen zur fachlichen Architektur}
+\section{Fundamental design decisions of \LibName{} functionality}
 \label{sec:Grld}
 
-Die folgenden grundlegenden Designentscheidungen haben einen maßgeblichen Einfluss auf die fachliche Architektur der Library, und sie haben einen übergreifenden Effekt, sind also nicht auf einzelne Subsysteme oder Komponenten beschränkt. Daher werden sie hier definiert. Sie liefern eine generelle Begründung des später entwickelten fachlichen Designs.
-
-%-----------------------------------------------------------------------------------------------
-
-\DD{dd:100}
-{% Titel
-	High-Level- und Low-Level-API
-}
-{% Kurzbeschreibung
-	Wir untergliedern \LibName{} in einen High-Level-Anteil, der bequeme User-Funktionalität zum Zugriff auf Metadaten bietet, und einen Low-Level-Anteil, der generische Expertenfunktionalität auf Bit- und Byte-Ebene bietet.
-}
-{% Begründung
-Zunächst muss eine Low-Level-Zugriffsmöglichkeit gemäßt \SectionLink{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary} zur Vergfügung gestellt werden. Statt Low-Level- und High-Level-Zugriff in einer unübersichtlichen API gemeinsam bereitzustellen, separieren wir sowohl API als auch die Implementierung dieser Belange. Aus Anwendersicht ist dann klar, welche API für ihn als ``bequem'' gedacht ist, und welche nur für detaillierten feingranularen Zugriff verwendet werden soll. Die low-level-API kann von der High-level-API aufgerufen werden, um diese zu implementieren. Dies schafft auch eine saubere Trennung in der Implementierung.
-}
-{% Nachteile
-Ggf. höhere Komplexität der Gesamtlösung
-}
+The following design decisions are fundamental for the whole library and mostly have a cross-cutting effect. They form the basis for the functional design of all functional library components.
 
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:101}
 {% Titel
-	Generisches Parsen und Schreiben anhand einer Format-Spezifikation
+Generic reading and writing according to a format specification
 }
 {% Kurzbeschreibung
-	Das Parsen und Schreiben sämtlicher Metadaten- und Container-Formate wird anhand einer generellen Format-Spezifikation durch eine zentrale Komponente durchgeführt. Die Format-Spezifikation beschreibt, welche Features und Teile ein binäres Datenformat enthält, insbesondere, wie ein Datenblock dieses Formates aufgebaut ist und interpretiert werden muss. Es handelt sich also um eine Art generische Anleitung für das Parsen (und auch das Schreiben und Validieren) dieses Datenformates.
-
-Weitere Designentscheidungen in späteren Abschnitten werden diese Designentscheidung vertiefen.
+Reading and writing different \TERMcontainerFormat{}s is done generically by a central component. A format specification describes which features a \TERMcontainerFormat{} has, especially how its \TERMdataBlock{}s are structured and how they need to be interpreted. Thus it can be seen as a kind of generic parsing (and writing and validating) instruction of the data format.
 }
 {% Begründung
-Gemäß dem Dokument \cite{MetaComp} haben zumindest binäre Container- und Metadatenformate viele Gemeinsamkeiten, die unter anderem die Definition eines generellen Domänenmodells ermöglichen. Diese Gemeinsamkeiten lassen sich auch durch generelle Formatspezifikationen beschreiben. Statt für jedes neu zu unterstützende Datenformat komplett neuen Parse-Code schreiben zu müssen, können viele Formate durch einheitlichen (nur einmal zu testenden) generischen Parse-Code unterstützt werden. Es ist eine Entkopplung von Format-Beschreibung und Lesen/Schreiben möglich. Die Formatbeschreibung kann als Textdokument abgelegt werden. Eine Erweiterung um ein neues Format ist daher im Idealfall einzig und allein durch Erzeugen einer solchen konformen Textdatei umsetzbar. Somit ermöglicht diese Designentscheidung die Umsetzung der Anforderung \SectionLink{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}.
+According to the document \cite{MetaComp}, \TERMcontainerFormat{}s and their more specific children \TERMmetadataFormat{}s have a lot of things in common, in specific the way how they are structured and parsed. These common properties can be descrubed using a generic format specification. Instead of rewriting specific parsing, writing and validation code for each new supported \TERMcontainerFormat{}, all of them can be implemented by the same generic parsing, writing and validation code that is based on the generic format specification.
+
+This way, in the end, there should be less code, less duplication, and also a higher quality of code as it can be tested easier.
+
+This design decision also essentially enables to meet the requirement \SectionLink{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}, as this way it is much easier to extend the library with new \TERMcontainerFormat{}s.
 }
 {% Nachteile
-Es kann nicht für jedes denkbare zukünftige Format sichergestellt werden, dass die Möglichkeiten der Format-Spezifikation ausreichen, um alle Features des jeweiligen Formates wirklich abzudecken. Dies kann zur Notwendigkeit führen, die Format-Spezifikation zu erweitern und damit auch das generische Parsen. Alternativ kann dies durch Möglichkeiten ausgeglichen werden, das Parsen doch selbst umzusetzen (und eine entsprechende Implementierung statt der generischen zu verwenden). Weiterer Nachteil: Evtl. leichter Performance-Verlust, da das generische Parsen natürlich viele verschiedene Fälle unterstützen muss.
+The generic code can probably not be written to support any and every possible future or existing \TERMcontainerFormat{} out of the box. Thus there might still be changes required in future. We have to carefully avoid to add format specific code to this generic core code, such that it not again becomes a complex monster, where in the end it would have been better to rewrite code for each extension. The latter risk exists if the formats do not have as much in common as assumed by this design decision. This can make testing or even understanding the generic code extensively hard.
+
+In addition, there might be some small performance drawbacks, as generic code can of course not as heavily and specifically tuned as format-specific code can.
 }
+
+To mitigate the possible disadvantages of \DesLink{dd:101}, we define the following design decision:
 
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:102}
 {% Titel
-	Überschreiben des generischen Parsens und und Schreibens
+It is possible to override generic reading and writing in extensions
 }
 {% Kurzbeschreibung
-	Erweiterungen können für ihre Datenformate den generischen Lese- und Schreibvorgang (siehe \DesLink{dd:101}) überschreiben und erweitern, um sie an spezielle Gegebenheiten ihres Datenformates besser anzupassen.
+\LibName{} \TERMcontainerFormat{} extensions are allowed to override specific parts of reading, writing and validation code to adapt them to specifics of their data format.
 }
 {% Begründung
-Dies minimiert die Nachteile von \DesLink{dd:101} und ermöglicht in Einzelfällen einfacherer oder performantere Implementierungen.
+This minimizes the disadvantages of \DesLink{dd:101}. In special cases, this can lead to easier or faster implementations. Furthermore, using such hooks, it might not be necessary to blow up the core code by specifics that are actually only relevant for one or just a few concrete formats. Those specifics can then be implemented in the corresponding format's code.
 }
 {% Nachteile
-Keine erkennbar
+It might not be easy to clearly define and communicate which parts can be overridden and which not.
 }
+
+To also mitigate the risk of too big and complex generic core code, we define:
 
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:103}
 {% Titel
-	Format-Spezifika werden nur in Erweiterungen definiert
+Format specifics are only defined in extensions
 }
 {% Kurzbeschreibung
-	Jegliche Spezifika eines Metadaten- oder Containerformates werden ausschließlich über Erweiterungen implementiert, das gilt selbst für Datenformate, die direkt mit der Kernversion von \LibName{} unterstützt werden.
+Any special features of a \TERMcontainerFormat{} or \TERMmetadataFormat{} that are no common properties/features of a lot of container formats are only defined in the corresponding extensions. That said, the generic core code never directly depends on specifics of data formats, neither syntactically (e.g. compile-time dependencs to format extension; by using if-then-else to do things different depending on the current format) or semantically (e.g. implementing a special feature for just one format, but claim it is ``generic''). Only if a special feature of a format can be brought down to a common denominator for all supported formats, it is implemented generically.
 }
 {% Begründung
 So wird bereits mit der Kernlibrary selbst das Erweiterungskonzept genutzt und erprobt. Es findet eine strikte Trennung zwischen Kernimplementierung und Format-Spezifika statt, was eine bessere Beherrschung der Gesamt-Komplexität ermöglicht.
 }
 {% Nachteile
-Keine erkennbar
+No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
 
-\DD{dd:104}
+\DD{dd:100}
 {% Titel
-	Fassadenkomponenten für High-Level- und Low-Level-Anteile
+High-level and low-level API
 }
 {% Kurzbeschreibung
-	Die Subsysteme \SUBSHighLevel{} und \SUBSLowLevel{} verfügen über je eine Fassadenkomponente, die Zugriff auf die anderen \emph{öffentlichen} Komponenten des jeweiligen Subsystems gewähren. ``Öffentlich'' sind diejenigen Komponenten, die vom Anwender oder von \SUBSBootstrap{} direkt zugegriffen werden müssen.
+The generic, format-independent core parts of \LibName{} form a kind of \emph{low-level API} for parsing, writing and validating data of a \TERMcontainerFormat{} quite generically down to the byte level. The end user of \LibName{} is allowed to use this part of the library directly.
+
+However, on top of that there is a more convenient and format-specific \emph{high-level API} the user usually uses to access data.
 }
 {% Begründung
-Das Subsystem \SUBSBootstrap{} muss keine direkte Abhängkeit zu den Komponenten der Subsysteme der High-Level- und Low-Level-Anteile eingehen, sondern gibt nur eine Instanz der Fassadenkomponenten zurück, dies verringert die Kopplung. Spezielle Methoden zum Zugriff auf die anderen Komponenten des Subsystems können in den Fassadenkomponenten bereitgestellt werden und müssen nicht im Subsystem \SUBSBootstrap{} bereitgestellt werden (was auch nicht der Aufgabe von \SUBSBootstrap{} entsprechen würde).
+According to \DesLink{dd:101}, \LibName{} has a generic format-independent core part. This could be made private, not to be used by end users of \LibName{}. However, this would not make it possible to fullfill \SectionLink{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary}. At the same time, format-specific extensions need to reuse the core part. We do not want to throw the core part together with these higher-level extensions.
 }
 {% Nachteile
-Keine erkennbar
+No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
-
-\DD{dd:105}
-{% Titel
-	Technische Basiskomponenten bilden ein eigenes Subsystem ohne Fassade
-}
-{% Kurzbeschreibung
-	Alle technischen Basiskomponenten bilden ein eigenes Subsystem und werden nicht zusammen mit fachlichen Komponenten in ein Subsystem aufgenommen. Es wird keine Fassadenkomponente zum Zugriff auf die Basiskomponenten bereitgestellt.
-}
-{% Begründung
-Um die Kohärenz der Subsysteme zu erhalten, werden die technischen Komponenten in ein eigenes Subsystem ausgelagert. Die technischen Basiskomponenten können als sogenannte ``0-Software'', d.h. perfekt wiederverwendbare Software betrachtet werden. Sie haben keine inhaltlich-fachliche Funktionen und sollten (in den meisten Fällen) keine weiteren Abhängigkeiten zu anderen Komponenten haben. Da sie alle recht spezifische und umfangreiche Funktionalität anbieten, macht ein Verwenden einer Fassadenkomponenten keinerlei Sinn. Diese würde einerseits viele unterschiedliche Belange, die nicht verwandt sind, in ein Interface zwängen, und andererseits  keineswegs zu geringerer Kopplung führen.
-}
-{% Nachteile
-Keine erkennbar
-}
-
-%-----------------------------------------------------------------------------------------------
-%		Subsysteme
+%		Extensions
 %-----------------------------------------------------------------------------------------------
 
-\section{Subsysteme}
-\label{sec:Subsystems}
-
-Die Unterteilung in Subsysteme zeigt bereits grob die wichtigsten Teile der Library und erste Abhängigkeiten zwischen ihnen. Über Subsysteme verorten wir auch den Begriff der \emph{Erweiterung}. Zudem bildet sich hier direkt die Designentscheidung \DesLink{dd:100} ab.
-
-Das folgende Architekturbild zeigt die Subsysteme von \LibName{} und ihre Beziehungen zueinander. Ein Pfeil bedeutet dabei eine hier noch nicht näher konkretisierte Abhängigkeit, die sich entweder als Compile-Zeit- oder als Laufzeit-Abhängigkeit oder beides manifestieren kann.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=1.00\textwidth]{figures/II_FunctionalArchitecture.pdf}
-\caption{Subsysteme von \LibName{}}
-\label{fig:5_3_SCH_TechnicalArchitecture}
-\end{figure}
-
-Der Anwender der Library kann direkt auf die Subsysteme \SUBSBootstrap{}, \SUBSExtension{}, \SUBSHighLevel{} und \SUBSLowLevel{} zugreifen, während die \SUBSTechBase{} nicht zugreifbar ist.
-
-Die Subsysteme werden im Folgenden weiter konkretisiert.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\SUBSBootstrap{}}
-\label{sec:Bootstrap}
-
-Dieses Subsystem kapselt alle Initialisierungen von \LibName{}. Das Subsystem ist der Eintrittspunkt der Benutzung von \LibName{} für den Anwender. Es nutzt daher alle anderen Subsysteme, um diese zu initialisieren.
-
-Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompBoots} aufgeführt.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\SUBSHighLevel{}}
-\label{sec:LibName2}
-
-Die High-Level-Anteile der Library gemäß \DesLink{dd:100}. Das Subsystem greift auf \SUBSTechBase{} und \SUBSLowLevel{} zu. Letzteres deshalb, weil gemäß \DesLink{dd:100} die Implementierung der High-Level-Anteile durch Verwendung der low-level-Anteile erfolgt.
-
-Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompHigh} aufgeführt.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\SUBSLowLevel{}}
-\label{sec:CoreAndUserInterface}
-
-Die Low-Level-Anteile der Library gemäß \DesLink{dd:100}. Greift nur auf die technische Basis zu.
-
-Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompLow} aufgeführt.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\SUBSTechBase{}}
-\label{sec:Techbase}
-
-Eine Sammlung von Komponenten, die als technische Rahmenkomponenten betrachtet werden können und keine fachlich-inhaltlichen Beiträge zum Thema ``Metadaten/Container'' liefern. Sie werden von so gut wie allen anderen Subsystemen benötigt.
-
-Die Komponenten des Subsystems sind im Abschnitt \SectionLink{sec:KompTB} aufgeführt.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\SUBSExtension{}}
-\label{sec:Extensions}
-
-\LibName{} erlaubt eine beliebige Anzahl an Erweiterungen, jede davon entspricht in der fachlichen Architektur einem Subsystem.
-
-Details finden sich im Abschnitt \SectionLink{sec:KompExt}.
-
-%-----------------------------------------------------------------------------------------------
-%		Komponenten-Steckbrief
-%-----------------------------------------------------------------------------------------------
-
-\section{Komponenten-Steckbrief}
-\label{sec:StructureofaComponentDescription}
-
-Da in den folgenden Abschnitten Komponenten einführend beschrieben werden, wird hier ein Steckbrief, d.h. eine grundlegende Beschreibungsstruktur für eine Komponentengrobbeschreibung definiert. Dieser Steckbrief wird dann in den folgenden Abschnitten für jede Komponente ausgefüllt.
-
-\textbf{Komponenten-Name:} Der Name der Komponente.
-
-\textbf{Aufgabe:} Die Aufgabe der Komponente.
-
-\textbf{Kontrollierte Daten:} Die Daten, die durch die Komponente kontrolliert werden, d.h. gelesen und geschrieben werden. Nutzt die Komponente Daten anderer Komponenten, wird dies hier nicht erwähnt.
-
-\textbf{Abhängig von $<$Komponenten-Name$>$:} Dieses Element kommt mehrfach je Komponente vor, von der diese Komponente abhängt. Der Grund für die Abhängigkeit wird kurz erläutert.
-
-%-----------------------------------------------------------------------------------------------
-%		Komponenten des Subsystems \SUBSBootstrap{}
-%-----------------------------------------------------------------------------------------------
-
-\section{Komponenten des Subsystems \SUBSBootstrap{}}
-\label{sec:KompBoots}
-
-Die folgende Abbildung zeigt die Komponenten des Subsystems \SUBSBootstrap{}.
-
-\OpenIssue{Bootstrap subsystem Componenten Abbildung}{}
-%\begin{figure}[H]
-	%\centering
-		%\includegraphics[width=1.00\textwidth]{Figures/Part_III/III_1_SUBSBootstrap.pdf}
-	%\caption{Komponenten des Subsystems \SUBSBootstrap{}}
-	%\label{fig:CompSB}
-%\end{figure}
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{Komponente \COMPcontext{}}
-\label{sec:COMPContext}
-
-\textbf{Komponenten-Name:} \COMPcontext{}.
-
-\textbf{Aufgabe:} Der Einstiegspunkt für jeden User von \LibName{}. Es ermöglicht Zugriff auf alle anderen Komponenten der Library.
-
-\textbf{Kontrollierte Daten:} Keine.
-
-\textbf{Abhängig von \COMPlowLevel{}:} \COMPcontext{} gibt Zugriff auf die Komponente \COMPlowLevel{}.
-
-\textbf{Abhängig von \COMPhighLevel{}:} \COMPcontext{} gibt Zugriff auf die Komponente \COMPhighLevel{}.
-
-\textbf{Abhängig von \COMPextensionManagement{}:} \COMPcontext{} lädt alle Erweiterungen unter Nutzung dieser Komponente.
-
-\textbf{Abhängig von \COMPlogging{}:} \COMPcontext{} nutzt diese Komponente zur Protokollierung des Startup-Prozesses.
-
-\textbf{Abhängig von \COMPcomponentRegistry{}:} \COMPcontext{} nutzt diese Komponente zum Instantiieren bzw. Abfragen von Implementierungen anderer verwendeter Komponenten-Interfaces.
-
-\textbf{Abhängig von \COMPutility{}:} \COMPcontext{} nutzt diverse querschnittliche Funktionen von \COMPutility{}.
-
-%-----------------------------------------------------------------------------------------------
-%		Komponenten des Subsystems \SUBSHighLevel{}
-%-----------------------------------------------------------------------------------------------
-
-\section{Komponenten des Subsystems \SUBSHighLevel{}}
-\label{sec:KompHigh}
-
-Die Komponenten des Subsystems \SUBSHighLevel{} werden in dieser Version der Library noch nicht definiert.
-
-%-----------------------------------------------------------------------------------------------
-%		Komponenten des Subsystems \SUBSLowLevel{}
-%-----------------------------------------------------------------------------------------------
-
-\section{Komponenten des Subsystems \SUBSLowLevel{}}
-\label{sec:KompLow}
-
-Die folgende Abbildung zeigt die Komponenten des Subsystems \SUBSLowLevel{}.
-\OpenIssue{Container API subsystem Abbildung}{}
-
-%\begin{figure}[H]
-	%\centering
-		%\includegraphics[width=1.00\textwidth]{Figures/Part_III/III_1_SUBSLowLevel.pdf}
-	%\caption{Komponenten des Subsystems \SUBSLowLevel{}}
-	%\label{fig:CompLL}
-%\end{figure}
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPlowLevel{}}
-\label{sec:COMPlowLevel}
-
-\textbf{Komponenten-Name:} \COMPlowLevel{}.
-
-\textbf{Aufgabe:} Fassadenkomponente. Gewährt allen Anwendern Zugriff auf die anderen öffentlichen Komponenten dieses Subsystems.
-
-\textbf{Kontrollierte Daten:} Keine.
-
-\textbf{Abhängig von \COMPdataPartManagement{}:} Gewährt Zugriff auf diese Komponente.
-
-\textbf{Abhängig von \COMPdataFormatManagement{}:} Gewährt Zugriff auf diese Komponente.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPdataPartManagement{}}
-\label{sec:COMPdataPartManagement}
-
-\textbf{Komponenten-Name:} \COMPdataPartManagement{}.
-
-\textbf{Aufgabe:} Gewährt lesenden Zugriff auf Metadaten und Containerdaten und schreibenden Zugriff auf Metadaten auf Bit- und Byte-Ebene, allerdings werden die Daten in handlichen Portionen gemäß Datenformat-Spezifikation geliefert.
-
-\textbf{Kontrollierte Daten:} Ein Zugriff auf \TERMcontainer{}- und \TERMtag{}-Daten ist nur über diese Komponente erlaubt. Somit hat sie die Kontrolle über diese Daten. Lediglich \COMPmedia{} darf auf noch generischerer Ebene auf Daten externer Medien zugreifen. Tatsächlich nutzt \COMPdataPartManagement{}  \COMPmedia{} für das Lesen und Schreiben.
-
-\textbf{Abhängig von \COMPmedia{}:} \COMPdataPartManagement{} muss Datenpakete von Medien lesen oder auf diese Schreiben. Dazu nutzt es \COMPmedia{}.
-
-\textbf{Abhängig von \COMPdataFormatManagement{}:} Das Lesen und Schreiben der Daten erfolgt anhand von Format-Spezifikationen, die durch \COMPdataFormatManagement{} geliefert werden.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPdataFormatManagement{}}
-\label{sec:COMPdataFormatManagement}
-
-\textbf{Komponenten-Name:} \COMPdataFormatManagement{}.
-
-\textbf{Aufgabe:} Verwaltet die konkreten Datenformat-Definitionen aller unterstützten Metadaten- und Container-Formate.
-
-\textbf{Kontrollierte Daten:} Hat Kontrolle über die Datenformat-Definitions-Daten.
-
-\textbf{Abhängig von:} Keinen anderen Komponenten.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPmedia{}}
-\label{sec:COMPmediumAccess}
-
-\textbf{Komponenten-Name:} \COMPmedia{}.
-
-\textbf{Aufgabe:} Bietet Primitive für den Zugriff auf physische Medien an.
-
-\textbf{Kontrollierte Daten:} Daten von externen Medien dürfen nur über diese Komponente zugegriffen und manipuliert werden.
-
-\textbf{Abhängig von:} Keinen anderen Komponenten.
-
-%-----------------------------------------------------------------------------------------------
-%		Komponenten des Subsystems \SUBSTechBase{}
-%-----------------------------------------------------------------------------------------------
-
-\section{Komponenten des Subsystems \SUBSTechBase{}}
-\label{sec:KompTB}
-
-Die folgende Abbildung zeigt die Komponenten des Subsystems \SUBSTechBase{}.
-\OpenIssue{Tech Base subsystem Abbildung}{}
-%\begin{figure}[H]
-	%\centering
-		%\includegraphics[width=1.00\textwidth]{Figures/Part_III/III_1_SUBSTechBase.pdf}
-	%\caption{Komponenten des Subsystems \SUBSTechBase{}}
-	%\label{fig:CompTB}
-%\end{figure}
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPextensionManagement{}}
-\label{sec:COMPextensionManagement}
-
-\textbf{Komponenten-Name:} \COMPextensionManagement{}.
-
-\textbf{Aufgabe:} Verwaltet alle Erweiterungen von \LibName{}, d.h. laden, verifizieren und Auslesen von Informationen zu jeder Erweiterung.
-
-\textbf{Kontrollierte Daten:} Beschreibungsdaten der Erweiterungen können nur über diese Komponente geladen werden.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPlogging{}}
-\label{sec:COMPlogging}
-
-\textbf{Komponenten-Name:} \COMPlogging{}.
-
-\textbf{Aufgabe:} Bietet Primitive zum Ausgeben von Logging-Informationen.
-
-\textbf{Kontrollierte Daten:} Logging-Konfiguration.
-
-\textbf{Abhängig von:} Keiner anderen Komponente.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPutility{}}
-\label{sec:COMPutility}
-
-\textbf{Komponenten-Name:} \COMPutility{}.
-
-\textbf{Aufgabe:} Bietet diverse (technische) Querschnittsfunktionen, die von allen anderen Komponenten regelmäßig benötigt werden, z.B. Hilfsfunktionen zur Umsetzung von design-by-contract.
-
-\textbf{Kontrollierte Daten:} Keine.
-
-\textbf{Abhängig von:} Keiner anderen Komponente.
-
-%-----------------------------------------------------------------------------------------------
-
-\subsection{\COMPcomponentRegistry{}}
-\label{sec:COMPcomponentRegistry}
-
-\textbf{Komponenten-Name:} \COMPcomponentRegistry{}.
-
-\textbf{Aufgabe:} Technische Komponente mit Service-Locator-Funktionalität zum Abfragen der Implementierungen von Interfaces anderer Komponenten.
-
-\textbf{Kontrollierte Daten:} Konfiguration von Komponenten, Interfaces und ihren Implementierungen.
-
-\textbf{Abhängig von:} Keiner anderen Komponente.
-
-%-----------------------------------------------------------------------------------------------
-%		Erweiterungen (Subsystem \SUBSExtension{})
-%-----------------------------------------------------------------------------------------------
-
-\section{Extensions (Subsystem \SUBSExtension{})}
+\section{Extensions}
 \label{sec:KompExt}
 
-An \emph{Extension} summarizes format-specific content for a given data format (or multiple variations of the data format). Per data format defined by the extension, these are (compare \DesLink{dd:101}, \DesLink{dd:102} and \DesLink{dd:103}):
+An \emph{extension} summarizes format-specific content for a given data format, or multiple variations of the data format. Per data format defined by the extension, these are (compare \DesLink{dd:101}, \DesLink{dd:102} and \DesLink{dd:103}):
 \begin{itemize}
-	\item A data format specification which defines data blocks and their structure and relations
-	\item An end-user API to comfortably work with the data format (e.g. creation of data blocks etc.); this API especially holds the data format identifier which the user can use to work with \SUBSHighLevel{} and \SUBSLowLevel{}.
-	\item Implementation extensions for \SUBSLowLevel{}, which influence the parsing and writing process. With this mechanism, a data format can extend or override the standard parsing and writing algorithms defined in \SUBSLowLevel{}.
+\item A data format specification which defines \TERMdataBlock{}s and their structure and relations.
+\item An end-user high-level API to comfortably work with the data format, e.g. for creation of \TERMdataBlock{}s etc.; this API especially holds the data format identifier which the user can use to work with other components.
+\item Implementation extensions that might override generic parsing, writing and validation.
 \end{itemize}
 
 As a ground rule, every single extension can but should not define extension code for more than one data format. It might expose more data formats only if these two data formats heavily overlap and are based on each other, e.g. ID3v1 and ID3v1.1. This is to fulfill the requirement \SectionLink{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}.
 
 Moreover, distinct extensions should never depend on each other, but only on the \LibName{} core to avoid any confusion for the user.
+
+%-----------------------------------------------------------------------------------------------
+%		Functional Architecture Components
+%-----------------------------------------------------------------------------------------------
+
+\section{Functional Architecture Components}
+\label{sec:Subsystems}
+
+The following component diagram shows the functional and technical base components of \LibName{} and their dependencies. An arrow indicates a necessary compile-time dependency. For each format extension, there is exactly one component.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.00\textwidth]{figures/II_FunctionalArchitecture.pdf}
+\caption{Component diagram of \LibName{}}
+\label{fig:5_3_SCH_TechnicalArchitecture}
+\end{figure}
+
+You can identify a kind of ``component layering'' (not to be confused with the architecture layering, it is just a grouping of components). At the lowest level we have the technical base components, then followed up by the low-level API components and the high-level API (according to \DesLink{dd:100}) on top.
+
+Dependencies to the technical base components are not shown in this diagram, as anybody can (and usually does) depend on them. Note that, due to this, we only list dependencies to technical base components in the component characteristics sections to follow if these dependencies are important and need to be specifically mentioned.
+
+All the components displayed are just briefly described in the next sections.
+
+%-----------------------------------------------------------------------------------------------
+%		Component Characteristics
+%-----------------------------------------------------------------------------------------------
+
+\section{Component Characteristics}
+\label{sec:StructureofaComponentDescription}
+
+All components are briefly described by a common structure that looks like this:
+
+\textbf{Component Name:} The name of the component.
+
+\textbf{Task:} The main responsibility of the component.
+
+\textbf{Controlled Data:} Any data the component has ownership for.
+
+\textbf{Depends on $<$Component Name$>$:} Occurring multiple times, once for each component it depends on with a reason why this dependency is necessary.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Component \COMPcontext{}}
+\label{sec:COMPContext}
+
+\textbf{Component Name:} \COMPcontext{}
+
+\textbf{Task:} The entry point for every user to \LibName{}. It loads all extensions and provides access to all other components of the library.
+
+\textbf{Controlled Data:} Keine.
+
+\textbf{Depends on \COMPextensionManagement{}:} \COMPcontext{} loads all extensions by using this component.
+
+\textbf{Depends on \COMPcomponentRegistry{}:} \COMPcontext{} uses this component to instantiate all component singletons the user asks for.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Any extension component}
+\label{sec:COMPContext}
+
+\textbf{Component Name:} Arbitrary, usually the name of the data format the extension implements
+
+\textbf{Task:} Offers the high-level API to work with the data format it implements.
+
+\textbf{Controlled Data:} None.
+
+\textbf{Depends on \COMPextensionManagement{}:} It needs this dependency to the extension framework because it is an extension.
+
+\textbf{Depends on \COMPdataFormatManagement{}:} It implements a specific data format, does needs to depend on data format base classes defined in \COMPdataFormatManagement{}.
+
+\textbf{Depends on \COMPdataPartManagement{}:} Extensions are allowed to override reading, writing and validation of data, thus they can depend on \COMPdataPartManagement{}.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Component \COMPdataPartManagement{}}
+\label{sec:COMPdataPartManagement}
+
+\textbf{Component Name:} \COMPdataPartManagement{}
+
+\textbf{Task:} Implements generic reading and writing of \TERMcontainerFormat{}s and \TERMmetadataFormat{}s according to their format specification.
+
+\textbf{Controlled Data:} Accessing raw \TERMcontainer{} or \TERMtag{} data on byte or bit level is only allowed by using this component.
+
+\textbf{Depends on \COMPmedia{}:} \COMPdataPartManagement{} must read and write data portions from an external medium, for this it uses \COMPmedia{}.
+
+\textbf{Depends on \COMPdataFormatManagement{}:} Needs access to the data format specification by depending on \COMPdataFormatManagement{}. This is necessary to implement the generic reading and writing.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Component \COMPdataFormatManagement{}}
+\label{sec:COMPdataFormatManagement}
+
+\textbf{Component Name:} \COMPdataFormatManagement{}
+
+\textbf{Task:} Manages the generic data format definitions for \TERMcontainerFormat{}s.
+
+\textbf{Controlled Data:} Has control over the data format specifications.
+
+\textbf{Depends on:} No other components except technical base components.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Component \COMPmedia{}}
+\label{sec:COMPmediumAccess}
+
+\textbf{Component Name:} \COMPmedia{}
+
+\textbf{Task:} Offers primitive to read and write all supported physical \TERMmedium{}. Hides medium access differences for other components.
+
+\textbf{Controlled Data:} Accessing data of external media is only allowed by using \COMPmedia{}.
+
+\textbf{Depends on:} No other components except technical base components.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Component \COMPextensionManagement{}}
+\label{sec:COMPextensionManagement}
+
+\textbf{Component Name:} \COMPextensionManagement{}
+
+\textbf{Task:} Manages all extensions of \LibName{} generically, i.e. loading and verification.
+
+\textbf{Controlled Data:} Descriptive data for extensions can only be obtained using \COMPextensionManagement{}.
+
+\textbf{Depends on:} No other components except utility.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Component \COMPcomponentRegistry{}}
+\label{sec:COMPcomponentRegistry}
+
+\textbf{Component Name:} \COMPcomponentRegistry{}
+
+\textbf{Task:} Implements the service locator functionality to enable components to depend only on the API of another component.
+
+\textbf{Controlled Data:} Only via \COMPcomponentRegistry{}, access to metadata about components of \LibName{} is possible.
+
+\textbf{Depends on:} No other components except utility.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Component \COMPutility{}}
+\label{sec:COMPutility}
+
+\textbf{Component Name:} \COMPutility{}.
+
+\textbf{Task:} Offers diverse (technical) cross-functional stuff that needs to be used by most if not all other components, e.g. helper functionality to implement design-by-contract.
+
+\textbf{Controlled Data:} None.
+
+\textbf{Depends on:} No other components.
 
 %###############################################################################################
 %###############################################################################################

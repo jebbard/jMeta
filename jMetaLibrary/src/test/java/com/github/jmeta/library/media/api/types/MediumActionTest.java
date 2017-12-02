@@ -189,7 +189,7 @@ public class MediumActionTest {
    private void checkCreatedAction(MediumAction newAction, MediumActionType expectedActionType,
       MediumRegion expectedRegion, ByteBuffer expectedActionBytes, int expectedSequenceNumber) {
       Assert.assertEquals(expectedActionType, newAction.getActionType());
-      Assert.assertEquals(expectedSequenceNumber, newAction.getSequenceNumber());
+      Assert.assertEquals(expectedSequenceNumber, newAction.getScheduleSequenceNumber());
       Assert.assertEquals(expectedActionBytes, newAction.getActionBytes());
       Assert.assertEquals(expectedRegion, newAction.getRegion());
       Assert.assertTrue(newAction.isPending());

@@ -65,11 +65,11 @@ public class MediumChangeManagerTest {
       MediumRegion region4 = new MediumRegion(at(200), BUFFER_SIZE_20.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region4, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region4, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3, 0, 1, 2, 4 },
          Arrays.asList());
@@ -94,11 +94,11 @@ public class MediumChangeManagerTest {
       // includes region 3
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_B, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_5, 2),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region4, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region4, BUFFER_SIZE_40));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 4, 3 },
          Arrays.asList());
@@ -120,10 +120,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(20), 55);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 3, 2 },
          Arrays.asList());
@@ -145,10 +145,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(100), BUFFER_SIZE_10_A.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0, 2, 3 },
          Arrays.asList());
@@ -168,8 +168,8 @@ public class MediumChangeManagerTest {
       MediumRegion region1 = new MediumRegion(at(1), 5);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 1));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
    }
@@ -179,7 +179,7 @@ public class MediumChangeManagerTest {
     * {@link MediumChangeManager#scheduleRemove(MediumRegion)} and {@link MediumChangeManager#iterator()}.
     */
    @Test
-   public void dd079case4_scheduleRemoveThenInsert_sameOffset_iteratedUnchangedInScheduleOrder() {
+   public void dd079case4_scheduleRemoveThenInsert_sameOffset_iteratedReturnsInsertBeforeRenove() {
 
       MediumChangeManager testling = getTestling();
 
@@ -188,10 +188,10 @@ public class MediumChangeManagerTest {
       MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A));
 
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0 }, Arrays.asList());
    }
 
    /**
@@ -210,10 +210,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(187), 100);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 3 },
          Arrays.asList(0, 2));
@@ -235,10 +235,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(0), 43);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_40, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3 },
          Arrays.asList(0, 1, 2));
@@ -260,12 +260,12 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(203), BUFFER_SIZE_40.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_40));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
    }
@@ -286,10 +286,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(45), BUFFER_SIZE_40.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 3 },
          Arrays.asList());
@@ -311,10 +311,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(65), BUFFER_SIZE_20.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0, 2, 3 },
          Arrays.asList());
@@ -334,8 +334,8 @@ public class MediumChangeManagerTest {
       MediumRegion region1 = new MediumRegion(at(1), 5);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 1));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
    }
@@ -345,7 +345,7 @@ public class MediumChangeManagerTest {
     * {@link MediumChangeManager#scheduleReplace(MediumRegion, ByteBuffer)} and {@link MediumChangeManager#iterator()}.
     */
    @Test
-   public void dd080case4_scheduleReplaceThenInsert_sameOffset_iteratedUnchangedInScheduleOrder() {
+   public void dd080case4_scheduleReplaceThenInsert_sameOffset_iteratorReturnsInsertBeforeReplace() {
 
       MediumChangeManager testling = getTestling();
 
@@ -354,10 +354,10 @@ public class MediumChangeManagerTest {
       MediumRegion region1 = new MediumRegion(at(1), BUFFER_SIZE_10_A.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 1));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A));
 
-      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
+      checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0 }, Arrays.asList());
    }
 
    /**
@@ -374,8 +374,8 @@ public class MediumChangeManagerTest {
       MediumRegion region1 = new MediumRegion(at(1), 20);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1 }, Arrays.asList(0));
    }
@@ -397,11 +397,11 @@ public class MediumChangeManagerTest {
       MediumRegion region4 = new MediumRegion(at(1), 20);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region2, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 4 },
          Arrays.asList(0, 1, 2, 3));
@@ -425,14 +425,14 @@ public class MediumChangeManagerTest {
       MediumRegion region5 = new MediumRegion(at(200 + BUFFER_SIZE_5.remaining() - 1), BUFFER_SIZE_20.remaining());
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region5, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region1, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region5, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2 },
          Arrays.asList());
@@ -454,11 +454,11 @@ public class MediumChangeManagerTest {
       MediumRegion region4 = new MediumRegion(at(2000), 1110);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3, 0, 1, 2, 4 },
          Arrays.asList());
@@ -485,16 +485,16 @@ public class MediumChangeManagerTest {
       MediumRegion region9 = new MediumRegion(at(2900), 200); // Completely encloses region 8
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region8, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region9, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region8, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region9, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 3, 7, 6, 9 },
          Arrays.asList(0, 4, 5, 8));
@@ -515,10 +515,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(0), 100); // Completely encloses all other regions
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3 },
          Arrays.asList(0, 1, 2));
@@ -539,12 +539,12 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(118), 1); // Completely enclosed by region 1
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 },
          Arrays.asList(2, 3));
@@ -567,14 +567,14 @@ public class MediumChangeManagerTest {
       MediumRegion region5 = new MediumRegion(at(1100), 250); // Overlaps region 0 at end by 100 bytes
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0 },
          Arrays.asList());
@@ -599,16 +599,16 @@ public class MediumChangeManagerTest {
       MediumRegion region7 = new MediumRegion(at(1200), 40); // Starts at same offset as region 6, overlaps it by 40 b.
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0, 3 },
          Arrays.asList());
@@ -630,12 +630,12 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(90), 10); // 10 bytes to replace
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
          // But replacement region overlaps 30 Bytes at front
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
          // 10 new bytes
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_A, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_A));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 0, 3, 2 },
          Arrays.asList());
@@ -657,10 +657,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(110), 10);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1, 2, 3 },
          Arrays.asList());
@@ -687,16 +687,16 @@ public class MediumChangeManagerTest {
       MediumRegion region9 = new MediumRegion(at(2900), 200);   // Completely encloses region 8
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region8, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region9, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region8, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region9, BUFFER_SIZE_40));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 3, 7, 6, 9 },
          Arrays.asList(0, 4, 5, 8));
@@ -718,10 +718,10 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(1), 70); // Completely encloses all other regions
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3 },
          Arrays.asList(0, 1, 2));
@@ -748,16 +748,16 @@ public class MediumChangeManagerTest {
       MediumRegion region9 = new MediumRegion(at(2900), 200); // Completely encloses region 8
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region8, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region9, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region8, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region9, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 3, 7, 6, 9 },
          Arrays.asList(0, 4, 5, 8));
@@ -778,12 +778,12 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(118), 1);   // Completely enclosed by region 1
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_5, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_5));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
    }
@@ -804,12 +804,12 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(118), 1);   // Completely enclosed by region 1
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_5, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_5));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
    }
@@ -831,14 +831,14 @@ public class MediumChangeManagerTest {
       MediumRegion region5 = new MediumRegion(at(1100), 250);   // Overlaps region 0 at end by 100 bytes
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_5, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_5));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0 },
          Arrays.asList());
@@ -862,14 +862,14 @@ public class MediumChangeManagerTest {
       MediumRegion region5 = new MediumRegion(at(1100), 250);   // Overlaps region 0 at end by 100 bytes
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0 },
          Arrays.asList());
@@ -894,16 +894,16 @@ public class MediumChangeManagerTest {
       MediumRegion region7 = new MediumRegion(at(1200), 40); // Starts at same offs. as reg. 6, overl. 40b.
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region0, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region6, null));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0, 3 },
          Arrays.asList());
@@ -929,16 +929,16 @@ public class MediumChangeManagerTest {
       MediumRegion region7 = new MediumRegion(at(1200), 40); // Starts at same offs. as reg. 6, overl. 40b.
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_20));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region4, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region5, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0, 3 },
          Arrays.asList());
@@ -962,12 +962,12 @@ public class MediumChangeManagerTest {
       MediumRegion region5 = new MediumRegion(at(225), 10);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 3, 0, 1, 2, 5, 4 },
          Arrays.asList());
@@ -994,16 +994,16 @@ public class MediumChangeManagerTest {
       MediumRegion region9 = new MediumRegion(at(2900), 200); // Completely encloses region 8
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region8, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region9, BUFFER_SIZE_10_A, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region8, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region9, BUFFER_SIZE_10_A));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 3, 7, 6, 9 },
          Arrays.asList(0, 4, 5, 8));
@@ -1025,12 +1025,12 @@ public class MediumChangeManagerTest {
       MediumRegion region3 = new MediumRegion(at(118), 1);   // Completely enclosed by region 1
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_40));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region3, null));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 0, 1 }, Arrays.asList());
    }
@@ -1053,14 +1053,14 @@ public class MediumChangeManagerTest {
       MediumRegion region5 = new MediumRegion(at(1100), 250);   // Overlaps region 0 at end by 100 bytes
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_5, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_5));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0 },
          Arrays.asList());
@@ -1086,16 +1086,16 @@ public class MediumChangeManagerTest {
       MediumRegion region7 = new MediumRegion(at(1200), 40); // Starts at same offs. as reg. 6, overl. 40b.
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region0, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region1, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region2, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_20));
 
       checkExceptionOnSchedule(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region3, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_10_A),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region7, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(), new int[] { 1, 2, 0, 3 },
          Arrays.asList());
@@ -1129,23 +1129,23 @@ public class MediumChangeManagerTest {
       MediumRegion region13 = new MediumRegion(at(1200), 20);
 
       List<MediumAction> scheduledActions = checkScheduleForRegions(testling,
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_20, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_10_B, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region8, BUFFER_SIZE_40, 1),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region9, BUFFER_SIZE_20, 2),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region10, BUFFER_SIZE_5, 3),
-         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region11, null, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region12, BUFFER_SIZE_40, 0),
-         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region13, BUFFER_SIZE_20, 0));
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region0, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region1, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region2, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region3, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region4, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region5, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region6, BUFFER_SIZE_10_B),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region7, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region8, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region9, BUFFER_SIZE_20),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region10, BUFFER_SIZE_5),
+         new MediumChangeManagerTestData(testling, MediumActionType.REMOVE, region11, null),
+         new MediumChangeManagerTestData(testling, MediumActionType.REPLACE, region12, BUFFER_SIZE_40),
+         new MediumChangeManagerTestData(testling, MediumActionType.INSERT, region13, BUFFER_SIZE_20));
 
       checkIteratorAgainstScheduledActions(scheduledActions, testling.iterator(),
-         new int[] { 2, 3, 5, 8, 9, 10, 0, 13, 12, 7 }, Arrays.asList(1, 4, 6, 11));
+         new int[] { 3, 2, 8, 9, 10, 5, 0, 13, 12, 7 }, Arrays.asList(1, 4, 6, 11));
    }
 
    /**
@@ -1343,13 +1343,15 @@ public class MediumChangeManagerTest {
 
       List<MediumAction> expectedActionsInIteratorOrder = new ArrayList<>();
 
+      int nextSequenceNumber = 0;
+
       for (MediumChangeManagerTestData testDataSet : testData) {
          MediumRegion mediumRegion = testDataSet.getRegionToUse();
 
          MediumAction returnedAction = callScheduleMethod(testling, testDataSet);
 
-         MediumAction expectedAction = new MediumAction(testDataSet.getTypeToUse(), mediumRegion,
-            testDataSet.getExpectedSequenceNumber(), testDataSet.getActionBytesToUse());
+         MediumAction expectedAction = new MediumAction(testDataSet.getTypeToUse(), mediumRegion, nextSequenceNumber++,
+            testDataSet.getActionBytesToUse());
 
          Assert.assertEquals(expectedAction, returnedAction);
 

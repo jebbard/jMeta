@@ -22,12 +22,16 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * A {@link MediumAction} X is smaller than another {@link MediumAction} Y, if one of the following is true:
  * <ul>
  * <li>The {@link MediumReference} of X is smaller than the {@link MediumReference} of Y, or</li>
- * <li>The {@link MediumReference} of X is equal to the {@link MediumReference} of Y, but the sequence number of X is
- * smaller than the sequence number of Y</li>
+ * <li>If the {@link MediumReference} of X is equal to the {@link MediumReference} of Y, we have following cases:</li>
+ * <li>Case 1: If the left {@link MediumAction} is an {@link MediumActionType#INSERT} action and the right is not: X is
+ * smaller than Y. That is: INSERTs at the same offset as Non-INSERTs are always executed first</li>
+ * <li>Case 2: If the left {@link MediumAction} is an {@link MediumActionType#INSERT} action and the right also is: X is
+ * smaller than Y iff the schedule sequence number of X is smaller than the schedule sequence number of Y</li>
+ * <li>Case 3: If the left {@link MediumAction} is not an {@link MediumActionType#INSERT} action: X is smaller than Y
+ * iff the schedule sequence number of X is smaller than the schedule sequence number of Y</li>
  * </ul>
  * 
- * That said, it does not matter what the values of the other attributes of a {@link MediumAction} are, especially the
- * {@link MediumActionType}.
+ * That said, it does not matter what the values of the other attributes of a {@link MediumAction} are.
  * 
  * Two {@link MediumAction}s are equal if and only if all of their attributes are equal (see implementation of
  * {@link MediumAction#equals(Object)}. Thus a {@link MediumAction} X is bigger than another {@link MediumAction} Y, if
@@ -54,8 +58,13 @@ public class MediumActionComparator implements Comparator<MediumAction> {
 
       if (leftStartReference.equals(rightStartReference)) {
 
+         // INSERTs always must be sorted before REMOVEs or REPLACEs, no matter what their schedule sequence number is
+         if (left.getActionType() == MediumActionType.INSERT && right.getActionType() != MediumActionType.INSERT) {
+            return -1;
+         }
+
          // left is smaller than right
-         if (left.getSequenceNumber() < right.getSequenceNumber()) {
+         if (left.getScheduleSequenceNumber() < right.getScheduleSequenceNumber()) {
             return -1;
          }
 

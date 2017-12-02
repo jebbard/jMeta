@@ -166,8 +166,8 @@ public class MediumCache {
 
       if (cachedRegionsInOffsetOrder.isEmpty()) {
          regionsInRange.addAll(
-                  getGapsBetweenCurrentAndPreviousCachedRegion(startReference, startReference.advance(rangeSizeInBytes)));
-    	  
+            getGapsBetweenCurrentAndPreviousCachedRegion(startReference, startReference.advance(rangeSizeInBytes)));
+
          return regionsInRange;
       }
 
@@ -362,8 +362,8 @@ public class MediumCache {
       if (previousRegionEndReference.before(currentRegionStartReference)) {
          int gapSizeInBytes = (int) currentRegionStartReference.distanceTo(previousRegionEndReference);
 
-         gapRegions.addAll(MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, previousRegionEndReference,
-            gapSizeInBytes, getMaximumCacheRegionSizeInBytes(), MediumRegion::new));
+         gapRegions.addAll(MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class,
+            previousRegionEndReference, gapSizeInBytes, getMaximumCacheRegionSizeInBytes(), MediumRegion::new));
       }
 
       return gapRegions;
@@ -372,8 +372,8 @@ public class MediumCache {
    /**
     * This method performs the actual splitting of a {@link MediumRegion} according to the maximum allowed cache region
     * size. It is used with
-    * {@link MediumRangeChunkAction#performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} and is
-    * called for each chunk the original {@link MediumRegion} is split into. It returns the {@link MediumRegion}
+    * {@link MediumRangeChunkAction#performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)}
+    * and is called for each chunk the original {@link MediumRegion} is split into. It returns the {@link MediumRegion}
     * corresponding to the current chunk.
     * 
     * @param regionToSplit

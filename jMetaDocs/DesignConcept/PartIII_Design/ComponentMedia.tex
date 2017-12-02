@@ -1039,6 +1039,24 @@ The second possible interpretation sketched above might lead to surprises in a f
 }
 %%%% <-- DD %%%%
 
+Before looking at the interactions between \emph{insert}s, \emph{remove}s and \emph{replace}s in detail, we have to deeper think about \texttt{AMed09}. The requirement is to allow \emph{insert}s and one of these other operations at the same offset in arbitrary order. What is the meaning behind? This is clarified by the following design decision:
+
+%%%% DD --> %%%%
+\DD{dd:422r}
+{% Titel
+\emph{insert} at the same offset as \emph{remove} and \emph{replace} means to insert before remove and replace, irrespective of schedule order
+}
+{% Kurzbeschreibung
+No matter if you first call \emph{insert} at offset $x$, then \emph{remove} or \emph{replace} at offset $x$, or the other way round: The meaning is that you want to insert new bytes before the bytes to remove or replace.
+}
+{% Begründung
+If you want to insert something behind the replacement or removed region, the insertion offset must point to the offset of the first byte behind the replacement or removed region. Thus, calling \emph{insert} after \emph{remove} or \emph{replace} cannot have the meaning ``first execute the replace or remove, then insert the bytes behind the removed or replaced region''. Thus, we have to ignore the sequence and ensure \emph{insert}s at the same offsets as \emph{remove} or \emph{replace} are always executed first.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 We now look at how \emph{insert} and \emph{remove} interact with each other:
 
 %%%% DD --> %%%%
@@ -1051,8 +1069,8 @@ The following cases can be identified:
 \begin{enumerate}
 \item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} $n$ bytes at offset $y$, where $x$ is not located within the removed range $[y,y+n)$: Both calls are allowed, they do not influence each other.
 \item Step 1: \emph{remove} $n$ bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is not located within the removed range $[y,y+n)$: Both calls are allowed, they do not influence each other.
-\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} at same offset: Both calls are allowed, they do not influence each other.
-\item Step 1: \emph{remove} at offset $x$, Step 2: \emph{insert} at same offset: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} at same offset: Both calls are allowed, with the meaning to first insert new bytes at offset $x$, then removing existing bytes starting at offset $x$ (see \DesLink{dd:422r}).
+\item Step 1: \emph{remove} at offset $x$, Step 2: \emph{insert} at same offset: Both calls are allowed, with the meaning to first insert new bytes at offset $x$, then removing existing bytes starting at offset $x$ (see \DesLink{dd:422r}).
 \item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} $n$ bytes at offset $y$, where $x$ is contained in the removed range $[y,y+n)$: The insert is revoked by the remove, i.e. will not be executed during a \emph{flush}.
 \item Step 1: \emph{remove} $n$ bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is contained in the removed range $[y,y+n)$: The second call is rejected with an exception, as it is pointing into an already removed region.
 \end{enumerate}
@@ -1084,8 +1102,8 @@ The following cases can be identified:
 \begin{enumerate}
 \item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, where $x$ is not located within the replaced range $[y,y+n)$: Both calls are allowed, they do not influence each other.
 \item Step 1: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is not located within the replaced range $[y,y+n)$: Both calls are allowed, they do not influence each other.
-\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} at same offset: Both calls are allowed, they do not influence each other.
-\item Step 1: \emph{replace} at offset $x$, Step 2: \emph{insert} at same offset: Both calls are allowed, they do not influence each other.
+\item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} at same offset: Both calls are allowed, with the meaning to first insert new bytes at offset $x$, then replacing existing bytes starting at offset $x$ (see \DesLink{dd:422r}).
+\item Step 1: \emph{replace} at offset $x$, Step 2: \emph{insert} at same offset: Both calls are allowed, with the meaning to first insert new bytes at offset $x$, then replacing existing bytes starting at offset $x$ (see \DesLink{dd:422r}).
 \item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, where $x$ is contained in the replaced range $[y,y+n)$: The insert is revoked by the replace, i.e. will not be executed during a \emph{flush}.
 \item Step 1: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is contained in the replaced range $[y,y+n)$: The second call is rejected with an exception, as it is pointing into an already replaced region.
 \end{enumerate}
@@ -1724,13 +1742,13 @@ We first state the following:
 %%%% DD --> %%%%
 \DD{dd:434}
 {% Titel
-\MediumAction{} has a sequence number for distinguishing actions at the same offset
+\MediumAction{} has a schedule sequence number for knowing the schedule order of actions
 }
 {% Kurzbeschreibung
-\MediumAction{} defines a sequence number (starting at 0) for distinguishing actions at the same offset. It is incremented by consecutive actions (no matter which type) at the same offset by 1. This sequence number is not thus only used for \texttt{insert}s at the same offset, but also for all other types of actions.
+\MediumAction{} defines a schedule sequence number (starting at 0) for distinguishing which action has been scheduled earlier. It is incremented by any scheduled action (no matter which type) by 1. The schedule sequence number is ``global'' for the same medium in a sense that it is simply incremented for each change, no matter what change it is and if there was a flush already or not.
 }
 {% Begründung
-Two distinct \MediumAction{} instances referring to the same offset cannot be sorted without this mechanism. However, this is especially important for \texttt{insert}s that are allowed to refer to the same offset (see \DesLink{dd:422}). Furthermore, it is also important for other types, as \texttt{insert} allows a later \texttt{remove} or \texttt{replace} at the same offset (see \DesLink{dd:422}).
+Two distinct \MediumAction{} instances of type \texttt{insert} referring to the same offset cannot be sorted without this mechanism (see \DesLink{dd:422}).
 }
 {% Nachteile
 No disadvantages known

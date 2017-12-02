@@ -738,12 +738,12 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(
          createFlushExpectationPath("expectation_flush_CF7b.txt"),
          new MediumAction[] {
-            createInsertAction(at(currentMedium, 5), "___CF7bMultipleInsertsAndRemovesAtDifferentOffsets[1]___"),
-            createRemoveAction(at(currentMedium, 4), 200), createInsertAction(at(currentMedium, 6), "===CF7b[2]==="),
+            createInsertAction(at(currentMedium, 4), "___CF7bMultipleInsertsAndRemovesAtDifferentOffsets[1]___"),
+            createRemoveAction(at(currentMedium, 4), 200), createInsertAction(at(currentMedium, 4), "===CF7b[2]==="),
             createRemoveAction(at(currentMedium, 304), currentMediumContent.length() - 304),
-            createInsertAction(at(currentMedium, currentMediumContent.length() - 1), "###CF7b[3]###"),
+            createInsertAction(at(currentMedium, currentMediumContent.length()), "###CF7b[3]###"),
             createInsertAction(at(currentMedium, currentMediumContent.length()), "x"),
-            createRemoveAction(at(currentMedium, 204), 10), createInsertAction(at(currentMedium, 205), "TEST"), });
+            createRemoveAction(at(currentMedium, 204), 10), createInsertAction(at(currentMedium, 204), "TEST"), });
    }
 
    /**
@@ -791,17 +791,16 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
       testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(
-         createFlushExpectationPath("expectation_flush_CF9.txt"), new MediumAction[] {
+         createFlushExpectationPath("expectation_flush_CF9.txt"),
+         new MediumAction[] { createReplaceAction(at(currentMedium, 4), 50, "===CF9[000000000000]==="),
+            createInsertAction(at(currentMedium, 56), "===CF9[1]==="),
+            createReplaceAction(at(currentMedium, 304), currentMediumContent.length() - 304, ">>>>הההההההההההההה<<<<"),
+            createInsertAction(at(currentMedium, 4), "___CF9MultipleInsertsRemovesAndReplacesAtDifferentOffsets[2]___"),
+            createInsertAction(at(currentMedium, currentMediumContent.length()), "###CF9[3]###"),
+            createReplaceAction(at(currentMedium, 215), 1, "REPLACEMENT #2"),
+            createRemoveAction(at(currentMedium, 204), 10),
 
-            createReplaceAction(at(currentMedium, 4), 50, "===CF9[000000000000]==="),
-         // createInsertAction(at(currentMedium, 56), "===CF9[1]==="),
-         // createReplaceAction(at(currentMedium, 304), currentMediumContent.length() - 304,
-         // ">>>>הההההההההההההה<<<<"),
-         // createInsertAction(at(currentMedium, 4), "___CF9MultipleInsertsRemovesAndReplacesAtDifferentOffsets[2]___"),
-         // createInsertAction(at(currentMedium, currentMediumContent.length()), "###CF9[3]###"),
-         // createReplaceAction(at(currentMedium, 215), 1, "REPLACEMENT #2"),
-         // createRemoveAction(at(currentMedium, 204), 10),
-         // createInsertAction(at(currentMedium, 205), "TEST"),
+         // createInsertAction(at(currentMedium, 204), "TEST"),
 
          });
    }

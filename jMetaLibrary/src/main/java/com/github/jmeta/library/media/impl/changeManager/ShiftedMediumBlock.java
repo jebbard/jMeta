@@ -18,11 +18,12 @@ import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link ShiftedMediumBlock} represents a block of existing, consecutive {@link IMedium} bytes which potentially need
- * to be shifted because of a causing {@link MediumAction}, e.g. an {@link MediumActionType#REMOVE} or
+ * {@link ShiftedMediumBlock} represents a block of existing, consecutive {@link Medium} bytes which potentially need to
+ * be shifted because of a causing {@link MediumAction}, e.g. an {@link MediumActionType#REMOVE} or
  * {@link MediumActionType#INSERT} operation. For random access media such as files or arrays, an insertion means that
  * all bytes behind the insertion index must be moved back by the number of inserted bytes. Likewise, for removals,
  * bytes behind the removed region must be moved forward to the index of removal. For replaces, it might be either a
@@ -31,30 +32,19 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * 
  * This class is a basic and important building block for the <i>create flush plan algorithm</i> (short hereafter:
  * <i>CFP algorithm</i>) that is implemented in {@link MediumChangeManager#createFlushPlan(int, long)}. The idea of the
- * CFP algorithm is that every insertion, removal or replacement leads to a "shift" of existing medium bytes. This shift
- * is not only determined by the single "causing" {@link MediumAction} that is stored in this instance of
- * {@link ShiftedMediumBlock}, but also by other inserts, removes and replaces that occur before the causing action of
- * the current {@link ShiftedMediumBlock}. Thus, the actual number of bytes to shift (see
- * {@link #getTotalShiftOfMediumBytes()}) changes throughout the CFP algorithm, requiring a setter called
- * {@link #setTotalShiftOfMediumBytes(int)}. Likewise, the actual end offset of the byte block represented by an
- * instance of {@link ShiftedMediumBlock} is only determined during the algorithm, thus there is a setter for
- * {@link #setEndReferenceOfMediumBytes(IMediumReference)}.
+ * CFP algorithm is that every insertion, removal or replacement leads to a "shift" of existing medium bytes.
  * 
- * All {@link IMediumReference} instances and sizes returned by this class refer to offsets and sizes on the external
- * {@link IMedium} and are therefore not in any way "virtual".
+ * All {@link MediumReference} instances and sizes returned by this class refer to valid offsets and sizes on the
+ * existing, external {@link Medium} and are therefore not in any way "virtual".
  * 
  * After instantiation, the {@link #getMediumByteCount()} method of this {@link ShiftedMediumBlock} returns
  * {@value #UNDEFINED_COUNT}. The reason for this is: The actual size of the medium bytes is only computed during
- * execution of the CFP algorithm. It is finally computable after
- * {@link #setEndReferenceOfMediumBytes(IMediumReference)} has been called. In this state, the
- * {@link ShiftedMediumBlock} is finally assembled. You can see such an instance as referring to existing medium bytes
- * including their location, and at the same time telling <i>where</i> they will be moved after applying not only one
- * action (i.e. the causing action of this specific {@link ShiftedMediumBlock} instance), but a whole sequence of
- * insertions, removals or replacements on the external {@link IMedium}.
- */
-/**
- * {@link ShiftedMediumBlock}
- *
+ * execution of the CFP algorithm. It is finally computable after {@link #setEndReferenceOfMediumBytes(MediumReference)}
+ * has been called. In this state, the {@link ShiftedMediumBlock} is finally assembled. You can see such an instance as
+ * referring to existing medium bytes including their location, and at the same time telling <i>where</i> they will be
+ * moved after applying not only one action (i.e. the causing action of this specific {@link ShiftedMediumBlock}
+ * instance), but a whole sequence of insertions, removals or replacements on the external {@link Medium} until the
+ * start offset of this block.
  */
 public class ShiftedMediumBlock {
 
@@ -65,19 +55,8 @@ public class ShiftedMediumBlock {
 
    private final MediumAction causingAction;
    private final MediumReference startReferenceOfFollowUpBytes;
-   private final int overlapWithPreviousRegion;
-   private MediumReference endReferenceOfFollowUpBytes;
-   private int totalShiftOfMediumBytes;
-
-   public ShiftedMediumBlock(MediumAction causingAction, int totalShiftOfMediumBytes, int overlapWithPreviousRegion) {
-
-      Reject.ifNull(causingAction, "causingAction");
-
-      this.causingAction = causingAction;
-      this.totalShiftOfMediumBytes = totalShiftOfMediumBytes;
-      this.startReferenceOfFollowUpBytes = initStartReference(getCausingAction());
-      this.overlapWithPreviousRegion = overlapWithPreviousRegion;
-   }
+   private final int totalShiftOfMediumBytes;
+   private int totalMediumByteCount = UNDEFINED_COUNT;
 
    /**
     * Creates a new {@link ShiftedMediumBlock}.
@@ -86,10 +65,9 @@ public class ShiftedMediumBlock {
     *           The {@link MediumAction} that is the reason for creating this {@link ShiftedMediumBlock}.
     * @param totalShiftOfMediumBytes
     *           The number of bytes the existing medium bytes need to be shifted in total. This number might be 0,
-    *           positive or negative. It changes during the create flush plan algorithm. Thus there is also a setter for
-    *           this attribute. The number provided <i>already includes</i> the shift introduced by the causing action
-    *           of this {@link ShiftedMediumBlock}, and therefore not only contains shifts by other actions at smaller
-    *           offsets.
+    *           positive or negative. The number provided <i>already includes</i> the shift introduced by the causing
+    *           action of this {@link ShiftedMediumBlock}, and therefore not only contains shifts by other actions at
+    *           smaller offsets.
     */
    public ShiftedMediumBlock(MediumAction causingAction, int totalShiftOfMediumBytes) {
 
@@ -98,7 +76,6 @@ public class ShiftedMediumBlock {
       this.causingAction = causingAction;
       this.totalShiftOfMediumBytes = totalShiftOfMediumBytes;
       this.startReferenceOfFollowUpBytes = initStartReference(getCausingAction());
-      this.overlapWithPreviousRegion = 0;
    }
 
    /**
@@ -128,22 +105,11 @@ public class ShiftedMediumBlock {
    }
 
    /**
-    * Returns the end {@link MediumReference} of the medium bytes this {@link ShiftedMediumBlock} refers to. It is set
-    * during execution of the CFP algorithm. Might return {@link #UNDEFINED_COUNT} if the CFP algorithm is still in
-    * progress.
-    * 
-    * @return the end {@link MediumReference} of the medium bytes this {@link ShiftedMediumBlock} refers to.
-    */
-   public MediumReference getEndReferenceOfFollowUpBytes() {
-      return endReferenceOfFollowUpBytes;
-   }
-
-   /**
     * Sets the end {@link MediumReference} of the consecutive block of medium bytes this {@link ShiftedMediumBlock}
     * refers to. These are actual and current offsets on the external medium. Saying this, they not yet reflect any
     * shift operations by any already or not yet executed {@link MediumAction}s.
     * 
-    * After this method has been called with a valid end {@link MediumReference}, {@link #computeMediumByteCount()} will
+    * After this method has been called with a valid end {@link MediumReference}, {@link #totalMediumByteCount} will
     * return the corresponding size.
     *
     * @param endReferenceOfFollowUpBytes
@@ -155,49 +121,14 @@ public class ShiftedMediumBlock {
          "the given end reference <" + endReferenceOfFollowUpBytes + "> must be located before the start reference <"
             + getStartReferenceOfFollowUpBytes() + ">.");
 
-      this.endReferenceOfFollowUpBytes = endReferenceOfFollowUpBytes;
-   }
+      long distance = endReferenceOfFollowUpBytes.distanceTo(getStartReferenceOfFollowUpBytes());
 
-   /**
-    * Returns by how many bytes the existing medium bytes will be shifted by this {@link ShiftedMediumBlock} in total.
-    * See the constructor javadocs for more details.
-    * 
-    * @return by how many bytes the existing medium bytes will be shifted by this {@link ShiftedMediumBlock} in total.
-    *         See the constructor javadocs for more details.
-    */
-   public int getTotalShiftOfMediumBytes() {
-      return totalShiftOfMediumBytes;
-   }
-
-   /**
-    * Sets by how many bytes the existing medium bytes will be shifted by this {@link ShiftedMediumBlock} in total. See
-    * the constructor javadocs for more details.
-    *
-    * @param totalShiftOfMediumBytes
-    *           by how many bytes the existing medium bytes will be shifted by this {@link ShiftedMediumBlock} in total.
-    *           See the constructor javadocs for more details.
-    */
-   public void setTotalShiftOfMediumBytes(int totalShiftOfMediumBytes) {
-      Reject.ifNull(totalShiftOfMediumBytes, "totalShiftOfMediumBytes");
-
-      this.totalShiftOfMediumBytes = totalShiftOfMediumBytes;
-   }
-
-   /**
-    * Computes and returns the number of existing medium bytes between {@link #getStartReferenceOfFollowUpBytes()} and
-    * {@link #getEndReferenceOfFollowUpBytes()} shifted by this {@link ShiftedMediumBlock}. It returns
-    * {@link #UNDEFINED_COUNT} if the CFP algorithm is currently still in progress and the method
-    * {@link #setEndReferenceOfMediumBytes(MediumReference)} of this {@link ShiftedMediumBlock} has not yet been called.
-    * 
-    * @return the number of medium bytes shifted by this {@link ShiftedMediumBlock}.
-    */
-   public int computeMediumByteCount() {
-
-      if (endReferenceOfFollowUpBytes == null) {
-         return UNDEFINED_COUNT;
+      if (distance > Integer.MAX_VALUE) {
+         throw new IllegalStateException("Cannot handle changes whose distance is bigger than " + Integer.MAX_VALUE
+            + " bytes. These changes must be executed within different flushes.");
       }
 
-      return (int) getEndReferenceOfFollowUpBytes().distanceTo(getStartReferenceOfFollowUpBytes());
+      totalMediumByteCount = (int) distance;
    }
 
    /**
@@ -209,7 +140,7 @@ public class ShiftedMediumBlock {
     * {@link MediumRegion} usually do not yet refer to a valid region of the <i>current</i> medium content.
     * 
     * In detail, the region returned can be described as follows - in the listing "(+delta)" wants to express that all
-    * offsets returned already include the total shift of the CFP algorithm:
+    * offsets returned already include the total shift determined by the CFP algorithm:
     * <ul>
     * <li>For {@link MediumActionType#INSERT}: Starting at the insertion offset (+delta), ending at the byte before the
     * next block (or end of medium) (+delta), it encompasses the inserted bytes at the beginning and then the follow-up
@@ -227,22 +158,26 @@ public class ShiftedMediumBlock {
     *         the newly written bytes, if any.
     */
    public MediumRegion getTargetRegion() {
-      if (getCausingAction().getActionType() == MediumActionType.REMOVE) {
-         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(getTotalShiftOfMediumBytes()),
-            computeMediumByteCount());
-      } else if (getCausingAction().getActionType() == MediumActionType.INSERT) {
-         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(getTotalShiftOfMediumBytes()),
-            computeMediumByteCount() + getCausingAction().getRegion().getSize());
+      if (getCausingAction().getActionType() == MediumActionType.INSERT) {
+         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(totalShiftOfMediumBytes),
+            totalMediumByteCount/* + getCausingAction().getSizeDelta() */);
+      } else if (getCausingAction().getActionType() == MediumActionType.REMOVE) {
+         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(totalShiftOfMediumBytes),
+            totalMediumByteCount);
       } else if (getCausingAction().getActionType() == MediumActionType.REPLACE) {
-         int targetRegionStartRefAdvance = -getCausingAction().getRegion().getSize() + getTotalShiftOfMediumBytes()
-            - (getCausingAction().getActionBytes().remaining() - getCausingAction().getRegion().getSize());
-
-         MediumReference targetRegionStartRef = getStartReferenceOfFollowUpBytes().advance(targetRegionStartRefAdvance);
-
-         return new MediumRegion(targetRegionStartRef,
-            computeMediumByteCount() + getCausingAction().getActionBytes().remaining());
+         //
+         // int replacementByteCount = getCausingAction().getActionBytes().remaining();
+         //
+         // int targetRegionStartRefAdvance = totalShiftOfMediumBytes - replacementByteCount;
+         //
+         // MediumReference targetRegionStartRef =
+         // getStartReferenceOfFollowUpBytes().advance(targetRegionStartRefAdvance);
+         //
+         // return new MediumRegion(targetRegionStartRef, totalMediumByteCount + replacementByteCount);
+         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(totalShiftOfMediumBytes),
+            totalMediumByteCount);
       } else {
-         throw new IllegalStateException("Only actions of type INSERT, REPLACE and REMOVE are allowed");
+         throw new IllegalStateException("Only actions of type INSERT, REPLACE and REMOVE are possible here");
       }
    }
 
@@ -266,10 +201,10 @@ public class ShiftedMediumBlock {
          int replacedByteCount = getCausingAction().getRegion().getSize();
 
          return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(-replacedByteCount),
-            computeMediumByteCount() + replacedByteCount);
+            totalMediumByteCount + replacedByteCount);
       }
 
-      return new MediumRegion(getStartReferenceOfFollowUpBytes(), computeMediumByteCount());
+      return new MediumRegion(getStartReferenceOfFollowUpBytes(), totalMediumByteCount);
    }
 
    /**
@@ -284,15 +219,15 @@ public class ShiftedMediumBlock {
    public List<MediumAction> computeResultingActions(int writeBlockSizeInBytes) {
       List<MediumAction> returnedActions = new ArrayList<>();
 
-      int readWriteBlockCount = computeMediumByteCount() / writeBlockSizeInBytes;
-      int remainingByteCount = computeMediumByteCount() % writeBlockSizeInBytes;
+      int readWriteBlockCount = totalMediumByteCount / writeBlockSizeInBytes;
+      int remainingByteCount = totalMediumByteCount % writeBlockSizeInBytes;
 
       MediumReference startReadRef = null;
 
       boolean backwardReadWrite = totalShiftOfMediumBytes > 0;
 
       if (backwardReadWrite && readWriteBlockCount > 0) {
-         startReadRef = getStartReferenceOfFollowUpBytes().advance(computeMediumByteCount());
+         startReadRef = getStartReferenceOfFollowUpBytes().advance(totalMediumByteCount);
       } else {
          startReadRef = getStartReferenceOfFollowUpBytes();
       }
@@ -339,29 +274,21 @@ public class ShiftedMediumBlock {
          int writtenByteCount = causingAction.getActionBytes().remaining();
 
          startWriteRef = causingAction.getRegion().getStartReference()
-            .advance(totalShiftOfMediumBytes - causingAction.getSizeDelta() + overlapWithPreviousRegion);
+            .advance(totalShiftOfMediumBytes - causingAction.getSizeDelta());
 
-         int writeBlockCount = writtenByteCount / writeBlockSizeInBytes;
-         int remainingWriteByteCount = writtenByteCount % writeBlockSizeInBytes;
-
-         List<MediumAction> writeActions = new ArrayList<>();
+         final MediumReference rangeStartRef = startWriteRef;
 
          byte[] insertBytes = causingAction.getActionBytes().array();
 
-         for (int i = 0; i < writeBlockCount; ++i) {
+         List<MediumAction> writeActions = MediumRangeChunkAction.performActionOnChunksInRange(MediumAction.class,
+            startWriteRef, writtenByteCount, writeBlockSizeInBytes,
+            (MediumReference chunkStartReference, int chunkSizeInBytes) -> {
 
-            writeActions
-               .add(new MediumAction(MediumActionType.WRITE, new MediumRegion(startWriteRef, writeBlockSizeInBytes), 0,
-                  ByteBuffer.wrap(insertBytes, i * writeBlockSizeInBytes, writeBlockSizeInBytes)));
+               int startIndex = (int) chunkStartReference.distanceTo(rangeStartRef);
 
-            startWriteRef = startWriteRef.advance(writeBlockSizeInBytes);
-         }
-
-         if (remainingWriteByteCount > 0) {
-            writeActions
-               .add(new MediumAction(MediumActionType.WRITE, new MediumRegion(startWriteRef, remainingWriteByteCount),
-                  0, ByteBuffer.wrap(insertBytes, writeBlockCount * writeBlockSizeInBytes, remainingWriteByteCount)));
-         }
+               return new MediumAction(MediumActionType.WRITE, new MediumRegion(chunkStartReference, chunkSizeInBytes),
+                  0, ByteBuffer.wrap(insertBytes, startIndex, chunkSizeInBytes));
+            });
 
          returnedActions.addAll(writeActions);
       }
@@ -380,7 +307,7 @@ public class ShiftedMediumBlock {
       String sourceIntvString = "UNDEFINED";
       String targetIntvString = "UNDEFINED";
 
-      if ((this.endReferenceOfFollowUpBytes != null)) {
+      if (totalMediumByteCount != UNDEFINED_COUNT) {
          MediumRegion sourceRegion = getSourceRegion();
          MediumRegion targetRegion = getTargetRegion();
 

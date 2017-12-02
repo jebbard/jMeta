@@ -24,8 +24,6 @@ public class MediumChangeManagerTestData {
 
    private final ByteBuffer actionBytesToUse;
 
-   private final int expectedSequenceNumber;
-
    private final MediumRegion regionToUse;
 
    private final MediumActionType typeToUse;
@@ -47,12 +45,9 @@ public class MediumChangeManagerTestData {
     *           Represents the action bytes which are used when calling the schedule method of
     *           {@link MediumChangeManager}. Furthermore, it represents the action bytes expected for the new
     *           {@link MediumAction} returned by the checked schedule method.
-    * @param expectedSequenceNumber
-    *           The sequence number expected for the new {@link MediumAction} returned by the checked schedule method.
     */
    public MediumChangeManagerTestData(MediumChangeManager testling, MediumActionType typeToUse,
-      MediumRegion regionToUse, ByteBuffer actionBytesToUse, int expectedSequenceNumber) {
-      this.expectedSequenceNumber = expectedSequenceNumber;
+      MediumRegion regionToUse, ByteBuffer actionBytesToUse) {
       this.actionBytesToUse = actionBytesToUse;
       this.regionToUse = regionToUse;
       this.typeToUse = typeToUse;
@@ -94,21 +89,11 @@ public class MediumChangeManagerTestData {
    }
 
    /**
-    * Returns the sequence number expected for the new {@link MediumAction} returned by the checked schedule method.
-    * 
-    * @return The sequence number expected for the new {@link MediumAction} returned by the checked schedule method.
-    */
-   public int getExpectedSequenceNumber() {
-
-      return expectedSequenceNumber;
-   }
-
-   /**
     * @see java.lang.Object#toString()
     */
    @Override
    public String toString() {
       return "MediumChangeManagerTestData [typeToUse=" + typeToUse + ", regionToUse=" + regionToUse
-         + ", actionBytesToUse=" + actionBytesToUse + ", expectedSequenceNumber=" + expectedSequenceNumber + "]";
+         + ", actionBytesToUse=" + actionBytesToUse + "]";
    }
 }

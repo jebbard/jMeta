@@ -40,14 +40,19 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link MediumAction}s represent an open action that is still to be performed before a {@link MediumStore#flush()}.
  * 
  * {@link MediumChangeManager} ensures that these {@link MediumAction}s are created consistently and maintains them in a
- * specific order such that later {@link MediumStore#flush()} can be more easier implemented. It does this by using a
+ * specific order such that {@link MediumStore#flush()} can be more easier implemented. It does this by using a
  * {@link TreeSet} as internal data structure and the {@link MediumActionComparator} as sorting criterion.
  */
 public class MediumChangeManager {
 
    private TreeSet<MediumAction> mediumActions = new TreeSet<>(new MediumActionComparator());
+   private long nextScheduleSequenceNumber = 0;
    private final MediumReferenceFactory mediumReferenceFactory;
    private static final Set<MediumActionType> EXISTING_ACTION_TYPES_TO_CHECK = new HashSet<>();
+   static {
+      EXISTING_ACTION_TYPES_TO_CHECK.add(MediumActionType.REMOVE);
+      EXISTING_ACTION_TYPES_TO_CHECK.add(MediumActionType.REPLACE);
+   }
 
    /**
     * Creates a new {@link MediumChangeManager}.
@@ -63,9 +68,9 @@ public class MediumChangeManager {
     * Schedules a new {@link MediumAction} of type {@link MediumActionType#REMOVE}. The remove action must not overlap
     * with an already existing remove or replace action. Otherwise this method will throw an
     * {@link InvalidOverlappingWriteException}. If the new {@link MediumAction} entirely contains one or several
-    * existing {@link MediumAction} (i.e. is equal to it or fully encloses it), the existing {@link MediumAction} is
-    * invalidated (i.e. its {@link MediumAction#isPending()} will return false) and removed from the
-    * {@link MediumChangeManager}.
+    * existing {@link MediumAction}s of any other type (i.e. is equal to it or fully encloses it), the existing
+    * {@link MediumAction} is invalidated (i.e. its {@link MediumAction#isPending()} will return false) and removed from
+    * the {@link MediumChangeManager}.
     * 
     * The method returns the newly created {@link MediumAction}.
     * 
@@ -73,9 +78,8 @@ public class MediumChangeManager {
     *           The {@link MediumRegion} the remove action refers to, i.e. the start offset and number of bytes to
     *           remove on the external medium.
     * @return The {@link MediumAction} representing the removal. The returned {@link MediumAction} is assigned a
-    *         zero-based sequence number that is guaranteed to be bigger than the sequence number of the last scheduled
-    *         {@link MediumAction} (no matter what type) for the same {@link MediumReference}, of 0 if there was no
-    *         previous {@link MediumAction} scheduled at the {@link MediumReference} of the given {@link MediumRegion}.
+    *         zero-based schedule sequence number that is guaranteed to be bigger than the sequence number of the last
+    *         scheduled {@link MediumAction} (no matter what type)
     */
    public MediumAction scheduleRemove(MediumRegion removedRegion) {
 
@@ -83,9 +87,10 @@ public class MediumChangeManager {
 
       handleExistingInsertsContainedInRegion(removedRegion);
 
-      int nextSequenceNumber = handleOverlappingExistingRemovesAndReplaces(removedRegion, MediumActionType.REMOVE);
+      handleOverlappingExistingRemovesAndReplaces(removedRegion, MediumActionType.REMOVE);
 
-      MediumAction returnedAction = new MediumAction(MediumActionType.REMOVE, removedRegion, nextSequenceNumber, null);
+      MediumAction returnedAction = new MediumAction(MediumActionType.REMOVE, removedRegion,
+         getAndIncrementNextScheduleSequenceNumber(), null);
       mediumActions.add(returnedAction);
 
       return returnedAction;
@@ -95,9 +100,9 @@ public class MediumChangeManager {
     * Schedules a new {@link MediumAction} of type {@link MediumActionType#REPLACE}. The replace action must not overlap
     * with an already existing remove or replace action. Otherwise this method will throw an
     * {@link InvalidOverlappingWriteException}. If the new {@link MediumAction} entirely contains one or several
-    * existing {@link MediumAction} (i.e. is equal to it or fully encloses it), the existing {@link MediumAction} is
-    * invalidated (i.e. its {@link MediumAction#isPending()} will return false) and removed from the
-    * {@link MediumChangeManager}.
+    * existing {@link MediumAction} of any other type (i.e. is equal to it or fully encloses it), the existing
+    * {@link MediumAction} is invalidated (i.e. its {@link MediumAction#isPending()} will return false) and removed from
+    * the {@link MediumChangeManager}.
     * 
     * The method returns the newly created {@link MediumAction}.
     * 
@@ -108,9 +113,8 @@ public class MediumChangeManager {
     *           The {@link ByteBuffer} containing the replacement bytes between its {@link ByteBuffer#position()} and
     *           {@link ByteBuffer#limit()}
     * @return The {@link MediumAction} representing the replacement. The returned {@link MediumAction} is assigned a
-    *         zero-based sequence number that is guaranteed to be bigger than the sequence number of the last scheduled
-    *         {@link MediumAction} (no matter what type) for the same {@link MediumReference}, of 0 if there was no
-    *         previous {@link MediumAction} scheduled at the {@link MediumReference} of the given {@link MediumRegion}.
+    *         zero-based schedule sequence number that is guaranteed to be bigger than the sequence number of the last
+    *         scheduled {@link MediumAction} (no matter what type)
     */
    public MediumAction scheduleReplace(MediumRegion replacedRegion, ByteBuffer replacementBytes) {
 
@@ -118,18 +122,19 @@ public class MediumChangeManager {
 
       handleExistingInsertsContainedInRegion(replacedRegion);
 
-      int nextSequenceNumber = handleOverlappingExistingRemovesAndReplaces(replacedRegion, MediumActionType.REPLACE);
+      handleOverlappingExistingRemovesAndReplaces(replacedRegion, MediumActionType.REPLACE);
 
-      MediumAction returnedAction = new MediumAction(MediumActionType.REPLACE, replacedRegion, nextSequenceNumber,
-         replacementBytes);
+      MediumAction returnedAction = new MediumAction(MediumActionType.REPLACE, replacedRegion,
+         getAndIncrementNextScheduleSequenceNumber(), replacementBytes);
       mediumActions.add(returnedAction);
 
       return returnedAction;
    }
 
    /**
-    * Schedules a new {@link MediumAction} of type {@link MediumActionType#INSERT}. The insert action may arbitrarily
-    * overlap with any already existing actions.
+    * Schedules a new {@link MediumAction} of type {@link MediumActionType#INSERT}. If the insert action is contained
+    * within the removed or replaced region of already scheduled remove or replace actions, this method throws an
+    * {@link InvalidOverlappingWriteException}.
     * 
     * The method returns the newly created {@link MediumAction}.
     * 
@@ -140,22 +145,18 @@ public class MediumChangeManager {
     *           The {@link ByteBuffer} containing the bytes to insert between its {@link ByteBuffer#position()} and
     *           {@link ByteBuffer#limit()}
     * @return The {@link MediumAction} representing the insertion. The returned {@link MediumAction} is assigned a
-    *         zero-based sequence number that is guaranteed to be bigger than the sequence number of the last scheduled
-    *         {@link MediumAction} (no matter what type) for the same {@link MediumReference}, of 0 if there was no
-    *         previous {@link MediumAction} scheduled at the {@link MediumReference} of the given {@link MediumRegion}.
+    *         zero-based schedule sequence number that is guaranteed to be bigger than the sequence number of the last
+    *         scheduled {@link MediumAction} (no matter what type)
     */
    public MediumAction scheduleInsert(MediumRegion insertionRegion, ByteBuffer insertionBytes) {
-
-      Reject.ifNull(insertionRegion, "region");
+      Reject.ifNull(insertionRegion, "insertionRegion");
 
       MediumAction previousAction = getPreviousAction(insertionRegion);
 
       verifyExistingRemoveOrReplaceNotContainingInsertOffset(insertionRegion, previousAction);
 
-      int nextSequenceNumber = determineNextSequenceNumber(insertionRegion, previousAction);
-
-      MediumAction returnedAction = new MediumAction(MediumActionType.INSERT, insertionRegion, nextSequenceNumber,
-         insertionBytes);
+      MediumAction returnedAction = new MediumAction(MediumActionType.INSERT, insertionRegion,
+         getAndIncrementNextScheduleSequenceNumber(), insertionBytes);
       mediumActions.add(returnedAction);
 
       return returnedAction;
@@ -185,20 +186,29 @@ public class MediumChangeManager {
       mediumActions.remove(action);
    }
 
-   // TODO add javadocs
-   public List<MediumAction> createFlushPlan(int writeBlockSizeInBytes, long totalMediumSizeInBytes) {
+   /**
+    * Creates a flush plan in form a of a list of {@link MediumAction}s to execute by a {@link MediumStore#flush()}. It
+    * considers all previously (i.e. since opening the medium or last successful flush) scheduled changes, enriches them
+    * with direct {@link MediumActionType#READ}, {@link MediumActionType#WRITE} and {@link MediumActionType#TRUNCATE}
+    * actions and ensures they are returned in an order such that no existing medium bytes are incorrectly overridden by
+    * changes.
+    * 
+    * The details of the overall flush algorithm are described at {@link MediumStore#flush()}.
+    * 
+    * @param maxReadWriteBlockSizeInBytes
+    *           The maximum read-write block size in bytes
+    * @param totalMediumSizeInBytes
+    *           The overall number of bytes the medium currently has
+    * @return The flush plan in form a of a list of {@link MediumAction}s to execute by a {@link MediumStore#flush()}
+    */
+   public List<MediumAction> createFlushPlan(int maxReadWriteBlockSizeInBytes, long totalMediumSizeInBytes) {
 
-      Reject.ifTrue(writeBlockSizeInBytes <= 0, "writeBlockSizeInBytes must be strictly positive");
+      Reject.ifTrue(maxReadWriteBlockSizeInBytes <= 0, "maxReadWriteBlockSizeInBytes must be strictly positive");
       Reject.ifTrue(totalMediumSizeInBytes <= 0, "totalMediumSizeInBytes must be strictly positive");
 
       List<MediumAction> flushPlan = new ArrayList<>();
       List<ShiftedMediumBlock> mediumBlocks = new ArrayList<>();
 
-      /*
-       * delta is the current change of the total medium size as indicated by the already processed MediumActions, (i.e.
-       * delta > 0 means the medium would grow by "delta" number of bytes, delta < 0 means the medium would shrink by
-       * "delta" number of bytes).
-       */
       int delta = 0;
 
       Iterator<MediumAction> actionIterator = iterator();
@@ -213,33 +223,13 @@ public class MediumChangeManager {
             if (delta == 0) {
                lastBlock.setEndReferenceOfMediumBytes(lastBlock.getStartReferenceOfFollowUpBytes());
             } else {
-               if (lastBlock.getCausingAction().getSizeDelta() > 0
-                  || !lastBlock.getCausingAction().getRegion().contains(currentRegion.getStartReference())) {
-                  lastBlock.setEndReferenceOfMediumBytes(currentRegion.getStartReference());
-               }
+               lastBlock.setEndReferenceOfMediumBytes(currentRegion.getStartReference());
             }
          }
 
          delta += currentAction.getSizeDelta();
 
-         if (mediumBlocks.size() > 0 && lastBlock.getCausingAction().getSizeDelta() < 0
-            && lastBlock.getCausingAction().getRegion().contains(currentRegion.getStartReference())) {
-            int newBlockShift = (int) (delta + lastBlock.getCausingAction().getRegion().getSize()
-               - currentRegion.getStartReference().getAbsoluteMediumOffset()
-               + lastBlock.getCausingAction().getRegion().getStartReference().getAbsoluteMediumOffset());
-
-            ShiftedMediumBlock newBlock = new ShiftedMediumBlock(currentAction, newBlockShift);
-            newBlock.setEndReferenceOfMediumBytes(newBlock.getStartReferenceOfFollowUpBytes());
-            mediumBlocks.add(mediumBlocks.size() - 1, newBlock);
-
-            if (lastBlock.getCausingAction().getActionType() == MediumActionType.REPLACE) {
-               lastBlock.setTotalShiftOfMediumBytes(delta - currentAction.getSizeDelta());
-            } else {
-               lastBlock.setTotalShiftOfMediumBytes(delta);
-            }
-         } else {
-            mediumBlocks.add(new ShiftedMediumBlock(currentAction, delta));
-         }
+         mediumBlocks.add(new ShiftedMediumBlock(currentAction, delta));
       }
 
       if (mediumBlocks.size() > 0) {
@@ -260,7 +250,7 @@ public class MediumChangeManager {
       for (int i = 0; i < mediumBlocks.size(); ++i) {
          ShiftedMediumBlock currentBlockInSortOrder = mediumBlocks.get(i);
 
-         flushPlan.addAll(currentBlockInSortOrder.computeResultingActions(writeBlockSizeInBytes));
+         flushPlan.addAll(currentBlockInSortOrder.computeResultingActions(maxReadWriteBlockSizeInBytes));
       }
 
       // Add a truncate action to ensure the file is shortened, if necessary
@@ -276,12 +266,12 @@ public class MediumChangeManager {
    /**
     * Returns an {@link Iterator} of all {@link MediumAction}s currently maintained in this {@link MediumChangeManager}.
     * The order the {@link MediumAction}s are returned by this {@link Iterator} follows the order induced by the
-    * {@link MediumActionComparator} class, i.e. sorted by {@link MediumReference} and sequence number, ascending.
+    * {@link MediumActionComparator} class.
     * 
-    * @return an {@link Iterator} of all {@link MediumAction}s currently maintained in this {@link MediumChangeManager}.
+    * @return an {@link Iterator} of all {@link MediumAction}s currently maintained in this {@link MediumChangeManager},
+    *         sorted according to {@link MediumActionComparator}.
     */
    public Iterator<MediumAction> iterator() {
-
       return Collections.unmodifiableSet(mediumActions).iterator();
    }
 
@@ -290,8 +280,21 @@ public class MediumChangeManager {
     * follow up calls to {@link #iterator()} will return an empty iterator.
     */
    public void clearAll() {
-
       mediumActions.clear();
+   }
+
+   /**
+    * @return the next not-yet used schedule sequence number
+    */
+   private long getAndIncrementNextScheduleSequenceNumber() {
+
+      if (nextScheduleSequenceNumber == Long.MAX_VALUE) {
+         throw new IllegalStateException(
+            "You are definitely working too much on the medium, you should sit back, calm down, "
+               + "close and reopen it to make further changes");
+      }
+
+      return nextScheduleSequenceNumber++;
    }
 
    /**
@@ -310,7 +313,7 @@ public class MediumChangeManager {
     */
    private MediumAction getPreviousAction(MediumRegion newRegion) {
       // NOTE: The MediumActionType does not matter for the biggest possible action, only the offset and the
-      // sequence number (due to the comparator implementation).
+      // schedule sequence number (due to the comparator implementation).
       MediumAction biggestPossibleAction = new MediumAction(MediumActionType.READ, newRegion, Integer.MAX_VALUE, null);
 
       return mediumActions.floor(biggestPossibleAction);
@@ -329,7 +332,7 @@ public class MediumChangeManager {
     */
    private MediumAction getNextAction(MediumRegion newRegion) {
       // NOTE: The MediumActionType does not matter for the biggest possible action, only the offset and the
-      // sequence number (due to the comparator implementation).
+      // schedule sequence number (due to the comparator implementation).
       MediumAction biggestPossibleAction = new MediumAction(MediumActionType.READ, newRegion, Integer.MAX_VALUE, null);
 
       return mediumActions.ceiling(biggestPossibleAction);
@@ -356,13 +359,8 @@ public class MediumChangeManager {
     * @param newActionType
     *           The {@link MediumActionType} of the new {@link MediumAction} to be scheduled, either
     *           {@link MediumActionType#REMOVE} or {@link MediumActionType#REPLACE}.
-    * 
-    * @return The next sequence number to take for the {@link MediumAction} to be scheduled.
     */
-   private int handleOverlappingExistingRemovesAndReplaces(MediumRegion newRegion, MediumActionType newActionType) {
-
-      EXISTING_ACTION_TYPES_TO_CHECK.add(MediumActionType.REMOVE);
-      EXISTING_ACTION_TYPES_TO_CHECK.add(MediumActionType.REPLACE);
+   private void handleOverlappingExistingRemovesAndReplaces(MediumRegion newRegion, MediumActionType newActionType) {
 
       Reject.ifFalse(EXISTING_ACTION_TYPES_TO_CHECK.contains(newActionType),
          "actionTypesToHandle.contains(newActionType)");
@@ -423,8 +421,6 @@ public class MediumChangeManager {
             break;
          }
       }
-
-      return determineNextSequenceNumber(newRegion, previousAction);
    }
 
    /**
@@ -444,9 +440,13 @@ public class MediumChangeManager {
       MediumAction nextAction = null;
 
       // Note that getNextAction() will NOT return a INSERTs at the same offset as the new region start offset
-      while ((nextAction = getNextAction(newRegion)) != null && nextAction.getActionType() == MediumActionType.INSERT
+      while ((nextAction = getNextAction(newRegion)) != null
          && newRegion.contains(nextAction.getRegion().getStartReference())) {
-         undo(nextAction);
+         if (nextAction.getActionType() == MediumActionType.INSERT) {
+            undo(nextAction);
+         } else {
+            newRegion = nextAction.getRegion();
+         }
       }
    }
 
@@ -477,32 +477,5 @@ public class MediumChangeManager {
             throw new InvalidOverlappingWriteException(previousAction, previousAction.getActionType(), newRegion);
          }
       }
-   }
-
-   /**
-    * Determines the next sequence number to take for a new {@link MediumAction} to be scheduled based on the sequence
-    * number of its previous {@link MediumAction}. Only if the previous {@link MediumAction} has the same
-    * {@link MediumReference}, its sequence number incremented by 1 is returned. Otherwise this method returns 0.
-    * 
-    * @param newRegion
-    *           The new {@link MediumRegion} for which a new {@link MediumAction} is scheduled.
-    * @param previousAction
-    *           the previous {@link MediumAction} already scheduled in this {@link MediumChangeManager}
-    * @return the next sequence number to take for a new {@link MediumAction} to be scheduled
-    */
-   private int determineNextSequenceNumber(MediumRegion newRegion, MediumAction previousAction) {
-      int nextSequenceNumberAtOffset = 0;
-
-      if (previousAction != null
-         && previousAction.getRegion().getStartReference().equals(newRegion.getStartReference())) {
-
-         if (previousAction.getSequenceNumber() == Integer.MAX_VALUE) {
-            throw new IllegalStateException("Sequence numbers exhausted which should never happen");
-         }
-
-         nextSequenceNumberAtOffset = previousAction.getSequenceNumber() + 1;
-      }
-
-      return nextSequenceNumberAtOffset;
    }
 }

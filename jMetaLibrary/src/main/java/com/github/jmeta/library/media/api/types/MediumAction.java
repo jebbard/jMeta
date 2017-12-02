@@ -20,9 +20,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * undone. The validity of a {@link MediumAction} is represented by its {@link MediumAction#isPending} method. See the
  * methods description for more details.
  * 
- * Every {@link MediumAction} has a sequence number that denotes the order of execution of the {@link MediumAction} for
- * actions that have the same offset. Saying this, there could be several different {@link MediumAction}s referencing
- * the same offset, but that are executed one after the other.
+ * Every {@link MediumAction} has a sequence number that denotes the order of scheduling of the {@link MediumAction}.
  */
 public class MediumAction {
 
@@ -32,7 +30,7 @@ public class MediumAction {
 
    private final ByteBuffer actionBytes;
 
-   private final int sequenceNumber;
+   private final long scheduleSequenceNumber;
 
    private boolean isPending;
 
@@ -51,7 +49,7 @@ public class MediumAction {
     *           The bytes associated to this {@link MediumAction}. Depending in the type of the action, this can be
     *           replacement bytes, bytes to write or bytes to insert. For all other types, it must be null.
     */
-   public MediumAction(MediumActionType actionType, MediumRegion region, int sequenceNumber, ByteBuffer actionBytes) {
+   public MediumAction(MediumActionType actionType, MediumRegion region, long sequenceNumber, ByteBuffer actionBytes) {
       Reject.ifNull(region, "region");
       Reject.ifNull(actionType, "actionType");
       Reject.ifTrue(region.getBytes() != null,
@@ -75,7 +73,7 @@ public class MediumAction {
                + " must match the remaining bytes of the given ByteBuffer");
       }
 
-      this.sequenceNumber = sequenceNumber;
+      this.scheduleSequenceNumber = sequenceNumber;
       this.actionBytes = actionBytes;
       this.actionType = actionType;
       this.isPending = true;
@@ -142,13 +140,13 @@ public class MediumAction {
    }
 
    /**
-    * Returns the sequence number of this {@link MediumAction} (zero-based).
+    * Returns the schedule sequence number of this {@link MediumAction} (zero-based).
     * 
-    * @return the insertion sequence number of this {@link MediumAction}.
+    * @return the schedule sequence number of this {@link MediumAction}.
     */
-   public int getSequenceNumber() {
+   public long getScheduleSequenceNumber() {
 
-      return sequenceNumber;
+      return scheduleSequenceNumber;
    }
 
    /**
@@ -206,7 +204,7 @@ public class MediumAction {
    @Override
    public String toString() {
       return "MediumAction [actionType=" + actionType + ", region=" + region + ", actionBytes=" + actionBytes
-         + ", sequenceNumber=" + sequenceNumber + ", isPending=" + isPending + "]";
+         + ", sequenceNumber=" + scheduleSequenceNumber + ", isPending=" + isPending + "]";
    }
 
    /**
@@ -218,9 +216,9 @@ public class MediumAction {
       int result = 1;
       result = prime * result + ((actionBytes == null) ? 0 : actionBytes.hashCode());
       result = prime * result + ((actionType == null) ? 0 : actionType.hashCode());
-      result = prime * result + sequenceNumber;
       result = prime * result + (isPending ? 1231 : 1237);
       result = prime * result + ((region == null) ? 0 : region.hashCode());
+      result = prime * result + (int) (scheduleSequenceNumber ^ (scheduleSequenceNumber >>> 32));
       return result;
    }
 
@@ -243,14 +241,14 @@ public class MediumAction {
          return false;
       if (actionType != other.actionType)
          return false;
-      if (sequenceNumber != other.sequenceNumber)
-         return false;
       if (isPending != other.isPending)
          return false;
       if (region == null) {
          if (other.region != null)
             return false;
       } else if (!region.equals(other.region))
+         return false;
+      if (scheduleSequenceNumber != other.scheduleSequenceNumber)
          return false;
       return true;
    }

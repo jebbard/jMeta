@@ -16,10 +16,11 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * It is a frequently occurring task to split an arbitrary range into regular equally-sized chunk and perform arbitrary
  * actions on each chunk. Despite writing the same integer division and modulo as well as looping code over and over
  * again, this function interface offers the static method
- * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} that standardizes the split
- * process and delegates to an arbitrary {@link #perform(MediumReference, int)} method implementing this interface. The
- * method {@link #perform(MediumReference, int)} can be a implemented as lambda, or reference to a an arbitrary private
- * or static method with the same signature. It gets the corresponding chunk start and size parameters.
+ * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} that standardizes the
+ * split process and delegates to an arbitrary {@link #perform(MediumReference, int)} method implementing this
+ * interface. The method {@link #perform(MediumReference, int)} can be a implemented as lambda, or reference to a an
+ * arbitrary private or static method with the same signature. It gets the corresponding chunk start and size
+ * parameters.
  *
  * @param <T>
  *           The return type of {@link MediumRangeChunkAction#perform(MediumReference, int)}
@@ -34,8 +35,8 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
     * chunk. It can have an arbitrary return value which is collected and returned by
     * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)}.
     * 
-    * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} calls this method in strict
-    * ascending sequence for each chunk of the given chunk size.
+    * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)} calls this method
+    * in strict ascending sequence for each chunk of the given chunk size.
     * 
     * @param chunkStartReference
     *           The start {@link MediumReference} of the current chunk.
@@ -81,9 +82,10 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
    }
 
    /**
-    * Behaves the same way as {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)}, but
-    * supports actions that declare exactly one checked exception of type E that they might throw. If this is needed,
-    * you must use this method and specify the type of exception that might be thrown. If it is thrown, this method just
+    * Behaves the same way as
+    * {@link #performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)}, but supports
+    * actions that declare exactly one checked exception of type E that they might throw. If this is needed, you must
+    * use this method and specify the type of exception that might be thrown. If it is thrown, this method just
     * redeclares it such that it is also thrown to the outside world as soon as it occurs.
     * 
     * @param resultClass

@@ -1427,7 +1427,6 @@ public class MediumChangeManagerCreateFlushPlanTest {
    /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
-   // TODO: Hinweis: Hier ist EVTL. createFlushPlan fehlerhaft (Position der WRITEs für das INSERT)
    @Test
    public void CF7f_removeThenInsert_consecutiveAtDifferentOffsets_notMutuallyCompensating() {
 
@@ -1459,16 +1458,13 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          new SingleActionSequence(removeAction1),
-         new WriteActionSequence(at(removeOffset1), 1, insertSize1, insertBuffer1),
-         new SingleActionSequence(insertAction1),
          new ReadWriteActionSequence(at(removeOffset1 + removeSize1), readWriteBlockCount1, writeBlockSizeInBytes,
             insertSize1 - removeSize1, ActionOrder.FORWARD),
          ReadWriteActionSequence.createSingleBlock(
             at(removeOffset1 + removeSize1 + readWriteBlockCount1 * writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, insertSize1 - removeSize1),
-         new SingleActionSequence(expectedTruncateAction)
-
-      );
+         new WriteActionSequence(at(removeOffset1), 1, insertSize1, insertBuffer1),
+         new SingleActionSequence(insertAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
    /**
@@ -1545,7 +1541,6 @@ public class MediumChangeManagerCreateFlushPlanTest {
    /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
-   // TODO: Hinweis: Hier ist createFlushPlan fehlerhaft
    @Test
    public void CF8c_removingReplaceThenInsert_allSameOffset_notMutuallyCompensating() {
 
@@ -1585,16 +1580,15 @@ public class MediumChangeManagerCreateFlushPlanTest {
          ReadWriteActionSequence.createSingleBlock(
             at(replaceOffset1 + replacedByteCount1 + readWriteBlockCount1 * writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
          new SingleActionSequence(replaceAction1),
-         new WriteActionSequence(at(replaceOffset1 + replaceSize1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
          new SingleActionSequence(insertAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
    /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
-   // TODO: Hinweis: Hier ist createFlushPlan fehlerhaft
    @Test
    public void CF8d_insertingReplaceThenInsert_allSameOffset_notMutuallyCompensating() {
 
@@ -1628,16 +1622,15 @@ public class MediumChangeManagerCreateFlushPlanTest {
             replaceSize1 - replacedByteCount1 + insertSize1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
          new SingleActionSequence(replaceAction1),
-         new WriteActionSequence(at(replaceOffset1 + replaceSize1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
          new SingleActionSequence(insertAction1));
    }
 
    /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
-   // TODO: Hinweis: Hier ist EVTL. createFlushPlan fehlerhaft (Position der WRITEs für das INSERT und REPLACE)
    @Test
    public void CF8e_insertThenRemovingReplace_allSameOffset_notMutuallyCompensating() {
 
@@ -1677,16 +1670,15 @@ public class MediumChangeManagerCreateFlushPlanTest {
          ReadWriteActionSequence.createSingleBlock(
             at(replaceOffset1 + replacedByteCount1 + readWriteBlockCount1 * writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
+         new SingleActionSequence(replaceAction1),
          new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
-         new SingleActionSequence(insertAction1),
-         new WriteActionSequence(at(replaceOffset1 + replaceSize1), 1, replaceSize1, replacementBuffer1),
-         new SingleActionSequence(replaceAction1), new SingleActionSequence(expectedTruncateAction));
+         new SingleActionSequence(insertAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
    /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
-   // TODO: Hinweis: Hier ist createFlushPlan fehlerhaft (u.a. evtl. Position der WRITEs für das INSERT)
    @Test
    public void CF8f_insertThenInsertingReplace_allSameOffset_notMutuallyCompensating() {
 
@@ -1720,16 +1712,17 @@ public class MediumChangeManagerCreateFlushPlanTest {
             replaceSize1 - replacedByteCount1 + insertSize1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
+         new SingleActionSequence(replaceAction1),
          new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
-         new SingleActionSequence(insertAction1),
-         new WriteActionSequence(at(replaceOffset1 + replaceSize1), 1, replaceSize1, replacementBuffer1),
-         new SingleActionSequence(replaceAction1));
+         new SingleActionSequence(insertAction1));
    }
 
    /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    // TODO kleinen Bug bei BB Position in Remainder WriteSequence raus so dass DIFFs auch immer übereinstimmen!
+   // (1c, 3a, 3e, 4b, 4e, 6a, 7d, 9)
    @Test
    public void CF9_insertRemoveAndReplace_notMutuallyCompensating() {
 

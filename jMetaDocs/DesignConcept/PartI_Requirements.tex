@@ -349,9 +349,22 @@ Usually, a data format describes how a consecutive block of bytes (i.e. a \TERMd
 
 \TERMmetadataFormat{}s are data formats that define the structure of digital metadata. Examples include: ID3v1, ID3v2.3, APEv1, MPEG-7, RDF/XML, VorbisComment and others.
 
-\TERMcontainerFormat{}s are a more general forn of \TERMdataFormat{} optimized for storing, transporting, editing and seeking multimedia \TERMpayload{} data. Examples are: MP3, Ogg, TIFF, QuickTime, JPEG 2000, PDF and others. Metadata formats can also be considered as container formats.
+\TERMcontainerFormat{}s are a more general form of \TERMdataFormat{} optimized for storing, transporting, editing and seeking multimedia \TERMpayload{} data. Examples are: MP3, Ogg, TIFF, QuickTime, JPEG 2000, PDF and others. Metadata formats can also be considered as container formats.
 
 An example for other \TERMdataFormat{}s is HTML. You can argue that it is neither a \TERMmetadataFormat{} nor a \TERMcontainerFormat{}. XML is a \TERMdataFormat{} that itself can be used to define further XML \TERMdataFormat{}s. Some XML \TERMdataFormat{}s are \TERMmetadataFormat{}s, e.g. MPEG-7, MPEG-21 or P\_Meta.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Binary vs. Textual Data Formats?}
+\label{sec:DataFormats}
+
+The terms \emph{binary format} and \emph{textual format} are sometimes rather misleading and not very clear to distinguish. A textual format is clearly a format where all information, might it be parsing metadata or content, must be interpreted as text of a specified encoding. So you basically need text processing for this. In contrast, binary formats might use chunks of bytes that need to be interpreted as integers or other numbers according to a specific byte order. However, there are also formats such as Lyrics3v2 which fully consists of textual characters, no integers in the way. Nevertheless, it has a lot of similarities with e.g. ID3v2.
+
+So a better distinction is:
+\begin{itemize}
+\item \TERMcontainerFormat{}s in \LibName{} are data formats that define payload lenghts in separate parsing metadata fields; their most common representation is as binary format, but some formats such as Lyrics3v2 use text characters also for parsing metadata. Saying this, all common \TERMmetadataFormat{}s are seen as specific \TERMcontainerFormat{}s.
+\item In contrast to this, a \emph{textual delimited data format} is a format where all bytes need to be interpreted as characters, and thus also parsing metadata is represented as strings. In addition, these formats do not have fields that specify lengths, but they use metadata delimiters to mark start end (optionally) end of a field. Examples are XML, HTML, JSON, LaTex or YAML.
+\end{itemize}
 
 %-----------------------------------------------------------------------------------------------
 
@@ -367,7 +380,7 @@ A \TERMdataFormat{} may define \TERMtransformation{}s. A \TERMtransformation{} d
 
 A \TERMdataBlock{} is a sequence of bytes that together form a logical unit (i.e. an object or entity with a specific meaning) in terms of the underlying \TERMdataFormat{}. Each \TERMdataBlock{} belongs to exactly one \TERMdataFormat{}. It can be assigned a current length in bytes. There are several concrete types of \TERMdataBlock{}s that are described in the following sections.
 
-The actual detailed meta model of \TERMdataBlock{}s is defined later in the detailed \LibName{} design sections of this document for %\COMPdataFormatManagement{}.
+The actual detailed meta model of \TERMdataBlock{}s is defined later in the detailed \LibName{} design sections of this document for \COMPdataFormatManagement{}.
 
 %***********************************************************************************************
 
