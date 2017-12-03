@@ -196,15 +196,15 @@ public class MediumChangeManager {
     * The details of the overall flush algorithm are described at {@link MediumStore#flush()}.
     * 
     * @param maxReadWriteBlockSizeInBytes
-    *           The maximum read-write block size in bytes
+    *           The maximum read-write block size in bytes, must be strictly positive
     * @param totalMediumSizeInBytes
-    *           The overall number of bytes the medium currently has
+    *           The overall number of bytes the medium currently has, must be positive, might be zero
     * @return The flush plan in form a of a list of {@link MediumAction}s to execute by a {@link MediumStore#flush()}
     */
    public List<MediumAction> createFlushPlan(int maxReadWriteBlockSizeInBytes, long totalMediumSizeInBytes) {
 
-      Reject.ifTrue(maxReadWriteBlockSizeInBytes <= 0, "maxReadWriteBlockSizeInBytes must be strictly positive");
-      Reject.ifTrue(totalMediumSizeInBytes <= 0, "totalMediumSizeInBytes must be strictly positive");
+      Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
+      Reject.ifNegative(totalMediumSizeInBytes, "totalMediumSizeInBytes");
 
       List<MediumAction> flushPlan = new ArrayList<>();
       List<ShiftedMediumBlock> mediumBlocks = new ArrayList<>();

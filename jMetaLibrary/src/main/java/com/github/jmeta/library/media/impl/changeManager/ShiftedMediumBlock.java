@@ -140,7 +140,7 @@ public class ShiftedMediumBlock {
     * {@link MediumRegion} usually do not yet refer to a valid region of the <i>current</i> medium content.
     * 
     * In detail, the region returned can be described as follows - in the listing "(+delta)" wants to express that all
-    * offsets returned already include the total shift determined by the CFP algorithm:
+    * offsets returned already include the total shift by any {@link MediumAction} changes at previous offsets:
     * <ul>
     * <li>For {@link MediumActionType#INSERT}: Starting at the insertion offset (+delta), ending at the byte before the
     * next block (or end of medium) (+delta), it encompasses the inserted bytes at the beginning and then the follow-up
@@ -158,52 +158,41 @@ public class ShiftedMediumBlock {
     *         the newly written bytes, if any.
     */
    public MediumRegion getTargetRegion() {
-      if (getCausingAction().getActionType() == MediumActionType.INSERT) {
-         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(totalShiftOfMediumBytes),
-            totalMediumByteCount/* + getCausingAction().getSizeDelta() */);
-      } else if (getCausingAction().getActionType() == MediumActionType.REMOVE) {
-         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(totalShiftOfMediumBytes),
-            totalMediumByteCount);
-      } else if (getCausingAction().getActionType() == MediumActionType.REPLACE) {
-         //
-         // int replacementByteCount = getCausingAction().getActionBytes().remaining();
-         //
-         // int targetRegionStartRefAdvance = totalShiftOfMediumBytes - replacementByteCount;
-         //
-         // MediumReference targetRegionStartRef =
-         // getStartReferenceOfFollowUpBytes().advance(targetRegionStartRefAdvance);
-         //
-         // return new MediumRegion(targetRegionStartRef, totalMediumByteCount + replacementByteCount);
-         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(totalShiftOfMediumBytes),
-            totalMediumByteCount);
-      } else {
-         throw new IllegalStateException("Only actions of type INSERT, REPLACE and REMOVE are possible here");
+      MediumReference changeOffset = getCausingAction().getRegion().getStartReference();
+      ByteBuffer actionBytes = getCausingAction().getActionBytes();
+
+      int addedByteCount = 0;
+
+      if (actionBytes != null) {
+         addedByteCount = actionBytes.remaining();
       }
+
+      // NOTE: We subtract the size delta of the causing action here because it is already included in the
+      // totalShiftOfMediumBytes, and we only want to have the shift introduced by any previous offset changes here
+      return new MediumRegion(changeOffset.advance(totalShiftOfMediumBytes - getCausingAction().getSizeDelta()),
+         totalMediumByteCount + addedByteCount);
    }
 
    /**
     * Returns a {@link MediumRegion} that represents the source region of existing medium bytes that are shifted by this
-    * {@link ShiftedMediumBlock}. However, the source region is not always the region between
-    * {@link #getStartReferenceOfFollowUpBytes()} and {@link #getEndReferenceOfFollowUpBytes()}, but it is slightly more
-    * complex:
-    * <ul>
-    * <li>For {@link MediumActionType#INSERT} and {@link MediumActionType#REMOVE}: It is the region between
-    * {@link #getStartReferenceOfFollowUpBytes()} and {@link #getEndReferenceOfFollowUpBytes()}</li>
-    * <li>For {@link MediumActionType#REPLACE}: The source region includes any to be replaced bytes. The reason is that
-    * the CFP algorithm has to consider overlaps of these bytes, too</li>
-    * </ul>
+    * {@link ShiftedMediumBlock}. The source region's medium bytes associated with this {@link ShiftedMediumBlock} are
+    * those existing medium bytes behind the {@link MediumAction}'s last changed byte and before the next
+    * {@link MediumAction} start offset or end of medium.
+    * 
+    * That said, any existing, but be removed or replaced bytes are not included, but the source region starts with the
+    * first byte "surviving" behind the causing {@link MediumAction}. And - quite clear - the source region of course
+    * does not contain any to be inserted or replacement bytes.
+    * 
+    * The source region is empty iff the {@link MediumAction} has {@link MediumActionType#INSERT} and there are schedule
+    * actions at the same offset (if {@link MediumActionType#INSERT}: also with higher schedule sequence number). This
+    * essentially has the meaning that this {@link MediumAction} has no associated bytes behind it, and the next
+    * {@link MediumAction} (or the last one) at the same offset is associated with any existing follow-up bytes behind
+    * the insertion offset.
     * 
     * @return a {@link MediumRegion} that represents the source region of existing medium bytes that are shifted by this
     *         {@link ShiftedMediumBlock}.
     */
    public MediumRegion getSourceRegion() {
-      if (getCausingAction().getActionType() == MediumActionType.REPLACE) {
-         int replacedByteCount = getCausingAction().getRegion().getSize();
-
-         return new MediumRegion(getStartReferenceOfFollowUpBytes().advance(-replacedByteCount),
-            totalMediumByteCount + replacedByteCount);
-      }
-
       return new MediumRegion(getStartReferenceOfFollowUpBytes(), totalMediumByteCount);
    }
 

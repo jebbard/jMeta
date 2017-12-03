@@ -389,6 +389,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
          previousActionType = mediumAction.getActionType();
       }
+
    }
 
    /**

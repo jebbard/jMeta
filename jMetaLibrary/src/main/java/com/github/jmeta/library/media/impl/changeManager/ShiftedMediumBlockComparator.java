@@ -57,11 +57,21 @@ public class ShiftedMediumBlockComparator implements Comparator<ShiftedMediumBlo
 
          // Important note: INSERTs at the same offset must be sorted DESCENDING by sequence number to ensure
          // the last insert (with the biggest sequence number) is first in the resulting flush plan.
-         return Long.compare(causingAction2.getScheduleSequenceNumber(), causingAction1.getScheduleSequenceNumber());
+         if (causingAction2.getScheduleSequenceNumber() < causingAction1.getScheduleSequenceNumber()) {
+            return -1;
+         }
+
+         return 1;
       }
 
-      if (left.getSourceRegion().getOverlappingByteCount(right.getTargetRegion()) != 0
-         || left.getSourceRegion().getStartReference().before(right.getTargetRegion().getStartReference())) {
+      // If the source region of the left block overlaps the target region of the right block, the left block
+      // must be read and shifted first. This includes the case where the source region of the left block is essentially
+      // empty (i.e.
+      // INSERTs with a direct follow-up action at the same offset). If there is no such "overlap", the left block is
+      // processed first if its start reference is before the one of the right block
+      if (right.getTargetRegion().contains(left.getSourceRegion().getStartReference())
+         || right.getTargetRegion().contains(left.getSourceRegion().calculateEndReference())
+         || right.getTargetRegion().getStartReference().behindOrEqual(left.getSourceRegion().getStartReference())) {
          return -1;
       }
 

@@ -19,6 +19,9 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * {@link MediumActionComparator} compares two {@link MediumAction} objects.
  * 
+ * First of all, this comparator returns 0 if and only if the compared {@link MediumAction}s are equal according to
+ * {@link MediumAction#equals(Object)}.
+ * 
  * A {@link MediumAction} X is smaller than another {@link MediumAction} Y, if one of the following is true:
  * <ul>
  * <li>The {@link MediumReference} of X is smaller than the {@link MediumReference} of Y, or</li>
@@ -31,12 +34,17 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * iff the schedule sequence number of X is smaller than the schedule sequence number of Y</li>
  * </ul>
  * 
- * That said, it does not matter what the values of the other attributes of a {@link MediumAction} are.
+ * In any other case, X is bigger then Y.
  * 
- * Two {@link MediumAction}s are equal if and only if all of their attributes are equal (see implementation of
- * {@link MediumAction#equals(Object)}. Thus a {@link MediumAction} X is bigger than another {@link MediumAction} Y, if
- * it is neither smaller nor equal. That means in case of equal {@link MediumReference}s and equal sequence numbers, X
- * is always considered bigger than Y if any other attribute differs.
+ * IMPORTANT: Do not change this {@link Comparator} unless you know what you are doing! Especially beware of the
+ * following:
+ * <ul>
+ * <li>It must only return 0 if the two {@link MediumAction}s are equal</li>
+ * <li>This especially means: After the initial equality check is false, you MUST NOT return 0 in any case; E.g. do not
+ * use Long.compareTo() for e.g. sequence numbers or offsets!</li>
+ * <li>The comparator must by "antisymmetric", i.e. if a < b, then also b > a and !(b < a)</li>
+ * <li>The comparator must by "transitive", i.e. if a < b, and b < c, then also a < c</li>
+ * </ul>
  */
 public class MediumActionComparator implements Comparator<MediumAction> {
 
@@ -56,30 +64,28 @@ public class MediumActionComparator implements Comparator<MediumAction> {
          return 0;
       }
 
+      // Important NOTE: You must never return 0 in the remaining lines at all! The point is that TreeSet and co.
+      // use compareTo to check for equality, i.e. if it returns 0 it considers two elements equal. So only -1 or 1
+      // must be returned in the remainder of this method!
+
       if (leftStartReference.equals(rightStartReference)) {
 
          // INSERTs always must be sorted before REMOVEs or REPLACEs, no matter what their schedule sequence number is
-         if (left.getActionType() == MediumActionType.INSERT && right.getActionType() != MediumActionType.INSERT) {
+         if (left.getActionType() != MediumActionType.INSERT && right.getActionType() == MediumActionType.INSERT) {
+            return 1;
+         } else if (left.getActionType() == MediumActionType.INSERT
+            && right.getActionType() != MediumActionType.INSERT) {
+            return -1;
+         } else if (left.getScheduleSequenceNumber() < right.getScheduleSequenceNumber()) {
+            return -1;
+         } else {
+            return 1;
+         }
+      } else {
+         if (leftStartReference.before(rightStartReference)) {
             return -1;
          }
-
-         // left is smaller than right
-         if (left.getScheduleSequenceNumber() < right.getScheduleSequenceNumber()) {
-            return -1;
-         }
-
-         // In case of the same start offset and sequence numbers, also 1 is returned
-         // no matter what value the action type and medium regions have
-         // left is bigger than right
-         return 1;
-      } else if (leftStartReference.before(rightStartReference)) {
-         // left is smaller than right
-         return -1;
-      } else if (leftStartReference.behindOrEqual(rightStartReference)) {
-         // left is bigger than right
          return 1;
       }
-
-      throw new IllegalStateException("Impossible to come here");
    }
 }

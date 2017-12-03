@@ -13,6 +13,8 @@ import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,6 +25,7 @@ import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumReference;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
@@ -251,4 +254,47 @@ public class MediumActionComparatorTest {
       comparator.compare(actionA1, null);
    }
 
+   /**
+    * Tests {@link MediumActionComparator#compare(MediumAction, MediumAction)}.
+    */
+   @Test
+   public void treeSetContains_forComplexActionSequenceUsingMediumActionComparator_returnsTrueForAllElements() {
+
+      String insertString1 = "===CF9b[11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111]===";
+
+      testTreeSetContainsReturnsTrueForAllActions(
+         new MediumAction(MediumActionType.INSERT, new MediumRegion(at(1), insertString1.length()), 0,
+            ByteBuffer.wrap(insertString1.getBytes(Charsets.CHARSET_ASCII))),
+         new MediumAction(MediumActionType.REPLACE, new MediumRegion(at(2), 320), 1,
+            ByteBuffer.wrap("==".getBytes(Charsets.CHARSET_ASCII))),
+         new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(1), 1), 2, null),
+         new MediumAction(MediumActionType.INSERT, new MediumRegion(at(1), 1), 3,
+            ByteBuffer.wrap("a".getBytes(Charsets.CHARSET_ASCII))),
+         new MediumAction(MediumActionType.INSERT, new MediumRegion(at(1), 1), 4,
+            ByteBuffer.wrap("b".getBytes(Charsets.CHARSET_ASCII))),
+         new MediumAction(MediumActionType.INSERT, new MediumRegion(at(1), 1), 5,
+            ByteBuffer.wrap("c".getBytes(Charsets.CHARSET_ASCII))),
+         new MediumAction(MediumActionType.INSERT, new MediumRegion(at(1), 1), 6,
+            ByteBuffer.wrap("d".getBytes(Charsets.CHARSET_ASCII))),
+         new MediumAction(MediumActionType.INSERT, new MediumRegion(at(1), 1), 7,
+            ByteBuffer.wrap("e".getBytes(Charsets.CHARSET_ASCII))));
+   }
+
+   /**
+    * @param actionsToAdd
+    *           the actions to add and check for being contained
+    */
+   private void testTreeSetContainsReturnsTrueForAllActions(MediumAction... actionsToAdd) {
+      Set<MediumAction> actionSetToSort = new TreeSet<>(new MediumActionComparator());
+
+      for (MediumAction mediumAction : actionsToAdd) {
+         actionSetToSort.add(mediumAction);
+         Assert.assertTrue(actionSetToSort.contains(mediumAction));
+      }
+
+      // Check again after having added all Actions: Still all of them must be contained
+      for (MediumAction mediumAction : actionsToAdd) {
+         Assert.assertTrue(actionSetToSort.contains(mediumAction));
+      }
+   }
 }

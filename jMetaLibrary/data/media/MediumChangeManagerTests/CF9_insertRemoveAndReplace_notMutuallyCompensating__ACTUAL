@@ -1,3 +1,4 @@
+REMOVE at 890 with size 250 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 READ at 690 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 1229 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 READ at 490 with size 200 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
@@ -25,4 +26,3 @@ READ at 10 with size 12 on medium E:\Programmieren\01_Java\02_projects\jMeta\tru
 WRITE at 200 with size 12 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 0 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 REPLACE at 0 with size 10 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=200] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
-REMOVE at 890 with size 250 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
