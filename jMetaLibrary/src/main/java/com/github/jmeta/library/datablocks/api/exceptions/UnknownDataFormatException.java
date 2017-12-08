@@ -10,7 +10,7 @@ package com.github.jmeta.library.datablocks.api.exceptions;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * Thrown whenever the {@link DataFormat} of a top-level {@link DataBlock} within a {@link AbstractMedium} is unknown.
@@ -27,7 +27,7 @@ public class UnknownDataFormatException extends RuntimeException {
     * @param reference
     * @param message
     */
-   public UnknownDataFormatException(MediumReference reference,
+   public UnknownDataFormatException(MediumOffset reference,
       String message) {
       super(message);
 
@@ -39,10 +39,10 @@ public class UnknownDataFormatException extends RuntimeException {
     *
     * @return medium
     */
-   public MediumReference getMediumReference() {
+   public MediumOffset getMediumReference() {
 
       return m_mediumReference;
    }
 
-   private final MediumReference m_mediumReference;
+   private final MediumOffset m_mediumReference;
 }
