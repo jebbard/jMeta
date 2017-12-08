@@ -133,7 +133,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount1, writeBlockSizeInBytes,
             insertSize1, ActionOrder.BACKWARD),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -159,7 +159,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), totalRWSizeInBytes1, insertSize1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -187,16 +187,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Write block for first insert
       int writeBlockCount1 = insertSize1 / writeBlockSizeInBytes;
       int writeRemainderSizeInBytes1 = insertSize1 % writeBlockSizeInBytes;
-      ByteBuffer remainingWriteBuffer1 = ByteBuffer.wrap(insertBuffer1.array(),
-         writeBlockCount1 * writeBlockSizeInBytes, writeRemainderSizeInBytes1);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount1, writeBlockSizeInBytes,
             insertSize1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), readWriteRemainderSizeInBytes1, insertSize1),
-         new WriteActionSequence(at(insertOffset1), writeBlockCount1, writeBlockSizeInBytes, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), writeBlockCount1, writeBlockSizeInBytes, insertBuffer1, 0),
          new WriteActionSequence(at(insertOffset1 + writeBlockCount1 * writeBlockSizeInBytes), 1,
-            writeRemainderSizeInBytes1, remainingWriteBuffer1),
+            writeRemainderSizeInBytes1, insertBuffer1, writeBlockCount1 * writeBlockSizeInBytes),
          new SingleActionSequence(insertAction1));
    }
 
@@ -219,7 +217,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          insertBuffer1);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -343,8 +341,6 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int replacedByteCount1 = 35;
       ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
       int remainingWriteByteCount1 = replaceSize1 % writeBlockSizeInBytes;
-      ByteBuffer remainingWriteBuffer1 = ByteBuffer.wrap(replacementBuffer1.array(), writeBlockSizeInBytes,
-         remainingWriteByteCount1);
 
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
@@ -352,9 +348,9 @@ public class MediumChangeManagerCreateFlushPlanTest {
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             totalMediumSizeInBytes - replaceOffset1 - replacedByteCount1, replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, writeBlockSizeInBytes, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, writeBlockSizeInBytes, replacementBuffer1, 0),
          new WriteActionSequence(at(replaceOffset1 + writeBlockSizeInBytes), 1, remainingWriteByteCount1,
-            remainingWriteBuffer1),
+            replacementBuffer1, writeBlockSizeInBytes),
          new SingleActionSequence(replaceAction1));
    }
 
@@ -386,7 +382,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          new ReadWriteActionSequence(at(replaceOffset1 + replacedByteCount1), readWriteBlockCount1,
             writeBlockSizeInBytes, replaceSize1 - replacedByteCount1, ActionOrder.FORWARD),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -418,7 +414,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
             replaceSize1 - replacedByteCount1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1), remainingWriteBlockSize1,
             replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1));
    }
 
@@ -449,7 +445,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1), totalRWSizeInBytes1,
             replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -471,16 +467,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
       ByteBuffer replacementBuffer1 = createTestByteBufferOfSize(replaceSize1);
 
       int remainingWriteByteCount1 = replaceSize1 % writeBlockSizeInBytes;
-      ByteBuffer remainingWriteBuffer1 = ByteBuffer.wrap(replacementBuffer1.array(), writeBlockSizeInBytes,
-         remainingWriteByteCount1);
 
       MediumAction replaceAction1 = testling.scheduleReplace(new MediumRegion(at(replaceOffset1), replacedByteCount1),
          replacementBuffer1);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(replaceOffset1), 1, writeBlockSizeInBytes, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, writeBlockSizeInBytes, replacementBuffer1, 0),
          new WriteActionSequence(at(replaceOffset1 + writeBlockSizeInBytes), 1, remainingWriteByteCount1,
-            remainingWriteBuffer1),
+            replacementBuffer1, writeBlockSizeInBytes),
          new SingleActionSequence(replaceAction1));
    }
 
@@ -508,7 +502,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          at(totalMediumSizeInBytes + replaceSize1 - replacedByteCount1), replacedByteCount1 - replaceSize1), 0, null);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -533,7 +527,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          replacementBuffer1);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1));
    }
 
@@ -558,7 +552,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          replacementBuffer1);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(replaceOffset1), 2, writeBlockSizeInBytes, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 2, writeBlockSizeInBytes, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1));
    }
 
@@ -596,9 +590,9 @@ public class MediumChangeManagerCreateFlushPlanTest {
             insertSize1 + insertSize2, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), readWriteRemainderSizeInBytes2,
             insertSize1 + insertSize2),
-         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2),
+         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2, 0),
          new SingleActionSequence(insertAction2),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -629,8 +623,6 @@ public class MediumChangeManagerCreateFlushPlanTest {
       // Write block for second insert
       int writeBlockCount2 = insertSize2 / writeBlockSizeInBytes;
       int writeRemainderSizeInBytes2 = insertSize2 % writeBlockSizeInBytes;
-      ByteBuffer remainingWriteBuffer2 = ByteBuffer.wrap(insertBuffer2.array(),
-         writeBlockCount2 * writeBlockSizeInBytes, writeRemainderSizeInBytes2);
 
       // Third insert
       int insertSize3 = 20;
@@ -645,14 +637,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount3, writeBlockSizeInBytes,
             insertSize1 + insertSize2 + insertSize3, ActionOrder.BACKWARD),
-         new WriteActionSequence(at(insertOffset3 + insertSize1 + insertSize2), 1, insertSize3, insertBuffer3),
+         new WriteActionSequence(at(insertOffset3 + insertSize1 + insertSize2), 1, insertSize3, insertBuffer3, 0),
          new SingleActionSequence(insertAction3),
          new WriteActionSequence(at(insertOffset2 + insertSize1), writeBlockCount2, writeBlockSizeInBytes,
-            insertBuffer2),
+            insertBuffer2, 0),
          new WriteActionSequence(at(insertOffset2 + writeBlockCount2 * writeBlockSizeInBytes + insertSize1), 1,
-            writeRemainderSizeInBytes2, remainingWriteBuffer2),
+            writeRemainderSizeInBytes2, insertBuffer2, writeBlockCount2 * writeBlockSizeInBytes),
          new SingleActionSequence(insertAction2),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -683,10 +675,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          ReadWriteActionSequence.createSingleBlock(at(insertOffset2), writeBlockSizeInBytes, insertSize1 + insertSize2),
-         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2),
+         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2, 0),
          new SingleActionSequence(insertAction2),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), insertOffset2 - insertOffset1, insertSize1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -716,10 +708,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
          insertBuffer2);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2),
+         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2, 0),
          new SingleActionSequence(insertAction2),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), insertOffset2 - insertOffset1, insertSize1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -779,31 +771,31 @@ public class MediumChangeManagerCreateFlushPlanTest {
             insertSize1 + insertSize2 + insertSize3 + insertSize4 + insertSize5, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset5), readWriteRemainderSizeInBytes5,
             insertSize1 + insertSize2 + insertSize3 + insertSize4 + insertSize5),
-         new WriteActionSequence(
-            at(insertOffset5 + insertSize1 + insertSize2 + insertSize3 + insertSize4), 1, insertSize5, insertBuffer5),
+         new WriteActionSequence(at(insertOffset5 + insertSize1 + insertSize2 + insertSize3 + insertSize4), 1,
+            insertSize5, insertBuffer5, 0),
          new SingleActionSequence(insertAction5),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset4), insertOffset5 - insertOffset4,
             insertSize1 + insertSize2 + insertSize3 + insertSize4),
          new WriteActionSequence(at(insertOffset4 + insertSize1 + insertSize2 + insertSize3), 1, writeBlockSizeInBytes,
-            insertBuffer4),
+            insertBuffer4, 0),
          new WriteActionSequence(at(insertOffset4 + writeBlockSizeInBytes + insertSize1 + insertSize2 + insertSize3), 1,
-            insertSize4 % writeBlockSizeInBytes, insertBuffer4),
+            insertSize4 % writeBlockSizeInBytes, insertBuffer4, writeBlockSizeInBytes),
          new SingleActionSequence(insertAction4),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset3), insertOffset4 - insertOffset3,
             insertSize1 + insertSize2 + insertSize3),
-         new WriteActionSequence(at(insertOffset3 + insertSize1 + insertSize2), 2, writeBlockSizeInBytes,
-            insertBuffer3),
+         new WriteActionSequence(at(insertOffset3 + insertSize1 + insertSize2), 2, writeBlockSizeInBytes, insertBuffer3,
+            0),
          new WriteActionSequence(at(insertOffset3 + 2 * writeBlockSizeInBytes + insertSize1 + insertSize2), 1,
-            insertSize3 % writeBlockSizeInBytes, insertBuffer3),
+            insertSize3 % writeBlockSizeInBytes, insertBuffer3, 2 * writeBlockSizeInBytes),
          new SingleActionSequence(insertAction3),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset3 - writeBlockSizeInBytes), writeBlockSizeInBytes,
             insertSize1 + insertSize2),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset2),
             (insertOffset3 - insertOffset2) % writeBlockSizeInBytes, insertSize1 + insertSize2),
-         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2),
+         new WriteActionSequence(at(insertOffset2 + insertSize1), 1, insertSize2, insertBuffer2, 0),
          new SingleActionSequence(insertAction2),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), insertOffset2 - insertOffset1, insertSize1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -1020,16 +1012,16 @@ public class MediumChangeManagerCreateFlushPlanTest {
       int readWriteRemainderSizeInBytes2 = totalRWSizeInBytes2 % writeBlockSizeInBytes;
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
          new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount2, writeBlockSizeInBytes,
             replaceSize1 - replacedByteCount1 + replaceSize2 - replacedByteCount2, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset2 + replacedByteCount2),
             readWriteRemainderSizeInBytes2, replaceSize1 - replacedByteCount1 + replaceSize2 - replacedByteCount2),
          new WriteActionSequence(at(replaceOffset2 + replaceSize1 - replacedByteCount1), 1, writeBlockSizeInBytes,
-            replacementBuffer2),
+            replacementBuffer2, 0),
          new WriteActionSequence(at(replaceOffset2 + replaceSize1 - replacedByteCount1 + writeBlockSizeInBytes), 1,
-            replaceSize2 % writeBlockSizeInBytes, replacementBuffer2),
+            replaceSize2 % writeBlockSizeInBytes, replacementBuffer2, writeBlockSizeInBytes),
          new SingleActionSequence(replaceAction2));
    }
 
@@ -1093,20 +1085,20 @@ public class MediumChangeManagerCreateFlushPlanTest {
             replaceSize1 - replacedByteCount1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
          new ReadWriteActionSequence(at(replaceOffset2), readWriteBlockCount3, writeBlockSizeInBytes,
             replaceSize1 - replacedByteCount1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset3 + replaceSize3), readWriteRemainderSizeInBytes3,
             replaceSize1 - replacedByteCount1),
          new WriteActionSequence(
-            at(replaceOffset3 + replaceSize1 - replacedByteCount1), 1, replaceSize3, replacementBuffer3),
+            at(replaceOffset3 + replaceSize1 - replacedByteCount1), 1, replaceSize3, replacementBuffer3, 0),
          new SingleActionSequence(replaceAction3),
          new ReadWriteActionSequence(at(replaceOffset2 + replacedByteCount2), readWriteBlockCount2,
             writeBlockSizeInBytes, replaceSize2 - replacedByteCount2 + replaceSize1 - replacedByteCount1,
             ActionOrder.FORWARD),
          new WriteActionSequence(at(replaceOffset2 + replaceSize1 - replacedByteCount1), 1, replaceSize2,
-            replacementBuffer2),
+            replacementBuffer2, 0),
          new SingleActionSequence(replaceAction2), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -1146,10 +1138,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
             replaceSize1 - replacedByteCount1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
          new WriteActionSequence(at(replaceOffset2 + replaceSize1 - replacedByteCount1), 1, replaceSize2,
-            replacementBuffer2),
+            replacementBuffer2, 0),
          new SingleActionSequence(replaceAction2));
    }
 
@@ -1215,22 +1207,22 @@ public class MediumChangeManagerCreateFlushPlanTest {
             writeBlockSizeInBytes, replaceSize1 - replacedByteCount1, ActionOrder.FORWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1 + writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
          new WriteActionSequence(
-            at(replaceOffset2 + replaceSize1 - replacedByteCount1), 1, replaceSize2, replacementBuffer2),
+            at(replaceOffset2 + replaceSize1 - replacedByteCount1), 1, replaceSize2, replacementBuffer2, 0),
          new SingleActionSequence(replaceAction2),
          new WriteActionSequence(at(replaceOffset4 + replaceSize3 - replacedByteCount3), 1, replaceSize4,
-            replacementBuffer4),
+            replacementBuffer4, 0),
          new SingleActionSequence(replaceAction4),
-         new WriteActionSequence(at(replaceOffset3), 1, replaceSize3, replacementBuffer3),
+         new WriteActionSequence(at(replaceOffset3), 1, replaceSize3, replacementBuffer3, 0),
          new SingleActionSequence(replaceAction3),
          new ReadWriteActionSequence(at(totalMediumSizeInBytes), readWriteBlockCount5, writeBlockSizeInBytes,
             replaceSize3 - replacedByteCount3 + replaceSize5 - replacedByteCount5, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset5 + replacedByteCount5),
             readWriteRemainderSizeInBytes5, replaceSize3 - replacedByteCount3 + replaceSize5 - replacedByteCount5),
          new WriteActionSequence(at(replaceOffset5 + replaceSize3 - replacedByteCount3), 1, replaceSize5,
-            replacementBuffer5),
+            replacementBuffer5, 0),
          new SingleActionSequence(replaceAction5));
    }
 
@@ -1261,7 +1253,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), totalRWSizeInBytes1, insertSize1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1), new SingleActionSequence(removeAction1));
    }
 
@@ -1289,7 +1281,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          insertBuffer1);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1), new SingleActionSequence(removeAction1));
    }
 
@@ -1317,7 +1309,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
       MediumAction removeAction1 = testling.scheduleRemove(new MediumRegion(at(removeOffset1), removeSize1));
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1), new SingleActionSequence(removeAction1));
    }
 
@@ -1372,7 +1364,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          ReadWriteActionSequence.createSingleBlock(at(insertOffset2), readWriteRemainderSizeInBytes3, insertSize2),
-         new WriteActionSequence(at(insertOffset2), 1, insertSize2, insertBuffer2),
+         new WriteActionSequence(at(insertOffset2), 1, insertSize2, insertBuffer2, 0),
          new SingleActionSequence(insertAction2),
          new ReadWriteActionSequence(at(removeOffset1 + removeSize1), readWriteBlockCount2, writeBlockSizeInBytes,
             insertSize2 - removeSize1, ActionOrder.FORWARD),
@@ -1384,10 +1376,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
             insertSize2 + insertSize1 - removeSize1, ActionOrder.FORWARD),
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1 + readWriteBlockCount1 * writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, insertSize2 + insertSize1 - removeSize1),
-         new WriteActionSequence(at(insertOffset1 + insertSize2 - removeSize1), 1, writeBlockSizeInBytes,
-            insertBuffer1),
+         new WriteActionSequence(at(insertOffset1 + insertSize2 - removeSize1), 1, writeBlockSizeInBytes, insertBuffer1,
+            0),
          new WriteActionSequence(at(insertOffset1 + insertSize2 - removeSize1 + writeBlockSizeInBytes), 1,
-            insertSize1 % writeBlockSizeInBytes, insertBuffer1),
+            insertSize1 % writeBlockSizeInBytes, insertBuffer1, writeBlockSizeInBytes),
          new SingleActionSequence(insertAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -1420,7 +1412,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          new MediumRegion(at(totalMediumSizeInBytes + truncatedBytes), -truncatedBytes), 0, null);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(0), 1, insertSize1, insertBuffer1), new SingleActionSequence(insertAction1),
+         new WriteActionSequence(at(0), 1, insertSize1, insertBuffer1, 0), new SingleActionSequence(insertAction1),
          new SingleActionSequence(removeAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -1463,7 +1455,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
          ReadWriteActionSequence.createSingleBlock(
             at(removeOffset1 + removeSize1 + readWriteBlockCount1 * writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, insertSize1 - removeSize1),
-         new WriteActionSequence(at(removeOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(removeOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -1494,9 +1486,9 @@ public class MediumChangeManagerCreateFlushPlanTest {
          insertBuffer1);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
-         new WriteActionSequence(at(replaceOffset1 + replaceSize1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + replaceSize1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -1532,9 +1524,10 @@ public class MediumChangeManagerCreateFlushPlanTest {
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1), totalRWSizeInBytes1,
             replaceSize1 - replacedByteCount1),
-         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
-         new WriteActionSequence(at(insertOffset1 - replacedByteCount1 + replaceSize1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1 - replacedByteCount1 + replaceSize1), 1, insertSize1, insertBuffer1,
+            0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -1575,14 +1568,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
          new MediumRegion(at(totalMediumSizeInBytes - truncatedBytes), truncatedBytes), 0, null);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1),
          new ReadWriteActionSequence(at(replaceOffset1 + replacedByteCount1), readWriteBlockCount1,
             writeBlockSizeInBytes, replaceSize1 - replacedByteCount1 + insertSize1, ActionOrder.FORWARD),
          ReadWriteActionSequence.createSingleBlock(
             at(replaceOffset1 + replacedByteCount1 + readWriteBlockCount1 * writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
-         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -1622,9 +1615,9 @@ public class MediumChangeManagerCreateFlushPlanTest {
             replaceSize1 - replacedByteCount1 + insertSize1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
-         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -1665,14 +1658,14 @@ public class MediumChangeManagerCreateFlushPlanTest {
          new MediumRegion(at(totalMediumSizeInBytes - truncatedBytes), truncatedBytes), 0, null);
 
       checkCreatedFlushPlan(testling, writeBlockSizeInBytes, totalMediumSizeInBytes,
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1),
          new ReadWriteActionSequence(at(replaceOffset1 + replacedByteCount1), readWriteBlockCount1,
             writeBlockSizeInBytes, replaceSize1 - replacedByteCount1 + insertSize1, ActionOrder.FORWARD),
          ReadWriteActionSequence.createSingleBlock(
             at(replaceOffset1 + replacedByteCount1 + readWriteBlockCount1 * writeBlockSizeInBytes),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
-         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1), new SingleActionSequence(expectedTruncateAction));
    }
 
@@ -1712,9 +1705,9 @@ public class MediumChangeManagerCreateFlushPlanTest {
             replaceSize1 - replacedByteCount1 + insertSize1, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             readWriteRemainderSizeInBytes1, replaceSize1 - replacedByteCount1 + insertSize1),
-         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + insertSize1), 1, replaceSize1, replacementBuffer1, 0),
          new SingleActionSequence(replaceAction1),
-         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1), 1, insertSize1, insertBuffer1, 0),
          new SingleActionSequence(insertAction1));
    }
 
@@ -1722,7 +1715,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
    // TODO kleinen Bug bei BB Position in Remainder WriteSequence raus so dass DIFFs auch immer übereinstimmen!
-   // (1c, 3a, 3e, 4b, 4e, 6a, 7d, 9)
+   // (9)
    @Test
    public void CF9_insertRemoveAndReplace_notMutuallyCompensating() {
 
@@ -1813,7 +1806,8 @@ public class MediumChangeManagerCreateFlushPlanTest {
             relativeWriteShiftInBytes4, ActionOrder.BACKWARD),
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset1 + replacedByteCount1),
             readWriteRemainderSizeInBytes4, relativeWriteShiftInBytes4),
-         new WriteActionSequence(at(replaceOffset1 + relativeWriteShiftInBytes4), 1, replaceSize1, replacementBuffer1),
+         new WriteActionSequence(at(replaceOffset1 + relativeWriteShiftInBytes4), 1, replaceSize1, replacementBuffer1,
+            0),
          new SingleActionSequence(replaceAction1),
          // Bytes between second insert and first replace
          ReadWriteActionSequence.createSingleBlock(at(insertOffset2), readWriteRemainderSizeInBytes3,
@@ -1821,14 +1815,15 @@ public class MediumChangeManagerCreateFlushPlanTest {
          // Third insert
          new WriteActionSequence(
             at(insertOffset3 + insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1 + insertSize2), 1,
-            insertSize3, insertBuffer3),
+            insertSize3, insertBuffer3, 0),
          new SingleActionSequence(insertAction3),
          // Second insert
          new WriteActionSequence(at(insertOffset2 + insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1), 2,
-            writeBlockSizeInBytes, insertBuffer2),
-         new WriteActionSequence(at(
-            insertOffset2 + insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1 + 2 * writeBlockSizeInBytes),
-            1, insertSize2 % writeBlockSizeInBytes, insertBuffer2),
+            writeBlockSizeInBytes, insertBuffer2, 0),
+         new WriteActionSequence(
+            at(insertOffset2 + insertSize1 - replacedByteCount2 + replaceSize2 - removeSize1
+               + 2 * writeBlockSizeInBytes),
+            1, insertSize2 % writeBlockSizeInBytes, insertBuffer2, 2 * writeBlockSizeInBytes),
          new SingleActionSequence(insertAction2),
          // Bytes between first remove and second insert
          ReadWriteActionSequence.createSingleBlock(at(removeOffset1 + removeSize1), readWriteRemainderSizeInBytes2,
@@ -1837,12 +1832,13 @@ public class MediumChangeManagerCreateFlushPlanTest {
          // Bytes between first insert and second replace
          ReadWriteActionSequence.createSingleBlock(at(insertOffset1), readWriteRemainderSizeInBytes1,
             relativeWriteShiftInBytes1),
-         new WriteActionSequence(at(insertOffset1 + replaceSize2 - replacedByteCount2), 1, insertSize1, insertBuffer1),
+         new WriteActionSequence(at(insertOffset1 + replaceSize2 - replacedByteCount2), 1, insertSize1, insertBuffer1,
+            0),
          new SingleActionSequence(insertAction1),
          // Bytes between second replace and first insert
          ReadWriteActionSequence.createSingleBlock(at(replaceOffset2 + replacedByteCount2),
             readWriteRemainderSizeInBytes0, relativeWriteShiftInBytes0),
-         new WriteActionSequence(at(replaceOffset2), 1, replaceSize2, replacementBuffer2),
+         new WriteActionSequence(at(replaceOffset2), 1, replaceSize2, replacementBuffer2, 0),
          new SingleActionSequence(replaceAction2));
    }
 

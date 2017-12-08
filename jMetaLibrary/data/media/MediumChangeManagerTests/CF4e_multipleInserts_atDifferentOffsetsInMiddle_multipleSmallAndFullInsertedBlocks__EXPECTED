@@ -11,13 +11,13 @@ INSERT at 521 with size 10 with bytes java.nio.HeapByteBuffer[pos=0 lim=10 cap=1
 READ at 520 with size 1 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 1163 with size 1 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 913 with size 150 with bytes java.nio.HeapByteBuffer[pos=0 lim=150 cap=250] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
-WRITE at 1063 with size 100 with bytes java.nio.HeapByteBuffer[pos=0 lim=100 cap=250] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 1063 with size 100 with bytes java.nio.HeapByteBuffer[pos=150 lim=250 cap=250] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 INSERT at 520 with size 250 with bytes java.nio.HeapByteBuffer[pos=0 lim=250 cap=250] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 READ at 500 with size 20 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 893 with size 20 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 560 with size 150 with bytes java.nio.HeapByteBuffer[pos=0 lim=150 cap=333] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 710 with size 150 with bytes java.nio.HeapByteBuffer[pos=150 lim=300 cap=333] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
-WRITE at 860 with size 33 with bytes java.nio.HeapByteBuffer[pos=0 lim=33 cap=333] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
+WRITE at 860 with size 33 with bytes java.nio.HeapByteBuffer[pos=300 lim=333 cap=333] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 INSERT at 500 with size 333 with bytes java.nio.HeapByteBuffer[pos=0 lim=333 cap=333] on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 READ at 350 with size 150 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
 WRITE at 410 with size 150 on medium E:\Programmieren\01_Java\02_projects\jMeta\trunk\jMetaLibrary\.\data\media\TestFile_1.txt
