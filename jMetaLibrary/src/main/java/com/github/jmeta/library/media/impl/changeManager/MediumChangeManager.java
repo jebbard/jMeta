@@ -23,18 +23,18 @@ import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteExce
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
-import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
+import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link MediumChangeManager} performs all tasks of handling and consolidating {@link MediumAction}s.
  * {@link MediumAction}s are created by the methods
- * {@link MediumStore#insertData(com.github.jmeta.library.media.api.types.MediumReference, ByteBuffer)},
- * {@link MediumStore#removeData(com.github.jmeta.library.media.api.types.MediumReference, int)} and
- * {@link MediumStore#replaceData(com.github.jmeta.library.media.api.types.MediumReference, int, ByteBuffer)} by calling
+ * {@link MediumStore#insertData(com.github.jmeta.library.media.api.types.MediumOffset, ByteBuffer)},
+ * {@link MediumStore#removeData(com.github.jmeta.library.media.api.types.MediumOffset, int)} and
+ * {@link MediumStore#replaceData(com.github.jmeta.library.media.api.types.MediumOffset, int, ByteBuffer)} by calling
  * one of the corresponding schedule methods of {@link MediumChangeManager}.
  * 
  * {@link MediumAction}s represent an open action that is still to be performed before a {@link MediumStore#flush()}.
@@ -47,7 +47,7 @@ public class MediumChangeManager {
 
    private TreeSet<MediumAction> mediumActions = new TreeSet<>(new MediumActionComparator());
    private long nextScheduleSequenceNumber = 0;
-   private final MediumReferenceFactory mediumReferenceFactory;
+   private final MediumOffsetFactory mediumReferenceFactory;
    private static final Set<MediumActionType> EXISTING_ACTION_TYPES_TO_CHECK = new HashSet<>();
    static {
       EXISTING_ACTION_TYPES_TO_CHECK.add(MediumActionType.REMOVE);
@@ -58,9 +58,9 @@ public class MediumChangeManager {
     * Creates a new {@link MediumChangeManager}.
     * 
     * @param mediumReferenceFactory
-    *           the {@link MediumReferenceFactory} used to create new {@link MediumReference}s, if necessary.
+    *           the {@link MediumOffsetFactory} used to create new {@link MediumOffset}s, if necessary.
     */
-   public MediumChangeManager(MediumReferenceFactory mediumReferenceFactory) {
+   public MediumChangeManager(MediumOffsetFactory mediumReferenceFactory) {
       this.mediumReferenceFactory = mediumReferenceFactory;
    }
 
@@ -223,7 +223,7 @@ public class MediumChangeManager {
             if (delta == 0) {
                lastBlock.setEndReferenceOfMediumBytes(lastBlock.getStartReferenceOfFollowUpBytes());
             } else {
-               lastBlock.setEndReferenceOfMediumBytes(currentRegion.getStartReference());
+               lastBlock.setEndReferenceOfMediumBytes(currentRegion.getStartOffset());
             }
          }
 
@@ -255,7 +255,7 @@ public class MediumChangeManager {
 
       // Add a truncate action to ensure the file is shortened, if necessary
       if (delta < 0) {
-         MediumReference truncateRef = mediumReferenceFactory.createMediumReference(totalMediumSizeInBytes + delta);
+         MediumOffset truncateRef = mediumReferenceFactory.createMediumReference(totalMediumSizeInBytes + delta);
 
          flushPlan.add(new MediumAction(MediumActionType.TRUNCATE, new MediumRegion(truncateRef, -delta), 0, null));
       }
@@ -300,7 +300,7 @@ public class MediumChangeManager {
    /**
     * Gets the previous {@link MediumAction} already scheduled in this {@link MediumChangeManager}, according to the
     * {@link MediumActionComparator}, or null if there is none. According to the definition of
-    * {@link MediumActionComparator}, the previous {@link MediumAction} with a smaller or equal {@link MediumReference}
+    * {@link MediumActionComparator}, the previous {@link MediumAction} with a smaller or equal {@link MediumOffset}
     * and smaller or equal sequence number will be returned by this method.
     * 
     * Due to the {@link MediumActionComparator} implementation, an existing action whose region starts at the same
@@ -322,9 +322,9 @@ public class MediumChangeManager {
    /**
     * Gets the next {@link MediumAction} already scheduled in this {@link MediumChangeManager}, according to the
     * {@link MediumActionComparator}, or null if there is none. According to the definition of
-    * {@link MediumActionComparator}, the next {@link MediumAction} with a bigger or equal {@link MediumReference} and
+    * {@link MediumActionComparator}, the next {@link MediumAction} with a bigger or equal {@link MediumOffset} and
     * bigger or equal sequence number will be returned by this method. This method also returns any {@link MediumAction}
-    * that has equal {@link MediumReference} and equal sequence number, but differs in any other attribute.
+    * that has equal {@link MediumOffset} and equal sequence number, but differs in any other attribute.
     * 
     * @param newRegion
     *           The new {@link MediumRegion} for which a new {@link MediumAction} is scheduled.
@@ -441,7 +441,7 @@ public class MediumChangeManager {
 
       // Note that getNextAction() will NOT return a INSERTs at the same offset as the new region start offset
       while ((nextAction = getNextAction(newRegion)) != null
-         && newRegion.contains(nextAction.getRegion().getStartReference())) {
+         && newRegion.contains(nextAction.getRegion().getStartOffset())) {
          if (nextAction.getActionType() == MediumActionType.INSERT) {
             undo(nextAction);
          } else {
@@ -472,8 +472,8 @@ public class MediumChangeManager {
       if (previousAction != null && EXISTING_ACTION_TYPES_TO_CHECK.contains(previousAction.getActionType())) {
          MediumRegion previousRegion = previousAction.getRegion();
 
-         if (previousRegion.contains(newRegion.getStartReference())
-            && !newRegion.getStartReference().equals(previousRegion.getStartReference())) {
+         if (previousRegion.contains(newRegion.getStartOffset())
+            && !newRegion.getStartOffset().equals(previousRegion.getStartOffset())) {
             throw new InvalidOverlappingWriteException(previousAction, previousAction.getActionType(), newRegion);
          }
       }

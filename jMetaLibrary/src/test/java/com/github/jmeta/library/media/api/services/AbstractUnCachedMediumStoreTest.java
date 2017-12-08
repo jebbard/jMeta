@@ -20,7 +20,7 @@ import org.mockito.Mockito;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
@@ -34,7 +34,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    protected static final int MAX_READ_WRITE_BLOCK_SIZE_FOR_UNCACHED_MEDIUM = 20;
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test
    public void isAtEndOfMedium_forFilledMediumAndOffsetBeforeEnd_returnsFalse() {
@@ -46,7 +46,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test
    public void isAtEndOfMedium_forEmptyMediumAtStartOffset_returnsTrue() {
@@ -58,7 +58,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test
    public void isAtEndOfMedium_forFilledMediumAndGetDataUntilEOM_returnsTrue() {
@@ -75,8 +75,8 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
-    * {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and
+    * {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledMediumWithDisabledCache_priorCache_returnsZero() {
@@ -84,7 +84,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 10);
+      MediumOffset cacheOffset = at(currentMedium, 10);
 
       cacheNoEOMExpected(cacheOffset, 20);
 
@@ -92,7 +92,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_forReferenceBehindMedium_returnsZero() {
@@ -106,7 +106,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledUncachedMedium_doesNotCacheAnything() {
@@ -122,7 +122,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledUncachedMedium_doesNotAddAnythingToCache() {
@@ -141,7 +141,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledUncachedMedium_fromStartAndMoreBytesThanMaxRWBlockSize_readsBlockWise() {
@@ -160,7 +160,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledUncachedMedium_fromStartAndLessBytesThanMaxRWBlockSize_readsOnce() {

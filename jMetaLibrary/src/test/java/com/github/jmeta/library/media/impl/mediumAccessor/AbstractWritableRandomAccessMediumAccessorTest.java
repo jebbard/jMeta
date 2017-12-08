@@ -16,8 +16,8 @@ import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
@@ -32,7 +32,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
 public abstract class AbstractWritableRandomAccessMediumAccessorTest extends AbstractMediumAccessorTest {
 
    /**
-    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)} and {@link MediumAccessor#getCurrentPosition()}.
+    * Tests {@link MediumAccessor#setCurrentPosition(MediumOffset)} and {@link MediumAccessor#getCurrentPosition()}.
     */
    @Test
    public void setCurrentPosition_offsetBeforeEOM_getCurrentPositionReturnsIt() {
@@ -42,14 +42,14 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       mediumAccessor.open();
 
       int newOffsetOne = 20;
-      MediumReference changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
+      MediumOffset changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
 
       mediumAccessor.setCurrentPosition(changeReferenceOne);
 
       Assert.assertEquals(newOffsetOne, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
 
       int newOffsetTwo = 10;
-      MediumReference changeReferenceTwo = at(mediumAccessor.getMedium(), newOffsetTwo);
+      MediumOffset changeReferenceTwo = at(mediumAccessor.getMedium(), newOffsetTwo);
 
       mediumAccessor.setCurrentPosition(changeReferenceTwo);
 
@@ -57,7 +57,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)}.
+    * Tests {@link MediumAccessor#setCurrentPosition(MediumOffset)}.
     */
    @Test
    public void setCurrentPosition_offsetBehindEOM_getCurrentPositionReturnsIt() {
@@ -67,7 +67,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       mediumAccessor.open();
 
       int newOffsetOne = getExpectedMediumContent().length + 10;
-      MediumReference changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
+      MediumOffset changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
 
       mediumAccessor.setCurrentPosition(changeReferenceOne);
 
@@ -75,7 +75,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)} and {@link MediumAccessor#getCurrentPosition()}.
+    * Tests {@link MediumAccessor#setCurrentPosition(MediumOffset)} and {@link MediumAccessor#getCurrentPosition()}.
     */
    @Test
    public void setCurrentPosition_offsetAtEOM_getCurrentPositionReturnsIt() {
@@ -85,7 +85,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       mediumAccessor.open();
 
       int newOffsetOne = getExpectedMediumContent().length;
-      MediumReference changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
+      MediumOffset changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
 
       mediumAccessor.setCurrentPosition(changeReferenceOne);
 
@@ -93,7 +93,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)}.
+    * Tests {@link MediumAccessor#setCurrentPosition(MediumOffset)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void setCurrentPosition_onClosedMediumAccessor_throwsException() {
@@ -103,7 +103,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#setCurrentPosition(MediumReference)}.
+    * Tests {@link MediumAccessor#setCurrentPosition(MediumOffset)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void setCurrentPosition_forInvalidMediumReference_throwsException() {
@@ -122,7 +122,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       mediumAccessor.open();
 
-      MediumReference writeReference = at(mediumAccessor.getMedium(), getExpectedMediumContent().length / 2);
+      MediumOffset writeReference = at(mediumAccessor.getMedium(), getExpectedMediumContent().length / 2);
 
       ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference, false);
 
@@ -139,7 +139,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       mediumAccessor.open();
 
       int startBeforeEndOfMedium = 5;
-      MediumReference writeReference = at(mediumAccessor.getMedium(),
+      MediumOffset writeReference = at(mediumAccessor.getMedium(),
          getExpectedMediumContent().length - startBeforeEndOfMedium);
 
       ByteBuffer dataWritten = performWrite(mediumAccessor, writeReference, false);
@@ -148,7 +148,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumAccessor#isAtEndOfMedium(MediumOffset)}.
     */
    @Test
    public void isAtEndOfMedium_forRandomAccessWithoutPriorReadIfAtEndOfMedium_returnsTrue() {
@@ -159,7 +159,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       int readOffset = getExpectedMediumContent().length;
 
-      MediumReference readReference = at(mediumAccessor.getMedium(), readOffset);
+      MediumOffset readReference = at(mediumAccessor.getMedium(), readOffset);
 
       // Each call is checked twice to ensure it is repeatable (especially for streams!)
       mediumAccessor.setCurrentPosition(readReference);
@@ -177,7 +177,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       mediumAccessor.open();
 
-      MediumReference writeReference = at(mediumAccessor.getMedium(), getExpectedMediumContent().length / 2);
+      MediumOffset writeReference = at(mediumAccessor.getMedium(), getExpectedMediumContent().length / 2);
 
       long mediumLengthBeforeWrite = mediumAccessor.getMedium().getCurrentLength();
 
@@ -203,7 +203,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       mediumAccessor.open();
 
       int startBeforeEndOfMedium = 5;
-      MediumReference writeReference = at(mediumAccessor.getMedium(),
+      MediumOffset writeReference = at(mediumAccessor.getMedium(),
          getExpectedMediumContent().length - startBeforeEndOfMedium);
 
       long mediumLengthBeforeWrite = mediumAccessor.getMedium().getCurrentLength();
@@ -230,7 +230,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       int distFromEOM = 5;
       long startOffset = getExpectedMediumContent().length + distFromEOM;
-      MediumReference writeReference = at(mediumAccessor.getMedium(), startOffset);
+      MediumOffset writeReference = at(mediumAccessor.getMedium(), startOffset);
 
       long mediumLengthBeforeWrite = mediumAccessor.getMedium().getCurrentLength();
 
@@ -242,7 +242,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       assertSameDataWrittenIsReadAgain(mediumAccessor, writeReference, dataWritten);
       // Ensure the medium did not change before the written range
-      MediumReference mediumStartOfs = at(mediumAccessor.getMedium(), 0);
+      MediumOffset mediumStartOfs = at(mediumAccessor.getMedium(), 0);
       assertMediumDidNotChangeInRange(mediumAccessor, mediumStartOfs,
          mediumStartOfs.advance(getExpectedMediumContent().length));
    }
@@ -256,7 +256,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
 
       mediumAccessor.open();
 
-      MediumReference writeReference = at(mediumAccessor.getMedium(), getExpectedMediumContent().length / 2);
+      MediumOffset writeReference = at(mediumAccessor.getMedium(), getExpectedMediumContent().length / 2);
 
       long mediumLengthBeforeWrite = mediumAccessor.getMedium().getCurrentLength();
 
@@ -301,7 +301,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumReference)}.
+    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
     */
    @Test
    public void truncate_toStrictlyPositiveLength_mediumBytesBehindReferenceAreGone() {
@@ -315,7 +315,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumReference)}.
+    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
     */
    @Test
    public void truncate_atEOM_doesNotChangeMedium() {
@@ -329,7 +329,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests the {@link MediumAccessor#truncate(MediumReference)}.
+    * Tests the {@link MediumAccessor#truncate(MediumOffset)}.
     */
    @Test
    public void truncate_toOneByteSmallerLength_mediumBytesBehindReferenceAreGone() {
@@ -343,7 +343,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumReference)}.
+    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
     */
    @Test
    public void truncate_toZeroLength_noMediumBytesAnymore() {
@@ -357,7 +357,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumReference)}.
+    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
     */
    @Test
    public void truncate_toExactlyCurrentLength_doesNotChangeTheMedium() {
@@ -371,7 +371,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumReference)}.
+    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void truncate_onClosedMediumAccessor_throwsException() {
@@ -399,18 +399,18 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests the {@link MediumAccessor#truncate(MediumReference)} method on the given {@link MediumAccessor} and with the
-    * given truncate {@link MediumReference}.
+    * Tests the {@link MediumAccessor#truncate(MediumOffset)} method on the given {@link MediumAccessor} and with the
+    * given truncate {@link MediumOffset}.
     * 
     * @param mediumAccessor
     *           The {@link MediumAccessor} to test
     * @param truncateReference
-    *           The truncate {@link MediumReference}
+    *           The truncate {@link MediumOffset}
     * @param expectedNewLength
     *           The expected new {@link Medium} length
     */
    private void testTruncate_mediumSizeChangesAndBytesBeforeAreUnchanged(MediumAccessor<?> mediumAccessor,
-      MediumReference truncateReference, long expectedNewLength) {
+      MediumOffset truncateReference, long expectedNewLength) {
 
       mediumAccessor.setCurrentPosition(truncateReference);
       mediumAccessor.truncate();
@@ -419,8 +419,8 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       Assert.assertEquals(mediumAccessor.getCurrentPosition(), truncateReference);
       Assert.assertTrue(mediumAccessor.isAtEndOfMedium());
 
-      MediumReference mediumStartReference = at(mediumAccessor.getMedium(), 0);
-      MediumReference mediumEndReference = at(mediumAccessor.getMedium(),
+      MediumOffset mediumStartReference = at(mediumAccessor.getMedium(), 0);
+      MediumOffset mediumEndReference = at(mediumAccessor.getMedium(),
          mediumAccessor.getMedium().getCurrentLength());
 
       if (expectedNewLength > 0) {
@@ -441,12 +441,12 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
     * @param mediumAccessor
     *           The {@link MediumAccessor} to test
     * @param writeReference
-    *           The {@link MediumReference} to write to
+    *           The {@link MediumOffset} to write to
     * @param useReadOnlyBuffer
     *           true to use a read-only buffer when writing, false otherwise
     * @return The written {@link ByteBuffer}.
     */
-   private static ByteBuffer performWrite(MediumAccessor<?> mediumAccessor, MediumReference writeReference,
+   private static ByteBuffer performWrite(MediumAccessor<?> mediumAccessor, MediumOffset writeReference,
       boolean useReadOnlyBuffer) {
       ByteBuffer dataToWrite = ByteBuffer
          .wrap(new byte[] { 'T', 'E', 'S', 'T', ' ', 'B', 'U', 'F', ' ', '1', '0', '0', '0', '0', '0', '3' });
@@ -470,12 +470,12 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
     * @param mediumAccessor
     *           The implementation to test
     * @param writeReference
-    *           The {@link StandardMediumReference} where the {@link ByteBuffer} has been written to.
+    *           The {@link StandardMediumOffset} where the {@link ByteBuffer} has been written to.
     * @param dataWritten
     *           The {@link ByteBuffer} written before.
     */
    private static void assertSameDataWrittenIsReadAgain(MediumAccessor<?> mediumAccessor,
-      MediumReference writeReference, ByteBuffer dataWritten) {
+      MediumOffset writeReference, ByteBuffer dataWritten) {
 
       ByteBuffer reread = performReadNoEOMExpected(mediumAccessor,
          new ReadTestData((int) writeReference.getAbsoluteMediumOffset(), dataWritten.remaining()));
@@ -484,18 +484,18 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Checks whether the bytes between two {@link MediumReference} instances is unchanged after a write operation.
+    * Checks whether the bytes between two {@link MediumOffset} instances is unchanged after a write operation.
     * 
     * @param mediumAccessor
     *           The implementation to test
     * @param rangeStartReference
-    *           The {@link MediumReference} pointing to the start of the range to check.
+    *           The {@link MediumOffset} pointing to the start of the range to check.
     * @param rangeEndReference
-    *           The {@link MediumReference} pointing to the end of the range to check, i.e. the first offset not
+    *           The {@link MediumOffset} pointing to the end of the range to check, i.e. the first offset not
     *           checked.
     */
-   private void assertMediumDidNotChangeInRange(MediumAccessor<?> mediumAccessor, MediumReference rangeStartReference,
-      MediumReference rangeEndReference) {
+   private void assertMediumDidNotChangeInRange(MediumAccessor<?> mediumAccessor, MediumOffset rangeStartReference,
+      MediumOffset rangeEndReference) {
 
       int sizeToRead = (int) (rangeEndReference.distanceTo(rangeStartReference));
 

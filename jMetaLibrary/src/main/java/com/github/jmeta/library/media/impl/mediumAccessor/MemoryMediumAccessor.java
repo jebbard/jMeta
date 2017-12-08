@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -35,7 +35,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumOffset)
     */
    @Override
    public boolean isAtEndOfMedium() {
@@ -61,13 +61,13 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumReference,
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumOffset,
     *      ByteBuffer)
     */
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
 
-      MediumReference currentPosition = getCurrentPosition();
+      MediumOffset currentPosition = getCurrentPosition();
       final int currentOffset = (int) currentPosition.getAbsoluteMediumOffset();
       final int currentLength = (int) getMedium().getCurrentLength();
 
@@ -97,7 +97,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumReference,
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumOffset,
     *      ByteBuffer)
     */
    @Override
@@ -141,10 +141,10 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.MediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.MediumOffset)
     */
    @Override
-   protected void mediumSpecificSetCurrentPosition(MediumReference position) throws IOException {
+   protected void mediumSpecificSetCurrentPosition(MediumOffset position) throws IOException {
       updateCurrentPosition(position);
    }
 }

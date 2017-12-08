@@ -21,7 +21,7 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
@@ -252,7 +252,7 @@ public abstract class AbstractMediumAccessorTest {
 
       int sizeToRead = readTestData.sizeToRead + 10;
 
-      MediumReference initialPosition = at(mediumAccessor.getMedium(), readTestData.offsetToRead);
+      MediumOffset initialPosition = at(mediumAccessor.getMedium(), readTestData.offsetToRead);
 
       mediumAccessor.setCurrentPosition(initialPosition);
 
@@ -319,7 +319,7 @@ public abstract class AbstractMediumAccessorTest {
 
       ByteBuffer readContent = ByteBuffer.allocate(readSize);
 
-      MediumReference readReference = at(medium, readOffset);
+      MediumOffset readReference = at(medium, readOffset);
 
       mediumAccessor.setCurrentPosition(readReference);
 
@@ -366,8 +366,8 @@ public abstract class AbstractMediumAccessorTest {
 
       int readOffset = readOverEndOfMedium.offsetToRead;
 
-      MediumReference readReferenceOne = at(medium, 0);
-      MediumReference readReferenceTwo = at(medium, readOffset);
+      MediumOffset readReferenceOne = at(medium, 0);
+      MediumOffset readReferenceTwo = at(medium, readOffset);
 
       // Each call is checked twice to ensure it is repeatable (especially for streams!)
       mediumAccessor.setCurrentPosition(readReferenceOne);

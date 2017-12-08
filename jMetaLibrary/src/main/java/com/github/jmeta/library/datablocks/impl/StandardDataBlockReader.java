@@ -51,7 +51,7 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -82,7 +82,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    @Override
-   public void free(MediumReference startReference, long size) {
+   public void free(MediumOffset startReference, long size) {
 
       m_cache.discard(startReference, size);
    }
@@ -124,12 +124,12 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#hasContainerWithId(MediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#hasContainerWithId(MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      com.github.jmeta.library.datablocks.api.types.Payload, long)
     */
    @Override
-   public boolean hasContainerWithId(MediumReference reference, DataBlockId id, Payload parent,
+   public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
       long remainingDirectParentByteCount) {
 
       Reject.ifNull(reference, "reference");
@@ -157,7 +157,7 @@ public class StandardDataBlockReader implements DataBlockReader {
             && magicKeySize > remainingDirectParentByteCount)
             return false;
 
-         MediumReference magicKeyReference = reference.advance(magicKey.getOffsetFromStartOfHeaderOrFooter());
+         MediumOffset magicKeyReference = reference.advance(magicKey.getOffsetFromStartOfHeaderOrFooter());
 
          final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySize);
          final boolean equalsBytes = magicKey.equalsBytes(readBytes);
@@ -176,12 +176,12 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
-    * {@link MediumReference} or null. If the {@link Container}s presence is optional, its actual presence is determined
+    * {@link MediumOffset} or null. If the {@link Container}s presence is optional, its actual presence is determined
     * 
     * @param parent
     */
    @Override
-   public Container readContainerWithId(MediumReference reference, DataBlockId id, Payload parent,
+   public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(reference, "reference");
@@ -199,7 +199,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          theContext = new FieldFunctionStack();
 
       // Read headers
-      MediumReference nextReference = reference;
+      MediumOffset nextReference = reference;
 
       List<Header> headers = new ArrayList<>();
 
@@ -280,7 +280,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
    // readPayloadBackwards
    @Override
-   public Container readContainerWithIdBackwards(MediumReference reference, DataBlockId id, Payload parent,
+   public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(reference, "reference");
@@ -297,7 +297,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          theContext = new FieldFunctionStack();
 
       // Read footers
-      MediumReference nextReference = reference;
+      MediumOffset nextReference = reference;
 
       List<Header> footers = new ArrayList<>();
       List<DataBlockDescription> footerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
@@ -385,7 +385,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
    // readPayloadBackwards
    @Override
-   public Payload readPayloadBackwards(MediumReference reference, DataBlockId id, DataBlockId parentId,
+   public Payload readPayloadBackwards(MediumOffset reference, DataBlockId id, DataBlockId parentId,
       List<Header> footers, FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(footers, "footers");
@@ -409,12 +409,12 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    /**
     * Returns the next {@link Header} with the given {@link DataBlockId} assumed to be stored starting at the given
-    * {@link MediumReference} or null. If the {@link Header}s presence is optional, its actual presence is determined
-    * using the given previous {@link Header}s. The method returns null if no {@link Header} with the
-    * {@link DataBlockId} is present at the given {@link MediumReference}.
+    * {@link MediumOffset} or null. If the {@link Header}s presence is optional, its actual presence is determined using
+    * the given previous {@link Header}s. The method returns null if no {@link Header} with the {@link DataBlockId} is
+    * present at the given {@link MediumOffset}.
     *
     * @param reference
-    *           The {@link MediumReference} pointing to the location of the assumed {@link Header} in the
+    *           The {@link MediumOffset} pointing to the location of the assumed {@link Header} in the
     *           {@link AbstractMedium}.
     * @param headerId
     *           The {@link DataBlockId} of the assumed {@link Header}.
@@ -425,10 +425,10 @@ public class StandardDataBlockReader implements DataBlockReader {
     *           {@link Header}. If there are no {@link Header}s that have been read beforehand, this {@link List} must
     *           be empty.
     * @return The {@link Header} with the given {@link DataBlockId} with its {@link StandardField}s read from the given
-    *         {@link MediumReference}.
+    *         {@link MediumOffset}.
     */
    @Override
-   public List<Header> readHeadersWithId(MediumReference reference, DataBlockId headerId, DataBlockId parentId,
+   public List<Header> readHeadersWithId(MediumOffset reference, DataBlockId headerId, DataBlockId parentId,
       List<Header> previousHeaders, FieldFunctionStack context) {
 
       Reject.ifNull(previousHeaders, "previousHeaders");
@@ -459,7 +459,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    @Override
-   public List<Header> readFootersWithId(MediumReference reference, DataBlockId footerId, DataBlockId parentId,
+   public List<Header> readFootersWithId(MediumOffset reference, DataBlockId footerId, DataBlockId parentId,
       List<Header> previousFooters, FieldFunctionStack context) {
 
       Reject.ifNull(previousFooters, "previousFooters");
@@ -490,12 +490,12 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readPayload(MediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readPayload(MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId, DataBlockId, java.util.List, FieldFunctionStack,
     *      long)
     */
    @Override
-   public Payload readPayload(MediumReference reference, DataBlockId id, DataBlockId parentId, List<Header> headers,
+   public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId, List<Header> headers,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
 
       Reject.ifNull(headers, "headers");
@@ -523,11 +523,11 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId, FieldFunctionStack, long)
     */
    @Override
-   public List<Field<?>> readFields(MediumReference reference, DataBlockId parentId, FieldFunctionStack context,
+   public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, FieldFunctionStack context,
       long remainingDirectParentByteCount) {
 
       List<DataBlockDescription> fieldChildren = DataBlockDescription.getChildDescriptionsOfType(m_spec, parentId,
@@ -539,7 +539,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          System.out.println("TEST");
       }
 
-      MediumReference currentFieldReference = reference;
+      MediumOffset currentFieldReference = reference;
       ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
       Charset currentCharset = m_spec.getDefaultCharacterEncoding();
       ByteOrder actualByteOrder = currentByteOrder;
@@ -672,10 +672,10 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumReference)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumOffset)
     */
    @Override
-   public boolean identifiesDataFormat(MediumReference reference) {
+   public boolean identifiesDataFormat(MediumOffset reference) {
 
       List<DataBlockDescription> topLevelContainerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, null,
          PhysicalDataBlockType.CONTAINER);
@@ -756,7 +756,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       }
    }
 
-   private Field<?> readField(final MediumReference reference, ByteOrder currentByteOrder, Charset currentCharset,
+   private Field<?> readField(final MediumOffset reference, ByteOrder currentByteOrder, Charset currentCharset,
       DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount) {
 
       ByteBuffer fieldBuffer = null;
@@ -930,7 +930,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    private long determineActualFieldSize(DataBlockDescription fieldDesc, DataBlockId parentId,
-      FieldFunctionStack context, long remainingDirectParentByteCount, MediumReference reference, ByteOrder byteOrder,
+      FieldFunctionStack context, long remainingDirectParentByteCount, MediumOffset reference, ByteOrder byteOrder,
       Charset characterEncoding) {
 
       long actualBlockSize = DataBlockDescription.UNKNOWN_SIZE;
@@ -974,12 +974,12 @@ public class StandardDataBlockReader implements DataBlockReader {
       return actualBlockSize;
    }
 
-   private long getSizeUpToTerminationBytes(MediumReference reference, ByteOrder byteOrder, byte[] terminationBytes,
+   private long getSizeUpToTerminationBytes(MediumOffset reference, ByteOrder byteOrder, byte[] terminationBytes,
       long remainingDirectParentByteCount) {
 
       long sizeUpToTerminationBytes = 0;
 
-      MediumReference currentReference = reference;
+      MediumOffset currentReference = reference;
 
       boolean endOfMediumReached = false;
 
@@ -1060,7 +1060,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       return -1;
    }
 
-   private DataBlockId determineActualId(MediumReference reference, DataBlockId id, FieldFunctionStack context,
+   private DataBlockId determineActualId(MediumOffset reference, DataBlockId id, FieldFunctionStack context,
       long remainingParentByteCount, ByteOrder byteOrder, Charset characterEncoding) {
 
       if (m_spec.isGeneric(id)) {
@@ -1086,7 +1086,7 @@ public class StandardDataBlockReader implements DataBlockReader {
                + ", a LocationProperties object with the exact offset for its container parent " + id
                + " must be specified.");
 
-         MediumReference idFieldReference = reference.advance(byteOffset);
+         MediumOffset idFieldReference = reference.advance(byteOffset);
 
          long actualFieldSize = determineActualFieldSize(idFieldDesc, id, context,
             remainingParentByteCount - byteOffset, idFieldReference, byteOrder, characterEncoding);
@@ -1198,7 +1198,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null);
    }
 
-   private String buildEOFExceptionMessage(MediumReference reference, long byteCount, final int bytesRead) {
+   private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {
 
       return "Unexpected EOF occurred during read from medium " + reference.getMedium() + " [offset="
          + reference.getAbsoluteMediumOffset() + ", byteCount=" + byteCount + "]. Only " + bytesRead
@@ -1212,11 +1212,11 @@ public class StandardDataBlockReader implements DataBlockReader {
    private Map<DataTransformationType, TransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumOffset,
     *      int)
     */
    @Override
-   public ByteBuffer readBytes(MediumReference reference, int size) {
+   public ByteBuffer readBytes(MediumOffset reference, int size) {
 
       Reject.ifNull(reference, "reference");
 
@@ -1228,11 +1228,11 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#cache(com.github.jmeta.library.media.api.types.MediumReference,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#cache(com.github.jmeta.library.media.api.types.MediumOffset,
     *      long)
     */
    @Override
-   public void cache(MediumReference reference, long size) throws EndOfMediumException {
+   public void cache(MediumOffset reference, long size) throws EndOfMediumException {
 
       m_cache.buffer(reference, (int) size);
    }

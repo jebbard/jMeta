@@ -12,7 +12,7 @@ package com.github.jmeta.library.media.api.exceptions;
 import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -26,7 +26,7 @@ public class EndOfMediumException extends Exception {
 
    private final int byteCountTriedToRead;
 
-   private final MediumReference readStartReference;
+   private final MediumOffset readStartReference;
 
    private static final long serialVersionUID = 1L;
 
@@ -34,7 +34,7 @@ public class EndOfMediumException extends Exception {
     * Creates a new {@link EndOfMediumException}.
     * 
     * @param readStartReference
-    *           The start {@link MediumReference} of the read attempt
+    *           The start {@link MediumOffset} of the read attempt
     * @param byteCountTriedToRead
     *           The number of bytes initially tried to read
     * @param byteCountActuallyRead
@@ -42,7 +42,7 @@ public class EndOfMediumException extends Exception {
     * @param bytesReadSoFar
     *           The actual bytes read so far
     */
-   public EndOfMediumException(MediumReference readStartReference, int byteCountTriedToRead, int byteCountActuallyRead,
+   public EndOfMediumException(MediumOffset readStartReference, int byteCountTriedToRead, int byteCountActuallyRead,
       ByteBuffer bytesReadSoFar) {
 
       Reject.ifNull(readStartReference, "mediumReference");
@@ -57,11 +57,11 @@ public class EndOfMediumException extends Exception {
    }
 
    /**
-    * Returns the {@link MediumReference} that was the starting point for the causing read attempt.
+    * Returns the {@link MediumOffset} that was the starting point for the causing read attempt.
     * 
-    * @return the {@link MediumReference} that was the starting point for the causing read attempt.
+    * @return the {@link MediumOffset} that was the starting point for the causing read attempt.
     */
-   public MediumReference getReadStartReference() {
+   public MediumOffset getReadStartReference() {
 
       return readStartReference;
    }

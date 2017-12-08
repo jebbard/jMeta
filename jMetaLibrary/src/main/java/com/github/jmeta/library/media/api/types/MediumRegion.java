@@ -71,7 +71,7 @@ public class MediumRegion {
       LEFT_OVERLAPS_RIGHT_AT_BACK,
    }
 
-   private MediumReference startReference;
+   private MediumOffset startReference;
 
    private ByteBuffer buffer;
 
@@ -81,12 +81,12 @@ public class MediumRegion {
     * Creates a new {@link MediumRegion} backed with cached bytes.
     * 
     * @param startReference
-    *           The start {@link MediumReference} of the {@link MediumRegion}.
+    *           The start {@link MediumOffset} of the {@link MediumRegion}.
     * @param buffer
     *           The bytes buffered in this {@link MediumRegion}. May be empty. The remaining bytes are considered as
     *           being cached.
     */
-   public MediumRegion(MediumReference startReference, ByteBuffer buffer) {
+   public MediumRegion(MediumOffset startReference, ByteBuffer buffer) {
 
       Reject.ifNull(buffer, "buffer");
       Reject.ifNull(startReference, "startReference");
@@ -100,11 +100,11 @@ public class MediumRegion {
     * medium.
     * 
     * @param startReference
-    *           The start {@link MediumReference} of the {@link MediumRegion}.
+    *           The start {@link MediumOffset} of the {@link MediumRegion}.
     * @param size
     *           The size of the region in bytes. May be 0 to represent the empty region.
     */
-   public MediumRegion(MediumReference startReference, int size) {
+   public MediumRegion(MediumOffset startReference, int size) {
 
       Reject.ifNegative(size, "size");
       Reject.ifNull(startReference, "startReference");
@@ -127,7 +127,7 @@ public class MediumRegion {
    public static MediumRegionOverlapType determineOverlapWithOtherRegion(MediumRegion left, MediumRegion right) {
       Reject.ifNull(right, "right");
       Reject.ifNull(left, "left");
-      Reject.ifFalse(left.getStartReference().getMedium().equals(right.getStartReference().getMedium()),
+      Reject.ifFalse(left.getStartOffset().getMedium().equals(right.getStartOffset().getMedium()),
          "left.getStartReference().getMedium().equals(right.getStartReference().getMedium()");
 
       int overlappingByteCount = left.getOverlappingByteCount(right);
@@ -178,44 +178,46 @@ public class MediumRegion {
    }
 
    /**
-    * Returns the start {@link MediumReference} of this {@link MediumRegion}.
+    * Returns the start {@link MediumOffset} of this {@link MediumRegion}.
     * 
-    * @return The start {@link MediumReference} of this {@link MediumRegion}.
+    * @return The start {@link MediumOffset} of this {@link MediumRegion}.
     */
-   public MediumReference getStartReference() {
+   public MediumOffset getStartOffset() {
 
       return startReference;
    }
 
    /**
-    * Calculates and returns the {@link MediumReference} pointing to the first byte after this {@link MediumRegion}.
+    * Calculates and returns the {@link MediumOffset} pointing to the first byte after this {@link MediumRegion}.
     * 
-    * @return the {@link MediumReference} pointing to the first byte after this {@link MediumRegion}.
+    * @return the {@link MediumOffset} pointing to the first byte after this {@link MediumRegion}.
     */
-   public MediumReference calculateEndReference() {
+   public MediumOffset calculateEndOffset() {
 
       return startReference.advance(getSize());
    }
 
    /**
-    * Splits this {@link MediumRegion} at the given {@link MediumReference} and returns two new {@link MediumRegion}
+    * Splits this {@link MediumRegion} at the given {@link MediumOffset} and returns two new {@link MediumRegion}
     * instances in any case. This existing {@link MediumRegion} instance is kept unchanged.
     * 
     * @param at
-    *           The {@link MediumReference} to split this {@link MediumRegion}. Must be behind the start reference of
-    *           this region, and must be smaller than the end reference of this {@link MediumRegion}.
+    *           The {@link MediumOffset} to split this {@link MediumRegion}. Must be behind the start offset of this
+    *           region, and must be smaller than the end offset of this {@link MediumRegion}.
+    * 
+    * @return An array of size 2, containing the split region parts in offset order
     */
-   public MediumRegion[] split(MediumReference at) {
+   public MediumRegion[] split(MediumOffset at) {
       Reject.ifNull(at, "at");
-      Reject.ifFalse(at.getMedium().equals(getStartReference().getMedium()),
+      Reject.ifFalse(at.getMedium().equals(getStartOffset().getMedium()),
          "at.getMedium().equals(getStartReference().getMedium())");
       Reject.ifFalse(contains(at), "contains(at)");
-      Reject.ifFalse(getStartReference().before(at), "getStartReference().before(at)");
+      Reject.ifFalse(getStartOffset().before(at), "getStartReference().before(at)");
 
       MediumRegion[] returnedSplitRegions = new MediumRegion[2];
 
-      int firstRegionSize = (int) at.distanceTo(getStartReference());
-      int secondRegionSize = (int) calculateEndReference().distanceTo(at);
+      int firstRegionSize = (int) at.distanceTo(getStartOffset());
+      int secondRegionSize = (int) calculateEndOffset().distanceTo(at);
 
       if (isCached()) {
          // NOTE: It is important here to NOT call getBytes() multiple times for each region, but just once,
@@ -233,10 +235,10 @@ public class MediumRegion {
          ByteBuffer firstRegionBuffer = ByteBuffer.wrap(firstRegionBytes);
          ByteBuffer secondRegionBuffer = ByteBuffer.wrap(secondRegionBytes);
 
-         returnedSplitRegions[0] = new MediumRegion(getStartReference(), firstRegionBuffer);
+         returnedSplitRegions[0] = new MediumRegion(getStartOffset(), firstRegionBuffer);
          returnedSplitRegions[1] = new MediumRegion(at, secondRegionBuffer);
       } else {
-         returnedSplitRegions[0] = new MediumRegion(getStartReference(), firstRegionSize);
+         returnedSplitRegions[0] = new MediumRegion(getStartOffset(), firstRegionSize);
          returnedSplitRegions[1] = new MediumRegion(at, secondRegionSize);
       }
 
@@ -244,40 +246,40 @@ public class MediumRegion {
    }
 
    /**
-    * Returns whether the given {@link MediumReference} is contained in the {@link MediumRegion}, i.e. is between
-    * {@link #getStartReference()} inclusive and {@link #calculateEndReference()} exclusive.
+    * Returns whether the given {@link MediumOffset} is contained in the {@link MediumRegion}, i.e. is between
+    * {@link #getStartOffset()} inclusive and {@link #calculateEndOffset()} exclusive.
     * 
     * @param reference
-    *           The {@link MediumReference} to test for being contained.
+    *           The {@link MediumOffset} to test for being contained.
     * @return true if it is contained, false otherwise.
     */
-   public boolean contains(MediumReference reference) {
+   public boolean contains(MediumOffset reference) {
 
       Reject.ifNull(reference, "reference");
-      Reject.ifFalse(reference.getMedium().equals(getStartReference().getMedium()),
+      Reject.ifFalse(reference.getMedium().equals(getStartOffset().getMedium()),
          "reference.getMedium().equals(getStartReference().getMedium())");
 
-      return reference.behindOrEqual(getStartReference()) && reference.before(calculateEndReference());
+      return reference.behindOrEqual(getStartOffset()) && reference.before(calculateEndOffset());
    }
 
    /**
-    * Discards the back bytes of this {@link MediumRegion}, shortening it to a new end {@link MediumReference}. Only
+    * Discards the back bytes of this {@link MediumRegion}, shortening it to a new end {@link MediumOffset}. Only
     * allowed to be called for cached {@link MediumRegion}s.
     * 
     * @param newEndReference
-    *           The new end {@link MediumReference}. Must be contained in the region. That said, it is not allowed to
-    *           pass in the end reference of this {@link MediumRegion}, because it is not contained in it.
+    *           The new end {@link MediumOffset}. Must be contained in the region. That said, it is not allowed to pass
+    *           in the end reference of this {@link MediumRegion}, because it is not contained in it.
     */
-   public void discardBytesAtEnd(MediumReference newEndReference) {
+   public void discardBytesAtEnd(MediumOffset newEndReference) {
 
       Reject.ifNull(newEndReference, "newEndReference");
       Reject.ifFalse(contains(newEndReference), "contains(newEndReference)");
       Reject.ifFalse(isCached(), "isCached()");
 
-      if (newEndReference.equals(calculateEndReference()))
+      if (newEndReference.equals(calculateEndOffset()))
          return;
 
-      int trimSize = (int) newEndReference.distanceTo(getStartReference());
+      int trimSize = (int) newEndReference.distanceTo(getStartOffset());
 
       buffer.position(getSize() - trimSize);
       ByteBuffer newBuffer = ByteBuffer.allocate(trimSize);
@@ -289,24 +291,24 @@ public class MediumRegion {
    }
 
    /**
-    * Discards the front bytes of this {@link MediumRegion}, shortening it to begin at a new start
-    * {@link MediumReference}. Only allowed to be called for cached {@link MediumRegion}s.
+    * Discards the front bytes of this {@link MediumRegion}, shortening it to begin at a new start {@link MediumOffset}.
+    * Only allowed to be called for cached {@link MediumRegion}s.
     * 
     * @param newStartReference
-    *           The new start {@link MediumReference}. Must be contained in the region. You can pass in the start
-    *           reference of the {@link MediumRegion}, which changes nothing on this {@link MediumRegion}.
+    *           The new start {@link MediumOffset}. Must be contained in the region. You can pass in the start reference
+    *           of the {@link MediumRegion}, which changes nothing on this {@link MediumRegion}.
     */
-   public void discardBytesAtFront(MediumReference newStartReference) {
+   public void discardBytesAtFront(MediumOffset newStartReference) {
 
       Reject.ifNull(newStartReference, "newStartReference");
       Reject.ifFalse(contains(newStartReference), "contains(newStartReference)");
       Reject.ifFalse(isCached(), "isCached()");
 
-      if (newStartReference.equals(getStartReference()))
+      if (newStartReference.equals(getStartOffset()))
          return;
 
-      int trimSize = (int) newStartReference.distanceTo(getStartReference());
-      int newSize = (int) calculateEndReference().distanceTo(newStartReference);
+      int trimSize = (int) newStartReference.distanceTo(getStartOffset());
+      int newSize = (int) calculateEndOffset().distanceTo(newStartReference);
 
       buffer.position(trimSize);
       ByteBuffer newBuffer = ByteBuffer.allocate(newSize);
@@ -393,13 +395,13 @@ public class MediumRegion {
     */
    public boolean overlapsOtherRegionAtBack(MediumRegion other) {
       Reject.ifNull(other, "other");
-      Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
+      Reject.ifFalse(other.getStartOffset().getMedium().equals(getStartOffset().getMedium()),
          "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
-      MediumReference startRef = getStartReference();
-      MediumReference otherStartRef = other.getStartReference();
-      MediumReference endRef = calculateEndReference();
-      MediumReference otherEndRef = other.calculateEndReference();
+      MediumOffset startRef = getStartOffset();
+      MediumOffset otherStartRef = other.getStartOffset();
+      MediumOffset endRef = calculateEndOffset();
+      MediumOffset otherEndRef = other.calculateEndOffset();
 
       return startRef.behindOrEqual(otherStartRef) && startRef.before(otherEndRef) && endRef.behindOrEqual(otherEndRef);
    }
@@ -467,13 +469,13 @@ public class MediumRegion {
     */
    public boolean overlapsOtherRegionAtFront(MediumRegion other) {
       Reject.ifNull(other, "other");
-      Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
+      Reject.ifFalse(other.getStartOffset().getMedium().equals(getStartOffset().getMedium()),
          "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
-      MediumReference startRef = getStartReference();
-      MediumReference otherStartRef = other.getStartReference();
-      MediumReference endRef = calculateEndReference();
-      MediumReference otherEndRef = other.calculateEndReference();
+      MediumOffset startRef = getStartOffset();
+      MediumOffset otherStartRef = other.getStartOffset();
+      MediumOffset endRef = calculateEndOffset();
+      MediumOffset otherEndRef = other.calculateEndOffset();
 
       return otherStartRef.behindOrEqual(startRef) && otherStartRef.before(endRef) && otherEndRef.behindOrEqual(endRef);
    }
@@ -488,13 +490,13 @@ public class MediumRegion {
     */
    public int getOverlappingByteCount(MediumRegion other) {
       Reject.ifNull(other, "other");
-      Reject.ifFalse(other.getStartReference().getMedium().equals(getStartReference().getMedium()),
+      Reject.ifFalse(other.getStartOffset().getMedium().equals(getStartOffset().getMedium()),
          "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
 
-      MediumReference startRef = getStartReference();
-      MediumReference otherStartRef = other.getStartReference();
-      MediumReference endRef = calculateEndReference();
-      MediumReference otherEndRef = other.calculateEndReference();
+      MediumOffset startRef = getStartOffset();
+      MediumOffset otherStartRef = other.getStartOffset();
+      MediumOffset endRef = calculateEndOffset();
+      MediumOffset otherEndRef = other.calculateEndOffset();
 
       if (overlapsOtherRegionAtFront(other)) {
          return (int) endRef.distanceTo(otherStartRef);
@@ -515,9 +517,9 @@ public class MediumRegion {
    @Override
    public String toString() {
 
-      return "MediumRegion [[" + getStartReference().getAbsoluteMediumOffset() + ", "
-         + (getStartReference().getAbsoluteMediumOffset() + getSize()) + "), size=" + getSize() + ", buffer=" + buffer
-         + ", on " + getStartReference().getMedium() + "]";
+      return "MediumRegion [[" + getStartOffset().getAbsoluteMediumOffset() + ", "
+         + (getStartOffset().getAbsoluteMediumOffset() + getSize()) + "), size=" + getSize() + ", buffer=" + buffer
+         + ", on " + getStartOffset().getMedium() + "]";
    }
 
    /**

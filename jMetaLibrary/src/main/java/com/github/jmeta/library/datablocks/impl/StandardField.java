@@ -18,7 +18,7 @@ import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO writeTests001: Test failing conversion when Enum interpr. value is unknown
@@ -53,7 +53,7 @@ public class StandardField<T> implements Field<T> {
    }
 
    private StandardField(DataBlockDescription fieldDesc,
-      MediumReference reference, FieldConverter<T> fieldConverter) {
+      MediumOffset reference, FieldConverter<T> fieldConverter) {
       Reject.ifNull(fieldDesc, "fieldDesc");
       Reject.ifNull(fieldConverter, "fieldConverter");
 
@@ -95,7 +95,7 @@ public class StandardField<T> implements Field<T> {
     * @param fieldConverter
     */
    public StandardField(DataBlockDescription fieldDesc, T interpretedValue,
-      MediumReference reference, FieldConverter<T> fieldConverter) {
+      MediumOffset reference, FieldConverter<T> fieldConverter) {
       this(fieldDesc, reference, fieldConverter);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
@@ -113,7 +113,7 @@ public class StandardField<T> implements Field<T> {
     * @param fieldConverter
     */
    public StandardField(DataBlockDescription fieldDesc, BinaryValue byteValue,
-      MediumReference reference, FieldConverter<T> fieldConverter) {
+      MediumOffset reference, FieldConverter<T> fieldConverter) {
       this(fieldDesc, reference, fieldConverter);
 
       Reject.ifNull(byteValue, "byteValue");
@@ -169,7 +169,7 @@ public class StandardField<T> implements Field<T> {
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getMediumReference()
     */
    @Override
-   public MediumReference getMediumReference() {
+   public MediumOffset getMediumReference() {
 
       return m_mediumReference;
    }
@@ -302,7 +302,7 @@ public class StandardField<T> implements Field<T> {
 
    private ByteOrder m_byteOrder;
 
-   private MediumReference m_mediumReference;
+   private MediumOffset m_mediumReference;
 
    private long m_totalSize;
 

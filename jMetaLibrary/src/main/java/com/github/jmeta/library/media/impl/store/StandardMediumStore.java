@@ -21,13 +21,13 @@ import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
 import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
-import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
+import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -39,14 +39,14 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    private final MediumCache cache;
 
-   private final MediumReferenceFactory referenceFactory;
+   private final MediumOffsetFactory referenceFactory;
 
    private boolean isOpened;
 
    private final MediumChangeManager changeManager;
 
    public StandardMediumStore(MediumAccessor<T> mediumAccessor, MediumCache cache,
-      MediumReferenceFactory referenceFactory, MediumChangeManager changeManager) {
+      MediumOffsetFactory referenceFactory, MediumChangeManager changeManager) {
       Reject.ifNull(mediumAccessor, "mediumAccessor");
       Reject.ifNull(referenceFactory, "referenceFactory");
       Reject.ifNull(cache, "cache");
@@ -90,10 +90,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumReference)
+    * @see com.github.jmeta.library.media.api.services.MediumStore#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumOffset)
     */
    @Override
-   public boolean isAtEndOfMedium(MediumReference offset) {
+   public boolean isAtEndOfMedium(MediumOffset offset) {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
@@ -117,18 +117,18 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * @see com.github.jmeta.library.media.api.services.MediumStore#createMediumReference(long)
     */
    @Override
-   public MediumReference createMediumReference(long offset) {
+   public MediumOffset createMediumReference(long offset) {
       ensureOpened();
 
       return referenceFactory.createMediumReference(offset);
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#cache(com.github.jmeta.library.media.api.types.MediumReference,
+    * @see com.github.jmeta.library.media.api.services.MediumStore#cache(com.github.jmeta.library.media.api.types.MediumOffset,
     *      int)
     */
    @Override
-   public void cache(MediumReference offset, int numberOfBytes) throws EndOfMediumException {
+   public void cache(MediumOffset offset, int numberOfBytes) throws EndOfMediumException {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
@@ -149,7 +149,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                cacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
 
                if (!cacheRegion.isCached()) {
-                  MediumRegion regionWithBytes = readRegion(cacheRegion.getStartReference(), cacheRegion.getSize());
+                  MediumRegion regionWithBytes = readRegion(cacheRegion.getStartOffset(), cacheRegion.getSize());
                   cache.addRegion(regionWithBytes);
                } else if (isPreviouslyCachedRegionNowUncached(cacheRegion, initialCacheSize, numberOfBytes)) {
                   cache.addRegion(cacheRegion);
@@ -158,7 +158,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          } else {
             List<MediumRegion> regionsToAdd = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
 
-            MediumReference offsetToUse = mediumAccessor.getCurrentPosition();
+            MediumOffset offsetToUse = mediumAccessor.getCurrentPosition();
             int numberOfBytesToUse = numberOfBytes - (int) offsetToUse.distanceTo(offset);
 
             if (numberOfBytesToUse > getCachedByteCountAt(offsetToUse)) {
@@ -171,10 +171,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#getCachedByteCountAt(com.github.jmeta.library.media.api.types.MediumReference)
+    * @see com.github.jmeta.library.media.api.services.MediumStore#getCachedByteCountAt(com.github.jmeta.library.media.api.types.MediumOffset)
     */
    @Override
-   public long getCachedByteCountAt(MediumReference offset) {
+   public long getCachedByteCountAt(MediumOffset offset) {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
@@ -183,11 +183,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#getData(com.github.jmeta.library.media.api.types.MediumReference,
+    * @see com.github.jmeta.library.media.api.services.MediumStore#getData(com.github.jmeta.library.media.api.types.MediumOffset,
     *      int)
     */
    @Override
-   public ByteBuffer getData(MediumReference offset, int numberOfBytes) throws EndOfMediumException {
+   public ByteBuffer getData(MediumOffset offset, int numberOfBytes) throws EndOfMediumException {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
@@ -212,7 +212,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
             ByteBuffer firstRegionCachedBytes = firstRegion.getBytes();
             firstRegionCachedBytes
-               .position(firstRegionCachedBytes.position() + (int) offset.distanceTo(firstRegion.getStartReference()));
+               .position(firstRegionCachedBytes.position() + (int) offset.distanceTo(firstRegion.getStartOffset()));
             firstRegionCachedBytes.limit(firstRegionCachedBytes.position() + numberOfBytes);
 
             return firstRegionCachedBytes;
@@ -227,9 +227,9 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                   cachedBytes.put(cacheRegion.getBytes());
                } else {
                   List<MediumRegion> regionsRead = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(
-                     cacheRegion.getStartReference());
+                     cacheRegion.getStartOffset());
 
-                  MediumRegion regionToAddWithBytes = readRegion(cacheRegion.getStartReference(),
+                  MediumRegion regionToAddWithBytes = readRegion(cacheRegion.getStartOffset(),
                      cacheRegion.getSize());
 
                   cachedBytes.put(regionToAddWithBytes.getBytes());
@@ -260,11 +260,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#insertData(com.github.jmeta.library.media.api.types.MediumReference,
+    * @see com.github.jmeta.library.media.api.services.MediumStore#insertData(com.github.jmeta.library.media.api.types.MediumOffset,
     *      java.nio.ByteBuffer)
     */
    @Override
-   public MediumAction insertData(MediumReference offset, ByteBuffer dataToInsert) {
+   public MediumAction insertData(MediumOffset offset, ByteBuffer dataToInsert) {
       Reject.ifNull(offset, "offset");
       Reject.ifNull(dataToInsert, "dataToInsert");
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
@@ -275,11 +275,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#removeData(com.github.jmeta.library.media.api.types.MediumReference,
+    * @see com.github.jmeta.library.media.api.services.MediumStore#removeData(com.github.jmeta.library.media.api.types.MediumOffset,
     *      int)
     */
    @Override
-   public MediumAction removeData(MediumReference offset, int numberOfBytesToRemove) {
+   public MediumAction removeData(MediumOffset offset, int numberOfBytesToRemove) {
       Reject.ifNull(offset, "offset");
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
       ensureOpened();
@@ -289,11 +289,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#replaceData(com.github.jmeta.library.media.api.types.MediumReference,
+    * @see com.github.jmeta.library.media.api.services.MediumStore#replaceData(com.github.jmeta.library.media.api.types.MediumOffset,
     *      int, java.nio.ByteBuffer)
     */
    @Override
-   public MediumAction replaceData(MediumReference offset, int numberOfBytesToReplace, ByteBuffer replacementData) {
+   public MediumAction replaceData(MediumOffset offset, int numberOfBytesToReplace, ByteBuffer replacementData) {
       Reject.ifNull(offset, "offset");
       Reject.ifNull(replacementData, "replacementData");
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
@@ -309,7 +309,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    @Override
    public void undo(MediumAction mediumAction) {
       Reject.ifNull(mediumAction, "mediumAction");
-      Reject.ifFalse(mediumAction.getRegion().getStartReference().getMedium().equals(getMedium()),
+      Reject.ifFalse(mediumAction.getRegion().getStartOffset().getMedium().equals(getMedium()),
          "mediumAction.getRegion().getStartReference().getMedium().equals(getMedium())");
       Reject.ifFalse(mediumAction.isPending(), "mediumAction.isPending()");
       ensureOpened();
@@ -337,7 +337,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          switch (mediumAction.getActionType()) {
             case READ:
                try {
-                  MediumRegion regionRead = readRegion(mediumAction.getRegion().getStartReference(),
+                  MediumRegion regionRead = readRegion(mediumAction.getRegion().getStartOffset(),
                      mediumAction.getRegion().getSize());
                   lastReadBytes = regionRead.getBytes();
                } catch (EndOfMediumException e) {
@@ -350,7 +350,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
             case WRITE:
                if (mediumAction.getActionBytes() != null) {
-                  mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartReference());
+                  mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                   mediumAccessor.write(mediumAction.getActionBytes());
                } else {
 
@@ -361,7 +361,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                            + mediumAction);
                   }
 
-                  mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartReference());
+                  mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                   mediumAccessor.write(lastReadBytes);
                }
             break;
@@ -379,7 +379,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
             break;
 
             case TRUNCATE:
-               mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartReference());
+               mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                mediumAccessor.truncate();
             break;
 
@@ -388,6 +388,14 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          }
 
          previousActionType = mediumAction.getActionType();
+      }
+
+      for (MediumAction mediumAction : flushPlan) {
+         if (mediumAction.getActionType() == MediumActionType.INSERT
+            || mediumAction.getActionType() == MediumActionType.REMOVE
+            || mediumAction.getActionType() == MediumActionType.REPLACE) {
+            referenceFactory.updateReferences(mediumAction);
+         }
       }
 
    }
@@ -405,10 +413,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     *           The size of the range in bytes
     * @return a {@link MediumRegion} clipped against the given range
     */
-   private MediumRegion clipRegionAgainstRange(MediumRegion region, MediumReference rangeOffset, int rangeSize) {
-      MediumReference regionStartReference = region.getStartReference();
-      MediumReference regionEndReference = region.calculateEndReference();
-      MediumReference rangeEndReference = rangeOffset.advance(rangeSize);
+   private MediumRegion clipRegionAgainstRange(MediumRegion region, MediumOffset rangeOffset, int rangeSize) {
+      MediumOffset regionStartReference = region.getStartOffset();
+      MediumOffset regionEndReference = region.calculateEndOffset();
+      MediumOffset rangeEndReference = rangeOffset.advance(rangeSize);
 
       MediumRegion regionToUse = region;
 
@@ -424,7 +432,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    /**
     * Determines if a given cached {@link MediumRegion}, that was still cached at point in time
-    * {@link MediumCache#getRegionsInRange(MediumReference, int)} was meanwhile has become uncached as new regions have
+    * {@link MediumCache#getRegionsInRange(MediumOffset, int)} was meanwhile has become uncached as new regions have
     * been added after this initial call which forced the cache to remove previously cached {@link MediumRegion}s to
     * keep its size below the maximum allowed cache size.
     * 
@@ -434,7 +442,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * @param cachedRegion
     *           The cached {@link MediumRegion} to check
     * @param initialCacheSizeInBytes
-    *           The cache size at point in time when {@link MediumCache#getRegionsInRange(MediumReference, int)} was
+    *           The cache size at point in time when {@link MediumCache#getRegionsInRange(MediumOffset, int)} was
     *           called
     * @param maxNumberOfBytesToAdd
     *           The maximum number of bytes that might get added to the cache in total
@@ -444,7 +452,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    private boolean isPreviouslyCachedRegionNowUncached(MediumRegion cachedRegion, long initialCacheSizeInBytes,
       int maxNumberOfBytesToAdd) {
       return initialCacheSizeInBytes + maxNumberOfBytesToAdd > cache.getMaximumCacheSizeInBytes()
-         && cache.getCachedByteCountAt(cachedRegion.getStartReference()) < cachedRegion.getSize();
+         && cache.getCachedByteCountAt(cachedRegion.getStartOffset()) < cachedRegion.getSize();
    }
 
    /**
@@ -460,12 +468,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * @throws EndOfMediumException
     *            if the end of the medium is reached during reading
     */
-   private List<MediumRegion> readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(MediumReference offset)
+   private List<MediumRegion> readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(MediumOffset offset)
       throws EndOfMediumException {
       List<MediumRegion> regionsRead = new ArrayList<>();
 
       if (!getMedium().isRandomAccess()) {
-         MediumReference currentPosition = mediumAccessor.getCurrentPosition();
+         MediumOffset currentPosition = mediumAccessor.getCurrentPosition();
 
          if (offset.before(currentPosition)) {
             long cachedByteCountAtOffset = cache.getCachedByteCountAt(offset);
@@ -496,7 +504,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * @throws EndOfMediumException
     *            if the end of the medium is reached during reading
     */
-   private List<MediumRegion> readRegionWise(MediumReference rangeOffset, long rangeSize) throws EndOfMediumException {
+   private List<MediumRegion> readRegionWise(MediumOffset rangeOffset, long rangeSize) throws EndOfMediumException {
       List<MediumRegion> regionsRead;
       regionsRead = MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, EndOfMediumException.class,
          rangeOffset, rangeSize, getMedium().getMaxReadWriteBlockSizeInBytes(), this::readRegion);
@@ -513,7 +521,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * @throws EndOfMediumException
     *            in case of EOM was reached during reading
     */
-   private MediumRegion readRegion(MediumReference regionOffset, int regionSize) throws EndOfMediumException {
+   private MediumRegion readRegion(MediumOffset regionOffset, int regionSize) throws EndOfMediumException {
       ByteBuffer dataRead = ByteBuffer.allocate(regionSize);
 
       mediumAccessor.setCurrentPosition(regionOffset);

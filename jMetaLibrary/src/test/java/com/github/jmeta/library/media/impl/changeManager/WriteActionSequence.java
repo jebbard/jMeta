@@ -15,7 +15,7 @@ import java.util.Iterator;
 
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 
 /**
@@ -34,7 +34,7 @@ public class WriteActionSequence extends ExpectedActionSequence {
     * @param blockSizeInBytes
     * @param expectedBytes
     */
-   public WriteActionSequence(MediumReference startRef, int blockCount, int blockSizeInBytes,
+   public WriteActionSequence(MediumOffset startRef, int blockCount, int blockSizeInBytes,
       ByteBuffer expectedBytes) {
       super(startRef, blockCount, blockSizeInBytes);
 
@@ -47,7 +47,7 @@ public class WriteActionSequence extends ExpectedActionSequence {
    @Override
    public void assertFollowsSequence(Iterator<MediumAction> actionIter) {
 
-      MediumReference nextExpectedWriteRef = getStartRef();
+      MediumOffset nextExpectedWriteRef = getStartRef();
 
       for (int i = 0; i < getBlockCount(); i++) {
          expectWriteAction(actionIter, nextExpectedWriteRef, getBlockSizeInBytes(),
@@ -63,7 +63,7 @@ public class WriteActionSequence extends ExpectedActionSequence {
    @Override
    public void dump(PrintStream stream) {
 
-      MediumReference nextExpectedWriteRef = getStartRef();
+      MediumOffset nextExpectedWriteRef = getStartRef();
 
       for (int i = 0; i < getBlockCount(); i++) {
          dumpMediumAction(stream,

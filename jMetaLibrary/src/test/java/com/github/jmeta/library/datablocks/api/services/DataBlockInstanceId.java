@@ -3,7 +3,7 @@ package com.github.jmeta.library.datablocks.api.services;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -22,7 +22,7 @@ public class DataBlockInstanceId {
     *           {@link DataBlockInstanceId} refers to a top level block.
     * @param sequenceNumber
     *           A zero based number that corresponds to the absolute occurrence index of the block in its parent block.
-    *           The first child block (regarding its {@link MediumReference} and irrespective of its
+    *           The first child block (regarding its {@link MediumOffset} and irrespective of its
     *           {@link DataBlockId} or {@link PhysicalDataBlockType}) gets sequence number 0, the second one gets
     *           sequence number 1, and so on.
     *
@@ -64,7 +64,7 @@ public class DataBlockInstanceId {
    /**
     * Returns the sequence number of this {@link DataBlockInstanceId}. The sequence number is a zero based number that
     * corresponds to the absolute occurrence index of the block in its parent block. The first child block (regarding
-    * its {@link MediumReference} and irrespective of its {@link DataBlockId} or {@link PhysicalDataBlockType}) gets
+    * its {@link MediumOffset} and irrespective of its {@link DataBlockId} or {@link PhysicalDataBlockType}) gets
     * sequence number 0, the second one gets sequence number 1, and so on.
     *
     * @return the sequence number of this {@link DataBlockInstanceId}.

@@ -21,7 +21,7 @@ import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.services.AbstractUnCachedMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.impl.mediumAccessor.InputStreamMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 
@@ -35,7 +35,7 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    private static final String STREAM_BASED_EMPTY_MEDIUM_NAME = "Stream based empty medium";
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledUncachedStreamMedium_fromMiddleAndMoreBytesThanMaxRWBlockSize_readsRangeAndBytesBeforeBlockWise() {
@@ -54,7 +54,7 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test(expected = InvalidMediumReferenceException.class)
    public void getData_forFilledUncachedStreamMedium_twiceInEnclosingRegion_throwsException() {
@@ -76,7 +76,7 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test(expected = InvalidMediumReferenceException.class)
    public void getData_forFilledUncachedStreamMedium_forOffsetBeforeCurrentPosition_throwsException() {

@@ -20,7 +20,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * A factory used for creating {@link DataBlock} instances of the various types.
@@ -45,7 +45,7 @@ public interface DataBlockFactory {
     * @return the created {@link Container}.
     */
    public Container createContainer(DataBlockId id, DataBlock parent,
-      MediumReference reference, List<Header> headers, Payload payload,
+      MediumOffset reference, List<Header> headers, Payload payload,
       List<Header> footers);
 
    /**
@@ -76,7 +76,7 @@ public interface DataBlockFactory {
     * @return the {@link Field}
     */
    public <T> Field<T> createFieldFromBytes(DataBlockId id,
-      DataFormatSpecification spec, MediumReference reference,
+      DataFormatSpecification spec, MediumOffset reference,
       BinaryValue fieldBytes, ByteOrder byteOrder, Charset characterEncoding);
 
    /**
@@ -93,7 +93,7 @@ public interface DataBlockFactory {
     * @param isFooter
     * @return the {@link Header}
     */
-   public Header createHeader(DataBlockId id, MediumReference reference,
+   public Header createHeader(DataBlockId id, MediumOffset reference,
       List<Field<?>> fields, boolean isFooter);
 
 }

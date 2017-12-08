@@ -27,7 +27,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.media.api.services.MediaAPI;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -38,12 +38,12 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.DataBlock, MediumReference, java.util.List, com.github.jmeta.library.datablocks.api.types.Payload,
+    *      com.github.jmeta.library.datablocks.api.types.DataBlock, MediumOffset, java.util.List, com.github.jmeta.library.datablocks.api.types.Payload,
     *      java.util.List)
     */
    @Override
    public Container createContainer(DataBlockId id, DataBlock parent,
-      MediumReference reference, List<Header> headers, Payload payload,
+      MediumOffset reference, List<Header> headers, Payload payload,
       List<Header> footers) {
 
       Reject.ifNull(id, "id");
@@ -57,11 +57,11 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
-    *      DataFormatSpecification, MediumReference, BinaryValue, ByteOrder, Charset)
+    *      DataFormatSpecification, MediumOffset, BinaryValue, ByteOrder, Charset)
     */
    @Override
    public <T> Field<T> createFieldFromBytes(DataBlockId id,
-      DataFormatSpecification spec, MediumReference reference,
+      DataFormatSpecification spec, MediumOffset reference,
       BinaryValue fieldBytes, ByteOrder byteOrder, Charset characterEncoding) {
 
       Reject.ifNull(id, "fieldDesc");
@@ -83,11 +83,11 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      MediumReference, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader, FieldFunctionStack)
+    *      MediumOffset, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader, FieldFunctionStack)
     */
    @Override
    public Payload createPayloadAfterRead(DataBlockId id,
-      MediumReference reference, long totalSize, DataBlockReader reader,
+      MediumOffset reference, long totalSize, DataBlockReader reader,
       FieldFunctionStack context) {
 
       Reject.ifNull(id, "id");
@@ -98,10 +98,10 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      MediumReference, java.util.List, boolean)
+    *      MediumOffset, java.util.List, boolean)
     */
    @Override
-   public Header createHeader(DataBlockId id, MediumReference reference,
+   public Header createHeader(DataBlockId id, MediumOffset reference,
       List<Field<?>> fields, boolean isFooter) {
 
       Reject.ifNull(id, "headerRef");

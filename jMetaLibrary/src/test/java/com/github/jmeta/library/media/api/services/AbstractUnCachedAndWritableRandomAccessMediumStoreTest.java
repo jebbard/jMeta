@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * {@link AbstractUnCachedAndWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable
@@ -29,7 +29,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
    extends AbstractUnCachedMediumStoreTest<T> {
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test
    public void isAtEndOfMedium_forRandomAccessMediumAtEOM_returnsTrue() {
@@ -43,7 +43,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test
    public void isAtEndOfMedium_forRandomAccessMediumBeforeEOM_returnsFalse() {
@@ -57,7 +57,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledUncachedMedium_twiceInEnclosingRegion_reReadsData() {
@@ -82,7 +82,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
@@ -92,7 +92,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, currentMediumContent.length() + 15);
+      MediumOffset cacheOffset = at(currentMedium, currentMediumContent.length() + 15);
       int cacheSize = 10;
 
       testCache_throwsEndOfMediumException(cacheOffset, cacheSize, currentMediumContent);
@@ -101,7 +101,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
@@ -111,7 +111,7 @@ public abstract class AbstractUnCachedAndWritableRandomAccessMediumStoreTest<T e
 
       mediumStoreUnderTest.open();
 
-      MediumReference getDataOffset = at(currentMedium, (long) (currentMediumContent.length() + 15));
+      MediumOffset getDataOffset = at(currentMedium, (long) (currentMediumContent.length() + 15));
       int getDataSize = 10;
 
       testGetData_throwsEndOfMediumException(getDataOffset, getDataSize, currentMediumContent.length(),

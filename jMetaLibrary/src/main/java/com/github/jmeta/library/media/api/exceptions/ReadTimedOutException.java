@@ -9,12 +9,12 @@
 package com.github.jmeta.library.media.api.exceptions;
 
 import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link ReadTimedOutException} is thrown whenever a call to {@link IMediumStore_OLD#buffer(MediumReference, long)} or
- * {@link IMediumStore_OLD#getData(MediumReference, int)} has prematurely timed out.
+ * {@link ReadTimedOutException} is thrown whenever a call to {@link IMediumStore_OLD#buffer(MediumOffset, long)} or
+ * {@link IMediumStore_OLD#getData(MediumOffset, int)} has prematurely timed out.
  */
 public class ReadTimedOutException extends MediumAccessException {
 
@@ -26,7 +26,7 @@ public class ReadTimedOutException extends MediumAccessException {
 
    private final int m_byteCountTriedToRead;
 
-   private final MediumReference m_mediumReference;
+   private final MediumOffset m_mediumReference;
 
    /**
     * Creates a new {@link ReadTimedOutException}.
@@ -37,7 +37,7 @@ public class ReadTimedOutException extends MediumAccessException {
     * @param bytesRead
     *           The number of bytes read before the exception was thrown.
     * @param mediumReference
-    *           The start {@link MediumReference} of the read attempt.
+    *           The start {@link MediumOffset} of the read attempt.
     * @param byteCountTriedToRead
     *           The number of bytes initially tried to read.
     * 
@@ -46,7 +46,7 @@ public class ReadTimedOutException extends MediumAccessException {
     * @pre timeoutMillis >= 0
     */
    public ReadTimedOutException(int timeoutMillis, int bytesRead,
-      MediumReference mediumReference, int byteCountTriedToRead) {
+      MediumOffset mediumReference, int byteCountTriedToRead) {
 
       super("Read timed out", null);
 
@@ -83,11 +83,11 @@ public class ReadTimedOutException extends MediumAccessException {
    }
 
    /**
-    * Returns the {@link MediumReference} that was the starting point for the causing read attempt.
+    * Returns the {@link MediumOffset} that was the starting point for the causing read attempt.
     * 
-    * @return the {@link MediumReference} that was the starting point for the causing read attempt.
+    * @return the {@link MediumOffset} that was the starting point for the causing read attempt.
     */
-   public MediumReference getMediumReference() {
+   public MediumOffset getMediumReference() {
 
       return m_mediumReference;
    }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
@@ -34,13 +34,13 @@ public class MediumActionEqualityTest extends AbstractEqualsTest<MediumAction> {
       List<MediumAction> objects = new ArrayList<>();
 
       objects.add(new MediumAction(MediumActionType.INSERT,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES));
-      objects.add(new MediumAction(MediumActionType.WRITE, new MediumRegion(new StandardMediumReference(MEDIUM, 22), 4),
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES));
+      objects.add(new MediumAction(MediumActionType.WRITE, new MediumRegion(new StandardMediumOffset(MEDIUM, 22), 4),
          122, null));
       objects.add(new MediumAction(MediumActionType.INSERT,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), DEFAULT_BYTES.remaining()), 12, DEFAULT_BYTES));
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), DEFAULT_BYTES.remaining()), 12, DEFAULT_BYTES));
       objects.add(new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), 9), 22, DEFAULT_BYTES));
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 9), 22, DEFAULT_BYTES));
 
       return objects;
    }
@@ -64,16 +64,16 @@ public class MediumActionEqualityTest extends AbstractEqualsTest<MediumAction> {
 
       // Different in MediumRegion
       objects.add(new MediumAction(MediumActionType.INSERT,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 2), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES));
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 2), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES));
       // Different in action type
-      objects.add(new MediumAction(MediumActionType.READ, new MediumRegion(new StandardMediumReference(MEDIUM, 22), 20),
+      objects.add(new MediumAction(MediumActionType.READ, new MediumRegion(new StandardMediumOffset(MEDIUM, 22), 20),
          122, null));
       // Different in sequence number
       objects.add(new MediumAction(MediumActionType.INSERT,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), DEFAULT_BYTES.remaining()), 22, DEFAULT_BYTES));
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), DEFAULT_BYTES.remaining()), 22, DEFAULT_BYTES));
       // Different replacement byte count
       objects.add(new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), 11), 22, DEFAULT_BYTES));
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 11), 22, DEFAULT_BYTES));
 
       return objects;
    }

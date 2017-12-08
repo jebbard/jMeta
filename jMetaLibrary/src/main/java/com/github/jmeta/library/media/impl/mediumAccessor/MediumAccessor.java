@@ -15,7 +15,7 @@ import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
@@ -23,16 +23,16 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  * distinguish two types of media for which the behavior differs correspondingly:
  * <ul>
  * <li><b>Random-access media:</b> Allow random-access to all bytes of the medium. You can use
- * {@link #setCurrentPosition(MediumReference)} to jump to a specific {@link MediumReference} on the medium and then
- * call {@link #read(ByteBuffer)}, {@link #write(ByteBuffer)}, {@link #truncate(MediumReference)} or
- * {@link #isAtEndOfMedium(MediumReference)}.</li>
+ * {@link #setCurrentPosition(MediumOffset)} to jump to a specific {@link MediumOffset} on the medium and then
+ * call {@link #read(ByteBuffer)}, {@link #write(ByteBuffer)}, {@link #truncate(MediumOffset)} or
+ * {@link #isAtEndOfMedium(MediumOffset)}.</li>
  * <li><b>Stream-based media:</b> Doe not allow random-access but only sequential reading of medium bytes.
- * {@link #setCurrentPosition(MediumReference)} does not have an effect, only {@link #read(ByteBuffer)} advances the
+ * {@link #setCurrentPosition(MediumOffset)} does not have an effect, only {@link #read(ByteBuffer)} advances the
  * current position.</li>
  * </ul>
  * 
  * In addition, an {@link Medium} might be read-only, such that the methods {@link #write(ByteBuffer)} and
- * {@link #truncate(MediumReference)} cannot be used on these media and will throwing a runtime exception.
+ * {@link #truncate(MediumOffset)} cannot be used on these media and will throwing a runtime exception.
  * 
  * Stream-based media are always also read-only, while random-access media might or might not be read-only.
  *
@@ -77,22 +77,22 @@ public interface MediumAccessor<T extends Medium<?>> {
    public T getMedium();
 
    /**
-    * Returns the current {@link MediumReference} position of this {@link MediumAccessor}. The current position is the
-    * position used for the next calls to {@link #read(ByteBuffer)}, {@link #truncate(MediumReference)} and
-    * {@link #write(ByteBuffer)} as well as for calls to {@link #isAtEndOfMedium(MediumReference)}.
+    * Returns the current {@link MediumOffset} position of this {@link MediumAccessor}. The current position is the
+    * position used for the next calls to {@link #read(ByteBuffer)}, {@link #truncate(MediumOffset)} and
+    * {@link #write(ByteBuffer)} as well as for calls to {@link #isAtEndOfMedium(MediumOffset)}.
     * 
-    * For random-access media, the current position can be changed using {@link #setCurrentPosition(MediumReference)},
+    * For random-access media, the current position can be changed using {@link #setCurrentPosition(MediumOffset)},
     * {@link #write(ByteBuffer)} (changes by the number of written bytes) and {@link #read(ByteBuffer)} (changes by the
     * number of read bytes).
     * 
-    * For non-random-access media, calls to {@link #setCurrentPosition(MediumReference)} do not have any effect. Only
+    * For non-random-access media, calls to {@link #setCurrentPosition(MediumOffset)} do not have any effect. Only
     * calls to {@link #read(ByteBuffer)} will change the current position for these media types.
     * 
     * After opening an {@link MediumAccessor}, the current position always points to medium offset 0.
     * 
-    * @return The current {@link MediumReference} position of this {@link MediumAccessor}
+    * @return The current {@link MediumOffset} position of this {@link MediumAccessor}
     */
-   public MediumReference getCurrentPosition();
+   public MediumOffset getCurrentPosition();
 
    /**
     * Sets the current position of this {@link MediumAccessor}. Only has an effect for random-access media. See
@@ -100,10 +100,10 @@ public interface MediumAccessor<T extends Medium<?>> {
     * e.g. to write new bytes at the indicated position.
     * 
     * @param position
-    *           The new {@link MediumReference} position to set. May be behind the current medium length. Must refer to
+    *           The new {@link MediumOffset} position to set. May be behind the current medium length. Must refer to
     *           the same {@link Medium} as this {@link MediumAccessor}.
     */
-   public void setCurrentPosition(MediumReference position);
+   public void setCurrentPosition(MediumOffset position);
 
    /**
     * Returns whether the current position as returned by {@link #getCurrentPosition()} is at end of the {@link Medium}

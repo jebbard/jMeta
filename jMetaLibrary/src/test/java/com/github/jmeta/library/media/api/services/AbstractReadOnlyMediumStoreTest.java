@@ -25,12 +25,12 @@ import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
-import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
+import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
@@ -171,7 +171,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
       mediumStoreUnderTest.open();
 
       int offset = 10;
-      MediumReference actualReference = mediumStoreUnderTest.createMediumReference(offset);
+      MediumOffset actualReference = mediumStoreUnderTest.createMediumReference(offset);
 
       Assert.assertEquals(at(currentMedium, offset), actualReference);
    }
@@ -199,7 +199,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#replaceData(MediumReference, int, java.nio.ByteBuffer)}.
+    * Tests {@link MediumStore#replaceData(MediumOffset, int, java.nio.ByteBuffer)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void replaceData_onReadOnlyMedium_throwsException() {
@@ -211,7 +211,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#removeData(MediumReference, int)}.
+    * Tests {@link MediumStore#removeData(MediumOffset, int)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void removeData_onReadOnlyMedium_throwsException() {
@@ -223,7 +223,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#insertData(MediumReference, ByteBuffer)}.
+    * Tests {@link MediumStore#insertData(MediumOffset, ByteBuffer)}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void insertData_onReadOnlyMedium_throwsException() {
@@ -286,7 +286,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
     * @return a {@link MediumStore} to test based on a given {@link Medium}.
     */
    protected MediumStore createMediumStoreToTest(T mediumToUse) {
-      MediumReferenceFactory mediumReferenceFactory = new MediumReferenceFactory(mediumToUse);
+      MediumOffsetFactory mediumReferenceFactory = new MediumOffsetFactory(mediumToUse);
       return new StandardMediumStore<>(createMediumAccessor(mediumToUse), new MediumCache(mediumToUse),
          mediumReferenceFactory, new MediumChangeManager(mediumReferenceFactory));
    }

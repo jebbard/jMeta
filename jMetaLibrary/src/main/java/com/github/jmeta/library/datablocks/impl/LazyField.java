@@ -21,7 +21,7 @@ import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -49,7 +49,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
     * @param byteOrder
     * @param characterEncoding
     */
-   public LazyField(DataBlockDescription fieldDesc, MediumReference reference,
+   public LazyField(DataBlockDescription fieldDesc, MediumOffset reference,
       DataBlock parent, long totalSize, ExtendedDataBlockFactory factory,
       DataBlockReader dataBlockReader, ByteOrder byteOrder,
       Charset characterEncoding) {
@@ -118,7 +118,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
 
          byte[][] binaryData = new byte[fragmentCount][];
 
-         MediumReference mediumReference = getMediumReference();
+         MediumOffset mediumReference = getMediumReference();
 
          int fragmentIndex = 0;
 

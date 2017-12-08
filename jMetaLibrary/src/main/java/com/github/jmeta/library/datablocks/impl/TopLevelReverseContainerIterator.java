@@ -28,7 +28,7 @@ import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO primeRefactor008: Review, refactor and document TopLevelReverseContainerIterator
@@ -134,7 +134,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
       return new ArrayList<>(allFormats);
    }
 
-   private DataFormat identifyDataFormat(MediumReference reference) {
+   private DataFormat identifyDataFormat(MediumOffset reference) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(m_precedenceList, "setDataFormatHints() must have been called before");
@@ -162,7 +162,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
 
                   if (offsetForBackwardReading != MagicKey.NO_BACKWARD_READING
                      && reference.getAbsoluteMediumOffset() + offsetForBackwardReading >= 0) {
-                     MediumReference footerStartReference = reference.advance(offsetForBackwardReading);
+                     MediumOffset footerStartReference = reference.advance(offsetForBackwardReading);
                      try {
                         dataBlockReader.cache(footerStartReference, -offsetForBackwardReading);
                      }
@@ -212,13 +212,13 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
       }
    }
 
-   private MediumReference m_currentReference;
+   private MediumOffset m_currentReference;
 
    private final MediaAPI m_mediumFactory;
 
    private final List<DataFormat> m_precedenceList = new ArrayList<>();
 
-   private MediumReference m_previousFooterStartReference;
+   private MediumOffset m_previousFooterStartReference;
 
    private MagicKey m_theMagicKey;
 

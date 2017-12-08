@@ -37,12 +37,12 @@ import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
-import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
+import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
@@ -75,8 +75,8 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * containing only human-readable standard ASCII characters, and must be UTF-8 encoded. This guarantees that 1 bytes = 1
  * character. Furthermore, all bytes inserted must also be standard human-readable ASCII characters with this property.
  * 
- * There are specific naming conventions for testing {@link MediumStore#getData(MediumReference, int)} and
- * {@link MediumStore#cache(MediumReference, int)}: [method name]_[medium type]_[parameter values, esp. offset
+ * There are specific naming conventions for testing {@link MediumStore#getData(MediumOffset, int)} and
+ * {@link MediumStore#cache(MediumOffset, int)}: [method name]_[medium type]_[parameter values, esp. offset
  * range]_[expected behaviour].
  *
  * @param <T>
@@ -121,7 +121,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
    protected MediumCache mediumCacheSpy;
 
-   protected MediumReferenceFactory mediumReferenceFactorySpy;
+   protected MediumOffsetFactory mediumReferenceFactorySpy;
 
    protected MediumChangeManager mediumChangeManagerSpy;
 
@@ -144,7 +144,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void isAtEndOfMedium_forClosedMedium_throwsException() {
@@ -154,7 +154,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void isAtEndOfMedium_forReferencePointingToWrongMedium_throwsException() {
@@ -166,7 +166,38 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
+    * Tests {@link MediumStore#createMediumReference(long)}.
+    */
+   @Test
+   public void isAtEndOfMedium_forReferencePreviouslyAtEOM_stillReturnsTrueAfterFlushingChanges() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String insertedString1 = "SecondString";
+      int insertOffset = 10;
+      int removeOffset1 = 100;
+      int removeSize1 = 200;
+
+      String mediumContentBefore = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      MediumOffset referenceAtEndOfMedium = mediumStoreUnderTest
+         .createMediumReference(mediumContentBefore.length());
+
+      scheduleAndFlush(new MediumAction[] { createInsertAction(at(currentMedium, insertOffset), insertedString1),
+         createRemoveAction(at(currentMedium, removeOffset1), removeSize1), });
+
+      mediumStoreUnderTest.close();
+
+      String mediumContentAfter = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(at(currentMedium, mediumContentAfter.length()), referenceAtEndOfMedium);
+   }
+
+   /**
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void getCachedByteCountAt_forClosedMedium_throwsException() {
@@ -176,7 +207,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void getCachedByteCountAt_forReferencePointingToWrongMedium_throwsException() {
@@ -188,7 +219,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void cache_forClosedMedium_anyRange_throwsException() {
@@ -198,7 +229,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void cache_forReferencePointingToWrongMedium_anyRange_throwsException() {
@@ -207,6 +238,70 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       mediumStoreUnderTest.open();
 
       cacheNoEOMExpected(at(MediaTestUtility.OTHER_MEDIUM, 10), 10);
+   }
+
+   /**
+    * Tests {@link MediumStore#createMediumReference(long)}.
+    */
+   @Test
+   public void createMediumReference_forFilledMedium_offsetBeforePendingChanges_referencesRemainUnchanged() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String insertedString = "ABCDEF";
+      int insertOffset = 10;
+      int removeOffset = 100;
+      int removeSize = 200;
+
+      mediumStoreUnderTest.open();
+
+      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(0);
+      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(5);
+      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(insertOffset - 1);
+
+      mediumStoreUnderTest.insertData(at(currentMedium, insertOffset),
+         ByteBuffer.wrap(insertedString.getBytes(Charsets.CHARSET_ASCII)));
+
+      MediumAction actionToUndo = mediumStoreUnderTest.removeData(at(currentMedium, removeOffset), removeSize);
+
+      mediumStoreUnderTest.undo(actionToUndo);
+
+      Assert.assertEquals(at(currentMedium, 0), firstReferenceBeforeChanges);
+      Assert.assertEquals(at(currentMedium, 5), secondReferenceBeforeChanges);
+      Assert.assertEquals(at(currentMedium, insertOffset - 1), thirdReferenceBeforeChanges);
+   }
+
+   /**
+    * Tests {@link MediumStore#createMediumReference(long)}.
+    */
+   @Test
+   public void createMediumReference_forFilledMedium_offsetBehindPendingChanges_referencesRemainUnchanged() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String insertedString = "ABCDEF";
+      int insertOffset = 10;
+      int removeOffset = 100;
+      int removeSize = 200;
+
+      mediumStoreUnderTest.open();
+
+      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(100);
+      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(55);
+      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(insertOffset + 20);
+
+      mediumStoreUnderTest.insertData(at(currentMedium, insertOffset),
+         ByteBuffer.wrap(insertedString.getBytes(Charsets.CHARSET_ASCII)));
+
+      MediumAction actionToUndo = mediumStoreUnderTest.removeData(at(currentMedium, removeOffset), removeSize);
+
+      mediumStoreUnderTest.undo(actionToUndo);
+
+      Assert.assertEquals(at(currentMedium, 100), firstReferenceBeforeChanges);
+      Assert.assertEquals(at(currentMedium, 55), secondReferenceBeforeChanges);
+      Assert.assertEquals(at(currentMedium, insertOffset + 20), thirdReferenceBeforeChanges);
    }
 
    /**
@@ -225,16 +320,16 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      MediumReference firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(0);
-      MediumReference secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(5);
-      MediumReference thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(insertOffset);
+      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(0);
+      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(5);
+      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(insertOffset - 1);
 
       scheduleAndFlush(createInsertAction(at(currentMedium, insertOffset), insertedString),
          createRemoveAction(at(currentMedium, removeOffset), removeSize));
 
       Assert.assertEquals(at(currentMedium, 0), firstReferenceBeforeChanges);
       Assert.assertEquals(at(currentMedium, 5), secondReferenceBeforeChanges);
-      Assert.assertEquals(at(currentMedium, insertOffset), thirdReferenceBeforeChanges);
+      Assert.assertEquals(at(currentMedium, insertOffset - 1), thirdReferenceBeforeChanges);
    }
 
    /**
@@ -246,47 +341,77 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
 
-      // TODO finish test case
-      // String insertedString1 = "SecondString";
-      // String insertedString2 = "ABCDEF";
-      // int insertOffset = 10;
-      // int removeOffset1 = 100;
-      // int removeSize1 = 200;
-      // int removeOffset2 = 70;
-      // int removeSize2 = 13;
-      // int replaceOffset1 = removeOffset1 + removeSize1;
-      // int replaceSize1 = 18;
-      // String replacementString1 = "REPL #1";
-      // int replaceOffset2 = 1000;
-      // int replaceSize2 = 10;
-      // String replacementString2 = "1234567890";
-      //
-      // mediumStoreUnderTest.open();
-      //
-      // MediumReference firstReferenceBehindTwoInserts = mediumStoreUnderTest.createMediumReference(insertOffset + 1);
-      // MediumReference secondReferenceBehindFirstRemoveOffset = mediumStoreUnderTest
-      // .createMediumReference(removeOffset2 + 1);
-      // MediumReference thirdReference = mediumStoreUnderTest.createMediumReference(insertOffset);
-      //
-      // scheduleAndFlush(new MediumAction[] { createInsertAction(at(currentMedium, insertOffset), insertedString1),
-      // createRemoveAction(at(currentMedium, removeOffset1), removeSize1),
-      // createReplaceAction(at(currentMedium, replaceOffset2), replaceSize2, replacementString2),
-      // createInsertAction(at(currentMedium, insertOffset), insertedString2),
-      // createRemoveAction(at(currentMedium, removeOffset2), removeSize2),
-      // createReplaceAction(at(currentMedium, replaceOffset1), replaceSize1, replacementString1), });
-      //
-      // int behindFirstOffsetShift = insertedString1.length() + insertedString2.length();
-      // int behindSecondOffsetShift = behindFirstOffsetShift - removeSize2;
-      //
-      // Assert.assertEquals(at(currentMedium, insertOffset + 1 + behindFirstOffsetShift),
-      // firstReferenceBehindTwoInserts);
-      // Assert.assertEquals(at(currentMedium, removeOffset2 + 1 + behindSecondOffsetShift),
-      // secondReferenceBehindFirstRemoveOffset);
-      // Assert.assertEquals(at(currentMedium, insertOffset), thirdReference);
+      String insertedString1 = "SecondString";
+      String insertedString2 = "ABCDEF";
+      int insertOffset = 10;
+      int removeOffset1 = 100;
+      int removeSize1 = 200;
+      int removeOffset2 = 70;
+      int removeSize2 = 13;
+      int replaceOffset1 = removeOffset1 + removeSize1;
+      int replaceSize1 = 18;
+      String replacementString1 = "REPL #1";
+      int replaceOffset2 = 1000;
+      int replaceSize2 = 10;
+      String replacementString2 = "1234567890";
+
+      String mediumContentBefore = getMediumContentAsString(currentMedium);
+
+      mediumStoreUnderTest.open();
+
+      MediumOffset firstReferenceBehindTwoInserts = mediumStoreUnderTest.createMediumReference(insertOffset);
+      MediumOffset secondReferenceBehindTwoInserts = mediumStoreUnderTest.createMediumReference(insertOffset + 1);
+      MediumOffset thirdReferenceBehindFirstRemoveOffset = mediumStoreUnderTest
+         .createMediumReference(removeOffset2 + 1);
+      MediumOffset fourthReferenceBehindSecondRemove = mediumStoreUnderTest
+         .createMediumReference(removeOffset1 + removeSize1 + 10);
+      MediumOffset fifthReferenceWithinFirstReplace = mediumStoreUnderTest.createMediumReference(replaceOffset1 + 5);
+      MediumOffset sixthReferenceAtEndOfMedium = mediumStoreUnderTest
+         .createMediumReference(mediumContentBefore.length());
+      MediumOffset seventhReferenceBeforeLastReplace = mediumStoreUnderTest
+         .createMediumReference(replaceOffset2 - 2);
+      MediumOffset eigthReferenceAtLastReplace = mediumStoreUnderTest.createMediumReference(replaceOffset2);
+      MediumOffset ninthReferenceBehindLastReplace = mediumStoreUnderTest
+         .createMediumReference(replaceOffset2 + replacementString2.length());
+
+      scheduleAndFlush(new MediumAction[] { createInsertAction(at(currentMedium, insertOffset), insertedString1),
+         createRemoveAction(at(currentMedium, removeOffset1), removeSize1),
+         createReplaceAction(at(currentMedium, replaceOffset2), replaceSize2, replacementString2),
+         createInsertAction(at(currentMedium, insertOffset), insertedString2),
+         createRemoveAction(at(currentMedium, removeOffset2), removeSize2),
+         createReplaceAction(at(currentMedium, replaceOffset1), replaceSize1, replacementString1),
+
+      });
+
+      mediumStoreUnderTest.close();
+
+      String mediumContentAfter = getMediumContentAsString(currentMedium);
+
+      int behindFirstOffsetShift = insertedString1.length() + insertedString2.length();
+      int behindFourthOffsetShift = behindFirstOffsetShift - removeSize2 - removeSize1;
+      int behindSeventhOffsetShift = behindFourthOffsetShift - replaceSize1 + replacementString1.length();
+      int behindEigthOffsetShift = behindFourthOffsetShift - replaceSize1 + replacementString1.length() - replaceSize2
+         + replacementString2.length();
+
+      Assert.assertEquals(at(currentMedium, insertOffset + behindFirstOffsetShift), firstReferenceBehindTwoInserts);
+      Assert.assertEquals(at(currentMedium, insertOffset + 1 + behindFirstOffsetShift),
+         secondReferenceBehindTwoInserts);
+      Assert.assertEquals(at(currentMedium, removeOffset2 + behindFirstOffsetShift),
+         thirdReferenceBehindFirstRemoveOffset);
+      Assert.assertEquals(at(currentMedium, removeOffset1 + removeSize1 + 10 + behindFourthOffsetShift),
+         fourthReferenceBehindSecondRemove);
+      Assert.assertEquals(at(currentMedium, replaceOffset1 + 5 + behindFourthOffsetShift),
+         fifthReferenceWithinFirstReplace);
+      Assert.assertEquals(at(currentMedium, mediumContentAfter.length()), sixthReferenceAtEndOfMedium);
+      Assert.assertEquals(at(currentMedium, replaceOffset2 - 2 + behindSeventhOffsetShift),
+         seventhReferenceBeforeLastReplace);
+      Assert.assertEquals(at(currentMedium, replaceOffset2 + behindSeventhOffsetShift), eigthReferenceAtLastReplace);
+      Assert.assertEquals(at(currentMedium, replaceOffset2 + replacementString2.length() + behindEigthOffsetShift),
+         ninthReferenceBehindLastReplace);
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMedium_noCacheBefore_returnsExpectedData() {
@@ -303,7 +428,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMedium_partlyCacheBeforeWithGaps_returnsExpectedData() {
@@ -324,7 +449,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMedium_fullMediumCacheBefore_returnsExpectedData() {
@@ -343,7 +468,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMedium_withPendingChanges_stillReturnsOldData() {
@@ -369,7 +494,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forEmptyMedium_fromStart_throwsEOMException() {
@@ -384,7 +509,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMedium_fromMiddleToBeyondEOMAndNoCacheBefore_throwsEOMException() {
@@ -399,7 +524,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void getData_forClosedMedium_anyRange_throwsException() {
@@ -409,7 +534,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void getData_forReferencePointingToWrongMedium_anyRange_throwsException() {
@@ -421,7 +546,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#replaceData(MediumReference, int, java.nio.ByteBuffer)}.
+    * Tests {@link MediumStore#replaceData(MediumOffset, int, java.nio.ByteBuffer)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void replaceData_forClosedMedium_throwsException() {
@@ -431,7 +556,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void replaceData_forReferencePointingToWrongMedium_throwsException() {
@@ -443,7 +568,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#removeData(MediumReference, int)}.
+    * Tests {@link MediumStore#removeData(MediumOffset, int)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void removeData_forClosedMedium_throwsException() {
@@ -453,7 +578,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#removeData(MediumReference, int)}.
+    * Tests {@link MediumStore#removeData(MediumOffset, int)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void removeData_forReferencePointingToWrongMedium_throwsException() {
@@ -465,7 +590,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#insertData(MediumReference, ByteBuffer)}.
+    * Tests {@link MediumStore#insertData(MediumOffset, ByteBuffer)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void insertData_forClosedMedium_throwsException() {
@@ -475,7 +600,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#insertData(MediumReference, ByteBuffer)}.
+    * Tests {@link MediumStore#insertData(MediumOffset, ByteBuffer)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void insertData_forReferencePointingToWrongMedium_throwsException() {
@@ -1216,7 +1341,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumCacheSpy = Mockito
          .spy(new MediumCache(mediumToUse, mediumToUse.getMaxCacheSizeInBytes(), maxCacheRegionSize));
-      mediumReferenceFactorySpy = Mockito.spy(new MediumReferenceFactory(mediumToUse));
+      mediumReferenceFactorySpy = Mockito.spy(new MediumOffsetFactory(mediumToUse));
       mediumChangeManagerSpy = Mockito.spy(new MediumChangeManager(mediumReferenceFactorySpy));
 
       return new StandardMediumStore<>(mediumAccessorSpy, mediumCacheSpy, mediumReferenceFactorySpy,
@@ -1246,7 +1371,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected abstract MediumStore createDefaultFilledMediumStore();
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)} by comparing its result with the expected medium content.
+    * Tests {@link MediumStore#getData(MediumOffset, int)} by comparing its result with the expected medium content.
     * 
     * @param getDataOffset
     *           The offset to use for the method call
@@ -1255,7 +1380,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param currentMediumContent
     *           The current medium content used to get the expected data
     */
-   protected void testGetData_returnsExpectedData(MediumReference getDataOffset, int getDataSize,
+   protected void testGetData_returnsExpectedData(MediumOffset getDataOffset, int getDataSize,
       String currentMediumContent) {
       Reject.ifNull(currentMediumContent, "currentMediumContent");
       Reject.ifNull(getDataOffset, "getDataOffset");
@@ -1277,7 +1402,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param currentMediumContent
     *           The current content of the {@link Medium}
     */
-   protected void assertByteBufferMatchesMediumRange(ByteBuffer returnedData, MediumReference rangeStartOffset,
+   protected void assertByteBufferMatchesMediumRange(ByteBuffer returnedData, MediumOffset rangeStartOffset,
       int rangeSize, String currentMediumContent) {
 
       Reject.ifNull(currentMediumContent, "currentMediumContent");
@@ -1297,7 +1422,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)} to throw an end of medium exception when reaching it.
+    * Tests {@link MediumStore#getData(MediumOffset, int)} to throw an end of medium exception when reaching it.
     * 
     * @param getDataSize
     *           The size to use for the method call
@@ -1308,7 +1433,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param getDataStartOffset
     *           The offset to use for the method call
     */
-   protected void testGetData_throwsEndOfMediumException(MediumReference getDataOffset, int getDataSize,
+   protected void testGetData_throwsEndOfMediumException(MediumOffset getDataOffset, int getDataSize,
       int chunkSizeToUse, String currentMediumContent) {
 
       Reject.ifNull(currentMediumContent, "currentMediumContent");
@@ -1320,7 +1445,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       } catch (EndOfMediumException e) {
          long getDataStartOffset = getDataOffset.getAbsoluteMediumOffset();
 
-         MediumReference expectedReadOffset = at(currentMedium, getDataStartOffset
+         MediumOffset expectedReadOffset = at(currentMedium, getDataStartOffset
             + chunkSizeToUse * (int) ((currentMediumContent.length() - getDataStartOffset) / chunkSizeToUse));
 
          long expectedByteCountActuallyRead = (currentMediumContent.length() - getDataStartOffset) % chunkSizeToUse;
@@ -1339,14 +1464,14 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Calls {@link MediumStore#getData(MediumReference, int)} and expects no end of medium.
+    * Calls {@link MediumStore#getData(MediumOffset, int)} and expects no end of medium.
     * 
     * @param offset
     *           The offset to use
     * @param byteCount
     *           The number of bytes to cache
     */
-   protected ByteBuffer getDataNoEOMExpected(MediumReference offset, int byteCount) {
+   protected ByteBuffer getDataNoEOMExpected(MediumOffset offset, int byteCount) {
       try {
          return mediumStoreUnderTest.getData(offset, byteCount);
       } catch (EndOfMediumException e) {
@@ -1355,14 +1480,14 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Calls {@link MediumStore#cache(MediumReference, int)} and expects no end of medium.
+    * Calls {@link MediumStore#cache(MediumOffset, int)} and expects no end of medium.
     * 
     * @param offset
     *           The offset to use
     * @param byteCount
     *           The number of bytes to cache
     */
-   protected void cacheNoEOMExpected(MediumReference offset, int byteCount) {
+   protected void cacheNoEOMExpected(MediumOffset offset, int byteCount) {
       try {
          mediumStoreUnderTest.cache(offset, byteCount);
       } catch (EndOfMediumException e) {
@@ -1405,7 +1530,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)} for throwing an {@link EndOfMediumException} as expected.
+    * Tests {@link MediumStore#cache(MediumOffset, int)} for throwing an {@link EndOfMediumException} as expected.
     * 
     * @param cacheOffset
     *           The offset to start caching
@@ -1414,7 +1539,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @param currentMediumContent
     *           The current content of the medium
     */
-   protected void testCache_throwsEndOfMediumException(MediumReference cacheOffset, int cacheSize,
+   protected void testCache_throwsEndOfMediumException(MediumOffset cacheOffset, int cacheSize,
       String currentMediumContent) {
 
       Reject.ifNull(currentMediumContent, "currentMediumContent");
@@ -1479,7 +1604,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     *           The text to insert
     * @return The corresponding insert {@link MediumAction}
     */
-   protected static MediumAction createInsertAction(MediumReference offset, String insertText) {
+   protected static MediumAction createInsertAction(MediumOffset offset, String insertText) {
       return new MediumAction(MediumActionType.INSERT, new MediumRegion(offset, insertText.length()), 0,
          ByteBuffer.wrap(insertText.getBytes(Charsets.CHARSET_UTF8)));
    }
@@ -1493,7 +1618,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     *           The number of bytes to remove
     * @return The corresponding remove {@link MediumAction}
     */
-   protected static MediumAction createRemoveAction(MediumReference offset, int removedByteCount) {
+   protected static MediumAction createRemoveAction(MediumOffset offset, int removedByteCount) {
       return new MediumAction(MediumActionType.REMOVE, new MediumRegion(offset, removedByteCount), 0, null);
    }
 
@@ -1508,7 +1633,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     *           The replacement text
     * @return The corresponding replace {@link MediumAction}
     */
-   protected static MediumAction createReplaceAction(MediumReference offset, int replacedByteCount,
+   protected static MediumAction createReplaceAction(MediumOffset offset, int replacedByteCount,
       String replacementText) {
       return new MediumAction(MediumActionType.REPLACE, new MediumRegion(offset, replacedByteCount), 0,
          ByteBuffer.wrap(replacementText.getBytes(Charsets.CHARSET_UTF8)));
@@ -1542,12 +1667,12 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       List<MediumAction> scheduledActions = new ArrayList<>();
 
-      MediumReference previousReference = null;
+      MediumOffset previousReference = null;
 
       for (int i = 0; i < actionsInOffsetAndExecutionOrder.length; i++) {
          MediumAction currentAction = actionsInOffsetAndExecutionOrder[i];
 
-         MediumReference startReference = currentAction.getRegion().getStartReference();
+         MediumOffset startReference = currentAction.getRegion().getStartOffset();
          int startReferenceAsInt = (int) startReference.getAbsoluteMediumOffset();
 
          if (previousReference != null) {
@@ -1669,7 +1794,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       for (int i = 0; i < actionsInExecutionOrder.length; i++) {
          MediumAction currentAction = actionsInExecutionOrder[i];
 
-         MediumReference startReference = currentAction.getRegion().getStartReference();
+         MediumOffset startReference = currentAction.getRegion().getStartOffset();
 
          ByteBuffer actionBytes = currentAction.getActionBytes();
 

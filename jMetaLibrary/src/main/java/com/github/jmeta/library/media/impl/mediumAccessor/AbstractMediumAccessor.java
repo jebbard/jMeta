@@ -16,8 +16,8 @@ import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -32,7 +32,7 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 
    private boolean isOpened;
 
-   private MediumReference currentPosition;
+   private MediumOffset currentPosition;
 
    /**
     * Creates a new {@link AbstractMediumAccessor}.
@@ -46,7 +46,7 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 
       this.isOpened = false;
       this.medium = medium;
-      updateCurrentPosition(new StandardMediumReference(getMedium(), 0));
+      updateCurrentPosition(new StandardMediumOffset(getMedium(), 0));
    }
 
    /**
@@ -103,15 +103,15 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
     * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#getCurrentPosition()
     */
    @Override
-   public MediumReference getCurrentPosition() {
+   public MediumOffset getCurrentPosition() {
       return currentPosition;
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#setCurrentPosition(com.github.jmeta.library.media.api.types.MediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#setCurrentPosition(com.github.jmeta.library.media.api.types.MediumOffset)
     */
    @Override
-   public void setCurrentPosition(MediumReference position) {
+   public void setCurrentPosition(MediumOffset position) {
       Reject.ifNull(position, "position");
       Reject.ifFalse(position.getMedium().equals(getMedium()), "reference.getMedium().equals(getMedium())");
       Reject.ifFalse(isOpened(), "isOpened()");
@@ -178,7 +178,7 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#truncate(com.github.jmeta.library.media.api.types.MediumReference)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#truncate(com.github.jmeta.library.media.api.types.MediumOffset)
     */
    @Override
    public void truncate() {
@@ -197,9 +197,9 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
     * Updates the position returned by {@link #getCurrentPosition()}.
     * 
     * @param position
-    *           The new {@link MediumReference} position
+    *           The new {@link MediumOffset} position
     */
-   protected void updateCurrentPosition(MediumReference position) {
+   protected void updateCurrentPosition(MediumOffset position) {
 
       currentPosition = position;
    }
@@ -249,14 +249,14 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
    protected abstract void mediumSpecificTruncate() throws IOException;
 
    /**
-    * Concrete core implementation of {@link #setCurrentPosition(MediumReference)}
+    * Concrete core implementation of {@link #setCurrentPosition(MediumOffset)}
     * 
     * @param position
-    *           The new {@link MediumReference} position to set
+    *           The new {@link MediumOffset} position to set
     * @throws IOException
     *            in case of anything goes wrong in the concrete implementation
     */
-   protected abstract void mediumSpecificSetCurrentPosition(MediumReference position) throws IOException;
+   protected abstract void mediumSpecificSetCurrentPosition(MediumOffset position) throws IOException;
 
    /**
     * Checks if the underlying {@link Medium} is read-only, and if so, it throws a {@link ReadOnlyMediumException}.

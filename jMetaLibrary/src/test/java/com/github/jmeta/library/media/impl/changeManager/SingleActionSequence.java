@@ -30,7 +30,7 @@ public class SingleActionSequence extends ExpectedActionSequence {
     *           the single {@link MediumAction} expected in the sequence.
     */
    public SingleActionSequence(MediumAction expectedAction) {
-      super(expectedAction.getRegion().getStartReference(), 1, expectedAction.getRegion().getSize());
+      super(expectedAction.getRegion().getStartOffset(), 1, expectedAction.getRegion().getSize());
 
       this.expectedAction = expectedAction;
    }

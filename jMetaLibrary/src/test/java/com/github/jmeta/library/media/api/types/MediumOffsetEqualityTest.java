@@ -1,6 +1,6 @@
 /**
  *
- * {@link StandardMediumReferenceTest}.java
+ * {@link StandardMediumOffsetTest}.java
  *
  * @author Jens Ebert
  *
@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
- * {@link MediumReferenceEqualityTest} tests the {@link StandardMediumReference} class (and its interface
- * {@link MediumReference} for its implementation of {@link #equals(Object)} and {@link #hashCode()}.
+ * {@link MediumOffsetEqualityTest} tests the {@link StandardMediumOffset} class (and its interface
+ * {@link MediumOffset} for its implementation of {@link #equals(Object)} and {@link #hashCode()}.
  */
-public class MediumReferenceEqualityTest extends AbstractEqualsTest<MediumReference> {
+public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
 
    private static final byte[] BYTES = new byte[] { 1, 2, 3 };
 
@@ -30,60 +30,60 @@ public class MediumReferenceEqualityTest extends AbstractEqualsTest<MediumRefere
     * @see AbstractEqualsTest#getObjects()
     */
    @Override
-   protected List<MediumReference> getObjects() {
+   protected List<MediumOffset> getObjects() {
 
-      return createMediumReferences(createMedia(), 0);
+      return createMediumOffsets(createMedia(), 0);
    }
 
    /**
     * @see AbstractEqualsTest#getEqualObjects()
     */
    @Override
-   protected List<MediumReference> getEqualObjects() {
+   protected List<MediumOffset> getEqualObjects() {
 
-      return createMediumReferences(createMedia(), 0);
+      return createMediumOffsets(createMedia(), 0);
    }
 
    /**
     * @see AbstractEqualsTest#getDifferentObjects()
     */
    @Override
-   protected List<MediumReference> getDifferentObjects() {
+   protected List<MediumOffset> getDifferentObjects() {
 
-      return createMediumReferences(createDifferentMedia(), 88);
+      return createMediumOffsets(createDifferentMedia(), 88);
    }
 
    /**
     * @see AbstractEqualsTest#getThirdEqualObjects()
     */
    @Override
-   protected List<MediumReference> getThirdEqualObjects() {
+   protected List<MediumOffset> getThirdEqualObjects() {
 
-      return createMediumReferences(createMedia(), 0);
+      return createMediumOffsets(createMedia(), 0);
    }
 
    /**
-    * Creates a {@link List} of {@link MediumReference}s for the given {@link List} of {@link Medium} instances.
+    * Creates a {@link List} of {@link MediumOffset}s for the given {@link List} of {@link Medium} instances.
     * 
     * @param baseOffset
     *           The base offset of the absolute medium offsets.
     * 
-    * @return a {@link List} of {@link MediumReference}s for the given {@link List} of {@link Medium} instances.
+    * @return a {@link List} of {@link MediumOffset}s for the given {@link List} of {@link Medium} instances.
     */
-   private List<MediumReference> createMediumReferences(List<Medium<?>> media, long baseOffset) {
+   private List<MediumOffset> createMediumOffsets(List<Medium<?>> media, long baseOffset) {
 
-      List<MediumReference> mediumReferences = new ArrayList<>();
+      List<MediumOffset> mediumReferences = new ArrayList<>();
 
       // Create the references different due to different media, other properties are the same
       for (int i = 0; i < media.size(); ++i) {
          Medium<?> medium = media.get(i);
 
-         mediumReferences.add(new StandardMediumReference(medium, i * 10));
+         mediumReferences.add(new StandardMediumOffset(medium, i * 10));
       }
 
       // Create some more references with equal medium, using the passed offset
       for (int i = 0; i < 3; ++i) {
-         mediumReferences.add(new StandardMediumReference(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false),
+         mediumReferences.add(new StandardMediumOffset(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false),
             baseOffset + i * 10));
       }
 

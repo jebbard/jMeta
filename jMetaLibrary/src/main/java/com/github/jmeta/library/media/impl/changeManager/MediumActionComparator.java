@@ -13,7 +13,7 @@ import java.util.Comparator;
 
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -24,8 +24,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * 
  * A {@link MediumAction} X is smaller than another {@link MediumAction} Y, if one of the following is true:
  * <ul>
- * <li>The {@link MediumReference} of X is smaller than the {@link MediumReference} of Y, or</li>
- * <li>If the {@link MediumReference} of X is equal to the {@link MediumReference} of Y, we have following cases:</li>
+ * <li>The {@link MediumOffset} of X is smaller than the {@link MediumOffset} of Y, or</li>
+ * <li>If the {@link MediumOffset} of X is equal to the {@link MediumOffset} of Y, we have following cases:</li>
  * <li>Case 1: If the left {@link MediumAction} is an {@link MediumActionType#INSERT} action and the right is not: X is
  * smaller than Y. That is: INSERTs at the same offset as Non-INSERTs are always executed first</li>
  * <li>Case 2: If the left {@link MediumAction} is an {@link MediumActionType#INSERT} action and the right also is: X is
@@ -54,8 +54,8 @@ public class MediumActionComparator implements Comparator<MediumAction> {
    @Override
    public int compare(MediumAction left, MediumAction right) {
 
-      MediumReference leftStartReference = left.getRegion().getStartReference();
-      MediumReference rightStartReference = right.getRegion().getStartReference();
+      MediumOffset leftStartReference = left.getRegion().getStartOffset();
+      MediumOffset rightStartReference = right.getRegion().getStartOffset();
       Reject.ifFalse(leftStartReference.getMedium().equals(rightStartReference.getMedium()),
          "leftStartReference.getMedium().equals(rightStartReference.getMedium())");
 

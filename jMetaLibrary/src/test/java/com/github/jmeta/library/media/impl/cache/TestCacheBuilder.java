@@ -80,7 +80,7 @@ class TestCacheBuilder {
          bytes.get(regionBytes);
 
          TestCacheRegionInfo testCacheRegionInfoToAdd = new TestCacheRegionInfo(
-            region.getStartReference().getAbsoluteMediumOffset(), regionBytes);
+            region.getStartOffset().getAbsoluteMediumOffset(), regionBytes);
          return testCacheRegionInfoToAdd;
       }
 
@@ -220,7 +220,7 @@ class TestCacheBuilder {
    public void appendRegionInfo(MediumRegion region) {
       Reject.ifNull(region, "region");
 
-      appendRegionInfo(new TestCacheRegionInfo(region.getStartReference().getAbsoluteMediumOffset(),
+      appendRegionInfo(new TestCacheRegionInfo(region.getStartOffset().getAbsoluteMediumOffset(),
          regionBytesFromMediumRegion(region)));
    }
 
@@ -500,9 +500,9 @@ class TestCacheBuilder {
          // Ignore the region, it does not survive as it is fully covered by the clip region
       } else if (overlappingByteCount == clipRegion.getSize()) {
          // Need to divide the region info as the clip region is fully enclosed in it
-         int keepBytesAtStart = (int) clipRegion.getStartReference().distanceTo(regionInfoAsRegion.getStartReference());
-         int keepBytesAtEnd = (int) regionInfoAsRegion.calculateEndReference()
-            .distanceTo(clipRegion.calculateEndReference());
+         int keepBytesAtStart = (int) clipRegion.getStartOffset().distanceTo(regionInfoAsRegion.getStartOffset());
+         int keepBytesAtEnd = (int) regionInfoAsRegion.calculateEndOffset()
+            .distanceTo(clipRegion.calculateEndOffset());
 
          TestCacheRegionInfo trimmedRegionInfo = trimRegionInfo(testCacheRegionInfo,
             testCacheRegionInfo.getRegionSize() - keepBytesAtStart, 0);

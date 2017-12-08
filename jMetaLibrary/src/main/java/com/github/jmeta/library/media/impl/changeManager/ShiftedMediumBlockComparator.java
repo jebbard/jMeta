@@ -53,7 +53,7 @@ public class ShiftedMediumBlockComparator implements Comparator<ShiftedMediumBlo
       // Preserve schedule order for INSERT actions with same offset
       if (causingAction1.getActionType() == MediumActionType.INSERT
          && causingAction2.getActionType() == MediumActionType.INSERT
-         && causingAction1.getRegion().getStartReference().equals(causingAction2.getRegion().getStartReference())) {
+         && causingAction1.getRegion().getStartOffset().equals(causingAction2.getRegion().getStartOffset())) {
 
          // Important note: INSERTs at the same offset must be sorted DESCENDING by sequence number to ensure
          // the last insert (with the biggest sequence number) is first in the resulting flush plan.
@@ -69,9 +69,9 @@ public class ShiftedMediumBlockComparator implements Comparator<ShiftedMediumBlo
       // empty (i.e.
       // INSERTs with a direct follow-up action at the same offset). If there is no such "overlap", the left block is
       // processed first if its start reference is before the one of the right block
-      if (right.getTargetRegion().contains(left.getSourceRegion().getStartReference())
-         || right.getTargetRegion().contains(left.getSourceRegion().calculateEndReference())
-         || right.getTargetRegion().getStartReference().behindOrEqual(left.getSourceRegion().getStartReference())) {
+      if (right.getTargetRegion().contains(left.getSourceRegion().getStartOffset())
+         || right.getTargetRegion().contains(left.getSourceRegion().calculateEndOffset())
+         || right.getTargetRegion().getStartOffset().behindOrEqual(left.getSourceRegion().getStartOffset())) {
          return -1;
       }
 

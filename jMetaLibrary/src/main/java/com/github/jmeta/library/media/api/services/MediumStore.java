@@ -19,25 +19,25 @@ import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * {@link MediumStore} provides reading and writing access to a single {@link Medium}.
  * 
- * For reading, you can first {@link #cache(MediumReference, int)} data and query the number of cached bytes at a given
- * offset using {@link #getCachedByteCountAt(MediumReference)}. The caching allows you to pre-buffer data in an internal
+ * For reading, you can first {@link #cache(MediumOffset, int)} data and query the number of cached bytes at a given
+ * offset using {@link #getCachedByteCountAt(MediumOffset)}. The caching allows you to pre-buffer data in an internal
  * cache when you now how much data you need, but you do not yet want to get the data itself. The data itself can later
- * be fetched using {@link #getData(MediumReference, int)}. Furthermore, you can query if a given offset is at end of
- * {@link Medium} using {@link #isAtEndOfMedium(MediumReference)}. Note that the reading methods slightly differ in
+ * be fetched using {@link #getData(MediumOffset, int)}. Furthermore, you can query if a given offset is at end of
+ * {@link Medium} using {@link #isAtEndOfMedium(MediumOffset)}. Note that the reading methods slightly differ in
  * behavior regarding the type (random-access versus stream-based) of {@link Medium} used, see the individual methods
  * for details.
  * 
  * For writing, all write-related methods throw a {@link ReadOnlyMediumException} if the underlying {@link Medium} is
  * read-only, specifically for any stream-based {@link Medium}. The write protocol is two-stage: First you "schedule"
- * changes using {@link #insertData(MediumReference, ByteBuffer)},
- * {@link #replaceData(MediumReference, int, ByteBuffer)} and {@link #removeData(MediumReference, int)}, then you
+ * changes using {@link #insertData(MediumOffset, ByteBuffer)},
+ * {@link #replaceData(MediumOffset, int, ByteBuffer)} and {@link #removeData(MediumOffset, int)}, then you
  * explicitly commit the changes and write the data to the external {@link Medium} persistently using {@link #flush()}.
- * This also changes any {@link MediumReference}s you have created between the last flush and the current flush using
+ * This also changes any {@link MediumOffset}s you have created between the last flush and the current flush using
  * {@link #createMediumReference(long)}, see this method for details. Using {@link #undo(MediumAction)}, you can revert
  * not-yet-committed changes done since the last flush.
  * 
@@ -86,14 +86,14 @@ public interface MediumStore {
    public Medium<?> getMedium();
 
    /**
-    * Tells whether the given {@link MediumReference} points to the end of the given medium or not. For stream-based
-    * media, the {@link MediumReference} is ignored and it is checked if - when currently read would start - the stream
+    * Tells whether the given {@link MediumOffset} points to the end of the given medium or not. For stream-based
+    * media, the {@link MediumOffset} is ignored and it is checked if - when currently read would start - the stream
     * is now at its end or not.
     * 
     * @param offset
-    *           The {@link MediumReference} offset to check, ignored for stream-based media. Must not be null and must
+    *           The {@link MediumOffset} offset to check, ignored for stream-based media. Must not be null and must
     *           point to the same {@link Medium} as this {@link MediumStore}
-    * @return whether the given {@link MediumReference} points to the end of the given medium or not
+    * @return whether the given {@link MediumOffset} points to the end of the given medium or not
     * 
     * @throws MediumAccessException
     *            in case of any problems to perform this operation
@@ -101,25 +101,25 @@ public interface MediumStore {
     * @throws MediumStoreClosedException
     *            in case this {@link MediumStore} has already been closed
     */
-   public boolean isAtEndOfMedium(MediumReference offset);
+   public boolean isAtEndOfMedium(MediumOffset offset);
 
    /**
-    * Creates an {@link MediumReference} for the specified offset. The {@link MediumReference}s created are internally
+    * Creates an {@link MediumOffset} for the specified offset. The {@link MediumOffset}s created are internally
     * managed in a pool to ensure proper updates in case of writing changes to the {@link Medium}. That means, as long
-    * as this {@link MediumStore} is open, all {@link MediumReference}s previously created with this method are
+    * as this {@link MediumStore} is open, all {@link MediumOffset}s previously created with this method are
     * automatically update once changes are written to the underlying medium using this {@link MediumStore}'s
     * {@link #flush()} method.
     * 
     * @param offset
-    *           The offset for which to create the {@link MediumReference} relative to the {@link Medium}s starting
+    *           The offset for which to create the {@link MediumOffset} relative to the {@link Medium}s starting
     *           point, which is offset 0, must be equal to or bigger than 0; the offset given is allowed to be behind
     *           the current {@link Medium} length
-    * @return The {@link MediumReference} pointing to the {@link MediumStore}s medium and the given offset.
+    * @return The {@link MediumOffset} pointing to the {@link MediumStore}s medium and the given offset.
     * 
     * @throws MediumStoreClosedException
     *            in case this {@link MediumStore} has already been closed
     */
-   public MediumReference createMediumReference(long offset);
+   public MediumOffset createMediumReference(long offset);
 
    /**
     * Caches up to numberOfBytes bytes read from the external {@link Medium}, starting at the given offset, without
@@ -130,7 +130,7 @@ public interface MediumStore {
     * thrown, all bytes read until the end of the medium will nevertheless be added to the cache.
     * 
     * Calling this method might lead to an internal auto-cleanup of the cache if the maximum configured cache size is
-    * exceeded. In this case, the data chunks cached with the very first call to {@link #cache(MediumReference, int)}
+    * exceeded. In this case, the data chunks cached with the very first call to {@link #cache(MediumOffset, int)}
     * since opening the {@link Medium} is removed from the cache first, then the data chunks of the second call and so
     * on, as much chunks are freed such that the current cache size plus the number of bytes to newly cache is again
     * below the maximum cache size. Each chunk has a maximum size of {@link Medium#getMaxCacheRegionSizeInBytes()}. In
@@ -155,8 +155,8 @@ public interface MediumStore {
     * 
     * This method offers users the possibility to buffer data as soon as its required size is known, thus minimizing
     * explicit read calls to the external medium. The buffered data can then later be fetched using
-    * {@link #getData(MediumReference, int)}. As an alternative, using code can directly call
-    * {@link #getData(MediumReference, int)}, if it is suitable to work with all the read data right away.
+    * {@link #getData(MediumOffset, int)}. As an alternative, using code can directly call
+    * {@link #getData(MediumOffset, int)}, if it is suitable to work with all the read data right away.
     * 
     * @param offset
     *           The offset to start caching, must point to the same {@link Medium} as this {@link MediumStore}, must not
@@ -182,7 +182,7 @@ public interface MediumStore {
     * @throws MediumStoreClosedException
     *            in case this {@link MediumStore} has already been closed
     */
-   public void cache(MediumReference offset, int numberOfBytes) throws EndOfMediumException;
+   public void cache(MediumOffset offset, int numberOfBytes) throws EndOfMediumException;
 
    /**
     * Returns the number of consecutively cached bytes at the given offset, or 0 if there are no cached bytes at this
@@ -196,7 +196,7 @@ public interface MediumStore {
     * @throws MediumStoreClosedException
     *            in case this {@link MediumStore} has already been closed
     */
-   public long getCachedByteCountAt(MediumReference offset);
+   public long getCachedByteCountAt(MediumOffset offset);
 
    /**
     * Returns medium data for the given range. All parts of this range that are found in the internal cache are taken
@@ -204,11 +204,11 @@ public interface MediumStore {
     * cache. During this, an {@link EndOfMediumException} might occur. Depending on what you previously did, you should
     * handle such an exception in the following ways:
     * <ol>
-    * <li>If you called {@link #cache(MediumReference, int)} before successfully for the same range, an
-    * {@link EndOfMediumException} when calling {@link #getData(MediumReference, int)} with this range is unexpected.
+    * <li>If you called {@link #cache(MediumOffset, int)} before successfully for the same range, an
+    * {@link EndOfMediumException} when calling {@link #getData(MediumOffset, int)} with this range is unexpected.
     * This might only happen if the medium was changed by another process meanwhile. You should throw a runtime
     * exception in this case, wrapping the original exception.</li>
-    * <li>Otherwise, you should re-call {@link #getData(MediumReference, int)} using
+    * <li>Otherwise, you should re-call {@link #getData(MediumOffset, int)} using
     * {@link EndOfMediumException#getByteCountActuallyRead()} as the new number of bytes to read.</li>
     * </ol>
     * 
@@ -218,10 +218,10 @@ public interface MediumStore {
     * The returned data is provided in a read-only {@link ByteBuffer} between its position and limit, i.e.
     * {@link ByteBuffer#remaining()} equals the read byte count, which equals the input parameter numberOfBytes.
     * 
-    * As already indicated, one model of working with this API is to call {@link #cache(MediumReference, int)} as soon
-    * as you know the number of bytes you need to work with ahead, then call {@link #getData(MediumReference, int)}
+    * As already indicated, one model of working with this API is to call {@link #cache(MediumOffset, int)} as soon
+    * as you know the number of bytes you need to work with ahead, then call {@link #getData(MediumOffset, int)}
     * portion-wise for the same range at places where you need the actually work with the data. Another option is to not
-    * use {@link #cache(MediumReference, int)} and directly call {@link #getData(MediumReference, int)} if your code
+    * use {@link #cache(MediumOffset, int)} and directly call {@link #getData(MediumOffset, int)} if your code
     * structure allows to directly work with the data. If an {@link EndOfMediumException} occurs in this case, you do
     * not necessarily have to again call this method with fewer bytes, but you can also obtain all bytes until end of
     * medium using {@link EndOfMediumException#getBytesReadSoFar()}.
@@ -256,19 +256,19 @@ public interface MediumStore {
     * @throws MediumStoreClosedException
     *            in case this {@link MediumStore} has already been closed
     */
-   public ByteBuffer getData(MediumReference offset, int numberOfBytes) throws EndOfMediumException;
+   public ByteBuffer getData(MediumOffset offset, int numberOfBytes) throws EndOfMediumException;
 
    /**
-    * Inserts the given bytes at the given {@link MediumReference} offset. This method does not actually write data to
+    * Inserts the given bytes at the given {@link MediumOffset} offset. This method does not actually write data to
     * the underlying external medium. To trigger explicit writing of the changes, you must explicitly call
     * {@link #flush()} after calling this method. Therefore a call to this method does not change the length of the
     * medium as returned by {@link Medium#getCurrentLength()} , and further calls to this method MUST NOT adjust their
-    * {@link MediumReference}s according to already posted calls to {@link #removeData(MediumReference, int)},
-    * {@link #insertData(MediumReference, ByteBuffer)} or {@link #replaceData(MediumReference, int, ByteBuffer)}. All
-    * {@link MediumReference}s refer to the current length and content of the {@link Medium}, irrespective of any
+    * {@link MediumOffset}s according to already posted calls to {@link #removeData(MediumOffset, int)},
+    * {@link #insertData(MediumOffset, ByteBuffer)} or {@link #replaceData(MediumOffset, int, ByteBuffer)}. All
+    * {@link MediumOffset}s refer to the current length and content of the {@link Medium}, irrespective of any
     * removals, insertions or replacements that are not yet flushed.
     * 
-    * You can call this method multiple times with exactly the same {@link MediumReference}. This corresponds to
+    * You can call this method multiple times with exactly the same {@link MediumOffset}. This corresponds to
     * multiple consecutive inserts, i.e. first the data of the first call with length <t>len</t> is inserted at the
     * <t>offset</t>, then the data of the second call is inserted at <t>offset+len</t> and so on. Inserting at the same
     * offset therefore does <i>not</i> mean overwriting any data or changing previous inserts.
@@ -277,7 +277,7 @@ public interface MediumStore {
     * actual insert position is shifted correspondingly.
     * 
     * @param offset
-    *           The {@link MediumReference} at which to insert the data. Must point to the {@link Medium} this
+    *           The {@link MediumOffset} at which to insert the data. Must point to the {@link Medium} this
     *           {@link MediumStore} works on. Must not exceed the {@link Medium}'s length as returned by
     *           {@link Medium#getCurrentLength()}.
     * @param dataToInsert
@@ -293,32 +293,32 @@ public interface MediumStore {
     * @throws ReadOnlyMediumException
     *            If the underlying {@link Medium} is read-only
     */
-   public MediumAction insertData(MediumReference offset, ByteBuffer dataToInsert);
+   public MediumAction insertData(MediumOffset offset, ByteBuffer dataToInsert);
 
    /**
-    * Removes the given number of bytes at the given {@link MediumReference} offset. This method does not actually write
+    * Removes the given number of bytes at the given {@link MediumOffset} offset. This method does not actually write
     * data to the underlying external medium. To trigger explicit writing of the changes, you must explicitly call
     * {@link #flush()} after calling this method. Therefore a call to this method does not change the length of the
     * medium as returned by {@link Medium#getCurrentLength()}, and further calls to this method MUST NOT adjust their
-    * {@link MediumReference}s according to already posted calls to {@link #removeData(MediumReference, int)},
-    * {@link #insertData(MediumReference, ByteBuffer)} or {@link #replaceData(MediumReference, int, ByteBuffer)}. All
-    * {@link MediumReference}s refer to the current length and content of the {@link Medium}, irrespective of any
+    * {@link MediumOffset}s according to already posted calls to {@link #removeData(MediumOffset, int)},
+    * {@link #insertData(MediumOffset, ByteBuffer)} or {@link #replaceData(MediumOffset, int, ByteBuffer)}. All
+    * {@link MediumOffset}s refer to the current length and content of the {@link Medium}, irrespective of any
     * removals, insertions or replacements that are not yet flushed.
     * 
-    * Subsequent calls to {@link #removeData(MediumReference, int)} that affect the same medium region are only
+    * Subsequent calls to {@link #removeData(MediumOffset, int)} that affect the same medium region are only
     * supported if the second call fully encloses the first call's region. This is necessary e.g. to first delete a
     * child object, but later also deleting the enclosing parent object.
     * 
-    * Other subsequent calls to {@link #removeData(MediumReference, int)} or
-    * {@link #replaceData(MediumReference, int, ByteBuffer)} referring to overlapping regions are not allowed and lead
+    * Other subsequent calls to {@link #removeData(MediumOffset, int)} or
+    * {@link #replaceData(MediumOffset, int, ByteBuffer)} referring to overlapping regions are not allowed and lead
     * to an {@link InvalidOverlappingWriteException}.
     * 
     * @param offset
-    *           The {@link MediumReference} at which to remove the data. Must point to the {@link Medium} this
+    *           The {@link MediumOffset} at which to remove the data. Must point to the {@link Medium} this
     *           {@link MediumStore} works on. Must not exceed the {@link Medium}'s length as returned by
     *           {@link Medium#getCurrentLength()}.
     * @param numberOfBytesToRemove
-    *           The number of bytes to remove at the given {@link MediumReference}. Must be bigger than 0.
+    *           The number of bytes to remove at the given {@link MediumOffset}. Must be bigger than 0.
     * @return A {@link MediumAction} describing the change. Can be used for undoing the change using
     *         {@link #undo(MediumAction)}.
     * 
@@ -329,38 +329,38 @@ public interface MediumStore {
     * @throws ReadOnlyMediumException
     *            If the underlying {@link Medium} is read-only
     * @throws InvalidOverlappingWriteException
-    *            If there was already another call to {@link #removeData(MediumReference, int)} or
-    *            {@link #replaceData(MediumReference, int, ByteBuffer)}, and the current call's range overlaps with the
+    *            If there was already another call to {@link #removeData(MediumOffset, int)} or
+    *            {@link #replaceData(MediumOffset, int, ByteBuffer)}, and the current call's range overlaps with the
     *            ranges passed to these previous calls, excluding the case that the new call fully encloses a range
-    *            passed to a previous call of {@link #removeData(MediumReference, int)}
+    *            passed to a previous call of {@link #removeData(MediumOffset, int)}
     */
-   public MediumAction removeData(MediumReference offset, int numberOfBytesToRemove);
+   public MediumAction removeData(MediumOffset offset, int numberOfBytesToRemove);
 
    /**
-    * Replaces the given number of bytes at the given {@link MediumReference} offset with the given {@link ByteBuffer}
+    * Replaces the given number of bytes at the given {@link MediumOffset} offset with the given {@link ByteBuffer}
     * contents, potentially shortening or extending existing {@link Medium} length. This method does not actually write
     * data to the underlying external medium. To trigger explicit writing of the changes, you must explicitly call
     * {@link #flush()} after calling this method. Therefore a call to this method does not change the length of the
     * medium as returned by {@link Medium#getCurrentLength()}, and further calls to this method MUST NOT adjust their
-    * {@link MediumReference}s according to already posted calls to {@link #removeData(MediumReference, int)},
-    * {@link #insertData(MediumReference, ByteBuffer)} or {@link #replaceData(MediumReference, int, ByteBuffer)}. All
-    * {@link MediumReference}s refer to the current length and content of the {@link Medium}, irrespective of any
+    * {@link MediumOffset}s according to already posted calls to {@link #removeData(MediumOffset, int)},
+    * {@link #insertData(MediumOffset, ByteBuffer)} or {@link #replaceData(MediumOffset, int, ByteBuffer)}. All
+    * {@link MediumOffset}s refer to the current length and content of the {@link Medium}, irrespective of any
     * removals, insertions or replacements that are not yet flushed.
     * 
-    * Subsequent calls to {@link #replaceData(MediumReference, int, ByteBuffer)} that affect the same medium region are
+    * Subsequent calls to {@link #replaceData(MediumOffset, int, ByteBuffer)} that affect the same medium region are
     * only supported if the second call fully encloses the first call's region. This is necessary e.g. to first replace
     * a child object, but later also replacing the enclosing parent object.
     * 
-    * Other subsequent calls to {@link #removeData(MediumReference, int)} or
-    * {@link #replaceData(MediumReference, int, ByteBuffer)} referring to overlapping regions are not allowed and lead
+    * Other subsequent calls to {@link #removeData(MediumOffset, int)} or
+    * {@link #replaceData(MediumOffset, int, ByteBuffer)} referring to overlapping regions are not allowed and lead
     * to an {@link InvalidOverlappingWriteException}.
     * 
     * @param offset
-    *           The {@link MediumReference} at which to replace the data. Must point to the {@link Medium} this
+    *           The {@link MediumOffset} at which to replace the data. Must point to the {@link Medium} this
     *           {@link MediumStore} works on. Must not exceed the {@link Medium}'s length as returned by
     *           {@link Medium#getCurrentLength()}.
     * @param numberOfBytesToReplace
-    *           The number of bytes to replace at the given {@link MediumReference}. Must be bigger than 0.
+    *           The number of bytes to replace at the given {@link MediumOffset}. Must be bigger than 0.
     * @param replacementData
     *           The bytes to use as replacement bytes
     * @return A {@link MediumAction} describing the change. Can be used for undoing the change using
@@ -373,16 +373,16 @@ public interface MediumStore {
     * @throws ReadOnlyMediumException
     *            If the underlying {@link Medium} is read-only
     * @throws InvalidOverlappingWriteException
-    *            If there was already another call to {@link #removeData(MediumReference, int)} or
-    *            {@link #replaceData(MediumReference, int, ByteBuffer)}, and the current call's range overlaps with the
+    *            If there was already another call to {@link #removeData(MediumOffset, int)} or
+    *            {@link #replaceData(MediumOffset, int, ByteBuffer)}, and the current call's range overlaps with the
     *            ranges passed to these previous calls, excluding the case that the new call fully encloses a range
-    *            passed to a previous call of {@link #replaceData(MediumReference, int, ByteBuffer)}
+    *            passed to a previous call of {@link #replaceData(MediumOffset, int, ByteBuffer)}
     */
-   public MediumAction replaceData(MediumReference offset, int numberOfBytesToReplace, ByteBuffer replacementData);
+   public MediumAction replaceData(MediumOffset offset, int numberOfBytesToReplace, ByteBuffer replacementData);
 
    /**
-    * Undoes changes made using {@link #insertData(MediumReference, ByteBuffer)},
-    * {@link #removeData(MediumReference, int)} or {@link #replaceData(MediumReference, int, ByteBuffer)}. After this
+    * Undoes changes made using {@link #insertData(MediumOffset, ByteBuffer)},
+    * {@link #removeData(MediumOffset, int)} or {@link #replaceData(MediumOffset, int, ByteBuffer)}. After this
     * method is called, the corresponding change is invalidated, such that a call to {@link #flush()} will not perform
     * this change. Furthermore, {@link MediumAction#isPending()} for the passed {@link MediumAction} instance will
     * return false afterwards.
@@ -396,19 +396,19 @@ public interface MediumStore {
    /**
     * Actually writes all changes since the last flush or since opening this {@link MediumStore} to the external
     * {@link Medium}, if any changes are present at all. Changes might only be done using
-    * {@link #insertData(MediumReference, ByteBuffer)}, {@link #removeData(MediumReference, int)} or
-    * {@link #replaceData(MediumReference, int, ByteBuffer)}. Theses changes can be undone before a flush by using
+    * {@link #insertData(MediumOffset, ByteBuffer)}, {@link #removeData(MediumOffset, int)} or
+    * {@link #replaceData(MediumOffset, int, ByteBuffer)}. Theses changes can be undone before a flush by using
     * {@link #undo(MediumAction)}, such that the next call to {@link #flush()} does not consider these changes anymore.
     * 
     * After a flush, the {@link MediumAction} instances returned by these methods instances will not be pending anymore,
     * i.e. {@link MediumAction#isPending()} will return false.
     * 
-    * Furthermore, after flushing, any {@link MediumReference}s previously created using
+    * Furthermore, after flushing, any {@link MediumOffset}s previously created using
     * {@link #createMediumReference(long)} might have been automatically updated according to the flushed changes. For
-    * example, if an {@link #insertData(MediumReference, ByteBuffer)} of 10 bytes was done at offset x, an
-    * {@link MediumReference} previously created for offset x+1 will have offset x+1+10 after the {@link #flush()} of
-    * this insert. The same happens for any replaces or removes at offsets before the {@link MediumReference}'s offset.
-    * {@link MediumReference}s with offsets before any changes are not changed after a {@link #flush()} of these
+    * example, if an {@link #insertData(MediumOffset, ByteBuffer)} of 10 bytes was done at offset x, an
+    * {@link MediumOffset} previously created for offset x+1 will have offset x+1+10 after the {@link #flush()} of
+    * this insert. The same happens for any replaces or removes at offsets before the {@link MediumOffset}'s offset.
+    * {@link MediumOffset}s with offsets before any changes are not changed after a {@link #flush()} of these
     * changes.
     * 
     * @throws MediumAccessException

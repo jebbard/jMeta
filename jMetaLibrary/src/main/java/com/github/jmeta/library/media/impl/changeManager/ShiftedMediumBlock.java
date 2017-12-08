@@ -16,7 +16,7 @@ import java.util.List;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -34,12 +34,12 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * <i>CFP algorithm</i>) that is implemented in {@link MediumChangeManager#createFlushPlan(int, long)}. The idea of the
  * CFP algorithm is that every insertion, removal or replacement leads to a "shift" of existing medium bytes.
  * 
- * All {@link MediumReference} instances and sizes returned by this class refer to valid offsets and sizes on the
+ * All {@link MediumOffset} instances and sizes returned by this class refer to valid offsets and sizes on the
  * existing, external {@link Medium} and are therefore not in any way "virtual".
  * 
  * After instantiation, the {@link #getMediumByteCount()} method of this {@link ShiftedMediumBlock} returns
  * {@value #UNDEFINED_COUNT}. The reason for this is: The actual size of the medium bytes is only computed during
- * execution of the CFP algorithm. It is finally computable after {@link #setEndReferenceOfMediumBytes(MediumReference)}
+ * execution of the CFP algorithm. It is finally computable after {@link #setEndReferenceOfMediumBytes(MediumOffset)}
  * has been called. In this state, the {@link ShiftedMediumBlock} is finally assembled. You can see such an instance as
  * referring to existing medium bytes including their location, and at the same time telling <i>where</i> they will be
  * moved after applying not only one action (i.e. the causing action of this specific {@link ShiftedMediumBlock}
@@ -54,7 +54,7 @@ public class ShiftedMediumBlock {
    public static final int UNDEFINED_COUNT = -1;
 
    private final MediumAction causingAction;
-   private final MediumReference startReferenceOfFollowUpBytes;
+   private final MediumOffset startReferenceOfFollowUpBytes;
    private final int totalShiftOfMediumBytes;
    private int totalMediumByteCount = UNDEFINED_COUNT;
 
@@ -88,7 +88,7 @@ public class ShiftedMediumBlock {
    }
 
    /**
-    * Returns the start {@link MediumReference} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
+    * Returns the start {@link MediumOffset} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
     * It must be clearly stated that these are the bytes <i>behind</i> the causing {@link MediumAction}s region, in
     * detail:
     * <ul>
@@ -98,24 +98,24 @@ public class ShiftedMediumBlock {
     * <li>For {@link MediumActionType#REPLACE}: It is the offset of the first medium byte after the replaced region</li>
     * </ul>
     * 
-    * @return the start {@link MediumReference} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
+    * @return the start {@link MediumOffset} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
     */
-   public MediumReference getStartReferenceOfFollowUpBytes() {
+   public MediumOffset getStartReferenceOfFollowUpBytes() {
       return startReferenceOfFollowUpBytes;
    }
 
    /**
-    * Sets the end {@link MediumReference} of the consecutive block of medium bytes this {@link ShiftedMediumBlock}
+    * Sets the end {@link MediumOffset} of the consecutive block of medium bytes this {@link ShiftedMediumBlock}
     * refers to. These are actual and current offsets on the external medium. Saying this, they not yet reflect any
     * shift operations by any already or not yet executed {@link MediumAction}s.
     * 
-    * After this method has been called with a valid end {@link MediumReference}, {@link #totalMediumByteCount} will
+    * After this method has been called with a valid end {@link MediumOffset}, {@link #totalMediumByteCount} will
     * return the corresponding size.
     *
     * @param endReferenceOfFollowUpBytes
-    *           the end {@link MediumReference} of the {@link ShiftedMediumBlock}.
+    *           the end {@link MediumOffset} of the {@link ShiftedMediumBlock}.
     */
-   public void setEndReferenceOfMediumBytes(MediumReference endReferenceOfFollowUpBytes) {
+   public void setEndReferenceOfMediumBytes(MediumOffset endReferenceOfFollowUpBytes) {
       Reject.ifNull(endReferenceOfFollowUpBytes, "endReferenceOfFollowUpBytes");
       Reject.ifTrue(endReferenceOfFollowUpBytes.before(getStartReferenceOfFollowUpBytes()),
          "the given end reference <" + endReferenceOfFollowUpBytes + "> must be located before the start reference <"
@@ -158,7 +158,7 @@ public class ShiftedMediumBlock {
     *         the newly written bytes, if any.
     */
    public MediumRegion getTargetRegion() {
-      MediumReference changeOffset = getCausingAction().getRegion().getStartReference();
+      MediumOffset changeOffset = getCausingAction().getRegion().getStartOffset();
       ByteBuffer actionBytes = getCausingAction().getActionBytes();
 
       int addedByteCount = 0;
@@ -211,7 +211,7 @@ public class ShiftedMediumBlock {
       int readWriteBlockCount = totalMediumByteCount / writeBlockSizeInBytes;
       int remainingByteCount = totalMediumByteCount % writeBlockSizeInBytes;
 
-      MediumReference startReadRef = null;
+      MediumOffset startReadRef = null;
 
       boolean backwardReadWrite = totalShiftOfMediumBytes > 0;
 
@@ -221,7 +221,7 @@ public class ShiftedMediumBlock {
          startReadRef = getStartReferenceOfFollowUpBytes();
       }
 
-      MediumReference startWriteRef = startReadRef.advance(totalShiftOfMediumBytes);
+      MediumOffset startWriteRef = startReadRef.advance(totalShiftOfMediumBytes);
 
       List<MediumAction> readWriteActions = new ArrayList<>();
 
@@ -262,16 +262,16 @@ public class ShiftedMediumBlock {
 
          int writtenByteCount = causingAction.getActionBytes().remaining();
 
-         startWriteRef = causingAction.getRegion().getStartReference()
+         startWriteRef = causingAction.getRegion().getStartOffset()
             .advance(totalShiftOfMediumBytes - causingAction.getSizeDelta());
 
-         final MediumReference rangeStartRef = startWriteRef;
+         final MediumOffset rangeStartRef = startWriteRef;
 
          byte[] insertBytes = causingAction.getActionBytes().array();
 
          List<MediumAction> writeActions = MediumRangeChunkAction.performActionOnChunksInRange(MediumAction.class,
             startWriteRef, writtenByteCount, writeBlockSizeInBytes,
-            (MediumReference chunkStartReference, int chunkSizeInBytes) -> {
+            (MediumOffset chunkStartReference, int chunkSizeInBytes) -> {
 
                int startIndex = (int) chunkStartReference.distanceTo(rangeStartRef);
 
@@ -300,35 +300,35 @@ public class ShiftedMediumBlock {
          MediumRegion sourceRegion = getSourceRegion();
          MediumRegion targetRegion = getTargetRegion();
 
-         sourceIntvString = sourceRegion.getStartReference().getAbsoluteMediumOffset() + ", "
-            + sourceRegion.calculateEndReference().getAbsoluteMediumOffset();
+         sourceIntvString = sourceRegion.getStartOffset().getAbsoluteMediumOffset() + ", "
+            + sourceRegion.calculateEndOffset().getAbsoluteMediumOffset();
 
-         targetIntvString = targetRegion.getStartReference().getAbsoluteMediumOffset() + ", "
-            + targetRegion.calculateEndReference().getAbsoluteMediumOffset();
+         targetIntvString = targetRegion.getStartOffset().getAbsoluteMediumOffset() + ", "
+            + targetRegion.calculateEndOffset().getAbsoluteMediumOffset();
       }
 
       return "ShiftedMediumBlock [causingActionType=" + causingAction.getActionType() + ", causingActionRegOfs="
-         + causingAction.getRegion().getStartReference().getAbsoluteMediumOffset() + ", causingActionRegSize="
+         + causingAction.getRegion().getStartOffset().getAbsoluteMediumOffset() + ", causingActionRegSize="
          + causingAction.getRegion().getSize() + ", srcRegnInterval=[" + sourceIntvString + "), targRegInterval=["
          + targetIntvString + "), totalShiftOfMediumBytes=" + totalShiftOfMediumBytes + "]";
    }
 
    /**
-    * Initializes the start {@link MediumReference} of the medium bytes as described in the javadocs of
+    * Initializes the start {@link MediumOffset} of the medium bytes as described in the javadocs of
     * {@link #getStartReferenceOfFollowUpBytes()}.
     * 
     * @param causingAction
     *           The causing {@link MediumAction} of this {@link ShiftedMediumBlock}.
-    * @return The start {@link MediumReference} of the medium bytes.
+    * @return The start {@link MediumOffset} of the medium bytes.
     */
-   private static MediumReference initStartReference(MediumAction causingAction) {
+   private static MediumOffset initStartReference(MediumAction causingAction) {
       MediumRegion region = causingAction.getRegion();
 
       if (causingAction.getActionType() == MediumActionType.INSERT) {
-         return region.getStartReference();
+         return region.getStartOffset();
       } else if (causingAction.getActionType() == MediumActionType.REMOVE
          || causingAction.getActionType() == MediumActionType.REPLACE) {
-         return region.getStartReference().advance(region.getSize());
+         return region.getStartOffset().advance(region.getSize());
       } else {
          throw new IllegalArgumentException("A causing action must have the type INSERT, REMOVE or REPLACE");
       }

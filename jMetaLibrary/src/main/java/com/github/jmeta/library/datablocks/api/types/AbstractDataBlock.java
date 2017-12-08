@@ -14,7 +14,7 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -31,7 +31,7 @@ public abstract class AbstractDataBlock implements DataBlock {
     * @param dataBlockReader
     */
    public AbstractDataBlock(DataBlockId id, DataBlock parent,
-      MediumReference reference, DataBlockReader dataBlockReader) {
+      MediumOffset reference, DataBlockReader dataBlockReader) {
       Reject.ifNull(id, "id");
       Reject.ifNull(dataBlockReader, "dataBlockReader");
       Reject.ifNull(reference, "reference");
@@ -79,7 +79,7 @@ public abstract class AbstractDataBlock implements DataBlock {
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getMediumReference()
     */
    @Override
-   public MediumReference getMediumReference() {
+   public MediumOffset getMediumReference() {
 
       return m_mediumReference;
    }
@@ -128,7 +128,7 @@ public abstract class AbstractDataBlock implements DataBlock {
 
    private DataBlock m_parent;
 
-   private MediumReference m_mediumReference;
+   private MediumOffset m_mediumReference;
 
    private DataBlockId m_id;
 

@@ -18,7 +18,7 @@ import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -35,7 +35,7 @@ public class StandardHeader extends AbstractDataBlock implements Header {
     * @param isFooter
     * @param dataBlockReader
     */
-   public StandardHeader(DataBlockId id, MediumReference reference,
+   public StandardHeader(DataBlockId id, MediumOffset reference,
       List<Field<?>> fields, boolean isFooter,
       DataBlockReader dataBlockReader) {
       super(id, null, reference, dataBlockReader);

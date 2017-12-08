@@ -14,7 +14,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * Represents a contiguous block of data bytes that can be stored on a {@link AbstractMedium}. An {@link DataBlock}
@@ -64,7 +64,7 @@ public interface DataBlock {
     * @return the {@link AbstractMedium} the {@link DataBlock} is currently stored on. May return null if the
     *         {@link DataBlock} has not been persisted yet.
     */
-   public MediumReference getMediumReference();
+   public MediumOffset getMediumReference();
 
    /**
     * Returns the total size of the {@link DataBlock} in bytes.

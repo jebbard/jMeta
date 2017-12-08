@@ -28,7 +28,7 @@ import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO stage2_002: Implement timeout when reading from stream-based medium
@@ -83,7 +83,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    @Override
    public Container next() {
 
-	   Reject.ifFalse(hasNext(), "hasNext()");
+      Reject.ifFalse(hasNext(), "hasNext()");
 
       DataFormat dataFormat = identifyDataFormat(m_currentReference);
 
@@ -124,7 +124,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       return new ArrayList<>(allFormats);
    }
 
-   private DataFormat identifyDataFormat(MediumReference reference) {
+   private DataFormat identifyDataFormat(MediumOffset reference) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(m_precedenceList, "setDataFormatHints() must have been called before");
@@ -145,7 +145,8 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
          // bytes really read are ignored as the read ByteBuffers.remaining() contains
          // the read byte count
          LOGGER.info("End of medium exception occurred during data format identification (see below).");
-         LOGGER.info("Read " + e.getByteCountActuallyRead() + " of " + e.getByteCountTriedToRead() + " bytes tried to read.");
+         LOGGER.info(
+            "Read " + e.getByteCountActuallyRead() + " of " + e.getByteCountTriedToRead() + " bytes tried to read.");
          LOGGER.error("identifyDataFormat", e);
       }
 
@@ -192,7 +193,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       }
    }
 
-   private MediumReference m_currentReference;
+   private MediumOffset m_currentReference;
 
    private long m_longestHeaderSize = 0;
 
@@ -202,7 +203,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
    private final List<DataFormat> m_precedenceList = new ArrayList<>();
 
-   private MediumReference m_previousIdentificationReference;
+   private MediumOffset m_previousIdentificationReference;
 
    private final Map<DataFormat, DataBlockReader> m_readerMap = new LinkedHashMap<>();
 }

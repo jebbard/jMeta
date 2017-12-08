@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 
 /**
  * {@link MediumActionTest} tests the {@link MediumAction} class.
@@ -34,7 +34,7 @@ public class MediumActionTest {
       MediumActionType expectedActionType = MediumActionType.INSERT;
       int expectedSequenceNumber = 11;
       ByteBuffer expectedActionBytes = DEFAULT_BYTES;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 11),
+      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11),
          expectedActionBytes.remaining());
 
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
@@ -52,7 +52,7 @@ public class MediumActionTest {
       MediumActionType expectedActionType = MediumActionType.REPLACE;
       int expectedSequenceNumber = 11;
       ByteBuffer expectedActionBytes = DEFAULT_BYTES;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 11), 22);
+      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11), 22);
 
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
          expectedActionBytes);
@@ -69,7 +69,7 @@ public class MediumActionTest {
       MediumActionType expectedActionType = MediumActionType.WRITE;
       int expectedSequenceNumber = 11;
       ByteBuffer expectedActionBytes = null;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 11), 4);
+      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11), 4);
 
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
          expectedActionBytes);
@@ -86,7 +86,7 @@ public class MediumActionTest {
       MediumActionType expectedActionType = MediumActionType.TRUNCATE;
       int expectedSequenceNumber = 11;
       ByteBuffer expectedActionBytes = null;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 11), 1);
+      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11), 1);
 
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
          expectedActionBytes);
@@ -103,7 +103,7 @@ public class MediumActionTest {
       MediumActionType expectedActionType = MediumActionType.INSERT;
       int expectedSequenceNumber = 0;
       ByteBuffer expectedActionBytes = DEFAULT_BYTES;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumReference(MEDIUM, 0),
+      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 0),
          expectedActionBytes.remaining());
 
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
@@ -122,7 +122,7 @@ public class MediumActionTest {
 
       ByteBuffer expectedActionBytes = DEFAULT_BYTES;
       MediumAction insertAction = new MediumAction(MediumActionType.INSERT,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), expectedActionBytes.remaining()), 0,
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), expectedActionBytes.remaining()), 0,
          expectedActionBytes);
 
       int expectedInsertDelta = expectedActionBytes.remaining();
@@ -131,7 +131,7 @@ public class MediumActionTest {
 
       int bytesToRemove = 99;
       MediumAction removeAction = new MediumAction(MediumActionType.REMOVE,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), bytesToRemove), 0, null);
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesToRemove), 0, null);
 
       int expectedRemoveDelta = -bytesToRemove;
 
@@ -139,7 +139,7 @@ public class MediumActionTest {
 
       int bytesTruncated = 99999;
       MediumAction truncateAction = new MediumAction(MediumActionType.TRUNCATE,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), bytesTruncated), 0, null);
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesTruncated), 0, null);
 
       int expectedTruncateDelta = -bytesTruncated;
 
@@ -147,7 +147,7 @@ public class MediumActionTest {
 
       int bytesToReplace1 = DEFAULT_BYTES.remaining() - 1;
       MediumAction insertingReplaceAction = new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), bytesToReplace1), 0, DEFAULT_BYTES);
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesToReplace1), 0, DEFAULT_BYTES);
 
       int expectedReplaceDelta1 = 1;
 
@@ -155,7 +155,7 @@ public class MediumActionTest {
 
       int bytesToReplace2 = DEFAULT_BYTES.remaining() + 10;
       MediumAction removingReplaceAction = new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), bytesToReplace2), 0, DEFAULT_BYTES);
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesToReplace2), 0, DEFAULT_BYTES);
 
       int expectedReplaceDelta2 = -10;
 
@@ -169,12 +169,12 @@ public class MediumActionTest {
    public void getSizeDelta_returnsZeroForNonSizeChangingTypes() {
 
       MediumAction readAction = new MediumAction(MediumActionType.READ,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), 20), 0, null);
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 20), 0, null);
 
       Assert.assertEquals(0, readAction.getSizeDelta());
 
       MediumAction writeAction = new MediumAction(MediumActionType.READ,
-         new MediumRegion(new StandardMediumReference(MEDIUM, 0), 20), 0, null);
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 20), 0, null);
 
       Assert.assertEquals(0, writeAction.getSizeDelta());
    }

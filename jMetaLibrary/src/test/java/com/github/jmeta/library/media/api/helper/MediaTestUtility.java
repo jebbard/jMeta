@@ -15,8 +15,8 @@ import java.nio.file.Path;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -69,30 +69,30 @@ public class MediaTestUtility {
    }
 
    /**
-    * Convenience method returning a new {@link MediumReference} pointing to the specified offset on the given
-    * {@link Medium}. Also encapsulates the use of the {@link MediumReference} implementation class in test cases to
-    * just a few places.
+    * Convenience method returning a new {@link MediumOffset} pointing to the specified offset on the given
+    * {@link Medium}. Also encapsulates the use of the {@link MediumOffset} implementation class in test cases to just a
+    * few places.
     * 
     * @param medium
     *           The {@link Medium} to use
     * @param offset
     *           The offset to use
-    * @return a new {@link MediumReference} pointing to the specified offset on the specified {@link Medium}
+    * @return a new {@link MediumOffset} pointing to the specified offset on the specified {@link Medium}
     */
-   public static MediumReference at(Medium<?> medium, long offset) {
-      return new StandardMediumReference(medium, offset);
+   public static MediumOffset at(Medium<?> medium, long offset) {
+      return new StandardMediumOffset(medium, offset);
    }
 
    /**
-    * Convenience method returning a new {@link MediumReference} pointing to the specified offset on the
-    * {@link #DEFAULT_TEST_MEDIUM}. Also encapsulates the use of the {@link MediumReference} implementation class in
-    * test cases to just a few places.
+    * Convenience method returning a new {@link MediumOffset} pointing to the specified offset on the
+    * {@link #DEFAULT_TEST_MEDIUM}. Also encapsulates the use of the {@link MediumOffset} implementation class in test
+    * cases to just a few places.
     * 
     * @param offset
     *           The offset to use
-    * @return a new {@link MediumReference} pointing to the specified offset on the default {@link #DEFAULT_TEST_MEDIUM}
+    * @return a new {@link MediumOffset} pointing to the specified offset on the default {@link #DEFAULT_TEST_MEDIUM}
     */
-   public static MediumReference at(long offset) {
+   public static MediumOffset at(long offset) {
       return at(DEFAULT_TEST_MEDIUM, offset);
    }
 

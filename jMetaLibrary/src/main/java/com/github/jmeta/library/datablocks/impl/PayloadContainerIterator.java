@@ -17,7 +17,7 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -36,7 +36,7 @@ public class PayloadContainerIterator
     * @param previousFieldSize
     */
    public PayloadContainerIterator(Payload parent, DataBlockReader reader,
-      MediumReference reference, FieldFunctionStack context,
+      MediumOffset reference, FieldFunctionStack context,
       long previousFieldSize) {
       Reject.ifNull(parent, "parent");
       Reject.ifNull(reader, "reader");
@@ -145,7 +145,7 @@ public class PayloadContainerIterator
 
    private long m_remainingParentSize;
 
-   private MediumReference m_nextContainerReference;
+   private MediumOffset m_nextContainerReference;
 
    private final DataBlockReader m_reader;
 

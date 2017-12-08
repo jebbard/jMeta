@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -42,10 +42,10 @@ public class MediumCache {
    private final int maximumCacheRegionSizeInBytes;
    private final Medium<?> medium;
 
-   private static final Comparator<MediumReference> OFFSET_ORDER_ASCENDING_COMPARATOR = (leftRef, rightRef) -> Long
+   private static final Comparator<MediumOffset> OFFSET_ORDER_ASCENDING_COMPARATOR = (leftRef, rightRef) -> Long
       .valueOf(leftRef.getAbsoluteMediumOffset()).compareTo(rightRef.getAbsoluteMediumOffset());
 
-   private final TreeMap<MediumReference, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(
+   private final TreeMap<MediumOffset, MediumRegion> cachedRegionsInOffsetOrder = new TreeMap<>(
       OFFSET_ORDER_ASCENDING_COMPARATOR);
    private final List<MediumRegion> cachedRegionsInInsertOrder = new LinkedList<>();
 
@@ -117,7 +117,7 @@ public class MediumCache {
 
    /**
     * @return all {@link MediumRegion}s currently maintained in this {@link MediumCache}, ordered by their
-    *         {@link MediumReference} ascending. If there are none currently, returns an empty {@link List}.
+    *         {@link MediumOffset} ascending. If there are none currently, returns an empty {@link List}.
     */
    public List<MediumRegion> getAllCachedRegions() {
       return new ArrayList<>(cachedRegionsInOffsetOrder.values());
@@ -148,42 +148,40 @@ public class MediumCache {
     * of the range after the second cached {@link MediumRegion}.</li>
     * </ul>
     * 
-    * @param startReference
-    *           The starting {@link MediumReference} of the range. Must refer to the same {@link Medium} as returned by
+    * @param offset
+    *           The starting {@link MediumOffset} of the range. Must refer to the same {@link Medium} as returned by
     *           {@link #getMedium()}.
     * @param rangeSizeInBytes
     *           The size of the range in bytes. Must not be negative and must not be zero.
     * @return {@link MediumRegion}s covering the whole range specified as input parameters. For details see the method
     *         description above.
     */
-   public List<MediumRegion> getRegionsInRange(MediumReference startReference, int rangeSizeInBytes) {
+   public List<MediumRegion> getRegionsInRange(MediumOffset offset, int rangeSizeInBytes) {
 
-      Reject.ifNull(startReference, "startReference");
-      Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
+      Reject.ifNull(offset, "offset");
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
       Reject.ifTrue(rangeSizeInBytes <= 0, "The range size must be strictly bigger than zero");
 
       List<MediumRegion> regionsInRange = new ArrayList<>();
 
       if (cachedRegionsInOffsetOrder.isEmpty()) {
-         regionsInRange.addAll(
-            getGapsBetweenCurrentAndPreviousCachedRegion(startReference, startReference.advance(rangeSizeInBytes)));
+         regionsInRange.addAll(getGapsBetweenCurrentAndPreviousCachedRegion(offset, offset.advance(rangeSizeInBytes)));
 
          return regionsInRange;
       }
 
-      MediumRegion virtualRangeRegion = new MediumRegion(startReference, rangeSizeInBytes);
+      MediumRegion virtualRangeRegion = new MediumRegion(offset, rangeSizeInBytes);
 
-      MediumReference endReference = virtualRangeRegion.calculateEndReference();
+      MediumOffset endReference = virtualRangeRegion.calculateEndOffset();
 
-      MediumReference firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder
-         .floorKey(startReference);
+      MediumOffset firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder.floorKey(offset);
 
       if (firstCachedRegionReferenceNearToStartReference == null) {
-         firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder.ceilingKey(startReference);
+         firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder.ceilingKey(offset);
 
          if (firstCachedRegionReferenceNearToStartReference == null) {
-            throw new IllegalStateException("The cache is not empty, but no " + MediumReference.class.getSimpleName()
-               + " was found that is smaller, equal or bigger than the given start reference <" + startReference
+            throw new IllegalStateException("The cache is not empty, but no " + MediumOffset.class.getSimpleName()
+               + " was found that is smaller, equal or bigger than the given start reference <" + offset
                + ">. This must never happen.");
          }
       }
@@ -199,14 +197,14 @@ public class MediumCache {
          return regionsInRange;
       }
 
-      Map<MediumReference, MediumRegion> cachedRegionsStartingWithFirstNearRangeStart = cachedRegionsInOffsetOrder
+      Map<MediumOffset, MediumRegion> cachedRegionsStartingWithFirstNearRangeStart = cachedRegionsInOffsetOrder
          .tailMap(firstCachedRegionReferenceNearToStartReference);
 
-      MediumReference previousRegionEndReference = startReference;
+      MediumOffset previousRegionEndReference = offset;
 
       for (MediumRegion currentRegion : cachedRegionsStartingWithFirstNearRangeStart.values()) {
-         MediumReference currentRegionStartReference = currentRegion.getStartReference();
-         MediumReference currentRegionEndReference = currentRegion.calculateEndReference();
+         MediumOffset currentRegionStartReference = currentRegion.getStartOffset();
+         MediumOffset currentRegionEndReference = currentRegion.calculateEndOffset();
 
          MediumRegionOverlapType overlapWithRangeRegion = MediumRegion.determineOverlapWithOtherRegion(currentRegion,
             virtualRangeRegion);
@@ -228,41 +226,41 @@ public class MediumCache {
    }
 
    /**
-    * Returns the number of consecutively cached bytes starting the the given start {@link MediumReference}. If there is
-    * no cached byte at the given start reference, returns 0L. THe methods stops at the first non cached byte behind
-    * start reference, so whenever the first gap is detected.
+    * Returns the number of consecutively cached bytes starting the the given start {@link MediumOffset}. If there is no
+    * cached byte at the given start reference, returns 0L. THe methods stops at the first non cached byte behind start
+    * reference, so whenever the first gap is detected.
     * 
     * @param startReference
-    *           The starting {@link MediumReference}. Must refer to the same {@link Medium} as returned by
+    *           The starting {@link MediumOffset}. Must refer to the same {@link Medium} as returned by
     *           {@link #getMedium()}.
-    * @return the number of consecutively cached bytes starting the the given start {@link MediumReference}. For details
+    * @return the number of consecutively cached bytes starting the the given start {@link MediumOffset}. For details
     *         see the method description above.
     */
-   public long getCachedByteCountAt(MediumReference startReference) {
+   public long getCachedByteCountAt(MediumOffset startReference) {
 
       Reject.ifNull(startReference, "startReference");
       Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
 
       long totalCachedByteCount = 0L;
 
-      MediumReference previousOrEqualReference = cachedRegionsInOffsetOrder.floorKey(startReference);
+      MediumOffset previousOrEqualReference = cachedRegionsInOffsetOrder.floorKey(startReference);
 
       if (previousOrEqualReference != null) {
          MediumRegion previousRegion = cachedRegionsInOffsetOrder.get(previousOrEqualReference);
 
          if (previousRegion.contains(startReference)) {
             totalCachedByteCount += previousRegion.getSize()
-               - startReference.distanceTo(previousRegion.getStartReference());
+               - startReference.distanceTo(previousRegion.getStartOffset());
 
-            Map<MediumReference, MediumRegion> tailRegions = cachedRegionsInOffsetOrder.tailMap(startReference, false);
+            Map<MediumOffset, MediumRegion> tailRegions = cachedRegionsInOffsetOrder.tailMap(startReference, false);
 
-            for (Iterator<MediumReference> iterator = tailRegions.keySet().iterator(); iterator.hasNext();) {
-               MediumReference nextReference = iterator.next();
+            for (Iterator<MediumOffset> iterator = tailRegions.keySet().iterator(); iterator.hasNext();) {
+               MediumOffset nextReference = iterator.next();
 
                MediumRegion nextRegion = tailRegions.get(nextReference);
 
                // Consecutive region
-               if (nextRegion.getStartReference().equals(previousRegion.calculateEndReference())) {
+               if (nextRegion.getStartOffset().equals(previousRegion.calculateEndOffset())) {
                   totalCachedByteCount += nextRegion.getSize();
                } else {
                   break;
@@ -297,11 +295,12 @@ public class MediumCache {
     */
    public void addRegion(MediumRegion regionToAdd) {
       Reject.ifNull(regionToAdd, "regionToAdd");
-      Reject.ifFalse(regionToAdd.getStartReference().getMedium().equals(getMedium()),
+      Reject.ifNull(regionToAdd.getBytes(), "regionToAdd.getBytes()");
+      Reject.ifFalse(regionToAdd.getStartOffset().getMedium().equals(getMedium()),
          "region.getStartReference().getMedium().equals(getMedium())");
 
       // First we existing regions overlapped by the new region
-      List<MediumRegion> regionsInRange = getRegionsInRange(regionToAdd.getStartReference(), regionToAdd.getSize());
+      List<MediumRegion> regionsInRange = getRegionsInRange(regionToAdd.getStartOffset(), regionToAdd.getSize());
 
       regionsInRange.stream().filter(regionInRange -> regionInRange.isCached())
          .forEach(existingRegion -> clipExistingRegionAgainstRegionToAdd(existingRegion, regionToAdd));
@@ -309,9 +308,8 @@ public class MediumCache {
       // Then we ensure the new region is divided into subregions with max region size, if necessary
       // and we add all divided subregions into the cache
       List<MediumRegion> regionsToAdd = MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class,
-         regionToAdd.getStartReference(), regionToAdd.getSize(), getMaximumCacheRegionSizeInBytes(),
-         (chunkStartReference, chunkSize) -> splitRegionExceedingMaxCacheRegionSize(regionToAdd, chunkStartReference,
-            chunkSize));
+         regionToAdd.getStartOffset(), regionToAdd.getSize(), getMaximumCacheRegionSizeInBytes(), (chunkStartReference,
+            chunkSize) -> splitRegionExceedingMaxCacheRegionSize(regionToAdd, chunkStartReference, chunkSize));
 
       regionsToAdd.stream().forEach(this::addRegionToCache);
 
@@ -335,6 +333,44 @@ public class MediumCache {
    }
 
    /**
+    * Removes a region from this {@link MediumCache}. Any already existing cache regions are split (if partly overlapped
+    * by the {@link MediumRegion} to remove) and then the overlapped parts removed, or entirely removed (if entirely
+    * covered by the {@link MediumRegion} to remove) from the cache. If the cache does not contain any cached regions in
+    * the given range, nothing happens.
+    * 
+    * @param offset
+    *           The starting {@link MediumOffset} of the range. Must refer to the same {@link Medium} as returned by
+    *           {@link #getMedium()}.
+    * @param rangeSizeInBytes
+    *           The size of the range in bytes. Must not be negative and must not be zero.
+    */
+   public void removeRegionsInRange(MediumOffset offset, int rangeSizeInBytes) {
+      Reject.ifNull(offset, "offset");
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+      Reject.ifNegativeOrZero(rangeSizeInBytes, "rangeSizeInBytes");
+
+      List<MediumRegion> regionsInRange = getRegionsInRange(offset, rangeSizeInBytes);
+
+      for (MediumRegion mediumRegion : regionsInRange) {
+
+         removeRegionFromCache(mediumRegion);
+
+         MediumRegion splitRegion = mediumRegion;
+
+         if (mediumRegion.getStartOffset().before(offset)) {
+            MediumRegion[] splitRegions = mediumRegion.split(offset);
+            addRegionToCache(splitRegions[0]);
+            splitRegion = splitRegions[1];
+         }
+
+         if (offset.advance(rangeSizeInBytes).before(splitRegion.calculateEndOffset())) {
+            MediumRegion[] splitRegions = splitRegion.split(offset.advance(rangeSizeInBytes));
+            addRegionToCache(splitRegions[1]);
+         }
+      }
+   }
+
+   /**
     * Removes up all {@link MediumRegion}s currently contained in this {@link MediumCache} instance, effectively
     * emptying the cache.
     */
@@ -348,13 +384,13 @@ public class MediumCache {
     * {@link #getMaximumCacheRegionSizeInBytes()} each.
     * 
     * @param previousRegionEndReference
-    *           The start {@link MediumReference} of the range
+    *           The start {@link MediumOffset} of the range
     * @param currentRegionStartReference
-    *           The start {@link MediumReference} of the range
+    *           The start {@link MediumOffset} of the range
     * @return all uncached gap {@link MediumRegion}s in the range.
     */
-   private List<MediumRegion> getGapsBetweenCurrentAndPreviousCachedRegion(MediumReference previousRegionEndReference,
-      MediumReference currentRegionStartReference) {
+   private List<MediumRegion> getGapsBetweenCurrentAndPreviousCachedRegion(MediumOffset previousRegionEndReference,
+      MediumOffset currentRegionStartReference) {
 
       List<MediumRegion> gapRegions = new ArrayList<>();
 
@@ -372,31 +408,31 @@ public class MediumCache {
    /**
     * This method performs the actual splitting of a {@link MediumRegion} according to the maximum allowed cache region
     * size. It is used with
-    * {@link MediumRangeChunkAction#performActionOnChunksInRange(Class, MediumReference, int, int, MediumRangeChunkAction)}
+    * {@link MediumRangeChunkAction#performActionOnChunksInRange(Class, MediumOffset, int, int, MediumRangeChunkAction)}
     * and is called for each chunk the original {@link MediumRegion} is split into. It returns the {@link MediumRegion}
     * corresponding to the current chunk.
     * 
     * @param regionToSplit
     *           The enclosing region to split
     * @param chunkStartReference
-    *           The start {@link MediumReference} of the current chunk
+    *           The start {@link MediumOffset} of the current chunk
     * @param chunkSize
     *           The size of the current chunk
-    * @return The split {@link MediumRegion} with given start {@link MediumReference} and (chunk) size with the
+    * @return The split {@link MediumRegion} with given start {@link MediumOffset} and (chunk) size with the
     *         corresponding portion of the original region to split.
     */
    private MediumRegion splitRegionExceedingMaxCacheRegionSize(MediumRegion regionToSplit,
-      MediumReference chunkStartReference, int chunkSize) {
+      MediumOffset chunkStartReference, int chunkSize) {
 
-      MediumReference chunkEndReference = chunkStartReference.advance(chunkSize);
+      MediumOffset chunkEndReference = chunkStartReference.advance(chunkSize);
 
       MediumRegion splitRegion = regionToSplit;
 
-      if (regionToSplit.getStartReference().before(chunkStartReference)) {
+      if (regionToSplit.getStartOffset().before(chunkStartReference)) {
          splitRegion = regionToSplit.split(chunkStartReference)[1];
       }
 
-      if (chunkEndReference.before(regionToSplit.calculateEndReference())) {
+      if (chunkEndReference.before(regionToSplit.calculateEndOffset())) {
          splitRegion = splitRegion.split(chunkEndReference)[0];
       }
 
@@ -422,17 +458,17 @@ public class MediumCache {
          removeRegionFromCache(leftExistingRegion);
       } else if (overlapType == MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT) {
          removeRegionFromCache(leftExistingRegion);
-         MediumRegion survivingPartOne = leftExistingRegion.split(rightRegionToAdd.getStartReference())[0];
+         MediumRegion survivingPartOne = leftExistingRegion.split(rightRegionToAdd.getStartOffset())[0];
          addRegionToCache(survivingPartOne);
-         MediumRegion survivingPartTwo = leftExistingRegion.split(rightRegionToAdd.calculateEndReference())[1];
+         MediumRegion survivingPartTwo = leftExistingRegion.split(rightRegionToAdd.calculateEndOffset())[1];
          addRegionToCache(survivingPartTwo);
       } else if (overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_FRONT) {
          removeRegionFromCache(leftExistingRegion);
-         MediumRegion survivingPart = leftExistingRegion.split(rightRegionToAdd.getStartReference())[0];
+         MediumRegion survivingPart = leftExistingRegion.split(rightRegionToAdd.getStartOffset())[0];
          addRegionToCache(survivingPart);
       } else if (overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK) {
          removeRegionFromCache(leftExistingRegion);
-         MediumRegion survivingPart = leftExistingRegion.split(rightRegionToAdd.calculateEndReference())[1];
+         MediumRegion survivingPart = leftExistingRegion.split(rightRegionToAdd.calculateEndOffset())[1];
          addRegionToCache(survivingPart);
       }
    }
@@ -445,7 +481,7 @@ public class MediumCache {
     */
    private void addRegionToCache(MediumRegion region) {
       cachedRegionsInInsertOrder.add(region);
-      cachedRegionsInOffsetOrder.put(region.getStartReference(), region);
+      cachedRegionsInOffsetOrder.put(region.getStartOffset(), region);
    }
 
    /**
@@ -457,6 +493,6 @@ public class MediumCache {
     */
    private void removeRegionFromCache(MediumRegion region) {
       cachedRegionsInInsertOrder.remove(region);
-      cachedRegionsInOffsetOrder.remove(region.getStartReference());
+      cachedRegionsInOffsetOrder.remove(region.getStartOffset());
    }
 }

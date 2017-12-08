@@ -35,7 +35,7 @@ import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.changeManager.ReadWriteActionSequence.ActionOrder;
-import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
+import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
@@ -1908,7 +1908,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
     * @return an instance of a new {@link MediumChangeManager} for testing
     */
    private MediumChangeManager getTestling() {
-      return new MediumChangeManager(new MediumReferenceFactory(MediaTestUtility.DEFAULT_TEST_MEDIUM));
+      return new MediumChangeManager(new MediumOffsetFactory(MediaTestUtility.DEFAULT_TEST_MEDIUM));
    }
 
    /**

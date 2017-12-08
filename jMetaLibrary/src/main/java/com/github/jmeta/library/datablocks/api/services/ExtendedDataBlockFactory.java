@@ -13,7 +13,7 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.services.MediaAPI;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * {@link ExtendedDataBlockFactory}
@@ -30,7 +30,7 @@ public interface ExtendedDataBlockFactory extends DataBlockFactory {
     * @return the {@link Payload}
     */
    public Payload createPayloadAfterRead(DataBlockId id,
-      MediumReference reference, long totalSize, DataBlockReader reader,
+      MediumOffset reference, long totalSize, DataBlockReader reader,
       FieldFunctionStack context);
 
    /**

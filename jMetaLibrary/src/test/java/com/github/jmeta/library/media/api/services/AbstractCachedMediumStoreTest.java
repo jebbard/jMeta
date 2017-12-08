@@ -21,7 +21,7 @@ import org.mockito.Mockito;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
@@ -53,7 +53,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test
    public void isAtEndOfMedium_forFilledMediumAndCacheUntilEOM_returnsTrue() {
@@ -70,7 +70,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledMediumWithBigCache_noPriorCache_returnsZero() {
@@ -82,8 +82,8 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
-    * {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and
+    * {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledMediumWithBigCache_priorCacheAndOffsetInCachedRegion_returnsExpectedCount() {
@@ -93,7 +93,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       int byteCountToCache = 10;
 
-      MediumReference cacheOffset = at(currentMedium, 20);
+      MediumOffset cacheOffset = at(currentMedium, 20);
 
       cacheNoEOMExpected(cacheOffset, byteCountToCache);
 
@@ -101,7 +101,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledMediumWithBigCache_fromStartTillBeyondEOM_throwsEOMException() {
@@ -111,7 +111,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 59);
+      MediumOffset cacheOffset = at(currentMedium, 59);
 
       testCache_throwsEndOfMediumException(cacheOffset, currentMediumContent.length() + 100, currentMediumContent);
 
@@ -120,7 +120,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forEmptyMedium_fromStart_throwsEOMException() {
@@ -136,7 +136,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledMediumWithSmallCache_fromStartAndMoreThanMaxCSize_cachesOnlyUpToMaxCSize() {
@@ -146,10 +146,10 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 20);
+      MediumOffset cacheOffset = at(currentMedium, 20);
       cacheNoEOMExpected(cacheOffset, currentMediumContent.length() - 21);
 
-      MediumReference expectedActualCacheStartOffset = at(currentMedium, 595);
+      MediumOffset expectedActualCacheStartOffset = at(currentMedium, 595);
       int expectedCachedByteCount = MAX_CACHE_SIZE_FOR_SMALL_CACHE
          - MAX_CACHE_SIZE_FOR_SMALL_CACHE % MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
 
@@ -162,7 +162,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledMediumWithBigCache_cacheWithinPreviousCache_doesNotRead() {
@@ -172,7 +172,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 0);
+      MediumOffset cacheOffset = at(currentMedium, 0);
       int cacheSize = 30;
       cacheNoEOMExpected(cacheOffset, cacheSize);
       cacheNoEOMExpected(at(currentMedium, 2), 10);
@@ -184,7 +184,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledMediumWithSmallCache_cacheWithinPreviousCache_doesNotRead() {
@@ -194,7 +194,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 0);
+      MediumOffset cacheOffset = at(currentMedium, 0);
       int cacheSize = 30;
 
       cacheNoEOMExpected(cacheOffset, cacheSize);
@@ -207,7 +207,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledMediumWithSmallCache_fromStartMoreThanMaxRWSize_readsBlockWiseAndUpdatesCache() {
@@ -219,7 +219,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       int expectedReadCount = 4;
       int cacheSize = (expectedReadCount - 1) * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1;
-      MediumReference cacheOffset = at(currentMedium, 0);
+      MediumOffset cacheOffset = at(currentMedium, 0);
       cacheNoEOMExpected(cacheOffset, cacheSize);
 
       verifyExactlyNReads(expectedReadCount);
@@ -231,7 +231,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledMediumWithBigCache_fromStartLessThanMaxRWSize_readsOnceAndUpdatesCache() {
@@ -242,7 +242,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       int cacheSize = 500;
-      MediumReference cacheOffset = at(currentMedium, 0);
+      MediumOffset cacheOffset = at(currentMedium, 0);
       cacheNoEOMExpected(cacheOffset, cacheSize);
 
       verifyExactlyNReads(1);
@@ -254,7 +254,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledMediumWithBigCache_partlyCacheBeforeWithGaps_updatesCacheInGaps() {
@@ -269,7 +269,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       cacheNoEOMExpected(at(currentMedium, 135), 200);
 
       int cacheSize = 500;
-      MediumReference cacheOffset = at(currentMedium, 0);
+      MediumOffset cacheOffset = at(currentMedium, 0);
       cacheNoEOMExpected(cacheOffset, cacheSize);
 
       verifyExactlyNReads(3 + 4);
@@ -281,7 +281,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithBigCache_partlyCacheBeforeWithGaps_updatesCacheInGaps() {
@@ -296,7 +296,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       cacheNoEOMExpected(at(currentMedium, 135), 200);
 
       long getDataStartOffset = 0;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 400;
 
       getDataNoEOMExpected(getDataOffset, getDataSize);
@@ -310,7 +310,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithBigCache_cacheBeforeAndRangeInSingleCachedRegion_doesNotReReadAndReturnsExpectedData() {
@@ -320,7 +320,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 0);
+      MediumOffset cacheOffset = at(currentMedium, 0);
       int cacheSize = 100;
 
       cacheNoEOMExpected(cacheOffset, cacheSize);
@@ -328,7 +328,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       verifyExactlyNReads(1);
 
       long getDataStartOffset = 15;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 80;
 
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
@@ -341,7 +341,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithSmallCache_cacheWithMultipleRegionsBeforeAndStartBehindFirstRegionStart_doesNotReReadAndReturnsExpectedData() {
@@ -352,14 +352,14 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       int blocksRead = 10;
-      MediumReference cacheOffset = at(currentMedium, 0);
+      MediumOffset cacheOffset = at(currentMedium, 0);
       int cacheSize = blocksRead * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
       cacheNoEOMExpected(cacheOffset, cacheSize);
 
       verifyExactlyNReads(blocksRead);
 
       long getDataStartOffset = MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE - 1;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 8 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 2;
 
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
@@ -372,7 +372,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithBigCache_twiceInEnclosingRegion_doesNotReReadAndReturnsExpectedData() {
@@ -383,7 +383,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 200;
 
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
@@ -398,7 +398,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithSmallCache_twiceInEnclosingRegion_doesNotReReadAndReturnsExpectedData() {
@@ -409,7 +409,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 200;
 
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
@@ -424,7 +424,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithBigCache_fromStartAndNoCacheBefore_returnsExpectedDataAndReadsOnceAndUpdatesCache() {
@@ -435,7 +435,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 300;
 
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
@@ -449,7 +449,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithSmallCache_fromStartAndNoCacheBefore_returnsExpectedDataAndReadsBlockWiseAndUpdatesCache() {
@@ -460,7 +460,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 0;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 3 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 4;
 
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
@@ -474,7 +474,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledMediumWithSmallCache_noCacheBeforeAndMoreThanMaxCSize_returnsExpectedDataButCachesOnlyLastBlocks() {
@@ -485,10 +485,10 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 20;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = currentMediumContent.length() - 21;
 
-      MediumReference expectedActualCacheStartOffset = at(currentMedium, 595);
+      MediumOffset expectedActualCacheStartOffset = at(currentMedium, 595);
       int expectedCachedByteCount = MAX_CACHE_SIZE_FOR_SMALL_CACHE
          - MAX_CACHE_SIZE_FOR_SMALL_CACHE % MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
 
@@ -509,13 +509,13 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
     * the range.
     * 
     * @param rangeStartOffset
-    *           The start {@link MediumReference} of the range
+    *           The start {@link MediumOffset} of the range
     * @param rangeSize
     *           The size of the range
     * @param totalExpectedMediumContent
     *           The expected content of the whole medium as string
     */
-   protected void assertRangeIsCached(MediumReference rangeStartOffset, int rangeSize,
+   protected void assertRangeIsCached(MediumOffset rangeStartOffset, int rangeSize,
       String totalExpectedMediumContent) {
       List<MediumRegion> regions = mediumCacheSpy.getRegionsInRange(rangeStartOffset, rangeSize);
 
@@ -546,11 +546,11 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
     * Ensures the given range is not cached.
     * 
     * @param rangeStartOffset
-    *           The start {@link MediumReference} of the range
+    *           The start {@link MediumOffset} of the range
     * @param rangeSize
     *           The size of the range
     */
-   protected void assertRangeIsNotCached(MediumReference rangeStartOffset, int rangeSize) {
+   protected void assertRangeIsNotCached(MediumOffset rangeStartOffset, int rangeSize) {
       List<MediumRegion> regions = mediumCacheSpy.getRegionsInRange(rangeStartOffset, rangeSize);
 
       for (MediumRegion mediumRegion : regions) {
@@ -593,7 +593,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
     * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
     * as content, backed by a cache, where the cache is (much) bigger than the overall {@link Medium} size. The
     * read-write block size is set to same value (to ensure only single reads during the test cases when testing
-    * {@link MediumStore#cache(MediumReference, int)}) and an also quite big max cache region size. This method must be
+    * {@link MediumStore#cache(MediumOffset, int)}) and an also quite big max cache region size. This method must be
     * called at the beginning of a test case to create the {@link MediumStore} to test and its return value must be
     * assigned to {@link #mediumStoreUnderTest}. It is used for testing cases where data read is expected to always end
     * up in the cache due to its big size.

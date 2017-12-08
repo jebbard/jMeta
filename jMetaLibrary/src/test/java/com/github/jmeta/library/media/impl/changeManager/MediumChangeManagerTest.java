@@ -23,7 +23,7 @@ import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
-import com.github.jmeta.library.media.impl.reference.MediumReferenceFactory;
+import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 
 /**
  * {@link MediumChangeManagerTest} tests the {@link MediumChangeManager} class except the tests of the
@@ -1288,7 +1288,7 @@ public class MediumChangeManagerTest {
     * @return an instance of a new {@link MediumChangeManager} for testing
     */
    private MediumChangeManager getTestling() {
-      return new MediumChangeManager(new MediumReferenceFactory(MediaTestUtility.DEFAULT_TEST_MEDIUM));
+      return new MediumChangeManager(new MediumOffsetFactory(MediaTestUtility.DEFAULT_TEST_MEDIUM));
    }
 
    /**

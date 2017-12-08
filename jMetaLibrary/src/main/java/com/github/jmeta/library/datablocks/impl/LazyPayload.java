@@ -22,7 +22,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -39,7 +39,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
     * @param dataBlockReader
     * @param context
     */
-   public LazyPayload(DataBlockId id, MediumReference reference,
+   public LazyPayload(DataBlockId id, MediumOffset reference,
       long totalSize, DataBlockReader dataBlockReader,
       FieldFunctionStack context) {
       super(id, null, reference, dataBlockReader);
@@ -102,7 +102,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
             m_fields = new ArrayList<>();
 
          else {
-            MediumReference fieldReference = getMediumReference();
+            MediumOffset fieldReference = getMediumReference();
 
             m_fields = new ArrayList<>();
 
@@ -143,7 +143,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
    @Override
    public AbstractDataBlockIterator<Container> getContainerIterator() {
 
-      MediumReference containerReference = getMediumReference();
+      MediumOffset containerReference = getMediumReference();
 
       long totalFieldSize = 0;
 

@@ -22,9 +22,9 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
-import com.github.jmeta.library.media.impl.reference.StandardMediumReference;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
@@ -159,7 +159,7 @@ public class MediumActionComparatorTest {
 
       MediumActionComparator comparator = new MediumActionComparator();
 
-      MediumReference offset = at(0);
+      MediumOffset offset = at(0);
 
       // Sequence number of left object is smaller than right one
       MediumAction leftAction = new MediumAction(MediumActionType.INSERT,
@@ -178,7 +178,7 @@ public class MediumActionComparatorTest {
 
       MediumActionComparator comparator = new MediumActionComparator();
 
-      MediumReference offset = at(0);
+      MediumOffset offset = at(0);
 
       // Sequence number of left object is smaller than right one
       MediumAction leftAction = new MediumAction(MediumActionType.INSERT,
@@ -197,7 +197,7 @@ public class MediumActionComparatorTest {
 
       MediumActionComparator comparator = new MediumActionComparator();
 
-      MediumReference offset = at(0);
+      MediumOffset offset = at(0);
 
       // Sequence number of left object is smaller than right one
       MediumAction leftAction = new MediumAction(MediumActionType.INSERT,
@@ -221,7 +221,7 @@ public class MediumActionComparatorTest {
       MediumAction actionA1 = new MediumAction(MediumActionType.INSERT,
          new MediumRegion(at(0), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES);
       MediumAction actionA2 = new MediumAction(MediumActionType.INSERT,
-         new MediumRegion(new StandardMediumReference(otherMedium, 0), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES);
+         new MediumRegion(new StandardMediumOffset(otherMedium, 0), DEFAULT_BYTES.remaining()), 0, DEFAULT_BYTES);
 
       comparator.compare(actionA1, actionA2);
    }

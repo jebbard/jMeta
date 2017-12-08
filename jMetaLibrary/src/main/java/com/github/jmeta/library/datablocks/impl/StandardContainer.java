@@ -19,7 +19,7 @@ import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -39,7 +39,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @param dataBlockReader
     */
    public StandardContainer(DataBlockId id, DataBlock parent,
-      MediumReference reference, List<Header> headers, Payload payload,
+      MediumOffset reference, List<Header> headers, Payload payload,
       List<Header> footers, DataBlockReader dataBlockReader) {
       super(id, parent, reference, dataBlockReader);
 

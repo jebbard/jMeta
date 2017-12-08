@@ -19,7 +19,7 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumReference;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * {@link AbstractCachedAndWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable
@@ -32,8 +32,8 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    extends AbstractCachedMediumStoreTest<T> {
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumReference)} and
-    * {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and
+    * {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledRandomAccessMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
@@ -43,7 +43,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       int byteCountToCache = 10;
 
-      MediumReference cacheOffset = at(currentMedium, 20);
+      MediumOffset cacheOffset = at(currentMedium, 20);
 
       cacheNoEOMExpected(cacheOffset, byteCountToCache);
 
@@ -53,7 +53,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledRandomAccessMediumWithSmallCache_forAlreadyFreedRangeBeforeCurrentPosition_updatesCache() {
@@ -63,7 +63,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 10);
+      MediumOffset cacheOffset = at(currentMedium, 10);
       int cacheSize = 20;
 
       cacheNoEOMExpected(cacheOffset, currentMediumContent.length() - 10);
@@ -81,7 +81,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledRandomAccessMediumWithBigCache_inMiddle_doesNotReadOrCacheDataBefore() {
@@ -91,7 +91,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 20);
+      MediumOffset cacheOffset = at(currentMedium, 20);
       int cacheSize = 10;
       cacheNoEOMExpected(cacheOffset, cacheSize);
 
@@ -103,7 +103,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledRandomAccessMediumWithBigCache_multipleOverlappingAndDisconnectedRegions_updatesCache() {
@@ -113,11 +113,11 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference firstCacheOffset = at(currentMedium, 20);
+      MediumOffset firstCacheOffset = at(currentMedium, 20);
       int firstCacheSize = 10;
-      MediumReference secondCacheOffset = at(currentMedium, 25);
+      MediumOffset secondCacheOffset = at(currentMedium, 25);
       int secondCacheSize = 100;
-      MediumReference thirdCacheOffset = at(currentMedium, 200);
+      MediumOffset thirdCacheOffset = at(currentMedium, 200);
       int thirdCacheSize = 35;
 
       cacheNoEOMExpected(firstCacheOffset, firstCacheSize);
@@ -139,7 +139,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledRandomAccessMediumWithSmallCache_overlappingAlreadyFreedRangeAtFront_updatesCache() {
@@ -149,10 +149,10 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference firstCacheOffset = at(currentMedium, 10);
+      MediumOffset firstCacheOffset = at(currentMedium, 10);
       int firstCacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 6 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
 
-      MediumReference secondCacheOffset = at(currentMedium, 5);
+      MediumOffset secondCacheOffset = at(currentMedium, 5);
       int secondCacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE;
 
       cacheNoEOMExpected(firstCacheOffset, firstCacheSize);
@@ -170,7 +170,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumReference, int)}.
+    * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void cache_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
@@ -180,7 +180,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, currentMediumContent.length() + 15);
+      MediumOffset cacheOffset = at(currentMedium, currentMediumContent.length() + 15);
       int cacheSize = 10;
 
       testCache_throwsEndOfMediumException(cacheOffset, cacheSize, currentMediumContent);
@@ -189,7 +189,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledRandomAccessMediumWithSmallCache_withinAlreadyFreedRange_returnsExpectedDataAndUpdatesCache() {
@@ -204,10 +204,10 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       cacheNoEOMExpected(at(currentMedium, 0), cacheSize);
 
       long getDataStartOffset = 10;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 20;
 
-      MediumReference expectedActualCacheStartOffset = at(currentMedium, 50);
+      MediumOffset expectedActualCacheStartOffset = at(currentMedium, 50);
       int expectedActualCacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE - getDataSize;
 
       testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
@@ -231,7 +231,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledRandomAccessMediumWithSmallCache_overlappingAlreadyFreedRangeAtFront_returnsExpectedDataAndUpdatesCache() {
@@ -241,10 +241,10 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference cacheOffset = at(currentMedium, 10);
+      MediumOffset cacheOffset = at(currentMedium, 10);
       int cacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 6 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
 
-      MediumReference getDataOffset = at(currentMedium, 5);
+      MediumOffset getDataOffset = at(currentMedium, 5);
       int getDataSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE;
 
       cacheNoEOMExpected(cacheOffset, cacheSize);
@@ -262,7 +262,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledRandomAccessMediumWithSmallCache_overlappingAlreadyCachedRangeAtFront_returnsExpectedDataAndUpdatesCache() {
@@ -272,7 +272,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference getDataOffset = at(currentMedium, 15 + 7 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
+      MediumOffset getDataOffset = at(currentMedium, 15 + 7 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
       int getDataSize = 10;
 
       int cacheSize = MAX_CACHE_SIZE_FOR_SMALL_CACHE + 6 * MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
@@ -292,7 +292,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledRandomAccessMediumWithBigCache_inMiddle_doesNotReadOrCacheDataBefore() {
@@ -303,7 +303,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       mediumStoreUnderTest.open();
 
       long getDataStartOffset = 20;
-      MediumReference getDataOffset = at(currentMedium, getDataStartOffset);
+      MediumOffset getDataOffset = at(currentMedium, getDataStartOffset);
       int getDataSize = 100;
 
       getDataNoEOMExpected(getDataOffset, getDataSize);
@@ -318,7 +318,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumReference, int)}.
+    * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
    @Test
    public void getData_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
@@ -328,7 +328,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.open();
 
-      MediumReference getDataOffset = at(currentMedium, (long) (currentMediumContent.length() + 15));
+      MediumOffset getDataOffset = at(currentMedium, (long) (currentMediumContent.length() + 15));
       int getDataSize = 10;
 
       testGetData_throwsEndOfMediumException(getDataOffset, getDataSize, currentMediumContent.length(),
@@ -338,7 +338,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = InvalidOverlappingWriteException.class)
    public void replaceData_overlappingWithPriorReplace_throwsException() {
@@ -351,7 +351,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = InvalidOverlappingWriteException.class)
    public void replaceData_overlappingWithPriorRemove_throwsException() {
@@ -364,7 +364,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = InvalidOverlappingWriteException.class)
    public void removeData_overlappingWithPriorReplace_throwsException() {
@@ -377,7 +377,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumReference)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = InvalidOverlappingWriteException.class)
    public void removeData_overlappingWithPriorRemove_throwsException() {
@@ -390,7 +390,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    }
 
    /**
-    * Tests {@link MediumStore#removeData(MediumReference, int)}.
+    * Tests {@link MediumStore#removeData(MediumOffset, int)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void removeData_forClosedMedium_throwsException() {
