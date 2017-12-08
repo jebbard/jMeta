@@ -1871,11 +1871,11 @@ We can add that the writing operations have some additional oddities:
 \end{itemize}
 \end{itemize}
 
-We can first confirm that the configuration of a maximum block size for writing is necessary:
+We can first confirm that the configuration of a maximum read write block size for writing is necessary:
 %%%% DD --> %%%%
 \DD{dd:438}
 {% Titel
-A maximum write block size must be configurable for the user
+A maximum read-write block size must be configurable for the user
 }
 {% Kurzbeschreibung
 It must be between 1 and N (any integer) bytes
@@ -1902,7 +1902,7 @@ Finding out wich operations must be executed during a flush is a complex task. W
 \item TRUNCATE: explicit shortening of a file, which is especially necessary for removing data
 \end{itemize}
 
-Each returned \texttt{READ} action must be followed by a \texttt{WRITE} action, otherwise the plan is invalid. \texttt{INSERT} and \texttt{REPLACE} operations (if more replacement bytes than bytes to replace) lead to \texttt{WRITE} actions. For all \texttt{READ} and \texttt{WRITE} actions: the number of bytes is between 0 and the (configured) maximum write block size. \texttt{createFlushPlan()} also returns the original \texttt{REMOVE}, \texttt{REPLACE} and \texttt{INSERT} actions explicitly in the plan, although they are implemented implicitly by \texttt{READ} and \texttt{WRITE} actions.
+Each returned \texttt{READ} action must be followed by a \texttt{WRITE} action, otherwise the plan is invalid. \texttt{INSERT} and \texttt{REPLACE} operations lead to \texttt{WRITE} actions. For all \texttt{READ} and \texttt{WRITE} actions: the number of bytes is between 0 and the (configured) maximum read-write block size. \texttt{createFlushPlan()} also returns the original \texttt{REMOVE}, \texttt{REPLACE} and \texttt{INSERT} actions explicitly in the plan, although they are implemented implicitly by \texttt{READ} and \texttt{WRITE} actions.
 
 The read-write-plan thus contains \MediumAction{}s in addition to those caused by scheduling actions by a user. These additional actions are, however, not added to the internal data structures of the \MediumChangeManager{}.
 
@@ -1924,19 +1924,21 @@ Next, we should clarify how the cache is involved in \texttt{flush()}. In case c
 \begin{itemize}
 \item If bytes are added to the medium with \texttt{INSERT} or \texttt{REPLACE}, these bytes must also be added to the cache
 \item If bytes are removed from the medium with \texttt{REMOVE} or \texttt{REPLACE}, these bytes must also be removed from the cache
-\item Is specific handling of \texttt{TRUNCATE} necessary?
 \item If bytes behind a change must be read (and written), they should also be directly added to the cache to save future medium accesses in these ranges
 \item Furthermore, if bytes behind a change must be read, it must also be checked if they are already contained in the cache, such that an explicit \texttt{READ} on the external medium is only necessary if these bytes are not cached
+\item It is not yet clear if a specific handling of \texttt{TRUNCATE} is necessary
 \end{itemize}
 
 For the last point, we define the following:
 %%%% DD --> %%%%
 \DD{dd:439b}
 {% Titel
-\texttt{READ} operations in \texttt{flush} prefer cached data and update the cache if not already contained 
+\texttt{READ} operations in \texttt{flush} prefer cached data and update the cache if not already contained - We implement this using \texttt{getData}
 }
 {% Kurzbeschreibung
 Whenever \texttt{flush} processes a \texttt{READ} action coming from the flush plan, it first checks if the data to read is fully cached. If it is, it takes the data from the cache. If it is not, it reads the data directly from the external medium and adds it to the cache.
+
+This is exactly what getData already does - so we simply call this method. If an \texttt{EndOfMediumException} occurs during reading, this is unexpected and will lead to an \texttt{IllegalStateException} thrown.
 }
 {% Begründung
 We want to use cached data as much as possible and avoid unnecessary medium accesses.
@@ -1954,7 +1956,7 @@ Correspondingly, this is how we treat \texttt{INSERT} and inserting \texttt{REPL
 \texttt{INSERT} and inserting \texttt{REPLACE} operations in \texttt{flush} add their data to the cache
 }
 {% Kurzbeschreibung
-Whenever \texttt{flush} processes an \texttt{INSERT} or inserting \texttt{REPLACE} action coming from the flush plan, it adds all bytes to insert or replacement bytes from these actions to the cache.
+Whenever \texttt{flush} processes an \texttt{INSERT} or \texttt{REPLACE} action coming from the flush plan, it adds all bytes to insert or replacement bytes from these actions to the cache.
 }
 {% Begründung
 We want to use cached data as much as possible and avoid unnecessary medium accesses.
@@ -1964,14 +1966,14 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Very similar for \texttt{REMOVE} and removing \texttt{REPLACE}:
+Very similar for \texttt{REMOVE} and \texttt{REPLACE}:
 %%%% DD --> %%%%
 \DD{dd:439d}
 {% Titel
-\texttt{REMOVE} and removing \texttt{REPLACE} operations in \texttt{flush} remove their ranges from the cache
+\texttt{REMOVE} and \texttt{REPLACE} operations in \texttt{flush} remove their removed or replaced ranges from the cache
 }
 {% Kurzbeschreibung
-Whenever \texttt{flush} processes a \texttt{REMOVE} or removing \texttt{REPLACE} action coming from the flush plan, it removes all bytes to remove or replace from the cache. Of course, the replacement bytes of a \texttt{REPLACE} action are still newly added to the cache.
+Whenever \texttt{flush} processes a \texttt{REMOVE} or \texttt{REPLACE} action coming from the flush plan, it removes all bytes to remove or replace from the cache.
 }
 {% Begründung
 Avoid cache corruption if old data is still present. In best case, the code directly fails when trying to add new data, in worst case the stale removed data remains in the cache and is later returned by read operations despite the medium already changed.
@@ -1998,48 +2000,84 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-We still have the topic to update any already created \IMediumReference{}s when processing \texttt{INSERT}s, \texttt{REMOVE}s and \texttt{REPLACE}s according to design decision \DesLink{dd:418b}. When do we need to perform these changes? This actually depends on the action type:
+We still have the topic to update any already created \IMediumReference{}s when processing \texttt{INSERT}s, \texttt{REMOVE}s and \texttt{REPLACE}s according to design decision \DesLink{dd:418b}. When do we need to perform these changes? The first part of the answer is given in the following design decision:
+
 %%%% DD --> %%%%
-\DD{dd:439e}
+\DD{dd:439f}
 {% Titel
-For \texttt{INSERT}s and inserting \texttt{REPLACE}s, \IMediumReference{}s are updated \emph{BEFORE} the cache is updated, for \texttt{REMOVE}s and removing \texttt{REPLACE}s they are updated \emph{AFTERWARDS}
+\texttt{flush} processes the flush plan in two phases: Medium access phase and cache update phase
 }
 {% Kurzbeschreibung
-For \texttt{INSERT}s and inserting \texttt{REPLACE}s, any \IMediumReference{}s already created and maintained in the \MediumReferenceRepository{} are updated first, which essentially increases the offsets of any \IMediumReference{}s behind the insertion offset by the number of bytes inserted. Only after this, the data newly inserted or replaced can be added to the cache.
-
-In contrast to this, when \texttt{REMOVE}s and removing \texttt{REPLACE}s are processed, first of all, the bytes to remove, if present in the cache, need to be removed from it. Only then, all \IMediumReference{}s behind the remove offset need to be decreased by the number of removed bytes (or fall back to remove offset, if within the removed range). 
+First of all, flush iterates all \texttt{MediumAction}s in the flush plan in order and executes any \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE} operations. So this can be called the \emph{medium access phase}. In the second phase, all \texttt{MediumAction}s are iterated again, while the cache is updated, the \texttt{MediumAction}s are set to done and the \IMediumReference{}s are updated in correspondence with the changes.
 }
 {% Begründung
-For \texttt{INSERT}s and inserting \texttt{REPLACE}s: If we add the inserted data to the cache before updating reference, the following would happen: Assume there are bytes already cached directly starting at the insertion offset. They would be superseded by the inserted data, i.e. thrown out of the cache. Then only all remaining data with higher offsets in the cache would be updated. This way, we would essentially lose cached data unnecessary and increase the complexity of cache management needed at runtime a bit.
-
-For \texttt{REMOVE}s and removing \texttt{REPLACE}s: If we would first update the \IMediumReference{}s here, the following could happen: Assume we have two consecutive cached regions within the region to remove. For both regions, its offset would be updated to point to the remove offset. So we would have two regions cached with the same start offset, which leaves the cache inconsistent. Instead, we first remove all cached regions within the removed range, then we update any remaining regions (those behind the removed range).
+Why not performing everything within the same loop, i.e. just once iterating the \texttt{MediumAction}s? This would mean to e.g. first execute an \texttt{INSERT} action, and then update all references. The problem: The flush plan might still contain READ and WRITE operations which are referring the offsets on the current medium. Calling \MediumReferenceRepository{}\texttt{.updateReferences()} already now would also update these references, and they would be pointing to the wrong bytes! Thus, we must first process all \texttt{READ} (including adding of the read bytes to the cache), \texttt{WRITE} and \texttt{TRUNCATE} operations with their original offsets. For the caching updates in terms of \texttt{INSERT}, \texttt{REPLACE} And \texttt{REMOVE}, there are additional constraints that make it necessary to do it in the second phase. These are detailled in the next design decision.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-TODO hier weiter
+The second part of the answer when to perform \MediumReferenceRepository{}\texttt{.updateReferences()} comes here. Some things need to be kept in mind when updating the cache, which depends on the action type:
+%%%% DD --> %%%%
+\DD{dd:439g}
+{% Titel
+For \texttt{INSERT}s and the replacement bytes of a \texttt{REPLACE}, \IMediumReference{}s are updated \emph{BEFORE} the cache is updated, for \texttt{REMOVE}s and the replaced bytes of a \texttt{REPLACE} they are updated \emph{AFTERWARDS}
+}
+{% Kurzbeschreibung
+For \texttt{INSERT}s and \texttt{REPLACE}s, any \IMediumReference{}s already created and maintained in the \MediumReferenceRepository{} are updated first, which essentially increases the offsets of any \IMediumReference{}s behind the insertion or replacement offset by the number of bytes inserted or the number of replacement bytes. Only after this, the data newly inserted or the replacement bytes can be added to the cache.
 
+In contrast to this, when \texttt{REMOVE}s and the replaced region of a \texttt{REPLACE} are processed, first of all, the bytes to remove or replace, if present in the cache, need to be removed from it. Only then, all \IMediumReference{}s behind the remove or replace offset need to be decreased by the number of removed or replaced bytes (or fall back to remove or replace offset, if within the removed or replaced range). 
+}
+{% Begründung
+For \texttt{INSERT}s: If we add the inserted (or replacement) data to the cache before updating reference, the following would happen: Assume there are bytes already cached directly starting at the insertion offset. They would be superseded by the inserted data, i.e. thrown out of the cache. Then only all remaining data with higher offsets in the cache would be updated. This way, we would essentially lose cached data unnecessarily and increase the complexity of cache management needed at runtime a bit.
+
+For \texttt{REMOVE}s: If we would first update the \IMediumReference{}s here, the following could happen: Assume we have two consecutive cached regions within the region to remove. For both regions, its offset would be updated to point to the remove offset. So we would have two regions cached with the same start offset, which leaves the cache inconsistent. Instead, we first remove all cached regions within the removed range, then we update any remaining regions (those behind the removed range).
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+The question for the complex \texttt{flush} operation now is: Do we need to do anything special for error handling? First of all we should think of: What could happen? In detail, there are two reasonable scenarios what could go wrong:
+\begin{itemize}
+\item There is a programming error in the library, and this leads to a runtime exception
+\item There is a problem during accessing the medium, may it by a HD failure or that another process accesses the medium in parallel
+\end{itemize}
+
+Both cases can be considered fatal. Would a retry make sense? Probably yes, but most often: Probably no. Should we support in performing a retry? Probably also no:
+
+%%%% DD --> %%%%
+\DD{dd:440}
+{% Titel
+No specific error handling is done in \texttt{flush} itself
+}
+{% Kurzbeschreibung
+There is no try-catch block within \texttt{flush} trying to handle any runtime errors. These errors are directly thrown up to the using code. The \texttt{flush} implementation does not perform any specific measures to ensure or allow retry or ``recovery'' mechanisms.
+}
+{% Begründung
+First of all, flush does not and cannot really support ACID, see \DesLink{dd:410b}. Second, the error situations one could think of are in no way expected, but refer to where unexpected, abnormal situation. In these situations, anyways the state of the overall system might be critical. We cannot foresee any possible error situations and we also cannot really pretend we can handle them correctly. The only advise for the user when an error in flush happens: If it might be a programming error, issue a bug. Otherwise, try closing and reopening the medium and redo the changes. In both cases, of course, due to \DesLink{dd:410b}, it could be that some changes have already been performed, which might leave the external medium in a corrupted state.
+}
+{% Nachteile
+No disadvantages known, as we hope there are really no cases where a retry would absolutely make sense
+}
+%%%% <-- DD %%%%
 
 Now we have all credentials to implement writing in \texttt{flush()}:
 \begin{enumerate}
-\item Create the read-write-plan according to \DesLink{dd:439}
-\item Iterate all actions of the read-write-plan, the following steps are done for each action.
-\item Execute the \MediumAction{} at the indicated offset, we distinguish the following cases:
+\item Create the flush plan according to \DesLink{dd:439}
+\item \textbf{Phase 1 - Medium access phase:} Iterate all actions of the flush plan in order, but only handle the action types mentioned below in a specific way:
 \begin{itemize}
-\item If action = \texttt{READ}: Read $n$ bytes \-- that are written in the subsequent action \-- where $n$ is smaller than the maximum write block size and bigger than 0. For that, first all regions are determined using \MediumCache{}\texttt{.getData()}. Those that are not cached are read by direct access to the medium via \IMediumAccessor{}. Then a corresponding \texttt{ByteBuffer} is built up step-wise. If an \texttt{EndOfMediumException} occurs, this is considered as impossible and an \texttt{IllegalStateException} is thrown.
-\item If action = \texttt{WRITE}: If the \texttt{WRITE} action contains bytes already, it as associated to an \texttt{INSERT} or \texttt{REPLACE}. In this case, directly write the contained bytes with direct access to the medium via \IMediumAccessor{}. If the action does not contain any bytes, the previous action must have been a \texttt{READ} reading exactly the same amount of bytes to write. If this is not the case, an \texttt{IllegalStateException} is thrown. Otherwise these previously read bytes are written with direct access to the medium via \IMediumAccessor{}.
-\item If action = \texttt{TRUNCATE}: Execute an explicit truncation of the medium.
-\item If action = \texttt{INSERT}, \texttt{REPLACE} or \texttt{REMOVE}: Do nothing, as these operations are implicitly implemented via \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE} operations.
+\item If action = \texttt{READ}: Call \texttt{getData} at the indicated offset to read $n$ bytes. These bytes are written in the subsequent \texttt{WRITE} action. If an \texttt{EndOfMediumException} occurs, this is considered as impossible and an \texttt{IllegalStateException} is thrown. Store the read bytes to be used by the upcoming \texttt{WRITE} action. Set the action to done afterwards.
+\item If action = \texttt{WRITE}: If the \texttt{WRITE} action contains bytes already, it as associated to an \texttt{INSERT} or \texttt{REPLACE}. In this case, directly write the contained bytes with direct access to the medium via \IMediumAccessor{}. If the action does not contain any bytes, the previous action must have been a \texttt{READ} reading exactly the same amount of bytes to write. If this is not the case, an \texttt{IllegalStateException} is thrown. Otherwise these previously read bytes are written with direct access to the medium via \IMediumAccessor{}. Set the action to done afterwards.
+\item If action = \texttt{TRUNCATE}: Execute a truncation of the medium with direct access to the medium via \IMediumAccessor{}. Set the action to done afterwards.
 \end{itemize}
-\item If action = \texttt{INSERT}, \texttt{REPLACE} or \texttt{REMOVE}: Call \MediumReferenceRepository{}\texttt{.updateReferences()} for the region, such that all consecutive  \IMediumReference{} instances are updated.
-\item Update the cache:
+\item \textbf{Phase 2 - Cache update phase:} Iterate all actions of the flush plan in order, but only handle the action types mentioned below in a specific way:
 \begin{itemize}
-\item If action = \texttt{WRITE}, then call \MediumCache{}\texttt{.addRegion()} to add the bytes written to the cache.
-\item If action = \texttt{REMOVE}, then call \MediumCache{}\texttt{.removeRegion()} to remove the bytes also from the cache.
+\item If action = \texttt{INSERT}: First call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action, then add the insertion bytes to the cache. Finally, call \MediumChangeManager{}.\texttt{undo} on the action.
+\item If action = \texttt{REMOVE}: First remove the bytes in the removal region from the cache, then call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action. Finally, call \MediumChangeManager{}.\texttt{undo} on the action.
+\item If action = \texttt{REPLACE}: First remove the bytes in the replaced region from the cache, then call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action, then add the replacement bytes to the cache. Finally, call \MediumChangeManager{}.\texttt{undo} on the action.
 \end{itemize}
-\item If action = \texttt{INSERT}, \texttt{REMOVE} or \texttt{REPLACE}: Call \MediumChangeManager{}\texttt{.undo()} to undo the action
 \end{enumerate}
 
 %%%% DD --> %%%%
@@ -2051,42 +2089,15 @@ Now we have all credentials to implement writing in \texttt{flush()}:
 \texttt{flush()} is implemented according to the process defined above
 }
 {% Begründung
-The read-write-plan must contain all operations explicitly, i.e. including those triggered by the user - \texttt{REPLACE}, \texttt{INSERT} and \texttt{REMOVE}, even if \texttt{READ} and \texttt{WRITE} would be sufficient for their implementation. The reason for that is that the actions of the user must explicitly be removed from the \MediumChangeManager{} and their influence on \IMediumReference{} instances behind must explicitly be executed. For this, you need the concrete types, \texttt{WRITE} is not sufficient.
+The flush plan must contain all operations explicitly, i.e. including those triggered by the user - \texttt{REPLACE}, \texttt{INSERT} and \texttt{REMOVE}, even if \texttt{READ} and \texttt{WRITE} would be sufficient for their implementation. The reason for that is that the actions of the user must explicitly be removed from the \MediumChangeManager{} and their influence on \IMediumReference{} instances behind must explicitly be executed. For this, you need the concrete types, \texttt{WRITE} is not sufficient.
 
 Throwing an \texttt{IllegalStateException} in case of end of medium encountered is necessary, as the creation of the flush plan must have considered the medium size. Thus, if it occurs, this is either a programming error in \texttt{createFlushPlan} or another process as changed the medium meanwhile.
 
 \texttt{undo()} is only executed for user operations, as only those are maintained in the internal data structures of \MediumChangeManager{}, according to \DesLink{dd:439}.
 
-The cache update is divided into two parts: In case of a \texttt{REMOVE}, \emph{first} the cache is updated, and \emph{then} the \IMediumReference{} instances are updated. The reaseon for that is that otherwise, at the same offset, there could be multiple cache regions \--- for example, if you have a remove of 10 bytes at offset 0 and an insert at offset 10, if you update the medium references first, the cache would contain the previous (to be removed) region from 0 to 10, and a new region from 0 to 10 (the newly inserted one, as the offsets were updated). This would bring the cache into an inconsistent state. With the same reason, the other writing operations are only updated in the cache (part 2) \emph{after} the update of the \IMediumReference{} instances.
+The cache update is divided into two parts as mentioned in previous design decisions.
 
 The cache management is completely done within \MediumCache{}\texttt{.addRegion()}, such that maximum size and consecutive regions can be optimized there.
-}
-{% Nachteile
-No disadvantages known
-}
-%%%% <-- DD %%%%
-
-Let us think about the error handling of this process:
-\begin{itemize}
-\item Is there a failure during creation of the read-write-plan (step 1), the user can try again, as all changes are still existing and nothing was changed yet (at least nothing by the current OS process and using \LibName{})
-\item Is there a failure during access to the external medium (step 3), then previously, some actions of the read-write-plan might already have been executed successfully, the external medium thus was already changed. This corresponds to what \DesLink{dd:410b} says. As the previous operations were already removed from the plan and other data structures, we have a clean ``recovery point'', at least, i.e. the user can retry the flush.
-\item Is there a failure in updating the cache in steps 4 or 6, neither the action is removed, nor the medium references are updated. Similar things happen if something goes wrong in step 5. In these cases, either the \MediumCache{} or the \MediumReferenceRepository{} is in an inconsistent state, basically it is out-of-sync with reality. The question is: Is there anything left to be rescued? This is clarified by the following design decision.
-\end{itemize}
-
-%%%% DD --> %%%%
-\DD{dd:441}
-{% Titel
-Undo of changes always happens, cache is emptied in case of update failures
-}
-{% Kurzbeschreibung
-Should a failure of the \texttt{flush()} occur during steps 4 to 6, i.e. any \texttt{Exception} is thrown, the action must nevertheless be undone.
-
-Further measures are not taken, because failure in steps 4 to 6 might only happen in case of programming errors or system failures. In these situations, recovery is anyway quite hard or even impossible.
-}
-{% Begründung
-\texttt{flush()} is a reasonable operation, that does however not support ACID, but at least the whole system is left in as sane state as possible. This includes that actions already executed successfully are removed such that they are not executed again by mistake.
-
-The attempt to also handle failures during cache management or \MediumReferenceRepository{} accesses has a very high complexity that is not justifiable compared to the scarcity of such events. Even then the system is actually not in a consistent state. Such error handling that believes it can rescue the overall system from failure probably makes things even worse.
 }
 {% Nachteile
 No disadvantages known
@@ -2125,7 +2136,7 @@ CF0 & No operation & - & The plan created is empty \\
 CF1 & Single \texttt{insert} $n$ bytes at offset $x$ &
 \begin{enumerate}
 \item[a.] $x$ is start, intermediate or end offset of the medium
-\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum read-write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
 \item[c.] Insertion bytes: The same cases as for the bytes behind
 \end{enumerate}
 & 
@@ -2140,7 +2151,7 @@ CF1 & Single \texttt{insert} $n$ bytes at offset $x$ &
 CF2 & Single \texttt{remove} $n$ bytes at offset $x$ &
 \begin{enumerate}
 \item[a.] $x$ is start, intermediate offset or $x+n$ is the end offset of the medium
-\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum read-write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
 \item[c.] Extreme case: All bytes of the medium are removed
 \end{enumerate}
 & 
@@ -2156,7 +2167,7 @@ CF2 & Single \texttt{remove} $n$ bytes at offset $x$ &
 CF3 & Single \texttt{replace} of $n$ bytes by $r$ new bytes at offset $x$ &
 \begin{enumerate}
 \item[a.] $x$ is start, intermediate offset or $x+n$ is the end offset of the medium
-\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[b.] Bytes behind: None, or whole-numbered multiple of the maximum read-write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
 \item[c.] Replacement bytes: Same cases as for bytes behind
 \item[d.] $r$ smaller, equal to or bigger than $n$
 \item[e.] Extreme case: All bytes of the medium are replaced
@@ -2175,7 +2186,7 @@ CF3 & Single \texttt{replace} of $n$ bytes by $r$ new bytes at offset $x$ &
 CF4 & Multiple \texttt{insert}s of in total $n$ bytes &
 \begin{enumerate}
 \item[a.] At same or different offsets
-\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum read-write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
 \item[c.] Bytes to insert: Same cases as for bytes behind
 \end{enumerate}
 & 
@@ -2191,7 +2202,7 @@ CF4 & Multiple \texttt{insert}s of in total $n$ bytes &
 CF5 & Multiple \texttt{remove}s of in total $n$ bytes &
 \begin{enumerate}
 \item[a.] All removes refer to consecutive regions or have gaps between
-\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum read-write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
 \item[c.] Extreme case: All bytes of the medium are removed
 \end{enumerate}
 &
@@ -2207,7 +2218,7 @@ CF5 & Multiple \texttt{remove}s of in total $n$ bytes &
 CF6 & Multiple \texttt{replace}s of in total $n$ bytes by in total $r$ new bytes &
 \begin{enumerate}
 \item[a.] All replaces refer to consecutive regions or have gaps between
-\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
+\item[b.] Bytes in-between/behind: None, whole-numbered multiple of the maximum read-write block size $m$, or no whole-numbered multiple of $m$, or fewer bytes than $m$
 \item[c.] Replacement bytes: Same cases as for bytes behind
 \item[d.] $r$ smaller, equal to or bigger than $n$
 \item[e.] Extreme case: All bytes of the medium are replaced
