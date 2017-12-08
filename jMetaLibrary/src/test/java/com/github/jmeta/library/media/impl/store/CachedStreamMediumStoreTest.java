@@ -77,8 +77,8 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       Assert.assertEquals(cacheSize + cacheOffset.getAbsoluteMediumOffset(),
          mediumStoreUnderTest.getCachedByteCountAt(mediumStartOffset));
 
-      assertRangeIsCached(mediumStartOffset, (int) cacheOffset.getAbsoluteMediumOffset(), currentMediumContent);
-      assertRangeIsCached(cacheOffset, cacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(mediumStartOffset, (int) cacheOffset.getAbsoluteMediumOffset(), currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(cacheOffset, cacheSize, currentMediumContent);
       assertRangeIsNotCached(cacheOffset.advance(cacheSize), currentMediumContent.length());
    }
 
@@ -110,7 +110,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       Assert.assertEquals(24, mediumStoreUnderTest.getCachedByteCountAt(thirdCacheOffset.advance(11)));
       Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(thirdCacheOffset.advance(thirdCacheSize)));
 
-      assertRangeIsCached(at(currentMedium, 0), (int) thirdCacheOffset.getAbsoluteMediumOffset() + thirdCacheSize,
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), (int) thirdCacheOffset.getAbsoluteMediumOffset() + thirdCacheSize,
          currentMediumContent);
       assertRangeIsNotCached(thirdCacheOffset.advance(thirdCacheSize), currentMediumContent.length());
    }
@@ -146,7 +146,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
          mediumStoreUnderTest.getCachedByteCountAt(expectedActualCacheStartOffset));
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) expectedActualCacheStartOffset.getAbsoluteMediumOffset());
-      assertRangeIsCached(expectedActualCacheStartOffset, expectedActualCacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(expectedActualCacheStartOffset, expectedActualCacheSize, currentMediumContent);
       assertRangeIsNotCached(expectedActualCacheStartOffset.advance(expectedActualCacheSize),
          currentMediumContent.length());
    }
@@ -209,7 +209,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
             e.getByteCountActuallyRead(), currentMediumContent);
       }
 
-      assertRangeIsCached(at(currentMedium, 0), currentMediumContent.length(), currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), currentMediumContent.length(), currentMediumContent);
    }
 
    /**
@@ -234,7 +234,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       Assert.assertEquals(getDataSize + getDataOffset.getAbsoluteMediumOffset(),
          mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 0)));
 
-      assertRangeIsCached(at(currentMedium, 0), (int) getDataOffset.getAbsoluteMediumOffset() + getDataSize,
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), (int) getDataOffset.getAbsoluteMediumOffset() + getDataSize,
          currentMediumContent);
       assertRangeIsNotCached(getDataOffset.advance(getDataSize), currentMediumContent.length());
    }
@@ -267,7 +267,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       // No additional reads, as everything was already cached
       verifyExactlyNReads(2);
 
-      assertRangeIsCached(at(currentMedium, 0), (int) cacheOffset.getAbsoluteMediumOffset() + cacheSize,
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), (int) cacheOffset.getAbsoluteMediumOffset() + cacheSize,
          currentMediumContent);
       assertRangeIsNotCached(cacheOffset.advance(cacheSize), currentMediumContent.length());
    }

@@ -22,6 +22,9 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
 
 /**
  * {@link MediumRegionTest} tests the {@link MediumRegion} class.
+ * 
+ * The cases mentioned in the test case methods for {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)} and
+ * {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)} are described in the javadocs of these methods.
  */
 public class MediumRegionTest {
 
@@ -197,7 +200,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase1_returnsTrue() {
+   public void overlapsAtFront_case1ThisOverlappingOtherAtFrontStartingBeforeEndingBehind_returnsTrue() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 10);
@@ -209,7 +212,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase2_returnsTrue() {
+   public void overlapsAtFront_case2ThisOverlappingOtherAtFrontStartingBeforeEndingAtSameOffset_returnsTrue() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 5);
@@ -221,7 +224,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase3_returnsTrue() {
+   public void overlapsAtFront_case3EqualRange_returnsTrue() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
@@ -236,7 +239,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase4_returnsFalse() {
+   public void overlapsAtFront_case4ThisOverlappingOtherAtBackStartingBehindEndingBehind_returnsFalse() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
@@ -248,19 +251,19 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase5_returnsFalse() {
+   public void overlapsAtFront_case5ThisOverlappingOtherAtBackStartingBehindEndingAtSameOffset_returnsFalse() {
 
-      MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
-      MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 5);
+      MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 5);
+      MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
 
-      Assert.assertFalse(region2.overlapsOtherRegionAtFront(region1));
+      Assert.assertFalse(region1.overlapsOtherRegionAtFront(region2));
    }
 
    /**
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase6_returnsFalse() {
+   public void overlapsAtFront_case6ThisFullyEnclosingOther_returnsFalse() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 2);
@@ -272,7 +275,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase7_returnsFalse() {
+   public void overlapsAtFront_case7OtherFullyEnclosingThis_returnsFalse() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 2);
@@ -284,7 +287,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)}.
     */
    @Test
-   public void overlapsAtFront_forCase8_returnsFalse() {
+   public void overlapsAtFront_case8NoOverlaps_returnsFalse() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 20), 10);
@@ -297,7 +300,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
     */
    @Test
-   public void overlapsAtBack_forCase1_returnsTrue() {
+   public void overlapsAtBack_case1ThisOverlappingOtherAtBackStartingBehindEndingBehind_returnsTrue() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
@@ -309,7 +312,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
     */
    @Test
-   public void overlapsAtBack_forCase2_returnsTrue() {
+   public void overlapsAtBack_case2ThisOverlappingOtherAtBackStartingBehindEndingAtSameOffset_returnsTrue() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 5);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
@@ -321,7 +324,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
     */
    @Test
-   public void overlapsAtBack_forCase3_returnsTrue() {
+   public void overlapsAtBack_case3EqualRange_returnsTrue() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
@@ -336,7 +339,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
     */
    @Test
-   public void overlapsAtBack_forCase4_returnsFalse() {
+   public void overlapsAtBack_case4ThisOverlappingOtherAtFrontStartingBeforeEndingBefore_returnsFalse() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 10);
@@ -348,19 +351,31 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
     */
    @Test
-   public void overlapsAtBack_forCase5_returnsFalse() {
+   public void overlapsAtBack_case5ThisOverlappingOtherAtFrontStartingBeforeEndingAtSameOffset_returnsFalse() {
 
-      MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 5);
-      MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
+      MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
+      MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 5);
 
-      Assert.assertFalse(region2.overlapsOtherRegionAtBack(region1));
+      Assert.assertFalse(region1.overlapsOtherRegionAtBack(region2));
    }
 
    /**
     * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
     */
    @Test
-   public void overlapsAtBack_forCase6_returnsFalse() {
+   public void overlapsAtBack_case6ThisFullyEnclosingOther_returnsFalse() {
+
+      MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
+      MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 2);
+
+      Assert.assertFalse(region1.overlapsOtherRegionAtBack(region2));
+   }
+
+   /**
+    * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
+    */
+   @Test
+   public void overlapsAtBack_case7OtherFullyEnclosingThis_returnsFalse() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 2);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
@@ -372,19 +387,7 @@ public class MediumRegionTest {
     * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
     */
    @Test
-   public void overlapsAtBack_forCase7_returnsFalse() {
-
-      MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 5), 2);
-      MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);
-
-      Assert.assertFalse(region2.overlapsOtherRegionAtBack(region1));
-   }
-
-   /**
-    * Tests {@link MediumRegion#overlapsOtherRegionAtBack(MediumRegion)}.
-    */
-   @Test
-   public void overlapsAtBack_forCase8_returnsFalse() {
+   public void overlapsAtBack_case8NoOverlaps_returnsFalse() {
 
       MediumRegion region1 = new MediumRegion(new StandardMediumOffset(MEDIUM, 20), 10);
       MediumRegion region2 = new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 10);

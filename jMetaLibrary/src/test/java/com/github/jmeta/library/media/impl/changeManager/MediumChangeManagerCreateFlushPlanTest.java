@@ -1714,8 +1714,6 @@ public class MediumChangeManagerCreateFlushPlanTest {
    /**
     * Tests {@link MediumChangeManager#createFlushPlan(int, long)}.
     */
-   // TODO kleinen Bug bei BB Position in Remainder WriteSequence raus so dass DIFFs auch immer übereinstimmen!
-   // (9)
    @Test
    public void CF9_insertRemoveAndReplace_notMutuallyCompensating() {
 

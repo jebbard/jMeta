@@ -71,6 +71,64 @@ public class MediumRegion {
       LEFT_OVERLAPS_RIGHT_AT_BACK,
    }
 
+   /**
+    * {@link MediumRegionClipResult} represents the result of clipping two overlapping {@link MediumRegion}s against
+    * each using {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   public static class MediumRegionClipResult {
+
+      /**
+       * Creates a new {@link MediumRegionClipResult}.
+       * 
+       * @param overlappedPartOfLeftRegion
+       *           See getter for details
+       * @param nonOverlappingPartAtFront
+       *           See getter for details
+       * @param nonOverlappingPartAtBack
+       *           See getter for details
+       */
+      public MediumRegionClipResult(MediumRegion overlappedPartOfLeftRegion, MediumRegion nonOverlappingPartAtFront,
+         MediumRegion nonOverlappingPartAtBack) {
+         Reject.ifNull(overlappedPartOfLeftRegion, "overlappedPartOfLeftRegion");
+
+         this.nonOverlappingPartAtFront = nonOverlappingPartAtFront;
+         this.overlappedPartOfLeftRegion = overlappedPartOfLeftRegion;
+         this.nonOverlappingPartOfAtBack = nonOverlappingPartAtBack;
+      }
+
+      /**
+       * @return a {@link MediumRegion} that is the overlapping part of the two {@link MediumRegion}s, containing the
+       *         bytes in the overlap area taken from the original left master {@link MediumRegion}.
+       */
+      public MediumRegion getOverlappingPartOfLeftRegion() {
+         return overlappedPartOfLeftRegion;
+      }
+
+      /**
+       * @return any part of the clipped regions that does not overlap at the front, that might be part of the original
+       *         left region (if the left region start offset is before the right region start offset) or of the
+       *         original right region (if the right region start offset is before the left region start offset) or null
+       *         if both start offsets are equal.
+       */
+      public MediumRegion getNonOverlappingPartAtFront() {
+         return nonOverlappingPartAtFront;
+      }
+
+      /**
+       * @return any part of the clipped regions that does not overlap at the back, that might be part of the original
+       *         left region (if the right region end offset is before the left region end offset) or of the original
+       *         right region (if the left region end offset is before the right region end offst) or null if both end
+       *         offsets are equal.
+       */
+      public MediumRegion getNonOverlappingPartOfAtBack() {
+         return nonOverlappingPartOfAtBack;
+      }
+
+      private final MediumRegion overlappedPartOfLeftRegion;
+      private final MediumRegion nonOverlappingPartAtFront;
+      private final MediumRegion nonOverlappingPartOfAtBack;
+   }
+
    private MediumOffset startReference;
 
    private ByteBuffer buffer;
@@ -124,7 +182,7 @@ public class MediumRegion {
     *           The right {@link MediumRegion}, must refer to the same {@link Medium} as the left {@link MediumRegion}
     * @return The determined {@link MediumRegionOverlapType} of the two regions
     */
-   public static MediumRegionOverlapType determineOverlapWithOtherRegion(MediumRegion left, MediumRegion right) {
+   public static MediumRegionOverlapType determineRegionOverlap(MediumRegion left, MediumRegion right) {
       Reject.ifNull(right, "right");
       Reject.ifNull(left, "left");
       Reject.ifFalse(left.getStartOffset().getMedium().equals(right.getStartOffset().getMedium()),
@@ -148,6 +206,49 @@ public class MediumRegion {
          throw new IllegalStateException(
             "Impossible overlap of two regions detected: left=" + left + ", right=" + right);
       }
+   }
+
+   /**
+    * Performs clipping of two {@link MediumRegion}s overlapping each other, where the left {@link MediumRegion} is
+    * considered as "master region", which means that the overlapped portion in the returned
+    * {@link MediumRegionClipResult} contains the bytes of the left {@link MediumRegion}.
+    * 
+    * @param leftMasterRegion
+    *           The left master {@link MediumRegion} to clip against the right region
+    * @param rightRegion
+    *           The right {@link MediumRegion} to clip against, must overlap the left region
+    * @return A {@link MediumRegionClipResult} containing all clipped portions, see {@link MediumRegionClipResult} for
+    *         details.
+    * 
+    */
+   public static MediumRegionClipResult clipOverlappingRegions(MediumRegion leftMasterRegion,
+      MediumRegion rightRegion) {
+      Reject.ifNull(rightRegion, "rightRegion");
+      Reject.ifNull(leftMasterRegion, "leftMasterRegion");
+
+      Reject.ifTrue(leftMasterRegion.getOverlappingByteCount(rightRegion) == 0,
+         "leftMasterRegion.getOverlappingByteCount(rightRegion) == 0");
+
+      MediumRegion nonOverlappingPartOfSmallerOffsetRegionAtFront = null;
+      MediumRegion overlappedPartOfLeftMasterRegion = leftMasterRegion;
+      MediumRegion nonOverlappingPartOfHigherOffsetRegionAtBack = null;
+
+      if (leftMasterRegion.getStartOffset().before(rightRegion.getStartOffset())) {
+         MediumRegion[] splitRegions = leftMasterRegion.split(rightRegion.getStartOffset());
+
+         nonOverlappingPartOfSmallerOffsetRegionAtFront = splitRegions[0];
+         overlappedPartOfLeftMasterRegion = splitRegions[1];
+      }
+
+      if (rightRegion.calculateEndOffset().before(leftMasterRegion.calculateEndOffset())) {
+         MediumRegion[] splitRegions = overlappedPartOfLeftMasterRegion.split(rightRegion.calculateEndOffset());
+
+         overlappedPartOfLeftMasterRegion = splitRegions[0];
+         nonOverlappingPartOfHigherOffsetRegionAtBack = splitRegions[1];
+      }
+
+      return new MediumRegionClipResult(overlappedPartOfLeftMasterRegion,
+         nonOverlappingPartOfSmallerOffsetRegionAtFront, nonOverlappingPartOfHigherOffsetRegionAtBack);
    }
 
    /**
@@ -210,9 +311,9 @@ public class MediumRegion {
    public MediumRegion[] split(MediumOffset at) {
       Reject.ifNull(at, "at");
       Reject.ifFalse(at.getMedium().equals(getStartOffset().getMedium()),
-         "at.getMedium().equals(getStartReference().getMedium())");
+         "at.getMedium().equals(getStartOffset().getMedium())");
       Reject.ifFalse(contains(at), "contains(at)");
-      Reject.ifFalse(getStartOffset().before(at), "getStartReference().before(at)");
+      Reject.ifFalse(getStartOffset().before(at), "getStartOffset().before(at)");
 
       MediumRegion[] returnedSplitRegions = new MediumRegion[2];
 
@@ -370,13 +471,13 @@ public class MediumRegion {
     * <p>
     * <code>this : S_______E___</code>
     * <p>
-    * <b>Case 6:</b> This region contains other region
+    * <b>Case 6:</b> This region fully encloses other region
     * <p>
     * <code>other: __S______E__</code>
     * <p>
     * <code>this : S__________E</code>
     * <p>
-    * <b>Case 7:</b> Other region contains this region
+    * <b>Case 7:</b> Other region fully encloses this region
     * <p>
     * <code>other: S__________E</code>
     * <p>
@@ -394,16 +495,7 @@ public class MediumRegion {
     * @return true if an overlap at back is detected, false otherwise.
     */
    public boolean overlapsOtherRegionAtBack(MediumRegion other) {
-      Reject.ifNull(other, "other");
-      Reject.ifFalse(other.getStartOffset().getMedium().equals(getStartOffset().getMedium()),
-         "other.getStartReference().getMedium().equals(getStartReference().getMedium())");
-
-      MediumOffset startRef = getStartOffset();
-      MediumOffset otherStartRef = other.getStartOffset();
-      MediumOffset endRef = calculateEndOffset();
-      MediumOffset otherEndRef = other.calculateEndOffset();
-
-      return startRef.behindOrEqual(otherStartRef) && startRef.before(otherEndRef) && endRef.behindOrEqual(otherEndRef);
+      return other.overlapsOtherRegionAtFront(this);
    }
 
    /**
@@ -444,13 +536,13 @@ public class MediumRegion {
     * <p>
     * <code>this : ___S_______E</code>
     * <p>
-    * <b>Case 6:</b> This region contains other region
+    * <b>Case 6:</b> This region fully encloses other region
     * <p>
     * <code>other: __S______E__</code>
     * <p>
     * <code>this : S__________E</code>
     * <p>
-    * <b>Case 7:</b> Other region contains this region
+    * <b>Case 7:</b> Other region fully encloses this region
     * <p>
     * <code>other: S__________E</code>
     * <p>

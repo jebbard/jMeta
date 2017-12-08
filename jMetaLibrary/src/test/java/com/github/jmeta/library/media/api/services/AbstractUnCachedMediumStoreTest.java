@@ -75,8 +75,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and
-    * {@link MediumStore#cache(MediumOffset, int)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledMediumWithDisabledCache_priorCache_returnsZero() {
@@ -182,7 +181,7 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
     * Tests {@link MediumStore#flush()}
     */
    @Test
-   public void flush_forFilledWritableMedium_insertAndRemove_readsAndWritesDataBlockWise() {
+   public void flush_forFilledUncachedWritableMedium_insertAndRemove_readsAndWritesDataBlockWise() {
       mediumStoreUnderTest = createDefaultFilledMediumStore();
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
@@ -204,6 +203,30 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
          + 1;
       verifyExactlyNReads(accessCount);
       verifyExactlyNWrites(accessCount + insertText.length() / currentMedium.getMaxReadWriteBlockSizeInBytes() + 1);
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()}
+    */
+   @Test
+   public void flush_forFilledUncachedWritableMedium_insertAndRemove_doesNotAddAnythingToCache() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
+
+      String insertText = "___CF7aMultipleMutuallyEliminatingInsertsAndRemoves[1]___";
+      int insertOffset = 200;
+      int removeSize = 100;
+      int removeOffset = 700;
+
+      mediumStoreUnderTest.open();
+
+      scheduleAndFlush(createInsertAction(at(currentMedium, insertOffset), insertText),
+         createRemoveAction(at(currentMedium, removeOffset), removeSize));
+
+      Mockito.verifyNoMoreInteractions(mediumCacheSpy);
+
+      assertCacheIsEmpty();
    }
 
    /**

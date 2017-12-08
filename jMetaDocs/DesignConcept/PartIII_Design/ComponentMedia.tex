@@ -920,7 +920,7 @@ To formulate the following design decision a bit easier, the vague term of ``Obj
 %%%% DD --> %%%%
 \DD{dd:418b}
 {% Titel
-\COMPmedia{} needs to automatically update \IMediumReference{} instances after medium changes
+\COMPmedia{} needs to automatically update \IMediumReference{} instances after medium changes: \texttt{remove} and \texttt{insert}
 }
 {% Kurzbeschreibung
 All \IMediumReference{} instances ever created for a medium must be updated automatically whenever this medium changes. The kind of update needed is more complex than you would think on first glance. 
@@ -932,11 +932,33 @@ Let $x$ be the start offset of a collection of $n$ bytes (an ``object''), let $y
 \item \texttt{remove} \emph{before the object start offset $x$ without overlap:} Is $y+k \leq x$, then $\overline{x}:=x-k$. Thus $k$ bytes are removed before the object, however the removed region does not overlap with the object.
 \item \texttt{remove} \emph{before the object start offset $x$ with overlap:} Is $y \leq x$, but $y+k > x$, then the removed region overlaps the object. It is thus a \emph{truncation} of the object starting at front, and it might even reduce the object to length 0. Thus the start offset of the object shifts $x-y$ to be equal to $y$, i.e. $\overline{x}:=y$.
 \item \texttt{remove} \emph{behind the object start offset $x$:} Is $y>x$, then $\overline{x}:=x$, i.e. the object start offset remains unchanged, of course also in the case that $y<x+n$. In the latter case, however, the object is truncated at its end.
-\item \texttt{replace}: Replacing $n$ bytes by $m>n$ bytes has the same effect to existing objects as an \texttt{insert}, with the very same case distinctions. Likewise, \texttt{replace} behaves like \texttt{remove} if $m<n$. The case $m=n$, i.e. an \emph{overwrite} operation does not lead to any offset changes of existing objects.
 \end{itemize}
 }
 {% Begründung
-\IMediumReference{}s are both handed out to the user as well as used to manage cache objects. If changes to the medium happens, all \IMediumReference{}s that are already in user hands or are internally used to manage data are rendered invalid. Thus, we would need to write code to detect such \IMediumReference{}s as invalid whenever used, or to invalidate the current cache content. Instead of doing so, we simply update all \IMediumReference{}s previously created according to the kind of change, thus practically still letting them point to the same ``object'' es before (despite deletion of the whole medium bytes as special case). The \IMediumReference{}s can thus be used further on.
+\IMediumReference{}s are both handed out to the user as well as used to manage cache objects. If changes to the medium happens, all \IMediumReference{}s that are already in user hands or are internally used to manage data are rendered invalid. Thus, we would need to write code to detect such \IMediumReference{}s as invalid whenever used, or to invalidate the current cache content. Instead of doing so, we simply update all \IMediumReference{}s previously created according to the kind of change, thus practically still letting them point to the same ``object'' as before (despite removing the medium bytes as special case). The \IMediumReference{}s can thus be used further on.
+}
+{% Nachteile
+A central management of \IMediumReference{} instances must be implemented (see \DesLink{dd:419}).
+}
+%%%% <-- DD %%%%
+
+\texttt{replace}s are discussed in the next design decision:
+
+%%%% DD --> %%%%
+\DD{dd:418c}
+{% Titel
+\COMPmedia{} needs to automatically update \IMediumReference{} instances after medium changes: \texttt{replace}
+}
+{% Kurzbeschreibung
+For \texttt{replace}, the update of already created \IMediumReference{}s is similar, but any offsets within the replaced region remain unchanged. In detail: Let $x$ be the start offset of a collection of $n$ bytes (an ``object''):
+\begin{itemize}
+\item \texttt{replace} \emph{behind the object start offset $x$:} The same as insert and remove behind the start offset, i.e. does not change it but might truncate or split an existing object starting earlier.
+\item \texttt{replace} \emph{before the object start offset $x$ without overlap:} For an inserting replace, The same as for \texttt{insert} before $x$. For a removing replace, the same as for \texttt{remove} before $x$ without overlap. For an overwriting replace, no changes are applied to $x$.
+\item \texttt{replace} \emph{before the object start offset $x$ with overlap:} The replaced region overlaps with an existing object. Here, $x$ remains unchanged by the replacement.
+\end{itemize}
+}
+{% Begründung
+There is no surprose for replaces behind the object start offset and those before the start offset without overlap. The only question is: If there is an overlap, i.e. $x$ lies within the replaced region of bytes, why do we not update it? The reason is: Because of the replacement by other bytes, the object is anyway changed, the correct semantics seems to be to let the \IMediumReference{}s point to $x$ still point to $x$.
 }
 {% Nachteile
 A central management of \IMediumReference{} instances must be implemented (see \DesLink{dd:419}).
@@ -2068,15 +2090,15 @@ Now we have all credentials to implement writing in \texttt{flush()}:
 \item Create the flush plan according to \DesLink{dd:439}
 \item \textbf{Phase 1 - Medium access phase:} Iterate all actions of the flush plan in order, but only handle the action types mentioned below in a specific way:
 \begin{itemize}
-\item If action = \texttt{READ}: Call \texttt{getData} at the indicated offset to read $n$ bytes. These bytes are written in the subsequent \texttt{WRITE} action. If an \texttt{EndOfMediumException} occurs, this is considered as impossible and an \texttt{IllegalStateException} is thrown. Store the read bytes to be used by the upcoming \texttt{WRITE} action. Set the action to done afterwards.
+\item If action = \texttt{READ}: Call \texttt{getData} at the indicated offset to read $n$ bytes. These bytes are written in the subsequent \texttt{WRITE} action. If an \\ \texttt{EndOfMediumException} occurs, this is considered as impossible and an \texttt{IllegalStateException} is thrown. Store the read bytes to be used by the upcoming \texttt{WRITE} action. Set the action to done afterwards.
 \item If action = \texttt{WRITE}: If the \texttt{WRITE} action contains bytes already, it as associated to an \texttt{INSERT} or \texttt{REPLACE}. In this case, directly write the contained bytes with direct access to the medium via \IMediumAccessor{}. If the action does not contain any bytes, the previous action must have been a \texttt{READ} reading exactly the same amount of bytes to write. If this is not the case, an \texttt{IllegalStateException} is thrown. Otherwise these previously read bytes are written with direct access to the medium via \IMediumAccessor{}. Set the action to done afterwards.
 \item If action = \texttt{TRUNCATE}: Execute a truncation of the medium with direct access to the medium via \IMediumAccessor{}. Set the action to done afterwards.
 \end{itemize}
 \item \textbf{Phase 2 - Cache update phase:} Iterate all actions of the flush plan in order, but only handle the action types mentioned below in a specific way:
 \begin{itemize}
-\item If action = \texttt{INSERT}: First call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action, then add the insertion bytes to the cache. Finally, call \MediumChangeManager{}.\texttt{undo} on the action.
-\item If action = \texttt{REMOVE}: First remove the bytes in the removal region from the cache, then call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action. Finally, call \MediumChangeManager{}.\texttt{undo} on the action.
-\item If action = \texttt{REPLACE}: First remove the bytes in the replaced region from the cache, then call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action, then add the replacement bytes to the cache. Finally, call \MediumChangeManager{}.\texttt{undo} on the action.
+\item If action = \texttt{INSERT}: First call \MediumChangeManager{}.\texttt{undo} on the action. If there is an existing cache region containing the insertion offset, we have to split this region now at the insertion offset. The reason is: Otherwise the already cached portion of the cached region behind the insertion offset would not be shifted by the number of insertion bytes, and the cache would get corrupted. Then call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action. Finally add the insertion bytes to the cache. Here it must be noted that, as the cache add is done after \texttt{updateReferences()}, the insertion offset was increased already before, and we must decrease it again to add the cached bytes at the original insertion offset!
+\item If action = \texttt{REMOVE}: First call \MediumChangeManager{}.\texttt{undo} on the action. Then remove the bytes in the removal region from the cache. Finally call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action.
+\item If action = \texttt{REPLACE}: First call \MediumChangeManager{}.\texttt{undo} on the action. Then remove the bytes in the replaced region from the cache. Finally call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action, then add the replacement bytes to the cache.
 \end{itemize}
 \end{enumerate}
 
@@ -2093,7 +2115,7 @@ The flush plan must contain all operations explicitly, i.e. including those trig
 
 Throwing an \texttt{IllegalStateException} in case of end of medium encountered is necessary, as the creation of the flush plan must have considered the medium size. Thus, if it occurs, this is either a programming error in \texttt{createFlushPlan} or another process as changed the medium meanwhile.
 
-\texttt{undo()} is only executed for user operations, as only those are maintained in the internal data structures of \MediumChangeManager{}, according to \DesLink{dd:439}.
+\texttt{undo()} is only executed for user operations, as only those are maintained in the internal data structures of \MediumChangeManager{}, according to \DesLink{dd:439}. Also, \texttt{undo()} must be executed first, otherwise \texttt{updateReferences()} changes offsets which would lead to a serious problem in a \texttt{TreeSet} as used in \MediumChangeManager{} to find the correct reference with \texttt{contains}.
 
 The cache update is divided into two parts as mentioned in previous design decisions.
 
@@ -2329,16 +2351,16 @@ No disadvantages known
 
 \begin{landscape}
 \begin{longtable}{|p{0.1\linewidth}|p{0.24\linewidth}|p{0.07\linewidth}|p{0.1\linewidth}|p{0.4\linewidth}|}
-	\hline
-	\rowcolor[gray]{.9}\textbf{Medium} & \textbf{Parameter Name} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\
-	\endhead
-	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{enableCaching} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. Setting this to \texttt{false} after creation of the \IMediumStore{} will clear the cache content directly. Implicitly set to \texttt{false} for \texttt{byte}-Array media according to \DesLink{dd:410c} \\
-	\hline
-	\texttt{File}, \texttt{InputStream} & \texttt{maxCacheSize} & long $> 0$ & 1 MB & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
-	\hline
-	\texttt{File}, \texttt{byte}-Array & \texttt{maxReadWriteBlockSize} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
-	\hline
+\hline
+\rowcolor[gray]{.9}\textbf{Medium} & \textbf{Parameter Name} & \textbf{Type} & \textbf{Default Value} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{File}, \texttt{InputStream} & \texttt{enableCaching} & boolean & \texttt{true} & Enables or disables caching for a medium according to \DesLink{dd:411c}. Setting this to \texttt{false} after creation of the \IMediumStore{} will clear the cache content directly. Implicitly set to \texttt{false} for \texttt{byte}-Array media according to \DesLink{dd:410c} \\
+\hline
+\texttt{File}, \texttt{InputStream} & \texttt{maxCacheSize} & long $> 0$ & 1 MB & Sets the maximum cache size according to \DesLink{dd:436b}. Changes to this parameter do not have any effect after the \IMediumStore{} was already created, so callers need to ensure to set this before creating the \IMediumStore{}. \\
+\hline
+\texttt{File}, \texttt{byte}-Array & \texttt{maxReadWriteBlockSize} & int $> 0$ & 8192 & The maximum size of read-write-actions in bytes, that is triggered by \texttt{INSERT}s or \texttt{REMOVE}s during a  \texttt{flush()}, see \DesLink{dd:440}. \\
+\hline
 \caption{Configuration parameters of medium access}
 \label{tab:ConfigMedia}
 \end{longtable}

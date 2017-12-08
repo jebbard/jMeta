@@ -12,14 +12,18 @@ package com.github.jmeta.library.media.api.services;
 import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
+import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumOffset;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 
 /**
  * {@link AbstractCachedAndWritableRandomAccessMediumStoreTest} tests the {@link MediumStore} interface for writable
@@ -32,8 +36,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
    extends AbstractCachedMediumStoreTest<T> {
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and
-    * {@link MediumStore#cache(MediumOffset, int)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledRandomAccessMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
@@ -73,10 +76,10 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       int remainingCacheStartOffset = 595 + cacheSize;
 
-      assertRangeIsCached(cacheOffset, cacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(cacheOffset, cacheSize, currentMediumContent);
       assertRangeIsNotCached(cacheOffset.advance(cacheSize),
          remainingCacheStartOffset - (int) cacheOffset.getAbsoluteMediumOffset() - cacheSize);
-      assertRangeIsCached(at(currentMedium, remainingCacheStartOffset),
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, remainingCacheStartOffset),
          currentMediumContent.length() - remainingCacheStartOffset, currentMediumContent);
    }
 
@@ -98,7 +101,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 20 - 1)));
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) cacheOffset.getAbsoluteMediumOffset());
-      assertRangeIsCached(cacheOffset, cacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(cacheOffset, cacheSize, currentMediumContent);
       assertRangeIsNotCached(cacheOffset.advance(cacheSize), currentMediumContent.length());
    }
 
@@ -130,11 +133,11 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       Assert.assertEquals(24, mediumStoreUnderTest.getCachedByteCountAt(thirdCacheOffset.advance(11)));
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) firstCacheOffset.getAbsoluteMediumOffset());
-      assertRangeIsCached(firstCacheOffset, secondCacheSize + 5, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(firstCacheOffset, secondCacheSize + 5, currentMediumContent);
       assertRangeIsNotCached(secondCacheOffset.advance(secondCacheSize),
          (int) (thirdCacheOffset.getAbsoluteMediumOffset() - secondCacheOffset.getAbsoluteMediumOffset()
             - secondCacheSize));
-      assertRangeIsCached(thirdCacheOffset, thirdCacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(thirdCacheOffset, thirdCacheSize, currentMediumContent);
       assertRangeIsNotCached(thirdCacheOffset.advance(thirdCacheSize), currentMediumContent.length());
    }
 
@@ -166,7 +169,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       Assert.assertEquals(secondCacheSize, mediumStoreUnderTest.getCachedByteCountAt(secondCacheOffset));
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) secondCacheOffset.getAbsoluteMediumOffset());
-      assertRangeIsCached(secondCacheOffset, secondCacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(secondCacheOffset, secondCacheSize, currentMediumContent);
    }
 
    /**
@@ -221,11 +224,12 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
          (MAX_CACHE_SIZE_FOR_SMALL_CACHE + getDataSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) getDataOffset.getAbsoluteMediumOffset());
-      assertRangeIsCached(getDataOffset, getDataSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(getDataOffset, getDataSize, currentMediumContent);
       assertRangeIsNotCached(getDataOffset.advance(getDataSize),
          (int) (expectedActualCacheStartOffset.getAbsoluteMediumOffset() - getDataOffset.getAbsoluteMediumOffset()
             - getDataSize));
-      assertRangeIsCached(expectedActualCacheStartOffset, expectedActualCacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(expectedActualCacheStartOffset, expectedActualCacheSize,
+         currentMediumContent);
       assertRangeIsNotCached(expectedActualCacheStartOffset.advance(expectedActualCacheSize),
          currentMediumContent.length());
    }
@@ -257,7 +261,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
          (MAX_CACHE_SIZE_FOR_SMALL_CACHE + getDataSize) / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) getDataOffset.getAbsoluteMediumOffset());
-      assertRangeIsCached(getDataOffset, getDataSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(getDataOffset, getDataSize, currentMediumContent);
       assertRangeIsNotCached(getDataOffset.advance(getDataSize), currentMediumContent.length());
    }
 
@@ -286,7 +290,8 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       verifyExactlyNReads(MAX_CACHE_SIZE_FOR_SMALL_CACHE / MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 6 + 1);
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) getDataOffset.advance(-10).getAbsoluteMediumOffset());
-      assertRangeIsCached(getDataOffset.advance(-10), MAX_CACHE_SIZE_FOR_SMALL_CACHE, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(getDataOffset.advance(-10), MAX_CACHE_SIZE_FOR_SMALL_CACHE,
+         currentMediumContent);
       assertRangeIsNotCached(getDataOffset.advance(-10 + MAX_CACHE_SIZE_FOR_SMALL_CACHE),
          currentMediumContent.length());
    }
@@ -313,7 +318,7 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
       Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 5)));
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) getDataOffset.getAbsoluteMediumOffset());
-      assertRangeIsCached(getDataOffset, getDataSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(getDataOffset, getDataSize, currentMediumContent);
       assertRangeIsNotCached(getDataOffset.advance(getDataSize), currentMediumContent.length());
    }
 
@@ -335,6 +340,91 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
          currentMediumContent);
 
       assertCacheIsEmpty();
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} in terms of caching
+    */
+   @Test
+   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_nothingCachedBefore_cachesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      int startOffsetOfChanges = 4;
+
+      mediumStoreUnderTest.open();
+
+      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
+
+      assertRangeIsNotCached(at(currentMedium, 0), startOffsetOfChanges);
+
+      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
+         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
+
+      mediumStoreUnderTest.close();
+
+      String expectedMediumContent = new String(
+         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
+         Charsets.CHARSET_UTF8);
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+
+      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
+
+      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
+         mediumContentAfterFlush.length());
+
+      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
+
+      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} in terms of caching
+    */
+   @Test
+   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_partlyCachedBefore_cachesCorrectData() {
+      mediumStoreUnderTest = createDefaultFilledMediumStore();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      int startOffsetOfChanges = 4;
+
+      mediumStoreUnderTest.open();
+
+      // Caching in some later removed and replaced regions, as well as some later "re-read" regions
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(5), 200);
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(255), 114);
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(600), 344);
+
+      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
+
+      assertRangeIsNotCached(at(currentMedium, 0), startOffsetOfChanges);
+
+      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
+         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
+
+      mediumStoreUnderTest.close();
+
+      String expectedMediumContent = new String(
+         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
+         Charsets.CHARSET_UTF8);
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+
+      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
+
+      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
+         mediumContentAfterFlush.length());
+
+      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
+
+      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
    }
 
    /**
@@ -398,4 +488,45 @@ public abstract class AbstractCachedAndWritableRandomAccessMediumStoreTest<T ext
 
       mediumStoreUnderTest.removeData(at(currentMedium, 10), 20);
    }
+
+   /**
+    * Schedules some hard-coded {@link MediumAction}s, flushes them and compares with the expectation. This is done as
+    * preparation for any caching tests in connection to flush.
+    * 
+    * @param startOffsetOfChanges
+    *           The offset to perform the first action
+    * @return The change of the size of the medium after the flush
+    */
+   private int performAndCheckFlushForCachingTests(long startOffsetOfChanges) {
+      MediumOffset firstReplaceOffset = at(currentMedium, startOffsetOfChanges);
+      MediumOffset insertOffset = at(currentMedium, 56);
+      MediumOffset secondReplaceOffset = at(currentMedium, 304);
+      MediumOffset thirdReplaceOffset = at(currentMedium, 215);
+      MediumOffset firstRemoveOffset = at(currentMedium, 500);
+      MediumOffset secondRemoveOffset = at(currentMedium, 100);
+      int firstRemoveSize = 486;
+      int secondRemoveSize = 30;
+      int firstReplaceSize = 50;
+      int secondReplaceSize = 2;
+      int thirdReplaceSize = 5;
+
+      String firstReplacementText = "===CF9[000000000000]===";
+      String insertionText = "===CF9[1]=== TEST TEST";
+      String secondReplacementText = ">>>>uuuuuuuuuuuuuu<<<<";
+      String thirdReplacementText = "REPLA";
+
+      List<MediumAction> scheduledActions = scheduleAndFlush(
+         new MediumAction[] { createReplaceAction(firstReplaceOffset, firstReplaceSize, firstReplacementText),
+            createRemoveAction(firstRemoveOffset, firstRemoveSize), createInsertAction(insertOffset, insertionText),
+            createRemoveAction(secondRemoveOffset, secondRemoveSize),
+            createReplaceAction(secondReplaceOffset, secondReplaceSize, secondReplacementText),
+            createReplaceAction(thirdReplaceOffset, thirdReplaceSize, thirdReplacementText), });
+
+      scheduledActions.forEach(action -> Assert.assertFalse(action.isPending()));
+
+      return -firstRemoveSize - secondRemoveSize + insertionText.length() + firstReplacementText.length()
+         - firstReplaceSize + secondReplacementText.length() - secondReplaceSize + thirdReplacementText.length()
+         - thirdReplaceSize;
+   }
+
 }

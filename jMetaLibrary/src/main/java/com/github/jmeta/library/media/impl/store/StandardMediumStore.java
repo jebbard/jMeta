@@ -23,6 +23,7 @@ import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionClipResult;
 import com.github.jmeta.library.media.impl.cache.MediumCache;
 import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
@@ -45,8 +46,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    private final MediumChangeManager changeManager;
 
-   public StandardMediumStore(MediumAccessor<T> mediumAccessor, MediumCache cache,
-      MediumOffsetFactory referenceFactory, MediumChangeManager changeManager) {
+   public StandardMediumStore(MediumAccessor<T> mediumAccessor, MediumCache cache, MediumOffsetFactory referenceFactory,
+      MediumChangeManager changeManager) {
       Reject.ifNull(mediumAccessor, "mediumAccessor");
       Reject.ifNull(referenceFactory, "referenceFactory");
       Reject.ifNull(cache, "cache");
@@ -114,13 +115,13 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.services.MediumStore#createMediumReference(long)
+    * @see com.github.jmeta.library.media.api.services.MediumStore#createMediumOffset(long)
     */
    @Override
-   public MediumOffset createMediumReference(long offset) {
+   public MediumOffset createMediumOffset(long offset) {
       ensureOpened();
 
-      return referenceFactory.createMediumReference(offset);
+      return referenceFactory.createMediumOffset(offset);
    }
 
    /**
@@ -229,8 +230,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                   List<MediumRegion> regionsRead = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(
                      cacheRegion.getStartOffset());
 
-                  MediumRegion regionToAddWithBytes = readRegion(cacheRegion.getStartOffset(),
-                     cacheRegion.getSize());
+                  MediumRegion regionToAddWithBytes = readRegion(cacheRegion.getStartOffset(), cacheRegion.getSize());
 
                   cachedBytes.put(regionToAddWithBytes.getBytes());
 
@@ -329,23 +329,26 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       List<MediumAction> flushPlan = changeManager.createFlushPlan(getMedium().getMaxReadWriteBlockSizeInBytes(),
          getMedium().getCurrentLength());
 
+      // Phase 1 - Medium access phase
       ByteBuffer lastReadBytes = null;
 
       MediumActionType previousActionType = null;
+
+      List<MediumAction> scheduledActions = new ArrayList<>();
 
       for (MediumAction mediumAction : flushPlan) {
          switch (mediumAction.getActionType()) {
             case READ:
                try {
-                  MediumRegion regionRead = readRegion(mediumAction.getRegion().getStartOffset(),
+                  lastReadBytes = getData(mediumAction.getRegion().getStartOffset(),
                      mediumAction.getRegion().getSize());
-                  lastReadBytes = regionRead.getBytes();
                } catch (EndOfMediumException e) {
                   throw new IllegalStateException(
                      "Unexpected end of medium, maybe the external medium was changed by another process? Medium: "
                         + getMedium(),
                      e);
                }
+               mediumAction.setDone();
             break;
 
             case WRITE:
@@ -353,7 +356,6 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                   mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                   mediumAccessor.write(mediumAction.getActionBytes());
                } else {
-
                   if (previousActionType != MediumActionType.READ || lastReadBytes == null
                      || lastReadBytes.remaining() != mediumAction.getRegion().getSize()) {
                      throw new IllegalStateException(
@@ -363,38 +365,79 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
                   mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                   mediumAccessor.write(lastReadBytes);
+                  lastReadBytes = null;
                }
-            break;
-
-            case INSERT:
-               changeManager.undo(mediumAction);
-            break;
-
-            case REMOVE:
-               changeManager.undo(mediumAction);
-            break;
-
-            case REPLACE:
-               changeManager.undo(mediumAction);
+               mediumAction.setDone();
             break;
 
             case TRUNCATE:
                mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                mediumAccessor.truncate();
+               mediumAction.setDone();
             break;
 
             default:
-               throw new IllegalStateException("Unexpected medium action type for action: " + mediumAction);
+               scheduledActions.add(mediumAction);
          }
 
          previousActionType = mediumAction.getActionType();
       }
 
-      for (MediumAction mediumAction : flushPlan) {
-         if (mediumAction.getActionType() == MediumActionType.INSERT
-            || mediumAction.getActionType() == MediumActionType.REMOVE
-            || mediumAction.getActionType() == MediumActionType.REPLACE) {
-            referenceFactory.updateReferences(mediumAction);
+      // Phase 2 - Cache update phase
+      for (MediumAction scheduledAction : scheduledActions) {
+         ByteBuffer actionBytes = scheduledAction.getActionBytes();
+
+         switch (scheduledAction.getActionType()) {
+            case INSERT:
+               changeManager.undo(scheduledAction);
+
+               // If there is an existing cached region containing the insert offset, we must split it there,
+               // to ensure the part of the region behind the insert offset is shifted correspondingly to leave room
+               // for the inserts
+               if (getMedium().isCachingEnabled()) {
+                  MediumRegion existingRegionContainingInsertOffset = cache
+                     .getRegionsInRange(scheduledAction.getRegion().getStartOffset(), 1).get(0);
+
+                  if (existingRegionContainingInsertOffset.isCached() && existingRegionContainingInsertOffset
+                     .getStartOffset().before(scheduledAction.getRegion().getStartOffset())) {
+                     MediumRegion existingRegionSplitAtInsertOffset = existingRegionContainingInsertOffset
+                        .split(scheduledAction.getRegion().getStartOffset())[0];
+
+                     cache.addRegion(existingRegionSplitAtInsertOffset);
+                  }
+               }
+
+               referenceFactory.updateOffsets(scheduledAction);
+
+               if (getMedium().isCachingEnabled()) {
+                  cache.addRegion(new MediumRegion(
+                     scheduledAction.getRegion().getStartOffset().advance(-actionBytes.remaining()), actionBytes));
+               }
+            break;
+
+            case REMOVE:
+               if (getMedium().isCachingEnabled()) {
+                  cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
+                     scheduledAction.getRegion().getSize());
+               }
+               changeManager.undo(scheduledAction);
+               referenceFactory.updateOffsets(scheduledAction);
+            break;
+
+            case REPLACE:
+               changeManager.undo(scheduledAction);
+               if (getMedium().isCachingEnabled()) {
+                  cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
+                     scheduledAction.getRegion().getSize());
+               }
+               referenceFactory.updateOffsets(scheduledAction);
+               if (getMedium().isCachingEnabled()) {
+                  cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
+               }
+            break;
+
+            default:
+               throw new IllegalStateException("Unexpected medium action type for action: " + scheduledAction);
          }
       }
 
@@ -414,20 +457,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * @return a {@link MediumRegion} clipped against the given range
     */
    private MediumRegion clipRegionAgainstRange(MediumRegion region, MediumOffset rangeOffset, int rangeSize) {
-      MediumOffset regionStartReference = region.getStartOffset();
-      MediumOffset regionEndReference = region.calculateEndOffset();
-      MediumOffset rangeEndReference = rangeOffset.advance(rangeSize);
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(region,
+         new MediumRegion(rangeOffset, rangeSize));
 
-      MediumRegion regionToUse = region;
-
-      if (regionStartReference.before(rangeOffset)) {
-         regionToUse = regionToUse.split(rangeOffset)[1];
-      }
-
-      if (rangeEndReference.before(regionEndReference)) {
-         regionToUse = regionToUse.split(rangeEndReference)[0];
-      }
-      return regionToUse;
+      return clipResult.getOverlappingPartOfLeftRegion();
    }
 
    /**
@@ -442,8 +475,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * @param cachedRegion
     *           The cached {@link MediumRegion} to check
     * @param initialCacheSizeInBytes
-    *           The cache size at point in time when {@link MediumCache#getRegionsInRange(MediumOffset, int)} was
-    *           called
+    *           The cache size at point in time when {@link MediumCache#getRegionsInRange(MediumOffset, int)} was called
     * @param maxNumberOfBytesToAdd
     *           The maximum number of bytes that might get added to the cache in total
     * 

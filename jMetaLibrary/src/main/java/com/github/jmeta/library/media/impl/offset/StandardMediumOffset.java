@@ -55,7 +55,7 @@ public class StandardMediumOffset implements MediumOffset {
       long advancedMediumOffset = getAbsoluteMediumOffset() + count;
 
       if (this.factory != null) {
-         return factory.createMediumReference(advancedMediumOffset);
+         return factory.createMediumOffset(advancedMediumOffset);
       }
 
       return new StandardMediumOffset(getMedium(), advancedMediumOffset);

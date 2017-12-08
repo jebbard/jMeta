@@ -255,7 +255,7 @@ public class MediumChangeManager {
 
       // Add a truncate action to ensure the file is shortened, if necessary
       if (delta < 0) {
-         MediumOffset truncateRef = mediumReferenceFactory.createMediumReference(totalMediumSizeInBytes + delta);
+         MediumOffset truncateRef = mediumReferenceFactory.createMediumOffset(totalMediumSizeInBytes + delta);
 
          flushPlan.add(new MediumAction(MediumActionType.TRUNCATE, new MediumRegion(truncateRef, -delta), 0, null));
       }
@@ -375,7 +375,7 @@ public class MediumChangeManager {
 
          MediumRegion previousRegion = previousAction.getRegion();
 
-         MediumRegionOverlapType overlapType = MediumRegion.determineOverlapWithOtherRegion(newRegion, previousRegion);
+         MediumRegionOverlapType overlapType = MediumRegion.determineRegionOverlap(newRegion, previousRegion);
 
          if (overlapType == MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT
             || overlapType == MediumRegionOverlapType.SAME_RANGE) {
@@ -403,7 +403,7 @@ public class MediumChangeManager {
 
          MediumRegion nextRegion = nextAction.getRegion();
 
-         MediumRegionOverlapType overlapType = MediumRegion.determineOverlapWithOtherRegion(newRegion, nextRegion);
+         MediumRegionOverlapType overlapType = MediumRegion.determineRegionOverlap(newRegion, nextRegion);
 
          if (overlapType == MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT
             || overlapType == MediumRegionOverlapType.SAME_RANGE) {

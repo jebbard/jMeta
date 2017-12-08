@@ -40,7 +40,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * {@link Medium} instances.
  * 
  * In addition it contains all general method tests for {@link MediumStore#open()}, {@link MediumStore#close()},
- * {@link MediumStore#getMedium()} and {@link MediumStore#createMediumReference(long)}.
+ * {@link MediumStore#getMedium()} and {@link MediumStore#createMediumOffset(long)}.
  * 
  * The reason for separating this class from others:
  * <ul>
@@ -162,7 +162,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test
    public void createMediumReference_onOpenedMediumStore_returnsExpectedReference() {
@@ -171,23 +171,23 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
       mediumStoreUnderTest.open();
 
       int offset = 10;
-      MediumOffset actualReference = mediumStoreUnderTest.createMediumReference(offset);
+      MediumOffset actualReference = mediumStoreUnderTest.createMediumOffset(offset);
 
       Assert.assertEquals(at(currentMedium, offset), actualReference);
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test(expected = MediumStoreClosedException.class)
    public void createMediumReference_onClosedMediumStore_throwsException() {
       mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.createMediumReference(10);
+      mediumStoreUnderTest.createMediumOffset(10);
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void createMediumReference_forInvalidOffset_throwsException() {
@@ -195,7 +195,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.createMediumReference(-10);
+      mediumStoreUnderTest.createMediumOffset(-10);
    }
 
    /**

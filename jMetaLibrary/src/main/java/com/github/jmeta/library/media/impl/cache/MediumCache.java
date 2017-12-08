@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionClipResult;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -189,7 +190,7 @@ public class MediumCache {
       MediumRegion firstCachedRegionNearToStartReference = cachedRegionsInOffsetOrder
          .get(firstCachedRegionReferenceNearToStartReference);
 
-      MediumRegionOverlapType overlapWithFirstRegion = MediumRegion.determineOverlapWithOtherRegion(virtualRangeRegion,
+      MediumRegionOverlapType overlapWithFirstRegion = MediumRegion.determineRegionOverlap(virtualRangeRegion,
          firstCachedRegionNearToStartReference);
 
       if (overlapWithFirstRegion == MediumRegionOverlapType.LEFT_FULLY_INSIDE_RIGHT) {
@@ -206,7 +207,7 @@ public class MediumCache {
          MediumOffset currentRegionStartReference = currentRegion.getStartOffset();
          MediumOffset currentRegionEndReference = currentRegion.calculateEndOffset();
 
-         MediumRegionOverlapType overlapWithRangeRegion = MediumRegion.determineOverlapWithOtherRegion(currentRegion,
+         MediumRegionOverlapType overlapWithRangeRegion = MediumRegion.determineRegionOverlap(currentRegion,
             virtualRangeRegion);
 
          // Only process cached region if it overlaps with range
@@ -353,19 +354,8 @@ public class MediumCache {
 
       for (MediumRegion mediumRegion : regionsInRange) {
 
-         removeRegionFromCache(mediumRegion);
-
-         MediumRegion splitRegion = mediumRegion;
-
-         if (mediumRegion.getStartOffset().before(offset)) {
-            MediumRegion[] splitRegions = mediumRegion.split(offset);
-            addRegionToCache(splitRegions[0]);
-            splitRegion = splitRegions[1];
-         }
-
-         if (offset.advance(rangeSizeInBytes).before(splitRegion.calculateEndOffset())) {
-            MediumRegion[] splitRegions = splitRegion.split(offset.advance(rangeSizeInBytes));
-            addRegionToCache(splitRegions[1]);
+         if (mediumRegion.isCached()) {
+            clipExistingRegionAgainstRegionToAdd(mediumRegion, new MediumRegion(offset, rangeSizeInBytes));
          }
       }
    }
@@ -424,19 +414,10 @@ public class MediumCache {
    private MediumRegion splitRegionExceedingMaxCacheRegionSize(MediumRegion regionToSplit,
       MediumOffset chunkStartReference, int chunkSize) {
 
-      MediumOffset chunkEndReference = chunkStartReference.advance(chunkSize);
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(regionToSplit,
+         new MediumRegion(chunkStartReference, chunkSize));
 
-      MediumRegion splitRegion = regionToSplit;
-
-      if (regionToSplit.getStartOffset().before(chunkStartReference)) {
-         splitRegion = regionToSplit.split(chunkStartReference)[1];
-      }
-
-      if (chunkEndReference.before(regionToSplit.calculateEndOffset())) {
-         splitRegion = splitRegion.split(chunkEndReference)[0];
-      }
-
-      return splitRegion;
+      return clipResult.getOverlappingPartOfLeftRegion();
    }
 
    /**
@@ -450,26 +431,31 @@ public class MediumCache {
     */
    private void clipExistingRegionAgainstRegionToAdd(MediumRegion leftExistingRegion, MediumRegion rightRegionToAdd) {
 
-      MediumRegionOverlapType overlapType = MediumRegion.determineOverlapWithOtherRegion(leftExistingRegion,
-         rightRegionToAdd);
+      MediumRegionOverlapType overlapType = MediumRegion.determineRegionOverlap(leftExistingRegion, rightRegionToAdd);
 
       if (overlapType == MediumRegionOverlapType.LEFT_FULLY_INSIDE_RIGHT
          || overlapType == MediumRegionOverlapType.SAME_RANGE) {
          removeRegionFromCache(leftExistingRegion);
-      } else if (overlapType == MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT) {
+      } else if (overlapType == MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT
+         || overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_FRONT
+         || overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK) {
          removeRegionFromCache(leftExistingRegion);
-         MediumRegion survivingPartOne = leftExistingRegion.split(rightRegionToAdd.getStartOffset())[0];
-         addRegionToCache(survivingPartOne);
-         MediumRegion survivingPartTwo = leftExistingRegion.split(rightRegionToAdd.calculateEndOffset())[1];
-         addRegionToCache(survivingPartTwo);
-      } else if (overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_FRONT) {
-         removeRegionFromCache(leftExistingRegion);
-         MediumRegion survivingPart = leftExistingRegion.split(rightRegionToAdd.getStartOffset())[0];
-         addRegionToCache(survivingPart);
-      } else if (overlapType == MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK) {
-         removeRegionFromCache(leftExistingRegion);
-         MediumRegion survivingPart = leftExistingRegion.split(rightRegionToAdd.calculateEndOffset())[1];
-         addRegionToCache(survivingPart);
+
+         MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftExistingRegion, rightRegionToAdd);
+
+         MediumRegion nonOverlappingPartOfSmallerOffsetRegionAtFront = clipResult.getNonOverlappingPartAtFront();
+
+         if (nonOverlappingPartOfSmallerOffsetRegionAtFront != null) {
+            addRegionToCache(nonOverlappingPartOfSmallerOffsetRegionAtFront);
+         }
+
+         MediumRegion nonOverlappingPartOfHigherOffsetRegionAtBack = clipResult.getNonOverlappingPartOfAtBack();
+
+         if (nonOverlappingPartOfHigherOffsetRegionAtBack != null) {
+            addRegionToCache(nonOverlappingPartOfHigherOffsetRegionAtBack);
+         }
+      } else if (overlapType == MediumRegionOverlapType.NO_OVERLAP) {
+         throw new IllegalStateException("both regions must overlap");
       }
    }
 

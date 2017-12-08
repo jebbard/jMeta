@@ -53,7 +53,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * {@link AbstractMediumStoreTest} is the base class for testing the {@link MediumStore} interface. In contrast to
  * {@link AbstractReadOnlyMediumStoreTest}, it uses also writable media, and it does not contain the default test cases
  * for {@link MediumStore#open()}, {@link MediumStore#close()}, {@link MediumStore#getMedium()} and
- * {@link MediumStore#createMediumReference(long)}.
+ * {@link MediumStore#createMediumOffset(long)}.
  * 
  * Each subclass corresponds to a specific {@link Medium} type, a read-only or writable {@link Medium} instance, as well
  * as a cached or un-cached medium. The sub-class hierarchy is non-trivial, so here is the explanation of the purpose of
@@ -166,7 +166,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test
    public void isAtEndOfMedium_forReferencePreviouslyAtEOM_stillReturnsTrueAfterFlushingChanges() {
@@ -183,8 +183,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      MediumOffset referenceAtEndOfMedium = mediumStoreUnderTest
-         .createMediumReference(mediumContentBefore.length());
+      MediumOffset referenceAtEndOfMedium = mediumStoreUnderTest.createMediumOffset(mediumContentBefore.length());
 
       scheduleAndFlush(new MediumAction[] { createInsertAction(at(currentMedium, insertOffset), insertedString1),
          createRemoveAction(at(currentMedium, removeOffset1), removeSize1), });
@@ -241,10 +240,10 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test
-   public void createMediumReference_forFilledMedium_offsetBeforePendingChanges_referencesRemainUnchanged() {
+   public void createMediumOffset_forFilledMedium_offsetBeforePendingChanges_referencesRemainUnchanged() {
       mediumStoreUnderTest = createDefaultFilledMediumStore();
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
@@ -256,14 +255,16 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(0);
-      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(5);
-      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(insertOffset - 1);
+      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(0);
+      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(5);
+      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(insertOffset - 1);
 
-      mediumStoreUnderTest.insertData(at(currentMedium, insertOffset),
+      MediumOffset theInsertOffset = mediumStoreUnderTest.createMediumOffset(insertOffset);
+      mediumStoreUnderTest.insertData(theInsertOffset,
          ByteBuffer.wrap(insertedString.getBytes(Charsets.CHARSET_ASCII)));
 
-      MediumAction actionToUndo = mediumStoreUnderTest.removeData(at(currentMedium, removeOffset), removeSize);
+      MediumOffset theRemoveOffset = mediumStoreUnderTest.createMediumOffset(removeOffset);
+      MediumAction actionToUndo = mediumStoreUnderTest.removeData(theRemoveOffset, removeSize);
 
       mediumStoreUnderTest.undo(actionToUndo);
 
@@ -273,10 +274,10 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test
-   public void createMediumReference_forFilledMedium_offsetBehindPendingChanges_referencesRemainUnchanged() {
+   public void createMediumOffset_forFilledMedium_offsetBehindPendingChanges_referencesRemainUnchanged() {
       mediumStoreUnderTest = createDefaultFilledMediumStore();
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
@@ -288,14 +289,17 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(100);
-      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(55);
-      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(insertOffset + 20);
+      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(100);
+      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(55);
+      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(insertOffset + 20);
 
-      mediumStoreUnderTest.insertData(at(currentMedium, insertOffset),
+      MediumOffset theInsertOffset = mediumStoreUnderTest.createMediumOffset(insertOffset);
+
+      mediumStoreUnderTest.insertData(theInsertOffset,
          ByteBuffer.wrap(insertedString.getBytes(Charsets.CHARSET_ASCII)));
 
-      MediumAction actionToUndo = mediumStoreUnderTest.removeData(at(currentMedium, removeOffset), removeSize);
+      MediumOffset theRemoveOffset = mediumStoreUnderTest.createMediumOffset(removeOffset);
+      MediumAction actionToUndo = mediumStoreUnderTest.removeData(theRemoveOffset, removeSize);
 
       mediumStoreUnderTest.undo(actionToUndo);
 
@@ -305,10 +309,10 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test
-   public void createMediumReference_forFilledMedium_offsetBeforeChanges_referencesRemainUnchangedAfterFlush() {
+   public void createMediumOffset_forFilledMedium_offsetBeforeChanges_referencesRemainUnchangedAfterFlush() {
       mediumStoreUnderTest = createDefaultFilledMediumStore();
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
@@ -320,9 +324,9 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(0);
-      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(5);
-      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumReference(insertOffset - 1);
+      MediumOffset firstReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(0);
+      MediumOffset secondReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(5);
+      MediumOffset thirdReferenceBeforeChanges = mediumStoreUnderTest.createMediumOffset(insertOffset - 1);
 
       scheduleAndFlush(createInsertAction(at(currentMedium, insertOffset), insertedString),
          createRemoveAction(at(currentMedium, removeOffset), removeSize));
@@ -333,10 +337,10 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    }
 
    /**
-    * Tests {@link MediumStore#createMediumReference(long)}.
+    * Tests {@link MediumStore#createMediumOffset(long)}.
     */
    @Test
-   public void createMediumReference_forFilledMedium_offsetBehindChanges_referencesAreCorrectlyChangedAfterFlush() {
+   public void createMediumOffset_forFilledMedium_offsetBehindChanges_referencesAreCorrectlyChangedAfterFlush() {
       mediumStoreUnderTest = createDefaultFilledMediumStore();
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
@@ -359,29 +363,24 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      MediumOffset firstReferenceBehindTwoInserts = mediumStoreUnderTest.createMediumReference(insertOffset);
-      MediumOffset secondReferenceBehindTwoInserts = mediumStoreUnderTest.createMediumReference(insertOffset + 1);
-      MediumOffset thirdReferenceBehindFirstRemoveOffset = mediumStoreUnderTest
-         .createMediumReference(removeOffset2 + 1);
+      MediumOffset firstReferenceBehindTwoInserts = mediumStoreUnderTest.createMediumOffset(insertOffset);
+      MediumOffset secondReferenceBehindTwoInserts = mediumStoreUnderTest.createMediumOffset(insertOffset + 1);
+      MediumOffset thirdReferenceBehindFirstRemoveOffset = mediumStoreUnderTest.createMediumOffset(removeOffset2 + 1);
       MediumOffset fourthReferenceBehindSecondRemove = mediumStoreUnderTest
-         .createMediumReference(removeOffset1 + removeSize1 + 10);
-      MediumOffset fifthReferenceWithinFirstReplace = mediumStoreUnderTest.createMediumReference(replaceOffset1 + 5);
-      MediumOffset sixthReferenceAtEndOfMedium = mediumStoreUnderTest
-         .createMediumReference(mediumContentBefore.length());
-      MediumOffset seventhReferenceBeforeLastReplace = mediumStoreUnderTest
-         .createMediumReference(replaceOffset2 - 2);
-      MediumOffset eigthReferenceAtLastReplace = mediumStoreUnderTest.createMediumReference(replaceOffset2);
+         .createMediumOffset(removeOffset1 + removeSize1 + 10);
+      MediumOffset fifthReferenceWithinFirstReplace = mediumStoreUnderTest.createMediumOffset(replaceOffset1 + 5);
+      MediumOffset sixthReferenceAtEndOfMedium = mediumStoreUnderTest.createMediumOffset(mediumContentBefore.length());
+      MediumOffset seventhReferenceBeforeLastReplace = mediumStoreUnderTest.createMediumOffset(replaceOffset2 - 2);
+      MediumOffset eigthReferenceAtLastReplace = mediumStoreUnderTest.createMediumOffset(replaceOffset2);
       MediumOffset ninthReferenceBehindLastReplace = mediumStoreUnderTest
-         .createMediumReference(replaceOffset2 + replacementString2.length());
+         .createMediumOffset(replaceOffset2 + replacementString2.length());
 
       scheduleAndFlush(new MediumAction[] { createInsertAction(at(currentMedium, insertOffset), insertedString1),
          createRemoveAction(at(currentMedium, removeOffset1), removeSize1),
          createReplaceAction(at(currentMedium, replaceOffset2), replaceSize2, replacementString2),
          createInsertAction(at(currentMedium, insertOffset), insertedString2),
          createRemoveAction(at(currentMedium, removeOffset2), removeSize2),
-         createReplaceAction(at(currentMedium, replaceOffset1), replaceSize1, replacementString1),
-
-      });
+         createReplaceAction(at(currentMedium, replaceOffset1), replaceSize1, replacementString1), });
 
       mediumStoreUnderTest.close();
 
@@ -398,7 +397,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
          secondReferenceBehindTwoInserts);
       Assert.assertEquals(at(currentMedium, removeOffset2 + behindFirstOffsetShift),
          thirdReferenceBehindFirstRemoveOffset);
-      Assert.assertEquals(at(currentMedium, removeOffset1 + removeSize1 + 10 + behindFourthOffsetShift),
+      // Minus 3 here because of this offset is inside the first replace
+      Assert.assertEquals(at(currentMedium, removeOffset1 + removeSize1 + 10 - 3 + behindFourthOffsetShift),
          fourthReferenceBehindSecondRemove);
       Assert.assertEquals(at(currentMedium, replaceOffset1 + 5 + behindFourthOffsetShift),
          fifthReferenceWithinFirstReplace);
@@ -1595,6 +1595,13 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       return copiedFile;
    }
 
+   protected MediumAction createManagedInsert(long offset, String insertText) {
+
+      MediumOffset insertOffset = mediumStoreUnderTest.createMediumOffset(offset);
+
+      return createInsertAction(insertOffset, insertText);
+   }
+
    /**
     * Creates an insert {@link MediumAction}
     * 
@@ -1667,24 +1674,25 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       List<MediumAction> scheduledActions = new ArrayList<>();
 
-      MediumOffset previousReference = null;
+      MediumOffset previousStartOffset = null;
 
       for (int i = 0; i < actionsInOffsetAndExecutionOrder.length; i++) {
          MediumAction currentAction = actionsInOffsetAndExecutionOrder[i];
 
-         MediumOffset startReference = currentAction.getRegion().getStartOffset();
-         int startReferenceAsInt = (int) startReference.getAbsoluteMediumOffset();
+         MediumOffset startOffset = mediumStoreUnderTest
+            .createMediumOffset(currentAction.getRegion().getStartOffset().getAbsoluteMediumOffset());
+         int startOffsetAsInt = (int) startOffset.getAbsoluteMediumOffset();
 
-         if (previousReference != null) {
-            if (startReference.before(previousReference)) {
+         if (previousStartOffset != null) {
+            if (startOffset.before(previousStartOffset)) {
                throw new InvalidTestDataException(
                   "This method must only be used with MediumAction arrays whose entries are sorted by offset, ascending",
                   null);
             }
          }
 
-         if (startReferenceAsInt > lastStringIndex) {
-            expectationBuilder.appendFromOriginal(lastStringIndex, startReferenceAsInt - lastStringIndex);
+         if (startOffsetAsInt > lastStringIndex) {
+            expectationBuilder.appendFromOriginal(lastStringIndex, startOffsetAsInt - lastStringIndex);
          }
 
          ByteBuffer actionBytes = currentAction.getActionBytes();
@@ -1702,20 +1710,19 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
          switch (currentAction.getActionType()) {
             case INSERT:
-               scheduledActions.add(mediumStoreUnderTest.insertData(startReference, actionBytes));
-               lastStringIndex = startReferenceAsInt;
+               scheduledActions.add(mediumStoreUnderTest.insertData(startOffset, actionBytes));
+               lastStringIndex = startOffsetAsInt;
             break;
 
             case REMOVE:
-               scheduledActions
-                  .add(mediumStoreUnderTest.removeData(startReference, currentAction.getRegion().getSize()));
-               lastStringIndex = startReferenceAsInt + currentAction.getRegion().getSize();
+               scheduledActions.add(mediumStoreUnderTest.removeData(startOffset, currentAction.getRegion().getSize()));
+               lastStringIndex = startOffsetAsInt + currentAction.getRegion().getSize();
             break;
 
             case REPLACE:
-               scheduledActions.add(
-                  mediumStoreUnderTest.replaceData(startReference, currentAction.getRegion().getSize(), actionBytes));
-               lastStringIndex = startReferenceAsInt + currentAction.getRegion().getSize();
+               scheduledActions
+                  .add(mediumStoreUnderTest.replaceData(startOffset, currentAction.getRegion().getSize(), actionBytes));
+               lastStringIndex = startOffsetAsInt + currentAction.getRegion().getSize();
             break;
 
             default:
@@ -1794,23 +1801,23 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       for (int i = 0; i < actionsInExecutionOrder.length; i++) {
          MediumAction currentAction = actionsInExecutionOrder[i];
 
-         MediumOffset startReference = currentAction.getRegion().getStartOffset();
+         MediumOffset startOffset = mediumStoreUnderTest
+            .createMediumOffset(currentAction.getRegion().getStartOffset().getAbsoluteMediumOffset());
 
          ByteBuffer actionBytes = currentAction.getActionBytes();
 
          switch (currentAction.getActionType()) {
             case INSERT:
-               scheduledActions.add(mediumStoreUnderTest.insertData(startReference, actionBytes));
+               scheduledActions.add(mediumStoreUnderTest.insertData(startOffset, actionBytes));
             break;
 
             case REMOVE:
-               scheduledActions
-                  .add(mediumStoreUnderTest.removeData(startReference, currentAction.getRegion().getSize()));
+               scheduledActions.add(mediumStoreUnderTest.removeData(startOffset, currentAction.getRegion().getSize()));
             break;
 
             case REPLACE:
-               scheduledActions.add(
-                  mediumStoreUnderTest.replaceData(startReference, currentAction.getRegion().getSize(), actionBytes));
+               scheduledActions
+                  .add(mediumStoreUnderTest.replaceData(startOffset, currentAction.getRegion().getSize(), actionBytes));
             break;
 
             default:

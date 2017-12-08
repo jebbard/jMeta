@@ -14,28 +14,27 @@ import java.util.Collections;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link MediumOffsetFactory} is a class to create and manage all created {@link MediumOffset} instances. Due to
- * this, it has a strong coupling to the {@link MediumOffset} and {@link StandardMediumOffset} classes.
+ * {@link MediumOffsetFactory} is a class to create and manage all created {@link MediumOffset} instances. Due to this,
+ * it has a strong coupling to the {@link MediumOffset} and {@link StandardMediumOffset} classes.
  * 
- * When creating an instance of {@link MediumOffset}, it automatically passes a reference to itself to the instance,
- * to ensure any call to {@link MediumOffset#advance(long)} can use it to create advanced {@link MediumOffset}
- * instance.
+ * When creating an instance of {@link MediumOffset}, it automatically passes a reference to itself to the instance, to
+ * ensure any call to {@link MediumOffset#advance(long)} can use it to create advanced {@link MediumOffset} instance.
  * 
- * It not only creates {@link MediumOffset} instances, but it also maintains all created instances in an internal
- * data structure. It provides corresponding methods to retrieve all {@link MediumOffset}s in a specific range.
- * Furthermore, it implements update functionality to automatically update all {@link MediumOffset} instances due to
- * an action that was done on the current {@link Medium}.
+ * It not only creates {@link MediumOffset} instances, but it also maintains all created instances in an internal data
+ * structure. It provides corresponding methods to retrieve all {@link MediumOffset}s in a specific range. Furthermore,
+ * it implements update functionality to automatically update all {@link MediumOffset} instances due to an action that
+ * was done on the current {@link Medium}.
  */
 public class MediumOffsetFactory {
 
-   private final List<MediumOffset> references = new ArrayList<>();
+   private final List<MediumOffset> offsets = new ArrayList<>();
 
    private final Medium<?> medium;
 
@@ -57,16 +56,16 @@ public class MediumOffsetFactory {
     *           The absolute, positive and null-origin byte offset of the new {@link MediumOffset} instance.
     * @return The created {@link MediumOffset} instance.
     */
-   public MediumOffset createMediumReference(long absoluteMediumOffset) {
+   public MediumOffset createMediumOffset(long absoluteMediumOffset) {
 
-      StandardMediumOffset newReference = new StandardMediumOffset(medium, absoluteMediumOffset);
+      StandardMediumOffset newOffset = new StandardMediumOffset(medium, absoluteMediumOffset);
 
       // To ensure IMediumReference.advance() can add the advanced references to "this"
-      newReference.setMediumReferenceRepository(this);
+      newOffset.setMediumReferenceRepository(this);
 
-      references.add(newReference);
+      offsets.add(newOffset);
 
-      return newReference;
+      return newOffset;
    }
 
    /**
@@ -80,22 +79,27 @@ public class MediumOffsetFactory {
    }
 
    /**
-    * Updates all {@link MediumOffset}s currently managed by this {@link MediumOffsetFactory} according to the
-    * given {@link MediumAction}. Only {@link MediumAction}s of types {@link MediumActionType#INSERT} and
-    * {@link MediumActionType#REMOVE} are supported, because only these actions move objects (in terms of sequences of
-    * bytes) that are stored behind the location of the change. In case of {@link MediumActionType#INSERT}, bytes behind
-    * the insert location must be moved back by the number of inserted bytes. In case of {@link MediumActionType#REMOVE}
-    * , bytes behind the remove location must be moved forward by the number of removed bytes. In either case, the idea
-    * of this method is that bytes/objects on the {@link Medium} get addressed by their {@link MediumOffset}. And
-    * if an insertion or removal happens before these objects, their {@link MediumOffset} addresses must be changed
-    * accordingly. Otherwise these {@link MediumOffset}s would no longer point to the same objects/bytes.
+    * Updates all {@link MediumOffset}s currently managed by this {@link MediumOffsetFactory} according to the given
+    * {@link MediumAction}. Only {@link MediumAction}s of types {@link MediumActionType#INSERT},
+    * {@link MediumActionType#REMOVE} and {@link MediumActionType#REPLACE} are supported, because only these actions
+    * move objects (in terms of sequences of bytes) that are stored behind the location of the change.
+    * <ul>
+    * <li>For {@link MediumActionType#INSERT}s, bytes at offsets equal to or behind the insert offset must be moved back
+    * by the number of inserted bytes.</li>
+    * <li>For {@link MediumActionType#REMOVE}s, bytes behind the removed region must be moved forward by the number of
+    * removed bytes. Any offsets <i>within</i> the removed region fall back to the remove offset.</li>
+    * <li>For {@link MediumActionType#REPLACE}s, bytes behind the replaced region must be moved forward by the number of
+    * removed bytes (if it is a removing replace) or must be moved backward by the number of inserted bytes (if it is an
+    * inserting replace), or must not be moved at all (if it is an overwriting replace). Any offsets <i>within</i> the
+    * replaced region are not changed at all.</li>
+    * </ul>
     * 
     * @param action
-    *           The {@link MediumAction} to apply. Only {@link MediumAction}s of types {@link MediumActionType#INSERT}
-    *           and {@link MediumActionType#REMOVE} are supported. Must refer to the same {@link Medium} as this
-    *           {@link MediumOffsetFactory}.
+    *           The {@link MediumAction} to apply. Only {@link MediumAction}s of types {@link MediumActionType#INSERT},
+    *           {@link MediumActionType#REMOVE} and {@link MediumActionType#REPLACE} are supported. Must refer to the
+    *           same {@link Medium} as this {@link MediumOffsetFactory}.
     */
-   public void updateReferences(MediumAction action) {
+   public void updateOffsets(MediumAction action) {
 
       Reject.ifNull(action, "action");
 
@@ -106,8 +110,7 @@ public class MediumOffsetFactory {
 
       MediumOffset startReference = action.getRegion().getStartOffset();
 
-      Reject.ifFalse(startReference.getMedium().equals(getMedium()),
-	   	         "startReference.getMedium().equals(getMedium())");
+      Reject.ifFalse(startReference.getMedium().equals(getMedium()), "startReference.getMedium().equals(getMedium())");
 
       boolean insertingReplace = false;
       boolean removingReplace = false;
@@ -134,7 +137,7 @@ public class MediumOffsetFactory {
          }
       }
 
-      List<MediumOffset> referencesBehindOrEqual = getAllReferencesBehindOrEqual(startReference);
+      List<MediumOffset> referencesBehindOrEqual = getAllOffsetsBehindOrEqual(startReference);
 
       long y = startReference.getAbsoluteMediumOffset();
 
@@ -161,7 +164,7 @@ public class MediumOffsetFactory {
     */
    public void clear() {
 
-      references.clear();
+      offsets.clear();
    }
 
    /**
@@ -169,9 +172,9 @@ public class MediumOffsetFactory {
     * 
     * @return all {@link MediumOffset}s currently maintained in this factory.
     */
-   public List<MediumOffset> getAllReferences() {
+   public List<MediumOffset> getAllOffsets() {
 
-      return Collections.unmodifiableList(references);
+      return Collections.unmodifiableList(offsets);
    }
 
    /**
@@ -183,46 +186,45 @@ public class MediumOffsetFactory {
     * @return all {@link MediumOffset}s currently maintained in this factory that lie within the provided
     *         {@link MediumRegion}.
     */
-   public List<MediumOffset> getAllReferencesInRegion(MediumRegion region) {
+   public List<MediumOffset> getAllOffsetsInRegion(MediumRegion region) {
 
       Reject.ifNull(region, "region");
       Reject.ifFalse(region.getStartOffset().getMedium().equals(getMedium()),
-	   	         "region.getStartReference().getMedium().equals(getMedium())");
+         "region.getStartOffset().getMedium().equals(getMedium())");
 
-      List<MediumOffset> allReferencesInRegion = new ArrayList<>();
+      List<MediumOffset> allOffsetsInRegion = new ArrayList<>();
 
-      for (MediumOffset mediumReference : references) {
-         if (region.contains(mediumReference)) {
-            allReferencesInRegion.add(mediumReference);
+      for (MediumOffset offset : offsets) {
+         if (region.contains(offset)) {
+            allOffsetsInRegion.add(offset);
          }
       }
 
-      return allReferencesInRegion;
+      return allOffsetsInRegion;
    }
 
    /**
     * Returns all {@link MediumOffset}s currently maintained in this factory that lie behind or are equal to the
     * provided {@link MediumOffset}.
     * 
-    * @param reference
+    * @param offset
     *           The {@link MediumOffset}, must belong to the same {@link Medium}.
     * @return all {@link MediumOffset}s currently maintained in this factory that lie behind or are equal to the
     *         provided {@link MediumOffset}.
     */
-   public List<MediumOffset> getAllReferencesBehindOrEqual(MediumOffset reference) {
+   public List<MediumOffset> getAllOffsetsBehindOrEqual(MediumOffset offset) {
 
-      Reject.ifNull(reference, "reference");
-      Reject.ifFalse(reference.getMedium().equals(getMedium()),
-	   	         "reference.getMedium().equals(getMedium())");
+      Reject.ifNull(offset, "offset");
+      Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
 
-      List<MediumOffset> allReferencesBehindOrEqual = new ArrayList<>();
+      List<MediumOffset> allOffsetsBehindOrEqual = new ArrayList<>();
 
-      for (MediumOffset mediumReference : references) {
-         if (mediumReference.behindOrEqual(reference)) {
-            allReferencesBehindOrEqual.add(mediumReference);
+      for (MediumOffset offsetBehindOrEqual : offsets) {
+         if (offsetBehindOrEqual.behindOrEqual(offset)) {
+            allOffsetsBehindOrEqual.add(offsetBehindOrEqual);
          }
       }
 
-      return allReferencesBehindOrEqual;
+      return allOffsetsBehindOrEqual;
    }
 }
