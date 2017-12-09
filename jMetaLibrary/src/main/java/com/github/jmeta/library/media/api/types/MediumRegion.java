@@ -81,19 +81,19 @@ public class MediumRegion {
        * Creates a new {@link MediumRegionClipResult}.
        * 
        * @param overlappedPartOfLeftRegion
+       *           See getter for details, must not be null
+       * @param nonOverlappedPartOfLeftRegionAtFront
        *           See getter for details
-       * @param nonOverlappingPartAtFront
-       *           See getter for details
-       * @param nonOverlappingPartAtBack
+       * @param nonOverlappedPartOfLeftRegionAtBack
        *           See getter for details
        */
-      public MediumRegionClipResult(MediumRegion overlappedPartOfLeftRegion, MediumRegion nonOverlappingPartAtFront,
-         MediumRegion nonOverlappingPartAtBack) {
+      public MediumRegionClipResult(MediumRegion overlappedPartOfLeftRegion,
+         MediumRegion nonOverlappedPartOfLeftRegionAtFront, MediumRegion nonOverlappedPartOfLeftRegionAtBack) {
          Reject.ifNull(overlappedPartOfLeftRegion, "overlappedPartOfLeftRegion");
 
-         this.nonOverlappingPartAtFront = nonOverlappingPartAtFront;
          this.overlappedPartOfLeftRegion = overlappedPartOfLeftRegion;
-         this.nonOverlappingPartOfAtBack = nonOverlappingPartAtBack;
+         this.nonOverlappedPartOfLeftRegionAtFront = nonOverlappedPartOfLeftRegionAtFront;
+         this.nonOverlappedPartOfLeftRegionAtBack = nonOverlappedPartOfLeftRegionAtBack;
       }
 
       /**
@@ -105,28 +105,24 @@ public class MediumRegion {
       }
 
       /**
-       * @return any part of the clipped regions that does not overlap at the front, that might be part of the original
-       *         left region (if the left region start offset is before the right region start offset) or of the
-       *         original right region (if the right region start offset is before the left region start offset) or null
-       *         if both start offsets are equal.
+       * @return any part of the left master region that does not overlap at the front, or null if there is no part of
+       *         the left master region starting before the right region.
        */
-      public MediumRegion getNonOverlappingPartAtFront() {
-         return nonOverlappingPartAtFront;
+      public MediumRegion getNonOverlappedPartOfLeftRegionAtFront() {
+         return nonOverlappedPartOfLeftRegionAtFront;
       }
 
       /**
-       * @return any part of the clipped regions that does not overlap at the back, that might be part of the original
-       *         left region (if the right region end offset is before the left region end offset) or of the original
-       *         right region (if the left region end offset is before the right region end offst) or null if both end
-       *         offsets are equal.
+       * @return any part of the left master region that does not overlap at the back, or null if there is no part of
+       *         the left master region ending behind the right region.
        */
-      public MediumRegion getNonOverlappingPartOfAtBack() {
-         return nonOverlappingPartOfAtBack;
+      public MediumRegion getNonOverlappedPartOfLeftRegionAtBack() {
+         return nonOverlappedPartOfLeftRegionAtBack;
       }
 
       private final MediumRegion overlappedPartOfLeftRegion;
-      private final MediumRegion nonOverlappingPartAtFront;
-      private final MediumRegion nonOverlappingPartOfAtBack;
+      private final MediumRegion nonOverlappedPartOfLeftRegionAtFront;
+      private final MediumRegion nonOverlappedPartOfLeftRegionAtBack;
    }
 
    private MediumOffset startReference;
@@ -179,7 +175,8 @@ public class MediumRegion {
     * @param left
     *           The left {@link MediumRegion}, must refer to the same {@link Medium} as the right {@link MediumRegion}
     * @param right
-    *           The right {@link MediumRegion}, must refer to the same {@link Medium} as the left {@link MediumRegion}
+    *           The right {@link MediumRegion}, must refer to the same {@link Medium} as the left {@link MediumRegion},
+    *           must point to the same {@link Medium} as the left {@link MediumRegion}
     * @return The determined {@link MediumRegionOverlapType} of the two regions
     */
    public static MediumRegionOverlapType determineRegionOverlap(MediumRegion left, MediumRegion right) {
@@ -211,15 +208,17 @@ public class MediumRegion {
    /**
     * Performs clipping of two {@link MediumRegion}s overlapping each other, where the left {@link MediumRegion} is
     * considered as "master region", which means that the overlapped portion in the returned
-    * {@link MediumRegionClipResult} contains the bytes of the left {@link MediumRegion}.
+    * {@link MediumRegionClipResult} contains the bytes of the left {@link MediumRegion}. Only non-overlapping parts of
+    * the left region are returned. That said, the left {@link MediumRegion} is what counts here: Parts of the right
+    * {@link MediumRegion} never appear in the {@link MediumRegionClipResult}.
     * 
     * @param leftMasterRegion
     *           The left master {@link MediumRegion} to clip against the right region
     * @param rightRegion
-    *           The right {@link MediumRegion} to clip against, must overlap the left region
-    * @return A {@link MediumRegionClipResult} containing all clipped portions, see {@link MediumRegionClipResult} for
-    *         details.
-    * 
+    *           The right {@link MediumRegion} to clip against, must overlap the left region, must point to the same
+    *           {@link Medium} as the left {@link MediumRegion}
+    * @return A {@link MediumRegionClipResult} containing all clipped portions of the left master {@link MediumRegion},
+    *         see {@link MediumRegionClipResult} for details.
     */
    public static MediumRegionClipResult clipOverlappingRegions(MediumRegion leftMasterRegion,
       MediumRegion rightRegion) {
@@ -229,26 +228,26 @@ public class MediumRegion {
       Reject.ifTrue(leftMasterRegion.getOverlappingByteCount(rightRegion) == 0,
          "leftMasterRegion.getOverlappingByteCount(rightRegion) == 0");
 
-      MediumRegion nonOverlappingPartOfSmallerOffsetRegionAtFront = null;
-      MediumRegion overlappedPartOfLeftMasterRegion = leftMasterRegion;
-      MediumRegion nonOverlappingPartOfHigherOffsetRegionAtBack = null;
+      MediumRegion overlappedPartOfLeftRegion = leftMasterRegion;
+      MediumRegion nonOverlappedPartOfLeftRegionAtFront = null;
+      MediumRegion nonOverlappedPartOfLeftRegionAtBack = null;
 
       if (leftMasterRegion.getStartOffset().before(rightRegion.getStartOffset())) {
          MediumRegion[] splitRegions = leftMasterRegion.split(rightRegion.getStartOffset());
 
-         nonOverlappingPartOfSmallerOffsetRegionAtFront = splitRegions[0];
-         overlappedPartOfLeftMasterRegion = splitRegions[1];
+         nonOverlappedPartOfLeftRegionAtFront = splitRegions[0];
+         overlappedPartOfLeftRegion = splitRegions[1];
       }
 
       if (rightRegion.calculateEndOffset().before(leftMasterRegion.calculateEndOffset())) {
-         MediumRegion[] splitRegions = overlappedPartOfLeftMasterRegion.split(rightRegion.calculateEndOffset());
+         MediumRegion[] splitRegions = overlappedPartOfLeftRegion.split(rightRegion.calculateEndOffset());
 
-         overlappedPartOfLeftMasterRegion = splitRegions[0];
-         nonOverlappingPartOfHigherOffsetRegionAtBack = splitRegions[1];
+         overlappedPartOfLeftRegion = splitRegions[0];
+         nonOverlappedPartOfLeftRegionAtBack = splitRegions[1];
       }
 
-      return new MediumRegionClipResult(overlappedPartOfLeftMasterRegion,
-         nonOverlappingPartOfSmallerOffsetRegionAtFront, nonOverlappingPartOfHigherOffsetRegionAtBack);
+      return new MediumRegionClipResult(overlappedPartOfLeftRegion, nonOverlappedPartOfLeftRegionAtFront,
+         nonOverlappedPartOfLeftRegionAtBack);
    }
 
    /**

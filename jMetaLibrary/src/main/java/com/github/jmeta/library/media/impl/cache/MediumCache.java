@@ -443,13 +443,13 @@ public class MediumCache {
 
          MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftExistingRegion, rightRegionToAdd);
 
-         MediumRegion nonOverlappingPartOfSmallerOffsetRegionAtFront = clipResult.getNonOverlappingPartAtFront();
+         MediumRegion nonOverlappingPartOfSmallerOffsetRegionAtFront = clipResult.getNonOverlappedPartOfLeftRegionAtFront();
 
          if (nonOverlappingPartOfSmallerOffsetRegionAtFront != null) {
             addRegionToCache(nonOverlappingPartOfSmallerOffsetRegionAtFront);
          }
 
-         MediumRegion nonOverlappingPartOfHigherOffsetRegionAtBack = clipResult.getNonOverlappingPartOfAtBack();
+         MediumRegion nonOverlappingPartOfHigherOffsetRegionAtBack = clipResult.getNonOverlappedPartOfLeftRegionAtBack();
 
          if (nonOverlappingPartOfHigherOffsetRegionAtBack != null) {
             addRegionToCache(nonOverlappingPartOfHigherOffsetRegionAtBack);

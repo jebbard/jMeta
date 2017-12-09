@@ -29,4 +29,6 @@ public interface MediaAPI {
     * @pre medium must be a supported {@link Medium} implementation.
     */
    public IMediumStore_OLD getMediumStore(Medium<?> medium);
+
+   public MediumStore createMediumStore(Medium<?> medium);
 }

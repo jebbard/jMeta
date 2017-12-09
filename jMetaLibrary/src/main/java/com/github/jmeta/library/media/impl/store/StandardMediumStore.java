@@ -40,21 +40,35 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    private final MediumCache cache;
 
-   private final MediumOffsetFactory referenceFactory;
+   private final MediumOffsetFactory offsetFactory;
 
    private boolean isOpened;
 
    private final MediumChangeManager changeManager;
 
-   public StandardMediumStore(MediumAccessor<T> mediumAccessor, MediumCache cache, MediumOffsetFactory referenceFactory,
+   /**
+    * Creates a new {@link StandardMediumStore}.
+    * 
+    * @param mediumAccessor
+    *           The {@link MediumAccessor} instance to use, also contains the {@link Medium} this {@link MediumStore}
+    *           works on
+    * @param cache
+    *           The {@link MediumCache} instance to use
+    * @param offsetFactory
+    *           The {@link MediumOffsetFactory} instance to use
+    * @param changeManager
+    *           The {@link MediumChangeManager} to use
+    */
+   public StandardMediumStore(MediumAccessor<T> mediumAccessor, MediumCache cache, MediumOffsetFactory offsetFactory,
       MediumChangeManager changeManager) {
       Reject.ifNull(mediumAccessor, "mediumAccessor");
-      Reject.ifNull(referenceFactory, "referenceFactory");
+      Reject.ifNull(offsetFactory, "offsetFactory");
+      Reject.ifNull(changeManager, "changeManager");
       Reject.ifNull(cache, "cache");
 
       this.mediumAccessor = mediumAccessor;
       this.cache = cache;
-      this.referenceFactory = referenceFactory;
+      this.offsetFactory = offsetFactory;
       this.changeManager = changeManager;
 
       isOpened = false;
@@ -77,7 +91,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
       cache.clear();
       mediumAccessor.close();
-      referenceFactory.clear();
+      offsetFactory.clear();
 
       isOpened = false;
    }
@@ -121,7 +135,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    public MediumOffset createMediumOffset(long offset) {
       ensureOpened();
 
-      return referenceFactory.createMediumOffset(offset);
+      return offsetFactory.createMediumOffset(offset);
    }
 
    /**
@@ -407,7 +421,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                   }
                }
 
-               referenceFactory.updateOffsets(scheduledAction);
+               offsetFactory.updateOffsets(scheduledAction);
 
                if (getMedium().isCachingEnabled()) {
                   cache.addRegion(new MediumRegion(
@@ -421,7 +435,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                      scheduledAction.getRegion().getSize());
                }
                changeManager.undo(scheduledAction);
-               referenceFactory.updateOffsets(scheduledAction);
+               offsetFactory.updateOffsets(scheduledAction);
             break;
 
             case REPLACE:
@@ -430,7 +444,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                   cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
                      scheduledAction.getRegion().getSize());
                }
-               referenceFactory.updateOffsets(scheduledAction);
+               offsetFactory.updateOffsets(scheduledAction);
                if (getMedium().isCachingEnabled()) {
                   cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
                }

@@ -17,6 +17,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionClipResult;
+import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
@@ -34,11 +36,16 @@ public class MediumRegionTest {
 
    private static final InMemoryMedium UNRELATED_MEDIUM = new InMemoryMedium(new byte[] {}, "Fake", false);
 
-   private final static byte[][] THE_BUFFERS = new byte[][] { new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, },
+   private final static byte[][] THE_BUFFERS = new byte[][] {
+      // @formatter:off
+      new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, },
       new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3,
          4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
          10, },
-      new byte[] { 1, }, new byte[] { 1, 2, 5, 6, 7, 8, 9, 'a', 'b', ' ' } };
+      new byte[] { 1, }, 
+      new byte[] { 1, 2, 5, 6, 7, 8, 9, 'a', 'b', ' ' } 
+      // @formatter:on
+   };
 
    private static int EXPECTED_SIZE = 200;
 
@@ -507,6 +514,387 @@ public class MediumRegionTest {
       MediumOffset unrelatedMediumOffset = new StandardMediumOffset(UNRELATED_MEDIUM, 15L);
 
       uncachedRegion.split(unrelatedMediumOffset);
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forEqualRange_returnsSameRange() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.SAME_RANGE,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+      Assert.assertEquals(MediumRegionOverlapType.SAME_RANGE,
+         MediumRegion.determineRegionOverlap(rightRegion, leftRegion));
+      Assert.assertEquals(MediumRegionOverlapType.SAME_RANGE,
+         MediumRegion.determineRegionOverlap(rightRegion, rightRegion));
+      Assert.assertEquals(MediumRegionOverlapType.SAME_RANGE,
+         MediumRegion.determineRegionOverlap(leftRegion, leftRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forNonOverlappingRange_returnsNoOverlaps() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 100L), 20);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.NO_OVERLAP,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+
+      Assert.assertEquals(MediumRegionOverlapType.NO_OVERLAP,
+         MediumRegion.determineRegionOverlap(rightRegion, leftRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftOverlappingRightAtFront_returnsLeftOverlapsRightAtFront() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 1L), 20);
+      MediumRegion secondLeftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 9L), 20);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_FRONT,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+      Assert.assertEquals(MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_FRONT,
+         MediumRegion.determineRegionOverlap(secondLeftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftOverlappingRightAtBack_returnsLeftOverlapsRightAtFront() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+      MediumRegion secondLeftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 2L), 20);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 1L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+      Assert.assertEquals(MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK,
+         MediumRegion.determineRegionOverlap(secondLeftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftStartingWithRightAndEndingBefore_returnsLeftFullyInsideRight() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 10);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.LEFT_FULLY_INSIDE_RIGHT,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftStartingBehindRightAndEndingBefore_returnsLeftFullyInsideRight() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11L), 10);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.LEFT_FULLY_INSIDE_RIGHT,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftStartingBehindRightAndEndingWithRight_returnsLeftFullyInsideRight() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 20L), 10);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.LEFT_FULLY_INSIDE_RIGHT,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftStartingBeforeRightAndEndingBehind_returnsrightFullyInsideLeft() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 9L), 22);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftStartingWithRightAndEndingBehind_returnsrightFullyInsideLeft() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 22);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void determinRegionOverlap_forLeftStartingBeforeRightAndEndingWith_returnsrightFullyInsideLeft() {
+      MediumRegion leftRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 8L), 22);
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      Assert.assertEquals(MediumRegionOverlapType.RIGHT_FULLY_INSIDE_LEFT,
+         MediumRegion.determineRegionOverlap(leftRegion, rightRegion));
+   }
+
+   /**
+    * Tests {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void determinRegionOverlap_forInvalidMediumReference_throwsException() {
+      MediumRegion uncachedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      MediumRegion uncachedRegionForOtherMedium = new MediumRegion(new StandardMediumOffset(UNRELATED_MEDIUM, 5L), 20);
+
+      MediumRegion.determineRegionOverlap(uncachedRegion, uncachedRegionForOtherMedium);
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forEqualRange_returnsOnlyLeftMasterRegion() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c', 'd', 'e', 'f' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y', 'z', 'u', 'v', 'w' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(leftMasterRegion, clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftOverlappingRightAtFront_returnsFrontAndMiddlePartOfLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 8L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c', 'd', 'e', 'f' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y', 'z', 'u', 'v', 'w' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 8L), ByteBuffer.wrap(new byte[] { 'a', 'b' })),
+         clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), ByteBuffer.wrap(new byte[] { 'c', 'd', 'e', 'f' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftStartingBeforeRightEndingWithRight_returnsFrontAndMiddlePartOfLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 8L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c', 'd', 'e', 'f' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y', 'z', 'u' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 8L), ByteBuffer.wrap(new byte[] { 'a', 'b' })),
+         clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), ByteBuffer.wrap(new byte[] { 'c', 'd', 'e', 'f' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftStartingBeforeRightEndingBehindRight_returnsFrontMiddleAndBackPartOfLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 8L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c', 'd', 'e', 'f' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 8L), ByteBuffer.wrap(new byte[] { 'a', 'b' })),
+         clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 12L), ByteBuffer.wrap(new byte[] { 'e', 'f' })),
+         clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), ByteBuffer.wrap(new byte[] { 'c', 'd' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftStartingWithRightEndingBehindRight_returnsBackAndMiddlePartOfLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c', 'd', 'e', 'f' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 12L), ByteBuffer.wrap(new byte[] { 'c', 'd', 'e', 'f' })),
+         clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), ByteBuffer.wrap(new byte[] { 'a', 'b' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftStartingWithRightEndingBeforeRight_returnsOnlyLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y', 'z', 'u', 'v', 'w' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), ByteBuffer.wrap(new byte[] { 'a', 'b', 'c' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftOverlappingRightAtBack_returnsBackAndMiddlePartOfLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 12L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c', 'd', 'e', 'f' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y', 'z', 'u', 'v', 'w' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 16L), ByteBuffer.wrap(new byte[] { 'e', 'f' })),
+         clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 12L), ByteBuffer.wrap(new byte[] { 'a', 'b', 'c', 'd' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftStartingBehindRightEndingBeforeRight_returnsOnlyLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 12L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y', 'z', 'u', 'v', 'w' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 12L), ByteBuffer.wrap(new byte[] { 'a', 'b', 'c' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test
+   public void clipOverlappingRegions_forLeftStartingBehindRightEndingWithRight_returnsOnlyLeft() {
+      MediumRegion leftMasterRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 13L),
+         ByteBuffer.wrap(new byte[] { 'a', 'b', 'c' }));
+
+      MediumRegion rightRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L),
+         ByteBuffer.wrap(new byte[] { 'x', 'y', 'z', 'u', 'v', 'w' }));
+
+      MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftMasterRegion, rightRegion);
+
+      Assert.assertNotNull(clipResult);
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtFront());
+      Assert.assertEquals(null, clipResult.getNonOverlappedPartOfLeftRegionAtBack());
+      Assert.assertEquals(
+         new MediumRegion(new StandardMediumOffset(MEDIUM, 13L), ByteBuffer.wrap(new byte[] { 'a', 'b', 'c' })),
+         clipResult.getOverlappingPartOfLeftRegion());
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void clipOverlappingRegions_forNonOverlappingRange_throwsException() {
+      MediumRegion uncachedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      MediumRegion uncachedRegionForOtherMedium = new MediumRegion(new StandardMediumOffset(UNRELATED_MEDIUM, 500L),
+         20);
+
+      MediumRegion.clipOverlappingRegions(uncachedRegion, uncachedRegionForOtherMedium);
+   }
+
+   /**
+    * Tests {@link MediumRegion#clipOverlappingRegions(MediumRegion, MediumRegion)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void clipOverlappingRegions_forInvalidMediumReference_throwsException() {
+      MediumRegion uncachedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 10L), 20);
+
+      MediumRegion uncachedRegionForOtherMedium = new MediumRegion(new StandardMediumOffset(UNRELATED_MEDIUM, 5L), 20);
+
+      MediumRegion.clipOverlappingRegions(uncachedRegion, uncachedRegionForOtherMedium);
    }
 
    /**
