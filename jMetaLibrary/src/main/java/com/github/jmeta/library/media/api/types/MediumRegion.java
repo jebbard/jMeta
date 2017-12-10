@@ -363,65 +363,6 @@ public class MediumRegion {
    }
 
    /**
-    * Discards the back bytes of this {@link MediumRegion}, shortening it to a new end {@link MediumOffset}. Only
-    * allowed to be called for cached {@link MediumRegion}s.
-    * 
-    * @param newEndReference
-    *           The new end {@link MediumOffset}. Must be contained in the region. That said, it is not allowed to pass
-    *           in the end reference of this {@link MediumRegion}, because it is not contained in it.
-    */
-   public void discardBytesAtEnd(MediumOffset newEndReference) {
-
-      Reject.ifNull(newEndReference, "newEndReference");
-      Reject.ifFalse(contains(newEndReference), "contains(newEndReference)");
-      Reject.ifFalse(isCached(), "isCached()");
-
-      if (newEndReference.equals(calculateEndOffset()))
-         return;
-
-      int trimSize = (int) newEndReference.distanceTo(getStartOffset());
-
-      buffer.position(getSize() - trimSize);
-      ByteBuffer newBuffer = ByteBuffer.allocate(trimSize);
-
-      newBuffer.put(buffer);
-      newBuffer.rewind();
-
-      setBuffer(newBuffer);
-   }
-
-   /**
-    * Discards the front bytes of this {@link MediumRegion}, shortening it to begin at a new start {@link MediumOffset}.
-    * Only allowed to be called for cached {@link MediumRegion}s.
-    * 
-    * @param newStartReference
-    *           The new start {@link MediumOffset}. Must be contained in the region. You can pass in the start reference
-    *           of the {@link MediumRegion}, which changes nothing on this {@link MediumRegion}.
-    */
-   public void discardBytesAtFront(MediumOffset newStartReference) {
-
-      Reject.ifNull(newStartReference, "newStartReference");
-      Reject.ifFalse(contains(newStartReference), "contains(newStartReference)");
-      Reject.ifFalse(isCached(), "isCached()");
-
-      if (newStartReference.equals(getStartOffset()))
-         return;
-
-      int trimSize = (int) newStartReference.distanceTo(getStartOffset());
-      int newSize = (int) calculateEndOffset().distanceTo(newStartReference);
-
-      buffer.position(trimSize);
-      ByteBuffer newBuffer = ByteBuffer.allocate(newSize);
-
-      newBuffer.put(buffer);
-      newBuffer.rewind();
-
-      setBuffer(newBuffer);
-
-      startReference = newStartReference;
-   }
-
-   /**
     * Tells whether this whole {@link MediumRegion} is cached or not. If it is cached, {@link #getBytes()} returns a
     * non-null and non-empty {@link ByteBuffer}
     * 
