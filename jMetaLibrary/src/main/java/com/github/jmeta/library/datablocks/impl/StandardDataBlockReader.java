@@ -48,8 +48,8 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -83,8 +83,6 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    @Override
    public void free(MediumOffset startReference, long size) {
-
-      m_cache.discard(startReference, size);
    }
 
    // TODO stage2_005: It is a validation / parsing error if a field for which a fixed value is
@@ -401,7 +399,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          throw new IllegalStateException("Payload size could not be determined");
 
       final Payload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(),
-         m_cache.createMediumReference(reference.getAbsoluteMediumOffset() - totalPayloadSize), totalPayloadSize, this,
+         m_cache.createMediumOffset(reference.getAbsoluteMediumOffset() - totalPayloadSize), totalPayloadSize, this,
          context);
 
       return createPayloadAfterRead;
@@ -607,7 +605,7 @@ public class StandardDataBlockReader implements DataBlockReader {
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setMediumCache(com.github.jmeta.library.media.api.OLD.IMediumStore_OLD)
     */
    @Override
-   public void setMediumCache(IMediumStore_OLD cache) {
+   public void setMediumCache(MediumStore cache) {
 
       Reject.ifNull(cache, "cache");
 
@@ -764,8 +762,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       try {
          if (remainingDirectParentByteCount > fieldSize) {
             if (fieldSize <= m_maxFieldBlockSize) {
-               if (m_cache.getBufferedByteCountAt(reference) >= 1) {
-                  if (m_cache.getBufferedByteCountAt(reference) < fieldSize)
+               if (m_cache.getCachedByteCountAt(reference) >= 1) {
+                  if (m_cache.getCachedByteCountAt(reference) < fieldSize)
                      cache(reference, fieldSize);
                }
 
@@ -775,7 +773,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          }
 
          else {
-            if (m_cache.getBufferedByteCountAt(reference) < fieldSize)
+            if (m_cache.getCachedByteCountAt(reference) < fieldSize)
                if (remainingDirectParentByteCount == DataBlockDescription.UNKNOWN_SIZE)
                   cache(reference, fieldSize);
 
@@ -810,10 +808,10 @@ public class StandardDataBlockReader implements DataBlockReader {
          TransformationHandler transformationHandler = handlerIterator.next();
 
          if (transformationHandler.requiresUntransform(transformedContainer)) {
-            if (m_cache.getBufferedByteCountAt(transformedContainer.getMediumReference()) < transformedContainer
+            if (m_cache.getCachedByteCountAt(transformedContainer.getMediumReference()) < transformedContainer
                .getTotalSize())
                try {
-                  m_cache.buffer(transformedContainer.getMediumReference(), (int) transformedContainer.getTotalSize());
+                  m_cache.cache(transformedContainer.getMediumReference(), (int) transformedContainer.getTotalSize());
                } catch (EndOfMediumException e) {
                   throw new IllegalStateException("Unexpected end of medium", e);
                }
@@ -992,6 +990,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       while (!endOfMediumReached) {
          int bytesToRead = fittingBlockSize;
 
+         long cachedByteCountAt = m_cache.getCachedByteCountAt(currentReference);
          // As long as no termination bytes are found: Cache from medium, if not already
          // done.
          try {
@@ -999,12 +998,25 @@ public class StandardDataBlockReader implements DataBlockReader {
             // fields, the whole field would - at the end - be cached in memory. This
             // will cause an OutOfMemory condition soon. Instead, use a "checkedRead"
             // approach that won't memorize read bytes...
-            if (m_cache.getBufferedByteCountAt(currentReference) < bytesToRead)
-               m_cache.buffer(currentReference, bytesToRead);
+            if (cachedByteCountAt < bytesToRead)
+               m_cache.cache(currentReference, bytesToRead);
          } catch (EndOfMediumException e) {
             bytesToRead = (int) e.getByteCountActuallyRead();
+
+            if (bytesToRead < cachedByteCountAt) {
+               bytesToRead = (int) cachedByteCountAt;
+            }
+
             // End condition for the loop
             endOfMediumReached = true;
+         }
+
+         // Workaround for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception, thus
+         // bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
+         if (bytesToRead > currentReference.getMedium().getCurrentLength()
+            - currentReference.getAbsoluteMediumOffset()) {
+            bytesToRead = (int) (currentReference.getMedium().getCurrentLength()
+               - currentReference.getAbsoluteMediumOffset());
          }
 
          ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
@@ -1234,10 +1246,10 @@ public class StandardDataBlockReader implements DataBlockReader {
    @Override
    public void cache(MediumOffset reference, long size) throws EndOfMediumException {
 
-      m_cache.buffer(reference, (int) size);
+      m_cache.cache(reference, (int) size);
    }
 
-   private IMediumStore_OLD m_cache;
+   private MediumStore m_cache;
 
    private int m_maxFieldBlockSize;
 

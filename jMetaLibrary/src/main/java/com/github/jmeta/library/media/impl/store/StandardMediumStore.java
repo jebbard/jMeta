@@ -147,6 +147,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+      Reject.ifNegativeOrZero(numberOfBytes, "numberOfBytes");
 
       if (getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH) {
          if (getMedium().getCurrentLength() < offset.getAbsoluteMediumOffset()) {
@@ -206,6 +207,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifNull(offset, "offset");
       ensureOpened();
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
+      Reject.ifNegativeOrZero(numberOfBytes, "numberOfBytes");
 
       if (getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH) {
          if (getMedium().getCurrentLength() < offset.getAbsoluteMediumOffset()) {

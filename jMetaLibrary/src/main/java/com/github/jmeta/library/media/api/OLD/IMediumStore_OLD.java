@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
-import com.github.jmeta.library.media.api.exceptions.ReadTimedOutException;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumOffset;

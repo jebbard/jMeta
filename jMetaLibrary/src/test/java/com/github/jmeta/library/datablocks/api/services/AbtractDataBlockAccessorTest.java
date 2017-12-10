@@ -32,7 +32,6 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 // TODO doItFirst005: write test case for "out of order" reading
-// TODO doItFirst004: make ogg test case
 // TODO doItFirst006: field function stack won't currently work when reading "out of order" in depth -
 // notion of data block instance ids OR saving parent IDataBlock reference...
 
@@ -472,11 +471,14 @@ public abstract class AbtractDataBlockAccessorTest {
       long absOffset = dataBlock.getMediumReference().getAbsoluteMediumOffset();
 
       for (int i = 0; i < readSizes.length; i++) {
-         byte[] expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
 
-         byte[] actualBytes = dataBlock.getBytes(readOffsets[i], readSizes[i]);
+         if (readSizes[i] != 0) {
+            byte[] expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
 
-         org.junit.Assert.assertArrayEquals(expectedBytes, actualBytes);
+            byte[] actualBytes = dataBlock.getBytes(readOffsets[i], readSizes[i]);
+
+            org.junit.Assert.assertArrayEquals(expectedBytes, actualBytes);
+         }
       }
    }
 

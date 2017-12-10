@@ -28,6 +28,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.media.api.services.MediaAPI;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -45,6 +46,8 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
 
    private static final int DEFAULT_LAZY_FIELD_SIZE = 8192;
+
+   private final Map<Medium<?>, MediumStore> mediumStores = new HashMap<>();
 
    @Override
    public void setLazyFieldSize(int lazyFieldSize) {
@@ -172,7 +175,12 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
 
-      return new TopLevelContainerIterator(medium, dataFormatHints, forceMediumReadOnly, m_readers, m_mediumFactory);
+      MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
+      mediumStore.open();
+
+      mediumStores.put(medium, mediumStore);
+
+      return new TopLevelContainerIterator(medium, dataFormatHints, forceMediumReadOnly, m_readers, mediumStore);
    }
 
    @Override
@@ -185,8 +193,12 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       if (!medium.isRandomAccess())
          throw new UnsupportedMediumException("Medium " + medium + " must be a random access medium.");
 
-      return new TopLevelReverseContainerIterator(medium, dataFormatHints, forceMediumReadOnly, m_readers,
-         m_mediumFactory);
+      MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
+      mediumStore.open();
+
+      mediumStores.put(medium, mediumStore);
+
+      return new TopLevelReverseContainerIterator(medium, dataFormatHints, forceMediumReadOnly, m_readers, mediumStore);
    }
 
    /**
@@ -242,6 +254,6 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       Reject.ifNull(medium, "medium");
 
-      m_mediumFactory.getMediumStore(medium).close();
+      mediumStores.get(medium).close();
    }
 }

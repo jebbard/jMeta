@@ -115,6 +115,7 @@
 		<module>../jMetaDefaultExtensionAPEv2</module>
 		<module>../jMetaDefaultExtensionOGG</module>
 		<module>../jMetaDefaultExtensionMP3</module>
+		<module>../jMetaDefaultExtensionIntegrationTests</module>
 		<module>../jMetaUtility</module>
 		<module>../jMetaTools</module>
 	</modules>

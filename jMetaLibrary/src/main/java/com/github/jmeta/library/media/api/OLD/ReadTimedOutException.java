@@ -6,9 +6,9 @@
  *
  * @date 24.04.2011
  */
-package com.github.jmeta.library.media.api.exceptions;
+package com.github.jmeta.library.media.api.OLD;
 
-import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
+import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 

@@ -13,8 +13,8 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
-import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
@@ -141,7 +141,7 @@ public interface DataBlockReader {
    /**
     * @param cache
     */
-   public void setMediumCache(IMediumStore_OLD cache);
+   public void setMediumCache(MediumStore cache);
 
    /**
     * @param payloadId

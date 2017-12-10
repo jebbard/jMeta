@@ -24,9 +24,8 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.OLD.IMediumStore_OLD;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.services.MediaAPI;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -47,21 +46,21 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
     * @param dataFormatHints
     * @param forceMediumReadOnly
     * @param readers
-    * @param mediumFactory
+    * @param mediumStore
     */
    public TopLevelContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints, boolean forceMediumReadOnly,
-      Map<DataFormat, DataBlockReader> readers, MediaAPI mediumFactory) {
+      Map<DataFormat, DataBlockReader> readers, MediumStore mediumStore) {
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
-      Reject.ifNull(mediumFactory, "mediumFactory");
+      Reject.ifNull(mediumStore, "mediumFactory");
 
       m_readerMap.putAll(readers);
-      m_mediumFactory = mediumFactory;
+      m_mediumStore = mediumStore;
 
       setDataFormatHints(dataFormatHints);
       setMedium(medium, forceMediumReadOnly);
-      m_currentReference = m_mediumStore.createMediumReference(0);
+      m_currentReference = m_mediumStore.createMediumOffset(0);
    }
 
    /**
@@ -187,7 +186,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       for (Iterator<DataFormat> iterator = m_readerMap.keySet().iterator(); iterator.hasNext();) {
          DataFormat dataFormat = iterator.next();
          DataBlockReader reader = m_readerMap.get(dataFormat);
-         m_mediumStore = m_mediumFactory.getMediumStore(medium);
 
          reader.setMediumCache(m_mediumStore);
       }
@@ -197,9 +195,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
    private long m_longestHeaderSize = 0;
 
-   private final MediaAPI m_mediumFactory;
-
-   private IMediumStore_OLD m_mediumStore;
+   private MediumStore m_mediumStore;
 
    private final List<DataFormat> m_precedenceList = new ArrayList<>();
 
