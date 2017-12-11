@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.FileMedium;
 
 /**
@@ -33,8 +33,8 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
     */
    private static int TEST_FILE_COUNTER = 0;
 
-   private Path copiedTestFile = MediaTestFiles.TEST_FILE_DIRECTORY_PATH
-      .resolve(TEMP_FOLDER_NAME + MediaTestFiles.FIRST_TEST_FILE_NAME);
+   private Path copiedTestFile = TestMedia.TEST_FILE_DIRECTORY_PATH
+      .resolve(TEMP_FOLDER_NAME + TestMedia.FIRST_TEST_FILE_NAME);
 
    /**
     * Tests creation and opening of a new {@link FileMediumAccessor} on an already locked medium.
@@ -97,15 +97,15 @@ public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccess
    @Override
    protected void prepareMediumData(byte[] testFileContents) {
 
-      copiedTestFile = MediaTestFiles.TEST_FILE_DIRECTORY_PATH
-         .resolve(TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + MediaTestFiles.FIRST_TEST_FILE_NAME);
+      copiedTestFile = TestMedia.TEST_FILE_DIRECTORY_PATH
+         .resolve(TEMP_FOLDER_NAME + TEST_FILE_COUNTER + '_' + TestMedia.FIRST_TEST_FILE_NAME);
 
       TEST_FILE_COUNTER++;
 
-      String message = "Could not copy the test file " + MediaTestFiles.FIRST_TEST_FILE_NAME + " to " + copiedTestFile;
+      String message = "Could not copy the test file " + TestMedia.FIRST_TEST_FILE_NAME + " to " + copiedTestFile;
 
       try {
-         Files.copy(MediaTestFiles.FIRST_TEST_FILE_PATH, copiedTestFile, StandardCopyOption.REPLACE_EXISTING);
+         Files.copy(TestMedia.FIRST_TEST_FILE_PATH, copiedTestFile, StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException e) {
          throw new RuntimeException(message, e);
       }

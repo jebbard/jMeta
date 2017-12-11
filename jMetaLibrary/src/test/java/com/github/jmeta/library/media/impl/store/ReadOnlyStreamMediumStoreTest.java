@@ -12,7 +12,7 @@ package com.github.jmeta.library.media.impl.store;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.AbstractReadOnlyMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
@@ -31,7 +31,7 @@ public class ReadOnlyStreamMediumStoreTest extends AbstractReadOnlyMediumStoreTe
     */
    @Override
    protected InputStreamMedium createMedium() throws IOException {
-      return new InputStreamMedium(new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile()),
+      return new InputStreamMedium(new FileInputStream(TestMedia.FIRST_TEST_FILE_PATH.toFile()),
          STREAM_BASED_MEDIUM_NAME);
    }
 

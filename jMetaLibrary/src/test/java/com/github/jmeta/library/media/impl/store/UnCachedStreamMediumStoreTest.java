@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.impl.store;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.AbstractUnCachedMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
@@ -99,7 +99,7 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
     */
    @Override
    protected InputStreamMedium createEmptyMedium(String testMethodName) throws IOException {
-      return new InputStreamMedium(new FileInputStream(MediaTestFiles.EMPTY_TEST_FILE_PATH.toFile()),
+      return new InputStreamMedium(new FileInputStream(TestMedia.EMPTY_TEST_FILE_PATH.toFile()),
          STREAM_BASED_EMPTY_MEDIUM_NAME);
    }
 
@@ -110,7 +110,7 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    @Override
    protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
       throws IOException {
-      return new InputStreamMedium(new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile()),
+      return new InputStreamMedium(new FileInputStream(TestMedia.FIRST_TEST_FILE_PATH.toFile()),
          STREAM_BASED_FILLED_MEDIUM_NAME, maxCacheSize, maxReadWriteBlockSize);
    }
 
@@ -128,9 +128,9 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    @Override
    protected String getMediumContentAsString(InputStreamMedium medium) {
       if (medium.getName().equals(STREAM_BASED_EMPTY_MEDIUM_NAME)) {
-         return MediaTestFiles.EMPTY_TEST_FILE_CONTENT;
+         return TestMedia.EMPTY_TEST_FILE_CONTENT;
       } else if (medium.getName().equals(STREAM_BASED_FILLED_MEDIUM_NAME)) {
-         return MediaTestFiles.FIRST_TEST_FILE_CONTENT;
+         return TestMedia.FIRST_TEST_FILE_CONTENT;
       }
       return "";
    }

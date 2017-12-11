@@ -12,7 +12,7 @@ package com.github.jmeta.library.media.impl.store;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.services.AbstractCachedAndWritableRandomAccessMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -33,7 +33,7 @@ public class CachedWritableFileMediumStoreTest
    @Override
    protected FileMedium createEmptyMedium(String testMethodName) throws IOException {
 
-      Path copiedFile = getCopiedFile(MediaTestFiles.EMPTY_TEST_FILE_PATH, "EMPTY_MEDIUM_", testMethodName);
+      Path copiedFile = getCopiedFile(TestMedia.EMPTY_TEST_FILE_PATH, "EMPTY_MEDIUM_", testMethodName);
 
       return new FileMedium(copiedFile, false);
    }
@@ -46,7 +46,7 @@ public class CachedWritableFileMediumStoreTest
    protected FileMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
       throws IOException {
 
-      Path copiedFile = getCopiedFile(MediaTestFiles.FIRST_TEST_FILE_PATH, "FIRST_TEST_FILE_MEDIUM_", testMethodName);
+      Path copiedFile = getCopiedFile(TestMedia.FIRST_TEST_FILE_PATH, "FIRST_TEST_FILE_MEDIUM_", testMethodName);
       return new FileMedium(copiedFile, false, maxCacheSize, maxReadWriteBlockSize);
    }
 

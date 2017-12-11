@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.api.services;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -19,7 +19,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -32,7 +32,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
 public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends AbstractMediumStoreTest<T> {
 
    protected static final int MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE = 5;
-   protected static final int MAX_CACHE_SIZE_FOR_SMALL_CACHE = MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() / 2;
+   protected static final int MAX_CACHE_SIZE_FOR_SMALL_CACHE = TestMedia.FIRST_TEST_FILE_CONTENT.length() / 2;
 
    /**
     * Tests {@link MediumStore#close()}.
@@ -597,7 +597,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
+    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
     * as content, backed by a cache, where the cache is smaller than the overall {@link Medium} size, in detail, it has
     * a size of {@link #MAX_CACHE_SIZE_FOR_SMALL_CACHE}. In line with that, the maximum read write block size is set to
     * {@link #MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE}. This method must be called at the beginning of a test case to
@@ -605,7 +605,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
     * is used for testing cases where data is read into the cache but then automatically purged due to the limited cache
     * size.
     * 
-    * @return a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
+    * @return a {@link MediumStore} based on a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
     *         as content, backed by a small cache, or null if the current implementation does not support this
     */
    protected MediumStore createFilledMediumStoreWithSmallCache() {
@@ -620,7 +620,7 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
    }
 
    /**
-    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
+    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
     * as content, backed by a cache, where the cache is (much) bigger than the overall {@link Medium} size. The
     * read-write block size is set to same value (to ensure only single reads during the test cases when testing
     * {@link MediumStore#cache(MediumOffset, int)}) and an also quite big max cache region size. This method must be
@@ -628,14 +628,14 @@ public abstract class AbstractCachedMediumStoreTest<T extends Medium<?>> extends
     * assigned to {@link #mediumStoreUnderTest}. It is used for testing cases where data read is expected to always end
     * up in the cache due to its big size.
     * 
-    * @return a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
+    * @return a {@link MediumStore} based on a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
     *         as content, backed by a big cache, or null if the current implementation does not support this
     */
    protected MediumStore createFilledMediumStoreWithBigCache() {
       try {
          currentMedium = createFilledMedium(testName.getMethodName(),
-            MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() + 1000,
-            MediaTestFiles.FIRST_TEST_FILE_CONTENT.length() + 1000);
+            TestMedia.FIRST_TEST_FILE_CONTENT.length() + 1000,
+            TestMedia.FIRST_TEST_FILE_CONTENT.length() + 1000);
 
          return createMediumStoreToTest(currentMedium);
       } catch (IOException e) {

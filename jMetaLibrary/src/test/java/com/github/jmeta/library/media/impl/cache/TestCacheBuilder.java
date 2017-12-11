@@ -1,6 +1,6 @@
 package com.github.jmeta.library.media.impl.cache;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -186,9 +186,9 @@ class TestCacheBuilder {
    /**
     * Appends the necessary information for a new cached {@link MediumRegion} to be contained in the {@link MediumCache}
     * to build. You specify the region based on its start and end offset. Where are the region bytes? You cannot pass
-    * them here, but they are automatically generated in a reproducible way. The byte at offset x has the value
-    * "x MOD Byte.MAX_VALUE". This way, on the one hand you can detect any problems with wrong bytes in the cache (as
-    * most bytes should differ from each other), on the other hand, you are not surprised which byte is where.
+    * them here, but they are automatically generated in a reproducible way. The byte at offset x has the value "x MOD
+    * Byte.MAX_VALUE". This way, on the one hand you can detect any problems with wrong bytes in the cache (as most
+    * bytes should differ from each other), on the other hand, you are not surprised which byte is where.
     * 
     * This method is incremental in a sense that you have to build the cache step by step from lower offset regions to
     * higher offset regions. You cannot add a region with offset 10 after you have already added a region with offset
@@ -375,11 +375,11 @@ class TestCacheBuilder {
     */
    static byte[] regionBytesFromDistinctOffsetSequence(long offset, int size) {
       byte[] content = new byte[size];
-   
+
       for (int i = 0; i < content.length; i++) {
          content[i] = (byte) ((offset + i) % Byte.MAX_VALUE);
       }
-   
+
       return content;
    }
 
@@ -501,8 +501,7 @@ class TestCacheBuilder {
       } else if (overlappingByteCount == clipRegion.getSize()) {
          // Need to divide the region info as the clip region is fully enclosed in it
          int keepBytesAtStart = (int) clipRegion.getStartOffset().distanceTo(regionInfoAsRegion.getStartOffset());
-         int keepBytesAtEnd = (int) regionInfoAsRegion.calculateEndOffset()
-            .distanceTo(clipRegion.calculateEndOffset());
+         int keepBytesAtEnd = (int) regionInfoAsRegion.calculateEndOffset().distanceTo(clipRegion.calculateEndOffset());
 
          TestCacheRegionInfo trimmedRegionInfo = trimRegionInfo(testCacheRegionInfo,
             testCacheRegionInfo.getRegionSize() - keepBytesAtStart, 0);

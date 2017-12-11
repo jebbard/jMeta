@@ -7,7 +7,7 @@
 
 package com.github.jmeta.library.media.impl.mediumAccessor;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,7 +18,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
@@ -102,10 +102,10 @@ public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest
    protected void prepareMediumData(byte[] testFileContents) {
 
       try {
-         testStream = new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile());
+         testStream = new FileInputStream(TestMedia.FIRST_TEST_FILE_PATH.toFile());
       } catch (FileNotFoundException e) {
          throw new RuntimeException("Could not find test file. Make sure it exists" + "on the hard drive: "
-            + MediaTestFiles.FIRST_TEST_FILE_PATH.toAbsolutePath().toString(), e);
+            + TestMedia.FIRST_TEST_FILE_PATH.toAbsolutePath().toString(), e);
       }
    }
 }

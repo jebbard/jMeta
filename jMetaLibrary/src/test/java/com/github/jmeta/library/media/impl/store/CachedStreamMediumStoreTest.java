@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.impl.store;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.AbstractCachedMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
@@ -37,8 +37,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    private static final String STREAM_BASED_EMPTY_MEDIUM_NAME = "Stream based empty medium";
 
    /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and
-    * {@link MediumStore#cache(MediumOffset, int)}.
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and {@link MediumStore#cache(MediumOffset, int)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledStreamMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
@@ -77,7 +76,8 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       Assert.assertEquals(cacheSize + cacheOffset.getAbsoluteMediumOffset(),
          mediumStoreUnderTest.getCachedByteCountAt(mediumStartOffset));
 
-      assertRangeIsCachedFromExternalMedium(mediumStartOffset, (int) cacheOffset.getAbsoluteMediumOffset(), currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(mediumStartOffset, (int) cacheOffset.getAbsoluteMediumOffset(),
+         currentMediumContent);
       assertRangeIsCachedFromExternalMedium(cacheOffset, cacheSize, currentMediumContent);
       assertRangeIsNotCached(cacheOffset.advance(cacheSize), currentMediumContent.length());
    }
@@ -110,8 +110,8 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       Assert.assertEquals(24, mediumStoreUnderTest.getCachedByteCountAt(thirdCacheOffset.advance(11)));
       Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(thirdCacheOffset.advance(thirdCacheSize)));
 
-      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), (int) thirdCacheOffset.getAbsoluteMediumOffset() + thirdCacheSize,
-         currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0),
+         (int) thirdCacheOffset.getAbsoluteMediumOffset() + thirdCacheSize, currentMediumContent);
       assertRangeIsNotCached(thirdCacheOffset.advance(thirdCacheSize), currentMediumContent.length());
    }
 
@@ -146,7 +146,8 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
          mediumStoreUnderTest.getCachedByteCountAt(expectedActualCacheStartOffset));
 
       assertRangeIsNotCached(at(currentMedium, 0), (int) expectedActualCacheStartOffset.getAbsoluteMediumOffset());
-      assertRangeIsCachedFromExternalMedium(expectedActualCacheStartOffset, expectedActualCacheSize, currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(expectedActualCacheStartOffset, expectedActualCacheSize,
+         currentMediumContent);
       assertRangeIsNotCached(expectedActualCacheStartOffset.advance(expectedActualCacheSize),
          currentMediumContent.length());
    }
@@ -234,8 +235,8 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       Assert.assertEquals(getDataSize + getDataOffset.getAbsoluteMediumOffset(),
          mediumStoreUnderTest.getCachedByteCountAt(at(currentMedium, 0)));
 
-      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), (int) getDataOffset.getAbsoluteMediumOffset() + getDataSize,
-         currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0),
+         (int) getDataOffset.getAbsoluteMediumOffset() + getDataSize, currentMediumContent);
       assertRangeIsNotCached(getDataOffset.advance(getDataSize), currentMediumContent.length());
    }
 
@@ -267,8 +268,8 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
       // No additional reads, as everything was already cached
       verifyExactlyNReads(2);
 
-      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), (int) cacheOffset.getAbsoluteMediumOffset() + cacheSize,
-         currentMediumContent);
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0),
+         (int) cacheOffset.getAbsoluteMediumOffset() + cacheSize, currentMediumContent);
       assertRangeIsNotCached(cacheOffset.advance(cacheSize), currentMediumContent.length());
    }
 
@@ -277,7 +278,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
     */
    @Override
    protected InputStreamMedium createEmptyMedium(String testMethodName) throws IOException {
-      return new InputStreamMedium(new FileInputStream(MediaTestFiles.EMPTY_TEST_FILE_PATH.toFile()),
+      return new InputStreamMedium(new FileInputStream(TestMedia.EMPTY_TEST_FILE_PATH.toFile()),
          STREAM_BASED_EMPTY_MEDIUM_NAME);
    }
 
@@ -288,7 +289,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    @Override
    protected InputStreamMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
       throws IOException {
-      return new InputStreamMedium(new FileInputStream(MediaTestFiles.FIRST_TEST_FILE_PATH.toFile()),
+      return new InputStreamMedium(new FileInputStream(TestMedia.FIRST_TEST_FILE_PATH.toFile()),
          STREAM_BASED_FILLED_MEDIUM_NAME, maxCacheSize, maxReadWriteBlockSize);
    }
 
@@ -306,9 +307,9 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    @Override
    protected String getMediumContentAsString(InputStreamMedium medium) {
       if (medium.getName().equals(STREAM_BASED_EMPTY_MEDIUM_NAME)) {
-         return MediaTestFiles.EMPTY_TEST_FILE_CONTENT;
+         return TestMedia.EMPTY_TEST_FILE_CONTENT;
       } else if (medium.getName().equals(STREAM_BASED_FILLED_MEDIUM_NAME)) {
-         return MediaTestFiles.FIRST_TEST_FILE_CONTENT;
+         return TestMedia.FIRST_TEST_FILE_CONTENT;
       }
       return "";
    }

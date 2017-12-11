@@ -7,14 +7,14 @@
 
 package com.github.jmeta.library.media.impl.mediumAccessor;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestUtility;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
@@ -109,7 +109,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    public void setCurrentPosition_forInvalidMediumReference_throwsException() {
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      mediumAccessor.setCurrentPosition(at(MediaTestUtility.OTHER_MEDIUM, 0));
+      mediumAccessor.setCurrentPosition(at(TestMedia.OTHER_MEDIUM, 0));
    }
 
    /**
@@ -420,8 +420,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
       Assert.assertTrue(mediumAccessor.isAtEndOfMedium());
 
       MediumOffset mediumStartReference = at(mediumAccessor.getMedium(), 0);
-      MediumOffset mediumEndReference = at(mediumAccessor.getMedium(),
-         mediumAccessor.getMedium().getCurrentLength());
+      MediumOffset mediumEndReference = at(mediumAccessor.getMedium(), mediumAccessor.getMedium().getCurrentLength());
 
       if (expectedNewLength > 0) {
          if (mediumEndReference.before(truncateReference)) {
@@ -474,8 +473,8 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
     * @param dataWritten
     *           The {@link ByteBuffer} written before.
     */
-   private static void assertSameDataWrittenIsReadAgain(MediumAccessor<?> mediumAccessor,
-      MediumOffset writeReference, ByteBuffer dataWritten) {
+   private static void assertSameDataWrittenIsReadAgain(MediumAccessor<?> mediumAccessor, MediumOffset writeReference,
+      ByteBuffer dataWritten) {
 
       ByteBuffer reread = performReadNoEOMExpected(mediumAccessor,
          new ReadTestData((int) writeReference.getAbsoluteMediumOffset(), dataWritten.remaining()));
@@ -491,8 +490,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
     * @param rangeStartReference
     *           The {@link MediumOffset} pointing to the start of the range to check.
     * @param rangeEndReference
-    *           The {@link MediumOffset} pointing to the end of the range to check, i.e. the first offset not
-    *           checked.
+    *           The {@link MediumOffset} pointing to the end of the range to check, i.e. the first offset not checked.
     */
    private void assertMediumDidNotChangeInRange(MediumAccessor<?> mediumAccessor, MediumOffset rangeStartReference,
       MediumOffset rangeEndReference) {

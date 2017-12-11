@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.api.services;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -32,7 +32,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
@@ -71,7 +71,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * random-access medium; only special write test cases specifically designed for an un-cached medium go here</li>
  * </ul>
  * 
- * The filled media used for testing all must contain {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT} a String fully
+ * The filled media used for testing all must contain {@link TestMedia#FIRST_TEST_FILE_CONTENT} a String fully
  * containing only human-readable standard ASCII characters, and must be UTF-8 encoded. This guarantees that 1 bytes = 1
  * character. Furthermore, all bytes inserted must also be standard human-readable ASCII characters with this property.
  * 
@@ -130,7 +130,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    @BeforeClass
    public static void validateTestFiles() {
-      MediaTestFiles.validateTestFiles();
+      TestMedia.validateTestFiles();
    }
 
    /**
@@ -162,7 +162,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.isAtEndOfMedium(at(MediaTestUtility.OTHER_MEDIUM, 10));
+      mediumStoreUnderTest.isAtEndOfMedium(at(TestMedia.OTHER_MEDIUM, 10));
    }
 
    /**
@@ -214,7 +214,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.getCachedByteCountAt(at(MediaTestUtility.OTHER_MEDIUM, 10));
+      mediumStoreUnderTest.getCachedByteCountAt(at(TestMedia.OTHER_MEDIUM, 10));
    }
 
    /**
@@ -236,7 +236,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      cacheNoEOMExpected(at(MediaTestUtility.OTHER_MEDIUM, 10), 10);
+      cacheNoEOMExpected(at(TestMedia.OTHER_MEDIUM, 10), 10);
    }
 
    /**
@@ -542,7 +542,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      getDataNoEOMExpected(at(MediaTestUtility.OTHER_MEDIUM, 10), 10);
+      getDataNoEOMExpected(at(TestMedia.OTHER_MEDIUM, 10), 10);
    }
 
    /**
@@ -564,7 +564,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.replaceData(at(MediaTestUtility.OTHER_MEDIUM, 10), 20, ByteBuffer.allocate(10));
+      mediumStoreUnderTest.replaceData(at(TestMedia.OTHER_MEDIUM, 10), 20, ByteBuffer.allocate(10));
    }
 
    /**
@@ -586,7 +586,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.removeData(at(MediaTestUtility.OTHER_MEDIUM, 10), 20);
+      mediumStoreUnderTest.removeData(at(TestMedia.OTHER_MEDIUM, 10), 20);
    }
 
    /**
@@ -608,7 +608,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.insertData(at(MediaTestUtility.OTHER_MEDIUM, 10), ByteBuffer.allocate(10));
+      mediumStoreUnderTest.insertData(at(TestMedia.OTHER_MEDIUM, 10), ByteBuffer.allocate(10));
    }
 
    /**
@@ -648,8 +648,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.undo(new MediumAction(MediumActionType.REMOVE,
-         new MediumRegion(at(MediaTestUtility.OTHER_MEDIUM, 10), 20), 0, null));
+      mediumStoreUnderTest.undo(
+         new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(TestMedia.OTHER_MEDIUM, 10), 20), 0, null));
    }
 
    /**
@@ -1275,7 +1275,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected abstract T createEmptyMedium(String testMethodName) throws IOException;
 
    /**
-    * Creates a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT} as content, backed or not
+    * Creates a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed or not
     * backed by a cache with the given maximum cache and cache region size as well as the given maximum read write block
     * size. Implementing test classes who's medium type does not support caching must return null.
     * 
@@ -1289,7 +1289,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     *           the maximum cache size in bytes
     * @param maxReadWriteBlockSize
     *           the maximum read write block size in bytes
-    * @return a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT} as content with the given
+    * @return a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content with the given
     *         configuration parameters
     * 
     * @throws IOException
@@ -1589,7 +1589,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       Reject.ifFalse(Files.isRegularFile(pathToFile), "Files.isRegularFile(pathToFile)");
 
       Path copiedFile = Files.copy(pathToFile,
-         MediaTestFiles.TEST_FILE_TEMP_OUTPUT_DIRECTORY_PATH
+         TestMedia.TEST_FILE_TEMP_OUTPUT_DIRECTORY_PATH
             .resolve(getClass().getSimpleName() + "_" + mediumType + testMethodName + ".txt"),
          StandardCopyOption.REPLACE_EXISTING);
       return copiedFile;
@@ -1838,6 +1838,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * @return a {@link Path} pointing to the given file containing expectations for flush testing.
     */
    protected Path createFlushExpectationPath(String fileName) {
-      return MediaTestFiles.TEST_FILE_DIRECTORY_PATH.resolve("MediumStoreTests").resolve(fileName);
+      return TestMedia.TEST_FILE_DIRECTORY_PATH.resolve("MediumStoreTests").resolve(fileName);
    }
 }

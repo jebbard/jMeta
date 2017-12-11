@@ -7,7 +7,7 @@
 
 package com.github.jmeta.library.media.impl.mediumAccessor;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -19,14 +19,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * Tests the interface {@IMediumAccessor}. Basic idea is to work on the {@link MediaTestFiles#FIRST_TEST_FILE_PATH}. Its
+ * Tests the interface {@IMediumAccessor}. Basic idea is to work on the {@link TestMedia#FIRST_TEST_FILE_PATH}. Its
  * contents is just ASCII bytes that are read once at the beginning of test execution and determined as expected
  * content. Then reading and writing is tested based on this.
  */
@@ -71,14 +71,14 @@ public abstract class AbstractMediumAccessorTest {
    private static byte[] EXPECTED_FILE_CONTENTS;
 
    /**
-    * Reads the contents of the {@link MediaTestFiles#FIRST_TEST_FILE_PATH} into memory to make it available for
+    * Reads the contents of the {@link TestMedia#FIRST_TEST_FILE_PATH} into memory to make it available for
     * expectation testing.
     */
    @BeforeClass
    public static void determineExpectedFileContents() {
-      MediaTestFiles.validateTestFiles();
+      TestMedia.validateTestFiles();
 
-      EXPECTED_FILE_CONTENTS = MediaTestFiles.FIRST_TEST_FILE_CONTENT.getBytes();
+      EXPECTED_FILE_CONTENTS = TestMedia.FIRST_TEST_FILE_CONTENT.getBytes();
    }
 
    /**
@@ -458,11 +458,11 @@ public abstract class AbstractMediumAccessorTest {
    }
 
    /**
-    * Returns a Map of offsets in the {@link MediaTestFiles#FIRST_TEST_FILE_PATH} that are checked using
+    * Returns a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that are checked using
     * {@link MediumAccessor#read}. It is checked that the bytes read from that offset match the expected bytes from the
-    * {@link MediaTestFiles#FIRST_TEST_FILE_PATH}. The given size to read is mapped to the offset.
+    * {@link TestMedia#FIRST_TEST_FILE_PATH}. The given size to read is mapped to the offset.
     * 
-    * @return a Map of offsets in the {@link MediaTestFiles#FIRST_TEST_FILE_PATH} that are checked using
+    * @return a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that are checked using
     *         {@link MediumAccessor#read}.
     */
    protected abstract List<ReadTestData> getReadTestDataToUse();

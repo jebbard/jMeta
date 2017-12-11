@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
@@ -23,7 +23,7 @@ import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 public class MediumActionEqualityTest extends AbstractEqualsTest<MediumAction> {
 
    private static final ByteBuffer DEFAULT_BYTES = ByteBuffer.wrap(new byte[] { 0, 1, 2, 3, 4 });
-   private static final FileMedium MEDIUM = new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
+   private static final FileMedium MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
 
    /**
     * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getObjects()

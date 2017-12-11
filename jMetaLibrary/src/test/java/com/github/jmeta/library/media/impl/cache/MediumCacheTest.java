@@ -1,8 +1,8 @@
 package com.github.jmeta.library.media.impl.cache;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.DEFAULT_TEST_MEDIUM;
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.OTHER_MEDIUM;
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.DEFAULT_TEST_MEDIUM;
+import static com.github.jmeta.library.media.api.helper.TestMedia.OTHER_MEDIUM;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestUtility;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
@@ -1325,7 +1325,7 @@ public class MediumCacheTest {
     * Creates a cached {@link MediumRegion} filled with a default fill byte
     */
    private static MediumRegion createCachedRegionWithDefaultFillByte(long startOffset, int size) {
-      return new MediumRegion(MediaTestUtility.at(startOffset),
+      return new MediumRegion(TestMedia.at(startOffset),
          ByteBuffer.wrap(TestCacheBuilder.regionBytesFromDistinctOffsetSequence(startOffset, size)));
    }
 

@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.impl.changeManager;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;

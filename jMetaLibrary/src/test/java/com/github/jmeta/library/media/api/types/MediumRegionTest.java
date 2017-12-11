@@ -16,7 +16,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionClipResult;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
@@ -32,7 +32,7 @@ public class MediumRegionTest {
 
    private static final int START_OFFSET = 15;
 
-   private static final FileMedium MEDIUM = new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
+   private static final FileMedium MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
 
    private static final InMemoryMedium UNRELATED_MEDIUM = new InMemoryMedium(new byte[] {}, "Fake", false);
 

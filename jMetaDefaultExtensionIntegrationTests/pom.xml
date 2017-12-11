@@ -10,29 +10,58 @@
 		<groupId>com.github.jmeta</groupId>
 		<artifactId>jmetaparent</artifactId>
 		<version>0.1</version>
+		<relativePath>../jMeta/pom.xml</relativePath>
 	</parent>
-	
+
 	<!-- ========================== Dependencies ========================== -->
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+		<!-- (1) jMeta Productive Dependencies -->
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetalibrary</artifactId>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.jmeta</groupId>
-			<artifactId>jmetalibrary</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetautility</artifactId>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaAPEv2</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaID3v1</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaID3v23</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaLyrics3v2</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaMP3</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetaOGG</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<!-- (2) jMeta Test Dependencies -->
+		<dependency>
+			<groupId>com.github.jmeta</groupId>
+			<artifactId>jmetalibrary</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
@@ -43,34 +72,43 @@
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetaAPEv2</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetaID3v1</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetaID3v23</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetaLyrics3v2</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetaMP3</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jmeta</groupId>
 			<artifactId>jmetaOGG</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
 		</dependency>
+		<!-- (4) Test libraries -->
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
 

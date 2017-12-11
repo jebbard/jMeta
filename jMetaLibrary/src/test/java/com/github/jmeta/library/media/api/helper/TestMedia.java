@@ -1,6 +1,6 @@
 /**
  *
- * {@link MediaTestFiles}.java
+ * {@link TestMedia}.java
  *
  * @author Jens Ebert
  *
@@ -12,13 +12,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.InMemoryMedium;
+import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumOffset;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * {@link MediaTestFiles} provides some globally available constants for the test cases of the media component.
+ * {@link TestMedia} provides some globally available media and files for the test cases of the media component.
  */
-public interface MediaTestFiles {
+public interface TestMedia {
 
    /**
     * Validates the correctness of the existing test files, i.e. that they exist, have the correct content etc. Should
@@ -52,9 +57,8 @@ public interface MediaTestFiles {
     */
    public static void checkFile(Path path, String expectedContent, String constantName) {
       if (!Files.isRegularFile(path)) {
-         throw new InvalidTestDataException(
-            "Test data file prerequisites: The file <" + path
-               + "> unexpectedly does not exist, ensure that all files are existing and or not deleted by any automatically executed code",
+         throw new InvalidTestDataException("Test data file prerequisites: The file <" + path
+            + "> unexpectedly does not exist, ensure that all files are existing and or not deleted by any automatically executed code",
             null);
       }
 
@@ -74,32 +78,59 @@ public interface MediaTestFiles {
     */
    public static void checkDirectory(Path path) {
       if (!Files.isDirectory(path)) {
-         throw new InvalidTestDataException(
-            "Test data file prerequisites: The directory <" + path
-               + "> unexpectedly does not exist, ensure that all folders are existing and or not deleted by any automatically executed code",
+         throw new InvalidTestDataException("Test data file prerequisites: The directory <" + path
+            + "> unexpectedly does not exist, ensure that all folders are existing and or not deleted by any automatically executed code",
             null);
       }
    }
 
    /**
-    * @return the content of the file {@link MediaTestFiles#FIRST_TEST_FILE_PATH} as UTF-8 encoded string
+    * @return the content of the file {@link TestMedia#FIRST_TEST_FILE_PATH} as UTF-8 encoded string
     */
    public static String getFirstTestFileContentAsString() {
-      return new String(MediaTestUtility.readFileContent(MediaTestFiles.FIRST_TEST_FILE_PATH), Charsets.CHARSET_UTF8);
+      return new String(MediaTestUtility.readFileContent(TestMedia.FIRST_TEST_FILE_PATH), Charsets.CHARSET_UTF8);
    }
 
    /**
-    * @return the content of the file {@link MediaTestFiles#SECOND_TEST_FILE_PATH} as UTF-8 encoded string
+    * @return the content of the file {@link TestMedia#SECOND_TEST_FILE_PATH} as UTF-8 encoded string
     */
    public static String getSecondTestFileContentAsString() {
-      return new String(MediaTestUtility.readFileContent(MediaTestFiles.SECOND_TEST_FILE_PATH), Charsets.CHARSET_UTF8);
+      return new String(MediaTestUtility.readFileContent(TestMedia.SECOND_TEST_FILE_PATH), Charsets.CHARSET_UTF8);
    }
 
    /**
-    * @return the content of the file {@link MediaTestFiles#EMPTY_TEST_FILE_PATH} as UTF-8 encoded string
+    * @return the content of the file {@link TestMedia#EMPTY_TEST_FILE_PATH} as UTF-8 encoded string
     */
    public static String getEmptyTestFileContentAsString() {
-      return new String(MediaTestUtility.readFileContent(MediaTestFiles.EMPTY_TEST_FILE_PATH), Charsets.CHARSET_UTF8);
+      return new String(MediaTestUtility.readFileContent(TestMedia.EMPTY_TEST_FILE_PATH), Charsets.CHARSET_UTF8);
+   }
+
+   /**
+    * Convenience method returning a new {@link MediumOffset} pointing to the specified offset on the given
+    * {@link Medium}. Also encapsulates the use of the {@link MediumOffset} implementation class in test cases to just a
+    * few places.
+    * 
+    * @param medium
+    *           The {@link Medium} to use
+    * @param offset
+    *           The offset to use
+    * @return a new {@link MediumOffset} pointing to the specified offset on the specified {@link Medium}
+    */
+   public static MediumOffset at(Medium<?> medium, long offset) {
+      return new StandardMediumOffset(medium, offset);
+   }
+
+   /**
+    * Convenience method returning a new {@link MediumOffset} pointing to the specified offset on the
+    * {@link #DEFAULT_TEST_MEDIUM}. Also encapsulates the use of the {@link MediumOffset} implementation class in test
+    * cases to just a few places.
+    * 
+    * @param offset
+    *           The offset to use
+    * @return a new {@link MediumOffset} pointing to the specified offset on the default {@link #DEFAULT_TEST_MEDIUM}
+    */
+   public static MediumOffset at(long offset) {
+      return at(DEFAULT_TEST_MEDIUM, offset);
    }
 
    /**
@@ -170,4 +201,17 @@ public interface MediaTestFiles {
    public static final Path EMPTY_TEST_FILE_PATH = TEST_FILE_DIRECTORY_PATH.resolve(EMPTY_TEST_FILE_NAME);
 
    public static final String EMPTY_TEST_FILE_CONTENT = "";
+
+   /**
+    * A test {@link Medium} to be used whenever it does not matter which exact type and properties the {@link Medium}
+    * used has. This is a read-only {@link FileMedium} with default caching and read-write block size, pointing to an
+    * existing file {@link TestMedia#FIRST_TEST_FILE_PATH}.
+    */
+   public static final FileMedium DEFAULT_TEST_MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
+
+   /**
+    * A second test {@link Medium} to be used whenever checks require another {@link Medium} than the
+    * {@link #DEFAULT_TEST_MEDIUM}.
+    */
+   public static final InMemoryMedium OTHER_MEDIUM = new InMemoryMedium(new byte[] {}, "Fake", false);
 }

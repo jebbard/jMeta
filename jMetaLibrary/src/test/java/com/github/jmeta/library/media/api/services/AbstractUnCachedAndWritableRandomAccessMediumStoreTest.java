@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.api.services;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import org.junit.Assert;
 import org.junit.Test;

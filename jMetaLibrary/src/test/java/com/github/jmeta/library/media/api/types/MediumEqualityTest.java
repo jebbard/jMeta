@@ -13,7 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
@@ -48,7 +48,7 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
       media.add(new InMemoryMedium(BYTE_ARRAY_1, "Hallo1", false));
       media.add(new InputStreamMedium(CENTRAL_BYTE_ARRAY_INPUT_STREAM, "Hallo"));
       media.add(new InputStreamMedium(CENTRAL_BUFFERED_INPUT_STREAM, "Hallo"));
-      media.add(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false));
+      media.add(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false));
 
       return media;
    }
@@ -70,7 +70,7 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
       media.add(new InputStreamMedium(CENTRAL_BUFFERED_INPUT_STREAM, "bye"));
       // For file media, equality is simply that the internal file object points
       // to the same file
-      media.add(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false));
+      media.add(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false));
 
       return media;
    }
@@ -91,7 +91,7 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
       media.add(new InMemoryMedium(BYTE_ARRAY_2, "Hallo1", false));
       media.add(new InputStreamMedium(CENTRAL_BUFFERED_INPUT_STREAM, "bye"));
       media.add(new InputStreamMedium(CENTRAL_BYTE_ARRAY_INPUT_STREAM, "Tschau"));
-      media.add(new FileMedium(MediaTestFiles.SECOND_TEST_FILE_PATH, false));
+      media.add(new FileMedium(TestMedia.SECOND_TEST_FILE_PATH, false));
 
       return media;
    }

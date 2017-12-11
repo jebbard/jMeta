@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
@@ -61,7 +61,7 @@ public class StandardMediaAPITest {
    public void createMediumStore_forFileMedium_returnsProperStoreInstance() {
       MediaAPI mediaAPI = new StandardMediaAPI();
 
-      FileMedium mediumDefinition = new FileMedium(MediaTestFiles.EMPTY_TEST_FILE_PATH, false, 1000, 500);
+      FileMedium mediumDefinition = new FileMedium(TestMedia.EMPTY_TEST_FILE_PATH, false, 1000, 500);
 
       MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 
@@ -93,7 +93,7 @@ public class StandardMediaAPITest {
 
       InputStreamMedium mediumDefinition;
       try {
-         mediumDefinition = new InputStreamMedium(new FileInputStream(MediaTestFiles.EMPTY_TEST_FILE_PATH.toFile()),
+         mediumDefinition = new InputStreamMedium(new FileInputStream(TestMedia.EMPTY_TEST_FILE_PATH.toFile()),
             "My Medium", 1000L, 500);
       } catch (FileNotFoundException e) {
          throw new RuntimeException("Unexpected exception", e);

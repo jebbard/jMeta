@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 
 /**
@@ -23,7 +23,7 @@ import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 public class MediumActionTest {
 
    private static final ByteBuffer DEFAULT_BYTES = ByteBuffer.wrap(new byte[] { 0, 1, 2, 3, 4 });
-   private static final FileMedium MEDIUM = new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
+   private static final FileMedium MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
 
    /**
     * Tests the constructor and several getters, for an insert action.

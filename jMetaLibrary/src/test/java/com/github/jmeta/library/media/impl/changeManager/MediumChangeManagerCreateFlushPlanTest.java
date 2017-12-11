@@ -8,7 +8,7 @@
  */
 package com.github.jmeta.library.media.impl.changeManager;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,8 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
-import com.github.jmeta.library.media.api.helper.MediaTestUtility;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
@@ -55,7 +54,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * concept.
  * 
  * Note that this test class dumps expected and actual flush plan created in files for easier comparison, the files are
- * stored in a sub-folder of {@link MediaTestFiles#TEST_FILE_DIRECTORY_PATH}.
+ * stored in a sub-folder of {@link TestMedia#TEST_FILE_DIRECTORY_PATH}.
  * 
  * Here, we only have positive tests for creation of flush plans, all negative tests for invalid scheduling sequences
  * can be found in {@link MediumChangeManagerTest}.
@@ -76,7 +75,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
     */
    @Before
    public void setUp() {
-      Path mediaFlushTestPath = MediaTestFiles.TEST_FILE_DIRECTORY_PATH.resolve("MediumChangeManagerTests");
+      Path mediaFlushTestPath = TestMedia.TEST_FILE_DIRECTORY_PATH.resolve("MediumChangeManagerTests");
 
       currentDumpStreamExpected = setupTestFile(currentTestName.getMethodName() + "__EXPECTED", mediaFlushTestPath);
       currentDumpStreamActual = setupTestFile(currentTestName.getMethodName() + "__ACTUAL", mediaFlushTestPath);
@@ -1902,7 +1901,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
     * @return an instance of a new {@link MediumChangeManager} for testing
     */
    private MediumChangeManager getTestling() {
-      return new MediumChangeManager(new MediumOffsetFactory(MediaTestUtility.DEFAULT_TEST_MEDIUM));
+      return new MediumChangeManager(new MediumOffsetFactory(TestMedia.DEFAULT_TEST_MEDIUM));
    }
 
    /**

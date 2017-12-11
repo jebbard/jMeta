@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.api.services;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
@@ -49,7 +49,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  * to a lot of duplicate test cases executed, here they are just run once per medium type</li>
  * </ul>
  * 
- * The media used for testing all must contain {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}, a String fully containing
+ * The media used for testing all must contain {@link TestMedia#FIRST_TEST_FILE_CONTENT}, a String fully containing
  * only human-readable standard ASCII characters. This guarantees that 1 bytes = 1 character. Furthermore, all bytes
  * inserted must also be standard human-readable ASCII characters with this property.
  *
@@ -66,7 +66,7 @@ public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
     */
    @BeforeClass
    public static void validateTestFiles() {
-      MediaTestFiles.validateTestFiles();
+      TestMedia.validateTestFiles();
    }
 
    /**

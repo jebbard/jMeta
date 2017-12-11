@@ -16,7 +16,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
@@ -31,7 +31,7 @@ public class MediumOffsetFactoryTest {
 
    private static final long END_OFFSET = 1000L;
    private static final ByteBuffer DEFAULT_BYTES = ByteBuffer.wrap(new byte[] { 1, 2, 3, 4 });
-   private static final FileMedium MEDIUM = new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
+   private static final FileMedium MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
 
    private final static long[] THE_REFERENCE_OFFSETS = new long[] { 0L, 2L, 3L, 0L, 2L, 20L, 50L, 50L, 500L,
       END_OFFSET, };

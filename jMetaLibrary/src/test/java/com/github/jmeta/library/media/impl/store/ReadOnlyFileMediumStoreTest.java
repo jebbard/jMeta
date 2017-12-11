@@ -11,7 +11,7 @@ package com.github.jmeta.library.media.impl.store;
 
 import java.io.IOException;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.AbstractReadOnlyMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.FileMedium;
@@ -28,7 +28,7 @@ public class ReadOnlyFileMediumStoreTest extends AbstractReadOnlyMediumStoreTest
     */
    @Override
    protected FileMedium createMedium() throws IOException {
-      return new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, true);
+      return new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
    }
 
    /**

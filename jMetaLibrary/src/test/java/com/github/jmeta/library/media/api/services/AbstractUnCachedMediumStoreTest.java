@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.media.api.services;
 
-import static com.github.jmeta.library.media.api.helper.MediaTestUtility.at;
+import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.IOException;
 
@@ -18,7 +18,7 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
@@ -238,12 +238,12 @@ public abstract class AbstractUnCachedMediumStoreTest<T extends Medium<?>> exten
    }
 
    /**
-    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT}
+    * Creates a {@link MediumStore} based on a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
     * as content, with disabled caching. This method must be called at the beginning of a test case to create the
     * {@link MediumStore} to test and its return value must be assigned to {@link #mediumStoreUnderTest}. It is used by
     * tests that check that disabled caching really works as expected.
     * 
-    * @return a {@link Medium} containing {@link MediaTestFiles#FIRST_TEST_FILE_CONTENT} as content, with disabled
+    * @return a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, with disabled
     *         caching
     */
    protected MediumStore createFilledUncachedMediumStore() {

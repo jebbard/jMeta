@@ -11,7 +11,7 @@ package com.github.jmeta.library.media.impl.store;
 
 import java.io.IOException;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.services.AbstractUnCachedAndWritableRandomAccessMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -42,7 +42,7 @@ public class UnCachedWritableInMemoryMediumStoreTest
    @Override
    protected InMemoryMedium createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
       throws IOException {
-      return new InMemoryMedium(MediaTestUtility.readFileContent(MediaTestFiles.FIRST_TEST_FILE_PATH),
+      return new InMemoryMedium(MediaTestUtility.readFileContent(TestMedia.FIRST_TEST_FILE_PATH),
          "Stream based filled medium", false, maxReadWriteBlockSize);
    }
 

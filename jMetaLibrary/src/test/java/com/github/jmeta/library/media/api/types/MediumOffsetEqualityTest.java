@@ -12,7 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.media.api.helper.MediaTestFiles;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
@@ -83,7 +83,7 @@ public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
 
       // Create some more references with equal medium, using the passed offset
       for (int i = 0; i < 3; ++i) {
-         mediumReferences.add(new StandardMediumOffset(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false),
+         mediumReferences.add(new StandardMediumOffset(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false),
             baseOffset + i * 10));
       }
 
@@ -101,7 +101,7 @@ public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
       // they are compared bases on object identity
       media.add(new InMemoryMedium(BYTES, "Hallo4", true));
       media.add(new InputStreamMedium(STREAM_MEDIUM, "Hallo"));
-      media.add(new FileMedium(MediaTestFiles.FIRST_TEST_FILE_PATH, false));
+      media.add(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false));
 
       return media;
    }
@@ -116,7 +116,7 @@ public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
       media.add(new InMemoryMedium(new byte[] { 1 }, "Hallo4", true));
       // We must create a new input stream here to achieve it is different
       media.add(new InputStreamMedium(new ByteArrayInputStream(BYTES), "Hallo"));
-      media.add(new FileMedium(MediaTestFiles.SECOND_TEST_FILE_PATH, false));
+      media.add(new FileMedium(TestMedia.SECOND_TEST_FILE_PATH, false));
 
       return media;
    }

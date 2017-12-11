@@ -13,30 +13,12 @@
 	<!-- Global dependencies for reuse in all child projects -->
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>2.11.0</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.12</version>
-				<scope>test</scope>
-			</dependency>
+			<!-- (1) jMeta Productive Dependencies -->
 			<dependency>
 				<groupId>com.github.jmeta</groupId>
 				<artifactId>jmetalibrary</artifactId>
 				<version>0.1</version>
 				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.github.jmeta</groupId>
-				<artifactId>jmetalibrary</artifactId>
-				<version>0.1</version>
-				<type>test-jar</type>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.github.jmeta</groupId>
@@ -80,6 +62,14 @@
 				<version>0.1</version>
 				<scope>compile</scope>
 			</dependency>
+			<!-- (2) jMeta Test Dependencies -->
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetalibrary</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
 			<dependency>
 				<groupId>com.github.jmeta</groupId>
 				<artifactId>jmetautility</artifactId>
@@ -88,19 +78,95 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.7.21</version>
-				<scope>compile</scope>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetaAPEv2</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>1.1.7</version>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetaID3v1</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetaID3v23</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetaLyrics3v2</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetaMP3</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.jmeta</groupId>
+				<artifactId>jmetaOGG</artifactId>
+				<version>0.1</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<!-- (4) Test library dependencies -->
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>2.11.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<dependencies>
+		<!-- (3) Logging Provider -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.21</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+			<version>2.10.0</version>
+		</dependency>
+		<!-- NOTE: Strange build problem with logback: Test sources do not find 
+			productive symbols of the same module during test-compile if using logback! -->
+		<!-- <dependency> -->
+		<!-- <groupId>ch.qos.logback</groupId> -->
+		<!-- <artifactId>logback-classic</artifactId> -->
+		<!-- <version>1.1.7</version> -->
+		<!-- <scope>compile</scope> -->
+		<!-- </dependency> -->
+	</dependencies>
 
 
 	<!-- ========================== Modules for Build ========================== -->
@@ -136,6 +202,20 @@
 					<target>9</target>
 				</configuration>
 			</plugin>
+			<!-- JAR: Build a test jar for test reuse -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Code coverage -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
