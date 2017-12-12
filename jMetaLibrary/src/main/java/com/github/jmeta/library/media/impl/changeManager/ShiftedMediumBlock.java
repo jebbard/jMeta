@@ -34,13 +34,13 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * <i>CFP algorithm</i>) that is implemented in {@link MediumChangeManager#createFlushPlan(int, long)}. The idea of the
  * CFP algorithm is that every insertion, removal or replacement leads to a "shift" of existing medium bytes.
  * 
- * All {@link MediumOffset} instances and sizes returned by this class refer to valid offsets and sizes on the
- * existing, external {@link Medium} and are therefore not in any way "virtual".
+ * All {@link MediumOffset} instances and sizes returned by this class refer to valid offsets and sizes on the existing,
+ * external {@link Medium} and are therefore not in any way "virtual".
  * 
  * After instantiation, the {@link #getMediumByteCount()} method of this {@link ShiftedMediumBlock} returns
  * {@value #UNDEFINED_COUNT}. The reason for this is: The actual size of the medium bytes is only computed during
- * execution of the CFP algorithm. It is finally computable after {@link #setEndReferenceOfMediumBytes(MediumOffset)}
- * has been called. In this state, the {@link ShiftedMediumBlock} is finally assembled. You can see such an instance as
+ * execution of the CFP algorithm. It is finally computable after {@link #setTotalMediumByteCount(MediumOffset)} has
+ * been called. In this state, the {@link ShiftedMediumBlock} is finally assembled. You can see such an instance as
  * referring to existing medium bytes including their location, and at the same time telling <i>where</i> they will be
  * moved after applying not only one action (i.e. the causing action of this specific {@link ShiftedMediumBlock}
  * instance), but a whole sequence of insertions, removals or replacements on the external {@link Medium} until the
@@ -88,9 +88,8 @@ public class ShiftedMediumBlock {
    }
 
    /**
-    * Returns the start {@link MediumOffset} of the existing medium bytes this {@link ShiftedMediumBlock} refers to.
-    * It must be clearly stated that these are the bytes <i>behind</i> the causing {@link MediumAction}s region, in
-    * detail:
+    * Returns the start {@link MediumOffset} of the existing medium bytes this {@link ShiftedMediumBlock} refers to. It
+    * must be clearly stated that these are the bytes <i>behind</i> the causing {@link MediumAction}s region, in detail:
     * <ul>
     * <li>For {@link MediumActionType#INSERT}: It is the start offset of the causing {@link MediumAction}, because bytes
     * are inserted before any existing medium bytes at the given offset</li>
@@ -105,30 +104,25 @@ public class ShiftedMediumBlock {
    }
 
    /**
-    * Sets the end {@link MediumOffset} of the consecutive block of medium bytes this {@link ShiftedMediumBlock}
-    * refers to. These are actual and current offsets on the external medium. Saying this, they not yet reflect any
-    * shift operations by any already or not yet executed {@link MediumAction}s.
-    * 
-    * After this method has been called with a valid end {@link MediumOffset}, {@link #totalMediumByteCount} will
-    * return the corresponding size.
+    * Sets the total number of consecutive medium bytes this {@link ShiftedMediumBlock} refers to. These are actual and
+    * current bytes on the external medium.
     *
-    * @param endReferenceOfFollowUpBytes
-    *           the end {@link MediumOffset} of the {@link ShiftedMediumBlock}.
+    * @param totalMediumByteCount
+    *           the total number of existing medium bytes behind this {@link ShiftedMediumBlock}s action that are
+    *           associated with it; might be strictly positive or zero. If it is bigger than {@link Integer#MAX_VALUE},
+    *           an {@link IllegalStateException} is thrown, as we cannot handle distances between blocks that are bigger
+    *           than this.
     */
-   public void setEndReferenceOfMediumBytes(MediumOffset endReferenceOfFollowUpBytes) {
-      Reject.ifNull(endReferenceOfFollowUpBytes, "endReferenceOfFollowUpBytes");
-      Reject.ifTrue(endReferenceOfFollowUpBytes.before(getStartReferenceOfFollowUpBytes()),
-         "the given end reference <" + endReferenceOfFollowUpBytes + "> must be located before the start reference <"
-            + getStartReferenceOfFollowUpBytes() + ">.");
+   public void setTotalMediumByteCount(long totalMediumByteCount) {
+      Reject.ifNegative(totalMediumByteCount, "totalMediumByteCount");
 
-      long distance = endReferenceOfFollowUpBytes.distanceTo(getStartReferenceOfFollowUpBytes());
-
-      if (distance > Integer.MAX_VALUE) {
-         throw new IllegalStateException("Cannot handle changes whose distance is bigger than " + Integer.MAX_VALUE
-            + " bytes. These changes must be executed within different flushes.");
+      if (totalMediumByteCount > Integer.MAX_VALUE) {
+         throw new IllegalStateException(
+            "Cannot handle changes whose distance is bigger than " + Integer.MAX_VALUE + " bytes, actual size: <"
+               + totalMediumByteCount + ">. These changes must be executed within different flushes.");
       }
 
-      totalMediumByteCount = (int) distance;
+      this.totalMediumByteCount = (int) totalMediumByteCount;
    }
 
    /**
@@ -300,11 +294,13 @@ public class ShiftedMediumBlock {
          MediumRegion sourceRegion = getSourceRegion();
          MediumRegion targetRegion = getTargetRegion();
 
-         sourceIntvString = sourceRegion.getStartOffset().getAbsoluteMediumOffset() + ", "
-            + sourceRegion.calculateEndOffset().getAbsoluteMediumOffset();
+         long sourceAbsoluteMediumOffset = sourceRegion.getStartOffset().getAbsoluteMediumOffset();
 
-         targetIntvString = targetRegion.getStartOffset().getAbsoluteMediumOffset() + ", "
-            + targetRegion.calculateEndOffset().getAbsoluteMediumOffset();
+         sourceIntvString = sourceAbsoluteMediumOffset + ", " + sourceRegion.calculateEndOffsetAsLong();
+
+         long targetAbsoluteMediumOffset = targetRegion.getStartOffset().getAbsoluteMediumOffset();
+
+         targetIntvString = targetAbsoluteMediumOffset + ", " + targetRegion.calculateEndOffsetAsLong();
       }
 
       return "ShiftedMediumBlock [causingActionType=" + causingAction.getActionType() + ", causingActionRegOfs="

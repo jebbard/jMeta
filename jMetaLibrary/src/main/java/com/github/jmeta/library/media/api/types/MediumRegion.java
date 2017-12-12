@@ -21,6 +21,10 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * 
  * A {@link MediumRegion} may at maximum have a size of {@link Integer#MAX_VALUE}. However, the minimum size is 0, so
  * the idea of the "empty" region is supported.
+ * 
+ * Note that - although {@link #calculateEndOffset()} and {@link MediumOffset#advance(long)} could have been used more
+ * to write even more readable algorithm, intentionally, they are avoided to optimize for new {@link MediumOffset} only
+ * to be created if really necessary.
  */
 public class MediumRegion {
 
@@ -239,7 +243,12 @@ public class MediumRegion {
          overlappedPartOfLeftRegion = splitRegions[1];
       }
 
-      if (rightRegion.calculateEndOffset().before(leftMasterRegion.calculateEndOffset())) {
+      long leftStartOffset = leftMasterRegion.getStartOffset().getAbsoluteMediumOffset();
+      long leftEndOffset = leftStartOffset + leftMasterRegion.getSize();
+      long rightStartOffset = rightRegion.getStartOffset().getAbsoluteMediumOffset();
+      long rightEndOffset = rightStartOffset + rightRegion.getSize();
+
+      if (rightEndOffset < leftEndOffset) {
          MediumRegion[] splitRegions = overlappedPartOfLeftRegion.split(rightRegion.calculateEndOffset());
 
          overlappedPartOfLeftRegion = splitRegions[0];
@@ -298,6 +307,16 @@ public class MediumRegion {
    }
 
    /**
+    * Calculates and returns the long offset pointing to the first byte after this {@link MediumRegion}. This method is
+    * slightly more efficient as it does not create a new {@link MediumOffset} (that probably is maintained in a pool).
+    * 
+    * @return the long pointing to the first byte after this {@link MediumRegion}.
+    */
+   public long calculateEndOffsetAsLong() {
+      return startReference.getAbsoluteMediumOffset() + getSize();
+   }
+
+   /**
     * Splits this {@link MediumRegion} at the given {@link MediumOffset} and returns two new {@link MediumRegion}
     * instances in any case. This existing {@link MediumRegion} instance is kept unchanged.
     * 
@@ -317,7 +336,10 @@ public class MediumRegion {
       MediumRegion[] returnedSplitRegions = new MediumRegion[2];
 
       int firstRegionSize = (int) at.distanceTo(getStartOffset());
-      int secondRegionSize = (int) calculateEndOffset().distanceTo(at);
+
+      long myEndOffset = calculateEndOffsetAsLong();
+
+      int secondRegionSize = (int) (myEndOffset - at.getAbsoluteMediumOffset());
 
       if (isCached()) {
          // NOTE: It is important here to NOT call getBytes() multiple times for each region, but just once,
@@ -359,7 +381,8 @@ public class MediumRegion {
       Reject.ifFalse(reference.getMedium().equals(getStartOffset().getMedium()),
          "reference.getMedium().equals(getStartReference().getMedium())");
 
-      return reference.behindOrEqual(getStartOffset()) && reference.before(calculateEndOffset());
+      return reference.behindOrEqual(getStartOffset())
+         && reference.getAbsoluteMediumOffset() < getStartOffset().getAbsoluteMediumOffset() + getSize();
    }
 
    /**
@@ -506,10 +529,12 @@ public class MediumRegion {
 
       MediumOffset startRef = getStartOffset();
       MediumOffset otherStartRef = other.getStartOffset();
-      MediumOffset endRef = calculateEndOffset();
-      MediumOffset otherEndRef = other.calculateEndOffset();
 
-      return otherStartRef.behindOrEqual(startRef) && otherStartRef.before(endRef) && otherEndRef.behindOrEqual(endRef);
+      long myEndOffset = calculateEndOffsetAsLong();
+      long otherStartOffset = other.getStartOffset().getAbsoluteMediumOffset();
+      long otherEndOffset = other.calculateEndOffsetAsLong();
+
+      return otherStartRef.behindOrEqual(startRef) && otherStartOffset < myEndOffset && otherEndOffset >= myEndOffset;
    }
 
    /**
@@ -527,16 +552,19 @@ public class MediumRegion {
 
       MediumOffset startRef = getStartOffset();
       MediumOffset otherStartRef = other.getStartOffset();
-      MediumOffset endRef = calculateEndOffset();
-      MediumOffset otherEndRef = other.calculateEndOffset();
+
+      long myStartOffset = getStartOffset().getAbsoluteMediumOffset();
+      long myEndOffset = calculateEndOffsetAsLong();
+      long otherStartOffset = other.getStartOffset().getAbsoluteMediumOffset();
+      long otherEndOffset = other.calculateEndOffsetAsLong();
 
       if (overlapsOtherRegionAtFront(other)) {
-         return (int) endRef.distanceTo(otherStartRef);
+         return (int) (myEndOffset - otherStartOffset);
       } else if (overlapsOtherRegionAtBack(other)) {
-         return (int) otherEndRef.distanceTo(startRef);
-      } else if (startRef.before(otherStartRef) && otherEndRef.before(endRef)) {
+         return (int) (otherEndOffset - myStartOffset);
+      } else if (startRef.before(otherStartRef) && otherEndOffset < myEndOffset) {
          return other.getSize();
-      } else if (otherStartRef.before(startRef) && endRef.before(otherEndRef)) {
+      } else if (otherStartRef.before(startRef) && myEndOffset < otherEndOffset) {
          return getSize();
       }
 
@@ -549,9 +577,8 @@ public class MediumRegion {
    @Override
    public String toString() {
 
-      return "MediumRegion [[" + getStartOffset().getAbsoluteMediumOffset() + ", "
-         + (getStartOffset().getAbsoluteMediumOffset() + getSize()) + "), size=" + getSize() + ", buffer=" + buffer
-         + ", on " + getStartOffset().getMedium() + "]";
+      return "MediumRegion [[" + getStartOffset().getAbsoluteMediumOffset() + ", " + calculateEndOffsetAsLong()
+         + "), size=" + getSize() + ", buffer=" + buffer + ", on " + getStartOffset().getMedium() + "]";
    }
 
    /**

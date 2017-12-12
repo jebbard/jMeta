@@ -220,10 +220,13 @@ public class MediumChangeManager {
          ShiftedMediumBlock lastBlock = null;
          if (mediumBlocks.size() > 0) {
             lastBlock = mediumBlocks.get(mediumBlocks.size() - 1);
+            MediumOffset startReferenceOfFollowUpBytes = lastBlock.getStartReferenceOfFollowUpBytes();
+
             if (delta == 0) {
-               lastBlock.setEndReferenceOfMediumBytes(lastBlock.getStartReferenceOfFollowUpBytes());
+               lastBlock.setTotalMediumByteCount(0);
             } else {
-               lastBlock.setEndReferenceOfMediumBytes(currentRegion.getStartOffset());
+               lastBlock.setTotalMediumByteCount(
+                  currentRegion.getStartOffset().distanceTo(startReferenceOfFollowUpBytes));
             }
          }
 
@@ -236,12 +239,11 @@ public class MediumChangeManager {
          ShiftedMediumBlock lastBlock = mediumBlocks.get(mediumBlocks.size() - 1);
 
          if (delta == 0) {
-            lastBlock.setEndReferenceOfMediumBytes(lastBlock.getStartReferenceOfFollowUpBytes());
+            lastBlock.setTotalMediumByteCount(0);
          } else {
             long startOfsLast = lastBlock.getStartReferenceOfFollowUpBytes().getAbsoluteMediumOffset();
 
-            lastBlock.setEndReferenceOfMediumBytes(
-               lastBlock.getStartReferenceOfFollowUpBytes().advance(totalMediumSizeInBytes - startOfsLast));
+            lastBlock.setTotalMediumByteCount(totalMediumSizeInBytes - startOfsLast);
          }
       }
 
@@ -300,8 +302,8 @@ public class MediumChangeManager {
    /**
     * Gets the previous {@link MediumAction} already scheduled in this {@link MediumChangeManager}, according to the
     * {@link MediumActionComparator}, or null if there is none. According to the definition of
-    * {@link MediumActionComparator}, the previous {@link MediumAction} with a smaller or equal {@link MediumOffset}
-    * and smaller or equal sequence number will be returned by this method.
+    * {@link MediumActionComparator}, the previous {@link MediumAction} with a smaller or equal {@link MediumOffset} and
+    * smaller or equal sequence number will be returned by this method.
     * 
     * Due to the {@link MediumActionComparator} implementation, an existing action whose region starts at the same
     * offset as the new region and overlaps the new region at front, but with smaller length, is returned by this method

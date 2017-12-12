@@ -826,7 +826,7 @@ No disadvantages known
 
 %-----------------------------------------------------------------------------------------------
 
-\subsubsection{Positions in and Lengths of a \TERMmedium{}}
+\subsubsection{Positions on and Lengths of a \TERMmedium{}}
 \label{sec:PositiZugriffEinesTERMmedium}
 
 In each case where dare is read from or written to a \TERMmedium{}, the question ``where?'' arises. Usually libraries use integer or long variables to represent offsets. It must be said however: Offsets do not only make sense for random-access media. You could also interpret them as offset since start of reading from an \texttt{InputStream}, which is actually the way it is done in \LibName{}. We decide:
@@ -859,7 +859,7 @@ The interface binds both the \TERMmedium{} and the offset on this \TERMmedium{} 
 \begin{itemize}
 \item \texttt{behindOrEqual:} Returns true if another \IMediumReference{} is located on the same medium behind of at the same position as this instance.
 \item \texttt{before:} Returns true if another \IMediumReference{} is located on the same medium before the position of this instance.
-\item \texttt{advance:} Creates a new \IMediumReference{} that is located by the given byte number before (negative argument) or after (positive argument) this instance.
+\item \texttt{advance:} Creates a new \IMediumReference{} that is located the given number of bytes before (negative argument) or behind (positive argument) this instance. Also zero is possible as argument.
 \end{itemize}
 }
 {% Begründung
@@ -881,7 +881,7 @@ Now we come to a central decision when it comes to dealing with lengths and offs
 In \LibName{}, lenghts and offsets are always specified using the Java datatyp long. The lenght is in any case the number of bytes, offsets are zero-based, linearly increasing byte offsets.
 }
 {% Begründung
-This guarantees uniformity. However, we also want to meet the requirement \SectionLink{sec:ANF009LesenSchreibenGrosse}. Integer with a maximum of 4.3 GB is already too limited, which leaves only long as a viable option. The datatype long allows for positive numbers up to $2^{63}-1=9223372036854775807$, i.e. approximately $9\cdot 10^{18}$ bytes, which is 9 exabytes or 9 billion gigabytes. From current point of view, such lenghts and offsets for input media, even for streams, should be sufficient for some decades to come. Furthermore, big data chunks are almost in any case subdivided in small units that can be easier handled, and these small units will not have big lengths. Even the Java file I/O uses long as offset and length datatype in most cases.
+This guarantees uniformity. However, we also want to meet the requirement \SectionLink{sec:REQ009LesenSchreibenGrosse}. Integer with a maximum of 4.3 GB is already too limited, which leaves only long as a viable option. The datatype long allows for positive numbers up to $2^{63}-1=9223372036854775807$, i.e. approximately $9\cdot 10^{18}$ bytes, which is 9 exabytes or 9 billion gigabytes. From current point of view, such lenghts and offsets for input media, even for streams, should be sufficient for some decades to come. Furthermore, big data chunks are almost in any case subdivided in small units that can be easier handled, and these small units will not have big lengths. Even the Java file I/O uses long as offset and length datatype in most cases.
 }
 {% Nachteile
 More memory for saving offsets and lengths is necessary. If we look at the development of storage media, storage needs and processing speed it might be that in 100 years the maximum data volume of long will be reached. If \LibName{} is still used in these future scenarios, a change request would be worth it!
@@ -913,9 +913,9 @@ Now the problem arises that the medium changes due to writing access. How do the
 \item Update already created \IMediumReference{} instances only when an explicit \emph{flush} according to \DesLink{dd:410} occurs
 \end{enumerate}
 
-Assume that \IMediumReference{} instances are not updated when writing. That means the user code remembers a position of an element in form of a \IMediumReference{} instance, and uses it to read or write data. If e.g. an inseration operation takes place on the medium before the offset of the \IMediumReference{} instance, then the instance refers to another data byte than before, and thus not anymore to the object it was referring to initially. We should not only think of raw bytes but - as necessary for data formats - \emph{objects}, i.e. parts of the binary data that form a specific unit with which has a specific meaning, representing something. Then failure to update the offset is fatal. Code using \COMPmedia{} locates an object at the wrong place if the medium changed before that offset meanwhile.
+Assume that \IMediumReference{} instances are not updated when writing. That means the user code remembers a position of an element in form of a \IMediumReference{} instance, and uses it to read or write data. If e.g. an insert operation takes place on the medium before the offset of the \IMediumReference{} instance, then the instance refers to another data byte than before, and thus not anymore to the object it was referring to initially. We should not only think of raw bytes but - as necessary for data formats - \emph{objects}, i.e. parts of the binary data that form a specific unit which has a specific meaning, representing something. Then failure to update the offset is fatal. Code using \COMPmedia{} locates an object at the wrong place if the medium changed before that offset meanwhile. The second point why we need it: If caching data, this data also refers to \IMediumReference{}s. If we do not update them automatically, an additional functionality must be added to perform the updates based on the changes, increasing the complexity of the caching implementation.
 
-To formulate the following design decision a bit easier, the vague term of ``Object'' used above is now defined a bit sharper: An object is a consecutive byte unit starting at aspecific offset $x$ and it has a length of $n$ bytes. \texttt{remove}, \texttt{insert} and \texttt{replace} in the offset interval $[x,x+n]$ change these objects, which cannot be in any case specifically treated by \COMPmedia{}.
+To formulate the following design decision a bit easier, the vague term of ``object'' used above is now defined a bit sharper: An object is a consecutive byte unit starting at aspecific offset $x$ and it has a length of $n$ bytes. \texttt{remove}, \texttt{insert} and \texttt{replace} in the offset interval $[x,x+n]$ change these objects, which cannot be in any case specifically treated by \COMPmedia{}.
 
 %%%% DD --> %%%%
 \DD{dd:418b}
@@ -958,14 +958,14 @@ For \texttt{replace}, the update of already created \IMediumReference{}s is simi
 \end{itemize}
 }
 {% Begründung
-There is no surprose for replaces behind the object start offset and those before the start offset without overlap. The only question is: If there is an overlap, i.e. $x$ lies within the replaced region of bytes, why do we not update it? The reason is: Because of the replacement by other bytes, the object is anyway changed, the correct semantics seems to be to let the \IMediumReference{}s point to $x$ still point to $x$.
+There is no surprise for replaces behind the object start offset and those before the start offset without overlap. The only question is: If there is an overlap, i.e. $x$ lies within the replaced region of bytes, why do we not update it? The reason is: Because of the replacement by other bytes, the object is anyway changed, the correct semantics seems to be to let the \IMediumReference{}s point to $x$ still point to $x$.
 }
 {% Nachteile
 A central management of \IMediumReference{} instances must be implemented (see \DesLink{dd:419}).
 }
 %%%% <-- DD %%%%
 
-As already indicated by \DesLink{dd:418b} the automatic updating of already created \IMediumReference{} instances requires that only \COMPmedia{} may create \IMediumReference{} instances. These must be managed in a kind of pool to be able to automatically update them in case of writing operations.
+As already indicated by \DesLink{dd:418b} the automatic updating of already created \IMediumReference{} instances requires that only \COMPmedia{} may create \IMediumReference{} instances. These must be managed in a kind of factory to be able to automatically update them in case of writing operations.
 
 %%%% DD --> %%%%
 \DD{dd:419}
@@ -973,10 +973,10 @@ As already indicated by \DesLink{dd:418b} the automatic updating of already crea
 \IMediumReference{} instances are centrally managed by \COMPmedia{} and cannot be directly created by users of the component
 }
 {% Kurzbeschreibung
-The lifecycle of \IMediumReference{} instances is controlled by \COMPmedia{}. They are created and returned to the user via a factory method.
+The lifecycle of \IMediumReference{} instances is controlled by \COMPmedia{}. They are created and returned to the user via a factory method. The user has no direct access to the implementation class of \IMediumReference{}.
 }
 {% Begründung
-It is strictly required to implement \DesLink{dd:418b}. Instances that have been created by the user cannot be update automatically, thus we have to ensure the manual creation by the user does not happen.
+It is strictly required to implement \DesLink{dd:418b}. Instances that have been created by the user cannot be updated automatically, thus we have to ensure the manual creation by the user does not happen.
 }
 {% Nachteile
 More complex instantiation of \IMediumReference{} instances.
@@ -1354,7 +1354,7 @@ No disadvantages known
 \hline
 \texttt{flush()} & Implements the writing operation \emph{flush} according to \DesLink{dd:410}: All \emph{changed} data currently in the temporary buffer are written in a suitable way to the external medium. It cannot be guaranteed that this operation is atomic. & This is a practical implementation of \DesLink{dd:410}: While \texttt{insertData()}, \texttt{removeData()} and \texttt{replaceData()} only write into a temporary buffer, this call directly writes to the external medium. & \texttt{ReadOnlyMediumException} \\
 \hline
-\texttt{createMediumReference(x)} & Creates a new \IMediumReference{} instance for the given offset $x$ according to \DesLink{dd:419} & Is needed for random-access & Is needed for \texttt{InputStream}s \\
+\texttt{createMediumOffset(x)} & Creates a new \IMediumReference{} instance for the given offset $x$ according to \DesLink{dd:419} & Is needed for random-access & Is needed for \texttt{InputStream}s \\
 \hline
 \texttt{undo(mediumAction)} & Undoes the changes of the given \MediumAction{} according to \DesLink{dd:420}, as far as it is still pending. & Is needed for random-access & \texttt{InvalidMediumActionException} \\
 \hline
@@ -1460,47 +1460,6 @@ No disadvantages known
 \subsection{Implementation Design}
 \label{sec:ImplementationDesignCOMPmedia}
 
-%-----------------------------------------------------------------------------------------------
-
-\subsubsection{\TERMmedium{} Access}
-\label{sec:ZugriffAufDasMedium}
-
-Access to the \TERMmedium{} is implemented in own classes, as the following design decision states:
-
-%%%% DD --> %%%%
-\DD{dd:429}
-{% Titel
-Interface \IMediumAccessor{} with implementations for each \TERMmedia{} type access
-}
-{% Kurzbeschreibung
-Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing a great deal of ensuring \DesLink{dd:407}. It offest the following primitives:
-\begin{itemize}
-	\item \texttt{getMedium}: Returns the medium this instance is working on.
-	\item \texttt{open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}).
-	\item \texttt{isOpened}: Check if the medium is opened.
-	\item \texttt{close}: Close the medium for access. A closed medium cannot be used anymore.
-	\item \texttt{setCurrentPosition}: Sets the current position for the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} call. Is ignored for non-random-access media.
-	\item \texttt{getCurrentPosition}: gets the current position on the medium where the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} will be executed.
-	\item \texttt{read} at the current position: Read $n$ bytes from external medium by explicit access from the current position, return the bytes in a \texttt{ByteBuffer}. Advances the current position by the number of read bytes.
-	\item \texttt{write} at the current position: Writes $n$ bytes to the external medium at the current position passed in a \texttt{ByteBuffer}. Throws an exception for read-only media, especially for \texttt{InputStream}. Advances the current position by the number of read bytes.
-        \item \texttt{truncate} to new end offset at the current position: Truncates the medium to end at the current position. Throws an exception for read-only media, especially for \texttt{InputStream}.
-	\item \texttt{isAtEndOfMedium}: Check if the current position is at end of the \TERMmedium{}.
-\end{itemize}
-
-There is one implementation of this interface for each distinct \TERMmedium{} type.
-
-\IMediumStore{} exclusively accesses the \TERMmedium{} only via this interface.
-}
-{% Begründung
-\IMediumStore{} itself can deal with caching and the complex implementation of writing functionality independently from the concrete medium, while the actual medium access can be abstracted away by concrete implementations generically. Classical separation of concerns to increase maintainability and comprehensibility of the solution.
-
-Regarding the offset handling for read: This is necessary to ensure readable and non-confusing use for non-random-access media. In that way, the user does not assume the medium is actually read-only.
-}
-{% Nachteile
-No disadvantages known
-}
-%%%% <-- DD %%%%
-
 % -------------------------------------------------------------------------------------------------------
 \subsubsection{Management of \IMediumReference{} instances}%
 \label{sec:VerwaltungderIMediumReferenceInstanzen}%
@@ -1514,10 +1473,10 @@ Thus, these things follow:
 No pooling of \IMediumReference{} instances for the same offsets is possible
 }
 {% Kurzbeschreibung
-In contrast to Java strings, the reuse of \IMediumReference{} instances in \texttt{createMediumReference()} for same offsets is not possible, i.e. if an \IMediumReference{} instance for offset $x$ has already been created, the same instance cannot be returned for the same offset on the next call. A new \IMediumReference{} instance must be created instead.
+In contrast to Java strings, the reuse of \IMediumReference{} instances in \texttt{createMediumOffset()} for same offsets is not possible, i.e. if an \IMediumReference{} instance for offset $x$ has already been created, the same instance cannot be returned for the same offset on the next call. A new \IMediumReference{} instance must be created instead.
 }
 {% Begründung
-Assum we use pooling. Furthermore, assume there are two inserts of lengths $n_1$ and $n_2$ at the same offset $x$ scheduled via \texttt{insertData()}. The internal implementation would only have a single instance of \IMediumReference{} for offset $x$. \texttt{flush()} must keep the offset of the first insertion unchanged, as the data of this first insertion remain there. Howeder, the offset of the second insertion must be changed, as these inserted bytes are actually located at offset $x+n_1$ after \texttt{flush()}.
+Assum we use pooling. Furthermore, assume there are two inserts of lengths $n_1$ and $n_2$ at the same offset $x$ scheduled via \texttt{insertData()}. The internal implementation would only have a single instance of \IMediumReference{} for offset $x$. \texttt{flush()} must keep the offset of the first insertion unchanged, as the data of this first insertion remains there. However, the offset of the second insertion must be changed, as these inserted bytes are actually located at offset $x+n_1$ after \texttt{flush()}.
 }
 {% Nachteile
 For many created \IMediumReference{} objects, there could be a bigger memory footprint.
@@ -1528,7 +1487,7 @@ Furthermore, the \IMediumReference{} objects must be maintained in a dedicated d
 %%%% DD --> %%%%
 \DD{dd:431}
 {% Titel
-All instances ever created with \texttt{createMediumReference()} are maintained in a dedicated data structure that allows duplicates
+All instances ever created with \texttt{createMediumOffset()} are maintained in a dedicated data structure that allows duplicates
 }
 {% Kurzbeschreibung
 All instances are held in a data structure that allows duplicates. It must be dedicated, i.e. only be used for storing all ever created \IMediumReference{} objects.
@@ -1552,7 +1511,7 @@ Unsorted ArrayList for keeping the \IMediumReference{} instances
 We use an \texttt{ArrayList} as data structure for maintaining all \IMediumReference{} instances. Insertion of \IMediumReference{} instances is done in creation order. The list is  unsorted.
 }
 {% Begründung
-A list allows for duplicates. Sorting of the list after each addition would lead to $O(n\log n)$ runtime complexity on average when creating a new \IMediumReference{} instance, if $n$ is the current size of the list. Ascending sort order by offset would be a bit more efficient for \texttt{flush()}, but does hardly justify the effort during insertion, because the creation of a \IMediumReference{} instance is usually much more commonly done than a \texttt{flush()}. Following approaches have been rejected especially:
+A list allows for duplicates. Sorting of the list after each addition would lead to $O(n\log n)$ runtime complexity on average when creating a new \IMediumReference{} instance, if $n$ is the current size of the list. Ascending sort order by offset would be a bit more efficient for \texttt{flush()}, but does hardly justify the effort during adding it, because the creation of a \IMediumReference{} instance is usually much more commonly done than a \texttt{flush()}. Following approaches have been rejected especially:
 \begin{itemize}
 \item A \texttt{Map<Long, List<\IMediumReference{}>}\texttt{>} with offsets as key and all \IMediumReference{} instances for the offset as value won't work, as the offsets would need to be shifted on each insertion, i.e. the keys of the map would either need to be \IMediumReference{} instances again, or would need to be updated expensively.
 \item A \texttt{TreeSet<\IMediumReference{}>} can be excluded as it does not allow duplicates.
@@ -1573,11 +1532,11 @@ The class \MediumReferenceRepository{} is used for maintaining \IMediumReference
 {% Kurzbeschreibung
 \MediumReferenceRepository{} implements the design decisions \DesLink{dd:431}, \DesLink{dd:432} as well as \DesLink{dd:419}. It offers following methods:
 \begin{itemize}
-\item \texttt{createMediumReference()} to create \IMediumReference{} instances
-\item \texttt{updateReferences()} for implementation of \DesLink{dd:418b}, where a \MediumAction{} instance is passed
-\item \texttt{getAllReferences()} returns all maintained instances
-\item \texttt{getAllReferencesInRegion()} returns all maintained instances with given offset range
-\item \texttt{getAllReferencesBehindOrEqual()} returns all maintained instances with offsets bigger than the given offset
+\item \texttt{createMediumOffset()} to create \IMediumReference{} instances
+\item \texttt{updateOffsets()} for implementation of \DesLink{dd:418b}, where a \MediumAction{} instance is passed
+\item \texttt{getAllOffsets()} returns all maintained instances
+\item \texttt{getAllOffsetsInRegion()} returns all maintained instances with given offset range
+\item \texttt{getAllOffsetsBehindOrEqual()} returns all maintained instances with offsets bigger than the given offset
 \item \texttt{clear()} removes all maintained instances
 \end{itemize}
 
@@ -1590,7 +1549,7 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-The last question for \IMediumReference{} instances that still has to be answered: How to deal with the method \texttt{advance()} mentioned in \DesLink{dd:416}. It creates \IMediumReference{} instances. Do they have to be maintained in \MediumReferenceRepository{}, too?
+How to deal with the method \texttt{advance()} mentioned in \DesLink{dd:416}. It creates \IMediumReference{} instances. Do they have to be maintained in \MediumReferenceRepository{}, too?
 
 %%%% DD --> %%%%
 \DD{dd:433b}
@@ -1601,10 +1560,132 @@ The  \IMediumReference{} instances created with \IMediumReference{}\texttt{.adva
 Initially, the new \IMediumReference{} instance must get a reference to its creator, i.e. \MediumReferenceRepository{}, during construction. To still enable a simple creation of instances of \IMediumReference{} implementation classes (e.g. in unit tests), the constructor is public.
 }
 {% Begründung
-The client code can arbitrarily use \IMediumReference{}\texttt{.advance()}, and the returned references can be used as usual, e.g. for newly created data blocks. Thus it is clear that even these references are auto-corrected with \MediumReferenceRepository{}\texttt{.updateReferences()}.
+The client code can arbitrarily use \IMediumReference{}\texttt{.advance()}, and the returned references can be used as usual, e.g. for newly created data blocks. Thus it is clear that even these references are auto-corrected with \MediumReferenceRepository{}\texttt{.updateOffsets()}.
 }
 {% Nachteile
 Close coupling between \IMediumReference{} and \MediumReferenceRepository{}, as both are knowing each other.
+}
+%%%% <-- DD %%%%
+
+Now we still have the issue with the memory footprint as mentioned in \DesLink{dd:430}, as we cannot pool \IMediumReference{}s referring to the same offset. Furthermore, tests so far showed that without any special measures, e.g. for only one insert (and nothing else) to process during \texttt{flush}, there are \IMediumReference{}s added to the \MediumReferenceRepository{}. For the biggest test case having 34 different changes with a flush, it resulted in a \MediumReferenceRepository{} with 4398 reference in case of using a cache. This is still somehow tolerable, but might not scale that good. Imagine you are editing a large file with several gigabytes, adding and removing data in each frame. This would result in probably millions of \IMediumReference{}s being stored in the \MediumReferenceRepository{}. Thus, there is some motivation to reduce the number of \IMediumReference{}s maintained in a \MediumReferenceRepository{}. What can we do? We already saw the pooling is no option. The second thing that is not possible is the following:
+
+%%%% DD --> %%%%
+\DD{dd:433c}
+{% Titel
+The end \IMediumReference{} of a \MediumRegion{} must not be stored, but be always recalculated
+}
+{% Kurzbeschreibung
+The end \IMediumReference{} of a \MediumRegion{} must not be stored within \MediumRegion{}, but must always be recalculated whenever \MediumRegion{}\texttt{.calculateEndOffset()} is called. 
+}
+{% Begründung
+The end \IMediumReference{} must be managed in \MediumReferenceRepository{}, because \MediumRegion{} is a public class and you never know how the client uses the created end offset in his code. This would not be a reason against calculating it right at creation time of the \MediumRegion{}.
+
+Of course, first of all it is good style to avoid redundancy, as we anyway store start offset and size in the \MediumRegion{}. 
+
+But the major reason for not storing it is the following case: Imagine an \texttt{insert} happens at an offset that is in the middle of an existing cached \MediumRegion{}. When storing the end \IMediumReference{} of the region, it would be shifted by the number of inserted bytes after a \texttt{flush}, while the start offset would not be changed. This would essentially punish the use of reduncancy: The end offset would not fit anymore to the size also stored in \MediumRegion{}, thus leading to subtle and interesting bugs in connection with flushing changes, e.g. for the \MediumRegion{}s stored in the cache.
+}
+{% Nachteile
+Each call to \MediumRegion{}\texttt{.calculateEndOffset()} creates a new entry to be maintained in \MediumReferenceRepository{}
+}
+%%%% <-- DD %%%%
+
+A second thing we unfortunately cannot do is the following:
+
+%%%% DD --> %%%%
+\DD{dd:433d}
+{% Titel
+It is not safe to create unmanaged \IMediumReference{}s in internal code
+}
+{% Kurzbeschreibung
+Whenever the internal implementation of scheduling or flushing requires \IMediumReference{}s advanced, it might be an idea that it only uses a variant of the \IMediumReference{}\texttt{.advance()} named \IMediumReference{}\texttt{.advanceUnmanaged()} that does not associate the advanced \IMediumReference{} instance with the \MediumReferenceRepository{}.
+
+However, this will always include the risk that some unmanaged \IMediumReference{} ``leaps'' out to the client or somehow comes into the cache.
+}
+{% Begründung
+It might be true that internally created \IMediumReference{} for flushing and scheduling never go out to the client user of \COMPmedia{}. However, still some of the \IMediumReference{}s created internally using \texttt{advance} might come into the cache. We cannot afford to risk stability and reliability for things that might only occur in ``corner cases''. This is extremely hard to debug and puts the overall image of the library at risk.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+After having eliminated three possibilities for improvement already, what are the remaining options to keep the number of \IMediumReference{}s maintained in \MediumReferenceRepository{} to a minimum? Basically, the calls to \IMediumReference{}\texttt{.advance()}, especially via \MediumRegion{}\texttt{.calculateEndOffset()}, must be minimized in the implementation without sacrificing readability of the code. We define:
+
+%%%% DD --> %%%%
+\DD{dd:433e}
+{% Titel
+\MediumRegion{} is optimized to create as few new \IMediumReference{} as possible
+}
+{% Kurzbeschreibung
+\MediumRegion{} only rarely or not at all calls \IMediumReference{}\texttt{.advance()}, thus avoiding creation of new managed \IMediumReference{} instances. Specifically, a new method \texttt{calculateEndOffsetAsLong} is introduced that can be used as replacement for \texttt{calculateEndOffset} and does not create new \IMediumReference{}s.
+}
+{% Begründung
+It showed that \MediumRegion{} was responsible for the greater part of \IMediumReference{}s created, because it is so heavily used during flushing, offset updates and cache management. In tests we could show that for cached media, it only created six times less \IMediumReference{}s using this approach.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+TODO: MediumAction.INSERT - Spezialfall
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{\TERMmedium{} Access}
+\label{sec:ZugriffAufDasMedium}
+
+Access to the \TERMmedium{} is implemented in own classes, as the following design decision states:
+
+%%%% DD --> %%%%
+\DD{dd:429}
+{% Titel
+Interface \IMediumAccessor{} with implementations for each \TERMmedia{} type access
+}
+{% Kurzbeschreibung
+Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing a great deal of ensuring \DesLink{dd:407}. It offest the following primitives:
+\begin{itemize}
+\item \texttt{getMedium}: Returns the medium this instance is working on.
+\item \texttt{open}: Opens the medium for access. Opening creates an exclusive lock on the medium, as far as the medium supports this (see \DesLink{dd:404}, \DesLink{dd:405}, \DesLink{dd:406}).
+\item \texttt{isOpened}: Check if the medium is opened.
+\item \texttt{close}: Close the medium for access. A closed medium cannot be used anymore.
+\item \texttt{setCurrentPosition}: Sets the current position for the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} call. Is ignored for non-random-access media.
+\item \texttt{getCurrentPosition}: gets the current position on the medium where the next \texttt{read}, \texttt{write}, \texttt{truncate} or \texttt{isAtEndOfMedium} will be executed.
+\item \texttt{read} at the current position: Read $n$ bytes from external medium by explicit access from the current position, return the bytes in a \texttt{ByteBuffer}. Advances the current position by the number of read bytes.
+\item \texttt{write} at the current position: Writes $n$ bytes to the external medium at the current position passed in a \texttt{ByteBuffer}. Throws an exception for read-only media, especially for \texttt{InputStream}. Advances the current position by the number of read bytes.
+\item \texttt{truncate} to new end offset at the current position: Truncates the medium to end at the current position. Throws an exception for read-only media, especially for \texttt{InputStream}.
+\item \texttt{isAtEndOfMedium}: Check if the current position is at end of the \TERMmedium{}.
+\end{itemize}
+
+There is one implementation of this interface for each distinct \TERMmedium{} type.
+
+\IMediumStore{} exclusively accesses the \TERMmedium{} only via this interface.
+}
+{% Begründung
+\IMediumStore{} itself can deal with caching and the complex implementation of writing functionality independently from the concrete medium, while the actual medium access can be abstracted away by concrete implementations generically. Classical separation of concerns to increase maintainability and comprehensibility of the solution.
+
+Regarding the offset handling for read: This is necessary to ensure readable and non-confusing use for non-random-access media. In that way, the user does not assume the medium is actually read-only.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+After having discussed the implementation of \MediumReferenceRepository{} in the last subsection, it should be stated what kind of current positions are stored in an \IMediumAccessor{} implementation? This is made clear by the following design decision:
+%%%% DD --> %%%%
+\DD{dd:429b}
+{% Titel
+The current position of an \IMediumAccessor{} instance is not maintained in \MediumReferenceRepository{}
+}
+{% Kurzbeschreibung
+The current position of an \IMediumAccessor{} instance is not maintained in \MediumReferenceRepository{}, such that it won't be changed by a \texttt{flush} of changes that would otherwise modify it.
+}
+{% Begründung
+It might work with using a managed \IMediumReference{} for storing the current position of the \IMediumAccessor{} implementation. This is because for stream-based media, you cannot flush, and for all random-access media the current position can be arbitrary.
+
+However, making the current position managed would first of all confuse outside users who might expect that the current position is only modified by read and write operations of the \IMediumAccessor{}, and not in addition by flushing. Second, we want to keep the memory footprint of \IMediumReference{} in \MediumReferenceRepository{} to a minimum. Last but not least, we want to avoid a direct dependency from \IMediumAccessor{} to \MediumReferenceRepository{}.
+}
+{% Nachteile
+No disadvantages known
 }
 %%%% <-- DD %%%%
 
@@ -1624,7 +1705,7 @@ Class \MediumRegion{} for consecutive regions of a medium, especially also for c
 {% Kurzbeschreibung
 The class \MediumRegion{} represents a consecutive byte range with start offset, size and contained bytes of a medium, that may or may not be cached. It offers the following methods:
 \begin{itemize}
-\item \texttt{getStartReference()}: Query start \IMediumReference{} of the region
+\item \texttt{getStartOffset()}: Query start \IMediumReference{} of the region
 \item \texttt{getSize()}: Query length of the region
 \item \texttt{isCached()}: Returns true if cached, false otherwise
 \item \texttt{getBytes()}: Returns null if the region is not cached, otherwise the \texttt{ByteBuffer} with the cached region data
@@ -1633,8 +1714,7 @@ The class \MediumRegion{} represents a consecutive byte range with start offset,
 \item \texttt{overlapsOtherRegionAtFront()}: Returns true if the this region overlaps the other region at its front, i.e. shares bytes with it at its front, otherwise returns false.
 \item \texttt{getOverlappingByteCount()}: Returns the number of bytes that this region shares with another region or zero if it does not share any bytes with it.
 \item \texttt{split()}: Splits this region into two regions at the given offset
-% \item \texttt{discardbytesAtFront()}: Allows to trim the region at its beginning by discarding a given number of bytes
-% \item \texttt{discardbytesAtEnd()}: Allows to trim the region at its back by discarding a given number of bytes
+\item \texttt{calculateEndOffset()}: Convenience method for calculating the end \IMediumReference{} of the region
 \end{itemize}
 }
 {% Begründung
@@ -2033,14 +2113,14 @@ We still have the topic to update any already created \IMediumReference{}s when 
 First of all, flush iterates all \texttt{MediumAction}s in the flush plan in order and executes any \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE} operations. So this can be called the \emph{medium access phase}. In the second phase, all \texttt{MediumAction}s are iterated again, while the cache is updated, the \texttt{MediumAction}s are set to done and the \IMediumReference{}s are updated in correspondence with the changes.
 }
 {% Begründung
-Why not performing everything within the same loop, i.e. just once iterating the \texttt{MediumAction}s? This would mean to e.g. first execute an \texttt{INSERT} action, and then update all references. The problem: The flush plan might still contain READ and WRITE operations which are referring the offsets on the current medium. Calling \MediumReferenceRepository{}\texttt{.updateReferences()} already now would also update these references, and they would be pointing to the wrong bytes! Thus, we must first process all \texttt{READ} (including adding of the read bytes to the cache), \texttt{WRITE} and \texttt{TRUNCATE} operations with their original offsets. For the caching updates in terms of \texttt{INSERT}, \texttt{REPLACE} And \texttt{REMOVE}, there are additional constraints that make it necessary to do it in the second phase. These are detailled in the next design decision.
+Why not performing everything within the same loop, i.e. just once iterating the \texttt{MediumAction}s? This would mean to e.g. first execute an \texttt{INSERT} action, and then update all references. The problem: The flush plan might still contain READ and WRITE operations which are referring the offsets on the current medium. Calling \MediumReferenceRepository{}\texttt{.updateOffsets()} already now would also update these references, and they would be pointing to the wrong bytes! Thus, we must first process all \texttt{READ} (including adding of the read bytes to the cache), \texttt{WRITE} and \texttt{TRUNCATE} operations with their original offsets. For the caching updates in terms of \texttt{INSERT}, \texttt{REPLACE} And \texttt{REMOVE}, there are additional constraints that make it necessary to do it in the second phase. These are detailled in the next design decision.
 }
 {% Nachteile
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-The second part of the answer when to perform \MediumReferenceRepository{}\texttt{.updateReferences()} comes here. Some things need to be kept in mind when updating the cache, which depends on the action type:
+The second part of the answer when to perform \MediumReferenceRepository{}\texttt{.updateOffsets()} comes here. Some things need to be kept in mind when updating the cache, which depends on the action type:
 %%%% DD --> %%%%
 \DD{dd:439g}
 {% Titel
@@ -2096,9 +2176,9 @@ Now we have all credentials to implement writing in \texttt{flush()}:
 \end{itemize}
 \item \textbf{Phase 2 - Cache update phase:} Iterate all actions of the flush plan in order, but only handle the action types mentioned below in a specific way:
 \begin{itemize}
-\item If action = \texttt{INSERT}: First call \MediumChangeManager{}.\texttt{undo} on the action. If there is an existing cache region containing the insertion offset, we have to split this region now at the insertion offset. The reason is: Otherwise the already cached portion of the cached region behind the insertion offset would not be shifted by the number of insertion bytes, and the cache would get corrupted. Then call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action. Finally add the insertion bytes to the cache. Here it must be noted that, as the cache add is done after \texttt{updateReferences()}, the insertion offset was increased already before, and we must decrease it again to add the cached bytes at the original insertion offset!
-\item If action = \texttt{REMOVE}: First call \MediumChangeManager{}.\texttt{undo} on the action. Then remove the bytes in the removal region from the cache. Finally call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action.
-\item If action = \texttt{REPLACE}: First call \MediumChangeManager{}.\texttt{undo} on the action. Then remove the bytes in the replaced region from the cache. Finally call \MediumReferenceRepository{}\texttt{.updateReferences()} for the action, then add the replacement bytes to the cache.
+\item If action = \texttt{INSERT}: First call \MediumChangeManager{}.\texttt{undo} on the action. If there is an existing cache region containing the insertion offset, we have to split this region now at the insertion offset. The reason is: Otherwise the already cached portion of the cached region behind the insertion offset would not be shifted by the number of insertion bytes, and the cache would get corrupted. Then call \MediumReferenceRepository{}\texttt{.updateOffsets()} for the action. Finally add the insertion bytes to the cache. Here it must be noted that, as the cache add is done after \texttt{updateOffsets()}, the insertion offset was increased already before, and we must decrease it again to add the cached bytes at the original insertion offset!
+\item If action = \texttt{REMOVE}: First call \MediumChangeManager{}.\texttt{undo} on the action. Then remove the bytes in the removal region from the cache. Finally call \MediumReferenceRepository{}\texttt{.updateOffsets()} for the action.
+\item If action = \texttt{REPLACE}: First call \MediumChangeManager{}.\texttt{undo} on the action. Then remove the bytes in the replaced region from the cache. Finally call \MediumReferenceRepository{}\texttt{.updateOffsets()} for the action, then add the replacement bytes to the cache.
 \end{itemize}
 \end{enumerate}
 
@@ -2115,7 +2195,7 @@ The flush plan must contain all operations explicitly, i.e. including those trig
 
 Throwing an \texttt{IllegalStateException} in case of end of medium encountered is necessary, as the creation of the flush plan must have considered the medium size. Thus, if it occurs, this is either a programming error in \texttt{createFlushPlan} or another process as changed the medium meanwhile.
 
-\texttt{undo()} is only executed for user operations, as only those are maintained in the internal data structures of \MediumChangeManager{}, according to \DesLink{dd:439}. Also, \texttt{undo()} must be executed first, otherwise \texttt{updateReferences()} changes offsets which would lead to a serious problem in a \texttt{TreeSet} as used in \MediumChangeManager{} to find the correct reference with \texttt{contains}.
+\texttt{undo()} is only executed for user operations, as only those are maintained in the internal data structures of \MediumChangeManager{}, according to \DesLink{dd:439}. Also, \texttt{undo()} must be executed first, otherwise \texttt{updateOffsets()} changes offsets which would lead to a serious problem in a \texttt{TreeSet} as used in \MediumChangeManager{} to find the correct reference with \texttt{contains}.
 
 The cache update is divided into two parts as mentioned in previous design decisions.
 

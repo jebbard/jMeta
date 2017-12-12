@@ -13,6 +13,7 @@ import java.util.Comparator;
 
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
+import com.github.jmeta.library.media.api.types.MediumRegion;
 
 /**
  * {@link ShiftedMediumBlockComparator} compares two {@link ShiftedMediumBlock}s to ensure a proper execution order of
@@ -69,9 +70,16 @@ public class ShiftedMediumBlockComparator implements Comparator<ShiftedMediumBlo
       // empty (i.e.
       // INSERTs with a direct follow-up action at the same offset). If there is no such "overlap", the left block is
       // processed first if its start reference is before the one of the right block
-      if (right.getTargetRegion().contains(left.getSourceRegion().getStartOffset())
-         || right.getTargetRegion().contains(left.getSourceRegion().calculateEndOffset())
-         || right.getTargetRegion().getStartOffset().behindOrEqual(left.getSourceRegion().getStartOffset())) {
+      MediumRegion rightTargetRegion = right.getTargetRegion();
+      MediumRegion leftSourceRegion = left.getSourceRegion();
+
+      long leftEndOffset = leftSourceRegion.calculateEndOffsetAsLong();
+      long rightStartOffset = rightTargetRegion.getStartOffset().getAbsoluteMediumOffset();
+      long rightEndOffset = rightTargetRegion.calculateEndOffsetAsLong();
+
+      if (rightTargetRegion.contains(leftSourceRegion.getStartOffset())
+         || (rightStartOffset <= leftEndOffset && rightEndOffset > leftEndOffset)
+         || rightTargetRegion.getStartOffset().behindOrEqual(leftSourceRegion.getStartOffset())) {
          return -1;
       }
 

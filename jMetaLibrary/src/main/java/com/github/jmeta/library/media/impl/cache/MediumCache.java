@@ -166,14 +166,12 @@ public class MediumCache {
       List<MediumRegion> regionsInRange = new ArrayList<>();
 
       if (cachedRegionsInOffsetOrder.isEmpty()) {
-         regionsInRange.addAll(getGapsBetweenCurrentAndPreviousCachedRegion(offset, offset.advance(rangeSizeInBytes)));
+         regionsInRange.addAll(getGapsBetweenCurrentAndPreviousCachedRegion(offset, rangeSizeInBytes));
 
          return regionsInRange;
       }
 
       MediumRegion virtualRangeRegion = new MediumRegion(offset, rangeSizeInBytes);
-
-      MediumOffset endReference = virtualRangeRegion.calculateEndOffset();
 
       MediumOffset firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder.floorKey(offset);
 
@@ -212,8 +210,8 @@ public class MediumCache {
 
          // Only process cached region if it overlaps with range
          if (overlapWithRangeRegion != MediumRegionOverlapType.NO_OVERLAP) {
-            regionsInRange.addAll(
-               getGapsBetweenCurrentAndPreviousCachedRegion(previousRegionEndReference, currentRegionStartReference));
+            regionsInRange.addAll(getGapsBetweenCurrentAndPreviousCachedRegion(previousRegionEndReference,
+               currentRegionStartReference.distanceTo(previousRegionEndReference)));
 
             regionsInRange.add(currentRegion);
 
@@ -221,7 +219,8 @@ public class MediumCache {
          }
       }
 
-      regionsInRange.addAll(getGapsBetweenCurrentAndPreviousCachedRegion(previousRegionEndReference, endReference));
+      regionsInRange.addAll(getGapsBetweenCurrentAndPreviousCachedRegion(previousRegionEndReference,
+         virtualRangeRegion.calculateEndOffsetAsLong() - previousRegionEndReference.getAbsoluteMediumOffset()));
 
       return regionsInRange;
    }
@@ -261,7 +260,7 @@ public class MediumCache {
                MediumRegion nextRegion = tailRegions.get(nextReference);
 
                // Consecutive region
-               if (nextRegion.getStartOffset().equals(previousRegion.calculateEndOffset())) {
+               if (nextRegion.getStartOffset().getAbsoluteMediumOffset() == previousRegion.calculateEndOffsetAsLong()) {
                   totalCachedByteCount += nextRegion.getSize();
                } else {
                   break;
@@ -375,21 +374,21 @@ public class MediumCache {
     * 
     * @param previousRegionEndReference
     *           The start {@link MediumOffset} of the range
-    * @param currentRegionStartReference
-    *           The start {@link MediumOffset} of the range
-    * @return all uncached gap {@link MediumRegion}s in the range.
+    * @param distanceToCurrent
+    *           The distance to the current region's {@link MediumOffset}, might be negative or zero, in which case
+    *           there is no gap and an empty list is returned
+    * @return all uncached gap {@link MediumRegion}s in the range
     */
    private List<MediumRegion> getGapsBetweenCurrentAndPreviousCachedRegion(MediumOffset previousRegionEndReference,
-      MediumOffset currentRegionStartReference) {
+      long distanceToCurrent) {
 
       List<MediumRegion> gapRegions = new ArrayList<>();
 
       // Gap detected! - Determine uncached region(s) for gap
-      if (previousRegionEndReference.before(currentRegionStartReference)) {
-         int gapSizeInBytes = (int) currentRegionStartReference.distanceTo(previousRegionEndReference);
-
-         gapRegions.addAll(MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class,
-            previousRegionEndReference, gapSizeInBytes, getMaximumCacheRegionSizeInBytes(), MediumRegion::new));
+      if (distanceToCurrent > 0) {
+         gapRegions
+            .addAll(MediumRangeChunkAction.performActionOnChunksInRange(MediumRegion.class, previousRegionEndReference,
+               (int) distanceToCurrent, getMaximumCacheRegionSizeInBytes(), MediumRegion::new));
       }
 
       return gapRegions;
@@ -443,13 +442,15 @@ public class MediumCache {
 
          MediumRegionClipResult clipResult = MediumRegion.clipOverlappingRegions(leftExistingRegion, rightRegionToAdd);
 
-         MediumRegion nonOverlappingPartOfSmallerOffsetRegionAtFront = clipResult.getNonOverlappedPartOfLeftRegionAtFront();
+         MediumRegion nonOverlappingPartOfSmallerOffsetRegionAtFront = clipResult
+            .getNonOverlappedPartOfLeftRegionAtFront();
 
          if (nonOverlappingPartOfSmallerOffsetRegionAtFront != null) {
             addRegionToCache(nonOverlappingPartOfSmallerOffsetRegionAtFront);
          }
 
-         MediumRegion nonOverlappingPartOfHigherOffsetRegionAtBack = clipResult.getNonOverlappedPartOfLeftRegionAtBack();
+         MediumRegion nonOverlappingPartOfHigherOffsetRegionAtBack = clipResult
+            .getNonOverlappedPartOfLeftRegionAtBack();
 
          if (nonOverlappingPartOfHigherOffsetRegionAtBack != null) {
             addRegionToCache(nonOverlappingPartOfHigherOffsetRegionAtBack);
