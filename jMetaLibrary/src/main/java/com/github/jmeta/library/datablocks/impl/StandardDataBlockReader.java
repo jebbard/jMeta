@@ -51,6 +51,7 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
+import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -506,7 +507,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          remainingDirectParentByteCount);
 
       // If the medium is a stream-based medium, all the payload bytes must be cached first
-      if (!m_cache.getMedium().isRandomAccess()) {
+      if (!m_cache.getMedium().isRandomAccess() && totalPayloadSize != Medium.UNKNOWN_LENGTH) {
          try {
             cache(reference, totalPayloadSize);
          } catch (EndOfMediumException e) {
@@ -1013,8 +1014,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          // Workaround for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception, thus
          // bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
-         if (bytesToRead > currentReference.getMedium().getCurrentLength()
-            - currentReference.getAbsoluteMediumOffset()) {
+         if (bytesToRead == 0 || (currentReference.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
+            && bytesToRead > currentReference.getMedium().getCurrentLength()
+               - currentReference.getAbsoluteMediumOffset())) {
             bytesToRead = (int) (currentReference.getMedium().getCurrentLength()
                - currentReference.getAbsoluteMediumOffset());
          }

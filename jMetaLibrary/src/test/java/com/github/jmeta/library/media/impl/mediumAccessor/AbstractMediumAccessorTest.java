@@ -71,8 +71,8 @@ public abstract class AbstractMediumAccessorTest {
    private static byte[] EXPECTED_FILE_CONTENTS;
 
    /**
-    * Reads the contents of the {@link TestMedia#FIRST_TEST_FILE_PATH} into memory to make it available for
-    * expectation testing.
+    * Reads the contents of the {@link TestMedia#FIRST_TEST_FILE_PATH} into memory to make it available for expectation
+    * testing.
     */
    @BeforeClass
    public static void determineExpectedFileContents() {
@@ -384,6 +384,22 @@ public abstract class AbstractMediumAccessorTest {
     * Tests {@link MediumAccessor#isAtEndOfMedium()}.
     */
    @Test
+   public void isAtEndOfMedium_ifNotAtEndOfMedium_doesNotAdanceCurrentPosition() {
+
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
+      MediumOffset offsetBeforeIsAtEOM = mediumAccessor.getCurrentPosition();
+
+      mediumAccessor.isAtEndOfMedium();
+      Assert.assertEquals(offsetBeforeIsAtEOM, mediumAccessor.getCurrentPosition());
+   }
+
+   /**
+    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
+    */
+   @Test
    public void isAtEndOfMedium_ifAtEndOfMedium_returnsTrue() {
 
       MediumAccessor<?> mediumAccessor = getImplementationToTest();
@@ -399,6 +415,28 @@ public abstract class AbstractMediumAccessorTest {
       // Each call is checked twice to ensure it is repeatable (especially for streams!)
       Assert.assertEquals(true, mediumAccessor.isAtEndOfMedium());
       Assert.assertEquals(true, mediumAccessor.isAtEndOfMedium());
+   }
+
+   /**
+    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
+    */
+   @Test
+   public void isAtEndOfMedium_ifAtEndOfMedium_doesNotAdvanceCurrentPosition() {
+
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+      mediumAccessor.open();
+
+      ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
+
+      // The explicit read is only really necessary for stream media, see a similar test case without read for
+      // random-access media
+      performReadNoEOMExpected(mediumAccessor, readOverEndOfMedium);
+
+      MediumOffset offsetBeforeIsAtEOM = mediumAccessor.getCurrentPosition();
+
+      mediumAccessor.isAtEndOfMedium();
+      Assert.assertEquals(offsetBeforeIsAtEOM, mediumAccessor.getCurrentPosition());
    }
 
    /**

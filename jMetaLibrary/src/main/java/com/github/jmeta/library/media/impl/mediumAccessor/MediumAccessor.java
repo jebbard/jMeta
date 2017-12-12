@@ -23,8 +23,8 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  * distinguish two types of media for which the behavior differs correspondingly:
  * <ul>
  * <li><b>Random-access media:</b> Allow random-access to all bytes of the medium. You can use
- * {@link #setCurrentPosition(MediumOffset)} to jump to a specific {@link MediumOffset} on the medium and then
- * call {@link #read(ByteBuffer)}, {@link #write(ByteBuffer)}, {@link #truncate(MediumOffset)} or
+ * {@link #setCurrentPosition(MediumOffset)} to jump to a specific {@link MediumOffset} on the medium and then call
+ * {@link #read(ByteBuffer)}, {@link #write(ByteBuffer)}, {@link #truncate(MediumOffset)} or
  * {@link #isAtEndOfMedium(MediumOffset)}.</li>
  * <li><b>Stream-based media:</b> Doe not allow random-access but only sequential reading of medium bytes.
  * {@link #setCurrentPosition(MediumOffset)} does not have an effect, only {@link #read(ByteBuffer)} advances the
@@ -85,8 +85,8 @@ public interface MediumAccessor<T extends Medium<?>> {
     * {@link #write(ByteBuffer)} (changes by the number of written bytes) and {@link #read(ByteBuffer)} (changes by the
     * number of read bytes).
     * 
-    * For non-random-access media, calls to {@link #setCurrentPosition(MediumOffset)} do not have any effect. Only
-    * calls to {@link #read(ByteBuffer)} will change the current position for these media types.
+    * For non-random-access media, calls to {@link #setCurrentPosition(MediumOffset)} do not have any effect. Only calls
+    * to {@link #read(ByteBuffer)} will change the current position for these media types.
     * 
     * After opening an {@link MediumAccessor}, the current position always points to medium offset 0.
     * 
@@ -100,14 +100,15 @@ public interface MediumAccessor<T extends Medium<?>> {
     * e.g. to write new bytes at the indicated position.
     * 
     * @param position
-    *           The new {@link MediumOffset} position to set. May be behind the current medium length. Must refer to
-    *           the same {@link Medium} as this {@link MediumAccessor}.
+    *           The new {@link MediumOffset} position to set. May be behind the current medium length. Must refer to the
+    *           same {@link Medium} as this {@link MediumAccessor}.
     */
    public void setCurrentPosition(MediumOffset position);
 
    /**
     * Returns whether the current position as returned by {@link #getCurrentPosition()} is at end of the {@link Medium}
-    * . The method may potentially block forever as it might require reading a byte to detect end of medium.
+    * . The method may potentially block forever as it might require reading a byte to detect end of medium. This call
+    * must NOT advance the current position, no matter which medium type is used.
     * 
     * @return Returns whether the current position is at end of the {@link Medium} used
     */

@@ -22,8 +22,6 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedium> {
 
-   private static final ByteBuffer SINGLE_BYTE_BUFFER = ByteBuffer.allocate(1);
-
    private PushbackInputStream inputStream;
 
    /**
@@ -43,30 +41,25 @@ public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStrea
    public boolean isAtEndOfMedium() {
       Reject.ifFalse(isOpened(), "isOpened()");
 
+      int size = 1;
+
+      byte[] byteBuffer = new byte[size];
+
+      int returnCode = 0;
+
       try {
          int bytesRead = 0;
-         int size = SINGLE_BYTE_BUFFER.remaining();
-         int initialPosition = SINGLE_BYTE_BUFFER.position();
-
-         byte[] byteBuffer = new byte[size];
 
          while (bytesRead < size) {
-            int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
+            returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
 
             if (returnCode == -1) {
-               SINGLE_BYTE_BUFFER.limit(initialPosition + bytesRead);
-               updateCurrentPosition(getCurrentPosition().advance(bytesRead));
-               throw new EndOfMediumException(getCurrentPosition(), size, bytesRead, SINGLE_BYTE_BUFFER);
+               throw new EndOfMediumException(getCurrentPosition(), size, bytesRead, ByteBuffer.allocate(0));
             }
 
             bytesRead += returnCode;
-
-            SINGLE_BYTE_BUFFER.put(byteBuffer, SINGLE_BYTE_BUFFER.position(), bytesRead);
          }
-
-         updateCurrentPosition(getCurrentPosition().advance(bytesRead));
       } catch (EndOfMediumException e) {
-         assert e != null;
          return true;
       } catch (IOException e) {
          throw new MediumAccessException("IOException when trying to determine end of medium", e);
@@ -74,23 +67,12 @@ public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStrea
 
       finally {
          try {
-            // Only if previously a byte has been read: Unread it
-            // Cases are:
-            // - 1: Byte has been read without end of medium -> hasRemaining()
-            // returns
-            // false, limit equals capacity and position
-            // - 2: End of medium occurred -> hasRemaining() returns false,
-            // limit
-            // equals position but does not equal capacity.
-            if (SINGLE_BYTE_BUFFER.limit() == SINGLE_BYTE_BUFFER.capacity())
-               inputStream.unread(SINGLE_BYTE_BUFFER.get(0));
+            // Only if previously a byte has been read, i.e. EOM was not reached: Unread it
+            if (returnCode != -1) {
+               inputStream.unread(byteBuffer[0]);
+            }
          } catch (IOException e) {
             throw new MediumAccessException("IOException when calling PushbackInputStream.unread()", e);
-         }
-
-         finally {
-            // Reset buffer to be able to read exactly one byte
-            SINGLE_BYTE_BUFFER.clear();
          }
       }
 
@@ -131,7 +113,6 @@ public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStrea
 
          if (returnCode == -1) {
             buffer.limit(initialPosition + bytesRead);
-            // buffer.rewind();
             updateCurrentPosition(currentPosition.advance(bytesRead));
             throw new EndOfMediumException(currentPosition, size, bytesRead, buffer);
          }

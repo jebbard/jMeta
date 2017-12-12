@@ -2,7 +2,6 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -35,8 +34,7 @@ import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
-// TODO doItFirst005: write test case for "out of order" reading
-// TODO doItFirst006: field function stack won't currently work when reading "out of order" in depth -
+// TODO [OLD]: field function stack won't currently work when reading "out of order" in depth -
 // notion of data block instance ids OR saving parent IDataBlock reference...
 
 /**
@@ -44,8 +42,6 @@ import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
  * the data to read. Using the file contents, the three media types file, memory and stream are tested.
  */
 public abstract class AbtractDataBlockAccessorTest {
-
-   private final List<Medium<?>> testedMedia = new ArrayList<>();
 
    private AbstractMediumExpectationProvider expectationProvider;
 
@@ -65,7 +61,7 @@ public abstract class AbtractDataBlockAccessorTest {
 
       dataFormatRepository = ComponentRegistry.lookupService(DataFormatRepository.class);
 
-      prepareTestedMedia();
+      checkTestFile();
 
       try {
          expectationProvider = createExpectationProvider();
@@ -115,6 +111,33 @@ public abstract class AbtractDataBlockAccessorTest {
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
+   public void getContainerIterator_forWritableFileMediumWithDefaultCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+      assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, 100));
+   }
+
+   /**
+    * Tests {@link DataBlockAccessor#getContainerIterator}.
+    */
+   @Test
+   public void getContainerIterator_forWritableFileMediumWithSmallCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+      assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, 101, 7));
+   }
+
+   /**
+    * Tests {@link DataBlockAccessor#getContainerIterator}.
+    */
+   @Test
+   public void getContainerIterator_forWritableFileMediumWithRidiculouslySmallCacheAndRWBSize_returnsExpectedContainersAndFields() {
+      assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, 1, 1));
+   }
+
+   /**
+    * Tests {@link DataBlockAccessor#getContainerIterator}.
+    */
+   @Test
    public void getContainerIterator_forWritableUncachedFileMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
          createFileMedium(getFileForMediaContents(), false, 0, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
@@ -124,9 +147,9 @@ public abstract class AbtractDataBlockAccessorTest {
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
-   public void getContainerIterator_forWritableFileMediumWithDefaultCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+   public void getContainerIterator_forWritableUncachedFileMediumWithSmallRWBSize_returnsExpectedContainersAndFields() {
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createFileMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, 100));
+         createFileMedium(getFileForMediaContents(), false, 0, 19));
    }
 
    /**
@@ -156,49 +179,132 @@ public abstract class AbtractDataBlockAccessorTest {
          createInMemoryMedium(getFileForMediaContents(), false, 10));
    }
 
+   // TODO: Currently assertion fails for Multi MP3 file (expects Lyrics Tag as next container, but EOM is wrongly
+   // detected); reason: Current position of the stream medium is advanced way more than the current read offset, thus
+   // isAtEOM detects medium end - too much cache calls in between that advance the streams current position -
+   // Reading style must be adapted
    // /**
    // * Tests {@link DataBlockAccessor#getContainerIterator}.
    // */
    // @Test
    // public void
-   // getContainerIterator_forWritableFileMediumWithSmallCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
-   // assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-   // createFileMedium(getFileForMediaContents(), false, 101, 7));
+   // getContainerIterator_forInputStreamMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+   // assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(createStreamMedium(getFileForMediaContents(),
+   // Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
    // }
 
+   // TODO: Currently fails for most of the formats: Redesign of reading process necessary
    // /**
    // * Tests {@link DataBlockAccessor#getContainerIterator}.
    // */
    // @Test
    // public void
-   // getContainerIterator_forWritableFileMediumWithRidiculouslySmallCacheAndRWBSize_returnsExpectedContainersAndFields()
-   // {
+   // getContainerIterator_forInputStreamMediumWithDefaultCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
    // assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-   // createFileMedium(getFileForMediaContents(), false, 1, 1));
+   // createStreamMedium(getFileForMediaContents(), Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, 99));
+   // }
+
+   // TODO: Currently fails for most of the formats: Redesign of reading process necessary
+   // /**
+   // * Tests {@link DataBlockAccessor#getContainerIterator}.
+   // */
+   // @Test
+   // public void
+   // getContainerIterator_forInputStreamMediumWithSmallCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+   // assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+   // createStreamMedium(getFileForMediaContents(), 35, 34));
    // }
 
    /**
-    * Tests {@link DataBlockAccessor#getReverseContainerIterator(Medium, List, boolean)}.
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
     */
    @Test
-   public void test_getReverseContainerIterator() {
+   public void getReverseContainerIterator_forReadOnlyFileMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), true, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
+            Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+   }
 
-      for (int i = 0; i < testedMedia.size(); ++i) {
-         Medium<?> medium = testedMedia.get(i);
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableFileMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
+            Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+   }
 
-         // Reverse reading is supported for random access media only
-         if (medium.isRandomAccess()) {
-            AbstractDataBlockIterator<Container> topLevelContainerIterator = getTestling()
-               .getReverseContainerIterator(medium, new ArrayList<DataFormat>(), false);
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableFileMediumWithDefaultCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, 100));
+   }
 
-            Assert.assertNotNull(topLevelContainerIterator);
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableFileMediumWithSmallCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, 101, 7));
+   }
 
-            // Check the whole data block hierarchy returned for correctness
-            checkContainers(topLevelContainerIterator, null, true);
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableFileMediumWithRidiculouslySmallCacheAndRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, 1, 1));
+   }
 
-            getTestling().closeMedium(medium);
-         }
-      }
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableUncachedFileMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, 0, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+   }
+
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableUncachedFileMediumWithSmallRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createFileMedium(getFileForMediaContents(), false, 0, 19));
+   }
+
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forReadOnlyUncachedInMemoryMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createInMemoryMedium(getFileForMediaContents(), true, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+   }
+
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableUncachedInMemoryMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+   }
+
+   /**
+    * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
+    */
+   @Test
+   public void getReverseContainerIterator_forWritableUncachedInMemoryMediumWithSmallRWBSize_returnsExpectedContainersAndFields() {
+      assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
+         createInMemoryMedium(getFileForMediaContents(), false, 10));
    }
 
    /**
@@ -237,68 +343,6 @@ public abstract class AbtractDataBlockAccessorTest {
    protected abstract List<Integer> getFieldSizesForTestingLazyFields();
 
    /**
-    * Creates and returns the {@link AbstractMedium} instances used for all tests.
-    * 
-    * @param baseFile
-    *           A base file whose contents can be used to create the media.
-    * @return The {@link AbstractMedium} instances used for all tests.
-    * @throws Exception
-    *            If an exception occurs during medium creation.
-    */
-   protected List<Medium<?>> createMediaToCheck(Path baseFile) throws Exception {
-
-      List<Medium<?>> media = new ArrayList<>();
-
-      long size = Files.size(baseFile);
-
-      if (size > Integer.MAX_VALUE)
-         throw new InvalidTestDataException("Specified file " + baseFile + " is too big: " + size, null);
-
-      byte[] readMediumBytes = new byte[(int) size];
-
-      try (RandomAccessFile raf = new RandomAccessFile(baseFile.toFile(), "r")) {
-         int bytesRead = 0;
-
-         while (bytesRead < readMediumBytes.length) {
-            int readReturn = raf.read(readMediumBytes, bytesRead, readMediumBytes.length - bytesRead);
-
-            if (readReturn == -1)
-               throw new RuntimeException("Unexpected end of file");
-
-            bytesRead += readReturn;
-         }
-
-         media.add(new FileMedium(baseFile, true));
-         // TODO stage2_003: stream medium currently does not work
-         // media.add(new StreamMedium(new FileInputStream(theFile), null));
-         media.add(new InMemoryMedium(readMediumBytes, null, true));
-      }
-
-      return media;
-   }
-
-   private Medium<?> createFileMedium(Path baseFile, boolean isReadOnly, long maxCacheSize, int maxReadWriteBlockSize) {
-      return new FileMedium(baseFile, isReadOnly, maxCacheSize, maxReadWriteBlockSize);
-   }
-
-   private Medium<?> createInMemoryMedium(Path baseFile, boolean isReadOnly, int maxReadWriteBlockSize) {
-
-      byte[] byteContent = MediaTestUtility.readFileContent(baseFile);
-
-      return new InMemoryMedium(byteContent, "TestMemMedium", isReadOnly, maxReadWriteBlockSize);
-   }
-
-   private Medium<?> createStreamMedium(Path baseFile, boolean isReadOnly, long maxCacheSize,
-      int maxReadWriteBlockSize) {
-      try {
-         return new InputStreamMedium(new FileInputStream(baseFile.toFile()), "TestStreamMedium", maxCacheSize,
-            maxReadWriteBlockSize);
-      } catch (FileNotFoundException e) {
-         throw new RuntimeException("Could not create FileInputStream for path <" + baseFile + ">", e);
-      }
-   }
-
-   /**
     * Returns a single {@link Path} object that contains the relevant base data from which the data blocks are read. The
     * data from the {@link Path} is taken by this class and converted to several {@link AbstractMedium} instances
     * finally tested.
@@ -317,6 +361,41 @@ public abstract class AbtractDataBlockAccessorTest {
    protected abstract AbstractMediumExpectationProvider createExpectationProvider()
       throws InvalidTestDataCsvFormatException;
 
+   /**
+    * Creates a {@link FileMedium}.
+    */
+   private Medium<?> createFileMedium(Path baseFile, boolean isReadOnly, long maxCacheSize, int maxReadWriteBlockSize) {
+      return new FileMedium(baseFile, isReadOnly, maxCacheSize, maxReadWriteBlockSize);
+   }
+
+   /**
+    * Creates an {@link InMemoryMedium}.
+    */
+   private Medium<?> createInMemoryMedium(Path baseFile, boolean isReadOnly, int maxReadWriteBlockSize) {
+
+      byte[] byteContent = MediaTestUtility.readFileContent(baseFile);
+
+      return new InMemoryMedium(byteContent, "TestMemMedium", isReadOnly, maxReadWriteBlockSize);
+   }
+
+   /**
+    * Creates an {@link InputStreamMedium}.
+    */
+   private Medium<?> createStreamMedium(Path baseFile, long maxCacheSize, int maxReadWriteBlockSize) {
+      try {
+         return new InputStreamMedium(new FileInputStream(baseFile.toFile()), "TestStreamMedium", maxCacheSize,
+            maxReadWriteBlockSize);
+      } catch (FileNotFoundException e) {
+         throw new RuntimeException("Could not create FileInputStream for path <" + baseFile + ">", e);
+      }
+   }
+
+   /**
+    * Checks {@link DataBlockAccessor#getContainerIterator(Medium, List, boolean)} for a given medium.
+    * 
+    * @param medium
+    *           The medium to check
+    */
    private void assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
       AbstractDataBlockIterator<Container> topLevelContainerIterator = getTestling().getContainerIterator(medium,
          new ArrayList<DataFormat>(), false);
@@ -325,6 +404,24 @@ public abstract class AbtractDataBlockAccessorTest {
 
       // Check the whole data block hierarchy returned for correctness
       checkContainers(topLevelContainerIterator, null, false);
+
+      getTestling().closeMedium(medium);
+   }
+
+   /**
+    * Checks {@link DataBlockAccessor#getReverseContainerIterator(Medium, List, boolean)} for a given medium.
+    * 
+    * @param medium
+    *           The medium to check
+    */
+   private void assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
+      AbstractDataBlockIterator<Container> topLevelReverseContainerIterator = getTestling()
+         .getReverseContainerIterator(medium, new ArrayList<DataFormat>(), false);
+
+      Assert.assertNotNull(topLevelReverseContainerIterator);
+
+      // Check the whole data block hierarchy returned for correctness
+      checkContainers(topLevelReverseContainerIterator, null, true);
 
       getTestling().closeMedium(medium);
    }
@@ -362,7 +459,8 @@ public abstract class AbtractDataBlockAccessorTest {
       for (int j = 0; j < expectedIds.size(); ++j) {
          DataBlockInstanceId expectedContainerId = expectedIds.get(j);
 
-         Assert.assertTrue(containerIterator.hasNext());
+         Assert.assertTrue("Expected next container with id <" + expectedContainerId + "> within parent of id <"
+            + parentInstanceId + ">, but containerIterator.hasNext() returned false.", containerIterator.hasNext());
 
          // Check container itself
          Container nextContainer = containerIterator.next();
@@ -631,19 +729,11 @@ public abstract class AbtractDataBlockAccessorTest {
    /**
     * Creates the {@link AbstractMedium} instances to be tested by the super class.
     */
-   private void prepareTestedMedia() {
+   private void checkTestFile() {
 
       Path theFile = getFileForMediaContents();
 
       if (theFile == null || !Files.exists(theFile))
          throw new InvalidTestDataException("Invalid file returned by method getFileForMediaContents", null);
-
-      try {
-         List<Medium<?>> media = createMediaToCheck(theFile);
-
-         testedMedia.addAll(media);
-      } catch (Exception e) {
-         throw new RuntimeException("Unexpected exception during medium preparation", e);
-      }
    }
 }
