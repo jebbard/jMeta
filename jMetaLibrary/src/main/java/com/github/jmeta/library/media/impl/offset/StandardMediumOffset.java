@@ -16,8 +16,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link StandardMediumOffset} refers to a specific offset on a {@link Medium}.
  * 
  * It refers to a position of byte N on {@link Medium} X, N >= 0, and therefore gives a globally unique address of each
- * medium byte. {@link StandardMediumOffset} referring to the same {@link Medium} can be compared as to which
- * position is before, equal or behind another one.
+ * medium byte. {@link StandardMediumOffset} referring to the same {@link Medium} can be compared as to which position
+ * is before, equal or behind another one.
  */
 public class StandardMediumOffset implements MediumOffset {
 
@@ -33,8 +33,8 @@ public class StandardMediumOffset implements MediumOffset {
     * @param medium
     *           The {@link Medium} to refer to.
     * @param absoluteMediumOffset
-    *           The absolute offset in the {@link Medium}, relative to its starting point which is offset 0. Must not
-    *           be smaller than 0.
+    *           The absolute offset in the {@link Medium}, relative to its starting point which is offset 0. Must not be
+    *           smaller than 0.
     */
    public StandardMediumOffset(Medium<?> medium, long absoluteMediumOffset) {
 
@@ -68,8 +68,7 @@ public class StandardMediumOffset implements MediumOffset {
    public boolean before(MediumOffset other) {
 
       Reject.ifNull(other, "other");
-      Reject.ifFalse(getMedium().equals(other.getMedium()),
-	   	         "getMedium().equals(other.getMedium())");
+      Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
 
       return getAbsoluteMediumOffset() < other.getAbsoluteMediumOffset();
    }
@@ -81,8 +80,7 @@ public class StandardMediumOffset implements MediumOffset {
    public boolean behindOrEqual(MediumOffset other) {
 
       Reject.ifNull(other, "other");
-      Reject.ifFalse(getMedium().equals(other.getMedium()),
-	   	         "getMedium().equals(other.getMedium())");
+      Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
 
       return getAbsoluteMediumOffset() >= other.getAbsoluteMediumOffset();
    }
@@ -94,8 +92,7 @@ public class StandardMediumOffset implements MediumOffset {
    public long distanceTo(MediumOffset other) {
 
       Reject.ifNull(other, "other");
-      Reject.ifFalse(getMedium().equals(other.getMedium()),
-	   	         "getMedium().equals(other.getMedium())");
+      Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
 
       return getAbsoluteMediumOffset() - other.getAbsoluteMediumOffset();
    }
@@ -171,9 +168,8 @@ public class StandardMediumOffset implements MediumOffset {
    }
 
    /**
-    * Sets the {@link MediumOffsetFactory} this {@link MediumOffset} belongs to. Whenever the
-    * {@link #advance(long)} method is called, the advanced {@link MediumOffset} instance is added to this
-    * {@link MediumOffsetFactory}.
+    * Sets the {@link MediumOffsetFactory} this {@link MediumOffset} belongs to. Whenever the {@link #advance(long)}
+    * method is called, the advanced {@link MediumOffset} instance is added to this {@link MediumOffsetFactory}.
     * 
     * @param factory
     *           The {@link MediumOffsetFactory} to add this {@link MediumOffset} to.
@@ -189,12 +185,12 @@ public class StandardMediumOffset implements MediumOffset {
     * Sets a new absolute medium offset for this {@link StandardMediumOffset}.
     * 
     * @param absoluteMediumOffset
-    *           The absolute offset in the {@link Medium}, relative to its starting point which is offset 0. Must not
-    *           be smaller than 0.
+    *           The absolute offset in the {@link Medium}, relative to its starting point which is offset 0. Must not be
+    *           smaller than 0.
     */
    void setAbsoluteMediumOffset(long absoluteMediumOffset) {
 
-	   Reject.ifNegative(absoluteMediumOffset, "absoluteMediumOffset");
+      Reject.ifNegative(absoluteMediumOffset, "absoluteMediumOffset");
 
       this.absoluteMediumOffset = absoluteMediumOffset;
    }

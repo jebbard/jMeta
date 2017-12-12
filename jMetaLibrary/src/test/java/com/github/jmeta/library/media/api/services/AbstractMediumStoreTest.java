@@ -32,8 +32,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
-import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
@@ -1031,7 +1031,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * Tests {@link MediumStore#flush()} CF 8b (see Design Concept).
     */
    @Test
-   public void flush_forFilledWritableMedium_CF8bReplaceThanInsertAtSameOffset_writesCorrectData() {
+   public void flush_forFilledWritableMedium_CF8bReplaceThenInsertAtSameOffset_writesCorrectData() {
       mediumStoreUnderTest = createDefaultFilledMediumStore();
 
       Assume.assumeTrue(!mediumStoreUnderTest.getMedium().isReadOnly());
@@ -1275,9 +1275,9 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    protected abstract T createEmptyMedium(String testMethodName) throws IOException;
 
    /**
-    * Creates a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed or not
-    * backed by a cache with the given maximum cache and cache region size as well as the given maximum read write block
-    * size. Implementing test classes who's medium type does not support caching must return null.
+    * Creates a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed or not backed by
+    * a cache with the given maximum cache and cache region size as well as the given maximum read write block size.
+    * Implementing test classes who's medium type does not support caching must return null.
     * 
     * For writable media, be sure to only return a copy of the original medium such that the original medium is not
     * modified by writing tests and all tests remain repeatable.

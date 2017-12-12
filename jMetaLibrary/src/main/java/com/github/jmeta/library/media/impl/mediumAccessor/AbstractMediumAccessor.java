@@ -46,6 +46,9 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 
       this.isOpened = false;
       this.medium = medium;
+      // NOTE: We are intentionally using an "unmanaged" MediumOffset here, means it won't change by updating offsets
+      // during a flush. This avoids a direct dependency to MediumOffsetFactory as well as unexpected changes for
+      // outside users
       updateCurrentPosition(new StandardMediumOffset(getMedium(), 0));
    }
 
