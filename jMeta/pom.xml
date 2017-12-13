@@ -181,6 +181,7 @@
 		<module>../jMetaDefaultExtensionIntegrationTests</module>
 		<module>../jMetaUtility</module>
 		<module>../jMetaTools</module>
+		<module>../jMetaDocs</module>
 	</modules>
 
 

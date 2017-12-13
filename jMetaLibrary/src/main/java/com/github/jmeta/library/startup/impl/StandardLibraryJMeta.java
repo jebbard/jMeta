@@ -219,12 +219,12 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 
       String jMetaGreetings = LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR
          + "[=================================================================]" + LoggingConstants.LINE_SEPARATOR
-         + "[                   __    ___   __        _                       ]" + LoggingConstants.LINE_SEPARATOR
-         + "[         ##       |__|  /   \\/  | _____| |_ ______     ##       ]" + LoggingConstants.LINE_SEPARATOR
-         + "[        ####   _______ / /| / \\ |/ __|_   _/  _   |   ####      ]" + LoggingConstants.LINE_SEPARATOR
-         + "[       ######  |____  | / | |  | |  ___|| |_| (_)  |  ######     ]" + LoggingConstants.LINE_SEPARATOR
-         + "[        ####    ____| |/  |_|  |_|\\___/|___\\_/\\_|   ####      ]" + LoggingConstants.LINE_SEPARATOR
-         + "[         ##     \\____/                                 ##       ]" + LoggingConstants.LINE_SEPARATOR
+         + "[                   __    ___   _        _                        ]" + LoggingConstants.LINE_SEPARATOR
+         + "[         ##       |__|  /   \\/ | _____| |_ ______     ##        ]" + LoggingConstants.LINE_SEPARATOR
+         + "[        ####   _______ / /| /\\ |/ __|_   _/  _   |   ####       ]" + LoggingConstants.LINE_SEPARATOR
+         + "[       ######  |____  | / | | | |  ___|| |_| (_)  |  ######      ]" + LoggingConstants.LINE_SEPARATOR
+         + "[        ####    ____| |/  |_| |_|\\___/|___\\_/\\_|   ####       ]" + LoggingConstants.LINE_SEPARATOR
+         + "[         ##     \\____/                                ##        ]" + LoggingConstants.LINE_SEPARATOR
          + "[                                                                 ]" + LoggingConstants.LINE_SEPARATOR
          + "[    _________________________________________________________    ]" + LoggingConstants.LINE_SEPARATOR
          + "[                                                                 ]" + LoggingConstants.LINE_SEPARATOR
