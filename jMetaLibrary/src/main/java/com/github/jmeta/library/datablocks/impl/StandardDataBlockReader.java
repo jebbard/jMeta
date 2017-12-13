@@ -96,7 +96,6 @@ public class StandardDataBlockReader implements DataBlockReader {
     * @param spec
     * @param transformationHandlers
     * @param maxFieldBlockSize
-    * @param logging
     */
    public StandardDataBlockReader(DataFormatSpecification spec,
       Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {
@@ -603,7 +602,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setMediumCache(com.github.jmeta.library.media.api.OLD.IMediumStore_OLD)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setMediumCache(MediumStore)
     */
    @Override
    public void setMediumCache(MediumStore cache) {

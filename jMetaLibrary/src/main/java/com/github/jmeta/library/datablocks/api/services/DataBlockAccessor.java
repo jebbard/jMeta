@@ -41,8 +41,8 @@ public interface DataBlockAccessor {
     *           false if the default behavior should be chosen.
     * @return the {@link Iterator} for iterating all the top-level {@link DataBlock}s of the {@link AbstractMedium}.
     */
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium,
-      List<DataFormat> dataFormatHints, boolean forceMediumReadOnly);
+   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints,
+      boolean forceMediumReadOnly);
 
    /**
     * @param medium
@@ -86,7 +86,6 @@ public interface DataBlockAccessor {
     * @param dataFormat
     * @param transformationType
     * @param handler
-    * @pre {@link DataTransformationType#isBuiltIn()} == false
     */
    public void setTransformationHandler(DataFormat dataFormat, DataTransformationType transformationType,
       TransformationHandler handler);

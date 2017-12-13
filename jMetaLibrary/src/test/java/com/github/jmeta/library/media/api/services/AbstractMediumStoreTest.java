@@ -1308,6 +1308,9 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * AFTER the closing of the medium (to get the changed content), otherwise you might run into exception because the
     * medium is still locked by the {@link MediumStore} and it cannot be accessed.
     * 
+    * @param medium
+    *           The medium to use
+    * 
     * @return the current content of the filled {@link Medium}
     */
    protected abstract String getMediumContentAsString(T medium);
@@ -1424,14 +1427,14 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
    /**
     * Tests {@link MediumStore#getData(MediumOffset, int)} to throw an end of medium exception when reaching it.
     * 
+    * @param getDataOffset
+    *           The offset to use for the method call
     * @param getDataSize
     *           The size to use for the method call
     * @param chunkSizeToUse
     *           The size of the read-write block chunks
     * @param currentMediumContent
     *           The current content of the medium
-    * @param getDataStartOffset
-    *           The offset to use for the method call
     */
    protected void testGetData_throwsEndOfMediumException(MediumOffset getDataOffset, int getDataSize,
       int chunkSizeToUse, String currentMediumContent) {
@@ -1470,6 +1473,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     *           The offset to use
     * @param byteCount
     *           The number of bytes to cache
+    * 
+    * @return The result data
     */
    protected ByteBuffer getDataNoEOMExpected(MediumOffset offset, int byteCount) {
       try {
@@ -1650,10 +1655,10 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     * Tests {@link MediumStore#flush()} to write changes as expected and to undo all given actions
     * 
     * IMPORTANT NOTE: This method must only be used for action offsets that are increasing, i.e. actions with index i in
-    * the specified array must have equal or bigger start offset than actions with offset j, if j > i. I.e. all actions
-    * in the specified array must be sorted in offset order, and they are also executed this way. If you test cases
-    * where the execution order differs from the offset order (which is allowed), this method MUST NOT be used. Use
-    * {@link #testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(MediumAction...)} instead.
+    * the specified array must have equal or bigger start offset than actions with offset j, if j &gt; i. I.e. all
+    * actions in the specified array must be sorted in offset order, and they are also executed this way. If you test
+    * cases where the execution order differs from the offset order (which is allowed), this method MUST NOT be used.
+    * Use {@link #testFlushWithComplexChangeSet_writesExpectedDataAndUndosActions(Path, MediumAction...)} instead.
     * 
     * @param actionsInOffsetAndExecutionOrder
     *           The {@link MediumAction}s to apply in the given order; they are also used to derive the expectations for

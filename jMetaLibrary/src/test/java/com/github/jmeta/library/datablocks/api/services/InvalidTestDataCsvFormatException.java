@@ -9,13 +9,13 @@
 package com.github.jmeta.library.datablocks.api.services;
 
 /**
- * {@link InvalidTestDataCsvFormatException} is thrown by {@link CsvFileDataFormatExpectationProvider} in case of
- * erroneous csv test data.
+ * {@link InvalidTestDataCsvFormatException} is thrown by {@link CsvFileMediumExpectationProvider} in case of erroneous
+ * csv test data.
  */
 public class InvalidTestDataCsvFormatException extends Exception {
 
    /**
-    * Creates a new {@InvalidTestDataCsvFormatException}.
+    * Creates a new {@link InvalidTestDataCsvFormatException}.
     * 
     * @param message
     *           The message.

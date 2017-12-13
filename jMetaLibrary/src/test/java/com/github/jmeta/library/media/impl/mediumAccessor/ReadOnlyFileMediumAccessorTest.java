@@ -17,7 +17,7 @@ import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.FileMedium;
 
 /**
- * Tests the class {@FileMediumAccessor} for a read-only medium.
+ * Tests the class {@link FileMediumAccessor} for a read-only medium.
  */
 public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 

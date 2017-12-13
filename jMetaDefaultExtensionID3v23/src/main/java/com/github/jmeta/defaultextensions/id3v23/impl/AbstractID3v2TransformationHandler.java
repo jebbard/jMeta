@@ -22,7 +22,6 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
     * @param dtt
     * @param handlerId
     * @param dbFactory
-    * @param logging
     */
    public AbstractID3v2TransformationHandler(DataTransformationType dtt, int handlerId, DataBlockFactory dbFactory) {
       super(dtt, dbFactory);

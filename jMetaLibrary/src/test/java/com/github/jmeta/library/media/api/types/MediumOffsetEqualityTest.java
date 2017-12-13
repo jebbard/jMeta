@@ -14,11 +14,12 @@ import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
+import com.github.jmeta.library.media.impl.offset.StandardMediumOffsetTest;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
- * {@link MediumOffsetEqualityTest} tests the {@link StandardMediumOffset} class (and its interface
- * {@link MediumOffset} for its implementation of {@link #equals(Object)} and {@link #hashCode()}.
+ * {@link MediumOffsetEqualityTest} tests the {@link StandardMediumOffset} class (and its interface {@link MediumOffset}
+ * for its implementation of {@link #equals(Object)} and {@link #hashCode()}.
  */
 public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
 
@@ -65,6 +66,8 @@ public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
    /**
     * Creates a {@link List} of {@link MediumOffset}s for the given {@link List} of {@link Medium} instances.
     * 
+    * @param media
+    *           The media to use
     * @param baseOffset
     *           The base offset of the absolute medium offsets.
     * 
@@ -83,8 +86,8 @@ public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
 
       // Create some more references with equal medium, using the passed offset
       for (int i = 0; i < 3; ++i) {
-         mediumReferences.add(new StandardMediumOffset(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false),
-            baseOffset + i * 10));
+         mediumReferences
+            .add(new StandardMediumOffset(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false), baseOffset + i * 10));
       }
 
       return mediumReferences;
@@ -92,6 +95,8 @@ public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
 
    /**
     * Creates the media for equality testing.
+    * 
+    * @return the equal media
     */
    private List<Medium<?>> createMedia() {
 
@@ -108,6 +113,8 @@ public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
 
    /**
     * Creates the media different to what {@link #createMedia()} returns for equality testing.
+    * 
+    * @return The different media
     */
    private List<Medium<?>> createDifferentMedia() {
 

@@ -18,7 +18,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * It removes the burden of creating {@link MediumRegion}s for the correct medium with the correct references from the
  * test automater by just working with plain offsets. It furthermore accumulates the (expected) total cache size and
  * provides the helper method {@link #getAllCachedRegionsWithGaps()} for testing
- * {@link MediumCache#getRegionsInRange(com.github.jmeta.library.media.api.IMediumReference, int)}. You can build the
+ * {@link MediumCache#getRegionsInRange(com.github.jmeta.library.media.api.types.MediumOffset, int)}. You can build the
  * {@link MediumCache} instance for testing from the {@link TestCacheBuilder} using the method
  * {@link #buildCache(long, int)}.
  * 
@@ -454,12 +454,13 @@ class TestCacheBuilder {
     * @param originalRegionInfo
     *           The {@link TestCacheRegionInfo} to trim.
     * 
-    * @param bytesToRemoveFromEnd
+    * @param bytesToRemove
     *           Number of bytes to trim away at the front or end of the original existing region, must not be negative
     *           or zero. Must not be bigger than the original region info's size minus 1.
     * @param originalByteCopyStartIndex
     *           The byte array index in the original region info bytes to start copying. This influences if trimming
     *           happens at front or back of the region.
+    * @return The trimmed {@link TestCacheRegionInfo}
     */
    private TestCacheRegionInfo trimRegionInfo(TestCacheRegionInfo originalRegionInfo, int bytesToRemove,
       int originalByteCopyStartIndex) {

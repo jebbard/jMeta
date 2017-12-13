@@ -35,7 +35,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium(com.github.jmeta.library.media.api.types.MediumOffset)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium()
     */
    @Override
    public boolean isAtEndOfMedium() {
@@ -61,8 +61,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(MediumOffset,
-    *      ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(ByteBuffer)
     */
    @Override
    protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
@@ -97,8 +96,7 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(MediumOffset,
-    *      ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(ByteBuffer)
     */
    @Override
    protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {

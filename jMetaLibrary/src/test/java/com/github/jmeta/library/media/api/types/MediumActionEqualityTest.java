@@ -26,7 +26,7 @@ public class MediumActionEqualityTest extends AbstractEqualsTest<MediumAction> {
    private static final FileMedium MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getObjects()
     */
    @Override
    protected List<MediumAction> getObjects() {
@@ -39,14 +39,14 @@ public class MediumActionEqualityTest extends AbstractEqualsTest<MediumAction> {
          122, null));
       objects.add(new MediumAction(MediumActionType.INSERT,
          new MediumRegion(new StandardMediumOffset(MEDIUM, 0), DEFAULT_BYTES.remaining()), 12, DEFAULT_BYTES));
-      objects.add(new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 9), 22, DEFAULT_BYTES));
+      objects.add(new MediumAction(MediumActionType.REPLACE, new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 9),
+         22, DEFAULT_BYTES));
 
       return objects;
    }
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getEqualObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getEqualObjects()
     */
    @Override
    protected List<MediumAction> getEqualObjects() {
@@ -55,7 +55,7 @@ public class MediumActionEqualityTest extends AbstractEqualsTest<MediumAction> {
    }
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getDifferentObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getDifferentObjects()
     */
    @Override
    protected List<MediumAction> getDifferentObjects() {
@@ -72,14 +72,14 @@ public class MediumActionEqualityTest extends AbstractEqualsTest<MediumAction> {
       objects.add(new MediumAction(MediumActionType.INSERT,
          new MediumRegion(new StandardMediumOffset(MEDIUM, 0), DEFAULT_BYTES.remaining()), 22, DEFAULT_BYTES));
       // Different replacement byte count
-      objects.add(new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 11), 22, DEFAULT_BYTES));
+      objects.add(new MediumAction(MediumActionType.REPLACE, new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 11),
+         22, DEFAULT_BYTES));
 
       return objects;
    }
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getThirdEqualObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getThirdEqualObjects()
     */
    @Override
    protected List<MediumAction> getThirdEqualObjects() {

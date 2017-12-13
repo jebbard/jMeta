@@ -64,8 +64,6 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
    /**
     * Creates a new {@link StandardDataBlockAccessor}.
-    * 
-    * @param registry
     */
    public StandardDataBlockAccessor() {
 
@@ -111,12 +109,6 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       LOGGER.info(LoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
    }
 
-   /**
-    * @param dataBlocksExtensions
-    * @param bundleType
-    * @param bundle
-    * @param logging
-    */
    private void addDataBlockExtensions(Extension iExtension2, DataBlockService dataBlocksExtensions) {
 
       DataFormat format = dataBlocksExtensions.getDataFormat();

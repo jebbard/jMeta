@@ -47,7 +47,7 @@ public class MediumRegion {
        * same offset and the right region is bigger than the left on, i.e. cases where also
        * {@link MediumRegion#overlapsOtherRegionAtFront(MediumRegion)} would return true. In the case that the left
        * {@link MediumRegion} starts or ends at the same offset as the right {@link MediumRegion},
-       * {@link MediumRegion#determineOverlapWithOtherRegion(MediumRegion, MediumRegion)} returns
+       * {@link MediumRegion#determineRegionOverlap(MediumRegion, MediumRegion)} returns
        * {@link #LEFT_FULLY_INSIDE_RIGHT}, and not {@link #LEFT_OVERLAPS_RIGHT_AT_FRONT} or
        * {@link #LEFT_OVERLAPS_RIGHT_AT_BACK}.
        */

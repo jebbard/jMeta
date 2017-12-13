@@ -21,7 +21,7 @@ import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.FileMedium;
 
 /**
- * Tests the class {@FileMediumAccessor} for a writable medium.
+ * Tests the class {@link FileMediumAccessor} for a writable medium.
  */
 public class WritableFileMediumAccessorTest extends AbstractWritableRandomAccessMediumAccessorTest {
 

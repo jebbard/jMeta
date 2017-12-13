@@ -12,16 +12,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.github.jmeta.library.dataformats.api.types.BitAddressXXXTest;
-import com.github.jmeta.library.dataformats.api.types.FlagSpecificationXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags1ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags2ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags3ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags4ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags5ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags6ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags7ByteXXXTest;
-import com.github.jmeta.library.dataformats.api.types.Flags8ByteXXXTest;
+import com.github.jmeta.library.dataformats.api.types.BitAddressEqualityTest;
+import com.github.jmeta.library.dataformats.api.types.FlagSpecificationTest;
+import com.github.jmeta.library.dataformats.api.types.Flags1ByteTest;
+import com.github.jmeta.library.dataformats.api.types.Flags2ByteTest;
+import com.github.jmeta.library.dataformats.api.types.Flags3ByteTest;
+import com.github.jmeta.library.dataformats.api.types.Flags4ByteTest;
+import com.github.jmeta.library.dataformats.api.types.Flags5ByteTest;
+import com.github.jmeta.library.dataformats.api.types.Flags6ByteTest;
+import com.github.jmeta.library.dataformats.api.types.Flags7ByteTest;
+import com.github.jmeta.library.dataformats.api.types.Flags8ByteTest;
 import com.github.jmeta.library.dataformats.api.types.FlagsMultibitTest;
 import com.github.jmeta.library.media.AllMediaTests;
 
@@ -29,9 +29,9 @@ import com.github.jmeta.library.media.AllMediaTests;
  * {@link AlljMetaLibraryTests} is used for running all test cases of the extension management component.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ AllMediaTests.class, BitAddressXXXTest.class, Flags1ByteXXXTest.class, Flags2ByteXXXTest.class,
-   Flags3ByteXXXTest.class, Flags4ByteXXXTest.class, Flags5ByteXXXTest.class, Flags6ByteXXXTest.class,
-   Flags7ByteXXXTest.class, Flags8ByteXXXTest.class, FlagSpecificationXXXTest.class, FlagsMultibitTest.class, })
+@SuiteClasses({ AllMediaTests.class, BitAddressEqualityTest.class, Flags1ByteTest.class, Flags2ByteTest.class,
+   Flags3ByteTest.class, Flags4ByteTest.class, Flags5ByteTest.class, Flags6ByteTest.class,
+   Flags7ByteTest.class, Flags8ByteTest.class, FlagSpecificationTest.class, FlagsMultibitTest.class, })
 public class AlljMetaLibraryTests {
    // Nothing necessary here
 }

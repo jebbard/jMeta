@@ -67,8 +67,9 @@ public class MediumCacheTest {
    private static final byte DEFAULT_FILL_BYTE = -13;
 
    /**
-    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()}
-    * , {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
+    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.types.Medium)},
+    * {@link MediumCache#getMedium()} , {@link MediumCache#getMaximumCacheSizeInBytes()} and
+    * {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
     */
    @Test
    public void constructor_initializesMediumAndDefaultSizesCorrectly() {
@@ -80,8 +81,9 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()}
-    * , {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
+    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.types.Medium, long, int)},
+    * {@link MediumCache#getMedium()} , {@link MediumCache#getMaximumCacheSizeInBytes()} and
+    * {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
     */
    @Test
    public void constructor_initializesMediumAndSizesCorrectly() {
@@ -96,8 +98,9 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.IMedium)}, {@link MediumCache#getMedium()}
-    * , {@link MediumCache#getMaximumCacheSizeInBytes()} and {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
+    * Tests {@link MediumCache#MediumCache(com.github.jmeta.library.media.api.types.Medium, long, int)},
+    * {@link MediumCache#getMedium()} , {@link MediumCache#getMaximumCacheSizeInBytes()} and
+    * {@link MediumCache#getMaximumCacheRegionSizeInBytes()}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void constructor_forMaxCacheSizeSmallerThanMaxRegionSize_throwsException() {
@@ -202,7 +205,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void getCachedByteCountAt_forInvalidReference_throwsException() {
@@ -211,7 +214,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_forEmptyCache_returnsZero() {
@@ -222,7 +225,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_forFilledCacheButWithOffsetOutsideRegions_returnsZero() {
@@ -236,7 +239,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_endOfLastConsecutiveRegion_returnsZero() {
@@ -252,7 +255,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_startOfRegionWithConsecutiveRegions_returnsTotalSizeOfAllConsecutiveRegions() {
@@ -269,7 +272,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_endOfRegionWithConsecutiveRegions_returnsTotalSizeOfSubsequentRegions() {
@@ -286,7 +289,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_middleOfRegionWithConsecutiveRegions_returnsCorrectTotalConsecutiveByteCount() {
@@ -304,7 +307,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#getCachedByteCountAt(IMediumReference)()}.
+    * Tests {@link MediumCache#getCachedByteCountAt(MediumOffset)}.
     */
    @Test
    public void getCachedByteCountAt_middleOfLastConsecutiveRegion_returnsRemainingLastRegionSize() {
@@ -1017,7 +1020,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromFilledCache_exactlyCoveringSingleCachedRegion_removesEntireRegion() {
@@ -1033,12 +1036,12 @@ public class MediumCacheTest {
 
       int bytesActuallyRemoved = existingRegion1.getSize();
 
-      testRemoveRegionsInRange(defaultCacheBuilder, maxCacheRegionSize, 0, 0, bytesActuallyRemoved,
+      testRemoveRegionsInRange(defaultCacheBuilder, 0, 0, maxCacheRegionSize, bytesActuallyRemoved,
          new MediumRegion(rangeToRemoveStartOffset, rangeToRemoveSize));
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromFilledCache_exactlyCoveringMultipleCachedRegions_removesEntireRegions() {
@@ -1058,13 +1061,13 @@ public class MediumCacheTest {
 
       int bytesActuallyRemoved = rangeToRemoveSize;
 
-      testRemoveRegionsInRange(defaultCacheBuilder, maxCacheRegionSize, 0, 0, bytesActuallyRemoved,
+      testRemoveRegionsInRange(defaultCacheBuilder, 0, 0, maxCacheRegionSize, bytesActuallyRemoved,
          new MediumRegion(rangeToRemoveStartOffset, maxCacheRegionSize), new MediumRegion(
             rangeToRemoveStartOffset.advance(maxCacheRegionSize), rangeToRemoveSize - maxCacheRegionSize));
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromFilledCache_coveringAndPartlyOverlappingMultipleCachedRegionsWithGaps_removesEntireRegionsAndPartlyCoveredOnes() {
@@ -1087,7 +1090,7 @@ public class MediumCacheTest {
 
       MediumRegion[] splitRegions = lastExistingRegion.split(rangeToRemoveStartOffset.advance(rangeToRemoveSize));
 
-      testRemoveRegionsInRange(defaultCacheBuilder, maxCacheRegionSize, 0, keepAtEnd, bytesActuallyRemoved,
+      testRemoveRegionsInRange(defaultCacheBuilder, 0, keepAtEnd, maxCacheRegionSize, bytesActuallyRemoved,
          new MediumRegion(rangeToRemoveStartOffset, maxCacheRegionSize),
          new MediumRegion(rangeToRemoveStartOffset.advance(maxCacheRegionSize), maxCacheRegionSize),
          new MediumRegion(rangeToRemoveStartOffset.advance(2 * maxCacheRegionSize), maxCacheRegionSize),
@@ -1095,7 +1098,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromFilledCache_overlappingSingleCachedRegionAtBack_splitsRegionAndOnlyRemovesBackPart() {
@@ -1115,12 +1118,12 @@ public class MediumCacheTest {
 
       MediumRegion[] splitRegions = existingRegion1.split(rangeToRemoveStartOffset);
 
-      testRemoveRegionsInRange(defaultCacheBuilder, maxCacheRegionSize, keepAtStart, 0, bytesActuallyRemoved,
+      testRemoveRegionsInRange(defaultCacheBuilder, keepAtStart, 0, maxCacheRegionSize, bytesActuallyRemoved,
          splitRegions[0], new MediumRegion(rangeToRemoveStartOffset, rangeToRemoveSize));
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromFilledCache_overlappingSingleCachedRegionAtFront_splitsRegionAndOnlyRemovesFrontPart() {
@@ -1140,12 +1143,12 @@ public class MediumCacheTest {
 
       MediumRegion[] splitRegions = existingRegion1.split(rangeToRemoveStartOffset.advance(rangeToRemoveSize));
 
-      testRemoveRegionsInRange(defaultCacheBuilder, maxCacheRegionSize, 0, keepAtBack, bytesActuallyRemoved,
+      testRemoveRegionsInRange(defaultCacheBuilder, 0, keepAtBack, maxCacheRegionSize, bytesActuallyRemoved,
          new MediumRegion(rangeToRemoveStartOffset, rangeToRemoveSize), splitRegions[1]);
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromFilledCache_insideSingleCachedRegion_splitsRegionAndOnlyRemovesInnerPart() {
@@ -1166,13 +1169,13 @@ public class MediumCacheTest {
 
       MediumRegion[] splitRegions = existingRegion1.split(rangeToRemoveStartOffset);
 
-      testRemoveRegionsInRange(defaultCacheBuilder, maxCacheRegionSize, keepAtStart, keepAtEnd, bytesActuallyRemoved,
+      testRemoveRegionsInRange(defaultCacheBuilder, keepAtStart, keepAtEnd, maxCacheRegionSize, bytesActuallyRemoved,
          splitRegions[0], new MediumRegion(rangeToRemoveStartOffset, rangeToRemoveSize),
          splitRegions[1].split(rangeToRemoveStartOffset.advance(rangeToRemoveSize))[1]);
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromFilledCache_inUncachedRange_doesNotChangeCacheSize() {
@@ -1192,7 +1195,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test
    public void removeRegionsInRange_fromEmptyCache_anyRange_doesNotChangeCacheSize() {
@@ -1203,7 +1206,7 @@ public class MediumCacheTest {
    }
 
    /**
-    * Tests {@link MediumCache#removeRegionsInRange(MediumReference, int)}.
+    * Tests {@link MediumCache#removeRegionsInRange(MediumOffset, int)}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void removeRegionsInRange_forInvalidReference_throwsException() {
@@ -1237,7 +1240,9 @@ public class MediumCacheTest {
     * @param cacheBuilder
     *           The {@link TestCacheBuilder} to use containing details about the cache structure
     * @param firstRegionAddSizeToStart
+    *           This is added to the start offset for calling {@link MediumCache#getRegionsInRange(MediumOffset, int)}
     * @param lastRegionSubstractSizeFromEnd
+    *           This is substracted from the size given to {@link MediumCache#getRegionsInRange(MediumOffset, int)}
     * @param maxCacheRegionSize
     *           Allows to pass in a custom maximum cache region size to use in the test.
     * @param expectedRegions
@@ -1267,8 +1272,27 @@ public class MediumCacheTest {
       Assert.assertEquals(expectedRegionList, actualRegionsInRange);
    }
 
-   private void testRemoveRegionsInRange(TestCacheBuilder cacheBuilder, int maxCacheRegionSize,
-      int firstRegionAddSizeToStart, int lastRegionSubstractSizeFromEnd, long totalByteCountRemoved,
+   /**
+    * @param cacheBuilder
+    *           The {@link TestCacheBuilder} to use containing details about the cache structure
+    * @param firstRegionAddSizeToStart
+    *           This is added to the start offset for calling
+    *           {@link MediumCache#removeRegionsInRange(MediumOffset, int)}
+    * @param lastRegionSubstractSizeFromEnd
+    *           This is subtracted from the size given to {@link MediumCache#removeRegionsInRange(MediumOffset, int)}
+    * @param maxCacheRegionSize
+    *           Allows to pass in a custom maximum cache region size to use in the test.
+    * @param totalByteCountRemoved
+    *           Total number of bytes actually removed
+    * @param expectedRegions
+    *           The {@link MediumRegion}s expected to be returned by
+    *           {@link MediumCache#getRegionsInRange(MediumOffset, int)} after the removal. The input range when calling
+    *           this method is derived from this list, its start reference is the {@link MediumOffset} of the first
+    *           region in the list advanced by "firstRegionAddSizeToStart" bytes, and its size is the total size of all
+    *           regions in the list minus "firstRegionAddSizeToStart" minus "lastRegionSubstractSizeFromEnd".
+    */
+   private void testRemoveRegionsInRange(TestCacheBuilder cacheBuilder, int firstRegionAddSizeToStart,
+      int lastRegionSubstractSizeFromEnd, int maxCacheRegionSize, long totalByteCountRemoved,
       MediumRegion... expectedRegions) {
 
       List<MediumRegion> expectedRegionList = Arrays.asList(expectedRegions);
@@ -1323,14 +1347,26 @@ public class MediumCacheTest {
 
    /**
     * Creates a cached {@link MediumRegion} filled with a default fill byte
+    * 
+    * @param offset
+    *           The start offset to use
+    * @param size
+    *           The size to use
+    * @return The created {@link MediumRegion}
     */
-   private static MediumRegion createCachedRegionWithDefaultFillByte(long startOffset, int size) {
-      return new MediumRegion(TestMedia.at(startOffset),
-         ByteBuffer.wrap(TestCacheBuilder.regionBytesFromDistinctOffsetSequence(startOffset, size)));
+   private static MediumRegion createCachedRegionWithDefaultFillByte(long offset, int size) {
+      return new MediumRegion(TestMedia.at(offset),
+         ByteBuffer.wrap(TestCacheBuilder.regionBytesFromDistinctOffsetSequence(offset, size)));
    }
 
    /**
     * Creates an uncached {@link MediumRegion} of the given size
+    * 
+    * @param offset
+    *           The start offset to use
+    * @param size
+    *           The size to use
+    * @return The created {@link MediumRegion}
     */
    private static MediumRegion createUnCachedRegion(long offset, int size) {
       return new MediumRegion(at(offset), size);
@@ -1367,8 +1403,8 @@ public class MediumCacheTest {
 
    /**
     * Creates a {@link TestCacheBuilder} with unlimited sizes and some pre-existing content: (1) Three consecutive
-    * regions of different sizes starting at an offset > 0, (2) A gap of {@value #DEFAULT_CACHE_FIRST_GAP_SIZE} bytes,
-    * (3) Two consecutive regions, (4) A gap of 1 byte, (5) A last region
+    * regions of different sizes starting at an offset &gt; 0, (2) A gap of {@value #DEFAULT_CACHE_FIRST_GAP_SIZE}
+    * bytes, (3) Two consecutive regions, (4) A gap of 1 byte, (5) A last region
     * 
     * @return The default {@link MediumCache} pre-filled and with unlimited sizes
     */

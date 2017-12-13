@@ -37,14 +37,12 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * All {@link MediumOffset} instances and sizes returned by this class refer to valid offsets and sizes on the existing,
  * external {@link Medium} and are therefore not in any way "virtual".
  * 
- * After instantiation, the {@link #getMediumByteCount()} method of this {@link ShiftedMediumBlock} returns
- * {@value #UNDEFINED_COUNT}. The reason for this is: The actual size of the medium bytes is only computed during
- * execution of the CFP algorithm. It is finally computable after {@link #setTotalMediumByteCount(MediumOffset)} has
- * been called. In this state, the {@link ShiftedMediumBlock} is finally assembled. You can see such an instance as
- * referring to existing medium bytes including their location, and at the same time telling <i>where</i> they will be
- * moved after applying not only one action (i.e. the causing action of this specific {@link ShiftedMediumBlock}
- * instance), but a whole sequence of insertions, removals or replacements on the external {@link Medium} until the
- * start offset of this block.
+ * The actual size of the medium bytes is only computed during execution of the CFP algorithm. It is finally computable
+ * after {@link #setTotalMediumByteCount(long)} has been called. In this state, the {@link ShiftedMediumBlock} is
+ * finally assembled. You can see such an instance as referring to existing medium bytes including their location, and
+ * at the same time telling <i>where</i> they will be moved after applying not only one action (i.e. the causing action
+ * of this specific {@link ShiftedMediumBlock} instance), but a whole sequence of insertions, removals or replacements
+ * on the external {@link Medium} until the start offset of this block.
  */
 public class ShiftedMediumBlock {
 

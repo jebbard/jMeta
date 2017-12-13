@@ -1,6 +1,6 @@
 /**
  *
- * {@link CsvFileDataFormatExpectationProvider}.java
+ * {@link CsvFileMediumExpectationProvider}.java
  *
  * @author Jens Ebert
  *
@@ -42,9 +42,9 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.namedio.api.services.NamedReader;
 
 /**
- * {@link CsvFileDataFormatExpectationProvider} reads test data from a single csv file and returns it accordingly.
+ * {@link CsvFileMediumExpectationProvider} reads test data from a single csv file and returns it accordingly.
  */
-public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectationProvider {
+public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationProvider {
 
    private static final String FLAG_SEPARATOR = "&&";
 
@@ -100,7 +100,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
    private Map<DataBlockId, CustomFieldValueParser> customFieldValueParsers = new HashMap<>();
 
    /**
-    * Creates a new {@CsvFileDataFormatExpectationProvider}.
+    * Creates a new {@link CsvFileMediumExpectationProvider}.
     * 
     * @param repository
     *           The {@link DataFormatRepository}.
@@ -111,8 +111,8 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
     * @throws InvalidTestDataCsvFormatException
     *            if the csv file is incorrect.
     */
-   public CsvFileDataFormatExpectationProvider(DataFormatRepository repository, Path testFile,
-      Path expectedDataCsvFile) throws InvalidTestDataCsvFormatException {
+   public CsvFileMediumExpectationProvider(DataFormatRepository repository, Path testFile, Path expectedDataCsvFile)
+      throws InvalidTestDataCsvFormatException {
       super(repository, testFile);
 
       Reject.ifNull(expectedDataCsvFile, "csvFile");
@@ -465,7 +465,7 @@ public class CsvFileDataFormatExpectationProvider extends AbstractMediumExpectat
     */
    private void processExpectedFieldInterpretedValue(Map<String, String> row, DataBlockId id,
       DataBlockInstanceId instanceId, String rowPrefix)
-         throws InvalidTestDataCsvFormatException, InvalidArrayStringFormatException {
+      throws InvalidTestDataCsvFormatException, InvalidArrayStringFormatException {
 
       String expInterpretedFieldValueString = row.get(COL_EXP_FIELD_INTERPRETED_VALUE);
 

@@ -13,7 +13,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public class DataBlockInstanceId {
 
    /**
-    * Creates a new {@DataBlockInstanceId}.
+    * Creates a new {@link DataBlockInstanceId}.
     * 
     * @param id
     *           the {@link DataBlockId} of the data block.
@@ -22,17 +22,12 @@ public class DataBlockInstanceId {
     *           {@link DataBlockInstanceId} refers to a top level block.
     * @param sequenceNumber
     *           A zero based number that corresponds to the absolute occurrence index of the block in its parent block.
-    *           The first child block (regarding its {@link MediumOffset} and irrespective of its
-    *           {@link DataBlockId} or {@link PhysicalDataBlockType}) gets sequence number 0, the second one gets
-    *           sequence number 1, and so on.
-    *
-    * @pre sequenceNumber >= 0
+    *           The first child block (regarding its {@link MediumOffset} and irrespective of its {@link DataBlockId} or
+    *           {@link PhysicalDataBlockType}) gets sequence number 0, the second one gets sequence number 1, and so on.
     */
-   public DataBlockInstanceId(DataBlockId id,
-      DataBlockInstanceId parentInstanceId, int sequenceNumber) {
+   public DataBlockInstanceId(DataBlockId id, DataBlockInstanceId parentInstanceId, int sequenceNumber) {
       Reject.ifNull(id, "id");
-      Reject.ifNegative(sequenceNumber,
-         "sequenceNumber");
+      Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
       m_id = id;
       m_parentInstanceId = parentInstanceId;
@@ -80,8 +75,8 @@ public class DataBlockInstanceId {
    @Override
    public String toString() {
 
-      return "DataBlockInstanceId [m_id=" + m_id + ", m_parentInstanceId="
-         + m_parentInstanceId + ", m_sequenceNumber=" + m_sequenceNumber + "]";
+      return "DataBlockInstanceId [m_id=" + m_id + ", m_parentInstanceId=" + m_parentInstanceId + ", m_sequenceNumber="
+         + m_sequenceNumber + "]";
    }
 
    private final DataBlockId m_id;
@@ -92,8 +87,7 @@ public class DataBlockInstanceId {
       final int prime = 31;
       int result = 1;
       result = prime * result + ((m_id == null) ? 0 : m_id.hashCode());
-      result = prime * result
-         + ((m_parentInstanceId == null) ? 0 : m_parentInstanceId.hashCode());
+      result = prime * result + ((m_parentInstanceId == null) ? 0 : m_parentInstanceId.hashCode());
       result = prime * result + m_sequenceNumber;
       return result;
    }

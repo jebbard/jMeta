@@ -181,7 +181,7 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#truncate(com.github.jmeta.library.media.api.types.MediumOffset)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#truncate()
     */
    @Override
    public void truncate() {

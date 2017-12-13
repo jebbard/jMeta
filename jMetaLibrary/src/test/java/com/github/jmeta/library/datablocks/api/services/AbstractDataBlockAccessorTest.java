@@ -17,7 +17,8 @@ import java.util.List;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractDataBlockAccessorTest} is a convenience class for derived classes of {@link AbtractDataBlockAccessorTest}.
+ * {@link AbstractDataBlockAccessorTest} is a convenience class for derived classes of
+ * {@link AbtractDataBlockAccessorTest}.
  */
 public abstract class AbstractDataBlockAccessorTest extends AbtractDataBlockAccessorTest {
 
@@ -28,7 +29,7 @@ public abstract class AbstractDataBlockAccessorTest extends AbtractDataBlockAcce
    private final List<Integer> fieldSizes = new ArrayList<>();
 
    /**
-    * Creates a new {@AbstractSingleBlockDataBlockAccessorTest}.
+    * Creates a new {@link AbstractDataBlockAccessorTest}.
     * 
     * @param testFile
     *           The test {@link Path}.
@@ -74,7 +75,7 @@ public abstract class AbstractDataBlockAccessorTest extends AbtractDataBlockAcce
    @Override
    protected AbstractMediumExpectationProvider createExpectationProvider() throws InvalidTestDataCsvFormatException {
 
-      return new CsvFileDataFormatExpectationProvider(getDataFormatRepository(), testFile, csvFile);
+      return new CsvFileMediumExpectationProvider(getDataFormatRepository(), testFile, csvFile);
    }
 
    /**

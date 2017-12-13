@@ -19,23 +19,27 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class BitAddress {
 
+   /** The number of bits within one byte. */
+   public static final int BITS_PER_BYTE = Byte.SIZE;
+
+   private final int bitPosition;
+
+   private final int byteAddress;
+
    /**
     * Creates a {@link BitAddress}.
     *
     * @param byteAddress
-    *           The address of the byte. Byte addresses can be arbitrary integers but must be positive.
+    *           The address of the byte. Byte addresses can be arbitrary integers but must be positive incl. zero.
     * @param bitPosition
     *           The position of the bit within the addressed byte. Must be in the range 0 to {@link #BITS_PER_BYTE} - 1.
-    *
-    * @pre {@literal byteAddress > 0}
-    * @pre {@literal bitAddress > 0 && bitAddress < 8}
     */
    public BitAddress(int byteAddress, int bitPosition) {
       Reject.ifNotInInterval(bitPosition, 0, BITS_PER_BYTE - 1, "bitPosition");
-      Reject.ifTrue(byteAddress < 0, "byteAddress < 0");
+      Reject.ifNegative(byteAddress, "byteAddress");
 
-      m_bitPosition = bitPosition;
-      m_byteAddress = byteAddress;
+      this.bitPosition = bitPosition;
+      this.byteAddress = byteAddress;
    }
 
    /**
@@ -44,7 +48,7 @@ public class BitAddress {
     * @return The bit position. The bit position is an int between 0 and {@link #BITS_PER_BYTE} - 1.
     */
    public int getBitPosition() {
-      return m_bitPosition;
+      return bitPosition;
    }
 
    /**
@@ -53,7 +57,7 @@ public class BitAddress {
     * @return The byte address. The byte address is an arbitrary positive integer.
     */
    public int getByteAddress() {
-      return m_byteAddress;
+      return byteAddress;
    }
 
    /**
@@ -61,18 +65,21 @@ public class BitAddress {
     */
    @Override
    public boolean equals(Object otherObject) {
-      if (this == otherObject)
+      if (this == otherObject) {
          return true;
+      }
 
-      if (otherObject == null)
+      if (otherObject == null) {
          return false;
+      }
 
-      if (getClass() != otherObject.getClass())
+      if (getClass() != otherObject.getClass()) {
          return false;
+      }
 
       final BitAddress address = (BitAddress) otherObject;
 
-      return m_byteAddress == address.getByteAddress() && m_bitPosition == address.getBitPosition();
+      return byteAddress == address.getByteAddress() && bitPosition == address.getBitPosition();
    }
 
    /**
@@ -80,7 +87,7 @@ public class BitAddress {
     */
    @Override
    public int hashCode() {
-      return 13 * ((Integer) m_bitPosition).hashCode() + 47 * ((Integer) m_byteAddress).hashCode();
+      return 13 * ((Integer) bitPosition).hashCode() + 47 * ((Integer) byteAddress).hashCode();
    }
 
    /**
@@ -103,8 +110,8 @@ public class BitAddress {
    public boolean smallerThan(BitAddress other) {
       Reject.ifNull(other, "other");
 
-      return m_byteAddress < other.getByteAddress()
-         || (m_byteAddress == other.getByteAddress() && m_bitPosition < other.getBitPosition());
+      return byteAddress < other.getByteAddress()
+         || (byteAddress == other.getByteAddress() && bitPosition < other.getBitPosition());
    }
 
    /**
@@ -118,13 +125,7 @@ public class BitAddress {
    public BitAddress advance(int bitCount) {
       Reject.ifNegative(bitCount, "bitCount");
 
-      return new BitAddress((m_byteAddress + (m_bitPosition + bitCount) / BITS_PER_BYTE),
-         (m_bitPosition + bitCount) % BITS_PER_BYTE);
+      return new BitAddress((byteAddress + (bitPosition + bitCount) / BITS_PER_BYTE),
+         (bitPosition + bitCount) % BITS_PER_BYTE);
    }
-
-   /** The number of bits within one byte. */
-   public static final int BITS_PER_BYTE = Byte.SIZE;
-
-   private final int m_bitPosition;
-   private final int m_byteAddress;
 }

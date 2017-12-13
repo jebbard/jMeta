@@ -19,6 +19,7 @@ import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
+import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
@@ -105,7 +106,10 @@ public interface MediumStore {
     * Creates an {@link MediumOffset} for the specified offset. The {@link MediumOffset}s created are internally managed
     * in a pool to ensure proper updates in case of writing changes to the {@link Medium}. That means, as long as this
     * {@link MediumStore} is open, all {@link MediumOffset}s previously created with this method are automatically
-    * update once changes are written to the underlying medium using this {@link MediumStore}'s {@link #flush()} method.
+    * updated once changes are written to the underlying medium using this {@link MediumStore}'s {@link #flush()}
+    * method.
+    * 
+    * See the documentation of {@link #flush()} for more details.
     * 
     * @param offset
     *           The offset for which to create the {@link MediumOffset} relative to the {@link Medium}s starting point,
@@ -130,13 +134,13 @@ public interface MediumStore {
     * exceeded. In this case, the data chunks cached with the very first call to {@link #cache(MediumOffset, int)} since
     * opening the {@link Medium} is removed from the cache first, then the data chunks of the second call and so on, as
     * much chunks are freed such that the current cache size plus the number of bytes to newly cache is again below the
-    * maximum cache size. Each chunk has a maximum size of {@link Medium#getMaxCacheRegionSizeInBytes()}. In an extreme
-    * case, the number of bytes to cache passed to this method is itself already exceeding the maximum cache size, which
-    * adds only the cache regions with higher offsets to the cache. For example, if numberOfBytes = maxCacheSize + n,
-    * after calling this method, only bytes starting from offset + n until offset + n + maxCacheSize are actually cached
-    * such that the maximum cache size is not exceeded. To avoid this strange situation, code using this method should
-    * ensure a proper configuration of maximum cache size and to pass sizes that are much smaller than the maximum cache
-    * size as parameter to this method.
+    * maximum cache size. Each chunk has a maximum size of {@link Medium#getMaxReadWriteBlockSizeInBytes()}. In an
+    * extreme case, the number of bytes to cache passed to this method is itself already exceeding the maximum cache
+    * size, which adds only the cache regions with higher offsets to the cache. For example, if numberOfBytes =
+    * maxCacheSize + n, after calling this method, only bytes starting from offset + n until offset + n + maxCacheSize
+    * are actually cached such that the maximum cache size is not exceeded. To avoid this strange situation, code using
+    * this method should ensure a proper configuration of maximum cache size and to pass sizes that are much smaller
+    * than the maximum cache size as parameter to this method.
     * 
     * Note that if this method reads bytes from the {@link Medium}, it does so using
     * {@link Medium#getMaxReadWriteBlockSizeInBytes()} as size. So it might perform multiple accesses to the external
@@ -266,9 +270,9 @@ public interface MediumStore {
     * insertions or replacements that are not yet flushed.
     * 
     * You can call this method multiple times with exactly the same {@link MediumOffset}. This corresponds to multiple
-    * consecutive inserts, i.e. first the data of the first call with length <t>len</t> is inserted at the
-    * <t>offset</t>, then the data of the second call is inserted at <t>offset+len</t> and so on. Inserting at the same
-    * offset therefore does <i>not</i> mean overwriting any data or changing previous inserts.
+    * consecutive inserts, i.e. first the data of the first call with length <tt>len</tt> is inserted at the
+    * <tt>offset</tt>, then the data of the second call is inserted at <tt>offset+len</tt> and so on. Inserting at the
+    * same offset therefore does <i>not</i> mean overwriting any data or changing previous inserts.
     * 
     * If data before the given offset is removed, replaced or inserted by prior calls to the corresponding methods, the
     * actual insert position is shifted correspondingly.
@@ -396,15 +400,46 @@ public interface MediumStore {
     * {@link #replaceData(MediumOffset, int, ByteBuffer)}. Theses changes can be undone before a flush by using
     * {@link #undo(MediumAction)}, such that the next call to {@link #flush()} does not consider these changes anymore.
     * 
-    * After a flush, the {@link MediumAction} instances returned by these methods instances will not be pending anymore,
-    * i.e. {@link MediumAction#isPending()} will return false.
+    * The order of scheduling changes using the three mentioned methods before a flush is irrelevant except but one
+    * case: If calling {@link #insertData(MediumOffset, ByteBuffer)} multiple times for the same offset, this has the
+    * meaning of first inserting the bytes of the first call at this offset, then inserting the bytes of the second call
+    * behind and so on. So inserts at the same offset are appending.
     * 
-    * Furthermore, after flushing, any {@link MediumOffset}s previously created using
-    * {@link #createMediumOffset(long)} might have been automatically updated according to the flushed changes. For
-    * example, if an {@link #insertData(MediumOffset, ByteBuffer)} of 10 bytes was done at offset x, an
-    * {@link MediumOffset} previously created for offset x+1 will have offset x+1+10 after the {@link #flush()} of this
-    * insert. The same happens for any replaces or removes at offsets before the {@link MediumOffset}'s offset.
-    * {@link MediumOffset}s with offsets before any changes are not changed after a {@link #flush()} of these changes.
+    * An example of some scheduled valid {@link MediumAction}s and the corresponding result after a call to this method
+    * are shown in the figure below.
+    * 
+    * TODO Figure einbinden
+    * 
+    * After a flush, the {@link MediumAction} instances returned by these methods instances are not pending anymore,
+    * i.e. {@link MediumAction#isPending()} returns false for them.
+    * 
+    * Furthermore, after flushing, any {@link MediumOffset} previously created using {@link #createMediumOffset(long)}
+    * is automatically updated according to the flushed changes, if it is affected by them. There are the following
+    * cases:
+    * <ul>
+    * <li>Any {@link MediumOffset}s before the first changed {@link MediumOffset} remain unchanged</li>
+    * <li>For {@link MediumActionType#INSERT}: Any previously created {@link MediumOffset}s equal to or behind the
+    * {@link MediumOffset} of the {@link MediumAction} are shifted back by the number of inserted bytes, i.e. their
+    * {@link MediumOffset}s increase correspondingly. There is but one important exception: The {@link MediumOffset} of
+    * the causing insert {@link MediumAction} itself is NOT changed to ensure it still points to the newly inserted
+    * bytes after the flush.</li>
+    * <li>For {@link MediumActionType#REMOVE}: Any previously created {@link MediumOffset}s equal to or behind the end
+    * of the removed range are shifted forward by the number of removed bytes, i.e. their {@link MediumOffset}s decrease
+    * correspondingly. Any previously created {@link MediumOffset}s within the removed range "fall back" to the start
+    * {@link MediumOffset} of the removed range, i.e. are set to this {@link MediumOffset}.</li>
+    * <li>For {@link MediumActionType#REPLACE}: Let <tt>n</tt> be the number of replaced bytes and <tt>m</tt> be the
+    * number of replacement bytes. For inserting replaces (<tt>n<m</tt>), any previously created {@link MediumOffset}s
+    * equal to or behind the end of the replaced range are shifted forward, i.e. their {@link MediumOffset}s increase
+    * correspondingly. For removing replaces (<tt>n>m</tt>), any previously created {@link MediumOffset}s equal to or
+    * behind the end of the replaced range are shifted backward, i.e. their {@link MediumOffset}s decrease
+    * correspondingly. For overwriting replaces (<tt>n=m</tt>), any previously created {@link MediumOffset}s equal to or
+    * behind the end of the replaced range remain unchanged. In any case, {@link MediumOffset}s within the replaced
+    * range are not changed by such a {@link MediumAction}.
+    * </ul>
+    * 
+    * If this method throws a runtime exception - which always indicates an abnormal situation - the content of the
+    * {@link Medium} might have got corrupted, as it does not guarantee ACID for changes. You should close this
+    * {@link MediumStore} and retry in this case.
     * 
     * @throws MediumAccessException
     *            If any other errors occurred during accessing the medium

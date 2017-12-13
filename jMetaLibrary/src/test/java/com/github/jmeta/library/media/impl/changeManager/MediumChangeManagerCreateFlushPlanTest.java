@@ -77,8 +77,8 @@ public class MediumChangeManagerCreateFlushPlanTest {
    public void setUp() {
       Path mediaFlushTestPath = TestMedia.TEST_FILE_DIRECTORY_PATH.resolve("MediumChangeManagerTests");
 
-      currentDumpStreamExpected = setupTestFile(currentTestName.getMethodName() + "__EXPECTED", mediaFlushTestPath);
-      currentDumpStreamActual = setupTestFile(currentTestName.getMethodName() + "__ACTUAL", mediaFlushTestPath);
+      currentDumpStreamExpected = setupTestDumpFile(currentTestName.getMethodName() + "__EXPECTED", mediaFlushTestPath);
+      currentDumpStreamActual = setupTestDumpFile(currentTestName.getMethodName() + "__ACTUAL", mediaFlushTestPath);
    }
 
    /**
@@ -1968,8 +1968,9 @@ public class MediumChangeManagerCreateFlushPlanTest {
     *           The name of the test file, will be newly created, if it already exists it will be deleted first.
     * @param parentPath
     *           The parent folder of the file, must exist.
+    * @return The {@link PrintStream} for dumping test results
     */
-   private static PrintStream setupTestFile(String name, Path parentPath) {
+   private static PrintStream setupTestDumpFile(String name, Path parentPath) {
       try {
          Path testFile = parentPath.resolve(name);
 

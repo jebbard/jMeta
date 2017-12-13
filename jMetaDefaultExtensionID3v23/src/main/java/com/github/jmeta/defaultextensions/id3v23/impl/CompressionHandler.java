@@ -46,7 +46,6 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
     * 
     * @param dtt
     * @param dbFactory
-    * @param logging
     */
    public CompressionHandler(DataTransformationType dtt, DataBlockFactory dbFactory) {
       super(dtt, COMPRESSION_TRANSFORMATION_ID, dbFactory);

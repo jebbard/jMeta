@@ -10,7 +10,7 @@ package com.github.jmeta.defaultextensions.ogg.impl;
 
 import java.util.HashMap;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -20,7 +20,7 @@ import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
  * {@link OggDataBlocksService}
  *
  */
-public class OggDataBlocksService extends AbstractDataService {
+public class OggDataBlocksService extends AbstractDataBlockService {
 
    /**
     * Creates a new {@link OggDataBlocksService}.

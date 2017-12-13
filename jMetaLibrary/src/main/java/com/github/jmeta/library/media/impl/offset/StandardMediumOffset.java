@@ -13,11 +13,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link StandardMediumOffset} refers to a specific offset on a {@link Medium}.
- * 
- * It refers to a position of byte N on {@link Medium} X, N >= 0, and therefore gives a globally unique address of each
- * medium byte. {@link StandardMediumOffset} referring to the same {@link Medium} can be compared as to which position
- * is before, equal or behind another one.
+ * {@link StandardMediumOffset} is the default implementation of {@link MediumOffset}.
  */
 public class StandardMediumOffset implements MediumOffset {
 

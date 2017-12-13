@@ -38,7 +38,7 @@ public abstract class AbstractMediumExpectationProvider {
    private DataFormatRepository dataFormatRepository;
 
    /**
-    * Creates a new {@AbstractDataFormatExpectationProvider}.
+    * Creates a new {@link AbstractMediumExpectationProvider}.
     * 
     * @param dataFormatRepository
     *           The {@link DataFormatRepository}.

@@ -33,6 +33,8 @@ public class ComponentRegistry {
     * 
     * @param service
     *           The service to query, should be a Java interface. Must not be null.
+    * @param <S>
+    *           The concrete service interface type
     * @return The first service provider found to be registered for the given service interface.
     */
    @SuppressWarnings("unchecked")

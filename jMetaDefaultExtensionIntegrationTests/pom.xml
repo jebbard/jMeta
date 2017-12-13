@@ -133,7 +133,6 @@
 							<subpackages>com.github.jmeta.defaultextensions</subpackages>
 						</configuration>
 						<reports>
-							<report>javadoc</report>
 							<report>test-javadoc</report>
 						</reports>
 					</reportSet>

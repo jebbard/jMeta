@@ -1,6 +1,6 @@
 /**
  *
- * {@link Flags1ByteXXXTest}.java
+ * {@link Flags1ByteTest}.java
  *
  * @author Jens Ebert
  *
@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link Flags1ByteXXXTest} tests the {@link Flags} class with single byte flags.
+ * {@link Flags1ByteTest} tests the {@link Flags} class with single byte flags.
  */
-public class Flags1ByteXXXTest extends FlagsTest {
+public class Flags1ByteTest extends FlagsTest {
 
    /**
     * @see com.github.jmeta.library.dataformats.api.types.FlagsTest#getBigEndianFlagSpecification()

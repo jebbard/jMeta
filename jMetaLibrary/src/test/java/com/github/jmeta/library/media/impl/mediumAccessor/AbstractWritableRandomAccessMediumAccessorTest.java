@@ -148,7 +148,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#isAtEndOfMedium(MediumOffset)}.
+    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
     */
    @Test
    public void isAtEndOfMedium_forRandomAccessWithoutPriorReadIfAtEndOfMedium_returnsTrue() {
@@ -301,7 +301,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
+    * Tests {@link MediumAccessor#truncate()}.
     */
    @Test
    public void truncate_toStrictlyPositiveLength_mediumBytesBehindReferenceAreGone() {
@@ -315,7 +315,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
+    * Tests {@link MediumAccessor#truncate()}.
     */
    @Test
    public void truncate_atEOM_doesNotChangeMedium() {
@@ -329,7 +329,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests the {@link MediumAccessor#truncate(MediumOffset)}.
+    * Tests the {@link MediumAccessor#truncate()}.
     */
    @Test
    public void truncate_toOneByteSmallerLength_mediumBytesBehindReferenceAreGone() {
@@ -343,7 +343,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
+    * Tests {@link MediumAccessor#truncate()}.
     */
    @Test
    public void truncate_toZeroLength_noMediumBytesAnymore() {
@@ -357,7 +357,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
+    * Tests {@link MediumAccessor#truncate()}.
     */
    @Test
    public void truncate_toExactlyCurrentLength_doesNotChangeTheMedium() {
@@ -371,7 +371,7 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
+    * Tests {@link MediumAccessor#truncate()}.
     */
    @Test(expected = PreconditionUnfullfilledException.class)
    public void truncate_onClosedMediumAccessor_throwsException() {
@@ -399,8 +399,8 @@ public abstract class AbstractWritableRandomAccessMediumAccessorTest extends Abs
    }
 
    /**
-    * Tests the {@link MediumAccessor#truncate(MediumOffset)} method on the given {@link MediumAccessor} and with the
-    * given truncate {@link MediumOffset}.
+    * Tests the {@link MediumAccessor#truncate()} method on the given {@link MediumAccessor} and with the given truncate
+    * {@link MediumOffset}.
     * 
     * @param mediumAccessor
     *           The {@link MediumAccessor} to test

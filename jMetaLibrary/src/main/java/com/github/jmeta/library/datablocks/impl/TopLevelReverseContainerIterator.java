@@ -46,7 +46,6 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
     * @param forceMediumReadOnly
     * @param readers
     * @param mediumStore
-    * @param logging
     */
    public TopLevelReverseContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints,
       boolean forceMediumReadOnly, Map<DataFormat, DataBlockReader> readers, MediumStore mediumStore) {

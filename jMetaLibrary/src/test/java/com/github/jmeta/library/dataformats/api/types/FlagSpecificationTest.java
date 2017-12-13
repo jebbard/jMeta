@@ -1,6 +1,6 @@
 /**
  *
- * {@link FlagSpecificationXXXTest}.java
+ * {@link FlagSpecificationTest}.java
  *
  * @author Jens Ebert
  *
@@ -19,9 +19,9 @@ import org.junit.Test;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
- * {@link FlagSpecificationXXXTest} tests the {@link FlagSpecification} class.
+ * {@link FlagSpecificationTest} tests the {@link FlagSpecification} class.
  */
-public class FlagSpecificationXXXTest {
+public class FlagSpecificationTest {
 
    /**
     * Test {@link FlagSpecification#FlagSpecification(List, int, ByteOrder, byte[])} for

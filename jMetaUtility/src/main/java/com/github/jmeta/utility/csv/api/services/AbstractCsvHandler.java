@@ -33,6 +33,10 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     */
    public static final Character DEFAULT_QUOTE = '"';
 
+   private Character separator;
+   private Character quote;
+   private T csvResource;
+
    /**
     * Creates a new {@link AbstractCsvHandler}.
     * 
@@ -44,10 +48,11 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
    public void setNewResource(T csvResource) throws IOException {
       Reject.ifNull(csvResource, "csvResource");
 
-      if (isCsvLoaded())
+      if (isCsvLoaded()) {
          closeCurrentCsvResource();
+      }
 
-      m_csvResource = csvResource;
+      this.csvResource = csvResource;
    }
 
    /**
@@ -56,7 +61,7 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     * @return the separator character used, which is never null.
     */
    public Character getSeparator() {
-      return m_separator;
+      return separator;
    }
 
    /**
@@ -66,10 +71,11 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     *           the separator to use, may be null to indicate the use of the {@link #DEFAULT_SEPARATOR}.
     */
    public void setSeparator(Character separator) {
-      if (separator == null)
-         m_separator = DEFAULT_SEPARATOR;
-      else
-         m_separator = separator;
+      if (separator == null) {
+         this.separator = DEFAULT_SEPARATOR;
+      } else {
+         this.separator = separator;
+      }
    }
 
    /**
@@ -78,7 +84,7 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     * @return the quote character used, which is never null.
     */
    public Character getQuote() {
-      return m_quote;
+      return quote;
    }
 
    /**
@@ -88,10 +94,11 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     *           the quote to use, may be null to indicate the use of the {@link #DEFAULT_QUOTE}.
     */
    public void setQuote(Character quote) {
-      if (quote == null)
-         m_quote = DEFAULT_QUOTE;
-      else
-         m_quote = quote;
+      if (quote == null) {
+         this.quote = DEFAULT_QUOTE;
+      } else {
+         this.quote = quote;
+      }
    }
 
    /**
@@ -100,7 +107,7 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     * @return whether a csv file has already been loaded.
     */
    public boolean isCsvLoaded() {
-      return m_csvResource != null;
+      return csvResource != null;
    }
 
    /**
@@ -109,7 +116,7 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     * @return the currently loaded csv file or null if no file is loaded.
     */
    public T getCurrentCsvResource() {
-      return m_csvResource;
+      return csvResource;
    }
 
    /**
@@ -117,20 +124,15 @@ public abstract class AbstractCsvHandler<T extends Closeable & AutoCloseable> {
     * The {@link CsvReader} can further be used after this method has been called. For this, simply a new source must be
     * set using {@link #setNewResource(Closeable)}.
     * 
+    * As a precondition, the CSV must be loaded.
+    * 
     * @throws IOException
     *            If closing the current file failed.
-    *
-    * @pre {@link #isCsvLoaded()} == true
-    * @post {@link #isCsvLoaded()} == false
     */
    public void closeCurrentCsvResource() throws IOException {
       Reject.ifFalse(isCsvLoaded(), "isCsvLoaded()");
-      m_csvResource.close();
+      csvResource.close();
 
-      m_csvResource = null;
+      csvResource = null;
    }
-
-   private Character m_separator;
-   private Character m_quote;
-   private T m_csvResource;
 }

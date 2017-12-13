@@ -208,7 +208,7 @@ public class StandardLibraryJMeta implements LibraryJMeta {
    }
 
    /**
-    * @see de.je.jmeta.context.IJMetaContext#getDataBlockAccessor()
+    * @see com.github.jmeta.library.startup.api.services.LibraryJMeta#getDataBlockAccessor()
     */
    @Override
    public DataBlockAccessor getDataBlockAccessor() {
@@ -217,7 +217,7 @@ public class StandardLibraryJMeta implements LibraryJMeta {
    }
 
    /**
-    * @see de.je.jmeta.context.IJMetaContext#getDataFormatRepository()
+    * @see com.github.jmeta.library.startup.api.services.LibraryJMeta#getDataFormatRepository()
     */
    @Override
    public DataFormatRepository getDataFormatRepository() {
@@ -327,9 +327,8 @@ public class StandardLibraryJMeta implements LibraryJMeta {
          + "**************************************" + LoggingMessageConstants.LINE_SEPARATOR
          + " Operating system environmental info: " + LoggingMessageConstants.LINE_SEPARATOR
          + "**************************************" + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Operating system name         : " + System.getProperty("os.name")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Operating system architecture : "
-         + System.getProperty("os.arch") + LoggingMessageConstants.LINE_SEPARATOR
+         + "  Operating system name         : " + System.getProperty("os.name") + LoggingMessageConstants.LINE_SEPARATOR
+         + "  Operating system architecture : " + System.getProperty("os.arch") + LoggingMessageConstants.LINE_SEPARATOR
          + "  Operating system version      : " + System.getProperty("os.version")
          + LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR;
 

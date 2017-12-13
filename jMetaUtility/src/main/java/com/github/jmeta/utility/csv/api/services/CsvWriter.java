@@ -19,6 +19,10 @@ import com.github.jmeta.utility.namedio.api.services.NamedWriter;
  */
 public class CsvWriter extends AbstractCsvHandler<NamedWriter> {
 
+   private int elementCount;
+
+   private final StringBuilder csvLineBuilder = new StringBuilder(500);
+
    /**
     * Creates a new {@link CsvWriter}.
     * 
@@ -26,9 +30,9 @@ public class CsvWriter extends AbstractCsvHandler<NamedWriter> {
     *           The number of elements in a record. Must be at least 1.
     */
    public CsvWriter(int elementCount) {
-      Reject.ifTrue(elementCount < 1, "elementCount < 1");
+      Reject.ifNegativeOrZero(elementCount, "elementCount");
 
-      m_elementCount = elementCount;
+      this.elementCount = elementCount;
       setSeparator(null);
       setQuote(null);
    }
@@ -39,7 +43,7 @@ public class CsvWriter extends AbstractCsvHandler<NamedWriter> {
     * @return the element count in one record.
     */
    public int getColumnCount() {
-      return m_elementCount;
+      return elementCount;
    }
 
    /**
@@ -47,23 +51,21 @@ public class CsvWriter extends AbstractCsvHandler<NamedWriter> {
     * in the same order to the CSV file using its toString() method.
     *
     * @param columns
-    *           The record to append. Each object represents an element of the record.
+    *           The record to append, each object represents an element of the record; it must have the same length as
+    *           returned by {@link #getColumnCount()}
     * @throws IOException
     *            if an I/O operation fails.
-    *
-    * @pre record.length == {@link #getColumnCount()} - The length of the given record must equal the initially
-    *      specified element count
     */
    public void writeNextRow(Object[] columns) throws IOException {
       Reject.ifFalse(columns.length == getColumnCount(), "columns.length == getColumnCount()");
 
       for (int i = 0; i < columns.length; i++) {
-         writeNextRow(m_csvLineBuilder, columns[i]);
+         writeNextRow(csvLineBuilder, columns[i]);
       }
 
-      getCurrentCsvResource().write(m_csvLineBuilder.toString());
+      getCurrentCsvResource().write(csvLineBuilder.toString());
       getCurrentCsvResource().newLine();
-      m_csvLineBuilder.setLength(0);
+      csvLineBuilder.setLength(0);
    }
 
    /**
@@ -85,8 +87,4 @@ public class CsvWriter extends AbstractCsvHandler<NamedWriter> {
       builder.append(appendedString);
       builder.append(getSeparator());
    }
-
-   private int m_elementCount;
-
-   private final StringBuilder m_csvLineBuilder = new StringBuilder(500);
 }

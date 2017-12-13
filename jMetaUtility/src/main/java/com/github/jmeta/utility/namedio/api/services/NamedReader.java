@@ -2,7 +2,7 @@
  *
  * {@link NamedReader}.java
  *
- * @author Jens
+ * @author Jens Ebert
  *
  * @date 11.05.2014
  *
@@ -24,10 +24,10 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link NamedReader} class is a {@link BufferedReader} that adds some meta data to a given arbitrary, wrapped
  * {@link Reader}. This is mainly useful for identification purposes, because you sometimes want to know the original
  * source of a given {@link Reader} (file, URL etc.).
- * 
- * @author jebert
  */
 public class NamedReader extends BufferedReader {
+
+   private final String name;
 
    /**
     * Creates a new {@link NamedReader}.
@@ -56,9 +56,6 @@ public class NamedReader extends BufferedReader {
     * @return The {@link NamedReader}.
     * @throws IOException
     *            if creation of the wrapped {@link Reader} fails.
-    * 
-    * @pre file.exists()
-    * @pre file.isFile()
     */
    @SuppressWarnings("resource")
    public static NamedReader createFromFile(File file, Charset charset) throws IOException {
@@ -93,9 +90,10 @@ public class NamedReader extends BufferedReader {
 
       InputStream resourceAsStream = clazz.getResourceAsStream(resource);
 
-      if (resourceAsStream == null)
+      if (resourceAsStream == null) {
          throw new IOException(
             "Resource with name <" + resource + "> not found for class <" + clazz.getCanonicalName() + ">.");
+      }
 
       return new NamedReader(new InputStreamReader(resourceAsStream, charset),
          clazz.getCanonicalName() + "." + resource);
@@ -107,6 +105,4 @@ public class NamedReader extends BufferedReader {
    public String getName() {
       return name;
    }
-
-   private final String name;
 }

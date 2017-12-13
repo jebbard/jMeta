@@ -13,7 +13,7 @@ package com.github.jmeta.library.media.api.types;
 /**
  * {@link MediumOffset} refers to a specific offset on a {@link Medium}.
  * 
- * It refers to a position of byte N on the {@link Medium}, N >= 0, and therefore gives a globally unique address of
+ * It refers to a position of byte N on the {@link Medium}, N &gt;= 0, and therefore gives a globally unique address of
  * each medium byte. {@link MediumOffset} referring to the same {@link Medium} can be compared as to which position is
  * before, equal or behind another one.
  */
@@ -30,8 +30,6 @@ public interface MediumOffset {
     * 
     * @return A new {@link MediumOffset} advanced to have medium position this.{@link #getAbsoluteMediumOffset()} +
     *         count.
-    * 
-    * @pre {@link #getAbsoluteMediumOffset()} >= -count
     */
    public MediumOffset advance(long count);
 
@@ -43,8 +41,6 @@ public interface MediumOffset {
     *           The other {@link MediumOffset} to compare with. Must refer to the same {@link Medium}.
     * @return true if this {@link MediumOffset} refers to a position before the given other {@link MediumOffset} , false
     *         otherwise.
-    * 
-    * @pre other.{@link #getMedium()}.equals({@link #getMedium()})
     */
    public boolean before(MediumOffset other);
 
@@ -52,14 +48,12 @@ public interface MediumOffset {
     * Checks whether this {@link MediumOffset} is referring to a position behind the given other {@link MediumOffset} or
     * to the same position. This only works if both {@link MediumOffset}s refer to the same {@link Medium}.
     * 
-    * It is guaranteed that this method returns true iff {@link #equals(Object)} returns true.
+    * Returns true if this is equal to other (must be ensured by any implementation).
     * 
     * @param other
     *           The other {@link MediumOffset} to compare with. Must refer to the same {@link Medium}.
     * @return true if this {@link MediumOffset} refers to a position on the same {@link Medium} that is behind or equal
     *         to the position referred to by the other {@link MediumOffset}, false otherwise.
-    * 
-    * @pre other.{@link #getMedium()}.equals({@link #getMedium()})
     */
    public boolean behindOrEqual(MediumOffset other);
 
@@ -74,8 +68,6 @@ public interface MediumOffset {
     * @param other
     *           The other {@link MediumOffset} to measure the distance to. Must refer to the same {@link Medium}.
     * @return the number of bytes between this {@link MediumOffset} and the other {@link MediumOffset}.
-    * 
-    * @pre other.{@link #getMedium()}.equals({@link #getMedium()})
     */
    public long distanceTo(MediumOffset other);
 

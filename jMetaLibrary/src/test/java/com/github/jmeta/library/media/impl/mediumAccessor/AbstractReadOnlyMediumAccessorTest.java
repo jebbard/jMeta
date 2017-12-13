@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
@@ -38,7 +37,7 @@ public abstract class AbstractReadOnlyMediumAccessorTest extends AbstractMediumA
    }
 
    /**
-    * Tests {@link MediumAccessor#truncate(MediumOffset)}.
+    * Tests {@link MediumAccessor#truncate()}.
     */
    @Test(expected = ReadOnlyMediumException.class)
    public void truncate_onReadOnlyMedium_throwsException() {

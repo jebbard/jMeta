@@ -27,6 +27,11 @@ public class FlagSpecification {
    /** The maximum length of {@link Flags} in bytes. */
    public static final int MAXIMUM_BYTE_COUNT = Long.SIZE / Byte.SIZE;
 
+   private final Map<String, FlagDescription> flagDescriptions = new HashMap<>();
+   private final int m_byteLength;
+   private final ByteOrder byteOrdering;
+   private final byte[] defaultFlagBytes;
+
    /**
     * Creates the specification.
     *
@@ -62,7 +67,7 @@ public class FlagSpecification {
 
          Reject.ifTrue(address.getByteAddress() > byteLength, "The given byte adress " + address.getByteAddress()
             + " is greater than the given byte length " + byteLength);
-         Reject.ifTrue(m_flagDescriptions.containsKey(flagName),
+         Reject.ifTrue(this.flagDescriptions.containsKey(flagName),
             "The flag name " + flagName + " is multiply defined in the given list. Flag names must be unique");
          Reject.ifTrue(bitAddressesWithSizes.containsKey(address), "The given bit address " + address
             + " is multiply defined in the given list. Bit addresses must be unique");
@@ -83,12 +88,12 @@ public class FlagSpecification {
 
          bitAddressesWithSizes.put(address, flagDescription.getBitSize());
 
-         m_flagDescriptions.put(flagName, flagDescription);
+         this.flagDescriptions.put(flagName, flagDescription);
       }
 
-      m_byteOrdering = byteOrdering;
-      m_byteLength = byteLength;
-      m_defaultFlagBytes = defaultFlagBytes;
+      this.byteOrdering = byteOrdering;
+      this.m_byteLength = byteLength;
+      this.defaultFlagBytes = defaultFlagBytes;
    }
 
    /**
@@ -97,7 +102,7 @@ public class FlagSpecification {
     * @return The byte ordering of this {@link FlagSpecification}.
     */
    public ByteOrder getByteOrdering() {
-      return m_byteOrdering;
+      return byteOrdering;
    }
 
    /**
@@ -120,7 +125,7 @@ public class FlagSpecification {
    public boolean hasFlag(String flagName) {
       Reject.ifNull(flagName, "flagName");
 
-      return m_flagDescriptions.containsKey(flagName);
+      return flagDescriptions.containsKey(flagName);
    }
 
    /**
@@ -129,7 +134,7 @@ public class FlagSpecification {
     * @return All flag names and their {@link FlagDescription}s as specified by this {@link FlagSpecification}.
     */
    public Map<String, FlagDescription> getFlagDescriptions() {
-      return Collections.unmodifiableMap(m_flagDescriptions);
+      return Collections.unmodifiableMap(flagDescriptions);
    }
 
    /**
@@ -138,13 +143,11 @@ public class FlagSpecification {
     * @param flagName
     *           The name of the flag, must exist.
     * @return The {@link BitAddress} of the flag with the given name.
-    *
-    * @pre {@link #hasFlag(String)}
     */
    public BitAddress getFlagAddress(String flagName) {
       Reject.ifNull(flagName, "flagName");
 
-      return m_flagDescriptions.get(flagName).getStartBitAddress();
+      return flagDescriptions.get(flagName).getStartBitAddress();
    }
 
    /**
@@ -153,7 +156,7 @@ public class FlagSpecification {
     * @return the default flag bytes used when initializing new flag bytes.
     */
    public byte[] getDefaultFlagBytes() {
-      return m_defaultFlagBytes;
+      return defaultFlagBytes;
    }
 
    /**
@@ -161,7 +164,7 @@ public class FlagSpecification {
     */
    @Override
    public String toString() {
-      return "FlagSpecification [m_byteOrdering=" + m_byteOrdering + ", m_flagPositions=" + m_flagDescriptions + "]";
+      return "FlagSpecification [m_byteOrdering=" + byteOrdering + ", m_flagPositions=" + flagDescriptions + "]";
    }
 
    /**
@@ -172,9 +175,9 @@ public class FlagSpecification {
       final int prime = 31;
       int result = 1;
       result = prime * result + m_byteLength;
-      result = prime * result + ((m_byteOrdering == null) ? 0 : m_byteOrdering.hashCode());
-      result = prime * result + Arrays.hashCode(m_defaultFlagBytes);
-      result = prime * result + ((m_flagDescriptions == null) ? 0 : m_flagDescriptions.hashCode());
+      result = prime * result + ((byteOrdering == null) ? 0 : byteOrdering.hashCode());
+      result = prime * result + Arrays.hashCode(defaultFlagBytes);
+      result = prime * result + ((flagDescriptions == null) ? 0 : flagDescriptions.hashCode());
 
       return result;
    }
@@ -198,30 +201,25 @@ public class FlagSpecification {
       if (m_byteLength != other.m_byteLength)
          return false;
 
-      if (m_byteOrdering == null) {
-         if (other.m_byteOrdering != null)
+      if (byteOrdering == null) {
+         if (other.byteOrdering != null)
             return false;
       }
 
-      else if (!m_byteOrdering.equals(other.m_byteOrdering))
+      else if (!byteOrdering.equals(other.byteOrdering))
          return false;
 
-      if (!Arrays.equals(m_defaultFlagBytes, other.m_defaultFlagBytes))
+      if (!Arrays.equals(defaultFlagBytes, other.defaultFlagBytes))
          return false;
 
-      if (m_flagDescriptions == null) {
-         if (other.m_flagDescriptions != null)
+      if (flagDescriptions == null) {
+         if (other.flagDescriptions != null)
             return false;
       }
 
-      else if (!m_flagDescriptions.equals(other.m_flagDescriptions))
+      else if (!flagDescriptions.equals(other.flagDescriptions))
          return false;
 
       return true;
    }
-
-   private final Map<String, FlagDescription> m_flagDescriptions = new HashMap<>();
-   private final int m_byteLength;
-   private final ByteOrder m_byteOrdering;
-   private final byte[] m_defaultFlagBytes;
 }

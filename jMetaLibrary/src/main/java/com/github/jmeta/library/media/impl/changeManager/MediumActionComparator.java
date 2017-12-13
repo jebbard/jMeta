@@ -42,8 +42,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * <li>It must only return 0 if the two {@link MediumAction}s are equal</li>
  * <li>This especially means: After the initial equality check is false, you MUST NOT return 0 in any case; E.g. do not
  * use Long.compareTo() for e.g. sequence numbers or offsets!</li>
- * <li>The comparator must by "antisymmetric", i.e. if a < b, then also b > a and !(b < a)</li>
- * <li>The comparator must by "transitive", i.e. if a < b, and b < c, then also a < c</li>
+ * <li>The comparator must by "antisymmetric", i.e. if a &lt; b, then also b &gt; a and !(b &lt; a)</li>
+ * <li>The comparator must by "transitive", i.e. if a &lt; b, and b &lt; c, then also a &lt; c</li>
  * </ul>
  */
 public class MediumActionComparator implements Comparator<MediumAction> {

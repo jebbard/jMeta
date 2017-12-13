@@ -17,8 +17,8 @@ import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
- * {@link MediumEqualityTest} tests the {@link Medium} interface and its implementations for {@link #equals(Object)}
- * and {@link #hashCode()}.
+ * {@link MediumEqualityTest} tests the {@link Medium} interface and its implementations for {@link #equals(Object)} and
+ * {@link #hashCode()}.
  */
 public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
 
@@ -37,6 +37,8 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
 
    /**
     * Creates the media for equality testing.
+    * 
+    * @return The media
     */
    private List<Medium<?>> createMedia() {
 
@@ -55,6 +57,8 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
 
    /**
     * Creates the media equal to what {@link #createMedia()} returns for equality testing.
+    * 
+    * @return the equal media
     */
    private List<Medium<?>> createEqualMedia() {
 
@@ -77,6 +81,8 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
 
    /**
     * Creates the media different to what {@link #createMedia()} returns for equality testing.
+    * 
+    * @return The differing media
     */
    private List<Medium<?>> createDifferentMedia() {
 
@@ -97,7 +103,7 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
    }
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getObjects()
     */
    @Override
    protected List<Medium<?>> getObjects() {
@@ -106,7 +112,7 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
    }
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getEqualObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getEqualObjects()
     */
    @Override
    protected List<Medium<?>> getEqualObjects() {
@@ -115,7 +121,7 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
    }
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getDifferentObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getDifferentObjects()
     */
    @Override
    protected List<Medium<?>> getDifferentObjects() {
@@ -124,7 +130,7 @@ public class MediumEqualityTest extends AbstractEqualsTest<Medium<?>> {
    }
 
    /**
-    * @see de.je.util.javautil.testUtil.equa.AbstractEqualsTest#getThirdEqualObjects()
+    * @see com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest#getThirdEqualObjects()
     */
    @Override
    protected List<Medium<?>> getThirdEqualObjects() {

@@ -1,6 +1,6 @@
 /**
  *
- * {@link AbstractDataService}.java
+ * {@link AbstractDataBlockService}.java
  *
  * @author Jens Ebert
  *
@@ -15,17 +15,17 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
 
 /**
- * {@link AbstractDataService} provides a default implementation of {@link IDataFormatsExtension} that only returns a
+ * {@link AbstractDataBlockService} provides a default implementation of {@link DataBlockService} that only returns a
  * {@link DataFormat}. Methods can be overridden to change its behavior.
  */
-public abstract class AbstractDataService implements DataBlockService {
+public abstract class AbstractDataBlockService implements DataBlockService {
 
    /**
-    * Creates a new {@link AbstractDataService}.
+    * Creates a new {@link AbstractDataBlockService}.
     * 
     * @param myDataFormat
     */
-   public AbstractDataService(DataFormat myDataFormat) {
+   public AbstractDataBlockService(DataFormat myDataFormat) {
       m_myDataFormat = myDataFormat;
    }
 
@@ -40,7 +40,8 @@ public abstract class AbstractDataService implements DataBlockService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockReader(DataFormatSpecification, int)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockReader(DataFormatSpecification,
+    *      int)
     */
    @Override
    public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {

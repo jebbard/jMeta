@@ -8,13 +8,13 @@
  */
 package com.github.jmeta.defaultextensions.id3v1.impl;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 
 /**
  * {@link ID3v1DataBlocksService}
  *
  */
-public class ID3v1DataBlocksService extends AbstractDataService {
+public class ID3v1DataBlocksService extends AbstractDataBlockService {
 
    /**
     * Creates a new {@link ID3v1DataBlocksService}.

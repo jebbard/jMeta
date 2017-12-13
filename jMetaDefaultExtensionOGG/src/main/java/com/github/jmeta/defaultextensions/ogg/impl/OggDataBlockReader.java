@@ -87,7 +87,6 @@ public class OggDataBlockReader extends StandardDataBlockReader {
     * @param spec
     * @param transformationHandlers
     * @param maxFieldBlockSize
-    * @param logging
     */
    public OggDataBlockReader(DataFormatSpecification spec,
       Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {

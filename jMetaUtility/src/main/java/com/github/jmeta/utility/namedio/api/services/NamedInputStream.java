@@ -1,3 +1,12 @@
+/**
+ *
+ * {@link NamedInputStream}.java
+ *
+ * @author Jens Ebert
+ *
+ * @date 11.05.2014
+ *
+ */
 package com.github.jmeta.utility.namedio.api.services;
 
 import java.io.File;
@@ -13,10 +22,10 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * The {@link NamedInputStream} class is a {@link FilterInputStream} that adds some meta data to a given arbitrary,
  * wrapped {@link InputStream}. This is mainly useful for identification purposes, because you sometimes want to know
  * the original source of a given input stream (file, URL etc.).
- * 
- * @author jebert
  */
 public class NamedInputStream extends FilterInputStream {
+
+   private final String name;
 
    /**
     * Creates a new {@link NamedInputStream}.
@@ -51,9 +60,6 @@ public class NamedInputStream extends FilterInputStream {
     * @return The {@link NamedInputStream}.
     * @throws IOException
     *            if creation of the wrapped {@link InputStream} fails.
-    * 
-    * @pre file.exists()
-    * @pre file.isFile()
     */
    @SuppressWarnings("resource")
    public static NamedInputStream createFromFile(File file) throws IOException {
@@ -101,12 +107,11 @@ public class NamedInputStream extends FilterInputStream {
 
       InputStream resourceAsStream = clazz.getResourceAsStream(resource);
 
-      if (resourceAsStream == null)
+      if (resourceAsStream == null) {
          throw new IOException(
             "Resource with name <" + resource + "> not found for class <" + clazz.getCanonicalName() + ">.");
+      }
 
       return new NamedInputStream(resourceAsStream, clazz.getCanonicalName() + "." + resource);
    }
-
-   private final String name;
 }

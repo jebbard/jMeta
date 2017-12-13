@@ -8,14 +8,14 @@
  */
 package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 
 /**
  * {@link Lyrics3v2DataBlocksService}
  *
  */
-public class Lyrics3v2DataBlocksService extends AbstractDataService {
+public class Lyrics3v2DataBlocksService extends AbstractDataBlockService {
 
    /**
     * Creates a new {@link Lyrics3v2DataBlocksService}.

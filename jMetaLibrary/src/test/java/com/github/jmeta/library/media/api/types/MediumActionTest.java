@@ -40,7 +40,8 @@ public class MediumActionTest {
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
          expectedActionBytes);
 
-      checkCreatedAction(newAction, expectedActionType, expectedRegion, expectedActionBytes, expectedSequenceNumber);
+      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+         expectedSequenceNumber);
    }
 
    /**
@@ -57,7 +58,8 @@ public class MediumActionTest {
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
          expectedActionBytes);
 
-      checkCreatedAction(newAction, expectedActionType, expectedRegion, expectedActionBytes, expectedSequenceNumber);
+      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+         expectedSequenceNumber);
    }
 
    /**
@@ -74,7 +76,8 @@ public class MediumActionTest {
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
          expectedActionBytes);
 
-      checkCreatedAction(newAction, expectedActionType, expectedRegion, expectedActionBytes, expectedSequenceNumber);
+      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+         expectedSequenceNumber);
    }
 
    /**
@@ -91,7 +94,8 @@ public class MediumActionTest {
       MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
          expectedActionBytes);
 
-      checkCreatedAction(newAction, expectedActionType, expectedRegion, expectedActionBytes, expectedSequenceNumber);
+      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+         expectedSequenceNumber);
    }
 
    /**
@@ -180,13 +184,20 @@ public class MediumActionTest {
    }
 
    /**
+    * Compares a given created {@link MediumAction} with expectations.
+    * 
     * @param newAction
+    *           The action to check
     * @param expectedActionType
+    *           The expected action type
     * @param expectedRegion
+    *           The expected region
     * @param expectedActionBytes
+    *           The expected action bytes
     * @param expectedSequenceNumber
+    *           The expected sequence number
     */
-   private void checkCreatedAction(MediumAction newAction, MediumActionType expectedActionType,
+   private void assertNewActionMatchesExpectations(MediumAction newAction, MediumActionType expectedActionType,
       MediumRegion expectedRegion, ByteBuffer expectedActionBytes, int expectedSequenceNumber) {
       Assert.assertEquals(expectedActionType, newAction.getActionType());
       Assert.assertEquals(expectedSequenceNumber, newAction.getScheduleSequenceNumber());

@@ -34,8 +34,8 @@ public abstract class AbstractMedium<T> implements Medium<T> {
 
    /**
     * Creates a new {@link AbstractMedium} with caching enabled (see {@link #isCachingEnabled()}), and default values
-    * used for all configuration values, see {@link #getMaxCacheRegionSizeInBytes()}, {@link #getMaxCacheSizeInBytes()}
-    * and {@link #getMaxReadWriteBlockSizeInBytes()}.
+    * used for all configuration values, see {@link #getMaxCacheSizeInBytes()} and
+    * {@link #getMaxReadWriteBlockSizeInBytes()}.
     * 
     * @param medium
     *           see #AbstractMedium(Object, String, boolean, boolean, boolean, long, int, int)

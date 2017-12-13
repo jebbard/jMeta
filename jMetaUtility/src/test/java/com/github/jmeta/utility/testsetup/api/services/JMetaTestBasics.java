@@ -14,9 +14,6 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-import org.junit.After;
-import org.junit.Before;
-
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
 import com.github.jmeta.utility.logchecker.api.services.LogChecker;
@@ -27,29 +24,8 @@ import junit.framework.AssertionFailedError;
  * {@link JMetaTestBasics} provides static methods to be used by most of the jMeta integration test cases for
  * cross-functional purposes. It is the basic test framework of jMeta integration testing.
  *
- * It basically does what {@link LibraryJMeta} does in the productive library: Load the extensions, instantiate
- * component registry and initialize all components.
- * 
- * The use of this class in test cases should follow the pattern:
- * <ul>
- * <li>Define a private non-static non-final attribute called registry of type {@link ISimpleComponentRegistry} in your
- * test class</li>
- * <li>Call {@link #setupComponents} in your jUnit setUp method (the one annotated with {@link Before}, assign its
- * return value to the previously mentioned attribute</li>
- * <li>In the setUp method, use the instance of {@link ISimpleComponentRegistry} to retrieve any component interfaces
- * you need for the test case, and assign them to private non-static non-final attributes of the test class</li>
- * <li>If the test cases in your test class need to access the {@link ISimpleComponentRegistry} or the component
- * interfaces, define private methods to retrieve the attributes</li>
- * <li>If you derive test classes from your current test class, make these methods protected to ensure the component
- * registry and component interfaces can be accessed by the subclasses</li>
- * <li>If a log check is required:
- * <ul>
- * <li>Call {@link #performGeneralLogCheck} in your jUnit tearDown method (the one annotated with {@link After}.</li>
- * </ul>
- * </ul>
- * 
- * This ensures that the life cycle of the components and its registry are clearly defined: They life during test case
- * execution, and not longer.
+ * It basically does what the productive library does: Load the extensions, instantiate component registry and
+ * initialize all components.
  */
 public class JMetaTestBasics {
 

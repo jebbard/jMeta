@@ -3,7 +3,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataService;
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
@@ -15,7 +15,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link ID3v23DataBlocksService}
  *
  */
-public class ID3v23DataBlocksService extends AbstractDataService {
+public class ID3v23DataBlocksService extends AbstractDataBlockService {
 
    /**
     * Creates a new {@link ID3v23DataBlocksService}.
@@ -52,7 +52,7 @@ public class ID3v23DataBlocksService extends AbstractDataService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataService#getDataBlockFactory()
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#getDataBlockFactory()
     */
    @Override
    public ExtendedDataBlockFactory getDataBlockFactory() {

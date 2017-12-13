@@ -1,6 +1,6 @@
 /**
  *
- * {@link Flags1ByteXXXTest}.java
+ * {@link Flags1ByteTest}.java
  *
  * @author Jens Ebert
  *
@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link Flags2ByteXXXTest} tests the {@link Flags} class with 2 byte flags.
+ * {@link Flags2ByteTest} tests the {@link Flags} class with 2 byte flags.
  */
-public class Flags2ByteXXXTest extends Flags1ByteXXXTest {
+public class Flags2ByteTest extends Flags1ByteTest {
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.types.Flags1ByteXXXTest#getByteLength()
+    * @see com.github.jmeta.library.dataformats.api.types.Flags1ByteTest#getByteLength()
     */
    @Override
    protected int getByteLength() {

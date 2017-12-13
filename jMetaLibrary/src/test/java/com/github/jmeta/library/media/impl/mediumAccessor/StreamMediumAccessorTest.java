@@ -23,7 +23,7 @@ import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
- * Tests the class {@StreamMediumAccessor}.
+ * Tests the class {@link InputStreamMediumAccessor}.
  */
 public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 

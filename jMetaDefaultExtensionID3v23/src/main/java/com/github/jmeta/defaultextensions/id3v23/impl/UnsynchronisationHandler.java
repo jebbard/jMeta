@@ -43,7 +43,6 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
     * 
     * @param dtt
     * @param dbFactory
-    * @param logging
     */
    public UnsynchronisationHandler(DataTransformationType dtt, DataBlockFactory dbFactory) {
       super(dtt, UNSYNCHRONISATION_TRANSFORMATION_ID, dbFactory);

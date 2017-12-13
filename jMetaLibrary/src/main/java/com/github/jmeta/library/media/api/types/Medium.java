@@ -23,8 +23,8 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  * 
  * In addition, there are several configuration values that can be used to configure the {@link Medium} for later access
  * by an {@link MediumStore}. These need to be set in the corresponding implementation classes. This interface only
- * offers methods for reading them: See {@link #getMaxReadWriteBlockSizeInBytes()},
- * {@link #getMaxCacheRegionSizeInBytes()}, {@link #getMaxCacheSizeInBytes()} and {@link #isCacheable()}.
+ * offers methods for reading them: See {@link #getMaxReadWriteBlockSizeInBytes()}, {@link #getMaxCacheSizeInBytes()}
+ * and {@link #isCachingEnabled()}.
  * 
  * @param <T>
  *           The concrete type of wrapped medium object.
@@ -94,11 +94,11 @@ public interface Medium<T> {
     * 
     * The read-write block size is used at several places:
     * <ol>
-    * <li>When reading bytes during {@link MediumStore#getData(MediumReference, int)} or
-    * {@link MediumStore#cache(MediumReference, int)}, at max this number of bytes is read at once. Thus a chunk-wise
-    * read is done in case more bytes need to be read from the medium.</li>
+    * <li>When reading bytes during {@link MediumStore#getData(MediumOffset, int)} or
+    * {@link MediumStore#cache(MediumOffset, int)}, at max this number of bytes is read at once. Thus a chunk-wise read
+    * is done in case more bytes need to be read from the medium.</li>
     * <li>It is also used as the maximum size of cache segments created during
-    * {@link MediumStore#getData(MediumReference, int)} or {@link MediumStore#cache(MediumReference, int)} for a cached
+    * {@link MediumStore#getData(MediumOffset, int)} or {@link MediumStore#cache(MediumOffset, int)} for a cached
     * medium.</li>
     * <li>When the need arises to read and write bytes before a written change in the medium during
     * {@link MediumStore#flush()}</li>
@@ -131,8 +131,6 @@ public interface Medium<T> {
    /**
     * Returns the current configuration for enabling caching (true) or disabling caching (false) for this
     * {@link Medium}.
-    * 
-    * The default value, if it is not explicitly set is {@link #DEFAULT_CACHING_ENABLED}.
     * 
     * @return the current configuration for enabling caching (true) or disabling caching (false)
     */

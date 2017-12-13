@@ -333,10 +333,9 @@ public abstract class AbtractDataBlockAccessorTest {
     * the data.
     *
     * This way, the cases of "field size equal to lazy field size" and "field size bigger than lazy field size" are
-    * tested in {@link #test_getContainerIterator_withLazyField()}. The "equal to" case is clearly the same as the
-    * "smaller" case, but is nevertheless tested separately. Note that the case "lazy field size smaller than lazy field
-    * size" which leads to the creation of normal fields is already covered by {@link #test_getContainerIterator()}, as
-    * usually the field sizes of the tested data in this method is smaller than the default lazy field size.
+    * tested. The "equal to" case is clearly the same as the "smaller" case, but is nevertheless tested separately. Note
+    * that the case "lazy field size smaller than lazy field size" which leads to the creation of normal fields is
+    * already covered.
     *
     * @return The field sizes to set as lazy field size.
     */

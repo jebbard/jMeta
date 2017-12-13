@@ -45,7 +45,6 @@ public interface DataFormatSpecification {
    public Set<DataBlockId> getTopLevelDataBlockIds();
 
    /**
-    * @pre {@link #specifiesBlockWithId(DataBlockId)} == true
     * @param id
     * @return the {@link DataBlockDescription} for the given id
     */

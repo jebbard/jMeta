@@ -33,42 +33,40 @@ public class Flags {
    /** The length of a {@link Long} in bytes. */
    public static final int LONG_BYTE_LENGTH = 8;
 
+   private final FlagSpecification spec;
+   private final ByteBuffer flagBytes;
+
    /**
     * Creates this {@link Flags} object.
     *
     * @param spec
-    *           The {@link FlagSpecification} defining names, length and positions of the flags.
-    *
-    * @pre spec != null
+    *           The {@link FlagSpecification} defining names, length and positions of the flags. Must not be null
     */
    public Flags(FlagSpecification spec) {
       Reject.ifNull(spec, "spec");
 
-      m_spec = spec;
+      this.spec = spec;
 
-      m_flagBytes = ByteBuffer.wrap(spec.getDefaultFlagBytes());
-      m_flagBytes.order(m_spec.getByteOrdering());
+      flagBytes = ByteBuffer.wrap(spec.getDefaultFlagBytes());
+      flagBytes.order(spec.getByteOrdering());
    }
 
    /**
     * Determines if a specific flag is set in the current byte value of this {@link Flags}.
     *
     * @param flagName
-    *           The name of the flag. Must be defined in the specification.
+    *           The name of the flag. Must be defined in the specification. Must be defined in the flag specification
     *
     * @return true if the flag is set, false if it is not set. For multi-bit flags, this method returns true if the at
     *         least one bit is set in the multi-bit flag.
-    *
-    * @pre The given flag name must be defined in the flag specification - {@link FlagSpecification#hasFlag(String)} ==
-    *      true for {@link #getSpecification()}
     */
    public boolean getFlag(String flagName) {
       Reject.ifNull(flagName, "flagName");
       Reject.ifFalse(getSpecification().hasFlag(flagName), "getSpecification().hasFlag(flagName)");
 
-      BitAddress address = m_spec.getFlagAddress(flagName);
+      BitAddress address = spec.getFlagAddress(flagName);
 
-      byte flagByte = m_flagBytes.get(address.getByteAddress());
+      byte flagByte = flagBytes.get(address.getByteAddress());
 
       byte mask = (byte) (1 << address.getBitPosition());
 
@@ -79,13 +77,13 @@ public class Flags {
     * Returns the flag value string
     * 
     * @param flagName
-    *           The name of the flag
+    *           The name of the flag. Must be defined in the flag specification
     * @return the flag value string
     */
    public String getFlagValueString(String flagName) {
       int flagValue = getFlagIntegerValue(flagName);
 
-      return m_spec.getFlagDescriptions().get(flagName).getValueNames().get(flagValue);
+      return spec.getFlagDescriptions().get(flagName).getValueNames().get(flagValue);
    }
 
    /**
@@ -102,13 +100,14 @@ public class Flags {
 
       int flagValue = 0;
 
-      FlagDescription description = m_spec.getFlagDescriptions().get(flagName);
+      FlagDescription description = spec.getFlagDescriptions().get(flagName);
 
       BitAddress flagStartAddress = description.getStartBitAddress();
 
       // The remaining bit count of the flag, starting with the next byte
       int bitCountInFurtherBytes = description.getBitSize() > (Byte.SIZE - flagStartAddress.getBitPosition())
-         ? description.getBitSize() - Byte.SIZE + flagStartAddress.getBitPosition() : 0;
+         ? description.getBitSize() - Byte.SIZE + flagStartAddress.getBitPosition()
+         : 0;
 
       // The number of bytes the flag spans over
       int spannedBytes = 1 + bitCountInFurtherBytes / Byte.SIZE + (bitCountInFurtherBytes % Byte.SIZE == 0 ? 0 : 1);
@@ -121,12 +120,14 @@ public class Flags {
          : Byte.SIZE - 1;
 
       for (int i = flagStartAddress.getByteAddress(); i < flagStartAddress.getByteAddress() + spannedBytes; i++) {
-         byte flagByte = m_flagBytes.get(i);
+         byte flagByte = flagBytes.get(i);
 
          // Build the bit mask
          byte bitMask = 0;
-         for (int j = startBitIndex; j <= endBitIndex; j++)
+
+         for (int j = startBitIndex; j <= endBitIndex; j++) {
             bitMask |= (1 << j);
+         }
 
          // Mask the flags (extracting the relevant bits only) and prevent signed one-bits
          // in the int when casting a negative flag byte by eliminating leading 1s.
@@ -141,7 +142,8 @@ public class Flags {
          // In case of the last byte the flag spans over: The end bit index might be
          // smaller thann 7
          endBitIndex = (i == flagStartAddress.getByteAddress() + spannedBytes - 2
-            ? (bitCountInFurtherBytes % Byte.SIZE) - 1 : Byte.SIZE - 1);
+            ? (bitCountInFurtherBytes % Byte.SIZE) - 1
+            : Byte.SIZE - 1);
       }
 
       return flagValue;
@@ -151,30 +153,29 @@ public class Flags {
     * Sets the flag with the given name to the given state.
     *
     * @param flagName
-    *           The flag to set.
+    *           The flag to set. Must be defined in the flag specification
     * @param set
     *           true to set the flag, false to unset the flag.
-    *
-    * @pre The given flag name must be defined in the flag specification - {@link FlagSpecification#hasFlag(String)} ==
-    *      true for {@link #getSpecification()}
     */
    public void setFlag(String flagName, boolean set) {
       Reject.ifNull(flagName, "flagName");
       Reject.ifFalse(getSpecification().hasFlag(flagName), "getSpecification().hasFlag(flagName)");
 
-      BitAddress address = m_spec.getFlagAddress(flagName);
+      BitAddress address = spec.getFlagAddress(flagName);
 
-      byte flagByte = m_flagBytes.get(address.getByteAddress());
+      byte flagByte = flagBytes.get(address.getByteAddress());
 
       byte mask = (byte) (1 << address.getBitPosition());
 
-      if (set)
+      if (set) {
          flagByte |= mask;
+      }
 
-      else
+      else {
          flagByte &= ~mask;
+      }
 
-      m_flagBytes.put(address.getByteAddress(), flagByte);
+      flagBytes.put(address.getByteAddress(), flagByte);
    }
 
    /**
@@ -203,7 +204,7 @@ public class Flags {
     * @return A byte representation of the {@link Flags}.
     */
    public byte asByte() {
-      return m_flagBytes.get(0);
+      return flagBytes.get(0);
    }
 
    /**
@@ -215,24 +216,23 @@ public class Flags {
     *           The byte value to set.
     */
    public void fromByte(byte byteValue) {
-      m_flagBytes.put(0, byteValue);
+      flagBytes.put(0, byteValue);
    }
 
    /**
     * Returns a short representation of the {@link Flags}. If the flags consist of more than {@link #SHORT_BYTE_LENGTH}
     * bytes, this only returns the first two bytes.
+    * 
+    * The specified byte length must be greater or equal to required byte length -
+    * {@link FlagSpecification#getByteLength()}{@literal >=} {@link #SHORT_BYTE_LENGTH} for {@link #getSpecification()}
     *
     * @return A short representation of the {@link Flags}.
-    *
-    * @pre Specified byte length must be greater or equal to required byte length -
-    *      {@link FlagSpecification#getByteLength()}{@literal >=} {@link #SHORT_BYTE_LENGTH} for
-    *      {@link #getSpecification()}
     */
    public short asShort() {
       Reject.ifFalse(getSpecification().getByteLength() >= SHORT_BYTE_LENGTH,
          "getSpecification().getByteLength() >= SHORT_BYTE_LENGTH");
 
-      return m_flagBytes.getShort(0);
+      return flagBytes.getShort(0);
    }
 
    /**
@@ -240,35 +240,33 @@ public class Flags {
     * Flags are set or unset according to the state of the bit at the specified position. If the flags consist of more
     * than {@link #SHORT_BYTE_LENGTH} bytes, this only writes the first two byte.
     *
+    * The specified byte length must be greater or equal to required byte length -
+    * {@link FlagSpecification#getByteLength()}{@literal >=} {@link #SHORT_BYTE_LENGTH} for {@link #getSpecification()}
+    *
     * @param shortValue
     *           The short value to set.
-    *
-    * @pre Specified byte length must be greater or equal to required byte length -
-    *      {@link FlagSpecification#getByteLength()}{@literal >=} {@link #SHORT_BYTE_LENGTH} for
-    *      {@link #getSpecification()}
     */
    public void fromShort(short shortValue) {
       Reject.ifFalse(getSpecification().getByteLength() >= SHORT_BYTE_LENGTH,
          "getSpecification().getByteLength() >= SHORT_BYTE_LENGTH");
 
-      m_flagBytes.putShort(0, shortValue);
+      flagBytes.putShort(0, shortValue);
    }
 
    /**
     * Returns an int representation of the {@link Flags}. If the flags consist of more than {@link #INT_BYTE_LENGTH}
     * bytes, this only returns the first four bytes.
     *
+    * The specified byte length must be greater or equal to required byte length -
+    * {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for {@link #getSpecification()}
+    * 
     * @return An int representation of the {@link Flags}.
-    *
-    * @pre Specified byte length must be greater or equal to required byte length -
-    *      {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for
-    *      {@link #getSpecification()}
     */
    public int asInt() {
       Reject.ifFalse(getSpecification().getByteLength() >= INT_BYTE_LENGTH,
          "getSpecification().getByteLength() >= INT_BYTE_LENGTH");
 
-      return m_flagBytes.getInt(0);
+      return flagBytes.getInt(0);
    }
 
    /**
@@ -276,52 +274,49 @@ public class Flags {
     * Flags are set or unset according to the state of the bit at the specified position. If the flags consist of more
     * than {@link #INT_BYTE_LENGTH} bytes, this only writes the first four bytes.
     *
+    * The specified byte length must be greater or equal to required byte length -
+    * {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for {@link #getSpecification()}
+    *
     * @param intValue
     *           The int value to set.
-    *
-    * @pre Specified byte length must be greater or equal to required byte length -
-    *      {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for
-    *      {@link #getSpecification()}
     */
    public void fromInt(int intValue) {
       Reject.ifFalse(getSpecification().getByteLength() >= INT_BYTE_LENGTH,
          "getSpecification().getByteLength() >= INT_BYTE_LENGTH");
 
-      m_flagBytes.putInt(0, intValue);
+      flagBytes.putInt(0, intValue);
    }
 
    /**
     * Returns a long representation of the {@link Flags}.
     *
-    * @return A long representation of the {@link Flags}.
+    * The specified byte length must be greater or equal to required byte length -
+    * {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for {@link #getSpecification()}
     *
-    * @pre Specified byte length must be greater or equal to required byte length -
-    *      {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for
-    *      {@link #getSpecification()}
+    * @return A long representation of the {@link Flags}.
     */
    public long asLong() {
       Reject.ifFalse(getSpecification().getByteLength() >= LONG_BYTE_LENGTH,
          "getSpecification().getByteLength() >= LONG_BYTE_LENGTH");
 
-      return m_flagBytes.getLong(0);
+      return flagBytes.getLong(0);
    }
 
    /**
     * Writes the flags from a long value. Flag positions that are not actually occupied by a named flag are ignored.
     * Flags are set or unset according to the state of the bit at the specified position.
     *
+    * The specified byte length must be greater or equal to required byte length -
+    * {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for {@link #getSpecification()}
+    *
     * @param longValue
     *           The long value to set.
-    *
-    * @pre Specified byte length must be greater or equal to required byte length -
-    *      {@link FlagSpecification#getByteLength()}{@literal >=}{@link #LONG_BYTE_LENGTH} for
-    *      {@link #getSpecification()}
     */
    public void fromLong(long longValue) {
       Reject.ifFalse(getSpecification().getByteLength() >= LONG_BYTE_LENGTH,
          "getSpecification().getByteLength() >= LONG_BYTE_LENGTH");
 
-      m_flagBytes.putLong(0, longValue);
+      flagBytes.putLong(0, longValue);
    }
 
    /**
@@ -330,7 +325,7 @@ public class Flags {
     * @return A byte array representation of the {@link Flags}.
     */
    public byte[] asArray() {
-      return m_flagBytes.array();
+      return flagBytes.array();
    }
 
    /**
@@ -338,16 +333,16 @@ public class Flags {
     * Flags are set or unset according to the state of the bit at the specified position. If the flags consist of more
     * than the arrays byte length bytes, this only writes the array bytes.
     *
+    * The specified byte length must be greater or equal to required byte length -
+    * {@link FlagSpecification#getByteLength()}{@literal >= array.length} for {@link #getSpecification()}
+    *
     * @param array
     *           The array to set.
-    *
-    * @pre Specified byte length must be greater or equal to required byte length -
-    *      {@link FlagSpecification#getByteLength()}{@literal >= array.length} for {@link #getSpecification()}
     */
    public void fromArray(byte[] array) {
-      Reject.ifFalse(m_spec.getByteLength() >= array.length, "getSpecification().getByteLength() >= array.length");
+      Reject.ifFalse(spec.getByteLength() >= array.length, "getSpecification().getByteLength() >= array.length");
 
-      m_flagBytes.put(array, 0, array.length);
+      flagBytes.put(array, 0, array.length);
    }
 
    /**
@@ -356,7 +351,7 @@ public class Flags {
     * @return The {@link FlagSpecification} associated with this {@link Flags} object.
     */
    public FlagSpecification getSpecification() {
-      return m_spec;
+      return spec;
    }
 
    /**
@@ -368,14 +363,16 @@ public class Flags {
 
       stringValue += getSpecification() + "; ";
 
-      for (Iterator<String> flagIterator = m_spec.getFlagDescriptions().keySet().iterator(); flagIterator.hasNext();) {
+      for (Iterator<String> flagIterator = spec.getFlagDescriptions().keySet().iterator(); flagIterator.hasNext();) {
          String flagName = flagIterator.next();
 
-         if (getFlag(flagName))
+         if (getFlag(flagName)) {
             stringValue += flagName + "=1 ";
+         }
 
-         else
+         else {
             stringValue += flagName + "=0 ";
+         }
       }
 
       stringValue += "]";
@@ -390,8 +387,8 @@ public class Flags {
    public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((m_flagBytes == null) ? 0 : m_flagBytes.hashCode());
-      result = prime * result + ((m_spec == null) ? 0 : m_spec.hashCode());
+      result = prime * result + ((flagBytes == null) ? 0 : flagBytes.hashCode());
+      result = prime * result + ((spec == null) ? 0 : spec.hashCode());
       return result;
    }
 
@@ -403,22 +400,26 @@ public class Flags {
       if (this == obj) {
          return true;
       }
+
       if (obj == null) {
          return false;
       }
+
       if (getClass() != obj.getClass()) {
          return false;
       }
+
       Flags other = (Flags) obj;
-      if (m_spec == null) {
-         if (other.m_spec != null) {
+
+      if (spec == null) {
+         if (other.spec != null) {
             return false;
          }
-      } else if (!m_spec.equals(other.m_spec)) {
+      } else if (!spec.equals(other.spec)) {
          return false;
       }
 
-      for (Iterator<String> iterator = m_spec.getFlagDescriptions().keySet().iterator(); iterator.hasNext();) {
+      for (Iterator<String> iterator = spec.getFlagDescriptions().keySet().iterator(); iterator.hasNext();) {
          String flagName = iterator.next();
 
          if (!getFlag(flagName) == other.getFlag(flagName))
@@ -427,7 +428,4 @@ public class Flags {
 
       return true;
    }
-
-   private final FlagSpecification m_spec;
-   private final ByteBuffer m_flagBytes;
 }

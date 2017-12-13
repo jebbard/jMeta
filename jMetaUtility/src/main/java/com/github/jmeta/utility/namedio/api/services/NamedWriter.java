@@ -2,7 +2,7 @@
  *
  * {@link NamedWriter}.java
  *
- * @author Jens
+ * @author Jens Ebert
  *
  * @date 11.05.2014
  *
@@ -23,10 +23,10 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link NamedWriter} class is a {@link BufferedWriter} that adds some meta data to a given arbitrary, wrapped
  * {@link Writer}. This is mainly useful for identification purposes, because you sometimes want to know the destination
  * of a given {@link Writer} (file, URL etc.).
- * 
- * @author jebert
  */
 public class NamedWriter extends BufferedWriter {
+
+   private final String name;
 
    /**
     * Creates a new {@link NamedWriter}.
@@ -57,9 +57,6 @@ public class NamedWriter extends BufferedWriter {
     * @return The {@link NamedWriter}.
     * @throws IOException
     *            if creation of the wrapped {@link Writer} fails.
-    * 
-    * @pre file.exists()
-    * @pre file.isFile()
     */
    @SuppressWarnings("resource")
    public static NamedWriter createFromFile(File file, Charset charset, boolean append) throws IOException {
@@ -77,6 +74,4 @@ public class NamedWriter extends BufferedWriter {
    public String getName() {
       return name;
    }
-
-   private final String name;
 }

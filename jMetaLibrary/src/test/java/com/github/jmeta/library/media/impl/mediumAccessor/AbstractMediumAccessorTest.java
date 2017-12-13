@@ -26,7 +26,7 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * Tests the interface {@IMediumAccessor}. Basic idea is to work on the {@link TestMedia#FIRST_TEST_FILE_PATH}. Its
+ * Tests the interface {@link MediumAccessor}. Basic idea is to work on the {@link TestMedia#FIRST_TEST_FILE_PATH}. Its
  * contents is just ASCII bytes that are read once at the beginning of test execution and determined as expected
  * content. Then reading and writing is tested based on this.
  */
@@ -42,7 +42,7 @@ public abstract class AbstractMediumAccessorTest {
        * relevant and the bytes read are expected at the same offset.
        * 
        * @param offsetToRead
-       *           The offset to read bytes from, null to indicate {@link MediumAccessor#NEXT_BYTES} for stream media.
+       *           The offset to read bytes from or null to indicate stream medium.
        * @param sizeToRead
        *           The number of bytes to read.
        */
@@ -54,6 +54,13 @@ public abstract class AbstractMediumAccessorTest {
        * This constructor is used for testing stream implementations, where the offset to read is ignored and no matter
        * what its value is, the bytes are read just sequentially. Thus, the offsetToRead might be arbitrary, while the
        * expected byte offsets are different.
+       * 
+       * @param offsetToRead
+       *           The offset to read from
+       * @param sizeToRead
+       *           The size to read
+       * @param expectedBytesOffset
+       *           The expected read offset
        */
       public ReadTestData(int offsetToRead, int sizeToRead, Integer expectedBytesOffset) {
          this.offsetToRead = offsetToRead;
@@ -513,10 +520,10 @@ public abstract class AbstractMediumAccessorTest {
    protected abstract ReadTestData getReadTestDataUntilEndOfMedium();
 
    /**
-    * Returns the concrete implementation of {@IMediumAccessor } to test. It is used for reading and writing from a
-    * {@IMediumAccessor}.
+    * Returns the concrete implementation of {@link MediumAccessor } to test. It is used for reading and writing from a
+    * {@link MediumAccessor}.
     * 
-    * @return the concrete implementation of {@IMediumAccessor } to test.
+    * @return the concrete implementation of {@link MediumAccessor } to test.
     */
    protected abstract MediumAccessor<?> createImplementationToTest();
 

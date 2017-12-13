@@ -24,15 +24,14 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  * <ul>
  * <li><b>Random-access media:</b> Allow random-access to all bytes of the medium. You can use
  * {@link #setCurrentPosition(MediumOffset)} to jump to a specific {@link MediumOffset} on the medium and then call
- * {@link #read(ByteBuffer)}, {@link #write(ByteBuffer)}, {@link #truncate(MediumOffset)} or
- * {@link #isAtEndOfMedium(MediumOffset)}.</li>
+ * {@link #read(ByteBuffer)}, {@link #write(ByteBuffer)}, {@link #truncate()} or {@link #isAtEndOfMedium()}.</li>
  * <li><b>Stream-based media:</b> Doe not allow random-access but only sequential reading of medium bytes.
  * {@link #setCurrentPosition(MediumOffset)} does not have an effect, only {@link #read(ByteBuffer)} advances the
  * current position.</li>
  * </ul>
  * 
  * In addition, an {@link Medium} might be read-only, such that the methods {@link #write(ByteBuffer)} and
- * {@link #truncate(MediumOffset)} cannot be used on these media and will throwing a runtime exception.
+ * {@link #truncate()} cannot be used on these media and will throwing a runtime exception.
  * 
  * Stream-based media are always also read-only, while random-access media might or might not be read-only.
  *
@@ -78,8 +77,8 @@ public interface MediumAccessor<T extends Medium<?>> {
 
    /**
     * Returns the current {@link MediumOffset} position of this {@link MediumAccessor}. The current position is the
-    * position used for the next calls to {@link #read(ByteBuffer)}, {@link #truncate(MediumOffset)} and
-    * {@link #write(ByteBuffer)} as well as for calls to {@link #isAtEndOfMedium(MediumOffset)}.
+    * position used for the next calls to {@link #read(ByteBuffer)}, {@link #truncate()} and {@link #write(ByteBuffer)}
+    * as well as for calls to {@link #isAtEndOfMedium()}.
     * 
     * For random-access media, the current position can be changed using {@link #setCurrentPosition(MediumOffset)},
     * {@link #write(ByteBuffer)} (changes by the number of written bytes) and {@link #read(ByteBuffer)} (changes by the

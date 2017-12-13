@@ -42,7 +42,9 @@ public interface Extension {
     * 
     * @param serviceInterface
     *           The service interface queried
+    * @param <S>
+    *           The concrete service interface type
     * @return all implementation instances for the given service interface that are offered by this extension
     */
-   public <T> List<T> getAllServiceProviders(Class<T> serviceInterface);
+   public <S> List<S> getAllServiceProviders(Class<S> serviceInterface);
 }

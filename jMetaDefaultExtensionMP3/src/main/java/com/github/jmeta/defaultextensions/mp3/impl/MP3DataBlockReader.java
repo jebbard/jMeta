@@ -153,7 +153,6 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
     * @param spec
     * @param transformationHandlers
     * @param maxFieldBlockSize
-    * @param logging
     */
    public MP3DataBlockReader(DataFormatSpecification spec,
       Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {

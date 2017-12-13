@@ -39,7 +39,7 @@ public class ShiftedMediumBlockComparator implements Comparator<ShiftedMediumBlo
    /**
     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
     * 
-    * @return negative int if left < right; positive int if left > right; zero if left.equals(right)
+    * @return negative int if left &lt; right; positive int if left &gt; right; zero if left.equals(right)
     */
    @Override
    public int compare(ShiftedMediumBlock left, ShiftedMediumBlock right) {
