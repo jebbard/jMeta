@@ -5,228 +5,189 @@
 \chapter{Cross-functional Aspects}
 \label{sec:BasicAspects}
 
-Als Design wird hier die Fortsetzung der skizzierten Architektur im Detail verstanden.
-
-In diesem Abschnitt werden übergreifende Aspekte des Designs von \LibName{} behandelt, die keinen Bezug zu nur einer Komponente oder nur einem Subsystem haben. Es handelt sich meist um die bekannten \emph{cross-cutting concerns}.
+This chapter covers cross-functional aspects of the \LibName{} design which are not implemented in a single component only but cover the whole library, i.e. these are the so called \emph{cross-cutting concerns}.
 
 %-----------------------------------------------------------------------------------------------
 %		General Error Handling
 %-----------------------------------------------------------------------------------------------
 
-\section{Generelle Fehlerbehandlung}
+\section{General Error Handling}
 \label{sec:GeneralErrorHandling}
 
-Hier wird der generelle komponenten-übergreifende Ansatz der Fehlerbehandlung in \LibName{} behandelt. Es werden also keine konkreten Fehler bestimmter Komponenten behandelt.
+Here, the general approach to error handling is presented. The basics of error handling are only slightly touched here. This section deals with errors that occur during the runtime of \LibName{}. This section does not describe concrete errors of concrete \LibName{} components. Instead, it defines guidelines used throughout \LibName{}.
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Abnormale Ereignisse vs. Fehler einer Operation}
+\subsection{Abnormal Events vs. Operation Errors}
 \label{sec:AbnormalEvengtVsOperationErrors}
 
-Gemäß \cite{Sied06} können wir Fehler wie folgt kategorisieren - die Kategorien werden hier zusätzlich untergliederd und benannt:
+According to \cite{Sied06}, errors can be categorized as follows:
 \begin{itemize}
-	\item \emph{Kategorie 1: Abnormale Ereignisse}: Ereignisse, die nur selten auftreten sollten und spezielle Behandlung erfordern.
-		\begin{itemize}
-			\item Verbindung zu einem Server ist abgebrochen
-			\item Eine Dateioperation schlägt fehl
-			\item Eine Konfigurations-Datei oder Tabelle, deren Existenz vorausgesetzt wird, ist nicht vorhand
-			\item Ein externer Speicher- oder der Hauptspeicherplatz ist erschöpft
-		\end{itemize}
-	\item \emph{Kategorie 2: Fehler einer Operation}: Eine Operation kann mit einem Fehler oder mit einem Erfolg beendet werden. Fehler einer Operation kann man von abnormalen Ereignissen dadurch unterscheiden, dass sie eine höhere Wahrscheinlichkeit haben, aufzutreten, und dass sie in der Regel direkt vom Aufrufer der Operation behandelt werden können.
-		\begin{itemize}
-			\item Kategorie 2a: Die Operation kann aus bestimmten inhaltlichen Gründen nicht korrekt durchgeführt werden, und muss daher abgebrochen werden. Z.B. hat ein Konto nicht die notwendige Deckung für die Durchführung einer Überweisung.
-			\item Kategorie 2b: Ungültiger User-Input, z.B. ist ein Eingabewert außerhalb des zulässigen Bereiches oder ein Objekt, auf dass sich die Eingaben beziehen, existiert nicht (mehr).
-			\item Kategorie 2c: Das aufgerufene Objekt hat nicht den notwendigen Zustand, der zum Aufruf der Operation gegeben sein muss.
-		\end{itemize}
+\item \emph{Abnormal events:} Events that should only rarely occur and require a special handling.
+\begin{itemize}
+\item Connection to a server is lost
+\item A file operation fails
+\item A configuration file, table or any other data item that is expected to exist is not present
+\item An external memory or the main memory lacks enough space to handle a request
+\end{itemize}
+\item \emph{Operation Errors:} An operation can be completed with success or error. Errors can be distinguished from abnormal events in that they are more likely or even expected to happen and that they can be handled directly by the caller of the operation.
+\begin{itemize}
+\item Invalid user input, e.g. an input value is out of range
+\item The state to call the operation is not yet established internally, the method must be called later or multiple times. This is e.g. very common in embedded programming.
+\item The previous case can be seen as a precondition that must be established to call the method. However, a precondition is rather something \emph{the user can establish} from the outside by e.g. calling another operation before.
+\end{itemize}
 \end{itemize}
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Fehlerbehandlungs-Ansätze}
+\subsection{Error Handling Approaches}
 \label{sec:ErrorHandlingApproaches}
 
-Fehlerbehandlungsmechanismen, die manchmal auch in Kombination eingesetzt werden:
+There are several different approaches to deal with the error categories, that are sometimes even used intermixed:
 \begin{itemize}
-	\item \emph{Error codes}: In prozeduralen System-Programmierungs-APIs, wie bei der Linux- oder Windows-API begegnen einem häufig noch error codes, d.h. Operationen liefern üblicherweise error codes als Rückgabewert. Einer der Codes ist häufig mit der Semantik ``kein Fehler aufgetreten'' belegt. Andere definieren spezielle Fehlersemantiken, die bei Ausführung der Operation aufgetreten sind.
-	\item \emph{Error-Handler}: Manche APIs ermöglichen es, Fehler-Behandlungsroutinen, sogenannte error handler anzugeben, die in Form von Call-Backs von der aufgerufenen Operation gerufen werden, wenn Fehler aufgetreten sind. Ein solcher error handler kann den Fehler dann behandeln.
-	\item \emph{Exceptions}: In objektorientierten Programmen sind Exceptions das Mittel der Wahl für die Fehlerbehandlung. Sie werden von einer Operation geworfen, was die Reihenfolge der Code-Ausführung ändert. Sie können in der call hierarchy gefangen werden. Geschieht dies nicht, beenden sie üblicherweise den Prozess, in dem die Operation ausgeführt werden ist. Fangen entspricht meist der Behandlung des Fehlers. Einge objekt-orientierte Sprachen wie Java und C++ unterscheiden zwischen checked und unchecked Exceptions.
+\item \emph{Error codes:} In procedural system programming APIs, e.g. the Linux or Windows API, operations usually return error codes. One code is reserved with the semantics "`no error"'. Other codes are defined with special semantics that describe the kind of error.
+\item \emph{Error handlers:} Some APIs allow to specify error handlers that are called back by the system in case of an error. The error handler, as the name suggests, needs to do something with the error condition. For this to work, it usually needs context information such as the kind of error that occurred.
+\item \emph{Exceptions:} Mostly in object-oriented programming, exceptions are objects that usually represent errors and can contain context information about the error. They are thrown by an operation which changes the order the operations code is executed. They need to be catched somewhere in the call hierarchy of the operation, either within the operation itself or in one of its active parent callers. If they are not catched, they terminate the process the operation was running in. So throwing is the raising of the error, thereby assuming that further code in the operation is not allowed to be executed as the current state prohibits that. Catching equals handling the error. Some object-oriented programming languages like Java and C++ distinguish between checked and unchecked exceptions.
 \end{itemize}
 
-\DD{dd:200}
-{% Titel
-	Fehlersignalisierung durch Exceptions
-}
-{% Kurzbeschreibung
-	\LibName{} nutzt ausschließlich Exceptions als Mechanismus zur Fehlersignalisierung.
-}
-{% Begründung
-Exceptions sind in Java gut unterstützt und wohlbekannt. Die anderen oben genannten Mechanismen sind in Java-APIs so gut wie nicht zu finden. Entsprechend ist die Verwendung des De-factor-Standardmechanismus auch für \LibName{} sinnvoll und gut geeignet.
-}
-{% Nachteile
- Keine erkennbar
-}
+Each approach has pros and cons. In object-oriented programs, usually the exception mechanism is used.
 
 %-----------------------------------------------------------------------------------------------
 
-\subsection{Allgemeine Designentscheidungen zur Fehlerbehandlung}
-\label{sec:ErrorHandlingApproachesAllgDes}
+\subsection{Error Handling in \LibName{}}
+\label{sec:ErrorHandlingLibName}
 
-Zunächst eine Designentscheidung mit sehr allgemeinen Richtlinien zu Exception-Klassen:
+\LibName{} as an object-oriented application uses the exception error handling approach. There are no error handlers in \LibName{}. The return values of \LibName{} methods will never have the semantics of an error.
 
-\DD{dd:201}
-{% Titel
-Richtlinien für die allgemeine Fehlerbehandlung in \LibName{}
-}
-{% Kurzbeschreibung
-	Es gelten folgende Richtlinien in \LibName{}:
-	\begin{itemize}
-		\item Für jede Fehlerkategorie wird eine separate Exception-Klasse definiert, diese hat einen sinnvollen Namen, der die Fehlerkategorie treffend beschreibt. Dieser Name endet mit ``Exception''. Die Klasse speichert notwendige Kontextinformationen zur Fehlerursache, die über getter im Rahmen der Fehlerbehandlung abgefragt werden kann.
-		\item \LibName{} wirft keine Exceptions der Java-Standard-Library. Stattdessen werden solche Fehler ggf. in eigene \LibName{} Exceptions als cause gewrappt.
-		\item Generell muss eine \LibName{}-Exception eine verursachende Exception als cause setzen.
-		\item \LibName{}-Exceptions können einen erläuternden Text zur Ursache des Fehlers enthalten. Dieser muss in U.S. Englisch formuliert werden.
-	\end{itemize}
-}
-{% Begründung
-Fehleranalyse wird somit nicht unnötig erschwert, Exceptions haben eine erkennbare Bedeutung und werden nicht zu generisch.
-}
-{% Nachteile
- Keine erkennbar
-}
+%***********************************************************************************************
 
-Die folgende Design-Entscheidung schließt eine Fehlerfassade aus:
+\subsubsection{General Exception Usage Guidelines}
+\label{sec:GeneralExceptionUsageGuidelines}
 
-\DD{dd:202}
-{% Titel
-Keine Fehlerfassade in \LibName{}
-}
-{% Kurzbeschreibung
-\LibName{} wird nicht durch eine Fehlerfassade umgeben, die alle unchecked Exceptions abfängt, bevor sie zum Anwender der Library gelangen können.
-}
-{% Begründung
-Eine solche Fehlerfassade bedeutet einen zusätzlichen Overhead. Die breite Schnittstelle der Library müsste so an allen ``Ausgängen'' mit der Fehlerfassade umgeben werden, was die Implementierung unnötig verkompliziert. \LibName{} kann ohnehin nicht alle unchecked Exceptions, die auftreten können, sinnvoll behandeln. Eine Weitergabe an den Anwender ist damit sinnvoll.
-}
-{% Nachteile
- Keine erkennbar
-}
+For each special category of error, a single exception class is defined. The exception class has a meaningful name the describes the error category. The name must end with \texttt{Exception}. The class stores as much context information as necessary to be able to handle the exception. This information is passed to the constructor of the exception when throwing it. It can be requested using special getters in the exception class.
 
-Die folgenden Designentscheidungen geben ganz grundlegende an, welche Exception-Arten für welche Fehlerkategorien eingesetzt werden:
+\LibName{} does not forward checked exceptions that are coming from internally used 3rd party libraries, such as the Java standard API. Instead, such errors are always wrapped by an own, meaningful \LibName{} exception.
 
+\LibName{} cannot handle all unchecked exceptions that might occur when calling a 3rd party library. So it might happen that such an exception propagates up to the \LibName{} library user. There is no means of a "`catch all"' implemented in \LibName{}, as there is not even a central common ground this could be implemented in.
 
-\DD{dd:203}
-{% Titel
-Unchecked exceptions für abnormale Ereignisse (Kategorie 1)
-}
-{% Kurzbeschreibung
-Im Falle von abnormalen Ereignissen wird in \LibName{} entweder eine spezielle \LibName-Exception als unchecked Exception (d.h. Exception, die von java.lang.RuntimeException ableitet) geworfen, oder es wird eine durch eine Java-Standard-Library-Methode erzeugte Exception geworfen.
+If a \LibName{} exception was caused by another exception, the causing exception must be specified in the \LibName{} exception.
 
-Es wird je Komponente entschieden, welche Fehler als abnormal gelten.
-}
-{% Begründung
-Abnormale Ereignisse können vom Aufrufer meist nicht sinnvoll behandelt werden. Durch checked exception würde jedoch zumindest ein ``catch'' erzwungen. Es macht darüber hinaus außer in Einzelfällen häufig wenig Sinn, runtime exceptions der Java-Standard-Library abzufangen und in \LibName{}-Exceptions zu konvertieren. Dies bringt nicht nur overhead mit sich, sondern gefährdet auch die Portabilität, da unter Umständen unspezifizierte Exceptions gefangen werden.
-}
-{% Nachteile
- Keine erkennbar
-}
+%***********************************************************************************************
 
-\DD{dd:204}
-{% Titel
-Checked exceptions für inhaltliche Fehler der Operation (Kategorie 2a)
-}
-{% Kurzbeschreibung
-Im Falle von inhaltlichen Fehlern einer Operation wird in \LibName{} eine spezielle \LibName-Exception als checked Exception (d.h. Exception, die von java.lang.Exception ableitet) geworfen.
+\subsubsection{Treating Abnormal Events}
+\label{sec:HandlingAbnormalEvents}
 
-Es wird je Komponente und Operation entschieden, welche Fehler als inhaltliche Fehler der Operation gelten.
-}
-{% Begründung
-Inhaltliche Fehler einer Operation können erwartet werden. Sie treten häufiger auf als abnormale Ereignisse. Aufrufer wissen i.d.R., wie sie diese behandeln müssen.
-}
-{% Nachteile
- Keine erkennbar
-}
+In case that \LibName{} detects an abnormal event, it throws a \LibName{} unchecked runtime exception. \LibName{} unchecked runtime exceptions must provide information about causing exceptions and a message. The message text may further describe the exact properties of the error. By now, message texts must be given in british English.
 
-\DD{dd:205}
-{% Titel
-Design-by-Contract für fehlerhafte Verwendung einer öffentlichen Operation (Kategorien 2b und 2c)
-}
-{% Kurzbeschreibung
-Erfolgen Aufrufe auf öffentliche API-Operationen einer Komponente im falschen Objektzustand (d.h. eine Vorbedingung ist nicht erfüllt) oder werden dort  Parameterwerte angegeben, die nicht dem gültigen Wertebereich entsprechen, dann verfährt \LibName{} gemäß design-by-contract rigoros, indem eine spezielle \LibName{} Unchecked Exception geworfen wird und die Verarbeitung der Operation somit ohne Effekt beendet wird. Dies signalisiert, dass es sich um einen fehlerhaften Aufruf der Operation handelt. Dieses Verhalten wird in der Schnittstellenbeschreiung der Methode definiert.
-}
-{% Begründung
-Der Vertrag ist klar definiert, dem Aufrufe ist klar, was er erfüllen muss, um die Methode verwenden zu dürfen. Falscher Aufruf wird als Programmierfehler gewertet und entsprechend quittiert. Die \LibName{}-Schnittstelle verhindert so, dass fehlerhafte Eingabe zu inkonsistenten Zuständen oder Daten oder zum Propagieren von Fehlern in untere Schichten führen und dann erst später zu, Vorschein kommen, was die Analyse solcher Fehler sehr erschweren kann. Hier wird gemäß ``fail fast'' gehandelt und der Fehler sofort bei der ersten Möglichkeit erkannt.
-}
-{% Nachteile
- Keine erkennbar
-}
+As mentioned before, the use of \LibName{} might also cause 3rd party unchecked runtime exceptions that are not under control of \LibName{}.
+
+How should \LibName{} users treat abnormal events? As the name and description of abnormal events suggest, there are usually only a few possible actions, but there might be also specialized handlings. A well-written application should not simply terminate in case of an abnormal event. It should at least have a catch all section that handles unchecked runtime errors. This section may show the error to their users in a dialog box or at least log them. In some cases, the users of that application might be able to retry the action, or choose another element on which to apply the action (e.g. in cased of a locked or read-only file). Depending on the kind of runtime error, a more sophisticated automated error handling can be set up by such an application. E.g. if a server connection had been lost, it might try to reconnect in a parallel thread, if the event happens during a database transaction, the database is of course rolled back and so on.
+
+%***********************************************************************************************
+
+\subsubsection{Treating Operation Errors}
+\label{sec:TreatingOperationErrors}
+
+Treating operation errors is not only done with the approach that every operation error is signaled by a checked exception. Most cases where checked exceptions could be used can well be covered with the design-by-contract paradigm. Some rare cases require checked exceptions, though. This is treated in the following sections.
+
+\paragraph{Design-by-Contract}
+\label{sec:DesignByContract}
+
+Design-by-contract, as originally created by Betrandt Meyer, states that each interface a client uses\footnote{Might be a OO class or interface as well as the interface of a module etc.} must define a contract. The contract includes the constraints and possibilities for the user (i.e. what he must provide or which state he has to establish) as well as the duty of the interface to behave as specified. This has multiple advantages:
+\begin{itemize}
+\item The interface clearly defines how it needs to be used. It is therefore easier to understand and also easier to test. The contract is most of the time the basis for test cases of the interface.
+\item If the interface implementation directly rejects wrong input according to its precondition, it strongly supports a defensive programming style. E.g. there are no NullPointerExceptions that are thrown from just anywhere in the implemention. Instead, the user input is checked immediately and pinpointed as the source of error. 
+\end{itemize}
+
+Violating the contract on the side of the user is clearly a programming error.\footnote{In theory, with a formal approach, such programming errors could even be checked at compile-time.} If the implementation violates the contract, it is simply not implementing its interface correctly.
+
+Design-by-contract distinguishes:
+\begin{itemize}
+\item \emph{Preconditions} that must be established by the user before calling a method
+\item \emph{Postconditions} that the implementation must establish after a method call
+\item \emph{Invariants}, i.e. state conditions for the interface that must be fulfilled before and after a method is called, but nut during a method call.
+\end{itemize}
+
+\paragraph{\LibName{} and Design-by-Contract}
+\label{sec:LibNameDesignByContract}
+
+The use of design-by-contract is basically described in the design decision \SectionLink{sec:DesignDecisionDbC}.
+
+In the Java implementation of \LibName{}, an invalid parameter range leads to an \texttt{IllegalArgumentException}, while a precondition that can only be checked by calling a method before-hand causes a \texttt{PreconditionUnfulfilledException} if not established. Every violation of a precondition contains a british English message that describes the error using detailed argument values.
+
+\paragraph{Design-by-Contract vs. Multithreading}
+\label{sec:DbcMultithreading}
+
+In case of multithreaded use of \LibName{}, the approach of actively checking the precondition at the beginning of each method can be outperformed. If a first thread finds that the precondition is established, but a second thread e.g. removes an item after that, leading to the precondition not being established anymore, the first thread will run into an error. The design-by-contract front-line is therefore not water-proof. However, this is not a problem of the approach itself, but a general multithreading issue. \LibName{} itself refuses to lock the code of every method for multiple threads at once to avoid decreased performance. Instead, multithreaded applications must ensure that multiple threads properly work together.
+
+\paragraph{Checked Exceptions}
+\label{sec:CheckedExceptions}
+
+Checked exceptions are only rarely used in \LibName{}, in exactly those cases where neither runtime exceptions nor preconditions are appropriate or applicable.
+
+Whenever the caller can handle an error that is quite likely to happen, this is reflected as a checked exception. The caller catches the exception and does an appropriate handling. An example for this is an end of file condition, which may always occur and simply indicates that the client should stop reading. Another example is a class loading some data in its constructor. However, the program functions even if this data contains errors and cannot be loaded. In that case, the constructor could throw a checked exception.
 
 %-----------------------------------------------------------------------------------------------
 
 \section{Logging in \LibName{}}
 \label{sec:LoggingLibName}
 
-Logging wird in \LibName{} ebenso verwendet, wie folgende Designentscheidung verrät:
+Logging is also used in \LibName{} as suggested by the following design decision:
 
 \DD{dd:206}
-{% Titel
-Verwendung von Logging in \LibName{}
+{% Title
+\LibName{} maintains a log file logging the most important events and errors
 }
-{% Kurzbeschreibung
-Logging wird in \LibName{} zumindest in den Subsysteme \SUBSBootstrap{} und \SUBSTechBase{} verwendet, um Startup der Library zu protokollieren. In anderen Subsystemen wird logging nur in Ausnahmefällen, z.B. bei Fehlerbehandlung eingesetzt. Das Logging kann auf Klassengranularität im Feinheitsgrad vom Anwender konfiguriert oder auch (komplett Klassenübergreifend) deaktiviert werden.
+{% Short description
+Logging is used in \LibName{} at least in \COMPcontext{} to protocol the startup loading of the library. In other components, logging is just used in exceptional cases, e.g. for error handling. The logging can be set on class basis by configuration done by the user, and it can also be fully disabled.
 }
-{% Begründung
-In hinreichend komplexen Systemen kann Logging zur Fehleranalyse nicht ersetzt werden. Logging ist zumindest für komplexe, fehleranfällige Abläufe unerlässlich. Deaktivierbarkeit verringert die Gefahr von Performance-Problemen.
+{% Rationale
+In sufficiently complex system it is simply necessary to log status information. The user can disable and fully configure it to his needs. 
 }
-{% Nachteile
- Keine erkennbar
+{% Disadvantages
+No disadvantages known
 }
 
-Die Frage ist natürlich, wann und auf welchen Levels genau geloggt wird:
+The question now is: What are the logging levels used?
 
 %%%% DD --> %%%%
 \DD{dd:206a}
-{% Titel
-Informative Ausgaben der Library auf INFO-Level, Details auf DEBUG, und Fehler auf ERROR
+{% Title
+Informative output is given on INFO level, details on DEBUG and errors on ERROR level
 }
-{% Kurzbeschreibung
-Wir loggen folgende Ausgaben auf dem angegeben Level:
+{% Short description
+\LibName{} logs the following output:
 \begin{itemize}
-\item \texttt{INFO}: Jegliche Ausgaben, die sich auf die Systemumgebung und die Version der Library beziehen werden einmalig beim ersten Verwenden der Library in der aktuellen JVM geloggt.
-\item \texttt{DEBUG}: Detailausgaben zu Fortschritten bestimmter Startup-Aktivitäten oder auch komplexer Operationen werden bei jedem Aufruf der komplexen Operation geloggt
-\item \texttt{ERROR}: Im Falle von Laufzeitfehlern, die die Library selbst wirft, werden zusätzlich zur Exception Fehlertexte in Englisch auf dem Level ERROR geloggt. Ausnahme: Fehler beim Prüfen von Vorbedingungen, insb. Eingabeparametern führen niemals zu zusätzlichen Logausgaben.
+\item \texttt{INFO}: Every informative output related to system environment, versioning etc.
+\item \texttt{DEBUG}: Detailed output for progress of specific startup activities or complex operations are logged during every call.
+\item \texttt{ERROR}: If necessary, additional diagnostic information is logged in case of errors on ERROR level.
 \end{itemize}
 }
-{% Begründung
-Beliebiges unnötiges Loggen wird eingedämmt. Komplexe, ggf. langlaufende Hintergrund-Operationen benötigen detaillierte Informationen für evtl. Fehleranalysen. Bei Laufzeitfehlern der Library selbst soll der Anwender bzw. der Analyst durch entsprechende Details im Logfile darauf hingewiesen werden, dass es an einer bestimmten Stelle ein Problem gegeben hat.
+{% Rationale
+There is no arbitrary but unnecessary logging. Complex background operations might require detailed log output for debugging. When errors at runtime occur within the library itself, debugging can be made easier by including addition information in logfiles.
 }
-{% Nachteile
-Keine bekannten Nachteile
+{% Disadvantages
+No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Zusätzlich muss noch festgelegt werden, ob es eine zentrale Instanz für das Logging gibt, oder ob stattdessen einfach eine Library genutzt wird.
+In addition, we have to define how the logging framework looks like:
 
 %%%% DD --> %%%%
 \DD{dd:206b}
-{% Titel
-Es wird keine Logging-Komponente erstellt, stattdessen wird slf4j direkt an allen notwendigen Stellen genutzt
+{% Title
+There is no self-made logging component, but \LibName{} uses \emph{slf4j} wherever necessary
 }
-{% Kurzbeschreibung
-Statt einer dedizierten, eigen-implementierten Logging-Komponente, die jede andere Komponente kennt, für das Logging genutzt wird und intern ein Logging-Framework kapselt, wird slf4j an allen notwendigen Stellen direkt genutzt.
+{% Short description
+Instead of a dedicated, hand-crafted and tested technical logging component which is known by every other component, and which encapsulates another logging library, \LibName{} code directly uses slf4j with a user-provided provider anywhere necessary. I.e. a direct dependency to slf4j is allowed from everywhere in the library.
 }
-{% Begründung
-Zuerst wurde eine zentrale Logging-Komponente implementiert, die letztlich nur java util Logging verwendet und festdefinierte Formatierungen nutzte. Grundidee war es hierbei, das Logging ``wegzukapseln'', um Logframeworks austauschbar zu gestalten sowie einige Konfigurationsaufgaben bezüglich des Loggings zu übernehmen. Diese Variante hat sich als wenig sinnvoll erwiesen, aus folgenden Gründen:
-\begin{itemize}
-\item Es muss jeder Komponente auf irgendeinem Wege eine Instanz der Logging Komponente mitgegeben werden bzw. diese muss sich eine Instanz dieser Komponente besorgen, damit können alle Komponenten nur gemeinsam mit der Logging-Komponente wiederverwendet werden
-\item Soll das Logging für wichtige zentrale Library-Elemente wie \ISimpleComponentRegistry{} oder das Verwalten von Erweiterungen genutzt werden, muss es vor deren Initialisierung initialisiert werden, da auch und gerade diese Bestandteile extensiv loggen müssen. Allerdings kann die Logging-Komponente nicht erstellt werden, wenn es noch kein Komponentenframework gibt. Ein Henne-Ei-Problem, was in der Vorversion zu seltsamen und unnötigen Konstrukten geführt hat
-\item Innovationen im gekapselten Logging-Framework bei Versions-Upgrades erfordern neuen Aufwand in der Logging-Komponente; insgesamt muss die Logging-Komponente entweder alle Funktionen des Logging-Frameworks weitergeben oder diese stark beschnitten anbieten
-\end{itemize}
-
-Die ``Kapselung'' des Loggings ist ein nur auf den ersten Blick gutes Argument. Erstens sollte man sich fragen: Wie oft tauscht man das Logging-Framework aus? slf4j bietet genau die Austauschbarkeit von Logging-Implementierungen direkt an. Als zusätzliches Plus kann der Anwender von \LibName{} selbst die slf4j-Implementierung seiner Wahl nutzen, was die Library u.a. ideal in bestehende Anwendungen integriert, ohne diesen die Verwendung einer weiteren neuen Log-Library aufzuzwingen. Ausgaben von \LibName{} können so beispielsweise direkt in die Hauptlogdatei der Anwendung mit aufgenommen werden. Zweitens ist Logging an sich ``0-Software'' ohne anwendungsspezifische Logik, eine eigene Komponente dafür wirkt übertrieben und verkompliziert neben den bereits erwähnten notwendigen Abhängigkeiten die Architektur. 
+{% Rationale
+An own component wastes time and effort, in addition, every other component must somehow get an instance of it. Furthermore, innovations of the logging framework encapsulated usually remain encapsulated until you also provide it at your outside interface. slf4j is already a wrapper shielding you from details of other logging frameworks. You do not need to rewrite a logging framework today yourself, there is more precious time to spent if you do not. \LibName{} reuses the great logging providers already out there directly as ``0 software'', i.e. perfectly reusable, functionally agnostic technical code. 
 }
-{% Nachteile
-Keine bekannten Nachteile
+{% Disadvantages
+No disadvantages known
 }
 %%%% <-- DD %%%%
-
 
 % -------------------------------------------------------------------------------------------------------
 %  Configuration
@@ -247,16 +208,16 @@ For now it turned out that there is no need in \LibName{} for such dynamic confi
 
 %%%% DD --> %%%%
 \DD{dd:207a}
-{% Titel
+{% Title
 \LibName{} offers no generic mechanism for (global or local) configuration, especiall it currently defines no properties that influence the behaviour of the library
 }
-{% Kurzbeschreibung
+{% Short description
 All necessary ``configurations'' for customizing the behaviour of a component are passed by the user via specialized (i.e. non-generic) setters or constructor  parameters.
 }
-{% Begründung
+{% Rationale
 There is no need for the bigger flexibility yet.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known.
 }
 %%%% <-- DD %%%%
@@ -266,22 +227,22 @@ No disadvantages known.
 
 % %%%% DD --> %%%%
 % \DD{dd:207}
-% {% Titel
+% {% Title
 % \LibName{} bietet einen generischen und erweiterbaren Konfigurationsmechanismus über die öffentliche API an
 % }
-% {% Kurzbeschreibung
+% {% Short description
 % Die Library über ihre öffentliche API Mittel zum Setzen und Abfragen von Konfigurationsparametern an. Die verfügbaren Konfigurationsparameter werden über die API als Konstanten repräsentiert und in der Dokumentation aufgeführt.
 
 % In \LibName{} kann prinzipiell jede Klasse einzeln konfigurierbar sein, d.h. der Sichtbarkeitsbereich der Konfigurationen muss in keinster Weise global sein.
 % }
-% {% Begründung
+% {% Rationale
 % Dies gewährt Flexibilität in vielerlei Hinsicht:
 % \begin{itemize}
 % \item Zukünftige Versionen von \LibName{} können einfach um weitere Konfigurationsmöglichkeiten erweitert werden, ohne die API anpassen zu müssen (bis auf die neue Konfigurationskonstante)
 % \item Konfigurationen mit globaler Gültigkeit machen meist wenig Sinn, sondern sind eher hinderlich, häufig erzeugt die Library einzelne Objekte (z.B. pro Sitzung oder pro Medium), die unabhängig voneinander konfiguriert werden müssen.
 % \end{itemize}
 % }
-% {% Nachteile
+% {% Disadvantages
 % Keine bekannten Nachteile
 % }
 % %%%% <-- DD %%%%
@@ -289,16 +250,16 @@ No disadvantages known.
 % Darüber hinaus gilt:
 % %%%% DD --> %%%%
 % \DD{dd:208}
-% {% Titel
+% {% Title
 % Konfiguration zur Laufzeit, keine properties-Dateien
 % }
-% {% Kurzbeschreibung
+% {% Short description
 % \LibName{} kann über Laufzeitaufrufe konfiguriert werden, und nicht über properties-Dateien
 % }
-% {% Begründung
+% {% Rationale
 % Properties-Dateien mögen in einigen Anwendungsfällen sinnvoll sein, aber nicht für eine dynamisch anpassbare Konfiguration. Sie sind eben nur statisch, und Änderungen erfordern i.d.R. den Neustart der Applikation. Natürlich können properties in Zukunft als Initial-Konfiguration dienen, die dann dynamisch nachjustiert werden kann. In der aktuellen \LibName{}-Version wird allerdings keine Notwendigkeit für statische Konfiguration gesehen.
 % }
-% {% Nachteile
+% {% Disadvantages
 % Keine bekannten Nachteile
 % }
 % %%%% <-- DD %%%%
@@ -306,20 +267,20 @@ No disadvantages known.
 % Für die Konfigurationsparameter selbst gilt:
 % %%%% DD --> %%%%
 % \DD{dd:209}
-% {% Titel
+% {% Title
 % Jeder Konfigurationsparamater hat einen Gültigkeitsbereich und einen Standardwert
 % }
-% {% Kurzbeschreibung
+% {% Short description
 % Jeder Konfigurationsparameter bei \LibName{} ist in dem Sinne verpflichtend, dass er immer einen Wert (in seinem Scope) hat. Dazu wird für jeden Parameter ein sinnvoller Standardwert definiert, der gilt, wenn kein explizites Setzen durchgeführt worden ist.
 
 % Zudem hat jeder Konfigurationsparameter einen gültigen Wertebereich, z.B. Minimum und Maximum bzw. gültige Werte.
 % }
-% {% Begründung
+% {% Rationale
 % Standardwerte sind immer wichtig, denn keiner will den Anwender zwingen, explizit zu konfigurieren. Die Standardwerte sollten so gewählt sein, dass das Verhalten der Library dem 80\%-Fall genügt und stabil funktioniert.
 
 % Wertebereiche kommunizieren dem Anwender bereits klar, welche Werte gültig sind und können für Plausibilitätsprüfungen genutzt werden.
 % }
-% {% Nachteile
+% {% Disadvantages
 % Keine bekannten Nachteile
 % }
 % %%%% <-- DD %%%%
@@ -327,16 +288,16 @@ No disadvantages known.
 % Schließlich legen wir noch fest:
 % %%%% DD --> %%%%
 % \DD{dd:210}
-% {% Titel
+% {% Title
 % Für Konfigurationen wird die Utility-API \SectionLink{sec:ConfigurationAPI} genutzt.
 % }
-% {% Kurzbeschreibung
+% {% Short description
 % \LibName{} nutzt eine API der Komponente \COMPutility{}, die auch prinzipiell von beliebigen anderen Projekten verwendet werden kann, um Konfigurationen anzubieten.
 % }
-% {% Begründung
+% {% Rationale
 % Konfiguration kann über eine generische API erfolgen. Die Notwendigkeit von Konfiguration ist nichts \LibName{}-spezifisches, sondern generell von Bedeutung. Daher macht das Aufbauen von wiederverwendbaren Komponenten in einem Utility-Anteil Sinn. Dies fördert auch die Einheitlichkeit: Die API für Konfiguration sieht für alle Komponenten von \LibName{} gleich aus.
 % }
-% {% Nachteile
+% {% Disadvantages
 % %Keine bekannten Nachteile
 % }
 % %%%% <-- DD %%%%
@@ -345,7 +306,7 @@ No disadvantages known.
 %  Naming Conventions and Project Structure
 % -------------------------------------------------------------------------------------------------------
 \section{Naming Conventions and Project Structure}%
-\label{sec:PackageNamingConventions}%
+\label{sec:NamingConventions}%
 
 % =======================================================================================================
 \subsection{Java Naming Conventions}%
@@ -404,7 +365,7 @@ Every IDE project containing code for \LibName{} starts has the form \texttt{\Li
 \item \texttt{Docs:} For any documentation of the library, no source code here (except for docs, e.g. tex files)
 \end{itemize}
 
-\texttt{[Extension]} is only used for the \texttt{DefaultExtension} library part. Each extension needs its own project and build unit. The reason is requirement \SectionLink{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}. This allows us to depoly individual JARs for each single extension. In addition, there is an integration testing projects for testing media that contain multiple different formats.
+\texttt{[Extension]} is only used for the \texttt{DefaultExtension} library part. Each extension needs its own project and build unit. The reason is requirement \SectionLink{sec:REQ010SchreibenInAnderesAusgabemediumUnterstützt}. This allows us to depoly individual JARs for each single extension. In addition, there is an integration testing projects for testing media that contain multiple different formats.
 
 Below, you can see the actual projects currently existing and their allowed dependencies:
 TODO

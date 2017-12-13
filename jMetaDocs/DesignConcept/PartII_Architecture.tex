@@ -24,16 +24,16 @@ This chapter presents all general design decisions that have a big impact on the
 \label{sec:VerwendungVonJava}
 
 \DD{dd:001}
-{% Titel
+{% Title
 \LibName{} is based on \JavaVersion{}%
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} is developed based on the ``latest update'' of \JavaVersion{}. Migrating \LibName{} towards newer Java versions is considered on a regular basis.
 }
-{% Begründung
+{% Rationale
 Java as programming language is well established and in wide use by a big number of world-wide developers. Furthermore, Java is platform-independent. In principle, porting \LibName{} to other platforms, to Java ME or to Java for  e.g. smart phones (e.g. Android) should be less effort than porting an equivalent C/C++ library. The author has long experience with Java programming, so this should facilitate productivity. The competitor libraries in the Java environment are good, but \LibName{} can be even better. The current (state 28th of November 2017) version \JavaVersion{} is used, because we want to create a modern library using the newest language features, libraries and programming models in the Java world. Furthermore, it is guaranteed that we get longer support for this Java version than for the previous ones.
 }
-{% Nachteile
+{% Disadvantages
 Applications being based on Java 7, Java 8 or older are not supported by \LibName{}. This would especially effect Java EE applications where it seems not yet possible to use \JavaVersion{} for some application servers.
 }
 
@@ -45,16 +45,16 @@ Applications being based on Java 7, Java 8 or older are not supported by \LibNam
 \label{sec:VerwendungAndLib}
 
 \DD{dd:002}
-{% Titel
+{% Title
 \LibName{} uses as few 3rd party libraries as possible
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} uses mostly only the libraries offered by Java SE. In the productive code of the library, no dependencies to other 3rd party libraries are used except for logging.
 }
-{% Begründung
+{% Rationale
 Additional dependencies could create overhead or question marks when it comes to building, shipping, testing or licensing. Furthermore, you might at one point in time reuse a well-tested and documented 3rd party library, and in the next year, it might get abandoned or bugs show up that do not get fixed. We ensure that bugs are just bugs that we can fix ourselves and we do not depend on other library developers.
 }
-{% Nachteile
+{% Disadvantages
 Sometimes this might mean ``do it yourself'' instead of reuse.
 }
 
@@ -66,16 +66,16 @@ Sometimes this might mean ``do it yourself'' instead of reuse.
 \label{sec:KomponentenbasierteLibrary}
 
 \DD{dd:003}
-{% Titel
+{% Title
 \LibName{} is component-based
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} is consisting of so-called components as defined in the follow-up sub-section. Each component has a well defined responsibility, a public API that can be used by all other components as well as a private implementation part that must not be used by other components. 
 }
-{% Begründung
+{% Rationale
 Structuring a big library into modular parts helps to manage the complexity of the library during planning, design, implementation and maintenance. By using a reasonable component structure, clear responsibilities, dependencies and decoupling of unrelated parts is achievable. Changes in implementation parts of a component do have less probability to affect other components, as they do only depend on the API of the component.
 }
-{% Nachteile
+{% Disadvantages
 Probably a little bit more overhead due to sometimes following ``conventions'' where an easier structure would be possible
 }
 
@@ -113,16 +113,16 @@ In addition, a component might have data ownership for a specific kind of releva
 %		Design Decision: Components decoupled by a light-weight service locator pattern
 %-----------------------------------------------------------------------------------------------
 \DD{dd:004}
-{% Titel
+{% Title
 Components decoupled by a light-weight service locator pattern
 }
-{% Kurzbeschreibung
+{% Short description
 To ensure low coupling between components, they must know each other only via their interfaces. A component can obtain a reference to a service implementation without directly depending on the implementation class itself by using a service locator pattern, specifically the Java SE \texttt{ServiceLoader}.
 }
-{% Begründung
+{% Rationale
 We want to decouple components. To achieve this, it must not be allowed for components to instantiate service implentations of other components directly, because service implementations are not part of the public interface of a component. A service locator exactly offers to obtain a service implementation reference without depending on it. For a library such as \LibName{}, neither JavaEE nor Spring or CDI dependency injection are valid options. Google Guice is not chosen because of \DesLink{dd:002}. Java SE \texttt{ServiceLoader} is a very easy to use and fully sufficient facility.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -131,18 +131,18 @@ No disadvantages known
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:005}
-{% Titel
+{% Title
 Singleton Components
 }
-{% Kurzbeschreibung
+{% Short description
 Each component offers a single \emph{main API service interface} that itself offers access to any other service interface the component provides.
 
 From a runtime perspective, each main API service interface thus has a single (ideally stateless) implementation, which you could refer to as ``singleton''.
 }
-{% Begründung
+{% Rationale
 A main API service interfaces is purely procedural. There is just one implementation of component allowed at runtime. We just need one instance for each component at runtime, as it is stateless. This safes memory and initialization overhead.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -151,16 +151,16 @@ No disadvantages known
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:007}
-{% Titel
+{% Title
 API and Implementation Layers
 }
-{% Kurzbeschreibung
+{% Short description
 Each component offers its services, exceptions and data types on an \emph{API layer}. This layer is a horizontal layer cutting through the whole library and representing the public API of the library. Also per component, it is the public API of a component. Compile-time dependencies from user code to \LibName{} as well as between components are only allowed via this API layer. The implementation layer depends on the API layer and contains any private classes. An outside component and user code is not allowed to have a compile-time dependency to implementation layer classes
 }
-{% Begründung
+{% Rationale
 Clear separation of concerns and information hiding. What implementation layer classes do is their private business, nobody from the outside world is allowed to directly work with and depend on them.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -169,16 +169,16 @@ No disadvantages known
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:008}
-{% Titel
+{% Title
 No further subdivision of implementation layer
 }
-{% Kurzbeschreibung
+{% Short description
 It is not necessary to further subdivide the implementation layer into sublayers. Instead, each component can have an arbitrary package structure in its implementation layer code.
 }
-{% Begründung
+{% Rationale
 We do not see any reasonable sublayers for \LibName{} that could be relevant for all components of the library.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -190,16 +190,16 @@ No disadvantages known
 \label{sec:entw}
 
 \DD{dd:009}
-{% Titel
+{% Title
 Development Environment
 }
-{% Kurzbeschreibung
+{% Short description
 As development environment, we use Maven, Eclipse and SubVersion for \LibName{}.
 }
-{% Begründung
+{% Rationale
 Amazing toolset that leaves not much else to wish for.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -211,16 +211,16 @@ No disadvantages known
 \label{sec:mult}
 
 \DD{dd:010}
-{% Titel
+{% Title
 \LibName{} is not thread-safe
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} is not a thread-safe library and (usually) does not use any Java APIs that are thread-safe.
 }
-{% Begründung
+{% Rationale
 In some cases, thread-safety means performance degradation due to synchronisation points. In addition, it almost always means higher complexity. In a non-functional programming language such as Java with a lot of mutable state, it is hard to get thread-safety right. If users need to work with \LibName{} in multiple threads, they have to ensure thread-safety themselves.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -232,16 +232,16 @@ No disadvantages known
 \label{sec:arch}
 
 \DD{dd:011}
-{% Titel
+{% Title
 Architecture of \LibName{}
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{}'s architecture adheres to the technical and functional architecture as descrived in chapters \SectionLink{sec:TechnicalArchitectureChap} and \SectionLink{sec:FunctionalArchitectureChap}.
 }
-{% Begründung
+{% Rationale
 See architecture discussion in detail in the next chapters
 }
-{% Nachteile
+{% Disadvantages
 See architecture discussion in detail in the next chapters
 }
 
@@ -314,20 +314,20 @@ The following design decisions are fundamental for the whole library and mostly 
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:101}
-{% Titel
+{% Title
 Generic reading and writing according to a format specification
 }
-{% Kurzbeschreibung
+{% Short description
 Reading and writing different \TERMcontainerFormat{}s is done generically by a central component. A format specification describes which features a \TERMcontainerFormat{} has, especially how its \TERMdataBlock{}s are structured and how they need to be interpreted. Thus it can be seen as a kind of generic parsing (and writing and validating) instruction of the data format.
 }
-{% Begründung
-According to the document \cite{MetaComp}, \TERMcontainerFormat{}s and their more specific children \TERMmetadataFormat{}s have a lot of things in common, in specific the way how they are structured and parsed. These common properties can be descrubed using a generic format specification. Instead of rewriting specific parsing, writing and validation code for each new supported \TERMcontainerFormat{}, all of them can be implemented by the same generic parsing, writing and validation code that is based on the generic format specification.
+{% Rationale
+According to the document \cite{MC17}, \TERMcontainerFormat{}s and their more specific children \TERMmetadataFormat{}s have a lot of things in common, in specific the way how they are structured and parsed. These common properties can be descrubed using a generic format specification. Instead of rewriting specific parsing, writing and validation code for each new supported \TERMcontainerFormat{}, all of them can be implemented by the same generic parsing, writing and validation code that is based on the generic format specification.
 
 This way, in the end, there should be less code, less duplication, and also a higher quality of code as it can be tested easier.
 
-This design decision also essentially enables to meet the requirement \SectionLink{sec:ANF007ErweiterbarkeitUmNeueMetadatenUndContainerformate}, as this way it is much easier to extend the library with new \TERMcontainerFormat{}s.
+This design decision also essentially enables to meet the requirement \SectionLink{sec:REQ007ErweiterbarkeitUmNeueMetadatenUndContainerformate}, as this way it is much easier to extend the library with new \TERMcontainerFormat{}s.
 }
-{% Nachteile
+{% Disadvantages
 The generic code can probably not be written to support any and every possible future or existing \TERMcontainerFormat{} out of the box. Thus there might still be changes required in future. We have to carefully avoid to add format specific code to this generic core code, such that it not again becomes a complex monster, where in the end it would have been better to rewrite code for each extension. The latter risk exists if the formats do not have as much in common as assumed by this design decision. This can make testing or even understanding the generic code extensively hard.
 
 In addition, there might be some small performance drawbacks, as generic code can of course not as heavily and specifically tuned as format-specific code can.
@@ -338,16 +338,16 @@ To mitigate the possible disadvantages of \DesLink{dd:101}, we define the follow
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:102}
-{% Titel
+{% Title
 It is possible to override generic reading and writing in extensions
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} \TERMcontainerFormat{} extensions are allowed to override specific parts of reading, writing and validation code to adapt them to specifics of their data format.
 }
-{% Begründung
+{% Rationale
 This minimizes the disadvantages of \DesLink{dd:101}. In special cases, this can lead to easier or faster implementations. Furthermore, using such hooks, it might not be necessary to blow up the core code by specifics that are actually only relevant for one or just a few concrete formats. Those specifics can then be implemented in the corresponding format's code.
 }
-{% Nachteile
+{% Disadvantages
 It might not be easy to clearly define and communicate which parts can be overridden and which not.
 }
 
@@ -356,34 +356,34 @@ To also mitigate the risk of too big and complex generic core code, we define:
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:103}
-{% Titel
+{% Title
 Format specifics are only defined in extensions
 }
-{% Kurzbeschreibung
+{% Short description
 Any special features of a \TERMcontainerFormat{} or \TERMmetadataFormat{} that are no common properties/features of a lot of container formats are only defined in the corresponding extensions. That said, the generic core code never directly depends on specifics of data formats, neither syntactically (e.g. compile-time dependencs to format extension; by using if-then-else to do things different depending on the current format) or semantically (e.g. implementing a special feature for just one format, but claim it is ``generic''). Only if a special feature of a format can be brought down to a common denominator for all supported formats, it is implemented generically.
 }
-{% Begründung
+{% Rationale
 So wird bereits mit der Kernlibrary selbst das Erweiterungskonzept genutzt und erprobt. Es findet eine strikte Trennung zwischen Kernimplementierung und Format-Spezifika statt, was eine bessere Beherrschung der Gesamt-Komplexität ermöglicht.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
 %-----------------------------------------------------------------------------------------------
 
 \DD{dd:100}
-{% Titel
+{% Title
 High-level and low-level API
 }
-{% Kurzbeschreibung
+{% Short description
 The generic, format-independent core parts of \LibName{} form a kind of \emph{low-level API} for parsing, writing and validating data of a \TERMcontainerFormat{} quite generically down to the byte level. The end user of \LibName{} is allowed to use this part of the library directly.
 
 However, on top of that there is a more convenient and format-specific \emph{high-level API} the user usually uses to access data.
 }
-{% Begründung
-According to \DesLink{dd:101}, \LibName{} has a generic format-independent core part. This could be made private, not to be used by end users of \LibName{}. However, this would not make it possible to fullfill \SectionLink{sec:ANF004ZugriffAufAlleRohdatenUeberDieLibrary}. At the same time, format-specific extensions need to reuse the core part. We do not want to throw the core part together with these higher-level extensions.
+{% Rationale
+According to \DesLink{dd:101}, \LibName{} has a generic format-independent core part. This could be made private, not to be used by end users of \LibName{}. However, this would not make it possible to fullfill \SectionLink{sec:REQ004ZugriffAufAlleRohdatenUeberDieLibrary}. At the same time, format-specific extensions need to reuse the core part. We do not want to throw the core part together with these higher-level extensions.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -401,7 +401,7 @@ An \emph{extension} summarizes format-specific content for a given data format, 
 \item Implementation extensions that might override generic parsing, writing and validation.
 \end{itemize}
 
-As a ground rule, every single extension can but should not define extension code for more than one data format. It might expose more data formats only if these two data formats heavily overlap and are based on each other, e.g. ID3v1 and ID3v1.1. This is to fulfill the requirement \SectionLink{sec:ANF010SchreibenInAnderesAusgabemediumUnterstützt}.
+As a ground rule, every single extension can but should not define extension code for more than one data format. It might expose more data formats only if these two data formats heavily overlap and are based on each other, e.g. ID3v1 and ID3v1.1. This is to fulfill the requirement \SectionLink{sec:REQ010SchreibenInAnderesAusgabemediumUnterstützt}.
 
 Moreover, distinct extensions should never depend on each other, but only on the \LibName{} core to avoid any confusion for the user.
 
@@ -462,7 +462,7 @@ All components are briefly described by a common structure that looks like this:
 %-----------------------------------------------------------------------------------------------
 
 \section{Any extension component}
-\label{sec:COMPContext}
+\label{sec:ExtComp}
 
 \textbf{Component Name:} Arbitrary, usually the name of the data format the extension implements
 

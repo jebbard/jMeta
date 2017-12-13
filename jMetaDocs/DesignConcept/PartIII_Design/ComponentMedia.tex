@@ -30,16 +30,16 @@ This section lists decisions about supported \TERMmedia{}. To start with, it is 
 
 %%%% DD --> %%%%
 \DD{dd:400}
-{% Titel
+{% Title
 Support for random-access file access
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} supports the use of files as input and output medium via \COMPmedia{} with access mechanism ``Random Access''.
 }
-{% Begründung
+{% Rationale
 Files are \emph{the} fundamental and most common digital media containers, even in 2016. Of course MP3 files, AVI files etc. with multimedia content are wide-spread. A library such as \LibName{} must support files as core element. To more efficiently process files, random-access is inevitable. Especially reading at arbitrary offsets \-- e.g. tags at end of file \-- as well as skipping of unimportant content is efficient to implement with random-access.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -48,16 +48,16 @@ But also reading streams shall be supported to increase the flexibility of the l
 
 %%%% DD --> %%%%
 \DD{dd:401}
-{% Titel
+{% Title
 Support for sequential, reading byte streams
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} supports the use of reading byte streams, i.e. \texttt{InputStream}s for input in mode ``sequential access''.
 }
-{% Begründung
+{% Rationale
 \texttt{InputStream} represents the most general alternative of a \TERMmedium{} from Java perspective, which ensures a potentially higher flexibility for using \LibName{}. E.g. multimedia files can be read from ZIP or JAR archives using streams, and support for media streams might be easier to implement in later releases \-- However: To state clearly: media streams do have nothing to do with this design decision. They might be implemented completely different in upcoming releases.
 }
-{% Nachteile
+{% Disadvantages
 An \texttt{InputStream} supports by definition only sequential access and no random-access (e.g. via \texttt{FileInputStream}). Thus there might be higher complexity for implementation, as well as signficant performance drawbacks because of lacking random-access.
 }
 %%%% <-- DD %%%%
@@ -66,16 +66,16 @@ Last but not least, the library offers access to RAM contained data, due to flex
 
 %%%% DD --> %%%%
 \DD{dd:402}
-{% Titel
+{% Title
 Support for random-access to byte arrays
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} allows for random-access to byte arrays as input medium and output medium.
 }
-{% Begründung
+{% Rationale
 Already loaded memory content can be parsed with \LibName{} without need for artistic climbs, increasing flexibility of the library.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -84,16 +84,16 @@ What about \texttt{OutputStream}s? That is discussed in the following:
 
 %%%% DD --> %%%%
 \DD{dd:403}
-{% Titel
+{% Title
 No support for writing byte streams
 }
-{% Kurzbeschreibung
+{% Short description
 \LibName{} does not support writing byte streams, i.e. \texttt{OutputStream}s.
 }
-{% Begründung
+{% Rationale
 \texttt{OutputStream}s are write-only, but still not random-access. Thus we would need \-- provided we want to access random-access media in a random-access style \-- a second implementation next to writing random-access. A combined usage of \texttt{InputStream}s and \texttt{OutputStream}s for Read-/Write access on the same medium is not designed into the Java API and leads to diverse problems. As \LibName{} already implements writing to output files and byte arrays, for reasons of effort, \texttt{OutputStream}s are not supported as output media. The user might implement \texttt{OutputStream}s easily by him- or herself, e.g. by first writing into byte arrays, then into an \texttt{OutputStream}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -109,16 +109,16 @@ To avoid such problems, there are special locking mechanisms for exclusive acces
 
 %%%% DD --> %%%%
 \DD{dd:404}
-{% Titel
+{% Title
 Locking of files during \LibName{} access
 }
-{% Kurzbeschreibung
+{% Short description
 Files are \emph{always} locked during access by \LibName{} explicitly. File content is protected by exclusive locks from corruption by other processes and threads. See \cite{PWikIO}, where we show that a file in Java must be explicitly opened for writing to be able to lock it. ``During access'' means: After opening it and until closing it. The lock thus might be long-term. \LibName{} opens a file for writing (and locking) even if the user explicitly requested read access only.
 }
-{% Begründung
+{% Rationale
 Other processes and threads of the same JVM cannot access the files and corrupt any data, which avoids consistency problems.
 }
-{% Nachteile
+{% Disadvantages
 It is not possible to access the same file in parallel threads when using \LibName{}. It seems rather unlikely that such parallel access to the same file (e.g. reading at different places) can speedup an application. But for future media this might indeed be a drawback.
 }
 %%%% <-- DD %%%%
@@ -127,16 +127,16 @@ The locking of byte streams or memory regions does not make sense, as discussed 
 
 %%%% DD --> %%%%
 \DD{dd:405}
-{% Titel
+{% Title
 No locking of byte streams 
 }
-{% Kurzbeschreibung
+{% Short description
 Byte streams are not locked
 }
-{% Begründung
+{% Rationale
 The interface \texttt{InputStream} does not offer any locking mechanisms. \LibName{} will not try to guess the kind of stream and lock it (e.g. by checking if it is a \texttt{FileInputStream}).
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -145,16 +145,16 @@ For different processes, the os usually protects access of memory regions. The q
 
 %%%% DD --> %%%%
 \DD{dd:406}
-{% Titel
+{% Title
 No locking of byte arrays
 }
-{% Kurzbeschreibung
+{% Short description
 Byte arrays are not locked
 }
-{% Begründung
+{% Rationale
 This makes not much sense as the user anyways gets a reference to the byte array by the API, and thus can access and manipulate the raw bytes arbitrarily in a multi- or single-threaded way. Protecting it by thread locking mechanisms increases complexity and does not seem to generate any benefits whatsoever.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -170,10 +170,10 @@ Moreover, we want a unifying combination of both approaches:
 
 %%%% DD --> %%%%
 \DD{dd:407}
-{% Titel
+{% Title
 Unified access to all supported media types in one API
 }
-{% Kurzbeschreibung
+{% Short description
 \COMPmedia{} offers a common abstraction for accessing files via random-access, \texttt{InputStream}s as well as byte arrays. This API provides the advantages of both access mechanisms via a common interface. The implementation throws exceptions of kind ``Operation not supported'' in some cases, if a feature is not supported by the medium. In other cases, a meaningful alternative behaviour is implemented. The using code must perform branche decisions at some places depending on the medium type.
 
 While byte arrays are no problem for the abstraction, even random-access files and \texttt{InputStream}s have more in common as you might think at first glance:
@@ -187,10 +187,10 @@ Writing access to a read-only medium is acquitted with a runtime exception, espe
 
 The main difference between files and \texttt{InputStream}s is of course: Random access is possible for files, while \texttt{InputStream}s can only be read sequentially. This difference can be potentially decreased using mechanisms such as buffering.
 }
-{% Begründung
+{% Rationale
 The API of the component \COMPmedia{} gets easier for outside users, its usage feels more comfortable. Using components of \COMPmedia{} can offer their users in turn an easier interface. At the same time, the advantages of both approaches (random-access and better performance for files, generality and flexibility for streams) are still available. 
 }
-{% Nachteile
+{% Disadvantages
 A few operations of the API cannot be implemted for both media types, which makes case decisions in the client code necessary in some cases.
 }
 %%%% <-- DD %%%%
@@ -204,16 +204,16 @@ When Writing, it is all about bundeling accesses and buffering. We want optimum 
 
 %%%% DD --> %%%%
 \DD{dd:410}
-{% Titel
+{% Title
 \COMPmedia{} uses a two-stage write protocol controlled by the user
 }
-{% Kurzbeschreibung
+{% Short description
 The first stageis the mere registration of changes, that need to written to the external medium. In this first stage, there is no access to the external medium yet. The second stage is the operation \emph{flush}, the final writing and commiting of all changes to the external medium. The underlying implementation bundles the write actions according to its needs into one or several packets and execute the write only in the second stage.
 }
-{% Begründung
+{% Rationale
 An efficient write implementation is possible. Internally, write actions can be bundled as needed to perform better. And this can be done without forcing the user to do it himself. The user can perform write (registration) actions whenever his code architecture needs it. Saying this, the user code is not burdened with too much restrictions or rules. Furthermore, the potential possibility of an ``undo'' of already registered actions comes into view.
 }
-{% Nachteile
+{% Disadvantages
 Errors that occur when actually flushing changes to the external medium are recognizes potentially quite late. Thus the registration of changes is quite fast while the flush itself can be a long taking process. Bugs might be introduced by user code forgetting to implement the second step, the flush.
 }
 %%%% <-- DD %%%%
@@ -222,16 +222,16 @@ Even if we implement this, it must be clearly stated that this is not in any way
 
 %%%% DD --> %%%%
 \DD{dd:410b}
-{% Titel
+{% Title
 Writing in \COMPmedia{} does not guarantee ACID, in case of errors during \emph{flush}, there is no rollback
 }
-{% Kurzbeschreibung
+{% Short description
 ACID (atomicity, consistency, isolation and durability) is not ensured neither by the implementation ofn \COMPmedia{} nor in gerenal by the Java File I/O. If e.g. an error occurs during Writing in the \emph{flush} stage, some data has been written already, while upcoming data will not get written anymore. There is no undo of already written data. The operation \emph{undo} must not be mixed up with a rollback and it is no action that is done automatically. While isolation and durability can be more or less provided, the user is responsible for consistency and atomicity himself.
 }
-{% Begründung
+{% Rationale
 A transaction manager that guarantees ACID, and this for files, is really hard to implement (correctly). This requirement is somehow out of scope, no other competing library is doing something similar. \LibName{} will not be a database!
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -286,10 +286,10 @@ Based on these requirements, we can first define the following basic design deci
 
 %%%% DD --> %%%%
 \DD{dd:410d}
-{% Titel
+{% Title
 \COMPmedia{} offers the writing operations \emph{insert}, \emph{remove} and \emph{replace}
 }
-{% Kurzbeschreibung
+{% Short description
 The user can:
 \begin{itemize}
 \item \emph{insert} $N$ bytes at a given offset (adresses requirement \texttt{AMed01})
@@ -302,10 +302,10 @@ The user can:
 \end{enumerate}
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 See requirements \texttt{AMed01}, \texttt{AMed02} and \texttt{AMed03}. The burden to implemen these convenient operations using the Java File I/O, which essentially only offers write() and truncate(), is taken over by \COMPmedia{}, such that the user need not care.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -313,20 +313,20 @@ No disadvantages known
 How is the padding requirement adressed? Like this:
 %%%% DD --> %%%%
 \DD{dd:410d2}
-{% Titel
+{% Title
 Requirement \texttt{AMed06} must be adressed by components using \COMPmedia{}, it is not built into \COMPmedia{} itself
 }
-{% Kurzbeschreibung
+{% Short description
 \COMPmedia{} does not implement \texttt{AMed06} itself, it does not know something like ``Padding'', but just the three primitive change operations. Using them, a third party component can do the following using \COMPmedia{}:
 \begin{itemize}
 \item If a new field is added to the ID3v2 tag (with an \emph{insert}) and padding that is longer than the newly inserted content is present, the 3rd party component has to do a \texttt{remove} of a corresponding number of padding bytes, or a \texttt{replace} of old padding bytes by new (shorter) padding bytes.
 \item If a field is removed from the ID3v2 tag (with a \emph{remove}), the 3rd party component can do an \texttt{insert} of a corresponding number of padding bytes at the end of the tag, or a \texttt{replace} of old padding bytes (if present) by new (longer) padding bytes.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 \COMPmedia{} should stay clean of any ``functional'' terms defined by some formats, but it should just stick to the primitives it offers to modify media content. As shown above, the requirement can quite easily be implemented by tag-specific logic on top of \COMPmedia{}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -335,16 +335,16 @@ As we have a two-stage write protocol, the \emph{undo} of not yet flushed change
 
 %%%% DD --> %%%%
 \DD{dd:420}
-{% Titel
+{% Title
 Writing operations on a medium can be undone with \emph{undo} before a \emph{flush}, adressing requirement \texttt{AMed07}
 }
-{% Kurzbeschreibung
+{% Short description
 Writing operations lead to pending changes according to \DesLink{dd:410}. These can be undone according to the requirements defined above.
 }
-{% Begründung
+{% Rationale
 The application logic can require \emph{undo} in some cases, e.g. for corrections of mistakes done by an end user. Instead of requiring to call the inverse operation (if any at all), the user is much more convenient with undoing the operation itself directly. This also ensures that the using code does not need to trace changes to be able to find which is the inverse operation.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -364,16 +364,16 @@ At first it is quite clear that for reading, you should help yourself with buffe
 
 %%%% DD --> %%%%
 \DD{dd:409}
-{% Titel
+{% Title
 Reading access can be done using a buffering mechanism, controlled by the component's user
 }
-{% Kurzbeschreibung
+{% Short description
 For each reading access, the calling code can specify the number of bytes to read, which corresponds to a buffering. The code controls the size of the buffer by itself. It potentially can also read only one byte. It lies in the responsibility of the calling code to read an amount of bytes that makes sense and minimizes read accesses.
 }
-{% Begründung
+{% Rationale
 A hardcoded fixed length buffering would rather lead to performance disadvantages, as there might be read too much bytes, more than necessary in average. Furthermore, depending on the fixed size, it would be necessary to read two or even several times when a bigger chunk of data is needed. According to \cite{PWikIO}, there is no ``one size fits all'' for buffer sizes in file I/O. The logical consequence is to let the user decide.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known.
 }
 %%%% <-- DD %%%%
@@ -421,20 +421,20 @@ Thus we decide:
 
 %%%% DD --> %%%%
 \DD{dd:411}
-{% Titel
+{% Title
 \COMPmedia{} keeps medium data read in a cache
 }
-{% Kurzbeschreibung
+{% Short description
 \COMPmedia{} uses a RAM-based, potentially long-lived fast storage (cache) to store already read content of the \TERMmedium{}. Subsequent read accesses request the cache content (if present) only.
 }
-{% Begründung
+{% Rationale
 \begin{itemize}
 \item We provide faster repeated read access to already read data to the end-user
 \item This can be used for direct implementation of \DesLink{dd:409} in a sense of buffering when reading. i.e. the cache works as the buffer for \DesLink{dd:409}
 \item Implementation of \DesLink{dd:407} can be done using a cache
 \end{itemize}
 }
-{% Nachteile
+{% Disadvantages
 Were given in table \hyperref[tab:CachingProCon]{\ref{tab:CachingProCon}}. The alternative is a direct medium access. To summarize the disadvantages against a direct medium access:
 \begin{itemize}
 \item Higher code complexity
@@ -449,16 +449,16 @@ How to use caching to better achieve \DesLink{dd:407}?
 
 %%%% DD --> %%%%
 \DD{dd:411b}
-{% Titel
+{% Title
 Caching is used to better mitigate the differences between \texttt{InputStream}s and files according to \DesLink{dd:407}.
 }
-{% Kurzbeschreibung
+{% Short description
 The data that has been read from an \texttt{InputStream} is always put into a cache. Reading actions are therefore allowed to ``go back'' to already read data, by not issuing another direct access (which is anyway not possible using an \texttt{InputStream}), but by taking the data from the cache. ``Read ahead'' for areas that have not yet been reached on the \texttt{InputStream} lead to the behaviour that all data up to the given higher offset is read and cached.
 }
-{% Begründung
+{% Rationale
 This implements \DesLink{dd:407} nearly entirely, ``transparent'' to the user.
 }
-{% Nachteile
+{% Disadvantages
 Even more heap space is necessary for \texttt{InputStream}s, as in extreme cases the whole medium might end up in the cache, which might lead to \texttt{OutOfMemoryError}s.
 }
 %%%% <-- DD %%%%
@@ -468,16 +468,16 @@ Of course, the disadvantages mentioned in \DesLink{dd:411b} are heavy-weigth. If
 As a first step, the following three design decisions are necessary:
 %%%% DD --> %%%%
 \DD{dd:411c}
-{% Titel
+{% Title
 The user can disable caching entirely
 }
-{% Kurzbeschreibung
+{% Short description
 The user can disable caching entirely. Here, too, access to previously cached offsets is not possible for \texttt{InputStream}s and will be acquitted with an exception.
 }
-{% Begründung
+{% Rationale
 The user is responsible to decide about the memory footprint: E.g. if the medium is comparatively small, caching can be tolerated. If it is a big medium, the user has the possibility to disable caching, however demanding a step-wise processing of the data.
 }
-{% Nachteile
+{% Disadvantages
 The implementation of \COMPmedia{} gets more complex due to corresponding case decisions.
 }
 %%%% <-- DD %%%%
@@ -485,48 +485,48 @@ The implementation of \COMPmedia{} gets more complex due to corresponding case d
 
 %%%% DD --> %%%%
 \DD{dd:411e}
-{% Titel
+{% Title
 The user can set the maximum size of the cache per medium, the cache keeps only the newest added data
 }
-{% Kurzbeschreibung
+{% Short description
 The user is allowed to limit the maximum size of the cache per medium by configuring it before creating the cache. The cache implementation ensures that at any time, the cache does not contain more bytes than which correspond to the maximum size. This is done using a FIFO (first in, first out) mechanism. I.e. the bytes added first are first discarded whenever trying to add new bytes to a cache.
 }
-{% Begründung
+{% Rationale
 This way, the user can influence the maximum heap size required for caching of a single medium. At the same time, he needs not control the cache size himself, but it is internally managed by \COMPmedia{}
 }.
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
 %%%% DD --> %%%%
 \DD{dd:411f}
-{% Titel
+{% Title
 Performance drawbacks of \texttt{InputStream}s are explicitly documented
 }
-{% Kurzbeschreibung
+{% Short description
 Reducing differences between \texttt{InputStream}s and files by caching in accordance to \DesLink{dd:411b} means: You must deal with the fact that you cannot store virtually unlimited \texttt{InputStream}s in a cache. For file access, the user can also choose between \texttt{FileInputStream} and more direct access via \texttt{RandomAccessFile}s. The performance drawbacks induced by using \texttt{FileInputStream} compared to  random-access \-- which are introduced by a unified API according to \DesLink{dd:411b} \-- are explicity described in the \LibName{} documentation. The mitigation mechanisms (setting maximum cache size, disabling caching) are explicitly described with their corresponding consequences.
 }
-{% Begründung
+{% Rationale
 There are no wrong expectations by providing the unified API. The contract is described clearly enoughto the user. He must choose the medium best suited for his purpose.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
 %%%% DD --> %%%%
 \DD{dd:411g}
-{% Titel
+{% Title
 The user cannot free up cache data in a fine-grained way
 }
-{% Kurzbeschreibung
+{% Short description
 \COMPmedia{} will not provide any mechanisms for the user to free up cached data himself in a fine-grained way (e.g. range-based).
 }
-{% Begründung
+{% Rationale
 This functionality needs to be implemented and tested (additional effort). It is quite unlikely that it is actually needed when having implemented \DesLink{dd:411e}. Furthermore, when should the user free the data? A monitoring by the using code is necessary which also makes the using code more complex.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -542,18 +542,18 @@ Finally, we want to list a design decision rejected during a proof of concept, w
 
 %%%% DD --> %%%%
 \DD{dd:411d}
-{% Titel
+{% Title
 The \COMPmedia{} API does not provide the option to skip bytes of an \texttt{InputStream} instead of reading them into the cache
 }
-{% Kurzbeschreibung
+{% Short description
 It sounds like a good idea to offer the configurable possibility to skip bytes from an \texttt{InputStream} instead of unnecessarily reading them (and put them into a cache). This mainly applies for the case when you are currently at offset $x$, but now you want to read bytes from the stream starting at offset $x+100$. You might never want to access the bytes between $x$ and $x+100$. So it would be worthwile to allow the possibility to simply skip them instead of reading them into memory and into the cache.
 
 However, \texttt{InputStream.skip} is not as straightforward as one could wish. It does not guarantee to skip the number of bytes given, but it might skip fewer bytes or even return a negative number. It might also throw an \texttt{IOException}, which might or might not include the case of reaching the end of medium. Although not specified, there might be the same behavior as for read, that \texttt{InputStream.skip} might block. Furthermore the javadocs specify that it is only supported for streams that support seeking. All in all, this gives the impression that the method is highly platform and implementation-dependent. How to bring this implementation into a reliable form that guarantees to always skip the given number of bytes or block (possibly with timeout)?
 }
-{% Begründung
+{% Rationale
 It is too complex to implement the method reliably, thus we omit it and only offer the possibility to read ahead until a given offset. All bytes read are possibly read into the cache. However, the cache is ``self-cleaning'' according to \DesLink{dd:411e}, if a maximum size is configured. This mechanism should be sufficient for achieving a moderate heap usage.
 }
-{% Nachteile
+{% Disadvantages
 Probably more heap usage and bytes might be unnecessary read and kept in memory.
 }
 %%%% <-- DD %%%%
@@ -562,16 +562,16 @@ Implementing the discussed caching mechanisms is a big challenge. It will be det
 
 %%%% DD --> %%%%
 \DD{dd:412}
-{% Titel
+{% Title
 \texttt{MappedByteBuffer} will not be used to implement caching
 }
-{% Kurzbeschreibung
+{% Short description
 You could come with the idea to use the Java NIO class \texttt{MappedByteBuffer} for implementing the caching of \DesLink{dd:411}. However, we do not use it and implement another solution ``by hand''.
 }
-{% Begründung
+{% Rationale
 It is not guaranteed, that each OS supporting Java also supports a \texttt{MappedByteBuffer}. It is also not guaranteed that the data ``cached'' is really present in RAM and thus accessible faster. Furthermore, it is indicated that for each concecutive region of a medium a new \texttt{MappedByteBuffer} instance including new OS call would need to be created. Thus this approach is unpredictable and might lack the desired benefits.
 }
-{% Nachteile
+{% Disadvantages
 The ``by hand'' caching is harder to implement.
 }
 %%%% <-- DD %%%%
@@ -579,16 +579,16 @@ The ``by hand'' caching is harder to implement.
 At the end we shortly list a special case of caching for byte array media:
 %%%% DD --> %%%%
 \DD{dd:412a}
-{% Titel
+{% Title
 For byte array media, caching is always disabled
 }
-{% Kurzbeschreibung
+{% Short description
 For byte array media, caching is always disabled
 }
-{% Begründung
+{% Rationale
 byte arrays already are in RAM, caching would just be unncessary overhead
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -608,18 +608,18 @@ You could base your answer on the following: For sure alternative (2), as it is 
 
 %%%% DD --> %%%%
 \DD{dd:410c}
-{% Titel
+{% Title
 The user can only read what is currently persisted on the medium
 }
-{% Kurzbeschreibung
+{% Short description
 Even if there are pending changes not yet \emph{flush}ed (e.g. inserts, removes), with \COMPmedia{} the user can only see the latest flushed state.
 }
-{% Begründung
+{% Rationale
 The changes the user has registered are coming form the user, and he thus could potentially keep bookmarks of them. Therefore their sole management by \COMPmedia{} is - at this point in time - not strictly necessary. Furthermore it must still be possible to read the data of a datablock that is threatened by a pending remove. 
 
 Another good reason for this behaviour is that  the reading operations are much less complex, as they do not need to consider any pending changes. The code that reads data can be sure to always only work on a persistent (or at least a cached) state. Thus it cannot occur that logic is basing on data that is not yet persisted.
 }
-{% Nachteile
+{% Disadvantages
 The expectation that ``what I have written before - even if pending - I can re-read afterwards'' is not fulfilled. The user must manage this for changed data by himself, at least temporarily until the next flush. 
 }
 %%%% <-- DD %%%%
@@ -627,16 +627,16 @@ The expectation that ``what I have written before - even if pending - I can re-r
 In \SectionLink{sec:PerfMedia}, caching has been discussed in detail. For buffering, we first need an operation to do buffering without actually returning the buffered data:
 %%%% DD --> %%%%
 \DD{dd:412b}
-{% Titel
+{% Title
 Explicit operation for buffering of media data
 }
-{% Kurzbeschreibung
+{% Short description
 There is an operation \emph{cache} which buffers $n$ data bytes starting at a given offset, without returning this data. Additionally, there is an operation to query the number of bytes buffered concecutively starting at a given offset. Of course, this might lead to an ``end of medium'' situation indicated by the method to the caller.
 }
-{% Begründung
+{% Rationale
 Necessary for implementing \DesLink{dd:409}. Of course one could ask: Why isn't it sufficient to just provide a single \texttt{getData} operation that returns data, either from the cache or from the medium. If the data was not yet in cache, it also adds it to the cache. The reason is: The code might not want the bytes yet! It just wants to give a statement like ``At this point in time, I know how much bytes I might need to read later, so please already buffer them. But do not give the bytes to me, because at this point in the code I cannot really use them and it would complicate my code strucutre.'' For instance, if only providing one method returning the data, the code must pass the read data as parameter to other methods to read it. Instead of doing this, the code can just buffer the needed number of bytes, then call other code to get just the data it needs without needing to fiddle keeping track of the last read byte.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -644,16 +644,16 @@ No disadvantages known
 Additionally, you must be able to get your hands at the buffered data:
 %%%% DD --> %%%%
 \DD{dd:412c}
-{% Titel
+{% Title
 Explicit operation to get medium bytes
 }
-{% Kurzbeschreibung
+{% Short description
 There is an operation \emph{getData} which returns $n$ data bytes starting at a given offset.
 }
-{% Begründung
+{% Rationale
 Without it there would not be any possibility to read data from a medium, as \emph{cache} only buffers it internally without returning it.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -661,16 +661,16 @@ No disadvantages known
 Now the question arises, how the operation \emph{getData} interacts with the cache, which is answered here:
 %%%% DD --> %%%%
 \DD{dd:412d}
-{% Titel
+{% Title
 \emph{getData} combines data from the cache with data form the medium and updates the cache thereby, if necessary
 }
-{% Kurzbeschreibung
+{% Short description
 \emph{getData} reads data from the cache, if the given range is entirely contained in it. Is it not entirely contained in the cache, \emph{getData} reads the bytes present in the cache, and reads the non-present ones from the medium, adding it to the cache afterwards. Thus data is combined from the two sources.
 }
-{% Begründung
+{% Rationale
 To ensure efficient reading, \emph{getData} can be used as such to fetch data from the cache, if anyhow possible. Only if there is at leaast one byte not in the cache, the medium must be accessed directly. Updating the cache by read data is useful, to ensure later calls to query the same data can fully leverage the cache and do not need another access to the external medium.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -678,16 +678,16 @@ No disadvantages known
 Should we provide a way to force medium access when getting data?
 %%%% DD --> %%%%
 \DD{dd:412da}
-{% Titel
+{% Title
 \emph{getData} provides no specific mode or configuration to ignore the cache and always read from the medium
 }
-{% Kurzbeschreibung
+{% Short description
 \emph{getData} does not provide a forced read mechanism, but it always only reads data from the external medium that it cannot find in the cache.
 }
-{% Begründung
+{% Rationale
 It is not clear when using code should use the forced or the unforced mode. If the using code somehow can magically see that the underlying medium was changed by other processes, it could do a forced direct read. But in this case, everything is lost already, because you can never know what the other process did. A better way to ensure integrity and consistency would be for the using code to close the medium and reopen another access instance.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -695,16 +695,16 @@ No disadvantages known
 We want to define now how the read media data is represented:
 %%%% DD --> %%%%
 \DD{dd:412e}
-{% Titel
+{% Title
 Read media data is represented as read-only \texttt{ByteBuffer}
 }
-{% Kurzbeschreibung
+{% Short description
 Read data is not returned in the form of \texttt{byte} arrays, but as \texttt{ByteBuffer} instances that are read-only.
 }
-{% Begründung
+{% Rationale
 Firstly, users can directly gain profit from conversion functions offered by \texttt{ByteBuffer}, on the other hand the implementation is more flexible when it comes to the content of the \texttt{ByteBuffer}, as only the bytes between \texttt{position()} and \texttt{limit()} can be read. Using this e.g. an internally managed, much bigger \texttt{ByteBuffer} object can be returned as a read-only view instead of copying it.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -712,16 +712,16 @@ No disadvantages known
 For efficiency reasons, we define the following:
 %%%% DD --> %%%%
 \DD{dd:412f}
-{% Titel
+{% Title
 Handle reading from a single already cached region or a size smaller than the maximum read-write block size as special case
 }
-{% Kurzbeschreibung
+{% Short description
 If a read offset and size for \emph{getData} is exactly hitting a single cache region, and this single region fully contains the range to read, the \texttt{ByteBuffer} corresponding to this region with adapted position and limit is returned instead of allocating a new \texttt{ByteBuffer} and copying bytes, which will happen in any other case. Similarly, if a range is not cached and needs to be read, and if the range's size is below the maximum read-write block size, again no copying happens, but the read \texttt{ByteBuffer} is directly returned.
 }
-{% Begründung
+{% Rationale
 The case of an already cached region fully covering the range to read can be considered as at least the use case covering 80\% of the typical uses. The reason is: Usually, the users should use cached media. And usually, they should call \emph{cache} before \emph{getData}, covering e.g. a whole header. Thus, reading individual fields later with \texttt{getData} will always hit the cache. Thus, for this 80\% case, we could optimize the library performance a lot by simply not copying.
 }
-{% Nachteile
+{% Disadvantages
 Slightly more complexity and testing effort involved
 }
 %%%% <-- DD %%%%
@@ -730,18 +730,18 @@ Let's discuss the topic of timeouts. In Java, each reading and writing I/O call 
 
 %%%% DD --> %%%%
 \DD{dd:426}
-{% Titel
+{% Title
 \LibName{} does not support any timeouts, neither reading nor writing
 }
-{% Kurzbeschreibung
+{% Short description
 \COMPmedia{} does not offer the possibility to configure timeouts for any reading or writing actions, and likewise, it does not implement any measures to prevent these actions from blocking arbitrarily long
 }
-{% Begründung
+{% Rationale
 Both for file or stream access, read and write operations, including determining where we are or truncation might or might not block. This is - unfortunately - OS and implementation dependent and cannot be predicted. It is possible and was tried to implement a parallel thread to execute the action against the medium and the main thread to monitor the time taken by the other thread and retrieve the result after a given timeout. While this is easily possible using Java's \texttt{Future}s, it is not so easy to really terminate the blocking action and its thread. In reality, on some OSs the action is really interruptible, on others it is not. This might also depend on the implementation. Thus, \LibName{} won't implement anything that would try to convince the user it can actually do it, leading also to increased complexity. Instead, the user must use his own mechanisms, i.e. an own custom \texttt{InputStream} implementation, using multithreading and monitoring of calls from the outside, or using implementation-specific timeouts such as for \texttt{SocketInputStream}.
 
 Furthermore, it is also problematic what state the medium is in after the timeout was detected. What shall the library or the user do with this implementation? Retry, fail, close and retry? There is not always an easy answer to it.
 }
-{% Nachteile
+{% Disadvantages
 Users might need to write more custom code themselves, if they strictly require this for mediums they use.
 }
 %%%% <-- DD %%%%
@@ -764,10 +764,10 @@ The medium has appeared a lot of times already as a term, thus a representation 
 
 %%%% DD --> %%%%
 \DD{dd:413}
-{% Titel
+{% Title
 Media are represented as interface and implementation class with following properties
 }
-{% Kurzbeschreibung
+{% Short description
 A medium is represented as Java interface \IMedium{} and allows users of \LibName{} to specify a concrete physical medium (i.e. the implementations of the interface \IMedium{}). As implementations we support a \FileMedium{} according to \DesLink{dd:400}, according to \DesLink{dd:401} aan \InputStreamMedium{} and according to \DesLink{dd:402} a \InMemoryMedium{}.
 
 A medium has the following properties:
@@ -779,10 +779,10 @@ A medium has the following properties:
 	\item The ``wrapped'' object representing the raw medium or its access mechanism, e.g. the file, the \texttt{InputStream} or the byte array.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 It can be controlled in detail which medium types are supported. The user can specify the medium to use in a comfortable way. Further API parts get more easier, as their interfaces must not distinguish between different media types, but rather only use the abstaction that \IMedium{} offers. Motivation for each of the properties see the listing above.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -791,16 +791,16 @@ Due to consistency reasons there are some restrictions regarding the manipulatio
 
 %%%% DD --> %%%%
 \DD{dd:414}
-{% Titel
+{% Title
 If a \IMedium{} implementation is writable, it must also be random-access
 }
-{% Kurzbeschreibung
+{% Short description
 Every in principle writable \IMedium{} implementation must be random-access, too. 
 }
-{% Begründung
+{% Rationale
 The \LibName{} APIs for writing content can thus concentrate on random-access output media. No separate API design and implementation for output media that are not random-access is necessary. The API gets easier for end-users. Lack of non-random-access output media such as \texttt{OutputStream}s can be mitigated via the examples in \DesLink{dd:403}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -808,18 +808,18 @@ No disadvantages known
 Here is a very importante note for byte array media:
 %%%% DD --> %%%%
 \DD{dd:414b}
-{% Titel
+{% Title
 For byte array media, a writing method for resetting the whole byte array is necessary
 }
-{% Kurzbeschreibung
+{% Short description
 The user can reset the bytes of the medium via a public method \texttt{setBytes} of class \InMemoryMedium{}.
 }
-{% Begründung
+{% Rationale
 It is mostly not harmful to offer the method as public, it is even an advantage for the users, as he can set the bytes himself. Only between registering write operations and a flush, this call leads to unexpected behaviour.
 
 This methode is very important for the implementation: Via writing actions, the byte array must be extended or shrinked in some situations. This basically means reacreating and copying the array. The method must thus be public, as the corresponding implementation funcitonality will be for sure placed in another package.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -833,16 +833,16 @@ In each case where dare is read from or written to a \TERMmedium{}, the question
 
 %%%% DD --> %%%%
 \DD{dd:415}
-{% Titel
+{% Title
 Byte offsets are used for any kind of \TERMmedia{}
 }
-{% Kurzbeschreibung
+{% Short description
 Byte offsets that refer to a position on a \TERMmedium{} are used for all media types: random-access and non-random-access. For byte streams they refer to the position of the current byte since start of reading the first byte after opening the stream, which has offset 0. The offset-based reading is simulated as specified in \DesLink{dd:407} and \DesLink{dd:411b}, because when directly reading from an \texttt{InputStream} via Java API, offsets are not needed, it is always read from the current position of the stream. 
 }
-{% Begründung
+{% Rationale
 We must therefore distinguish between random-access and non-random-access only at a few places in the implementation. Users can use the API uniformly and irrespective of the actual medium type (with restrictions: see \DesLink{dd:411e}).
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -851,10 +851,10 @@ It makes not so much sense to represent offsets only via a primitve data type. I
 
 %%%% DD --> %%%%
 \DD{dd:416}
-{% Titel
+{% Title
 \LibName{} uses the interface \IMediumReference{} to represent offsets on a \TERMmedium{}.
 }
-{% Kurzbeschreibung
+{% Short description
 The interface binds both the \TERMmedium{} and the offset on this \TERMmedium{} together, and thus is a kind of ``global'' address of a byte. Next to reading medium and of offset, it offers some helper methods:
 \begin{itemize}
 \item \texttt{behindOrEqual:} Returns true if another \IMediumReference{} is located on the same medium behind of at the same position as this instance.
@@ -862,10 +862,10 @@ The interface binds both the \TERMmedium{} and the offset on this \TERMmedium{} 
 \item \texttt{advance:} Creates a new \IMediumReference{} that is located the given number of bytes before (negative argument) or behind (positive argument) this instance. Also zero is possible as argument.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 We clearly state how the library deals with offsets. We can thus implement some helper functions into the datatype (e.g. validation, offset comparison, advance etc.) which ensure reuse and ease working with offsets in general.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -874,16 +874,16 @@ Now we come to a central decision when it comes to dealing with lengths and offs
 
 %%%% DD --> %%%%
 \DD{dd:417}
-{% Titel
+{% Title
 \LibName{} uses long for length and offset specifications, byte is always its unit
 }
-{% Kurzbeschreibung
+{% Short description
 In \LibName{}, lenghts and offsets are always specified using the Java datatyp long. The lenght is in any case the number of bytes, offsets are zero-based, linearly increasing byte offsets.
 }
-{% Begründung
+{% Rationale
 This guarantees uniformity. However, we also want to meet the requirement \SectionLink{sec:REQ009LesenSchreibenGrosse}. Integer with a maximum of 4.3 GB is already too limited, which leaves only long as a viable option. The datatype long allows for positive numbers up to $2^{63}-1=9223372036854775807$, i.e. approximately $9\cdot 10^{18}$ bytes, which is 9 exabytes or 9 billion gigabytes. From current point of view, such lenghts and offsets for input media, even for streams, should be sufficient for some decades to come. Furthermore, big data chunks are almost in any case subdivided in small units that can be easier handled, and these small units will not have big lengths. Even the Java file I/O uses long as offset and length datatype in most cases.
 }
-{% Nachteile
+{% Disadvantages
 More memory for saving offsets and lengths is necessary. If we look at the development of storage media, storage needs and processing speed it might be that in 100 years the maximum data volume of long will be reached. If \LibName{} is still used in these future scenarios, a change request would be worth it!
 }
 %%%% <-- DD %%%%
@@ -892,16 +892,16 @@ A rather seldom special case is dealt with in the following design decision:
 
 %%%% DD --> %%%%
 \DD{dd:418}
-{% Titel
+{% Title
 No special handling of long overflows
 }
-{% Kurzbeschreibung
+{% Short description
 For unusal long uninterrupted reading from \texttt{InputStream} you could think that even when using long, it could come to an overflow in some time. This is however very unlikely, thus this case is not treated. The implementation always assumes taht the current offset is positive and can be incremented without reaching the max long number.
 }
-{% Begründung
+{% Rationale
 Even here it holds true: The datatype long allows positive numbers up to $2^{63}-1=9223372036854775807$. Let us assume that an implementation could make it to process 10 GB per second, then it would still need 9 billion seconds, i.e. nearly 30 years, to reach the offset limit and create an overflow.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages knownn
 }
 %%%% <-- DD %%%%
@@ -919,10 +919,10 @@ To formulate the following design decision a bit easier, the vague term of ``obj
 
 %%%% DD --> %%%%
 \DD{dd:418b}
-{% Titel
+{% Title
 \COMPmedia{} needs to automatically update \IMediumReference{} instances after medium changes: \texttt{remove} and \texttt{insert}
 }
-{% Kurzbeschreibung
+{% Short description
 All \IMediumReference{} instances ever created for a medium must be updated automatically whenever this medium changes. The kind of update needed is more complex than you would think on first glance. 
 
 Let $x$ be the start offset of a collection of $n$ bytes (an ``object''), let $y$ be the insert or remove offset and $k$ the number of bytes to insert or remove. Let $\overline{x}$ be the offset of the \IMediumReference{} instance after updating. Then the following detailed rules apply:
@@ -934,10 +934,10 @@ Let $x$ be the start offset of a collection of $n$ bytes (an ``object''), let $y
 \item \texttt{remove} \emph{behind the object start offset $x$:} Is $y>x$, then $\overline{x}:=x$, i.e. the object start offset remains unchanged, of course also in the case that $y<x+n$. In the latter case, however, the object is truncated at its end.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 \IMediumReference{}s are both handed out to the user as well as used to manage cache objects. If changes to the medium happens, all \IMediumReference{}s that are already in user hands or are internally used to manage data are rendered invalid. Thus, we would need to write code to detect such \IMediumReference{}s as invalid whenever used, or to invalidate the current cache content. Instead of doing so, we simply update all \IMediumReference{}s previously created according to the kind of change, thus practically still letting them point to the same ``object'' as before (despite removing the medium bytes as special case). The \IMediumReference{}s can thus be used further on.
 }
-{% Nachteile
+{% Disadvantages
 A central management of \IMediumReference{} instances must be implemented (see \DesLink{dd:419}).
 }
 %%%% <-- DD %%%%
@@ -946,10 +946,10 @@ A central management of \IMediumReference{} instances must be implemented (see \
 
 %%%% DD --> %%%%
 \DD{dd:418c}
-{% Titel
+{% Title
 \COMPmedia{} needs to automatically update \IMediumReference{} instances after medium changes: \texttt{replace}
 }
-{% Kurzbeschreibung
+{% Short description
 For \texttt{replace}, the update of already created \IMediumReference{}s is similar, but any offsets within the replaced region remain unchanged. In detail: Let $x$ be the start offset of a collection of $n$ bytes (an ``object''):
 \begin{itemize}
 \item \texttt{replace} \emph{behind the object start offset $x$:} The same as insert and remove behind the start offset, i.e. does not change it but might truncate or split an existing object starting earlier.
@@ -957,10 +957,10 @@ For \texttt{replace}, the update of already created \IMediumReference{}s is simi
 \item \texttt{replace} \emph{before the object start offset $x$ with overlap:} The replaced region overlaps with an existing object. Here, $x$ remains unchanged by the replacement.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 There is no surprise for replaces behind the object start offset and those before the start offset without overlap. The only question is: If there is an overlap, i.e. $x$ lies within the replaced region of bytes, why do we not update it? The reason is: Because of the replacement by other bytes, the object is anyway changed, the correct semantics seems to be to let the \IMediumReference{}s point to $x$ still point to $x$.
 }
-{% Nachteile
+{% Disadvantages
 A central management of \IMediumReference{} instances must be implemented (see \DesLink{dd:419}).
 }
 %%%% <-- DD %%%%
@@ -969,16 +969,16 @@ As already indicated by \DesLink{dd:418b} the automatic updating of already crea
 
 %%%% DD --> %%%%
 \DD{dd:419}
-{% Titel
+{% Title
 \IMediumReference{} instances are centrally managed by \COMPmedia{} and cannot be directly created by users of the component
 }
-{% Kurzbeschreibung
+{% Short description
 The lifecycle of \IMediumReference{} instances is controlled by \COMPmedia{}. They are created and returned to the user via a factory method. The user has no direct access to the implementation class of \IMediumReference{}.
 }
-{% Begründung
+{% Rationale
 It is strictly required to implement \DesLink{dd:418b}. Instances that have been created by the user cannot be updated automatically, thus we have to ensure the manual creation by the user does not happen.
 }
-{% Nachteile
+{% Disadvantages
 More complex instantiation of \IMediumReference{} instances.
 }
 %%%% <-- DD %%%%
@@ -987,13 +987,13 @@ The question \emph{when} to update \IMediumReference{} instances has still not b
 
 %%%% DD --> %%%%
 \DD{dd:419b}
-{% Titel
+{% Title
 \IMediumReference{} instances are only updated after a \emph{flush}
 }
-{% Kurzbeschreibung
+{% Short description
 According to \DesLink{dd:418} \IMediumReference{} instances are automatically updated in case of medium changes. This automatic update only happens at \emph{flush} time.
 }
-{% Begründung
+{% Rationale
 Assumed that \IMediumReference{} instances would already be updated whenever a pending change is registered using \emph{insert}, \emph{replace} or \emph{remove}. In this case the following would be necessary:
 \begin{itemize}
 \item When reading data, this data is not necessarily in a cache. This indicates that reading from external medium is necessary. If all \IMediumReference{} instances would reflect a state including any pending changes, they would no longer correspond to the state of the external medium. If you would now want to read or write to the external medium, the real offset on the external medium would need to be ``reconstructed'' based on the changes made so far, everytime you want to know where current data resides on the medium. This implies a complex coding overhead that would not ease debugging errors or understanding the current state of instances.
@@ -1001,7 +1001,7 @@ Assumed that \IMediumReference{} instances would already be updated whenever a p
 \end{itemize}
 If \IMediumReference{} instances in contrast are first updated after a \emph{flush}, then no reconstruction of original offsets based on already made changes is necessary.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1010,16 +1010,16 @@ This directly implies the following design decision:
 
 %%%% DD --> %%%%
 \DD{dd:421}
-{% Titel
+{% Title
 In \COMPmedia{}, offset specifications always are offsets on the external medium as it was looking like after the last \emph{flush} or after opening it initially
 }
-{% Kurzbeschreibung
+{% Short description
 For operations of \COMPmedia{} that take an offset as argument, this offset refers to a location on the external \TERMmedium{} after the last \emph{flush} or the initial opening - in case no \emph{flush} has occurred yet. These offsets must especially be located within the interval $[0, \text{length}]$, where ``length'' is the current length of the medium in bytes.
 }
-{% Begründung
+{% Rationale
 Naturally follows from \DesLink{dd:419b}. For users, the offset situation remains stable and logical, he does not need to maintain a history of \emph{insert}, \emph{replace} and \emph{remove} operations. Likewise, the offsets stay stable for the implementation, too: Checking offsets and organisation of internal data structures can be based on this invariant.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1035,10 +1035,10 @@ We start with how multiple \emph{insert} operations behave:
 
 %%%% DD --> %%%%
 \DD{dd:422}
-{% Titel
+{% Title
 \emph{insert} concatenates insertions in call order
 }
-{% Kurzbeschreibung
+{% Short description
 \begin{enumerate}
 \item Step 1: \emph{insert} at offset $x$, Step 2: \emph{insert} at different offset:  Both calls are allowed, they do not influence each other.
 \item Step 1: \emph{insert}, Step 2: \emph{insert} at the same offset: \emph{insert} concats, each call with the same offset determines a new, consecutive insertion, i.e. insertions at the same medium location are done with increasing offsets. Let ``Call 1'' be the earlier call with insertion length $n_1$, ``Call 2'' the later call at $x$ with insertion length $n_2$. The end result on the medium after \emph{flush} is:
@@ -1048,7 +1048,7 @@ We start with how multiple \emph{insert} operations behave:
 \end{itemize}
 \end{enumerate}
 }
-{% Begründung
+{% Rationale
 \begin{enumerate}
 \item See requirement \texttt{AMed01}
 \item See requirement \texttt{AMed08}
@@ -1056,7 +1056,7 @@ We start with how multiple \emph{insert} operations behave:
 
 You could alternatively interpret ``insert'' as such that the second call inserts data \emph{before} the previous earlier one. However, the design decision says that ``insert'' inserts before the currently persisted medium byte at the insertion offset. Concatenating allows user code to linearly insert stuff with increasing offsets, which is in most cases the convenient and expected behavior.
 }
-{% Nachteile
+{% Disadvantages
 The second possible interpretation sketched above might lead to surprises in a few use scenarios.
 }
 %%%% <-- DD %%%%
@@ -1065,16 +1065,16 @@ Before looking at the interactions between \emph{insert}s, \emph{remove}s and \e
 
 %%%% DD --> %%%%
 \DD{dd:422r}
-{% Titel
+{% Title
 \emph{insert} at the same offset as \emph{remove} and \emph{replace} means to insert before remove and replace, irrespective of schedule order
 }
-{% Kurzbeschreibung
+{% Short description
 No matter if you first call \emph{insert} at offset $x$, then \emph{remove} or \emph{replace} at offset $x$, or the other way round: The meaning is that you want to insert new bytes before the bytes to remove or replace.
 }
-{% Begründung
+{% Rationale
 If you want to insert something behind the replacement or removed region, the insertion offset must point to the offset of the first byte behind the replacement or removed region. Thus, calling \emph{insert} after \emph{remove} or \emph{replace} cannot have the meaning ``first execute the replace or remove, then insert the bytes behind the removed or replaced region''. Thus, we have to ignore the sequence and ensure \emph{insert}s at the same offsets as \emph{remove} or \emph{replace} are always executed first.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1083,10 +1083,10 @@ We now look at how \emph{insert} and \emph{remove} interact with each other:
 
 %%%% DD --> %%%%
 \DD{dd:422b}
-{% Titel
+{% Title
 \emph{insert} is revoked by overlapping \emph{remove}s, \emph{insert}s within already removed regions are not allowed
 }
-{% Kurzbeschreibung
+{% Short description
 The following cases can be identified:
 \begin{enumerate}
 \item Step 1: \emph{insert} at offset $x$, Step 2: \emph{remove} $n$ bytes at offset $y$, where $x$ is not located within the removed range $[y,y+n)$: Both calls are allowed, they do not influence each other.
@@ -1097,7 +1097,7 @@ The following cases can be identified:
 \item Step 1: \emph{remove} $n$ bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is contained in the removed range $[y,y+n)$: The second call is rejected with an exception, as it is pointing into an already removed region.
 \end{enumerate}
 }
-{% Begründung
+{% Rationale
 \begin{enumerate}
 \item See requirement \texttt{AMed01} and \texttt{AMed02}
 \item See requirement \texttt{AMed01} and \texttt{AMed02}
@@ -1107,7 +1107,7 @@ The following cases can be identified:
 \item See requirement \texttt{AMed13}
 \end{enumerate}
 }
-{% Nachteile
+{% Disadvantages
 Then, how to implement write requirement \texttt{AMed04}? See \DesLink{dd:422c}.
 }
 %%%% <-- DD %%%%
@@ -1116,10 +1116,10 @@ Now we are left with clarifying how \emph{insert} and \emph{replace} interact wi
 
 %%%% DD --> %%%%
 \DD{dd:422d}
-{% Titel
+{% Title
 \emph{insert} is revoked by overlapping \emph{replace}s, \emph{insert}s within already replaced regions are not allowed
 }
-{% Kurzbeschreibung
+{% Short description
 The following cases can be identified:
 \begin{enumerate}
 \item Step 1: \emph{insert} at offset $x$, Step 2: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, where $x$ is not located within the replaced range $[y,y+n)$: Both calls are allowed, they do not influence each other.
@@ -1130,7 +1130,7 @@ The following cases can be identified:
 \item Step 1: \emph{replace} $n$ bytes by $m$ new bytes at offset $y$, Step 2: \emph{insert} at offset $x$, where $x$ is contained in the replaced range $[y,y+n)$: The second call is rejected with an exception, as it is pointing into an already replaced region.
 \end{enumerate}
 }
-{% Begründung
+{% Rationale
 \begin{enumerate}
 \item See requirement \texttt{AMed01} and \texttt{AMed03}
 \item See requirement \texttt{AMed01} and \texttt{AMed03}
@@ -1140,7 +1140,7 @@ The following cases can be identified:
 \item See requirement \texttt{AMed13}
 \end{enumerate}
 }
-{% Nachteile
+{% Disadvantages
 Then, how to implement write requirement \texttt{AMed05}? See \DesLink{dd:422c}.
 }
 
@@ -1148,16 +1148,16 @@ Saying all this, it is not possible to implement \texttt{AMed04} (``it is possib
 
 %%%% DD --> %%%%
 \DD{dd:422c}
-{% Titel
+{% Title
 Meeting requirements \texttt{AMed04} and  \texttt{AMed05} is done outside of \COMPmedia{}, yet using its \emph{undo} feature
 }
-{% Kurzbeschreibung
+{% Short description
 \texttt{AMed04} and \texttt{AMed05} can only be met outside \COMPmedia{}. Using code must detect that a parent of the changed field was already scheduled for insertion or replacement. If that is the case, they have to ``re-compute'' the overall insertion or replacment bytes, undo the previous insertion or replacement using \COMPmedia{} and finally schedule a new insertion or replacement containing the changed bytes. Alternatively, the implementation using \COMPmedia{} might freeze a data block for change once its scheduled for insertion or replacement and throws an exception if someone tries to modify it afterwards. The details of this are defined in the design of \COMPdataPartManagement{}.
 }
-{% Begründung
+{% Rationale
 \COMPmedia{} could somehow support here by offering modification functions for already done \emph{insert}s or \emph{replace}s. However, this would also at least require the using code to detect the change in a parent, and also recompute. It would make the API more complex. Using \emph{undo}, the using code has just slightly more work to do.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 
@@ -1165,10 +1165,10 @@ We already clarified how insert interacts with insert, remove and replace, in an
 
 %%%% DD --> %%%%
 \DD{dd:424}
-{% Titel
+{% Title
 \emph{remove} allows no overlaps by other \emph{remove}s, only later calls with bigger region make earlier calls obsolete
 }
-{% Kurzbeschreibung
+{% Short description
 The following cases can be identified:
 \begin{enumerate}
 \item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} $m$ bytes at offset $y$ without any overlaps to $[x,x+n)$: Both calls are allowed, they do not influence each other.
@@ -1178,7 +1178,7 @@ The following cases can be identified:
 \item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{remove} $m$ bytes at offset $y<x$ with $y>x, y+m<x+n$: The second call is an overlapping call, that removes additional bytes before the first remove call, but still includes some bytes of the region removed with the first call. The second call is rejected with an exception.
 \end{enumerate}
 }
-{% Begründung
+{% Rationale
 \begin{enumerate}
 \item See requirement \texttt{AMed02}
 \item See requirement \texttt{AMed10}
@@ -1187,7 +1187,7 @@ The following cases can be identified:
 \item See requirement \texttt{AMed12}
 \end{enumerate}
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1195,10 +1195,10 @@ No disadvantages known
 Interactions between \emph{remove} and \emph{replace} are identical to this, as defined in the following design decision:
 %%%% DD --> %%%%
 \DD{dd:424bb}
-{% Titel
+{% Title
 \emph{remove} allows no overlaps by \emph{replace}s, only later calls with bigger region make earlier calls obsolete
 }
-{% Kurzbeschreibung
+{% Short description
 The following cases can be identified:
 \begin{enumerate}
 \item Step 1: \emph{remove} $n$ bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r$ new bytes at offset $y$ without any overlaps to $[x,x+n)$: Both calls are allowed, they do not influence each other.
@@ -1213,10 +1213,10 @@ The following cases can be identified:
 \item Previous case, exchange order of \emph{remove} and \emph{replace}: Same result
 \end{enumerate}
 }
-{% Begründung
+{% Rationale
 For (1.) and (2.): See requirement \texttt{AMed02} and \texttt{AMed03}. For (3.): See requirement \texttt{AMed11}; For (4.): See requirement \texttt{AMed10}. For (5.) and (6.): See requirement \texttt{AMed13}. For (7.) to (10.): See requirement \texttt{AMed12}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1225,10 +1225,10 @@ Now we are just left to clarify how multiple \emph{replace} operations interact 
 
 %%%% DD --> %%%%
 \DD{dd:424a}
-{% Titel
+{% Title
 \emph{replace} allows no overlaps by other \emph{replace}s, only later calls with bigger region make earlier calls obsolete
 }
-{% Kurzbeschreibung
+{% Short description
 The following cases can be identified:
 \begin{enumerate}
 \item Step 1: \emph{replace} $n$ bytes by $r_{1}$ new bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r_{2}$ new bytes at offset $y$ without any overlaps to $[x,x+n)$: Both calls are allowed, they do not influence each other.
@@ -1238,7 +1238,7 @@ The following cases can be identified:
 \item Step 1: \emph{replace} $n$ bytes by $r_{1}$ new bytes at offset $x$, Step 2: \emph{replace} $m$ bytes by $r_{2}$ new bytes at offset $y<x$ with $y>x, y+m<x+n$: The second call is an overlapping call, that replaces additional bytes before the first replace call, but still includes some bytes of the region replaced with the first call. The second call is rejected with an exception.
 \end{enumerate}
 }
-{% Begründung
+{% Rationale
 \begin{enumerate}
 \item See requirement \texttt{AMed02}
 \item See requirement \texttt{AMed11}
@@ -1247,7 +1247,7 @@ The following cases can be identified:
 \item See requirement \texttt{AMed12}
 \end{enumerate}
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1257,10 +1257,10 @@ Another problem: How to map the actual data to a data block before a \emph{flush
 An answer is given in the following design decision that explains how action, data and offset are brought into close relation:
 %%%% DD --> %%%%
 \DD{dd:424b}
-{% Titel
+{% Title
 Each of the writing operations returns an instance of a class \MediumAction{} to describe the action in more detail
 }
-{% Kurzbeschreibung
+{% Short description
 This class contains following data:
 \begin{itemize}
 \item The kind of action (\emph{insert}, \emph{replace}, \emph{remove}); \textbf{Motivation:} The user must be able to know the kind of change
@@ -1270,14 +1270,14 @@ This class contains following data:
 \item Validity: Handle is already persisted by a \emph{flush} or still pending; \textbf{Motivation:} Thus it can be clearly state from outside whether the data must still be persisted and thus must be taken from the instance of the user requires to read them, or the data has already been written to the external medium.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 According to \DesLink{dd:410c}, the user can only read data that is currently persisted.
 
 Nevertheless it is necessary that application code can also re-read data previously registered for writing, but not yet persisted by a \emph{flush}. That now becomes possible with the \MediumAction{} class that is returned by \emph{insert}, \emph{replace} and \emph{remove}. Is the \MediumAction{} still pending, the application code can return the pending bytes from the \MediumAction{}, otherwise by directly accessing the  \COMPmedia{} read functionality to fetch the currently persisted bytes.
 
 Instances of \MediumAction{} can ideally be used for internal data management by \COMPmedia{}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1290,18 +1290,18 @@ No disadvantages known
 We still need an operation to end the medium access, thus we define:
 %%%% DD --> %%%%
 \DD{dd:419ac}
-{% Titel
+{% Title
 Operation \emph{close} ends the medium access and empties the cache, consecutive operations are not possible on the medium
 }
-{% Kurzbeschreibung
+{% Short description
 A user can manually end medium access by calling \emph{close}. It is then no longer possible to access the medium via the closed access way. The user must explicitly reopen the medium to access it again.
 }
-{% Begründung
+{% Rationale
 The implementation works with OS resources such as files that must be closed. Furthermore cache content and other memory is not freed anytime if you could not close the medium.
 
 Closing cannot be implemented automatically but must be explicity called by the user.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1315,16 +1315,16 @@ Based on the previous design decisions we now design the public API of the compo
 
 %%%% DD --> %%%%
 \DD{dd:419c}
-{% Titel
+{% Title
 Access to a medium is done using the \IMediumStore{} 
 }
-{% Kurzbeschreibung
+{% Short description
 The reading and writing access to a medium (both random-access as well as byte stream according to \DesLink{dd:407}) is offered via interface \IMediumStore{} with the operations listed in table \hyperref[tab:MediaOps]{\ref{tab:MediaOps}}.
 }
-{% Begründung
+{% Rationale
 A further subdivision of functionality into more than one interface is neither necessary nor helpful. It would just be an unneccessary complex API, and despite the single interface, the implementation can still be modularized as needed. The individual operations are motivated in the table itself.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1379,16 +1379,16 @@ How are the public functions exposed to the outside world? There must be a funct
 
 %%%% DD --> %%%%
 \DD{dd:428}
-{% Titel
+{% Title
 \IMediaAPI{} is the central entry point with creation functions for \IMediumStore{}s
 }
-{% Kurzbeschreibung
+{% Short description
 The interface \IMediaAPI{} offers the central entry point for the component \COMPmedia{}. Using the method \texttt{createMediumStore()}, users can create an \IMediumStore{} instance.
 }
-{% Begründung
+{% Rationale
 The necessity for a further interface in addition to \IMediumStore{} is clear enough: A \IMediumStore{} refers to just a single ``medium access session'' for a medium, and of course users want to be able to open multiple media at the same time using \COMPmedia{}. Pushing creation functions into \IMediumStore{} is not considered good practice as it would decrease comprehensibilty.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1437,18 +1437,18 @@ To summarize:
 
 %%%% DD --> %%%%
 \DD{dd:427}
-{% Titel
+{% Title
 Reaching the end of medium is not necessarily an error, other problems with I/O are seen as abnormal events.
 }
-{% Kurzbeschreibung
+{% Short description
 \COMPmedia{} sees achieving at the end of a medium not as abnormal event, but it must be handled according to the current context by the user code. \LibName{} assumes output media to be virtually unlimited and thus does not implement any means of treating end of medium situations when writing (also in accordance to the Java API).
 
 All other error sitations in \COMPmedia{} are abnormal situations according to table \hyperref[tab:FBMedia]{\ref{tab:FBMedia}}.
 }
-{% Begründung
+{% Rationale
 See table
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1469,16 +1469,16 @@ According to \DesLink{dd:419}, \IMediumReference{} instances must be maintained 
 Thus, these things follow:
 %%%% DD --> %%%%
 \DD{dd:430}
-{% Titel
+{% Title
 No pooling of \IMediumReference{} instances for the same offsets is possible
 }
-{% Kurzbeschreibung
+{% Short description
 In contrast to Java strings, the reuse of \IMediumReference{} instances in \texttt{createMediumOffset()} for same offsets is not possible, i.e. if an \IMediumReference{} instance for offset $x$ has already been created, the same instance cannot be returned for the same offset on the next call. A new \IMediumReference{} instance must be created instead.
 }
-{% Begründung
+{% Rationale
 Assum we use pooling. Furthermore, assume there are two inserts of lengths $n_1$ and $n_2$ at the same offset $x$ scheduled via \texttt{insertData()}. The internal implementation would only have a single instance of \IMediumReference{} for offset $x$. \texttt{flush()} must keep the offset of the first insertion unchanged, as the data of this first insertion remains there. However, the offset of the second insertion must be changed, as these inserted bytes are actually located at offset $x+n_1$ after \texttt{flush()}.
 }
-{% Nachteile
+{% Disadvantages
 For many created \IMediumReference{} objects, there could be a bigger memory footprint.
 }
 %%%% <-- DD %%%%
@@ -1486,16 +1486,16 @@ For many created \IMediumReference{} objects, there could be a bigger memory foo
 Furthermore, the \IMediumReference{} objects must be maintained in a dedicated data structure:
 %%%% DD --> %%%%
 \DD{dd:431}
-{% Titel
+{% Title
 All instances ever created with \texttt{createMediumOffset()} are maintained in a dedicated data structure that allows duplicates
 }
-{% Kurzbeschreibung
+{% Short description
 All instances are held in a data structure that allows duplicates. It must be dedicated, i.e. only be used for storing all ever created \IMediumReference{} objects.
 }
-{% Begründung
+{% Rationale
 Dupllicates must be possible due to \DesLink{dd:430}. We cannot mix that data structure with the caching or pending change data structures, as on the one hand side there will be always more \IMediumReference{} instances, than cache entries or pending changes, and on the other hand cache and pending change list could be cleared, while the \IMediumReference{} instances must be kept until the explicit close of the mediums.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1504,13 +1504,13 @@ Are these entries of the dedicated data structure indicated by \DesLink{dd:430} 
 
 %%%% DD --> %%%%
 \DD{dd:432}
-{% Titel
+{% Title
 Unsorted ArrayList for keeping the \IMediumReference{} instances
 }
-{% Kurzbeschreibung
+{% Short description
 We use an \texttt{ArrayList} as data structure for maintaining all \IMediumReference{} instances. Insertion of \IMediumReference{} instances is done in creation order. The list is  unsorted.
 }
-{% Begründung
+{% Rationale
 A list allows for duplicates. Sorting of the list after each addition would lead to $O(n\log n)$ runtime complexity on average when creating a new \IMediumReference{} instance, if $n$ is the current size of the list. Ascending sort order by offset would be a bit more efficient for \texttt{flush()}, but does hardly justify the effort during adding it, because the creation of a \IMediumReference{} instance is usually much more commonly done than a \texttt{flush()}. Following approaches have been rejected especially:
 \begin{itemize}
 \item A \texttt{Map<Long, List<\IMediumReference{}>}\texttt{>} with offsets as key and all \IMediumReference{} instances for the offset as value won't work, as the offsets would need to be shifted on each insertion, i.e. the keys of the map would either need to be \IMediumReference{} instances again, or would need to be updated expensively.
@@ -1518,7 +1518,7 @@ A list allows for duplicates. Sorting of the list after each addition would lead
 \item A combination of a \texttt{TreeSet} with a special \texttt{Comparator}, which assumes \IMediumReference{} instances only to be equal, if they are the same objects, and as bigger, if the offset is the same, but the object is different, would accept such ``duplicates'' with the same offsets and ensure correct sorting for every insert. However, the \texttt{Set} then is incompatible with \texttt{equals}, what is not a best practice according to the javadocs. Secondly: More time required for insertion as mentioned.
 \end{itemize}
 }
-{% Nachteile
+{% Disadvantages
 Finding all \IMediumReference{} instances within the \texttt{flush()} implementation, that are bigger than a given offset has $O(n)$ complexity, which can however be tolerated.
 }
 %%%% <-- DD %%%%
@@ -1526,10 +1526,10 @@ Finding all \IMediumReference{} instances within the \texttt{flush()} implementa
 To handle the complexity of \IMediumStore{} we decide:
 %%%% DD --> %%%%
 \DD{dd:433}
-{% Titel
+{% Title
 The class \MediumReferenceRepository{} is used for maintaining \IMediumReference{} instances
 }
-{% Kurzbeschreibung
+{% Short description
 \MediumReferenceRepository{} implements the design decisions \DesLink{dd:431}, \DesLink{dd:432} as well as \DesLink{dd:419}. It offers following methods:
 \begin{itemize}
 \item \texttt{createMediumOffset()} to create \IMediumReference{} instances
@@ -1541,10 +1541,10 @@ The class \MediumReferenceRepository{} is used for maintaining \IMediumReference
 \end{itemize}
 
 }
-{% Begründung
+{% Rationale
 Reduction of total complexity of the \IMediumStore{}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1553,16 +1553,16 @@ How to deal with the method \texttt{advance()} mentioned in \DesLink{dd:416}. It
 
 %%%% DD --> %%%%
 \DD{dd:433b}
-{% Titel
+{% Title
 The  \IMediumReference{} instances created with \IMediumReference{}\texttt{.advance()} need to be maintained with \MediumReferenceRepository{}, too.
 }
-{% Kurzbeschreibung
+{% Short description
 Initially, the new \IMediumReference{} instance must get a reference to its creator, i.e. \MediumReferenceRepository{}, during construction. To still enable a simple creation of instances of \IMediumReference{} implementation classes (e.g. in unit tests), the constructor is public.
 }
-{% Begründung
+{% Rationale
 The client code can arbitrarily use \IMediumReference{}\texttt{.advance()}, and the returned references can be used as usual, e.g. for newly created data blocks. Thus it is clear that even these references are auto-corrected with \MediumReferenceRepository{}\texttt{.updateOffsets()}.
 }
-{% Nachteile
+{% Disadvantages
 Close coupling between \IMediumReference{} and \MediumReferenceRepository{}, as both are knowing each other.
 }
 %%%% <-- DD %%%%
@@ -1571,20 +1571,20 @@ Now we still have the issue with the memory footprint as mentioned in \DesLink{d
 
 %%%% DD --> %%%%
 \DD{dd:433c}
-{% Titel
+{% Title
 The end \IMediumReference{} of a \MediumRegion{} must not be stored, but be always recalculated
 }
-{% Kurzbeschreibung
+{% Short description
 The end \IMediumReference{} of a \MediumRegion{} must not be stored within \MediumRegion{}, but must always be recalculated whenever \MediumRegion{}\texttt{.calculateEndOffset()} is called. 
 }
-{% Begründung
+{% Rationale
 The end \IMediumReference{} must be managed in \MediumReferenceRepository{}, because \MediumRegion{} is a public class and you never know how the client uses the created end offset in his code. This would not be a reason against calculating it right at creation time of the \MediumRegion{}.
 
 Of course, first of all it is good style to avoid redundancy, as we anyway store start offset and size in the \MediumRegion{}. 
 
 But the major reason for not storing it is the following case: Imagine an \texttt{insert} happens at an offset that is in the middle of an existing cached \MediumRegion{}. When storing the end \IMediumReference{} of the region, it would be shifted by the number of inserted bytes after a \texttt{flush}, while the start offset would not be changed. This would essentially punish the use of reduncancy: The end offset would not fit anymore to the size also stored in \MediumRegion{}, thus leading to subtle and interesting bugs in connection with flushing changes, e.g. for the \MediumRegion{}s stored in the cache.
 }
-{% Nachteile
+{% Disadvantages
 Each call to \MediumRegion{}\texttt{.calculateEndOffset()} creates a new entry to be maintained in \MediumReferenceRepository{}
 }
 %%%% <-- DD %%%%
@@ -1593,18 +1593,18 @@ A second thing we unfortunately cannot do is the following:
 
 %%%% DD --> %%%%
 \DD{dd:433d}
-{% Titel
+{% Title
 It is not safe to create unmanaged \IMediumReference{}s in internal code
 }
-{% Kurzbeschreibung
+{% Short description
 Whenever the internal implementation of scheduling or flushing requires \IMediumReference{}s advanced, it might be an idea that it only uses a variant of the \IMediumReference{}\texttt{.advance()} named \IMediumReference{}\texttt{.advanceUnmanaged()} that does not associate the advanced \IMediumReference{} instance with the \MediumReferenceRepository{}.
 
 However, this will always include the risk that some unmanaged \IMediumReference{} ``leaps'' out to the client or somehow comes into the cache.
 }
-{% Begründung
+{% Rationale
 It might be true that internally created \IMediumReference{} for flushing and scheduling never go out to the client user of \COMPmedia{}. However, still some of the \IMediumReference{}s created internally using \texttt{advance} might come into the cache. We cannot afford to risk stability and reliability for things that might only occur in ``corner cases''. This is extremely hard to debug and puts the overall image of the library at risk.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1613,16 +1613,16 @@ After having eliminated three possibilities for improvement already, what are th
 
 %%%% DD --> %%%%
 \DD{dd:433e}
-{% Titel
+{% Title
 \MediumRegion{} is optimized to create as few new \IMediumReference{} as possible
 }
-{% Kurzbeschreibung
+{% Short description
 \MediumRegion{} only rarely or not at all calls \IMediumReference{}\texttt{.advance()}, thus avoiding creation of new managed \IMediumReference{} instances. Specifically, a new method \texttt{calculateEndOffsetAsLong} is introduced that can be used as replacement for \texttt{calculateEndOffset} and does not create new \IMediumReference{}s.
 }
-{% Begründung
+{% Rationale
 It showed that \MediumRegion{} was responsible for the greater part of \IMediumReference{}s created, because it is so heavily used during flushing, offset updates and cache management. In tests we could show that for cached media, it only created six times less \IMediumReference{}s using this approach.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1631,18 +1631,18 @@ Now there is but one topic left: A special case for \MediumReferenceRepository{}
 
 %%%% DD --> %%%%
 \DD{dd:433f}
-{% Titel
+{% Title
 \texttt{updateOffsets()} must not increase the \IMediumReference{}s auf the \texttt{insert} \MediumAction{} causing the shift
 }
-{% Kurzbeschreibung
+{% Short description
 According to \DesLink{dd:418b}, \texttt{insert} \MediumAction{}s shift managed \IMediumReference{}s with an offset \emph{equal to} or bigger than the insert offset by the number of inserted bytes towards higher offsets. This is necessary for \emph{any other insert} at the same offset, but not for the causing \MediumAction{}s insert.
 }
-{% Begründung
+{% Rationale
 First of all, only \MediumAction{}s of type \texttt{insert} are affected, as only for these also \IMediumReference{}s at the same offset need to be updated. 
 
 If we would also shift the causing \MediumAction{}s \IMediumReference{}, it would not point to the same bytes anymore. E.g. when adding the insertion bytes to the cache after updateing all offsets, we would need to recalculate the original offset again by substraction.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1656,10 +1656,10 @@ Access to the \TERMmedium{} is implemented in own classes, as the following desi
 
 %%%% DD --> %%%%
 \DD{dd:429}
-{% Titel
+{% Title
 Interface \IMediumAccessor{} with implementations for each \TERMmedia{} type access
 }
-{% Kurzbeschreibung
+{% Short description
 Access to a \TERMmedium{} is possible via an interface \IMediumAccessor{}, doing a great deal of ensuring \DesLink{dd:407}. It offest the following primitives:
 \begin{itemize}
 \item \texttt{getMedium}: Returns the medium this instance is working on.
@@ -1678,12 +1678,12 @@ There is one implementation of this interface for each distinct \TERMmedium{} ty
 
 \IMediumStore{} exclusively accesses the \TERMmedium{} only via this interface.
 }
-{% Begründung
+{% Rationale
 \IMediumStore{} itself can deal with caching and the complex implementation of writing functionality independently from the concrete medium, while the actual medium access can be abstracted away by concrete implementations generically. Classical separation of concerns to increase maintainability and comprehensibility of the solution.
 
 Regarding the offset handling for read: This is necessary to ensure readable and non-confusing use for non-random-access media. In that way, the user does not assume the medium is actually read-only.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1691,18 +1691,18 @@ No disadvantages known
 After having discussed the implementation of \MediumReferenceRepository{} in the last subsection, it should be stated what kind of current positions are stored in an \IMediumAccessor{} implementation? This is made clear by the following design decision:
 %%%% DD --> %%%%
 \DD{dd:429b}
-{% Titel
+{% Title
 The current position of an \IMediumAccessor{} instance is not maintained in \MediumReferenceRepository{}
 }
-{% Kurzbeschreibung
+{% Short description
 The current position of an \IMediumAccessor{} instance is not maintained in \MediumReferenceRepository{}, such that it won't be changed by a \texttt{flush} of changes that would otherwise modify it.
 }
-{% Begründung
+{% Rationale
 It might work with using a managed \IMediumReference{} for storing the current position of the \IMediumAccessor{} implementation. This is because for stream-based media, you cannot flush, and for all random-access media the current position can be arbitrary.
 
 However, making the current position managed would first of all confuse outside users who might expect that the current position is only modified by read and write operations of the \IMediumAccessor{}, and not in addition by flushing. Second, we want to keep the memory footprint of \IMediumReference{} in \MediumReferenceRepository{} to a minimum. Last but not least, we want to avoid a direct dependency from \IMediumAccessor{} to \MediumReferenceRepository{}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1717,10 +1717,10 @@ The cache on first sight maintains data bytes per offset, always assuming that t
 In most cases we want to query which parts of data to read, write or remove is within the cache. The cache might be fragmented arbitrarily due to multiple fill operations. The make the code easier to understand and maintain, we create a specific class for representing the so called regions, i.e. added cache fragments:
 %%%% DD --> %%%%
 \DD{dd:435}
-{% Titel
+{% Title
 Class \MediumRegion{} for consecutive regions of a medium, especially also for cache regions
 }
-{% Kurzbeschreibung
+{% Short description
 The class \MediumRegion{} represents a consecutive byte range with start offset, size and contained bytes of a medium, that may or may not be cached. It offers the following methods:
 \begin{itemize}
 \item \texttt{getStartOffset()}: Query start \IMediumReference{} of the region
@@ -1735,10 +1735,10 @@ The class \MediumRegion{} represents a consecutive byte range with start offset,
 \item \texttt{calculateEndOffset()}: Convenience method for calculating the end \IMediumReference{} of the region
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 The cache regions and the non-cached regions of the medium can be treated in the same way. Implementing caching is easier when not based on primitive types (e.g. byte[]) only, but using this helper class.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1746,10 +1746,10 @@ No disadvantages known
 Maintenance of cache content is done by a helper class:
 %%%% DD --> %%%%
 \DD{dd:436}
-{% Titel
+{% Title
 Cache maintenance by \MediumCache{}, ensuring maximum cache size and no overlapping regions
 }
-{% Kurzbeschreibung
+{% Short description
 Cache maintenance is done by the class \MediumCache{}. This class has the following invariants at any point in time before and after public method calls:
 \begin{itemize}
 \item The \MediumRegion{}s stored in the cache do never overlap
@@ -1769,10 +1769,10 @@ It offers the following methods:
 \item \texttt{getCurrentCacheSizeInBytes()}: Returns the current size of the cache in bytes.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 Reducing complexity of \IMediumStore{}
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1781,16 +1781,16 @@ For the cache sizes, we saw already that we can query the maximum and current ca
 
 %%%% DD --> %%%%
 \DD{dd:436b}
-{% Titel
+{% Title
 The maximum cache and maximum region size of a cache instance can never be changed throughout its life time.
 }
-{% Kurzbeschreibung
+{% Short description
 The maximum cache size and the maximum region size are passed to the constructor of the \MediumCache{} class and they must not be changed later.
 }
-{% Begründung
+{% Rationale
 Otherwise complex methods for reorganizing the cache are necessary, splitting and discarding existing regions. It is very unlikely that the user needs to change the cache size during accessing the medium. It if fully sufficient that he can configure the maximum size of the cache and its regions before the first access to the medium.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1799,18 +1799,18 @@ How are the cache regions internally managed?
 
 %%%% DD --> %%%%
 \DD{dd:437}
-{% Titel
+{% Title
 A \texttt{TreeMap} is used for managing the cache contents, an additional \texttt{LinkedList} for freeing up according to FIFO
 }
-{% Kurzbeschreibung
+{% Short description
 A \texttt{TreeMap<}\IMediumReference{}, \MediumRegion{}\texttt{>} is used for managing the cache contents. An additional \texttt{LinkedList} is used for freeing up cache data according to FIFO.
 }
-{% Begründung
+{% Rationale
 Content must be read based on offsets. Thus a data structure sorted by offset is necessary. It allows the efficient retrieval of all \MediumRegion{}s bigger or smaller than a given offest. This operation should most probably need a runtime complexity of only $O(log(n))$ instead of $O(n)$.
 
 The \texttt{LinkedList} is necessary to efficiently remove the first added cache regions when freeing up is necessary due to max cache size reached, see \DesLink{dd:411e}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1830,22 +1830,22 @@ To ease the implementation complexity, we nevertheless decide:
 
 %%%% DD --> %%%%
 \DD{dd:437d}
-{% Titel
+{% Title
 Fragmentation of cache regions is not actively avoided
 }
-{% Kurzbeschreibung
+{% Short description
 \COMPmedia{} does not try to mitigate or avoid the following situations:
 \begin{itemize}
 \item Direct consecutive cache regions are not joined, even if their total size is smaller than the maximum allowed region size
 \item ``Nearby'' but unconnected (i.e. non-consective) cache regions of small sizes are not handled in any special way.
 \end{itemize}
 }
-{% Begründung
+{% Rationale
 It would lead to even higher complexity of the implementation of \texttt{addRegion()}.
 
 In contrast to that high complexity, we can ask the caller to ensure that he only adds data for reasonably connected offset ranges.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1861,16 +1861,16 @@ We first state the following:
 
 %%%% DD --> %%%%
 \DD{dd:434}
-{% Titel
+{% Title
 \MediumAction{} has a schedule sequence number for knowing the schedule order of actions
 }
-{% Kurzbeschreibung
+{% Short description
 \MediumAction{} defines a schedule sequence number (starting at 0) for distinguishing which action has been scheduled earlier. It is incremented by any scheduled action (no matter which type) by 1. The schedule sequence number is ``global'' for the same medium in a sense that it is simply incremented for each change, no matter what change it is and if there was a flush already or not.
 }
-{% Begründung
+{% Rationale
 Two distinct \MediumAction{} instances of type \texttt{insert} referring to the same offset cannot be sorted without this mechanism (see \DesLink{dd:422}).
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1879,10 +1879,10 @@ We now have to define comparisons between two \MediumAction{}s in a reasonable w
 
 %%%% DD --> %%%%
 \DD{dd:434a}
-{% Titel
+{% Title
 Comparisons of \MediumAction{}s is done based on \IMediumReference{} and - for \texttt{insert} only - the sequence number
 }
-{% Kurzbeschreibung
+{% Short description
 A \MediumAction{} \texttt{a} is smaller than another \MediumAction{} \texttt{b} according to Javas \texttt{compareTo}, if and only if one of the following criteria are met:
 \begin{itemize}
 \item The \IMediumReference{} of \texttt{a} is smaller than the \IMediumReference{} of \texttt{b},
@@ -1893,10 +1893,10 @@ A \MediumAction{} \texttt{a} is equal to a \MediumAction{} \texttt{b} according 
 
 A \MediumAction{} \texttt{a} is bigger than a \MediumAction{} \texttt{b} according to Javas \texttt{compareTo}, if \texttt{a} is neither smaller than \texttt{b} nor equals \texttt{b}. This is especially true if the \IMediumReference{} is bigger, or for equal \IMediumReference{}s of type \texttt{insert}, if the sequence number is bigger. Furthermore it is defined: If \IMediumReference{}s and sequence numbers of \texttt{insert}s are identical, then \texttt{a} is still bigger than \texttt{b} in the case that any of the other attribute of the \MediumAction{}s differs.
 }
-{% Begründung
+{% Rationale
 Sorting of \MediumAction{}s should be done according to their order on the medium (i.e. their \IMediumReference{}s) and only for \texttt{insert}s in creation order (i.e. their sequence number), because behaviour of consecutive operations is based on call order, according to \DesLink{dd:422}, \DesLink{dd:424} and \DesLink{dd:424a}. In addition, the \MediumAction{}s must be processesed in a defined order during \texttt{flush}. \texttt{equals} must return true exactly in the case that \texttt{compareTo} returns 0.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1905,16 +1905,16 @@ Now we can define in which way the \MediumAction{}s are stored:
 
 %%%% DD --> %%%%
 \DD{dd:435b}
-{% Titel
+{% Title
 \MediumAction{}s are stored in a sorted data structure without duplicates
 }
-{% Kurzbeschreibung
+{% Short description
 The \MediumAction{}s created before a \texttt{flush()} are held in a datastructure sorted by offset and sequence number (according to \DesLink{dd:434}), which does not allow duplicates (e.g. \texttt{TreeSet}).
 }
-{% Begründung
+{% Rationale
 The sort order is necessary for in-order-processing via \texttt{flush()}, two \MediumAction{}s with same offset, same sequence number and same type should not show up twice.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1922,10 +1922,10 @@ No disadvantages known
 Now regarding management of \MediumAction{}s:
 %%%% DD --> %%%%
 \DD{dd:436a}
-{% Titel
+{% Title
 For managing \MediumAction{}s, the class \MediumChangeManager{} is responsible
 }
-{% Kurzbeschreibung
+{% Short description
 For managing \MediumAction{}s, the class \MediumChangeManager{} is defined, which internally implements \DesLink{dd:435b}, with following methods:
 \begin{itemize}
 \item \texttt{scheduleInsert()} for scheduling an \emph{insert}, implements \DesLink{dd:422}, gets a \MediumRegion{} as parameter and returns a \MediumAction{} of the given type and with correct sequence number, i.e. should there be other actions at the same offset, the new action is guaranteed to have a sequence number higher than the action with the biggest sequence number already present for the same offset.
@@ -1937,29 +1937,29 @@ For managing \MediumAction{}s, the class \MediumChangeManager{} is defined, whic
 \end{itemize}
 Here, the three \texttt{schedule} methods create \MediumAction{}s according to \DesLink{dd:424b} and \DesLink{dd:434}.
 }
-{% Begründung
+{% Rationale
 Reduction of overall complexity of \IMediumStore{}.
 
 The iterator allows reading of changes in order, but is not needed for processing, as we see later. \texttt{remove} on this iterator is not necessary, as \texttt{undo()} can undo an action.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
 At the end, we highlight some commonalities between \MediumAction{}s and \MediumRegion{}s, and define:
 %%%% DD --> %%%%
-\DD{dd:436b}
-{% Titel
+\DD{dd:436x}
+{% Title
 \MediumAction{} aggregates a \MediumRegion{} instance
 }
-{% Kurzbeschreibung
+{% Short description
 \MediumAction{} aggregate a \MediumRegion{} instance which holds that offset and length of the action, BUT NOT the bytes related to the action itself, which are held in a separate attribute of the \MediumAction{}.
 }
-{% Begründung
+{% Rationale
 \MediumAction{} needs a start \IMediumReference{}, a length of the change as well as possibly the bytes to change, if any. However, we only implement start and length in form of a \MediumRegion{} instance. You can interpret \MediumAction{} as a class that refers to a \MediumRegion{}. It is a classical ``has a'' instead of an ``is a'' relationship, which requires aggregation instead of inheritance. The reason to not keep the bytes in the aggregated \MediumRegion{} but in the \MediumAction{} itself lies in the special form of the  \texttt{replace} operation. For detecting non-allowed overlaps, only the number of bytes to replace is important (see \DesLink{dd:424} and \DesLink{dd:424a}) and not the replacement bytes themselves. In that way, we can get a common implementation of overlap detection.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1994,16 +1994,16 @@ We can add that the writing operations have some additional oddities:
 We can first confirm that the configuration of a maximum read write block size for writing is necessary:
 %%%% DD --> %%%%
 \DD{dd:438}
-{% Titel
+{% Title
 A maximum read-write block size must be configurable for the user
 }
-{% Kurzbeschreibung
+{% Short description
 It must be between 1 and N (any integer) bytes
 }
-{% Begründung
+{% Rationale
 Necessary due to the block-wise reading and writing operations behind affected regions caused by inserts and removes. By making it configurable, the user can himself decide how much bytes should be processed in a single pass.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2011,10 +2011,10 @@ No disadvantages known
 Finding out wich operations must be executed during a flush is a complex task. We need to perform this complex task within a method:
 %%%% DD --> %%%%
 \DD{dd:439}
-{% Titel
+{% Title
 \texttt{createFlushPlan()} in \MediumChangeManager{} creates a read-write-plan for a flush in form of a \texttt{List<}\MediumAction{}\texttt{>}
 }
-{% Kurzbeschreibung
+{% Short description
 \texttt{createFlushPlan()} creates a read-write-plan for a flush and returns a \texttt{List<}\MediumAction{}\texttt{>}.  The read-write-plan contains the actions to be executed in the given order. The list of possible actions is extended by \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE}. Which are defined as:
 \begin{itemize}
 \item READ: primitive reading of $n$ bytes starting at offset $x$
@@ -2028,14 +2028,14 @@ The read-write-plan thus contains \MediumAction{}s in addition to those caused b
 
 The created plan is the basis for processing in \texttt{flush} afterwards.
 }
-{% Begründung
+{% Rationale
 Determining the necessary operations is a complex process, which should be done separately. A direct execution of the plan would be an alternative, but testability of the code would heavily suffer.
 
 \MediumChangeManager{} is the correct place for this operation, as here all \MediumAction{}s are managed anyways. The additional \MediumAction{}s in the plan are not added to any internal data structures to ensure the operation is stateless and ideally repeatable. 
 
 Adding another \texttt{WRITE} primitive seems unnecessary, as there is already an operation named \texttt{REPLACE}. However, \texttt{WRITE} differs insofar as the bytes to write might not yet be known when the action is created, in contrast to \texttt{REPLACE}.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2052,18 +2052,18 @@ Next, we should clarify how the cache is involved in \texttt{flush()}. In case c
 For the last point, we define the following:
 %%%% DD --> %%%%
 \DD{dd:439b}
-{% Titel
+{% Title
 \texttt{READ} operations in \texttt{flush} prefer cached data and update the cache if not already contained - We implement this using \texttt{getData}
 }
-{% Kurzbeschreibung
+{% Short description
 Whenever \texttt{flush} processes a \texttt{READ} action coming from the flush plan, it first checks if the data to read is fully cached. If it is, it takes the data from the cache. If it is not, it reads the data directly from the external medium and adds it to the cache.
 
 This is exactly what getData already does - so we simply call this method. If an \texttt{EndOfMediumException} occurs during reading, this is unexpected and will lead to an \texttt{IllegalStateException} thrown.
 }
-{% Begründung
+{% Rationale
 We want to use cached data as much as possible and avoid unnecessary medium accesses.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2072,16 +2072,16 @@ Correspondingly, this is how we treat \texttt{INSERT} and inserting \texttt{REPL
 
 %%%% DD --> %%%%
 \DD{dd:439c}
-{% Titel
+{% Title
 \texttt{INSERT} and inserting \texttt{REPLACE} operations in \texttt{flush} add their data to the cache
 }
-{% Kurzbeschreibung
+{% Short description
 Whenever \texttt{flush} processes an \texttt{INSERT} or \texttt{REPLACE} action coming from the flush plan, it adds all bytes to insert or replacement bytes from these actions to the cache.
 }
-{% Begründung
+{% Rationale
 We want to use cached data as much as possible and avoid unnecessary medium accesses.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2089,16 +2089,16 @@ No disadvantages known
 Very similar for \texttt{REMOVE} and \texttt{REPLACE}:
 %%%% DD --> %%%%
 \DD{dd:439d}
-{% Titel
+{% Title
 \texttt{REMOVE} and \texttt{REPLACE} operations in \texttt{flush} remove their removed or replaced ranges from the cache
 }
-{% Kurzbeschreibung
+{% Short description
 Whenever \texttt{flush} processes a \texttt{REMOVE} or \texttt{REPLACE} action coming from the flush plan, it removes all bytes to remove or replace from the cache.
 }
-{% Begründung
+{% Rationale
 Avoid cache corruption if old data is still present. In best case, the code directly fails when trying to add new data, in worst case the stale removed data remains in the cache and is later returned by read operations despite the medium already changed.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2106,16 +2106,16 @@ No disadvantages known
 Do we have to do anything with the cache regarding a \texttt{TRUNCATE} action? This is answered in the following design decision:
 %%%% DD --> %%%%
 \DD{dd:439e}
-{% Titel
+{% Title
 For a \texttt{TRUNCATE}, nothing is to be done related to caching
 }
-{% Kurzbeschreibung
+{% Short description
 The cache does not require any updates when processing a \texttt{TRUNCATE} action in \texttt{flush}.
 }
-{% Begründung
+{% Rationale
 Although it first might seem that, because \texttt{TRUNCATE} shortens the medium, no cache updates are necessary for any cached bytes at the end of the medium. This is because the cache is implicitly cleaned by handling the \texttt{REMOVE} that leads to the truncate. This consists of removing cached bytes for the removed region as well as updating \IMediumReference{}s of any data cached behind the removed region.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2124,16 +2124,16 @@ We still have the topic to update any already created \IMediumReference{}s when 
 
 %%%% DD --> %%%%
 \DD{dd:439f}
-{% Titel
+{% Title
 \texttt{flush} processes the flush plan in two phases: Medium access phase and cache update phase
 }
-{% Kurzbeschreibung
+{% Short description
 First of all, flush iterates all \texttt{MediumAction}s in the flush plan in order and executes any \texttt{READ}, \texttt{WRITE} and \texttt{TRUNCATE} operations. So this can be called the \emph{medium access phase}. In the second phase, all \texttt{MediumAction}s are iterated again, while the cache is updated, the \texttt{MediumAction}s are set to done and the \IMediumReference{}s are updated in correspondence with the changes.
 }
-{% Begründung
+{% Rationale
 Why not performing everything within the same loop, i.e. just once iterating the \texttt{MediumAction}s? This would mean to e.g. first execute an \texttt{INSERT} action, and then update all references. The problem: The flush plan might still contain READ and WRITE operations which are referring the offsets on the current medium. Calling \MediumReferenceRepository{}\texttt{.updateOffsets()} already now would also update these references, and they would be pointing to the wrong bytes! Thus, we must first process all \texttt{READ} (including adding of the read bytes to the cache), \texttt{WRITE} and \texttt{TRUNCATE} operations with their original offsets. For the caching updates in terms of \texttt{INSERT}, \texttt{REPLACE} And \texttt{REMOVE}, there are additional constraints that make it necessary to do it in the second phase. These are detailled in the next design decision.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2141,20 +2141,20 @@ No disadvantages known
 The second part of the answer when to perform \MediumReferenceRepository{}\texttt{.updateOffsets()} comes here. Some things need to be kept in mind when updating the cache, which depends on the action type:
 %%%% DD --> %%%%
 \DD{dd:439g}
-{% Titel
+{% Title
 For \texttt{INSERT}s and the replacement bytes of a \texttt{REPLACE}, \IMediumReference{}s are updated \emph{BEFORE} the cache is updated, for \texttt{REMOVE}s and the replaced bytes of a \texttt{REPLACE} they are updated \emph{AFTERWARDS}
 }
-{% Kurzbeschreibung
+{% Short description
 For \texttt{INSERT}s and \texttt{REPLACE}s, any \IMediumReference{}s already created and maintained in the \MediumReferenceRepository{} are updated first, which essentially increases the offsets of any \IMediumReference{}s behind the insertion or replacement offset by the number of bytes inserted or the number of replacement bytes. Only after this, the data newly inserted or the replacement bytes can be added to the cache.
 
 In contrast to this, when \texttt{REMOVE}s and the replaced region of a \texttt{REPLACE} are processed, first of all, the bytes to remove or replace, if present in the cache, need to be removed from it. Only then, all \IMediumReference{}s behind the remove or replace offset need to be decreased by the number of removed or replaced bytes (or fall back to remove or replace offset, if within the removed or replaced range). 
 }
-{% Begründung
+{% Rationale
 For \texttt{INSERT}s: If we add the inserted (or replacement) data to the cache before updating reference, the following would happen: Assume there are bytes already cached directly starting at the insertion offset. They would be superseded by the inserted data, i.e. thrown out of the cache. Then only all remaining data with higher offsets in the cache would be updated. This way, we would essentially lose cached data unnecessarily and increase the complexity of cache management needed at runtime a bit.
 
 For \texttt{REMOVE}s: If we would first update the \IMediumReference{}s here, the following could happen: Assume we have two consecutive cached regions within the region to remove. For both regions, its offset would be updated to point to the remove offset. So we would have two regions cached with the same start offset, which leaves the cache inconsistent. Instead, we first remove all cached regions within the removed range, then we update any remaining regions (those behind the removed range).
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2168,17 +2168,17 @@ The question for the complex \texttt{flush} operation now is: Do we need to do a
 Both cases can be considered fatal. Would a retry make sense? Probably yes, but most often: Probably no. Should we support in performing a retry? Probably also no:
 
 %%%% DD --> %%%%
-\DD{dd:440}
-{% Titel
+\DD{dd:440x}
+{% Title
 No specific error handling is done in \texttt{flush} itself
 }
-{% Kurzbeschreibung
+{% Short description
 There is no try-catch block within \texttt{flush} trying to handle any runtime errors. These errors are directly thrown up to the using code. The \texttt{flush} implementation does not perform any specific measures to ensure or allow retry or ``recovery'' mechanisms.
 }
-{% Begründung
+{% Rationale
 First of all, flush does not and cannot really support ACID, see \DesLink{dd:410b}. Second, the error situations one could think of are in no way expected, but refer to where unexpected, abnormal situation. In these situations, anyways the state of the overall system might be critical. We cannot foresee any possible error situations and we also cannot really pretend we can handle them correctly. The only advise for the user when an error in flush happens: If it might be a programming error, issue a bug. Otherwise, try closing and reopening the medium and redo the changes. In both cases, of course, due to \DesLink{dd:410b}, it could be that some changes have already been performed, which might leave the external medium in a corrupted state.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known, as we hope there are really no cases where a retry would absolutely make sense
 }
 %%%% <-- DD %%%%
@@ -2202,13 +2202,13 @@ Now we have all credentials to implement writing in \texttt{flush()}:
 
 %%%% DD --> %%%%
 \DD{dd:440}
-{% Titel
+{% Title
 \texttt{flush()} is implemented according to the process defined above
 }
-{% Kurzbeschreibung
+{% Short description
 \texttt{flush()} is implemented according to the process defined above
 }
-{% Begründung
+{% Rationale
 The flush plan must contain all operations explicitly, i.e. including those triggered by the user - \texttt{REPLACE}, \texttt{INSERT} and \texttt{REMOVE}, even if \texttt{READ} and \texttt{WRITE} would be sufficient for their implementation. The reason for that is that the actions of the user must explicitly be removed from the \MediumChangeManager{} and their influence on \IMediumReference{} instances behind must explicitly be executed. For this, you need the concrete types, \texttt{WRITE} is not sufficient.
 
 Throwing an \texttt{IllegalStateException} in case of end of medium encountered is necessary, as the creation of the flush plan must have considered the medium size. Thus, if it occurs, this is either a programming error in \texttt{createFlushPlan} or another process as changed the medium meanwhile.
@@ -2219,7 +2219,7 @@ The cache update is divided into two parts as mentioned in previous design decis
 
 The cache management is completely done within \MediumCache{}\texttt{.addRegion()}, such that maximum size and consecutive regions can be optimized there.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2413,16 +2413,16 @@ So far, we have identified several mechanisms the user can use to influence the 
 We thus first define:
 %%%% DD --> %%%%
 \DD{dd:441b}
-{% Titel
+{% Title
 The configuration of the medium access parameters is done per \IMedium{} instance
 }
-{% Kurzbeschreibung
+{% Short description
 The configuration of \COMPmedia{} is done per \IMedium{} instance. By doing this, all configuration parameters correlate to an \IMedium{}, have the same lifetime and scope. The setting of the parameters is done by passing them directly to the constructor of the media created by the user, with constructors setting the parameters to sensitive defaults.
 }
-{% Begründung
+{% Rationale
 The whole internal implementation of the most important classes, i.e. \IMediumStore{}, \IMediumAccessor{}, \MediumCache{} and so on works on exactly one medium. The user can create \IMedium{} instances directly himself and configure them as needed, independent of other \IMedium{} instances. As these parameters must not change after creation of the medium, it is correct to pass them to the constructor and to not offer setters.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -2432,16 +2432,16 @@ Now the question arises: Which configuration parameters are needed in detail? We
 First of all, we exclude one potential parameter:
 %%%% DD --> %%%%
 \DD{dd:441c}
-{% Titel
+{% Title
 The maximum cache region size is not configurable by the user, but is automatically set to the maximum read-write block size
 }
-{% Kurzbeschreibung
+{% Short description
 The user can only configure the maximum read-write block size, but not the maximum cache region size which is just set to the configured maximum read-write block size.
 }
-{% Begründung
+{% Rationale
 For a usual user, it is not clear what the maximum cache region size really is and which size it should have; there is not much ``tuning'' potential in setting it to another value than the maximum read-write block size. By doing so, we have usually a one to one match betwen a read block of bytes and the medium region added to the cache. This is good performance-wise, as it does not require to e.g. read the content of a not-yet-cached medium region below maximum cache region size block-wise, in case the maximum read-write block size is smaller than the maximum cache region size. Instead, we just automatically set them to the same value, the user can only influence the maximum read-write block size. It is clearly documented to the user what it does. As additional plus, the configuration interface of a medium gets easier.
 }
-{% Nachteile
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
