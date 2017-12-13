@@ -17,8 +17,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
-import com.github.jmeta.utility.logging.api.services.LoggingMessageConstants;
-import com.github.jmeta.utility.namedio.api.services.NamedInputStream;
+import com.github.jmeta.utility.logging.api.services.LoggingConstants;
 
 /**
  * {@link StandardLibraryJMeta}
@@ -42,15 +41,13 @@ public class StandardLibraryJMeta implements LibraryJMeta {
     * Official version of the current JMeta release.
     */
    public final static String LIBRARY_RELEASE_VERSION = "0.1.0";
-   private final static String EXTENSION_POINTS_CONFIG = "config/ExtensionPoints.xml";
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardLibraryJMeta.class);
-   private static final String MSG_INSTALLATION_CHECK = LoggingMessageConstants.LINE_SEPARATOR
+   private static final String MSG_INSTALLATION_CHECK = LoggingConstants.LINE_SEPARATOR
       + "################################################################################"
-      + LoggingMessageConstants.LINE_SEPARATOR + "  " + LIBRARY_NAME
-      + " terminates. Check your installation and contact " + LIBRARY_NAME + " support."
-      + LoggingMessageConstants.LINE_SEPARATOR
+      + LoggingConstants.LINE_SEPARATOR + "  " + LIBRARY_NAME + " terminates. Check your installation and contact "
+      + LIBRARY_NAME + " support." + LoggingConstants.LINE_SEPARATOR
       + "################################################################################"
-      + LoggingMessageConstants.LINE_SEPARATOR;
+      + LoggingConstants.LINE_SEPARATOR;
    // TODO stage2_014: hide this field
    /**
     * Internally used logging trigger.
@@ -66,9 +63,9 @@ public class StandardLibraryJMeta implements LibraryJMeta {
     */
    private static String failingTask(String taskInfo) {
 
-      return LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR
-         + LoggingMessageConstants.PREFIX_TASK_FAILED + LoggingMessageConstants.PREFIX_CRITICAL_ERROR + taskInfo
-         + LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR;
+      return LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR + LoggingConstants.PREFIX_TASK_FAILED
+         + LoggingConstants.PREFIX_CRITICAL_ERROR + taskInfo + LoggingConstants.LINE_SEPARATOR
+         + LoggingConstants.LINE_SEPARATOR;
    }
 
    /**
@@ -83,10 +80,10 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 
       String[] pathSplit = path.split(System.getProperty("path.separator"));
 
-      String returnedPath = LoggingMessageConstants.LINE_SEPARATOR + "     ";
+      String returnedPath = LoggingConstants.LINE_SEPARATOR + "     ";
 
       for (int i = 0; i < pathSplit.length; i++)
-         returnedPath += pathSplit[i] + System.getProperty("path.separator") + LoggingMessageConstants.LINE_SEPARATOR
+         returnedPath += pathSplit[i] + System.getProperty("path.separator") + LoggingConstants.LINE_SEPARATOR
             + "     ";
 
       return returnedPath;
@@ -115,9 +112,8 @@ public class StandardLibraryJMeta implements LibraryJMeta {
     */
    private static String startingTask(String taskInfo) {
 
-      return LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR
-         + LoggingMessageConstants.PREFIX_TASK_STARTING + taskInfo + LoggingMessageConstants.LINE_SEPARATOR
-         + LoggingMessageConstants.LINE_SEPARATOR;
+      return LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR + LoggingConstants.PREFIX_TASK_STARTING
+         + taskInfo + LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR;
    }
 
    /**
@@ -129,19 +125,19 @@ public class StandardLibraryJMeta implements LibraryJMeta {
     */
    private static String successfulTask(String taskInfo) {
 
-      return LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR
-         + LoggingMessageConstants.PREFIX_TASK_DONE_SUCCESSFUL + taskInfo + LoggingMessageConstants.LINE_SEPARATOR
-         + LoggingMessageConstants.LINE_SEPARATOR;
+      return LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR
+         + LoggingConstants.PREFIX_TASK_DONE_SUCCESSFUL + taskInfo + LoggingConstants.LINE_SEPARATOR
+         + LoggingConstants.LINE_SEPARATOR;
    }
 
    /**
     * Creates a new {@link StandardLibraryJMeta}.
     */
    public StandardLibraryJMeta() {
-      String loadComponents = "Loading components initially" + LoggingMessageConstants.SUFFIX_TASK;
+      String loadComponents = "Loading components initially" + LoggingConstants.SUFFIX_TASK;
 
-      String jMetaIntro = LoggingMessageConstants.LINE_SEPARATOR + LIBRARY_NAME + " is about to start..."
-         + LoggingMessageConstants.LINE_SEPARATOR;
+      String jMetaIntro = LoggingConstants.LINE_SEPARATOR + LIBRARY_NAME + " is about to start..."
+         + LoggingConstants.LINE_SEPARATOR;
 
       //////////
       // ##### (1.) Log jMeta startup
@@ -165,22 +161,13 @@ public class StandardLibraryJMeta implements LibraryJMeta {
       //////////
       // ##### (2.) Load all extensions
       //////////
-      String taskLoadExtensions = "Load all extensions" + LoggingMessageConstants.SUFFIX_TASK;
+      String taskLoadExtensions = "Load all extensions" + LoggingConstants.SUFFIX_TASK;
 
       LOGGER.info(startingTask(taskLoadExtensions));
 
-      try (NamedInputStream extensionPointsStream = NamedInputStream.createFromResource(StandardLibraryJMeta.class,
-         EXTENSION_POINTS_CONFIG)) {
-         ComponentRegistry.lookupService(ExtensionManager.class);
+      ComponentRegistry.lookupService(ExtensionManager.class);
 
-         LOGGER.info(successfulTask(taskLoadExtensions));
-      } catch (Throwable e) {
-         LOGGER.error(failingTask(taskLoadExtensions));
-         LOGGER.error("Could not load extensions due to exception.");
-         LOGGER.error(getClass().getSimpleName(), e);
-         LOGGER.error(MSG_INSTALLATION_CHECK);
-         return;
-      }
+      LOGGER.info(successfulTask(taskLoadExtensions));
 
       //////////
       // ##### (3.) Load all components initially
@@ -201,10 +188,10 @@ public class StandardLibraryJMeta implements LibraryJMeta {
       }
 
       LOGGER.info(successfulTask(loadComponents));
-      LOGGER.info(LoggingMessageConstants.LINE_SEPARATOR + "#################################################"
-         + LoggingMessageConstants.LINE_SEPARATOR + " " + LIBRARY_NAME + " startup ended successfully"
-         + LoggingMessageConstants.LINE_SEPARATOR + "#################################################"
-         + LoggingMessageConstants.LINE_SEPARATOR);
+      LOGGER.info(LoggingConstants.LINE_SEPARATOR + "#################################################"
+         + LoggingConstants.LINE_SEPARATOR + " " + LIBRARY_NAME + " startup ended successfully"
+         + LoggingConstants.LINE_SEPARATOR + "#################################################"
+         + LoggingConstants.LINE_SEPARATOR);
    }
 
    /**
@@ -229,58 +216,30 @@ public class StandardLibraryJMeta implements LibraryJMeta {
     * Logs startup.
     */
    private void logJMetaStartup() {
-      /*
-       * "[=================================================================]"
-       * "[                   __    ___  __        _                        ]" + ILoggingStringConstants.LINE_SEPARATOR
-       * + "[        ##        |__|  /   \/  | _____| |_ _____     ##         ]" +
-       * ILoggingStringConstants.LINE_SEPARATOR + "[       ####    _______ / /| / \ |/ __|_   _/  _  |   ####        ]"
-       * + ILoggingStringConstants.LINE_SEPARATOR +
-       * "[      ######   |____  | / | | | |  ___|| |_| (_) |  ######       ]" + ILoggingStringConstants.LINE_SEPARATOR
-       * + "[       ####     ____| |/  |_| |_|\___/ |___\__/\_|   ####        ]" +
-       * ILoggingStringConstants.LINE_SEPARATOR + "[        ##      \____/                                ##         ]"
-       * + ILoggingStringConstants.LINE_SEPARATOR +
-       * "[                                                                 ]" + ILoggingStringConstants.LINE_SEPARATOR
-       * +
-       */
 
-      String jMetaGreetings = LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR
-         + "[=================================================================]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[                   __    ___  __        _                        ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[         ##       |__|  /   \\/  | _____| |_ _____     ##         ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[        ####   _______ / /| / \\ |/ __|_   _/  _  |   ####        ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[       ######  |____  | / | | | |  ___|| |_| (_) |  ######       ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[        ####    ____| |/  |_| |_|\\___/ |___\\__/\\_|   ####        ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[         ##     \\____/                                ##         ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[                                                                 ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[    _________________________________________________________    ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[                                                                 ]"
-         + LoggingMessageConstants.LINE_SEPARATOR + "[       " + LIBRARY_NAME
-         + " - The Metadata and Container Format Library         ]" + LoggingMessageConstants.LINE_SEPARATOR
-         + "[    _________________________________________________________    ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[                                                                 ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[                © 2011-2020 Jens Ebert                           ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[                                                                 ]"
-         + LoggingMessageConstants.LINE_SEPARATOR + "[               Version: " + LIBRARY_RELEASE_VERSION
-         + "                                    ]" + LoggingMessageConstants.LINE_SEPARATOR + "[               Build: "
-         + LIBRARY_RELEASE_BUILD + "                                        ]" + LoggingMessageConstants.LINE_SEPARATOR
+      String jMetaGreetings = LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR
+         + "[=================================================================]" + LoggingConstants.LINE_SEPARATOR
+         + "[                   __    ___   __        _                       ]" + LoggingConstants.LINE_SEPARATOR
+         + "[         ##       |__|  /   \\/  | _____| |_ ______     ##       ]" + LoggingConstants.LINE_SEPARATOR
+         + "[        ####   _______ / /| / \\ |/ __|_   _/  _   |   ####      ]" + LoggingConstants.LINE_SEPARATOR
+         + "[       ######  |____  | / | |  | |  ___|| |_| (_)  |  ######     ]" + LoggingConstants.LINE_SEPARATOR
+         + "[        ####    ____| |/  |_|  |_|\\___/|___\\_/\\_|   ####      ]" + LoggingConstants.LINE_SEPARATOR
+         + "[         ##     \\____/                                 ##       ]" + LoggingConstants.LINE_SEPARATOR
+         + "[                                                                 ]" + LoggingConstants.LINE_SEPARATOR
+         + "[    _________________________________________________________    ]" + LoggingConstants.LINE_SEPARATOR
+         + "[                                                                 ]" + LoggingConstants.LINE_SEPARATOR
+         + "[       " + LIBRARY_NAME + " - The Metadata and Container Format Library         ]"
+         + LoggingConstants.LINE_SEPARATOR + "[    _________________________________________________________    ]"
+         + LoggingConstants.LINE_SEPARATOR + "[                                                                 ]"
+         + LoggingConstants.LINE_SEPARATOR + "[                \u00A92011-2020 Jens Ebert                           ]"
+         + LoggingConstants.LINE_SEPARATOR + "[                                                                 ]"
+         + LoggingConstants.LINE_SEPARATOR + "[               Version: " + LIBRARY_RELEASE_VERSION
+         + "                                    ]" + LoggingConstants.LINE_SEPARATOR + "[               Build: "
+         + LIBRARY_RELEASE_BUILD + "                                        ]" + LoggingConstants.LINE_SEPARATOR
          + "[               Release Date: " + LIBRARY_RELEASE_DATE + "                          ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[                                                                 ]"
-         + LoggingMessageConstants.LINE_SEPARATOR
-         + "[=================================================================]"
-         + LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR;
+         + LoggingConstants.LINE_SEPARATOR + "[                                                                 ]"
+         + LoggingConstants.LINE_SEPARATOR + "[=================================================================]"
+         + LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR;
 
       LOGGER.info(jMetaGreetings);
 
@@ -290,47 +249,45 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 
       libraryPath = humanReadablePaths(libraryPath);
       classPath = humanReadablePaths(classPath);
-      extPath = humanReadablePaths(extPath);
 
-      String javaEnvironmentInfo = LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR
-         + "**************************" + LoggingMessageConstants.LINE_SEPARATOR + " Java environmental info: "
-         + LoggingMessageConstants.LINE_SEPARATOR + "**************************"
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Java Runtime Environment version               : "
-         + System.getProperty("java.version") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java Runtime Environment vendor                : " + System.getProperty("java.vendor")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Java Runtime Environment specification version : "
-         + System.getProperty("java.specification.version") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java Runtime Environment specification vendor  : " + System.getProperty("java.specification.vendor")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Java Runtime Environment specification name    : "
-         + System.getProperty("java.specification.name") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java vendor URL                                : " + System.getProperty("java.vendor.url")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Java installation directory                    : "
-         + System.getProperty("java.home") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java Virtual Machine specification version     : " + System.getProperty("java.vm.specification.version")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Java Virtual Machine specification vendor      : "
-         + System.getProperty("java.vm.specification.vendor") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java Virtual Machine specification name        : " + System.getProperty("java.vm.specification.name")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Java Virtual Machine implementation version    : "
-         + System.getProperty("java.vm.version") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java Virtual Machine implementation vendor     : " + System.getProperty("java.vm.vendor")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Java Virtual Machine implementation name       : "
-         + System.getProperty("java.vm.name") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java class format version number               : " + System.getProperty("java.class.version")
-         + LoggingMessageConstants.LINE_SEPARATOR + "  Name of JIT compiler to use                    : "
-         + System.getProperty("java.compiler") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Java class path                                : " + classPath + LoggingMessageConstants.LINE_SEPARATOR
-         + "  List of paths to search when loading libraries : " + libraryPath + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Path of extension directory or directories     : " + extPath + LoggingMessageConstants.LINE_SEPARATOR
-         + LoggingMessageConstants.LINE_SEPARATOR;
+      String javaEnvironmentInfo = LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR
+         + "**************************" + LoggingConstants.LINE_SEPARATOR + " Java environmental info: "
+         + LoggingConstants.LINE_SEPARATOR + "**************************" + LoggingConstants.LINE_SEPARATOR
+         + "  Java Runtime Environment version               : " + System.getProperty("java.version")
+         + LoggingConstants.LINE_SEPARATOR + "  Java Runtime Environment vendor                : "
+         + System.getProperty("java.vendor") + LoggingConstants.LINE_SEPARATOR
+         + "  Java Runtime Environment specification version : " + System.getProperty("java.specification.version")
+         + LoggingConstants.LINE_SEPARATOR + "  Java Runtime Environment specification vendor  : "
+         + System.getProperty("java.specification.vendor") + LoggingConstants.LINE_SEPARATOR
+         + "  Java Runtime Environment specification name    : " + System.getProperty("java.specification.name")
+         + LoggingConstants.LINE_SEPARATOR + "  Java vendor URL                                : "
+         + System.getProperty("java.vendor.url") + LoggingConstants.LINE_SEPARATOR
+         + "  Java installation directory                    : " + System.getProperty("java.home")
+         + LoggingConstants.LINE_SEPARATOR + "  Java Virtual Machine specification version     : "
+         + System.getProperty("java.vm.specification.version") + LoggingConstants.LINE_SEPARATOR
+         + "  Java Virtual Machine specification vendor      : " + System.getProperty("java.vm.specification.vendor")
+         + LoggingConstants.LINE_SEPARATOR + "  Java Virtual Machine specification name        : "
+         + System.getProperty("java.vm.specification.name") + LoggingConstants.LINE_SEPARATOR
+         + "  Java Virtual Machine implementation version    : " + System.getProperty("java.vm.version")
+         + LoggingConstants.LINE_SEPARATOR + "  Java Virtual Machine implementation vendor     : "
+         + System.getProperty("java.vm.vendor") + LoggingConstants.LINE_SEPARATOR
+         + "  Java Virtual Machine implementation name       : " + System.getProperty("java.vm.name")
+         + LoggingConstants.LINE_SEPARATOR + "  Java class format version number               : "
+         + System.getProperty("java.class.version") + LoggingConstants.LINE_SEPARATOR
+         + "  Name of JIT compiler to use                    : " + System.getProperty("java.compiler")
+         + LoggingConstants.LINE_SEPARATOR + "  Java class path                                : " + classPath
+         + LoggingConstants.LINE_SEPARATOR + "  List of paths to search when loading libraries : " + libraryPath
+         + LoggingConstants.LINE_SEPARATOR + "  Path of extension directory or directories     : " + extPath
+         + LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR;
 
-      String osEnvironmentInfo = LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR
-         + "**************************************" + LoggingMessageConstants.LINE_SEPARATOR
-         + " Operating system environmental info: " + LoggingMessageConstants.LINE_SEPARATOR
-         + "**************************************" + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Operating system name         : " + System.getProperty("os.name") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Operating system architecture : " + System.getProperty("os.arch") + LoggingMessageConstants.LINE_SEPARATOR
-         + "  Operating system version      : " + System.getProperty("os.version")
-         + LoggingMessageConstants.LINE_SEPARATOR + LoggingMessageConstants.LINE_SEPARATOR;
+      String osEnvironmentInfo = LoggingConstants.LINE_SEPARATOR + LoggingConstants.LINE_SEPARATOR
+         + "**************************************" + LoggingConstants.LINE_SEPARATOR
+         + " Operating system environmental info: " + LoggingConstants.LINE_SEPARATOR
+         + "**************************************" + LoggingConstants.LINE_SEPARATOR
+         + "  Operating system name         : " + System.getProperty("os.name") + LoggingConstants.LINE_SEPARATOR
+         + "  Operating system architecture : " + System.getProperty("os.arch") + LoggingConstants.LINE_SEPARATOR
+         + "  Operating system version      : " + System.getProperty("os.version") + LoggingConstants.LINE_SEPARATOR
+         + LoggingConstants.LINE_SEPARATOR;
 
       LOGGER.info(javaEnvironmentInfo);
       LOGGER.info(osEnvironmentInfo);

@@ -25,9 +25,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public class StringFieldConverter implements FieldConverter<String> {
 
    @Override
-   public String toInterpreted(BinaryValue binaryValue,
-      DataBlockDescription desc, ByteOrder byteOrder, Charset characterEncoding)
-         throws BinaryValueConversionException {
+   public String toInterpreted(BinaryValue binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
@@ -36,17 +35,14 @@ public class StringFieldConverter implements FieldConverter<String> {
 
       if (binaryValue.getTotalSize() > Integer.MAX_VALUE)
          throw new BinaryValueConversionException(
-            "String fields may not be longer than " + Integer.MAX_VALUE
-               + " bytes.",
-            null, desc, binaryValue, byteOrder, characterEncoding);
+            "String fields may not be longer than " + Integer.MAX_VALUE + " bytes.", null, desc, binaryValue, byteOrder,
+            characterEncoding);
 
       String stringValue;
       try {
-         stringValue = new String(binaryValue.getFragment(0),
-            characterEncoding.name());
+         stringValue = new String(binaryValue.getFragment(0), characterEncoding.name());
 
-         final Character terminationCharacter = desc.getFieldProperties()
-            .getTerminationCharacter();
+         final Character terminationCharacter = desc.getFieldProperties().getTerminationCharacter();
 
          if (terminationCharacter != null) {
             int index = stringValue.indexOf(terminationCharacter, 0);
@@ -55,35 +51,31 @@ public class StringFieldConverter implements FieldConverter<String> {
                stringValue = stringValue.substring(0, index);
          }
 
-         // CONFIG_CHECK: Prüfen auf nicht unterstützte Encodings
+         // CONFIG_CHECK: Check for supported encodings
          return stringValue;
       } catch (UnsupportedEncodingException e) {
          throw new BinaryValueConversionException(
-            "String conversion failed due to unsupported character encoding <"
-               + characterEncoding + ">.",
-            e, desc, binaryValue, byteOrder, characterEncoding);
+            "String conversion failed due to unsupported character encoding <" + characterEncoding + ">.", e, desc,
+            binaryValue, byteOrder, characterEncoding);
       }
    }
 
    @Override
-   public BinaryValue toBinary(String interpretedValue,
-      DataBlockDescription desc, ByteOrder byteOrder, Charset characterEncoding)
-         throws InterpretedValueConversionException {
+   public BinaryValue toBinary(String interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
       Reject.ifNull(desc, "desc");
       Reject.ifNull(interpretedValue, "interpretedValue");
 
-      // CONFIG_CHECK: Prüfen auf nicht unterstützte Encodings
+      // CONFIG_CHECK: Check for supported Encodings
       try {
-         return new BinaryValue(
-            interpretedValue.getBytes(characterEncoding.name()));
+         return new BinaryValue(interpretedValue.getBytes(characterEncoding.name()));
       } catch (UnsupportedEncodingException e) {
          throw new InterpretedValueConversionException(
-            "String conversion failed due to unsupported character encoding <"
-               + characterEncoding + ">.",
-            e, desc, interpretedValue, byteOrder, characterEncoding);
+            "String conversion failed due to unsupported character encoding <" + characterEncoding + ">.", e, desc,
+            interpretedValue, byteOrder, characterEncoding);
       }
    }
 

@@ -11,7 +11,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
+import com.github.jmeta.defaultextensions.apev2.impl.APEv2Extension;
+import com.github.jmeta.defaultextensions.id3v1.impl.ID3v1Extension;
+import com.github.jmeta.defaultextensions.id3v23.impl.ID3v23Extension;
+import com.github.jmeta.defaultextensions.mp3.impl.MP3Extension;
 import com.github.jmeta.defaultextensions.ogg.impl.OggExtension;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
@@ -34,20 +40,20 @@ public class DataFormatsSmoke {
    private final static Map<File, DataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, DataFormat>();
 
    static {
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"), ID3v23Extension.ID3v23);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_01.txt"), OggExtension.OGG);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"), ID3v23Extension.ID3v23);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_01.txt"), OggExtension.OGG);
       TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_FILE_02.txt"), OggExtension.OGG);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_02.txt"), OggExtension.OGG);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_03.txt"), OggExtension.OGG);
-      // TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_04.txt"), OggExtension.OGG);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_02.txt"), OggExtension.OGG);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_03.txt"), OggExtension.OGG);
+      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_04.txt"), OggExtension.OGG);
    }
 
-   private static Logger PRIVATE_LOGGER;
+   private static Logger PRIVATE_LOGGER = Logger.getGlobal();
 
    private LibraryJMeta m_context;
 
@@ -58,6 +64,8 @@ public class DataFormatsSmoke {
     *           No arguments
     */
    public static void main(String[] args) {
+      PRIVATE_LOGGER.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
+      PRIVATE_LOGGER.setUseParentHandlers(false);
 
       PRIVATE_LOGGER.info("###################### Starting Data Format smoke-Test ##################");
 

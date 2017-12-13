@@ -8,7 +8,12 @@
 	<packaging>pom</packaging>
 	<name>jMetaParent</name>
 	<url>http://maven.apache.org</url>
-
+	
+	<!-- ========================== Text file encoding ========================== -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+  
 	<!-- ========================== Dependencies ========================== -->
 	<!-- Global dependencies for reuse in all child projects -->
 	<dependencyManagement>
@@ -158,14 +163,6 @@
 			<artifactId>log4j-1.2-api</artifactId>
 			<version>2.10.0</version>
 		</dependency>
-		<!-- NOTE: Strange build problem with logback: Test sources do not find 
-			productive symbols of the same module during test-compile if using logback! -->
-		<!-- <dependency> -->
-		<!-- <groupId>ch.qos.logback</groupId> -->
-		<!-- <artifactId>logback-classic</artifactId> -->
-		<!-- <version>1.1.7</version> -->
-		<!-- <scope>compile</scope> -->
-		<!-- </dependency> -->
 	</dependencies>
 
 

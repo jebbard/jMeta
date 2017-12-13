@@ -26,7 +26,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.exceptions.InvalidExtensionException;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
-import com.github.jmeta.utility.logging.api.services.LoggingMessageConstants;
+import com.github.jmeta.utility.logging.api.services.LoggingConstants;
 
 /**
  * {@link StandardDataFormatRepository}
@@ -44,9 +44,9 @@ public class StandardDataFormatRepository implements DataFormatRepository {
       extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
       String validatingExtensions = "Validating registered data format extensions"
-         + LoggingMessageConstants.SUFFIX_TASK;
+         + LoggingConstants.SUFFIX_TASK;
 
-      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
+      LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
       List<Extension> availableExtensions = extManager.getAllExtensions();
 
@@ -60,7 +60,7 @@ public class StandardDataFormatRepository implements DataFormatRepository {
 
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataFormatSpec + " must not return null for its data format.";
-               LOGGER.error(LoggingMessageConstants.PREFIX_TASK_FAILED + LoggingMessageConstants.PREFIX_CRITICAL_ERROR
+               LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR
                   + validatingExtensions);
                LOGGER.error(message);
                throw new InvalidExtensionException(message, iExtension2);
@@ -78,7 +78,7 @@ public class StandardDataFormatRepository implements DataFormatRepository {
          }
       }
 
-      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
+      LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
    }
 
    /**

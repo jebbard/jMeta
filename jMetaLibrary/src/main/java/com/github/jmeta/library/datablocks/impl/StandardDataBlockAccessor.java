@@ -35,7 +35,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.exceptions.InvalidExtensionException;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
-import com.github.jmeta.utility.logging.api.services.LoggingMessageConstants;
+import com.github.jmeta.utility.logging.api.services.LoggingConstants;
 
 /**
  *
@@ -75,9 +75,9 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       List<Extension> extBundles = extManager.getAllExtensions();
 
       String validatingExtensions = "Validating registered data blocks extensions"
-         + LoggingMessageConstants.SUFFIX_TASK;
+         + LoggingConstants.SUFFIX_TASK;
 
-      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_STARTING + validatingExtensions);
+      LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
       for (Extension iExtension2 : extBundles) {
          List<DataBlockService> bundleDataBlocksExtensions = iExtension2.getAllServiceProviders(DataBlockService.class);
@@ -88,7 +88,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataBlocksExtension
                   + " must not return null for its data format.";
-               LOGGER.error(LoggingMessageConstants.PREFIX_TASK_FAILED + LoggingMessageConstants.PREFIX_CRITICAL_ERROR
+               LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR
                   + validatingExtensions);
                LOGGER.error(message);
                throw new InvalidExtensionException(message, iExtension2);
@@ -106,7 +106,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
          }
       }
 
-      LOGGER.info(LoggingMessageConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
+      LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
    }
 
    private void addDataBlockExtensions(Extension iExtension2, DataBlockService dataBlocksExtensions) {

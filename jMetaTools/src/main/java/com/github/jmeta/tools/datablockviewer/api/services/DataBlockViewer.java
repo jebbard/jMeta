@@ -9,8 +9,6 @@
  */
 package com.github.jmeta.tools.datablockviewer.api.services;
 
-import com.github.jmeta.utility.dbc.api.services.Reject;
-
 /**
  * {@link DataBlockViewer} tests the usability of the Audio Composition API. It provides a window where users may choose
  * audio files and display all supported meta data within.
@@ -24,8 +22,6 @@ public class DataBlockViewer {
     *           Ignored.
     */
    public static void main(String[] args) {
-
-      Reject.ifNull(args, "args");
 
       DataBlockViewerMainDialog mainDialog = new DataBlockViewerMainDialog();
 

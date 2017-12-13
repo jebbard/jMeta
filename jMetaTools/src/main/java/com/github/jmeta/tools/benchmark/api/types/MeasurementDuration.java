@@ -37,19 +37,19 @@ public class MeasurementDuration {
     * A long pattern containing all duration information up to days. Units are skipped if being zero. Duration
     * information with this pattern is returned by the {@link #longFormat()} method.
     */
-   public static String LONG_PATTERN_EN = "${d-, }{s: days}${h-, }{s: hours}${M-, }{s: minutes}${s-, }{s: seconds}${m-, }{s: milliseconds}${µ-, }{s: microseconds}${n-, }{s: nanoseconds}";
+   public static String LONG_PATTERN_EN = "${d-, }{s: days}${h-, }{s: hours}${M-, }{s: minutes}${s-, }{s: seconds}${m-, }{s: milliseconds}${\u03BC-, }{s: microseconds}${n-, }{s: nanoseconds}";
    /**
     * A short pattern containing all duration information up to days. Units are skipped if being zero. Duration
     * information with this pattern is returned by the {@link #shortFormat()} method.
     */
-   public static String SHORT_PATTERN = "${d-, }{s: d}${h-, }{s: h}${M-, }{s: min}${s-, }{s: s}${m-, }{s: ms}${µ-, }{s: µs}${n-, }{s: ns}";
+   public static String SHORT_PATTERN = "${d-, }{s: d}${h-, }{s: h}${M-, }{s: min}${s-, }{s: s}${m-, }{s: ms}${\u03BC-, }{s: \u03BCs}${n-, }{s: ns}";
    /**
     * A tiny pattern containing all duration information up to days. Days are skipped if being zero, microseconds and
     * milliseconds are skipped if being zero and all smaller units are zero. Hours, minutes and seconds are always
     * given, even if zero, in the format hh:mm:ss. Duration information with this pattern is returned by the
     * {@link #tinyFormat()} method.
     */
-   public static String TINY_PATTERN = "${d-, }{s:d}${0h:}${0M:}${0s}${0m?}{p:.}${0µ?}{p:.}${0n?}{p:.}";
+   public static String TINY_PATTERN = "${d-, }{s:d}${0h:}${0M:}${0s}${0m?}{p:.}${0\u03BC?}{p:.}${0n?}{p:.}";
 
    /**
     * Creates a new {@link MeasurementDuration}.
@@ -204,7 +204,7 @@ public class MeasurementDuration {
     * <li>M - Remaining minutes in this duration</li>
     * <li>s - Remaining seconds in this duration</li>
     * <li>m - Remaining milliseconds in this duration</li>
-    * <li>µ - Remaining microseconds in this duration</li>
+    * <li>ï¿½ - Remaining microseconds in this duration</li>
     * <li>n - Remaining nanoseconds in this duration</li>
     * </ul>
     * 
@@ -466,7 +466,7 @@ public class MeasurementDuration {
          SUPPORTED_IDENTIFIERS.put('M', TimeUnit.MINUTES);
          SUPPORTED_IDENTIFIERS.put('s', TimeUnit.SECONDS);
          SUPPORTED_IDENTIFIERS.put('m', TimeUnit.MILLISECONDS);
-         SUPPORTED_IDENTIFIERS.put('µ', TimeUnit.MICROSECONDS);
+         SUPPORTED_IDENTIFIERS.put('\u03BC', TimeUnit.MICROSECONDS);
          SUPPORTED_IDENTIFIERS.put('n', TimeUnit.NANOSECONDS);
       }
 
@@ -477,7 +477,7 @@ public class MeasurementDuration {
          LEADING_ZERO_IDENTIFIERS.put('M', 1);
          LEADING_ZERO_IDENTIFIERS.put('s', 1);
          LEADING_ZERO_IDENTIFIERS.put('m', 2);
-         LEADING_ZERO_IDENTIFIERS.put('µ', 2);
+         LEADING_ZERO_IDENTIFIERS.put('\u03BC', 2);
          LEADING_ZERO_IDENTIFIERS.put('n', 2);
       }
 

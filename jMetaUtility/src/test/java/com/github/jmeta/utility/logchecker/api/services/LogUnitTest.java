@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
-import com.github.jmeta.utility.logging.api.services.LoggingMessageConstants;
+import com.github.jmeta.utility.logging.api.services.LoggingConstants;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 import junit.framework.AssertionFailedError;
@@ -52,7 +52,7 @@ public class LogUnitTest {
             readLine = binput.readLine();
 
             if (readLine != null) {
-               buffer.append(readLine + LoggingMessageConstants.LINE_SEPARATOR);
+               buffer.append(readLine + LoggingConstants.LINE_SEPARATOR);
             }
          } while (readLine != null);
 

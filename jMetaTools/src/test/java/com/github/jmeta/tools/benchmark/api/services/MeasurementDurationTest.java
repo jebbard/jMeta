@@ -14,7 +14,7 @@ import com.github.jmeta.tools.benchmark.api.types.MeasurementDuration;
  */
 public class MeasurementDurationTest {
 
-   private static final String COMPLETE_PATTERN = "${d}_${h}_${M}_${s}_${m}_${µ}_${n}";
+   private static final String COMPLETE_PATTERN = "${d}_${h}_${M}_${s}_${m}_${\u03BC}_${n}";
 
    /**
     * Tests handling of seconds.
@@ -125,7 +125,7 @@ public class MeasurementDurationTest {
       MeasurementDuration zeroDur1 = createMeasurementDuration(TimeUnit.MICROSECONDS, 0, 0, 0, 0, 0, 0, 0);
 
       Assert.assertEquals("0 microseconds", zeroDur1.format(MeasurementDuration.LONG_PATTERN_EN));
-      Assert.assertEquals("0 µs", zeroDur1.format(MeasurementDuration.SHORT_PATTERN));
+      Assert.assertEquals("0 \u03BCs", zeroDur1.format(MeasurementDuration.SHORT_PATTERN));
       Assert.assertEquals("00:00:00", zeroDur1.format(MeasurementDuration.TINY_PATTERN));
       Assert.assertEquals("0_0_0_0_0_0_0", zeroDur1.format(COMPLETE_PATTERN));
 
@@ -172,11 +172,12 @@ public class MeasurementDurationTest {
       String nanosecondFormat = "%6$03d";
 
       final String expectedLongFormat = (days != 0 ? days + " days" : "")
-         + (days != 0 && (hours != 0 || minutes != 0 || seconds != 0 || milliseconds != 0 || microseconds != 0
-            || nanoseconds != 0) ? ", " : "")
+         + (days != 0 && (hours != 0
+            || minutes != 0 || seconds != 0 || milliseconds != 0 || microseconds != 0 || nanoseconds != 0) ? ", " : "")
          + (hours != 0 ? hours + " hours" : "")
          + (hours != 0 && (minutes != 0 || seconds != 0 || milliseconds != 0 || microseconds != 0 || nanoseconds != 0)
-            ? ", " : "")
+            ? ", "
+            : "")
          + (minutes != 0 ? minutes + " minutes" : "")
          + (minutes != 0 && (seconds != 0 || milliseconds != 0 || microseconds != 0 || nanoseconds != 0) ? ", " : "")
          + (seconds != 0 ? seconds + " seconds" : "")
@@ -186,18 +187,19 @@ public class MeasurementDurationTest {
          + (microseconds != 0 ? microseconds + " microseconds" : "")
          + (microseconds != 0 && nanoseconds != 0 ? ", " : "") + (nanoseconds != 0 ? nanoseconds + " nanoseconds" : "");
       final String expectedShortFormat = (days != 0 ? days + " d" : "")
-         + (days != 0 && (hours != 0 || minutes != 0 || seconds != 0 || milliseconds != 0 || microseconds != 0
-            || nanoseconds != 0) ? ", " : "")
+         + (days != 0 && (hours != 0
+            || minutes != 0 || seconds != 0 || milliseconds != 0 || microseconds != 0 || nanoseconds != 0) ? ", " : "")
          + (hours != 0 ? hours + " h" : "")
          + (hours != 0 && (minutes != 0 || seconds != 0 || milliseconds != 0 || microseconds != 0 || nanoseconds != 0)
-            ? ", " : "")
+            ? ", "
+            : "")
          + (minutes != 0 ? minutes + " min" : "")
          + (minutes != 0 && (seconds != 0 || milliseconds != 0 || microseconds != 0 || nanoseconds != 0) ? ", " : "")
          + (seconds != 0 ? seconds + " s" : "")
          + (seconds != 0 && (milliseconds != 0 || microseconds != 0 || nanoseconds != 0) ? ", " : "")
          + (milliseconds != 0 ? milliseconds + " ms" : "")
          + (milliseconds != 0 && (microseconds != 0 || nanoseconds != 0) ? ", " : "")
-         + (microseconds != 0 ? microseconds + " µs" : "") + (microseconds != 0 && nanoseconds != 0 ? ", " : "")
+         + (microseconds != 0 ? microseconds + " \u03BCs" : "") + (microseconds != 0 && nanoseconds != 0 ? ", " : "")
          + (nanoseconds != 0 ? nanoseconds + " ns" : "");
       final String expectedTinyFormat = (days != 0 ? days + "d, " : "") + hourFormat + ":" + minuteFormat + ":"
          + secondFormat
