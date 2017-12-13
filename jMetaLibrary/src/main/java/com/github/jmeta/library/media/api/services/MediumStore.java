@@ -406,9 +406,19 @@ public interface MediumStore {
     * behind and so on. So inserts at the same offset are appending.
     * 
     * An example of some scheduled valid {@link MediumAction}s and the corresponding result after a call to this method
-    * are shown in the figure below.
+    * are shown in the figures below.
     * 
-    * TODO Figure einbinden
+    * The first figure illustrates the results of an insert, a remove and a removing replace in the given order (which
+    * does not matter in this case):
+    * <p>
+    * <img src="./doc-files/flush1.png" alt="first flush example">
+    * </p>
+    * 
+    * The second figure shows that it is also possible to do multiple inserts at the same offset, where order is
+    * important, and the later call appends to the earlier call. In addition, an overwriting replace is shown:
+    * <p>
+    * <img src="./doc-files/flush2.png" alt="second flush example">
+    * </p>
     * 
     * After a flush, the {@link MediumAction} instances returned by these methods instances are not pending anymore,
     * i.e. {@link MediumAction#isPending()} returns false for them.
@@ -428,13 +438,13 @@ public interface MediumStore {
     * correspondingly. Any previously created {@link MediumOffset}s within the removed range "fall back" to the start
     * {@link MediumOffset} of the removed range, i.e. are set to this {@link MediumOffset}.</li>
     * <li>For {@link MediumActionType#REPLACE}: Let <tt>n</tt> be the number of replaced bytes and <tt>m</tt> be the
-    * number of replacement bytes. For inserting replaces (<tt>n<m</tt>), any previously created {@link MediumOffset}s
-    * equal to or behind the end of the replaced range are shifted forward, i.e. their {@link MediumOffset}s increase
-    * correspondingly. For removing replaces (<tt>n>m</tt>), any previously created {@link MediumOffset}s equal to or
-    * behind the end of the replaced range are shifted backward, i.e. their {@link MediumOffset}s decrease
-    * correspondingly. For overwriting replaces (<tt>n=m</tt>), any previously created {@link MediumOffset}s equal to or
-    * behind the end of the replaced range remain unchanged. In any case, {@link MediumOffset}s within the replaced
-    * range are not changed by such a {@link MediumAction}.
+    * number of replacement bytes. For inserting replaces (<tt>n &lt; m</tt>), any previously created
+    * {@link MediumOffset}s equal to or behind the end of the replaced range are shifted forward, i.e. their
+    * {@link MediumOffset}s increase correspondingly. For removing replaces (<tt>n &gt; m</tt>), any previously created
+    * {@link MediumOffset}s equal to or behind the end of the replaced range are shifted backward, i.e. their
+    * {@link MediumOffset}s decrease correspondingly. For overwriting replaces (<tt>n=m</tt>), any previously created
+    * {@link MediumOffset}s equal to or behind the end of the replaced range remain unchanged. In any case,
+    * {@link MediumOffset}s within the replaced range are not changed by such a {@link MediumAction}.
     * </ul>
     * 
     * If this method throws a runtime exception - which always indicates an abnormal situation - the content of the
