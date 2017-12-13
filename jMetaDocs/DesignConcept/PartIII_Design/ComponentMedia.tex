@@ -1627,7 +1627,25 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-TODO: MediumAction.INSERT - Spezialfall
+Now there is but one topic left: A special case for \MediumReferenceRepository{}.\texttt{updateOffsets()}, as indicated in the following design decision:
+
+%%%% DD --> %%%%
+\DD{dd:433f}
+{% Titel
+\texttt{updateOffsets()} must not increase the \IMediumReference{}s auf the \texttt{insert} \MediumAction{} causing the shift
+}
+{% Kurzbeschreibung
+According to \DesLink{dd:418b}, \texttt{insert} \MediumAction{}s shift managed \IMediumReference{}s with an offset \emph{equal to} or bigger than the insert offset by the number of inserted bytes towards higher offsets. This is necessary for \emph{any other insert} at the same offset, but not for the causing \MediumAction{}s insert.
+}
+{% Begründung
+First of all, only \MediumAction{}s of type \texttt{insert} are affected, as only for these also \IMediumReference{}s at the same offset need to be updated. 
+
+If we would also shift the causing \MediumAction{}s \IMediumReference{}, it would not point to the same bytes anymore. E.g. when adding the insertion bytes to the cache after updateing all offsets, we would need to recalculate the original offset again by substraction.
+}
+{% Nachteile
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 %-----------------------------------------------------------------------------------------------
 
@@ -1862,24 +1880,24 @@ We now have to define comparisons between two \MediumAction{}s in a reasonable w
 %%%% DD --> %%%%
 \DD{dd:434a}
 {% Titel
-Comparisons of \MediumAction{}s is done based on \IMediumReference{} and the sequence number
+Comparisons of \MediumAction{}s is done based on \IMediumReference{} and - for \texttt{insert} only - the sequence number
 }
 {% Kurzbeschreibung
 A \MediumAction{} \texttt{a} is smaller than another \MediumAction{} \texttt{b} according to Javas \texttt{compareTo}, if and only if one of the following criteria are met:
 \begin{itemize}
 \item The \IMediumReference{} of \texttt{a} is smaller than the \IMediumReference{} of \texttt{b},
-\item Or the \IMediumReference{} of \texttt{a} is equal to the \IMediumReference{} of \texttt{b}, and the sequence number of \texttt{a} is smaller than the sequence number of \texttt{b}
+\item Or only in the case that the \IMediumReference{} belongs to a \MediumAction{} of type \texttt{insert}: if \texttt{a} is equal to the \IMediumReference{} of \texttt{b}, and the sequence number of \texttt{a} is smaller than the sequence number of \texttt{b}
 \end{itemize}
 
 A \MediumAction{} \texttt{a} is equal to a \MediumAction{} \texttt{b} according to Javas \texttt{equals} and \texttt{compareTo}, if all attributes of \texttt{a} are equal to all attributes of \texttt{b} (in terms of \texttt{equals}).
 
-A \MediumAction{} \texttt{a} is bigger than a \MediumAction{} \texttt{b} according to Javas \texttt{compareTo}, if \texttt{a} is neither smaller than \texttt{b} nor equals \texttt{b}. This is especially true if the \IMediumReference{} is bigger, or for equal \IMediumReference{}s, if the sequence number is bigger. Furthermore it is defined: If \IMediumReference{}s and sequence numbers are identical, then \texttt{a} is still bigger than \texttt{b} in the case that any of the other attribute of the \MediumAction{}s differs.
+A \MediumAction{} \texttt{a} is bigger than a \MediumAction{} \texttt{b} according to Javas \texttt{compareTo}, if \texttt{a} is neither smaller than \texttt{b} nor equals \texttt{b}. This is especially true if the \IMediumReference{} is bigger, or for equal \IMediumReference{}s of type \texttt{insert}, if the sequence number is bigger. Furthermore it is defined: If \IMediumReference{}s and sequence numbers of \texttt{insert}s are identical, then \texttt{a} is still bigger than \texttt{b} in the case that any of the other attribute of the \MediumAction{}s differs.
 }
 {% Begründung
-Sorting of \MediumAction{}s should be done according to their order on the medium (i.e. their \IMediumReference{}s) and creation order (i.e. their sequence number), because behaviour of consecutive operations is based on call order, according to \DesLink{dd:422}, \DesLink{dd:424} and \DesLink{dd:424a}. In addition, the \MediumAction{}s must be processesed in a defined order during \texttt{flush}. \texttt{equals} must return true exactly in the case that \texttt{compareTo} returns 0.
+Sorting of \MediumAction{}s should be done according to their order on the medium (i.e. their \IMediumReference{}s) and only for \texttt{insert}s in creation order (i.e. their sequence number), because behaviour of consecutive operations is based on call order, according to \DesLink{dd:422}, \DesLink{dd:424} and \DesLink{dd:424a}. In addition, the \MediumAction{}s must be processesed in a defined order during \texttt{flush}. \texttt{equals} must return true exactly in the case that \texttt{compareTo} returns 0.
 }
 {% Nachteile
-Might cause confusion, as smaller and bigger are not symmetric. The implementation must thus ensure that  \MediumAction{}s with same offset always get different sequence numbers that strictly increase with creation order.
+No disadvantages known
 }
 %%%% <-- DD %%%%
 

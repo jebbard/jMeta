@@ -426,8 +426,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                offsetFactory.updateOffsets(scheduledAction);
 
                if (getMedium().isCachingEnabled()) {
-                  cache.addRegion(new MediumRegion(
-                     scheduledAction.getRegion().getStartOffset().advance(-actionBytes.remaining()), actionBytes));
+                  // Please note the comment in ShiftedMediumBlock.initStartReference()
+                  cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
                }
             break;
 

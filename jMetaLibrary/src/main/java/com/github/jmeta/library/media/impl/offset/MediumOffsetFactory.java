@@ -141,12 +141,17 @@ public class MediumOffsetFactory {
 
       long y = startReference.getAbsoluteMediumOffset();
 
-      for (MediumOffset updatedReference : referencesBehindOrEqual) {
-         long x = updatedReference.getAbsoluteMediumOffset();
+      for (MediumOffset offsetToUpdate : referencesBehindOrEqual) {
+         long x = offsetToUpdate.getAbsoluteMediumOffset();
 
-         StandardMediumOffset ref = (StandardMediumOffset) updatedReference;
+         StandardMediumOffset ref = (StandardMediumOffset) offsetToUpdate;
 
-         if (action.getActionType() == MediumActionType.INSERT || insertingReplace) {
+         // For INSERTS, we only update all medium offsets EXCEPT the causing action's start offset which must remain
+         // stable
+         // Please also note the comment in ShiftedMediumBlock.initStartReference() where a specific workaround is
+         // necessary due to this...
+         if ((action.getActionType() == MediumActionType.INSERT
+            && offsetToUpdate != action.getRegion().getStartOffset()) || insertingReplace) {
             ref.setAbsoluteMediumOffset(x + k);
          } else if (action.getActionType() == MediumActionType.REMOVE || removingReplace) {
 

@@ -321,7 +321,13 @@ public class ShiftedMediumBlock {
       MediumRegion region = causingAction.getRegion();
 
       if (causingAction.getActionType() == MediumActionType.INSERT) {
-         return region.getStartOffset();
+         // NOTE: The advance(0) is very important here to ensure that the start offset of the follow-up bytes is a
+         // different (but equal) object! Reason: This reference might be used in cache to store follow-up-bytes read
+         // behind the insert. Furthermore, if the flush finally happens, when shifting all created MediumOffsets by
+         // this INSERT, all references behind or at equal offset, EXCEPT for the same object of this insert itself, are
+         // shifted. Thus, if we would not advance(0) here, the same object would be used for the cache entry, and thus
+         // it would wrongly not be shifted by the updateOffsets()
+         return region.getStartOffset().advance(0);
       } else if (causingAction.getActionType() == MediumActionType.REMOVE
          || causingAction.getActionType() == MediumActionType.REPLACE) {
          return region.getStartOffset().advance(region.getSize());
