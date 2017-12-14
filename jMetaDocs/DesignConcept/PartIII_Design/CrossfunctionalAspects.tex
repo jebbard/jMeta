@@ -198,12 +198,33 @@ The question is how to deal with technical runtime exceptions? Should they be lo
 }
 {% Short description
 Before \LibName{} code itself throws a runtime exception, it logs a corresponding error message, preferably the exception itself, such that its message and stack trace get protocolled in the logs. This is done on ERROR level. For jMeta's own exceptions - including precondition checks - the logging is done in the exception constructor itself. A generic base class \texttt{JMetaRuntimeException} is used for this.
+
+\LibName{} code does not log anything if it throws a checked exception.
 }
 {% Rationale
 There is no ``catch all'' in \LibName{} possible or reasonable, so if runtime exceptions are thrown, they are not captured in the \LibName{} logs. This is usually fine, unless \LibName{} itself throws such exceptions. We do not want to rely on the arbitrary logs of users of \LibName{}, but we want to be able to analyze what was going on in the \LibName{} code. The most important aspect of this is seeing where which exceptions originated from the library itself.
+
+Not logging anything for checked exceptions because they are in some way expected. If they become unexpected, a JMeta runtime exception can do the logging again.
 }
 {% Disadvantages
 Even during usual unit tests, there is logging output, i.e. probably file I/O
+}
+%%%% <-- DD %%%%
+
+The last topic to handle here is whether we use tracing or not:
+%%%% DD --> %%%%
+\DD{dd:206d}
+{% Title
+\LibName{} does not use tracing anywhere
+}
+{% Short description
+With tracing, we mean very fine grained log statements usually at the beginning and end of every method. This can be e.g. service facade methods only, or in the most extreme case any public, protected, default or private method called. Some applications log the input and output parameters in addition.
+}
+{% Rationale
+Even though in rare cases tracing can give a lot of very important hints to debug a problem based on logs, it has also several drawbacks. Either you have to add it all manually. If you do, you might forget it, or you might write it in a way that is ``repeating itself'', making general changes harder. And, in addition, the code is cluttered with statements, probably statements such as ``if logging enabled, then log''. This makes the code barely readable. An alternative is to use aspect-oriented libraries. However, here it might be not always entirely clear how to only log \emph{those specific methods} you want to trace. And there is a third-party dependency.
+}
+{% Disadvantages
+In some cases, it might be hard to track down runtime errors if no tracing logs can be created and analyzed
 }
 %%%% <-- DD %%%%
 
