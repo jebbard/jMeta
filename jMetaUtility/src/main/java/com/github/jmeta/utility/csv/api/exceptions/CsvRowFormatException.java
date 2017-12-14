@@ -14,6 +14,8 @@ package com.github.jmeta.utility.csv.api.exceptions;
  */
 public class CsvRowFormatException extends Exception {
 
+   private static final long serialVersionUID = 1523517457321949452L;
+
    /**
     * Creates a new {@link CsvRowFormatException}.
     * 
@@ -30,6 +32,4 @@ public class CsvRowFormatException extends Exception {
       super(message + " (in row <" + rowNr + ">, " + ((colNr != -1) ? "in column <" + colNr + ">, " : "") + "of file <"
          + csvResourceName + ">).");
    }
-
-   private static final long serialVersionUID = 1L;
 }

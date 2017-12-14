@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * {@link JMetaRuntimeException} is the base class of all specific runtime exceptions of the library. It adds simple
  * logging support to each exception.
  */
-public abstract class JMetaRuntimeException extends RuntimeException {
+public class JMetaRuntimeException extends RuntimeException {
 
    private static final long serialVersionUID = 267998174522267962L;
 

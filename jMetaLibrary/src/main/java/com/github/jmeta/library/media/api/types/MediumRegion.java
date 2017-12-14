@@ -11,6 +11,7 @@ package com.github.jmeta.library.media.api.types;
 import java.nio.ByteBuffer;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
 /**
  * {@link MediumRegion} represents a part of an external medium. This part can either be cached or not. If it is cached,
@@ -204,8 +205,8 @@ public class MediumRegion {
       } else if (left.overlapsOtherRegionAtBack(right)) {
          return MediumRegionOverlapType.LEFT_OVERLAPS_RIGHT_AT_BACK;
       } else {
-         throw new IllegalStateException(
-            "Impossible overlap of two regions detected: left=" + left + ", right=" + right);
+         throw new JMetaIllegalStateException(
+            "Impossible overlap of two regions detected: left=" + left + ", right=" + right, null);
       }
    }
 

@@ -7,6 +7,7 @@ import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
 /**
  * Represents an action to perform for a given chunk of a range within an {@link Medium}. A range is not a formal term,
@@ -121,8 +122,8 @@ public interface MediumRangeChunkAction<T, E extends Throwable> {
       long fullChunkCountLong = totalRangeSizeInBytes / chunkSizeInBytes;
 
       if (fullChunkCountLong > Integer.MAX_VALUE) {
-         throw new RuntimeException(
-            "Overflow in total range size, as the chunk count is bigger than " + Integer.MAX_VALUE);
+         throw new JMetaIllegalStateException(
+            "Overflow in total range size, as the chunk count is bigger than " + Integer.MAX_VALUE, null);
       }
 
       int fullChunkCount = (int) fullChunkCountLong;

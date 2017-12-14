@@ -28,6 +28,7 @@ import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
 /**
  * {@link MediumChangeManager} performs all tasks of handling and consolidating {@link MediumAction}s.
@@ -225,8 +226,8 @@ public class MediumChangeManager {
             if (delta == 0) {
                lastBlock.setTotalMediumByteCount(0);
             } else {
-               lastBlock.setTotalMediumByteCount(
-                  currentRegion.getStartOffset().distanceTo(startReferenceOfFollowUpBytes));
+               lastBlock
+                  .setTotalMediumByteCount(currentRegion.getStartOffset().distanceTo(startReferenceOfFollowUpBytes));
             }
          }
 
@@ -291,9 +292,10 @@ public class MediumChangeManager {
    private long getAndIncrementNextScheduleSequenceNumber() {
 
       if (nextScheduleSequenceNumber == Long.MAX_VALUE) {
-         throw new IllegalStateException(
+         throw new JMetaIllegalStateException(
             "You are definitely working too much on the medium, you should sit back, calm down, "
-               + "close and reopen it to make further changes");
+               + "close and reopen it to make further changes",
+            null);
       }
 
       return nextScheduleSequenceNumber++;

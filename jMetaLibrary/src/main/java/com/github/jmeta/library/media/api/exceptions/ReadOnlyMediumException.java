@@ -16,7 +16,7 @@ import com.github.jmeta.library.media.api.types.Medium;
  */
 public class ReadOnlyMediumException extends MediumAccessException {
 
-   private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = -6150560889404823051L;
 
    /**
     * Creates a new {@link ReadOnlyMediumException}.
@@ -27,6 +27,6 @@ public class ReadOnlyMediumException extends MediumAccessException {
     *           The cause
     */
    public ReadOnlyMediumException(Medium<?> medium, Throwable cause) {
-      super("Medium <" + medium + "> is read-only!", cause);
+      super("Medium <" + medium + "> is read-only and thus cannot be accessed with writing operations", cause);
    }
 }

@@ -8,13 +8,14 @@
 package com.github.jmeta.library.media.api.exceptions;
 
 import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.utility.errors.api.services.JMetaRuntimeException;
 
 /**
  * This exception is thrown whenever an {@link Medium} could not be accessed.
  */
-public class MediumAccessException extends RuntimeException {
+public class MediumAccessException extends JMetaRuntimeException {
 
-   private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = -1281570771668926850L;
 
    /**
     * Creates a new {@link MediumAccessException}.
@@ -25,7 +26,6 @@ public class MediumAccessException extends RuntimeException {
     *           The cause.
     */
    public MediumAccessException(String message, Throwable cause) {
-
       super(message, cause);
    }
 }

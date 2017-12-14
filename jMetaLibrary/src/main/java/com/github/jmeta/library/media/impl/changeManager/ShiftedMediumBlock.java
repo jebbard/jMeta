@@ -20,6 +20,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
 /**
  * {@link ShiftedMediumBlock} represents a block of existing, consecutive {@link Medium} bytes which potentially need to
@@ -115,9 +116,10 @@ public class ShiftedMediumBlock {
       Reject.ifNegative(totalMediumByteCount, "totalMediumByteCount");
 
       if (totalMediumByteCount > Integer.MAX_VALUE) {
-         throw new IllegalStateException(
+         throw new JMetaIllegalStateException(
             "Cannot handle changes whose distance is bigger than " + Integer.MAX_VALUE + " bytes, actual size: <"
-               + totalMediumByteCount + ">. These changes must be executed within different flushes.");
+               + totalMediumByteCount + ">. These changes must be executed within different flushes.",
+            null);
       }
 
       this.totalMediumByteCount = (int) totalMediumByteCount;
@@ -330,7 +332,7 @@ public class ShiftedMediumBlock {
          || causingAction.getActionType() == MediumActionType.REPLACE) {
          return region.getStartOffset().advance(region.getSize());
       } else {
-         throw new IllegalArgumentException("A causing action must have the type INSERT, REMOVE or REPLACE");
+         throw new JMetaIllegalStateException("A causing action must have the type INSERT, REMOVE or REPLACE", null);
       }
    }
 

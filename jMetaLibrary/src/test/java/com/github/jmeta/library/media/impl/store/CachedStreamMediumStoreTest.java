@@ -18,7 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumOffsetException;
 import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.AbstractCachedMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -155,7 +155,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    /**
     * Tests {@link MediumStore#cache(MediumOffset, int)}.
     */
-   @Test(expected = InvalidMediumReferenceException.class)
+   @Test(expected = InvalidMediumOffsetException.class)
    public void cache_forFilledStreamMediumWithSmallCache_offsetInPreviouslyFreedCacheRegion_throwsException() {
       mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
 
@@ -171,7 +171,7 @@ public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<I
    /**
     * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
-   @Test(expected = InvalidMediumReferenceException.class)
+   @Test(expected = InvalidMediumOffsetException.class)
    public void getData_forFilledStreamMediumWithSmallCache_offsetInPreviouslyFreedCacheRegion_throwsException() {
       mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
 

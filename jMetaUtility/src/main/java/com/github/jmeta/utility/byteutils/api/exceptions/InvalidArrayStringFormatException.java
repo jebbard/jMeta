@@ -16,6 +16,8 @@ import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
  */
 public class InvalidArrayStringFormatException extends Exception {
 
+   private static final long serialVersionUID = 964433052578653577L;
+
    /**
     * Creates a new {@link InvalidArrayStringFormatException}.
     * 
@@ -25,6 +27,4 @@ public class InvalidArrayStringFormatException extends Exception {
    public InvalidArrayStringFormatException(String message) {
       super(message);
    }
-
-   private static final long serialVersionUID = 1L;
 }

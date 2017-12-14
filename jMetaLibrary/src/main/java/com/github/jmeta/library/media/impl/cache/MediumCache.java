@@ -15,6 +15,7 @@ import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionClipResult;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
 /**
  * Represents a permanent in-memory cache for an {@link Medium}. It provides methods for adding and retrieving cache
@@ -179,9 +180,9 @@ public class MediumCache {
          firstCachedRegionReferenceNearToStartReference = cachedRegionsInOffsetOrder.ceilingKey(offset);
 
          if (firstCachedRegionReferenceNearToStartReference == null) {
-            throw new IllegalStateException("The cache is not empty, but no " + MediumOffset.class.getSimpleName()
+            throw new JMetaIllegalStateException("The cache is not empty, but no " + MediumOffset.class.getSimpleName()
                + " was found that is smaller, equal or bigger than the given start reference <" + offset
-               + ">. This must never happen.");
+               + ">. This must never happen.", null);
          }
       }
 
@@ -456,7 +457,7 @@ public class MediumCache {
             addRegionToCache(nonOverlappingPartOfHigherOffsetRegionAtBack);
          }
       } else if (overlapType == MediumRegionOverlapType.NO_OVERLAP) {
-         throw new IllegalStateException("both regions must overlap");
+         throw new JMetaIllegalStateException("Both regions to clip must overlap", null);
       }
    }
 

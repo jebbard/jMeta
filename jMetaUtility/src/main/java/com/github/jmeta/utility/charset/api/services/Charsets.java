@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
+import com.github.jmeta.utility.errors.api.services.JMetaRuntimeException;
 
 /**
  * {@link Charsets} is a helper class defining constants for all {@link Charset}s Java defines as always available.
@@ -61,7 +63,7 @@ public final class Charsets {
       try {
          returnedBytes = string.getBytes(cs.name());
       } catch (UnsupportedEncodingException e) {
-         throw new RuntimeException("Unsupported encoding", e);
+         throw new JMetaRuntimeException("Unsupported encoding", e);
       }
 
       if (hasBOM(cs)) {
@@ -69,9 +71,10 @@ public final class Charsets {
 
          for (int i = 0; i < bomBytes.length; i++) {
             if (returnedBytes.length <= i || returnedBytes[i] != bomBytes[i])
-               throw new IllegalStateException(
+               throw new JMetaIllegalStateException(
                   "Byte representation: <" + Arrays.toString(returnedBytes) + "> of String: <" + string
-                     + "> with charset: <" + cs + "> does not start with BOM bytes: <" + bomBytes + ">");
+                     + "> with charset: <" + cs + "> does not start with BOM bytes: <" + bomBytes + ">",
+                  null);
          }
 
          byte[] tempBytes = new byte[returnedBytes.length - bomBytes.length];

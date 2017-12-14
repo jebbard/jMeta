@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumOffsetException;
 import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.AbstractUnCachedMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -56,7 +56,7 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    /**
     * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
-   @Test(expected = InvalidMediumReferenceException.class)
+   @Test(expected = InvalidMediumOffsetException.class)
    public void getData_forFilledUncachedStreamMedium_twiceInEnclosingRegion_throwsException() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 
@@ -78,7 +78,7 @@ public class UnCachedStreamMediumStoreTest extends AbstractUnCachedMediumStoreTe
    /**
     * Tests {@link MediumStore#getData(MediumOffset, int)}.
     */
-   @Test(expected = InvalidMediumReferenceException.class)
+   @Test(expected = InvalidMediumOffsetException.class)
    public void getData_forFilledUncachedStreamMedium_forOffsetBeforeCurrentPosition_throwsException() {
       mediumStoreUnderTest = createFilledUncachedMediumStore();
 

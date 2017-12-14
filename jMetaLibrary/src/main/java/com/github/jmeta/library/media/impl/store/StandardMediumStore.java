@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumOffsetException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.exceptions.ReadOnlyMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -30,6 +30,7 @@ import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
 /**
  * {@link StandardMediumStore} is the default implementation of the {@link MediumStore} interface.
@@ -359,7 +360,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                   lastReadBytes = getData(mediumAction.getRegion().getStartOffset(),
                      mediumAction.getRegion().getSize());
                } catch (EndOfMediumException e) {
-                  throw new IllegalStateException(
+                  throw new JMetaIllegalStateException(
                      "Unexpected end of medium, maybe the external medium was changed by another process? Medium: "
                         + getMedium(),
                      e);
@@ -374,9 +375,10 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                } else {
                   if (previousActionType != MediumActionType.READ || lastReadBytes == null
                      || lastReadBytes.remaining() != mediumAction.getRegion().getSize()) {
-                     throw new IllegalStateException(
+                     throw new JMetaIllegalStateException(
                         "A WRITE action was given, but there was no READ action directly before reading the exact amount of bytes indicated by the current action: "
-                           + mediumAction);
+                           + mediumAction,
+                        null);
                   }
 
                   mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
@@ -453,7 +455,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
             break;
 
             default:
-               throw new IllegalStateException("Unexpected medium action type for action: " + scheduledAction);
+               throw new JMetaIllegalStateException("Unexpected medium action type for action: " + scheduledAction,
+                  null);
          }
       }
 
@@ -506,7 +509,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    /**
     * Only for non-random access media: If the medium's current position is smaller than the given offset, it reads all
     * bytes between these offsets chunk-wise and returns the corresponding {@link MediumRegion}s. If the medium's
-    * current position is bigger than the given offset, it throws an {@link InvalidMediumReferenceException}. If the
+    * current position is bigger than the given offset, it throws an {@link InvalidMediumOffsetException}. If the
     * offsets are equal, it returns an empty list. For random-access media it also returns an empty list.
     * 
     * @param offset
@@ -527,7 +530,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
             long cachedByteCountAtOffset = cache.getCachedByteCountAt(offset);
 
             if (cachedByteCountAtOffset < currentPosition.distanceTo(offset)) {
-               throw new InvalidMediumReferenceException(offset,
+               throw new InvalidMediumOffsetException(offset,
                   "Cannot re-read data of  non-random-access media for already passed ranges that are not fully cached");
             }
          }

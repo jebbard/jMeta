@@ -12,7 +12,7 @@ package com.github.jmeta.library.media.api.services;
 import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
-import com.github.jmeta.library.media.api.exceptions.InvalidMediumReferenceException;
+import com.github.jmeta.library.media.api.exceptions.InvalidMediumOffsetException;
 import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
@@ -149,7 +149,7 @@ public interface MediumStore {
     * For non-random-access media, this method has a specialized behavior: If passing the already described initial
     * checks (data is not yet in the cache and caching is enabled), it compares the given offset with the last position
     * read from the stream. If the given offset is smaller then the highest previous read position, it throws an
-    * {@link InvalidMediumReferenceException}, indicating that you cannot cache bytes from earlier stream positions,
+    * {@link InvalidMediumOffsetException}, indicating that you cannot cache bytes from earlier stream positions,
     * because streams cannot look back. If it is equal, it simply reads the given number of bytes. If it is bigger, it
     * reads all bytes until the given offset and possibly caches them (if caching is enabled), and then it tries to read
     * the indicated number of bytes. Of course, during these reads, also an {@link EndOfMediumException} might occur.
@@ -175,7 +175,7 @@ public interface MediumStore {
     *            and the {@link EndOfMediumException#getByteCountActuallyRead()} method returns the actual number of
     *            bytes read up to the end of medium. In addition, {@link EndOfMediumException#getBytesReadSoFar()}
     *            returns all bytes that have been read during the last read attempt until end of medium.
-    * @throws InvalidMediumReferenceException
+    * @throws InvalidMediumOffsetException
     *            Only for stream media, if the given offset is before the highest previously read offset and the data is
     *            not yet cached
     * @throws MediumAccessException
@@ -229,7 +229,7 @@ public interface MediumStore {
     * 
     * For random-access media, this method does not throw an exception if it finds that the data is not cached. For
     * stream-based media, if parts of the range are not found in the cache, and the range is before the current highest
-    * read offset, an {@link InvalidMediumReferenceException} is thrown, as with streams, you cannot go back.
+    * read offset, an {@link InvalidMediumOffsetException} is thrown, as with streams, you cannot go back.
     * 
     * @param offset
     *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}, must not be beyond
@@ -249,7 +249,7 @@ public interface MediumStore {
     *            {@link EndOfMediumException#getByteCountActuallyRead()} method returns the actual number of bytes read
     *            up to the end of medium. In addition, {@link EndOfMediumException#getBytesReadSoFar()} returns all
     *            bytes that have been read during the last read attempt until end of medium.
-    * @throws InvalidMediumReferenceException
+    * @throws InvalidMediumOffsetException
     *            Only for stream media, if the given offset is before the highest previously read offset, and the data
     *            was not found to be cached
     * @throws MediumAccessException

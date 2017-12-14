@@ -14,6 +14,7 @@ import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.utility.dbc.api.services.Reject;
+import com.github.jmeta.utility.errors.api.services.JMetaRuntimeException;
 
 /**
  * {@link InvalidOverlappingWriteException} is thrown whenever one of the operations
@@ -21,9 +22,9 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link MediumStore#removeData(com.github.jmeta.library.media.api.types.MediumOffset, int)} is invoked before a
  * {@link MediumStore#flush()}, and the operation overlaps with a previous remove or replace operation.
  */
-public class InvalidOverlappingWriteException extends RuntimeException {
+public class InvalidOverlappingWriteException extends JMetaRuntimeException {
 
-   private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 2210334358957045512L;
 
    private final MediumAction overlappedExistingAction;
    private final MediumRegion region;
@@ -41,6 +42,8 @@ public class InvalidOverlappingWriteException extends RuntimeException {
     */
    public InvalidOverlappingWriteException(MediumAction overlappedExistingAction, MediumActionType actionType,
       MediumRegion region) {
+      super("Invalid overlap between existing action <" + overlappedExistingAction + "> and new region <" + region
+         + "> of action type <" + actionType + ">.", null);
       Reject.ifNull(overlappedExistingAction, "overlappedExistingAction");
       Reject.ifNull(actionType, "actionType");
       Reject.ifNull(region, "region");
