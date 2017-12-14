@@ -512,12 +512,12 @@ The performance of \LibName{} on all supported platforms must be as least as goo
 %		REQ 006
 %-----------------------------------------------------------------------------------------------
 
-\section{REQ 006: Fehlererkennung, Fehlertoleranz, Fehlerkorrektur}
+\section{REQ 006: Fault recognition, fault tolerance, fault correction}
 \label{sec:REQ006FehlererkennungFehlertoleranzFehlerkorrektur}
 
-Ergänzend zur \SectionLink{sec:REQ003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen} muss die Library aber auch \emph{fehlertolerant} sein, so weit möglich. D.h. u.a., das Spezifikationsverstöße und fehlerhafte Parsing-Metadaten erkannt werden, und dies - soweit nicht unumgänglich - nicht zum Abbruch des Parsens mit einem Fehler endet. Verstöße werden protokolliert und wenn möglich automatisch korrigiert (optional, wenn es der Library-Anwender wünscht).
+In addtion to \SectionLink{sec:REQ003SpezifikationUnterstuetzterMetadatenUndContainerformateErfuellen}, the library also has be to \emph{fault tolerant} as much as possible. That means that specification violations and incorrect parsing metadata must be detected and - as far as possible - this should not lead to aborting parsing with an error. All violations can be protocolled and ideall automatically corrected (optional, if the user wants it).
 
-\textbf{Rationale:} Altanwendungen oder andere Libraries schreiben Datenformate manchmal nicht 100\% spezifikationskonform. Zudem sind nicht alle Spezifikationen eindeutig oder genau genug, sodass Varianten entstehen könnten. Trotz Vorliegen fehlerhafter Daten soll der Anwender der Library in die Lage versetzt werden, Daten dennoch auslesen und ggf. sogar korrigieren zu können.
+\textbf{Rationale:} Old applications or other libraries write data formats sometimes not 100\% compliant to the specification. In addtion, sometimes specifications are ambiguous or not accurate enough such that alternatives are possible. If there is a chance to still read the data, the user should be able to do it even in the event of faulty data.
 
 %-----------------------------------------------------------------------------------------------
 %		REQ 007
@@ -546,7 +546,7 @@ Ergänzend zur \SectionLink{sec:REQ003SpezifikationUnterstuetzterMetadatenUndCont
 %-----------------------------------------------------------------------------------------------
 
 \section{REQ 009: Selective Format Choice}
-\label{sec:REQ010SchreibenInAnderesAusgabemediumUnterstützt}
+\label{sec:REQ010SchreibenInAnderesAusgabemediumUnterstuetzt}
 
 An application using \LibName{} must be able to selectively choose those formats that it wants to support. This is not only necessary for runtime, but also for the library extension packages it wants to use.
 

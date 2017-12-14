@@ -2,25 +2,25 @@
 %		Minipages for tables heavily containing text
 %===============================================================================================
 
-% Überschriften-Minipage für Tag-Vergleichstabelle
+% Ãœberschriften-Minipage fÃ¼r Tag-Vergleichstabelle
 \newenvironment{TAGcapt}{\begin{minipage}[t]{0.09\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
 \newenvironment{TAGcrit}{\begin{minipage}[t]{0.11\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
 
-% Überschriften-Minipage für ID3v2-Tag-Vergleichstabelle
+% Ãœberschriften-Minipage fÃ¼r ID3v2-Tag-Vergleichstabelle
 \newenvironment{IDTAGcapt}{\begin{minipage}[t]{0.24\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
 \newenvironment{IDTAGcrit}{\begin{minipage}[t]{0.18\textheight}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
 
-% Beschreibungsminipage für Use-Case-Eigenschafts-Überschrift (in einer Use-Case-Tabelle)
+% Beschreibungsminipage fÃ¼r Use-Case-Eigenschafts-Ãœberschrift (in einer Use-Case-Tabelle)
 \newenvironment{UCcapt}{\begin{minipage}[t]{0.26\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
-% Minipage für Use-Case-Eigenschaften (in einer Use-Case-Tabelle)
+% Minipage fÃ¼r Use-Case-Eigenschaften (in einer Use-Case-Tabelle)
 \newenvironment{UCdesc}{\begin{minipage}[t]{0.74\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
 
-% Beschreibungsminipage für Standard-Tabellen (zweispaltig)
+% Beschreibungsminipage fÃ¼r Standard-Tabellen (zweispaltig)
 \newenvironment{TABLEcapt}{\begin{minipage}[t]{0.32\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
-% Minipage für Standard-Tabellen (zweispaltig)
+% Minipage fÃ¼r Standard-Tabellen (zweispaltig)
 \newenvironment{TABLEdesc}{\begin{minipage}[t]{0.68\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
 
-% Minipage für Package-Eigenschaften (in einer Package-Beschreibungs-Tabelle)
+% Minipage fÃ¼r Package-Eigenschaften (in einer Package-Beschreibungs-Tabelle)
 \newenvironment{Packdesc}{\begin{minipage}[t]{0.36\textwidth}\begin{flushleft}}{\\\emph{}\end{flushleft}\end{minipage}}
 
 %===============================================================================================
@@ -105,13 +105,13 @@ breaklines=true, breakautoindent=true, breakindent=20pt
 %		Open Issue Command
 %===============================================================================================
 
-% Counter für offene Punkte, der pro Kapitel hochzählt
+% Counter fÃ¼r offene Punkte, der pro Kapitel hochzÃ¤hlt
 \newcounter{OpenIssueCounter}[chapter]
 
-% Hintergrundfarbe für Boxen von offenen Punkten
+% Hintergrundfarbe fÃ¼r Boxen von offenen Punkten
 \definecolor{OpenIssueColor}{rgb}{0.97,0.97,0.71}
 
-% Einfügen offener Punkte in den Textfluss
+% EinfÃ¼gen offener Punkte in den Textfluss
 \newcommand{\OpenIssue}%
 [2]%
 {\addtocounter{OpenIssueCounter}{1}%
@@ -139,10 +139,10 @@ breaklines=true, breakautoindent=true, breakindent=20pt
 % Counter for design decisions
 \newcounter{DesignDecisionCounter}
 
-% Hintergrundfarbe für Boxen von Designentscheidungen
+% Hintergrundfarbe fÃ¼r Boxen von Designentscheidungen
 \definecolor{DesignDecisionColor}{rgb}{0.85,0.95,0.95}
 
-% Einfügen von Designentscheidungen in den Textfluss
+% EinfÃ¼gen von Designentscheidungen in den Textfluss
 \newcommand{\DES}{DES~\ifnum\value{DesignDecisionCounter}<100 0\fi\ifnum\value{DesignDecisionCounter}<10 0\fi\arabic{DesignDecisionCounter}}
 
 % #1 - The unique id of the design decision, to be used as a label, do not change after creation
@@ -192,7 +192,7 @@ breaklines=true, breakautoindent=true, breakindent=20pt
 %		Special Terms Command
 %===============================================================================================
 
-% Hervorhebung eines Spezialbegriffs ohne Verweis (für Überschriften und den Glossareintrag des
+% Hervorhebung eines Spezialbegriffs ohne Verweis (fÃ¼r Ãœberschriften und den Glossareintrag des
 % Begriffs).
 \newcommand{\SpecialTermBasic}[1]%
 	{\textsc{#1}}

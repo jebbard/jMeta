@@ -363,7 +363,7 @@ Format specifics are only defined in extensions
 Any special features of a \TERMcontainerFormat{} or \TERMmetadataFormat{} that are no common properties/features of a lot of container formats are only defined in the corresponding extensions. That said, the generic core code never directly depends on specifics of data formats, neither syntactically (e.g. compile-time dependencs to format extension; by using if-then-else to do things different depending on the current format) or semantically (e.g. implementing a special feature for just one format, but claim it is ``generic''). Only if a special feature of a format can be brought down to a common denominator for all supported formats, it is implemented generically.
 }
 {% Rationale
-So wird bereits mit der Kernlibrary selbst das Erweiterungskonzept genutzt und erprobt. Es findet eine strikte Trennung zwischen Kernimplementierung und Format-Spezifika statt, was eine bessere Beherrschung der Gesamt-Komplexität ermöglicht.
+There is a strict separation between core implementation and format specifics, which allows better handling of the overall complexity.
 }
 {% Disadvantages
 No disadvantages known
@@ -401,7 +401,7 @@ An \emph{extension} summarizes format-specific content for a given data format, 
 \item Implementation extensions that might override generic parsing, writing and validation.
 \end{itemize}
 
-As a ground rule, every single extension can but should not define extension code for more than one data format. It might expose more data formats only if these two data formats heavily overlap and are based on each other, e.g. ID3v1 and ID3v1.1. This is to fulfill the requirement \SectionLink{sec:REQ010SchreibenInAnderesAusgabemediumUnterstützt}.
+As a ground rule, every single extension can but should not define extension code for more than one data format. It might expose more data formats only if these two data formats heavily overlap and are based on each other, e.g. ID3v1 and ID3v1.1. This is to fulfill the requirement \SectionLink{sec:REQ010SchreibenInAnderesAusgabemediumUnterstuetzt}.
 
 Moreover, distinct extensions should never depend on each other, but only on the \LibName{} core to avoid any confusion for the user.
 

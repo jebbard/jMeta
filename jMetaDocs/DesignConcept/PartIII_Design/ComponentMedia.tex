@@ -2224,6 +2224,22 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+%%%% DD --> %%%%
+\DD{dd:440x}
+{% Title
+Flushing progress is logged on DEBUG level
+}
+{% Short description
+Flushing and probably even scheduling of changes is logged on DEBUG level
+}
+{% Rationale
+The process of flushing is the most complex process in \COMPmedia{}. If there are any subtle bugs for end-users, they might be incredibly hard to track down without proper logging.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 %-----------------------------------------------------------------------------------------------
 
 \subsubsection{Implementation of \texttt{createFlushPlan}}

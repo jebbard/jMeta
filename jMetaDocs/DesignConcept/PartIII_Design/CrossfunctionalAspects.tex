@@ -249,10 +249,10 @@ For now it turned out that there is no need in \LibName{} for such dynamic confi
 %%%% DD --> %%%%
 \DD{dd:207a}
 {% Title
-\LibName{} offers no generic mechanism for (global or local) configuration, especiall it currently defines no properties that influence the behaviour of the library
+\LibName{} offers no generic configuration mechanism
 }
 {% Short description
-All necessary ``configurations'' for customizing the behaviour of a component are passed by the user via specialized (i.e. non-generic) setters or constructor  parameters.
+\LibName{} offers no generic mechanism for (global or local) configuration, especiall it currently defines no properties that influence the behaviour of the library. All necessary ``configurations'' for customizing the behaviour of a component are passed by the user via specialized (i.e. non-generic) setters or constructor  parameters.
 }
 {% Rationale
 There is no need for the bigger flexibility yet.
@@ -268,18 +268,18 @@ No disadvantages known.
 % %%%% DD --> %%%%
 % \DD{dd:207}
 % {% Title
-% \LibName{} bietet einen generischen und erweiterbaren Konfigurationsmechanismus über die öffentliche API an
+% \LibName{} bietet einen generischen und erweiterbaren Konfigurationsmechanismus Ã¼ber die Ã¶ffentliche API an
 % }
 % {% Short description
-% Die Library über ihre öffentliche API Mittel zum Setzen und Abfragen von Konfigurationsparametern an. Die verfügbaren Konfigurationsparameter werden über die API als Konstanten repräsentiert und in der Dokumentation aufgeführt.
+% Die Library Ã¼ber ihre Ã¶ffentliche API Mittel zum Setzen und Abfragen von Konfigurationsparametern an. Die verfÃ¼gbaren Konfigurationsparameter werden Ã¼ber die API als Konstanten reprÃ¤sentiert und in der Dokumentation aufgefÃ¼hrt.
 
 % In \LibName{} kann prinzipiell jede Klasse einzeln konfigurierbar sein, d.h. der Sichtbarkeitsbereich der Konfigurationen muss in keinster Weise global sein.
 % }
 % {% Rationale
-% Dies gewährt Flexibilität in vielerlei Hinsicht:
+% Dies gewÃ¤hrt FlexibilitÃ¤t in vielerlei Hinsicht:
 % \begin{itemize}
-% \item Zukünftige Versionen von \LibName{} können einfach um weitere Konfigurationsmöglichkeiten erweitert werden, ohne die API anpassen zu müssen (bis auf die neue Konfigurationskonstante)
-% \item Konfigurationen mit globaler Gültigkeit machen meist wenig Sinn, sondern sind eher hinderlich, häufig erzeugt die Library einzelne Objekte (z.B. pro Sitzung oder pro Medium), die unabhängig voneinander konfiguriert werden müssen.
+% \item ZukÃ¼nftige Versionen von \LibName{} kÃ¶nnen einfach um weitere KonfigurationsmÃ¶glichkeiten erweitert werden, ohne die API anpassen zu mÃ¼ssen (bis auf die neue Konfigurationskonstante)
+% \item Konfigurationen mit globaler GÃ¼ltigkeit machen meist wenig Sinn, sondern sind eher hinderlich, hÃ¤ufig erzeugt die Library einzelne Objekte (z.B. pro Sitzung oder pro Medium), die unabhÃ¤ngig voneinander konfiguriert werden mÃ¼ssen.
 % \end{itemize}
 % }
 % {% Disadvantages
@@ -287,55 +287,55 @@ No disadvantages known.
 % }
 % %%%% <-- DD %%%%
 
-% Darüber hinaus gilt:
+% DarÃ¼ber hinaus gilt:
 % %%%% DD --> %%%%
 % \DD{dd:208}
 % {% Title
 % Konfiguration zur Laufzeit, keine properties-Dateien
 % }
 % {% Short description
-% \LibName{} kann über Laufzeitaufrufe konfiguriert werden, und nicht über properties-Dateien
+% \LibName{} kann Ã¼ber Laufzeitaufrufe konfiguriert werden, und nicht Ã¼ber properties-Dateien
 % }
 % {% Rationale
-% Properties-Dateien mögen in einigen Anwendungsfällen sinnvoll sein, aber nicht für eine dynamisch anpassbare Konfiguration. Sie sind eben nur statisch, und Änderungen erfordern i.d.R. den Neustart der Applikation. Natürlich können properties in Zukunft als Initial-Konfiguration dienen, die dann dynamisch nachjustiert werden kann. In der aktuellen \LibName{}-Version wird allerdings keine Notwendigkeit für statische Konfiguration gesehen.
+% Properties-Dateien mÃ¶gen in einigen AnwendungsfÃ¤llen sinnvoll sein, aber nicht fÃ¼r eine dynamisch anpassbare Konfiguration. Sie sind eben nur statisch, und Ã„nderungen erfordern i.d.R. den Neustart der Applikation. NatÃ¼rlich kÃ¶nnen properties in Zukunft als Initial-Konfiguration dienen, die dann dynamisch nachjustiert werden kann. In der aktuellen \LibName{}-Version wird allerdings keine Notwendigkeit fÃ¼r statische Konfiguration gesehen.
 % }
 % {% Disadvantages
 % Keine bekannten Nachteile
 % }
 % %%%% <-- DD %%%%
 
-% Für die Konfigurationsparameter selbst gilt:
+% FÃ¼r die Konfigurationsparameter selbst gilt:
 % %%%% DD --> %%%%
 % \DD{dd:209}
 % {% Title
-% Jeder Konfigurationsparamater hat einen Gültigkeitsbereich und einen Standardwert
+% Jeder Konfigurationsparamater hat einen GÃ¼ltigkeitsbereich und einen Standardwert
 % }
 % {% Short description
-% Jeder Konfigurationsparameter bei \LibName{} ist in dem Sinne verpflichtend, dass er immer einen Wert (in seinem Scope) hat. Dazu wird für jeden Parameter ein sinnvoller Standardwert definiert, der gilt, wenn kein explizites Setzen durchgeführt worden ist.
+% Jeder Konfigurationsparameter bei \LibName{} ist in dem Sinne verpflichtend, dass er immer einen Wert (in seinem Scope) hat. Dazu wird fÃ¼r jeden Parameter ein sinnvoller Standardwert definiert, der gilt, wenn kein explizites Setzen durchgefÃ¼hrt worden ist.
 
-% Zudem hat jeder Konfigurationsparameter einen gültigen Wertebereich, z.B. Minimum und Maximum bzw. gültige Werte.
+% Zudem hat jeder Konfigurationsparameter einen gÃ¼ltigen Wertebereich, z.B. Minimum und Maximum bzw. gÃ¼ltige Werte.
 % }
 % {% Rationale
-% Standardwerte sind immer wichtig, denn keiner will den Anwender zwingen, explizit zu konfigurieren. Die Standardwerte sollten so gewählt sein, dass das Verhalten der Library dem 80\%-Fall genügt und stabil funktioniert.
+% Standardwerte sind immer wichtig, denn keiner will den Anwender zwingen, explizit zu konfigurieren. Die Standardwerte sollten so gewÃ¤hlt sein, dass das Verhalten der Library dem 80\%-Fall genÃ¼gt und stabil funktioniert.
 
-% Wertebereiche kommunizieren dem Anwender bereits klar, welche Werte gültig sind und können für Plausibilitätsprüfungen genutzt werden.
+% Wertebereiche kommunizieren dem Anwender bereits klar, welche Werte gÃ¼ltig sind und kÃ¶nnen fÃ¼r PlausibilitÃ¤tsprÃ¼fungen genutzt werden.
 % }
 % {% Disadvantages
 % Keine bekannten Nachteile
 % }
 % %%%% <-- DD %%%%
 
-% Schließlich legen wir noch fest:
+% SchlieÃŸlich legen wir noch fest:
 % %%%% DD --> %%%%
 % \DD{dd:210}
 % {% Title
-% Für Konfigurationen wird die Utility-API \SectionLink{sec:ConfigurationAPI} genutzt.
+% FÃ¼r Konfigurationen wird die Utility-API \SectionLink{sec:ConfigurationAPI} genutzt.
 % }
 % {% Short description
 % \LibName{} nutzt eine API der Komponente \COMPutility{}, die auch prinzipiell von beliebigen anderen Projekten verwendet werden kann, um Konfigurationen anzubieten.
 % }
 % {% Rationale
-% Konfiguration kann über eine generische API erfolgen. Die Notwendigkeit von Konfiguration ist nichts \LibName{}-spezifisches, sondern generell von Bedeutung. Daher macht das Aufbauen von wiederverwendbaren Komponenten in einem Utility-Anteil Sinn. Dies fördert auch die Einheitlichkeit: Die API für Konfiguration sieht für alle Komponenten von \LibName{} gleich aus.
+% Konfiguration kann Ã¼ber eine generische API erfolgen. Die Notwendigkeit von Konfiguration ist nichts \LibName{}-spezifisches, sondern generell von Bedeutung. Daher macht das Aufbauen von wiederverwendbaren Komponenten in einem Utility-Anteil Sinn. Dies fÃ¶rdert auch die Einheitlichkeit: Die API fÃ¼r Konfiguration sieht fÃ¼r alle Komponenten von \LibName{} gleich aus.
 % }
 % {% Disadvantages
 % %Keine bekannten Nachteile
@@ -405,7 +405,7 @@ Every IDE project containing code for \LibName{} starts has the form \texttt{\Li
 \item \texttt{Docs:} For any documentation of the library, no source code here (except for docs, e.g. tex files)
 \end{itemize}
 
-\texttt{[Extension]} is only used for the \texttt{DefaultExtension} library part. Each extension needs its own project and build unit. The reason is requirement \SectionLink{sec:REQ010SchreibenInAnderesAusgabemediumUnterstützt}. This allows us to depoly individual JARs for each single extension. In addition, there is an integration testing projects for testing media that contain multiple different formats.
+\texttt{[Extension]} is only used for the \texttt{DefaultExtension} library part. Each extension needs its own project and build unit. The reason is requirement \SectionLink{sec:REQ010SchreibenInAnderesAusgabemediumUnterstuetzt}. This allows us to depoly individual JARs for each single extension. In addition, there is an integration testing projects for testing media that contain multiple different formats.
 
 Below, you can see the actual projects currently existing and their allowed dependencies:
 TODO
