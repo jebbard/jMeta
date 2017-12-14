@@ -182,12 +182,31 @@ There is no self-made logging component, but \LibName{} uses \emph{slf4j} wherev
 Instead of a dedicated, hand-crafted and tested technical logging component which is known by every other component, and which encapsulates another logging library, \LibName{} code directly uses slf4j with a user-provided provider anywhere necessary. I.e. a direct dependency to slf4j is allowed from everywhere in the library.
 }
 {% Rationale
-An own component wastes time and effort, in addition, every other component must somehow get an instance of it. Furthermore, innovations of the logging framework encapsulated usually remain encapsulated until you also provide it at your outside interface. slf4j is already a wrapper shielding you from details of other logging frameworks. You do not need to rewrite a logging framework today yourself, there is more precious time to spent if you do not. \LibName{} reuses the great logging providers already out there directly as ``0 software'', i.e. perfectly reusable, functionally agnostic technical code. 
+An own component wastes time and effort, in addition, every other component must somehow get an instance of it. Furthermore, innovations of the logging framework encapsulated usually remain encapsulated until you also provide it at your outside interface. slf4j is already a wrapper shielding you from details of other logging frameworks. You do not need to rewrite a logging framework today yourself, there is more precious time to spent if you do not. \LibName{} reuses the great logging providers already out there directly. 
 }
 {% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
+
+The question is how to deal with technical runtime exceptions? Should they be logged, if so, where? This is clarified in the following design decision:
+
+%%%% DD --> %%%%
+\DD{dd:206c}
+{% Title
+\LibName{} code logs an error message before throwing a runtime exception
+}
+{% Short description
+Before \LibName{} code itself throws a runtime exception, it logs a corresponding error message, preferably the exception itself, such that its message and stack trace get protocolled in the logs. This is done on ERROR level. For jMeta's own exceptions - including precondition checks - the logging is done in the exception constructor itself. A generic base class \texttt{JMetaRuntimeException} is used for this.
+}
+{% Rationale
+There is no ``catch all'' in \LibName{} possible or reasonable, so if runtime exceptions are thrown, they are not captured in the \LibName{} logs. This is usually fine, unless \LibName{} itself throws such exceptions. We do not want to rely on the arbitrary logs of users of \LibName{}, but we want to be able to analyze what was going on in the \LibName{} code. The most important aspect of this is seeing where which exceptions originated from the library itself.
+}
+{% Disadvantages
+Even during usual unit tests, there is logging output, i.e. probably file I/O
+}
+%%%% <-- DD %%%%
+
 
 % -------------------------------------------------------------------------------------------------------
 %  Configuration

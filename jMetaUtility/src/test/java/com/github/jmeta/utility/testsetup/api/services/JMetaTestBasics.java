@@ -30,19 +30,20 @@ import junit.framework.AssertionFailedError;
 public class JMetaTestBasics {
 
    /**
-    * The default path where test case log files are stored.
+    * The default path where test case log files are stored - ATTENTION: Must be the same as configured in
+    * log4j2-test.xml
     */
-   public static final File DEFAULT_LOG_PATH = new File(new File(new File("."), "logs"), "unitTest");
+   public static final File DEFAULT_UNITTEST_LOG_PATH = new File(new File(new File("."), "logs"), "unitTest");
 
    /**
-    * The default log file
+    * The default log file - ATTENTION: Must be the same as configured in log4j2-test.xml
     */
-   public static final File DEFAULT_LOG_FILE = new File(DEFAULT_LOG_PATH, "unitTest.log");
+   public static final File DEFAULT_UNITTEST_LOG_FILE = new File(DEFAULT_UNITTEST_LOG_PATH, "jMeta.log");
 
    /**
     * The default path where log files with errors are copied to.
     */
-   private static final File FAILED_LOG_CHECK_PATH = new File(DEFAULT_LOG_PATH, "failedLogChecks");
+   private static final File FAILED_LOG_CHECK_PATH = new File(DEFAULT_UNITTEST_LOG_PATH, "failedLogChecks");
 
    private static final LogChecker LOG_CHECKER = new LogChecker();
 

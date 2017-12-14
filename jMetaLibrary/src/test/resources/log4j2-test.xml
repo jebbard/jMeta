@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
 	<Appenders>
-		<File name="File" fileName="logs/unitTest/unitTest.log">
+		<File name="File" fileName="logs/unitTest/jMeta.log" append="false">
 			<PatternLayout>
-				<pattern>%d %p %C{1.} [%t] %m%n</pattern>
+				<pattern>%d %p %C{10} [%t] %m%n</pattern>
 			</PatternLayout>
 		</File>
 	</Appenders>

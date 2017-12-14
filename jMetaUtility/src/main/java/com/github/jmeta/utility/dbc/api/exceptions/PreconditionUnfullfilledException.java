@@ -10,12 +10,15 @@
 
 package com.github.jmeta.utility.dbc.api.exceptions;
 
-/**
- * {@link PreconditionUnfullfilledException} is thrown whenever a specified prerequisite-condition of a class is violated.
- */
-public class PreconditionUnfullfilledException extends RuntimeException {
+import com.github.jmeta.utility.errors.api.services.JMetaRuntimeException;
 
-   private static final long serialVersionUID = 1L;
+/**
+ * {@link PreconditionUnfullfilledException} is thrown whenever a specified prerequisite-condition of a class is
+ * violated.
+ */
+public class PreconditionUnfullfilledException extends JMetaRuntimeException {
+
+   private static final long serialVersionUID = -1124070837233774318L;
 
    /**
     * Creates a new {@link PreconditionUnfullfilledException}.
@@ -24,12 +27,6 @@ public class PreconditionUnfullfilledException extends RuntimeException {
     *           The message containing the cause of this exception.
     */
    public PreconditionUnfullfilledException(String message) {
-      super(message);
-   }
-
-   /**
-    * Creates a new {@link PreconditionUnfullfilledException}.
-    */
-   public PreconditionUnfullfilledException() {
+      super(message, null);
    }
 }

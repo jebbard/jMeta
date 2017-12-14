@@ -55,7 +55,7 @@ public abstract class AbtractDataBlockAccessorTest {
    @Before
    public void setUp() {
 
-      JMetaTestBasics.emptyLogFile(JMetaTestBasics.DEFAULT_LOG_FILE);
+      JMetaTestBasics.emptyLogFile(JMetaTestBasics.DEFAULT_UNITTEST_LOG_FILE);
 
       JMetaTestBasics.setupExtensions();
 
@@ -84,7 +84,7 @@ public abstract class AbtractDataBlockAccessorTest {
       expectationProvider.cleanUp();
 
       // Check log files
-      JMetaTestBasics.performGeneralLogCheck(JMetaTestBasics.DEFAULT_LOG_FILE);
+      JMetaTestBasics.performGeneralLogCheck(JMetaTestBasics.DEFAULT_UNITTEST_LOG_FILE);
 
       ComponentRegistry.clearServiceCache();
    }

@@ -8,12 +8,15 @@
 	<packaging>pom</packaging>
 	<name>jMetaParent</name>
 	<url>http://maven.apache.org</url>
-	
+
 	<!-- ========================== Text file encoding ========================== -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- The following ensures that using  ${project.build.timestamp} gets properly replaced in resources -->
+		<project.build.timestamp>${maven.build.timestamp}</project.build.timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss.SSS z</maven.build.timestamp.format>
 	</properties>
-  
+
 	<!-- ========================== Dependencies ========================== -->
 	<!-- Global dependencies for reuse in all child projects -->
 	<dependencyManagement>
@@ -188,6 +191,13 @@
 	<!-- ========================== Build ========================== -->
 	<!-- Global build settings -->
 	<build>
+    	<!-- Ensures that resource filtering (i.e. replacing property references ${x} in project resources) happens -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<!-- COMPILER -->
 			<plugin>
