@@ -7,13 +7,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionClipResult;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
+import com.github.jmeta.library.startup.impl.StandardLibraryJMeta;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
@@ -40,6 +45,7 @@ public class MediumCache {
     */
    public static final int UNLIMITED_CACHE_REGION_SIZE = Integer.MAX_VALUE;
 
+   private static final Logger LOGGER = LoggerFactory.getLogger(StandardLibraryJMeta.class);
    private final long maximumCacheSizeInBytes;
    private final int maximumCacheRegionSizeInBytes;
    private final Medium<?> medium;
@@ -300,6 +306,8 @@ public class MediumCache {
       Reject.ifFalse(regionToAdd.getStartOffset().getMedium().equals(getMedium()),
          "region.getStartReference().getMedium().equals(getMedium())");
 
+      logDebugMessage(() -> "Adding region to cache: " + regionToAdd);
+
       // First we existing regions overlapped by the new region
       List<MediumRegion> regionsInRange = getRegionsInRange(regionToAdd.getStartOffset(), regionToAdd.getSize());
 
@@ -349,6 +357,8 @@ public class MediumCache {
       Reject.ifNull(offset, "offset");
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
       Reject.ifNegativeOrZero(rangeSizeInBytes, "rangeSizeInBytes");
+
+      logDebugMessage(() -> "Removing regions in range: " + new MediumRegion(offset, rangeSizeInBytes));
 
       List<MediumRegion> regionsInRange = getRegionsInRange(offset, rangeSizeInBytes);
 
@@ -482,5 +492,17 @@ public class MediumCache {
    private void removeRegionFromCache(MediumRegion region) {
       cachedRegionsInInsertOrder.remove(region);
       cachedRegionsInOffsetOrder.remove(region.getStartOffset());
+   }
+
+   /**
+    * Logs a debug message, if debug logging is enabled
+    * 
+    * @param message
+    *           The message to log
+    */
+   private void logDebugMessage(Supplier<String> message) {
+      if (LOGGER.isDebugEnabled()) {
+         LOGGER.debug(message.get());
+      }
    }
 }

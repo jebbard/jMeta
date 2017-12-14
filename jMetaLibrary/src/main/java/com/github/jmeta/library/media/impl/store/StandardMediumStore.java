@@ -12,6 +12,10 @@ package com.github.jmeta.library.media.impl.store;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumOffsetException;
@@ -29,6 +33,7 @@ import com.github.jmeta.library.media.impl.cache.MediumRangeChunkAction;
 import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
+import com.github.jmeta.library.startup.impl.StandardLibraryJMeta;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
 
@@ -36,6 +41,8 @@ import com.github.jmeta.utility.errors.api.services.JMetaIllegalStateException;
  * {@link StandardMediumStore} is the default implementation of the {@link MediumStore} interface.
  */
 public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
+
+   private static final Logger LOGGER = LoggerFactory.getLogger(StandardLibraryJMeta.class);
 
    private final MediumAccessor<T> mediumAccessor;
 
@@ -150,41 +157,61 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
       Reject.ifNegativeOrZero(numberOfBytes, "numberOfBytes");
 
+      logDebugMessage(() -> "STARTING Cache <" + numberOfBytes + "> bytes at <" + offset + ">");
+
       if (getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH) {
          if (getMedium().getCurrentLength() < offset.getAbsoluteMediumOffset()) {
+            logDebugMessage(() -> "Tried to cache starting beyond end of medium, throwing EndOfMediumException");
             throw new EndOfMediumException(offset, numberOfBytes, 0, ByteBuffer.allocate(0));
          }
       }
 
       if (getMedium().isCachingEnabled()) {
          if (getMedium().isRandomAccess()) {
+            logDebugMessage(() -> "Caching is enabled, working on random access medium");
+
             long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
+
+            logDebugMessage(() -> "Current cache size is: " + initialCacheSize);
+            logDebugMessage(() -> "Getting all cached regions in range "
+               + new MediumRegion(offset, numberOfBytes).toIntervalString());
 
             List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
 
             for (MediumRegion cacheRegion : cacheRegionsInRange) {
-               cacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
+               logDebugMessage(() -> "Next cache region in range: " + cacheRegion);
 
-               if (!cacheRegion.isCached()) {
-                  MediumRegion regionWithBytes = readRegion(cacheRegion.getStartOffset(), cacheRegion.getSize());
+               MediumRegion clippedCacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
+
+               if (!clippedCacheRegion.isCached()) {
+                  MediumRegion regionWithBytes = readRegion(clippedCacheRegion.getStartOffset(),
+                     clippedCacheRegion.getSize());
                   cache.addRegion(regionWithBytes);
-               } else if (isPreviouslyCachedRegionNowUncached(cacheRegion, initialCacheSize, numberOfBytes)) {
-                  cache.addRegion(cacheRegion);
+               } else if (isPreviouslyCachedRegionNowUncached(clippedCacheRegion, initialCacheSize, numberOfBytes)) {
+                  cache.addRegion(clippedCacheRegion);
                }
             }
          } else {
+            logDebugMessage(() -> "Caching is enabled, working on non-random access medium");
+            logDebugMessage(() -> "Reading any bytes until cache start offset, if necessary");
+
             List<MediumRegion> regionsToAdd = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
 
             MediumOffset offsetToUse = mediumAccessor.getCurrentPosition();
             int numberOfBytesToUse = numberOfBytes - (int) offsetToUse.distanceTo(offset);
 
-            if (numberOfBytesToUse > getCachedByteCountAt(offsetToUse)) {
+            logDebugMessage(() -> "Current position on medium: " + offsetToUse);
+            logDebugMessage(() -> "Number of bytes to actually cache (only if positive): " + numberOfBytesToUse);
+
+            if (numberOfBytesToUse > 0) {
                regionsToAdd.addAll(readRegionWise(offsetToUse, numberOfBytesToUse));
             }
 
             regionsToAdd.forEach(cache::addRegion);
          }
       }
+
+      logDebugMessage(() -> "DONE Cache <" + numberOfBytes + "> bytes at <" + offset + ">");
    }
 
    /**
@@ -210,8 +237,13 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
       Reject.ifNegativeOrZero(numberOfBytes, "numberOfBytes");
 
+      logDebugMessage(() -> "STARTING getData of <" + numberOfBytes + "> bytes at <" + offset + ">");
+
+      ByteBuffer returnedBytes = null;
+
       if (getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH) {
          if (getMedium().getCurrentLength() < offset.getAbsoluteMediumOffset()) {
+            logDebugMessage(() -> "Tried to get data starting beyond end of medium, throwing EndOfMediumException");
             throw new EndOfMediumException(offset, numberOfBytes, 0, ByteBuffer.allocate(0));
          }
       }
@@ -219,7 +251,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       if (getMedium().isCachingEnabled()) {
          long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
 
+         logDebugMessage(() -> "Caching is enabled, current cache size: " + initialCacheSize);
+
          List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
+
+         logDebugMessage(
+            () -> "Getting all cached regions in range " + new MediumRegion(offset, numberOfBytes).toIntervalString());
 
          MediumRegion firstRegion = cacheRegionsInRange.get(0);
 
@@ -228,26 +265,33 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          if (cacheRegionsInRange.size() == 1 && firstRegion.isCached()
             && firstRegion.getOverlappingByteCount(new MediumRegion(offset, numberOfBytes)) == numberOfBytes) {
 
+            logDebugMessage(() -> "Full region cache hit");
+
             ByteBuffer firstRegionCachedBytes = firstRegion.getBytes();
             firstRegionCachedBytes
                .position(firstRegionCachedBytes.position() + (int) offset.distanceTo(firstRegion.getStartOffset()));
             firstRegionCachedBytes.limit(firstRegionCachedBytes.position() + numberOfBytes);
 
-            return firstRegionCachedBytes;
+            returnedBytes = firstRegionCachedBytes;
          } else {
             ByteBuffer cachedBytes = ByteBuffer.allocate(numberOfBytes);
 
-            for (MediumRegion cacheRegion : cacheRegionsInRange) {
-               cacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
+            logDebugMessage(() -> "Need to gather data from several cache regions");
 
-               if (cacheRegion.isCached()
-                  && !isPreviouslyCachedRegionNowUncached(cacheRegion, initialCacheSize, numberOfBytes)) {
-                  cachedBytes.put(cacheRegion.getBytes());
+            for (MediumRegion cacheRegion : cacheRegionsInRange) {
+               logDebugMessage(() -> "Next cache region in range: " + cacheRegion);
+
+               MediumRegion clippedCacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
+
+               if (clippedCacheRegion.isCached()
+                  && !isPreviouslyCachedRegionNowUncached(clippedCacheRegion, initialCacheSize, numberOfBytes)) {
+                  cachedBytes.put(clippedCacheRegion.getBytes());
                } else {
                   List<MediumRegion> regionsRead = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(
-                     cacheRegion.getStartOffset());
+                     clippedCacheRegion.getStartOffset());
 
-                  MediumRegion regionToAddWithBytes = readRegion(cacheRegion.getStartOffset(), cacheRegion.getSize());
+                  MediumRegion regionToAddWithBytes = readRegion(clippedCacheRegion.getStartOffset(),
+                     clippedCacheRegion.getSize());
 
                   cachedBytes.put(regionToAddWithBytes.getBytes());
 
@@ -259,9 +303,11 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
             cachedBytes.rewind();
 
-            return cachedBytes;
+            returnedBytes = cachedBytes;
          }
       } else {
+         logDebugMessage(() -> "Caching is not enabled");
+
          readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
 
          ByteBuffer readBytes = ByteBuffer.allocate(numberOfBytes);
@@ -272,8 +318,12 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
          readBytes.rewind();
 
-         return readBytes;
+         returnedBytes = readBytes;
       }
+
+      logDebugMessage(() -> "DONE getData of <" + numberOfBytes + "> bytes at <" + offset + ">");
+
+      return returnedBytes;
    }
 
    /**
@@ -288,6 +338,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
+      logDebugMessage(() -> "insertData of <" + dataToInsert + "> at <" + offset + ">");
+
       return changeManager.scheduleInsert(new MediumRegion(offset, dataToInsert.remaining()), dataToInsert);
    }
 
@@ -301,6 +353,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       Reject.ifFalse(offset.getMedium().equals(getMedium()), "offset.getMedium().equals(getMedium())");
       ensureOpened();
       ensureWritable();
+
+      logDebugMessage(() -> "removeData of <" + numberOfBytesToRemove + "> bytes at <" + offset + ">");
 
       return changeManager.scheduleRemove(new MediumRegion(offset, numberOfBytesToRemove));
    }
@@ -317,6 +371,9 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
+      logDebugMessage(() -> "replaceData of <" + numberOfBytesToReplace + "> bytes at <" + offset
+         + "> with replacement bytes <" + replacementData + ">");
+
       return changeManager.scheduleReplace(new MediumRegion(offset, numberOfBytesToReplace), replacementData);
    }
 
@@ -332,6 +389,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
+      logDebugMessage(() -> "undoing action <" + mediumAction + ">");
+
       changeManager.undo(mediumAction);
    }
 
@@ -343,10 +402,18 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       ensureOpened();
       ensureWritable();
 
+      logDebugMessage(() -> "STARTING Flush, having " + changeManager.getScheduledActionCount() + " scheduled changes");
+
+      logDebugMessage(() -> "Creating flush plan...");
+
       List<MediumAction> flushPlan = changeManager.createFlushPlan(getMedium().getMaxReadWriteBlockSizeInBytes(),
          getMedium().getCurrentLength());
 
+      logDebugMessage(() -> "Done with creation of flush plan plan; it has " + flushPlan.size() + " actions");
+
       // Phase 1 - Medium access phase
+      logDebugMessage(() -> "Starting medium access phase...");
+
       ByteBuffer lastReadBytes = null;
 
       MediumActionType previousActionType = null;
@@ -356,6 +423,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
       for (MediumAction mediumAction : flushPlan) {
          switch (mediumAction.getActionType()) {
             case READ:
+               logDebugMessage(() -> "Executing READ action: " + mediumAction);
                try {
                   lastReadBytes = getData(mediumAction.getRegion().getStartOffset(),
                      mediumAction.getRegion().getSize());
@@ -369,6 +437,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
             break;
 
             case WRITE:
+               logDebugMessage(() -> "Executing WRITE action: " + mediumAction);
                if (mediumAction.getActionBytes() != null) {
                   mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                   mediumAccessor.write(mediumAction.getActionBytes());
@@ -389,6 +458,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
             break;
 
             case TRUNCATE:
+               logDebugMessage(() -> "Executing TRUNCATE action: " + mediumAction);
                mediumAccessor.setCurrentPosition(mediumAction.getRegion().getStartOffset());
                mediumAccessor.truncate();
                mediumAction.setDone();
@@ -401,8 +471,14 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          previousActionType = mediumAction.getActionType();
       }
 
+      logDebugMessage(() -> "Done with medium access phase");
+
       // Phase 2 - Cache update phase
+      logDebugMessage(() -> "Starting cache update phase...");
+
       for (MediumAction scheduledAction : scheduledActions) {
+         logDebugMessage(() -> "Next scheduledAction in flush plan: " + scheduledAction);
+
          ByteBuffer actionBytes = scheduledAction.getActionBytes();
 
          switch (scheduledAction.getActionType()) {
@@ -460,6 +536,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          }
       }
 
+      logDebugMessage(() -> "Done with cache update phase");
+      logDebugMessage(() -> "DONE Flush");
    }
 
    /**
@@ -527,6 +605,9 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          MediumOffset currentPosition = mediumAccessor.getCurrentPosition();
 
          if (offset.before(currentPosition)) {
+            logDebugMessage(() -> "Reading data from the current position " + currentPosition.getAbsoluteMediumOffset()
+               + " until " + offset.getAbsoluteMediumOffset() + " for non-random-access medium");
+
             long cachedByteCountAtOffset = cache.getCachedByteCountAt(offset);
 
             if (cachedByteCountAtOffset < currentPosition.distanceTo(offset)) {
@@ -607,6 +688,18 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    private void ensureWritable() {
       if (getMedium().isReadOnly()) {
          throw new ReadOnlyMediumException(getMedium(), null);
+      }
+   }
+
+   /**
+    * Logs a debug message, if debug logging is enabled
+    * 
+    * @param message
+    *           The message to log
+    */
+   private void logDebugMessage(Supplier<String> message) {
+      if (LOGGER.isDebugEnabled()) {
+         LOGGER.debug(message.get());
       }
    }
 

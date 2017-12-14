@@ -291,16 +291,8 @@ public class ShiftedMediumBlock {
       String targetIntvString = "UNDEFINED";
 
       if (totalMediumByteCount != UNDEFINED_COUNT) {
-         MediumRegion sourceRegion = getSourceRegion();
-         MediumRegion targetRegion = getTargetRegion();
-
-         long sourceAbsoluteMediumOffset = sourceRegion.getStartOffset().getAbsoluteMediumOffset();
-
-         sourceIntvString = sourceAbsoluteMediumOffset + ", " + sourceRegion.calculateEndOffsetAsLong();
-
-         long targetAbsoluteMediumOffset = targetRegion.getStartOffset().getAbsoluteMediumOffset();
-
-         targetIntvString = targetAbsoluteMediumOffset + ", " + targetRegion.calculateEndOffsetAsLong();
+         sourceIntvString = getSourceRegion().toIntervalString();
+         targetIntvString = getTargetRegion().toIntervalString();
       }
 
       return "ShiftedMediumBlock [causingActionType=" + causingAction.getActionType() + ", causingActionRegOfs="

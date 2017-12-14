@@ -573,13 +573,20 @@ public class MediumRegion {
    }
 
    /**
+    * Returns an offset interval string representation of this {@link MediumRegion}, omitting any {@link Medium}
+    * information.
+    */
+   public String toIntervalString() {
+      return "[" + getStartOffset().getAbsoluteMediumOffset() + ", " + calculateEndOffsetAsLong() + ")";
+   }
+
+   /**
     * @see java.lang.Object#toString()
     */
    @Override
    public String toString() {
-
-      return "MediumRegion [[" + getStartOffset().getAbsoluteMediumOffset() + ", " + calculateEndOffsetAsLong()
-         + "), size=" + getSize() + ", buffer=" + buffer + ", on " + getStartOffset().getMedium() + "]";
+      return "MediumRegion [" + toIntervalString() + ", size=" + getSize() + ", buffer=" + buffer + ", on "
+         + getStartOffset().getMedium() + "]";
    }
 
    /**

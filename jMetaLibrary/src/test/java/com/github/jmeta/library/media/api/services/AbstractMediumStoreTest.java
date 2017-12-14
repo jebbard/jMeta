@@ -1153,6 +1153,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
       Mockito.verify(mediumChangeManagerSpy).createFlushPlan(currentMedium.getMaxReadWriteBlockSizeInBytes(),
          currentMedium.getCurrentLength());
       Mockito.verify(mediumChangeManagerSpy).iterator();
+      Mockito.verify(mediumChangeManagerSpy, Mockito.atMost(1)).getScheduledActionCount();
       Mockito.verify(mediumCacheSpy).clear();
 
       Mockito.verifyZeroInteractions(mediumCacheSpy);

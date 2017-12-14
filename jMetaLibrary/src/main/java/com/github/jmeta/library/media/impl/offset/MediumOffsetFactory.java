@@ -12,12 +12,17 @@ package com.github.jmeta.library.media.impl.offset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumAction;
 import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.library.startup.impl.StandardLibraryJMeta;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -33,6 +38,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * was done on the current {@link Medium}.
  */
 public class MediumOffsetFactory {
+
+   private static final Logger LOGGER = LoggerFactory.getLogger(StandardLibraryJMeta.class);
 
    private final List<MediumOffset> offsets = new ArrayList<>();
 
@@ -57,6 +64,9 @@ public class MediumOffsetFactory {
     * @return The created {@link MediumOffset} instance.
     */
    public MediumOffset createMediumOffset(long absoluteMediumOffset) {
+
+      logDebugMessage(() -> "Creating managed medium offset instance for medium <" + getMedium() + "> and offset: "
+         + absoluteMediumOffset);
 
       StandardMediumOffset newOffset = new StandardMediumOffset(medium, absoluteMediumOffset);
 
@@ -231,5 +241,17 @@ public class MediumOffsetFactory {
       }
 
       return allOffsetsBehindOrEqual;
+   }
+
+   /**
+    * Logs a debug message, if debug logging is enabled
+    * 
+    * @param message
+    *           The message to log
+    */
+   private void logDebugMessage(Supplier<String> message) {
+      if (LOGGER.isDebugEnabled()) {
+         LOGGER.debug(message.get());
+      }
    }
 }

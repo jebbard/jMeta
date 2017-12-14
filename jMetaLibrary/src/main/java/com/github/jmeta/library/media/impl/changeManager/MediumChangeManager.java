@@ -279,6 +279,13 @@ public class MediumChangeManager {
    }
 
    /**
+    * @return The number of currently scheduled {@link MediumAction}s
+    */
+   public int getScheduledActionCount() {
+      return mediumActions.size();
+   }
+
+   /**
     * Completely clears this {@link MediumChangeManager} from all previously scheduled {@link MediumAction}s, thus
     * follow up calls to {@link #iterator()} will return an empty iterator.
     */

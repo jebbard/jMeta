@@ -8,6 +8,9 @@
 		</File>
 	</Appenders>
 	<Loggers>
+		<!-- NOTE: If you change the level to debug, you might get large log files 
+			when working with Media, especially running all tests will take VERY long 
+			and creates GBs of logs -->
 		<Root level="info">
 			<AppenderRef ref="File" />
 		</Root>
