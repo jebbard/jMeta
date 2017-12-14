@@ -27,7 +27,8 @@
 	<!-- ========================== Build ========================== -->
 	<build>
 		<plugins>
-			<!-- Copy utility tex files to target dir (necessary for building latex documents with the m2elatex plugin) -->
+			<!-- Copy utility tex files to target dir (necessary for building latex 
+				documents with the m2elatex plugin) -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.7</version>
@@ -54,6 +55,58 @@
 				</executions>
 			</plugin>
 
+			<!-- Save PPT as PDF-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<executable>cscript</executable>
+							<workingDirectory>${basedir}/scripts/savePowerPointAsPDF/</workingDirectory>
+							<arguments>
+								<argument>OpenAndSavePowerPointAsPDF.vbs</argument>
+								<argument>${basedir}/DesignConcept/figures/FiguresTotal.ppt</argument>
+								<argument>${basedir}/DesignConcept/figures/FiguresTotal.pdf</argument>
+							</arguments>
+						</configuration>
+						<id>ppt-save-as</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Create figures for design concept -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<executable>C:\Python27\python</executable>
+							<workingDirectory>${basedir}/scripts/pdfCropper/</workingDirectory>
+							<arguments>
+								<argument>PDFCropper.py</argument>
+								<argument>${basedir}/DesignConcept/figures/</argument>
+								<argument>${basedir}/DesignConcept/figures/FiguresTotal.pdf</argument>
+							</arguments>
+							<environmentVariables>
+								<PYTHONPATH>./pyPdf-1.13/pyPdf</PYTHONPATH>
+							</environmentVariables>
+						</configuration>
+						<id>python-build</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- DESIGN CONCEPT -->
 			<plugin>
 				<groupId>de.akquinet.maven</groupId>
 				<artifactId>maven-latex-plugin</artifactId>

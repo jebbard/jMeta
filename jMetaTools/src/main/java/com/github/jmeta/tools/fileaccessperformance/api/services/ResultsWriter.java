@@ -83,7 +83,7 @@ public class ResultsWriter {
     * @param session
     *           The {@link MeasurementSession}
     * @param execution
-    *           TODO
+    * 
     * @param machineString
     *           The string identifying the machine.
     * @throws IOException
