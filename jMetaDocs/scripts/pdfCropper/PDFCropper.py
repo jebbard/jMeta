@@ -36,13 +36,25 @@ def writePDFPage(path, page):
     outputStream.close()
 
 #######################
+# Prints details about the cropping
+#######################
+def printCropDetails(box, widthAmount, heightAmount):
+    """ Prints details about the cropping"""
+
+    print "[INFO] --> ... cropping new PDF page ... "
+    print "[INFO] --> CROP-BOX before: ", box
+    print "[INFO] --> Desired width amount: ", widthAmount * 100,"%"
+    print "[INFO] --> Desired height amount: ", heightAmount * 100,"%"
+    print "[INFO] --> Page upper right (X,Y): (", box.getUpperRight_x(), ",", box.getUpperRight_y(), ")"
+
+#######################
 # Crop page to size amounts. For details see docstring.
 #######################
-def cropPDFPage(page, widthAmount, heightAmount):
+def cropPDFPageFreePDF(page, widthAmount, heightAmount):
     """
         Crops the given PDF page to the given size amounts (numbers between 0 and
         1 that specify the amount of the current width and height for the crop
-        operation).
+        operation) - assuming it comes from FreePDF.
 
         Two issues have to be noticed:
         - It is assumed the page was printed by FreePDF and it therefore contains
@@ -65,7 +77,7 @@ def cropPDFPage(page, widthAmount, heightAmount):
         upper left (X, Y) ++++++++++++++++++++++++++++++ upper right (X, Y)
     """
 
-    # print "CROP-BOX: ", page.cropBox
+    printCropDetails(page.cropBox, widthAmount, heightAmount)
 
     # FreePDF creates a static white frame around the printed figure:
     #    top: 1 cm, bottom: 1 cm, left: 2,2 cm, right: 2,2 cm.
@@ -77,11 +89,6 @@ def cropPDFPage(page, widthAmount, heightAmount):
     # size to avoid clipping effects.
     staticBorderWidth = 2.1 * cmToPoints
     staticBorderHeight = 0.9 * cmToPoints
-
-    print "[INFO] --> ... cropping new PDF page ... "
-    print "[INFO] --> Desired width amount: ", widthAmount * 100,"%"
-    print "[INFO] --> Desired height amount: ", heightAmount * 100,"%"
-    print "[INFO] --> Page upper right (X,Y): (", page.cropBox.getUpperRight_x(), ",", page.cropBox.getUpperRight_y(), ")"
 
     # (1) Scale the page width and height according to given amounts.
     #    Only the pages "payload" is scaled, i.e. what is within the frame
@@ -103,6 +110,42 @@ def cropPDFPage(page, widthAmount, heightAmount):
         staticBorderHeight,
         staticBorderWidth
         ])
+
+#######################
+# Crop page to size amounts. For details see docstring.
+#######################
+def cropPDFPagePowerpoint(page, widthAmount, heightAmount):
+    """
+        Crops the given PDF page to the given size amounts (numbers between 0 and
+        1 that specify the amount of the current width and height for the crop
+        operation) - Assuming it comes from PowerPoint.
+
+        Differences to FreePDF Case:
+        - The coordinate system is strangle flipped: 
+
+        upper left (0, height) ++++++++++++++++ upper right (width, height)
+        +                                                                 +
+        +                         original PPT                            +
+        +                                                                 +
+        lower left (0, 0) ++++++++++++++++++++++++++ lower right (width, 0)
+    """
+
+    printCropDetails(page.cropBox, widthAmount, heightAmount)
+    
+    # Scale the page width and height according to given amounts.
+    #    Only the pages "payload" is scaled, i.e. what is within the frame
+    #    that FreePDF added.
+    widthToScale = page.cropBox.getUpperRight_x()
+    heightToScale = page.cropBox.getUpperRight_y()
+
+    page.cropBox.setLowerLeft([
+        0,
+        heightToScale * (1 - heightAmount),
+        ])
+    page.cropBox.setLowerRight([
+        widthToScale * widthAmount,
+        heightToScale * (1 - heightAmount),
+        ])  
 
 #######################
 # Return page sizing amounts. For details see docstring.
@@ -195,8 +238,6 @@ def main():
             currentPage = input.getPage(currentPageIndex)
 
             pageText = currentPage.extractText()
-            
-            print pageText
 
             pageWidthAmount, pageSizeAmount = getPageSizingAmounts(pageText)
             
@@ -214,9 +255,11 @@ def main():
                 else:
                     print "[INFO] - Output filename of current page:", pageFileName
     
-                    cropPDFPage(currentPage, pageWidthAmount, pageSizeAmount)
+                    cropPDFPagePowerpoint(currentPage, pageWidthAmount, pageSizeAmount)
                     outputPath = getOutputPath(outputFolderBase, pageFileName)
                     writePDFPage(outputPath, currentPage)
+                    print "[INFO] - Done current page:", pageFileName
+                    print 
 
 
 #######################
