@@ -17,15 +17,22 @@
 
 \usepackage[landscape] {geometry}
 
+\usepackage{wrapfig}
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{textcomp}
+
 % Better mathematical formulas
 \usepackage{amsthm,amsmath,amssymb}
 
 % More on figures
 \usepackage{float}
+\usepackage{hyperref}
 
 \title{An algorithm for writing scheduled modifications to finite byte sequences}
 \author{Jens Ebert}
 \date{\today}
+
 
 %###############################################################################################
 %###############################################################################################
@@ -38,6 +45,24 @@
 \begin{document}
 
 \maketitle
+
+
+%===============================================================================================
+%		Copyright
+%===============================================================================================
+
+\begin{wrapfigure}{l}{3cm}
+\includegraphics{figures/CClicense_BY_ND.PNG}
+\end{wrapfigure}
+
+Jens Ebert, 2018
+
+\textcopyright{} 2018 by Jens Ebert
+
+\textcolor{white}{blind text} \linebreak
+
+This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0 International License: \url{http://creativecommons.org/licenses/by-nd/4.0/}.
+
 \begin{abstract}
 This paper describes a simple, algorithm with quadratic complexity for modifying a finite sequence of bytes by a series of modifications, namely insertions, removes and replaces. The order of changes is not relevant except the case of multiple insertions at the same offset. The paper defines rules for valid modification series. For a valid modification series, the algorithm calculates the disjoint subsets of the byte sequence that need to be moved to another offset, as indicated by the modifications. The algorithm ensures that modifications are executed at the correct offsets and that existing bytes of the sequence not covered by a modification are never overwritten. The paper specifically covers an aspect relevant for practical implementation: Block-wise reading and writing of existing and new bytes.
 \end{abstract}
