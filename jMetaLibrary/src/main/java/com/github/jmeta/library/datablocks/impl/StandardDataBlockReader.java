@@ -227,6 +227,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       afterHeaderReading(actualId, theContext, headers);
 
       // Read payload
+      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
       List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
          PhysicalDataBlockType.PAYLOAD);
 
@@ -325,6 +326,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       afterFooterReading(actualId, theContext, footers);
 
       // Read payload
+      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
       List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
          PhysicalDataBlockType.PAYLOAD);
 
@@ -832,6 +834,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       DataBlockDescription blockDesc = m_spec.getDataBlockDescription(sizeBlockId);
 
       // The given SIZE_OF may be a total size of payload plus headers and /or footers
+      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
       if (blockDesc.getPhysicalType().equals(PhysicalDataBlockType.PAYLOAD)) {
          long totalSizeToSubtract = 0;
 

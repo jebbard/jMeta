@@ -29,8 +29,7 @@ public interface ExtendedDataBlockFactory extends DataBlockFactory {
     * @param context
     * @return the {@link Payload}
     */
-   public Payload createPayloadAfterRead(DataBlockId id,
-      MediumOffset reference, long totalSize, DataBlockReader reader,
+   public Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader,
       FieldFunctionStack context);
 
    /**

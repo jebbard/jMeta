@@ -14,9 +14,9 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -28,7 +28,21 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
+// FIXME: Aufspalten in zwei Klassen: LazyFieldBasedPayload und LazyContainerBasedPayload
+// FIXME: Dritte Klasse GenericPayload nötig?
 public class LazyPayload extends AbstractDataBlock implements Payload {
+
+   private final FieldFunctionStack context;
+
+   private long totalSize;
+
+   private List<Field<?>> fields;
+
+   private boolean fieldsFirst;
+
+   private boolean hasFields;
+
+   private boolean hasContainers;
 
    /**
     * Creates a new {@link LazyPayload}.
@@ -39,25 +53,24 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
     * @param dataBlockReader
     * @param context
     */
-   public LazyPayload(DataBlockId id, MediumOffset reference,
-      long totalSize, DataBlockReader dataBlockReader,
+   public LazyPayload(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader dataBlockReader,
       FieldFunctionStack context) {
       super(id, null, reference, dataBlockReader);
 
       Reject.ifNull(context, "context");
 
-      m_context = context;
+      this.context = context;
       determineFieldPosition(id);
 
-      m_totalSize = totalSize;
+      this.totalSize = totalSize;
 
       // TODO primeRefactor007: review this new code and document...
       // The size of the payload is still unknown - There is no other way than to read
       // its children and sum up their sizes...
-      if (m_totalSize == DataBlockDescription.UNKNOWN_SIZE) {
+      if (this.totalSize == DataBlockDescription.UNKNOWN_SIZE) {
          long summedUpTotalSize = 0;
 
-         if (m_hasFields) {
+         if (this.hasFields) {
             List<Field<?>> fields = getFields();
 
             for (int i = 0; i < fields.size(); ++i) {
@@ -67,7 +80,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
             }
          }
 
-         if (m_hasContainers) {
+         if (this.hasContainers) {
             AbstractDataBlockIterator<Container> containerIter = getContainerIterator();
 
             while (containerIter.hasNext()) {
@@ -77,11 +90,11 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
             }
          }
 
-         m_totalSize = summedUpTotalSize;
+         this.totalSize = summedUpTotalSize;
       }
 
       else
-         m_totalSize = totalSize;
+         this.totalSize = totalSize;
    }
 
    /**
@@ -97,19 +110,19 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
       // present field functions required.
 
       // Fields start first
-      if (m_fields == null)
-         if (!m_hasFields)
-            m_fields = new ArrayList<>();
+      if (this.fields == null)
+         if (!this.hasFields)
+            this.fields = new ArrayList<>();
 
          else {
             MediumOffset fieldReference = getMediumReference();
 
-            m_fields = new ArrayList<>();
+            this.fields = new ArrayList<>();
 
             long totalContainerSize = 0;
 
             // First read the containers to know where exactly the fields start
-            if (!m_fieldsFirst) {
+            if (!this.fieldsFirst) {
                AbstractDataBlockIterator<Container> iter = getContainerIterator();
 
                while (iter.hasNext()) {
@@ -121,10 +134,9 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
                fieldReference = fieldReference.advance(totalContainerSize);
             }
 
-            if (m_hasFields || m_totalSize - totalContainerSize > 0) {
-               List<Field<?>> readFields = getDataBlockReader().readFields(
-                  fieldReference, getId(), m_context,
-                  m_totalSize - totalContainerSize);
+            if (this.hasFields || this.totalSize - totalContainerSize > 0) {
+               List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), this.context,
+                  this.totalSize - totalContainerSize);
 
                for (int i = 0; i < readFields.size(); ++i) {
                   Field<?> field = readFields.get(i);
@@ -134,7 +146,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
             }
          }
 
-      return m_fields;
+      return this.fields;
    }
 
    /**
@@ -147,7 +159,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
 
       long totalFieldSize = 0;
 
-      if (m_hasFields && m_fieldsFirst) {
+      if (this.hasFields && this.fieldsFirst) {
          Iterator<Field<?>> fieldIterator = getFields().iterator();
 
          while (fieldIterator.hasNext()) {
@@ -159,8 +171,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
          containerReference = containerReference.advance(totalFieldSize);
       }
 
-      return new PayloadContainerIterator(this, getDataBlockReader(),
-         containerReference, m_context, totalFieldSize);
+      return new PayloadContainerIterator(this, getDataBlockReader(), containerReference, this.context, totalFieldSize);
    }
 
    /**
@@ -169,7 +180,7 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
    @Override
    public long getTotalSize() {
 
-      return m_totalSize;
+      return this.totalSize;
    }
 
    /**
@@ -179,22 +190,18 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
 
       DataFormatSpecification spec = getDataBlockReader().getSpecification();
 
-      int fieldCount = DataBlockDescription
-         .getChildDescriptionsOfType(spec, id, PhysicalDataBlockType.FIELD)
-         .size();
-      int containerCount = DataBlockDescription
-         .getChildDescriptionsOfType(spec, id, PhysicalDataBlockType.CONTAINER)
+      int fieldCount = DataBlockDescription.getChildDescriptionsOfType(spec, id, PhysicalDataBlockType.FIELD).size();
+      int containerCount = DataBlockDescription.getChildDescriptionsOfType(spec, id, PhysicalDataBlockType.CONTAINER)
          .size();
 
-      final List<DataBlockId> orderedChildIds = spec.getDataBlockDescription(id)
-         .getOrderedChildIds();
+      final List<DataBlockId> orderedChildIds = spec.getDataBlockDescription(id).getOrderedChildIds();
 
       if (fieldCount + containerCount != orderedChildIds.size())
          throw new IllegalStateException("For payload block " + id
             + ", only children with physical block type CONTAINER and FIELD are allowed to be specified.");
 
-      m_hasFields = fieldCount > 0;
-      m_hasContainers = containerCount > 0;
+      this.hasFields = fieldCount > 0;
+      this.hasContainers = containerCount > 0;
 
       PhysicalDataBlockType previousPhysicalType = null;
       PhysicalDataBlockType currentPhysicalType = null;
@@ -202,19 +209,17 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
       int typeChanges = 0;
 
       for (int i = 0; i < orderedChildIds.size(); ++i) {
-         DataBlockDescription desc = spec
-            .getDataBlockDescription(orderedChildIds.get(i));
+         DataBlockDescription desc = spec.getDataBlockDescription(orderedChildIds.get(i));
 
          currentPhysicalType = desc.getPhysicalType();
 
          if (currentPhysicalType.equals(PhysicalDataBlockType.FIELD))
-            m_fieldsFirst = true;
+            this.fieldsFirst = true;
 
          else
-            m_fieldsFirst = false;
+            this.fieldsFirst = false;
 
-         if (previousPhysicalType != null
-            && previousPhysicalType != currentPhysicalType)
+         if (previousPhysicalType != null && previousPhysicalType != currentPhysicalType)
             typeChanges++;
 
          previousPhysicalType = currentPhysicalType;
@@ -231,18 +236,6 @@ public class LazyPayload extends AbstractDataBlock implements Payload {
 
       field.initParent(this);
 
-      m_fields.add(field);
+      this.fields.add(field);
    }
-
-   private final FieldFunctionStack m_context;
-
-   private long m_totalSize;
-
-   private List<Field<?>> m_fields;
-
-   private boolean m_fieldsFirst;
-
-   private boolean m_hasFields;
-
-   private boolean m_hasContainers;
 }

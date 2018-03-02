@@ -270,6 +270,7 @@ public class ID3v1Extension implements Extension {
       payloadLocationProps.put(id3v1TagId,
          new LocationProperties(3, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
+      // FIXME: Change to FIELD_BASED_PAYLOAD, also in test cases
       descMap.put(id3v1PayloadId,
          new DataBlockDescription(id3v1PayloadId, "payload", "The ID3v1 payload", PhysicalDataBlockType.PAYLOAD,
             payloadChildIds, ChildOrder.SEQUENTIAL, null, payloadLocationProps, 125, 125, null, null));

@@ -290,6 +290,7 @@ public class OggExtension implements Extension {
       final List<DataBlockId> packetChildIds = new ArrayList<>();
       packetChildIds.add(oggSegmentId);
 
+      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(oggPacketPartId,
          new DataBlockDescription(oggPacketPartId, "Ogg packet", "Ogg packet", PhysicalDataBlockType.PAYLOAD,
             packetChildIds, ChildOrder.SEQUENTIAL, null, packetLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE,
@@ -319,6 +320,7 @@ public class OggExtension implements Extension {
 
       pagePayloadChildIds.add(oggPacketPartContainerId);
 
+      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(oggPayloadId,
          new DataBlockDescription(oggPayloadId, "Ogg page payload", "Ogg page payload", PhysicalDataBlockType.PAYLOAD,
             pagePayloadChildIds, ChildOrder.SEQUENTIAL, null, pagePayloadLocationProps, 0, 9999999, null, null));

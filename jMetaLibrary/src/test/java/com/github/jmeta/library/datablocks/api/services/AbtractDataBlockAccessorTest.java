@@ -502,6 +502,7 @@ public abstract class AbtractDataBlockAccessorTest {
 
       Assert.assertNotNull(payload);
 
+      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
       DataBlockInstanceId expectedPayloadId = expectationProvider
          .getExpectedChildBlocksOfType(parentContainerInstanceId, PhysicalDataBlockType.PAYLOAD).get(0);
 

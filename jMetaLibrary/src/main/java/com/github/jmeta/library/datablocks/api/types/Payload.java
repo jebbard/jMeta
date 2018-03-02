@@ -12,20 +12,17 @@ import java.util.Iterator;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 
 /**
- * The {@link Payload} is the part of the data of an {@link Container} that holds the information valuable for the
- * user, while {@link Header}s usually only store technical and version information mainly required for parsing.
+ * The {@link Payload} is the part of the data of an {@link Container} that holds the information valuable for the user,
+ * while {@link Header}s usually only store technical and version information mainly required for parsing.
  *
  * The {@link Payload} might both consist of {@link Field}s or child {@link Container}s. Usually, it is an either or.
  * E.g. an ID3v2.3 tag has a payload that usually contains child {@link Container}s only while these {@link Container}
  * children are the metadata attributes that usually only contain {@link Field}s as children of their {@link Payload}.
  *
- * However, there might be cases where an {@link Payload} both contains {@link Container} and {@link Field} children,
- * so always both should be considered.
+ * However, there might be cases where an {@link Payload} both contains {@link Container} and {@link Field} children, so
+ * always both should be considered.
  */
 public interface Payload extends DataBlock, FieldSequence {
-	// FIXME: Implementieren/Extend durch FieldBasedPayload und ContainerBasedPayload
-	// FieldBasedPayload: extends FieldSequence
-	// ContainerBasedPayload mit der Methode unten
 
    /**
     * Returns the child {@link Container}s contained in this {@link Payload}. If there are no {@link Container}

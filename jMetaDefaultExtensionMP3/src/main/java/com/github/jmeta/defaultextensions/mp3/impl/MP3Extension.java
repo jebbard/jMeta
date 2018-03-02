@@ -232,6 +232,7 @@ public class MP3Extension implements Extension {
       payloadLocationProps.put(mp3FrameId,
          new LocationProperties(4, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
+      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(mp3PayloadId,
          new DataBlockDescription(mp3PayloadId, "payload", "The MP3 payload", PhysicalDataBlockType.PAYLOAD,
             payloadChildIds, ChildOrder.SEQUENTIAL, null, payloadLocationProps, 1, 998, null, null));

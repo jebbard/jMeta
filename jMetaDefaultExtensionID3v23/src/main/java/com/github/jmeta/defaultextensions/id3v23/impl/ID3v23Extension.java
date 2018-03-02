@@ -193,6 +193,7 @@ public class ID3v23Extension implements Extension {
       FieldProperties<?> concreteFieldProperties = genericDesc.getFieldProperties();
 
       // Add payload children, if this is a PAYLOAD block
+      // FIXME: Change to FIELD_BASED_PAYLOAD or CONTAINER_BASED_PAYLOAD
       if (genericDesc.getPhysicalType().equals(PhysicalDataBlockType.PAYLOAD))
          if (concretePayloadChildren != null) {
             for (int i = 0; i < concretePayloadChildren.size(); ++i) {
@@ -577,6 +578,7 @@ public class ID3v23Extension implements Extension {
       genericFramePayloadLocationProps.put(GENERIC_FRAME_ID,
          new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
+      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(GENERIC_FRAME_PAYLOAD_ID, new DataBlockDescription(GENERIC_FRAME_PAYLOAD_ID, "Generic frame payload",
          "The generic frame payload", PhysicalDataBlockType.PAYLOAD, genericFramePayloadChildIds, ChildOrder.SEQUENTIAL,
          new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
@@ -757,6 +759,7 @@ public class ID3v23Extension implements Extension {
       paddingPayloadLocationProps.put(PADDING_ID,
          new LocationProperties(1, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
+      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(PADDING_PAYLOAD_ID,
          new DataBlockDescription(PADDING_PAYLOAD_ID, "Padding payload", "Padding payload",
             PhysicalDataBlockType.PAYLOAD, paddingPayloadChildIds, ChildOrder.SEQUENTIAL, null,
@@ -798,6 +801,7 @@ public class ID3v23Extension implements Extension {
       payloadLocationProps.put(ID3V23_TAG_ID,
          new LocationProperties(10, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
+      // FIXME: Change to CONTAINER_BASED_PAYLOAD
       descMap.put(ID3V23_PAYLOAD_ID,
          new DataBlockDescription(ID3V23_PAYLOAD_ID, "payload", "The id3v23 payload", PhysicalDataBlockType.PAYLOAD,
             payloadChildIds, ChildOrder.UNORDERED, null, payloadLocationProps, 11, DataBlockDescription.UNKNOWN_SIZE,

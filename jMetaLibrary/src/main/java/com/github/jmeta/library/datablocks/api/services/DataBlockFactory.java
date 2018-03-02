@@ -44,27 +44,8 @@ public interface DataBlockFactory {
     *           the {@link Payload} building this {@link Container}.
     * @return the created {@link Container}.
     */
-   public Container createContainer(DataBlockId id, DataBlock parent,
-      MediumOffset reference, List<Header> headers, Payload payload,
-      List<Header> footers);
-
-   /**
-    * Creates an {@link Payload} instance.
-    *
-    * @param id
-    *           the {@link DataBlockId}.
-    * @param parent
-    *           the parent {@link DataBlock}.
-    * @param containers
-    *           the {@link Container}s building this {@link Payload}. May be null if there are no {@link Container}s
-    *           in the {@link Payload} instance. If this is the case, the fields parameter must be non-null.
-    * @param fields
-    *           the {@link Field}s building this {@link Payload}. May be null if there are no {@link Container}s in
-    *           the {@link Payload} instance. If this is the case, the containers parameter must be non-null.
-    * @return the created {@link Payload}.
-    */
-   public Payload createPayload(DataBlockId id, DataBlock parent,
-      List<Container> containers, List<Field<?>> fields);
+   public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
+      Payload payload, List<Header> footers);
 
    /**
     * @param id
@@ -75,8 +56,7 @@ public interface DataBlockFactory {
     * @param characterEncoding
     * @return the {@link Field}
     */
-   public <T> Field<T> createFieldFromBytes(DataBlockId id,
-      DataFormatSpecification spec, MediumOffset reference,
+   public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
       BinaryValue fieldBytes, ByteOrder byteOrder, Charset characterEncoding);
 
    /**
@@ -93,7 +73,6 @@ public interface DataBlockFactory {
     * @param isFooter
     * @return the {@link Header}
     */
-   public Header createHeader(DataBlockId id, MediumOffset reference,
-      List<Field<?>> fields, boolean isFooter);
+   public Header createHeader(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter);
 
 }
