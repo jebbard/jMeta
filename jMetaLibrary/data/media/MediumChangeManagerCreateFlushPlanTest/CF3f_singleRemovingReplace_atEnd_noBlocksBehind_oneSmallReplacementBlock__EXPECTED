@@ -1,0 +1,3 @@
+WRITE at 280 with size 10 with bytes java.nio.HeapByteBuffer[pos=0 lim=10 cap=10] on medium TestFile_1.txt
+REPLACE at 280 with size 20 with bytes java.nio.HeapByteBuffer[pos=0 lim=10 cap=10] on medium TestFile_1.txt
+TRUNCATE at 290 with size 10 on medium TestFile_1.txt

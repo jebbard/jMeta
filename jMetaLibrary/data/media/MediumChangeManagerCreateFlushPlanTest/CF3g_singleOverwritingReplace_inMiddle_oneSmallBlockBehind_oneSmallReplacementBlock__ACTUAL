@@ -1,0 +1,2 @@
+WRITE at 150 with size 80 with bytes java.nio.HeapByteBuffer[pos=0 lim=80 cap=80] on medium TestFile_1.txt
+REPLACE at 150 with size 80 with bytes java.nio.HeapByteBuffer[pos=0 lim=80 cap=80] on medium TestFile_1.txt

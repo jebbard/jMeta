@@ -12,6 +12,7 @@ package com.github.jmeta.library.media.impl.changeManager;
 import java.io.FilterOutputStream;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Iterator;
 
 import org.junit.Assert;
@@ -125,7 +126,8 @@ public abstract class ExpectedActionSequence {
          outputString += " with bytes " + action.getActionBytes();
       }
 
-      outputString += " on medium " + region.getStartOffset().getMedium().getName();
+      Path mediumPath = (Path) region.getStartOffset().getMedium().getWrappedMedium();
+      outputString += " on medium " + mediumPath.getName(mediumPath.getNameCount() - 1);
 
       stream.println(outputString);
    }

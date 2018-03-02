@@ -11,6 +11,7 @@ package com.github.jmeta.library.dataformats.api.types;
  *
  */
 public enum PhysicalDataBlockType {
+	// FIXME: FIELD_BASED_PAYLOAD und CONTAINER_BASED_PAYLOAD hinzufügen
    PAYLOAD,
    FIELD,
    HEADER,

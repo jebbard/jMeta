@@ -1,0 +1,2 @@
+REMOVE at 740 with size 400 on medium TestFile_1.txt
+TRUNCATE at 740 with size 400 on medium TestFile_1.txt

@@ -23,6 +23,9 @@ import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterato
  * so always both should be considered.
  */
 public interface Payload extends DataBlock, FieldSequence {
+	// FIXME: Implementieren/Extend durch FieldBasedPayload und ContainerBasedPayload
+	// FieldBasedPayload: extends FieldSequence
+	// ContainerBasedPayload mit der Methode unten
 
    /**
     * Returns the child {@link Container}s contained in this {@link Payload}. If there are no {@link Container}

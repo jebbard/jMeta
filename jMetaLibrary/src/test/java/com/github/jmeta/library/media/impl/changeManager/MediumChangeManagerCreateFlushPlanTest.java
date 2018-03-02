@@ -75,7 +75,7 @@ public class MediumChangeManagerCreateFlushPlanTest {
     */
    @Before
    public void setUp() {
-      Path mediaFlushTestPath = TestMedia.TEST_FILE_DIRECTORY_PATH.resolve("MediumChangeManagerTests");
+      Path mediaFlushTestPath = TestMedia.TEST_FILE_DIRECTORY_PATH.resolve("MediumChangeManagerCreateFlushPlanTest");
 
       currentDumpStreamExpected = setupTestDumpFile(currentTestName.getMethodName() + "__EXPECTED", mediaFlushTestPath);
       currentDumpStreamActual = setupTestDumpFile(currentTestName.getMethodName() + "__ACTUAL", mediaFlushTestPath);

@@ -1,0 +1,17 @@
+READ at 99 with size 1 on medium TestFile_1.txt
+WRITE at 229 with size 1 on medium TestFile_1.txt
+WRITE at 99 with size 130 with bytes java.nio.HeapByteBuffer[pos=0 lim=130 cap=130] on medium TestFile_1.txt
+INSERT at 99 with size 130 with bytes java.nio.HeapByteBuffer[pos=0 lim=130 cap=130] on medium TestFile_1.txt
+READ at 600 with size 200 on medium TestFile_1.txt
+WRITE at 230 with size 200 on medium TestFile_1.txt
+READ at 800 with size 100 on medium TestFile_1.txt
+WRITE at 430 with size 100 on medium TestFile_1.txt
+REMOVE at 100 with size 500 on medium TestFile_1.txt
+READ at 900 with size 200 on medium TestFile_1.txt
+WRITE at 890 with size 200 on medium TestFile_1.txt
+READ at 1100 with size 40 on medium TestFile_1.txt
+WRITE at 1090 with size 40 on medium TestFile_1.txt
+WRITE at 530 with size 200 with bytes java.nio.HeapByteBuffer[pos=0 lim=200 cap=360] on medium TestFile_1.txt
+WRITE at 730 with size 160 with bytes java.nio.HeapByteBuffer[pos=200 lim=360 cap=360] on medium TestFile_1.txt
+INSERT at 900 with size 360 with bytes java.nio.HeapByteBuffer[pos=0 lim=360 cap=360] on medium TestFile_1.txt
+TRUNCATE at 1130 with size 10 on medium TestFile_1.txt

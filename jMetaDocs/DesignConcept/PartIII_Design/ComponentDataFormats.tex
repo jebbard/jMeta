@@ -84,10 +84,10 @@ How are these containers structured in detail?
 A container consists of an optional \textbf{header}, \textbf{payload} and an optional \textbf{footer}
 }
 {% Short description
-Every container - no matter which data format - follows the same basic structure: An optional header starts the containers byte sequence. Following this, there is a sequence of bytes called the payload. At the end of the container, there is an optional footer. A container must either have a header or a footer.
+Every container - no matter which data format - follows the same basic structure: One or more optional headers start the container's byte sequence. Following this, there is a sequence of bytes called the payload. At the end of the container, there are one or more optional footers. A container must either have at least a single header or at least a single footer.
 }
 {% Rationale
-Considering table \ref{tab:DFcompareMult} and \ref{tab:DFcompareMeta}, every container in every format has at least one header or one footer, including nested containers. Only ID3v23 as sole exception has a second, so-called extended header. To be discussed soon how this will be handled. We do not want to add additional complexity by having multiple headers or footers just because of this singular case. Modelling the middle part of a container as payload explicitly instead of just as list of sub-containers or fields makes sense because it allows to lazily read substructures, or entirely skip the payload.
+Considering table \ref{tab:DFcompareMult} and \ref{tab:DFcompareMeta}, every container in every format has at least one header or one footer, including nested containers. Only ID3v23 as sole exception has a second, so-called extended header. Thus we have to support multiple headers and footers, even though this might be a singular case. But future formats might come to bring multiple headers, too. Modelling the middle part of a container as payload explicitly instead of just as list of sub-containers or fields makes sense because it allows to lazily read substructures, or entirely skip the payload.
 }
 {% Disadvantages
 No disadvantages known
@@ -120,7 +120,7 @@ Now towards headers and footers: Are they inherently different or basically the 
 Headers and footers as sequences of fields are structurally identical
 }
 {% Short description
-Headers and footers are sequences of fields, i.e. they must not nest a container. They are either variable or fixed-size. For ID3v2, the extended header can be seen as extending the mandatory ID3v2 header, i.e. the usual static header becomes a potentially larger, i.e. variable sized header. This eliminates the need to have multiple headers in the metamodel. For both header and footer, the same model class called FieldSequence is used.
+Headers and footers are sequences of fields, i.e. they must not nest a container. They are either variable or fixed-size. For both header and footer, the same model class called FieldSequence is used.
 }
 {% Rationale
 No data format specifies a header or footer nesting a container-like data structure, they all consist of plain fields. Despite the location (before or behind the payload), there is nothing really distinguishing headers or footers from a structural perspective. Thus the same model class can be used for both. However, there is no english term for that class that seems to clearly be a grouping term for headers and footers.
@@ -147,7 +147,7 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-How how to handle padding? If we look at the data format comparisons in \ref{tab:DFcompareMult} and \ref{tab:DFcompareMeta}, we see that padding is just a special case in ID3v2 and MP3. All other format solve it ``more naturally'' by embedding it in special child container. ID3v2 just adds some nullbytes at the end of the tag payload behind the frames. How to model this? There are basically three possibilities:
+How to handle padding? If we look at the data format comparisons in \ref{tab:DFcompareMult} and \ref{tab:DFcompareMeta}, we see that padding is just a special case in ID3v2 and MP3. All other formats solve it ``more naturally'' by embedding it in special child container. ID3v2 just adds some nullbytes at the end of the tag payload behind the frames. How to model this? There are basically three possibilities:
 \begin{itemize}
 \item The padding is a part of the payload, basically a field. This seems most intuitive, but is already excluded by the previous design decision, because then we would need to support mixed payloads, consisting both of child containers and fields.
 \item The padding is part of the payload, but considered as a very special child container.
