@@ -36,7 +36,6 @@ import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
-import com.github.jmeta.library.dataformats.api.types.ChildOrder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.DataFormat;
@@ -1211,8 +1210,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
-         ChildOrder.SEQUENTIAL, unknownFieldProperties, new HashMap<DataBlockId, LocationProperties>(),
-         DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null);
+         unknownFieldProperties, new HashMap<DataBlockId, LocationProperties>(), DataBlockDescription.UNKNOWN_SIZE,
+         DataBlockDescription.UNKNOWN_SIZE, null, null);
    }
 
    private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {

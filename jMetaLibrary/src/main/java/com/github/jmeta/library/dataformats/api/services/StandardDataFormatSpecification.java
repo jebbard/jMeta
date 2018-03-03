@@ -135,9 +135,9 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
             realChildIds.add(new DataBlockId(m_dataFormat, replacedChildId));
          }
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
-            genericDescription.getPhysicalType(), realChildIds, genericDescription.getChildOrder(),
-            genericDescription.getFieldProperties(), locationProps, genericDescription.getMinimumByteLength(),
-            genericDescription.getMaximumByteLength(), genericDescription.getMagicKeys(), null);
+            genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(),
+            locationProps, genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(),
+            genericDescription.getMagicKeys(), null);
       }
 
       return m_dataBlockDescriptions.get(id);

@@ -40,14 +40,10 @@ public class DataBlockDescription {
     * @param magicKeys
     * @param overriddenId
     */
-   public DataBlockDescription(DataBlockId id, String name,
-      String specDescription, PhysicalDataBlockType physicalType,
-      List<DataBlockId> childIds, ChildOrder childOrder,
-      FieldProperties<?> fieldProperties,
-      Map<DataBlockId, LocationProperties> locationProperties,
-      long minimumByteLength, long maximumByteLength, List<MagicKey> magicKeys,
-      DataBlockId overriddenId) {
-      Reject.ifNull(childOrder, "childOrder");
+   public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
+      List<DataBlockId> childIds, FieldProperties<?> fieldProperties,
+      Map<DataBlockId, LocationProperties> locationProperties, long minimumByteLength, long maximumByteLength,
+      List<MagicKey> magicKeys, DataBlockId overriddenId) {
       Reject.ifNull(childIds, "childIds");
       Reject.ifNull(physicalType, "physicalType");
       Reject.ifNull(specDescription, "specDescription");
@@ -56,15 +52,13 @@ public class DataBlockDescription {
 
       if (minimumByteLength != DataBlockDescription.UNKNOWN_SIZE
          && maximumByteLength != DataBlockDescription.UNKNOWN_SIZE)
-    	  Reject.ifFalse(minimumByteLength <= maximumByteLength,
-            "minimumByteLength <= maximumByteLength");
+         Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
 
       m_id = id;
       m_name = name;
       m_specDescription = specDescription;
       m_physicalType = physicalType;
       m_childIds.addAll(childIds);
-      m_childOrder = childOrder;
       m_fieldProperties = fieldProperties;
       m_minimumByteLength = minimumByteLength;
       m_maximumByteLength = maximumByteLength;
@@ -119,14 +113,6 @@ public class DataBlockDescription {
    }
 
    /**
-    * @return the {@link ChildOrder}
-    */
-   public ChildOrder getChildOrder() {
-
-      return m_childOrder;
-   }
-
-   /**
     * @return the {@link FieldProperties}
     */
    public FieldProperties<?> getFieldProperties() {
@@ -146,11 +132,9 @@ public class DataBlockDescription {
     * @param parentId
     * @return the {@link LocationProperties}
     */
-   public LocationProperties getLocationPropertiesForParent(
-      DataBlockId parentId) {
+   public LocationProperties getLocationPropertiesForParent(DataBlockId parentId) {
 
-	  Reject.ifFalse(
-         getAllParentsForLocationProperties().contains(parentId),
+      Reject.ifFalse(getAllParentsForLocationProperties().contains(parentId),
          "getAllParentsForLocationProperties().contains(parentId)");
 
       return m_locationProperties.get(parentId);
@@ -192,12 +176,10 @@ public class DataBlockDescription {
    @Override
    public String toString() {
 
-      return getClass().getName() + "[" + "id=" + m_id + ", name=" + m_name
-         + ", specDescription=" + m_specDescription + ", physicalType="
-         + m_physicalType + ", childIds=" + m_childIds + ", childOrder="
-         + m_childOrder + ", fieldProperties=" + m_fieldProperties
-         + ", locationProperties=" + m_locationProperties + ", maximumLength="
-         + m_maximumByteLength + ", minimumLength=" + m_minimumByteLength + "]";
+      return getClass().getName() + "[" + "id=" + m_id + ", name=" + m_name + ", specDescription=" + m_specDescription
+         + ", physicalType=" + m_physicalType + ", childIds=" + m_childIds + ", fieldProperties=" + m_fieldProperties
+         + ", locationProperties=" + m_locationProperties + ", maximumLength=" + m_maximumByteLength
+         + ", minimumLength=" + m_minimumByteLength + "]";
    }
 
    /**
@@ -238,16 +220,14 @@ public class DataBlockDescription {
     * @param headerDesc
     * @return the total minimum size of the data block
     */
-   public static long getTotalMinimumSize(DataFormatSpecification spec,
-      DataBlockDescription headerDesc) {
+   public static long getTotalMinimumSize(DataFormatSpecification spec, DataBlockDescription headerDesc) {
 
       Reject.ifNull(headerDesc, "headerDesc");
       Reject.ifNull(spec, "spec");
 
       long totalMinimumSize = 0;
 
-      for (Iterator<DataBlockId> childIterator = headerDesc.getOrderedChildIds()
-         .iterator(); childIterator.hasNext();) {
+      for (Iterator<DataBlockId> childIterator = headerDesc.getOrderedChildIds().iterator(); childIterator.hasNext();) {
          DataBlockId childId = childIterator.next();
 
          DataBlockDescription childDesc = spec.getDataBlockDescription(childId);
@@ -264,9 +244,8 @@ public class DataBlockDescription {
     * @param type
     * @return a list of child {@link DataBlockDescription}s
     */
-   public static List<DataBlockDescription> getChildDescriptionsOfType(
-      DataFormatSpecification spec, DataBlockId parentId,
-      PhysicalDataBlockType type) {
+   public static List<DataBlockDescription> getChildDescriptionsOfType(DataFormatSpecification spec,
+      DataBlockId parentId, PhysicalDataBlockType type) {
 
       Reject.ifNull(spec, "spec");
       Reject.ifNull(type, "type");
@@ -280,8 +259,7 @@ public class DataBlockDescription {
          childIterator = spec.getTopLevelDataBlockIds().iterator();
 
       else {
-         DataBlockDescription parentDesc = spec
-            .getDataBlockDescription(parentId);
+         DataBlockDescription parentDesc = spec.getDataBlockDescription(parentId);
 
          childIterator = parentDesc.getOrderedChildIds().iterator();
       }
@@ -307,8 +285,6 @@ public class DataBlockDescription {
    private final PhysicalDataBlockType m_physicalType;
 
    private final List<DataBlockId> m_childIds = new ArrayList<>();
-
-   private final ChildOrder m_childOrder;
 
    private final FieldProperties<?> m_fieldProperties;
 
