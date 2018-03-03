@@ -26,6 +26,7 @@ import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -77,7 +78,6 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
       return field;
    }
 
-   // FIXME: Hier je nach Typ unterscheiden, welche Implementierung erzeugt wird
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      MediumOffset, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader, FieldFunctionStack)
@@ -89,7 +89,16 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
       Reject.ifNull(id, "id");
       Reject.ifNull(reference, "reference");
       Reject.ifNull(reader, "reader");
-      return new LazyPayload(id, reference, totalSize, reader, context);
+
+      DataFormatSpecification spec = reader.getSpecification();
+
+      DataBlockDescription desc = spec.getDataBlockDescription(id);
+
+      if (desc.getPhysicalType() == PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
+         return new ContainerBasedLazyPayload(id, reference, totalSize, reader, context);
+      } else {
+         return new FieldBasedLazyPayload(id, reference, totalSize, reader, context);
+      }
    }
 
    /**

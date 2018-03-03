@@ -15,8 +15,10 @@ import org.junit.Test;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -477,7 +479,7 @@ public abstract class AbtractDataBlockAccessorTest {
          checkHeadersFooters(nextContainer, expectedContainerId, false);
 
          // Check the payload of the container
-         checkPayload(nextContainer, expectedContainerId, j % 2 == 0);
+         checkPayload(nextContainer, expectedContainerId);
       }
 
       // There must not be any further containers
@@ -491,20 +493,27 @@ public abstract class AbtractDataBlockAccessorTest {
     *           The parent {@link Container}.
     * @param parentContainerInstanceId
     *           The {@link DataBlockInstanceId} of the parent.
-    * @param fieldsFirst
-    *           true to read child fields of the payload before child containers, false to read child containers of the
-    *           payload before child fields.
     */
-   private void checkPayload(Container parentContainer, DataBlockInstanceId parentContainerInstanceId,
-      boolean fieldsFirst) {
+   private void checkPayload(Container parentContainer, DataBlockInstanceId parentContainerInstanceId) {
 
       Payload payload = parentContainer.getPayload();
 
       Assert.assertNotNull(payload);
 
-      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
-      DataBlockInstanceId expectedPayloadId = expectationProvider
-         .getExpectedChildBlocksOfType(parentContainerInstanceId, PhysicalDataBlockType.PAYLOAD).get(0);
+      DataBlockInstanceId expectedPayloadId = null;
+      boolean hasFieldBasedPayload = false;
+
+      List<DataBlockInstanceId> fieldBasedPayloadChildren = expectationProvider
+         .getExpectedChildBlocksOfType(parentContainerInstanceId, PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+      if (fieldBasedPayloadChildren.size() > 0) {
+         expectedPayloadId = fieldBasedPayloadChildren.get(0);
+         hasFieldBasedPayload = true;
+      } else {
+         expectedPayloadId = expectationProvider
+            .getExpectedChildBlocksOfType(parentContainerInstanceId, PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)
+            .get(0);
+      }
 
       Assert.assertEquals(expectedPayloadId.getId(), payload.getId());
       // Check size of the payload
@@ -513,22 +522,12 @@ public abstract class AbtractDataBlockAccessorTest {
       // Check the bytes of the payload
       checkDataBlockBytes(payload);
 
-      // The check for fields and child containers is tested in different
-      // order in each loop pass!
-      if (fieldsFirst) {
-         // FIRST: Check all fields of the payload
-         checkFields(payload, expectedPayloadId);
-
-         // SECOND: Recursively check all child containers
-         checkContainers(payload.getContainerIterator(), expectedPayloadId, false);
+      if (hasFieldBasedPayload) {
+         checkFields((FieldBasedPayload) payload, expectedPayloadId);
       }
 
       else {
-         // FIRST: Recursively check all child containers
-         checkContainers(payload.getContainerIterator(), expectedPayloadId, false);
-
-         // SECOND: Check all fields of the payload
-         checkFields(payload, expectedPayloadId);
+         checkContainers(((ContainerBasedPayload) payload).getContainerIterator(), expectedPayloadId, false);
       }
    }
 

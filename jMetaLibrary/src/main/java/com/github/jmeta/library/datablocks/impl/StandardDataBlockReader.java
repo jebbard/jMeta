@@ -227,9 +227,11 @@ public class StandardDataBlockReader implements DataBlockReader {
       afterHeaderReading(actualId, theContext, headers);
 
       // Read payload
-      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
       List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.PAYLOAD);
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+      payloadDescs.addAll(DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
+         PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
 
       // CONFIG_CHECK: Any container must specify a single PAYLOAD block
       if (payloadDescs.size() != 1)
@@ -326,9 +328,11 @@ public class StandardDataBlockReader implements DataBlockReader {
       afterFooterReading(actualId, theContext, footers);
 
       // Read payload
-      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
       List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.PAYLOAD);
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+      payloadDescs.addAll(DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
+         PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
 
       // CONFIG_CHECK: Any container must specify a single PAYLOAD block
       if (payloadDescs.size() != 1)
@@ -534,10 +538,6 @@ public class StandardDataBlockReader implements DataBlockReader {
          PhysicalDataBlockType.FIELD);
 
       List<Field<?>> fields = new ArrayList<>();
-
-      if (reference.getAbsoluteMediumOffset() == 72095) {
-         System.out.println("TEST");
-      }
 
       MediumOffset currentFieldReference = reference;
       ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
@@ -835,7 +835,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       // The given SIZE_OF may be a total size of payload plus headers and /or footers
       // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
-      if (blockDesc.getPhysicalType().equals(PhysicalDataBlockType.PAYLOAD)) {
+      if (blockDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD_BASED_PAYLOAD)
+         || blockDesc.getPhysicalType().equals(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)) {
          long totalSizeToSubtract = 0;
 
          List<DataBlockDescription> headerAndFooterDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec,

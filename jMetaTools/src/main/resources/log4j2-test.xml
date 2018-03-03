@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Appenders>
+		<File name="File" fileName="logs/jMeta.log" append="false">
+			<PatternLayout>
+				<pattern>%d %p %C{10} [%t] %m%n</pattern>
+			</PatternLayout>
+		</File>
+	</Appenders>
+	<Loggers>
+		<!-- NOTE: If you change the level to debug, you might get large log files 
+			when working with Media, especially running all tests will take VERY long 
+			and creates GBs of logs -->
+		<Root level="info">
+			<AppenderRef ref="File" />
+		</Root>
+	</Loggers>
+</Configuration>

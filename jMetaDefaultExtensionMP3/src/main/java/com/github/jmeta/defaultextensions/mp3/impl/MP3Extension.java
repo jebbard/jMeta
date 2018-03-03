@@ -70,7 +70,7 @@ public class MP3Extension implements Extension {
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
-      return null;
+      return new ExtensionDescription("MP3", "jMeta", "1.0", null, "MP3 extension", null, null);
    }
 
    /**
@@ -232,9 +232,8 @@ public class MP3Extension implements Extension {
       payloadLocationProps.put(mp3FrameId,
          new LocationProperties(4, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(mp3PayloadId,
-         new DataBlockDescription(mp3PayloadId, "payload", "The MP3 payload", PhysicalDataBlockType.PAYLOAD,
+         new DataBlockDescription(mp3PayloadId, "payload", "The MP3 payload", PhysicalDataBlockType.FIELD_BASED_PAYLOAD,
             payloadChildIds, ChildOrder.SEQUENTIAL, null, payloadLocationProps, 1, 998, null, null));
 
       // 08. MP3 tag

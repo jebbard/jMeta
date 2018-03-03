@@ -74,7 +74,7 @@ public class APEv2Extension implements Extension {
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
-      return null;
+      return new ExtensionDescription("APEv2", "jMeta", "1.0", null, "APEv2 extension", null, null);
    }
 
    /**
@@ -402,11 +402,10 @@ public class APEv2Extension implements Extension {
       final List<DataBlockId> itemPayloadChildIds = new ArrayList<>();
       itemPayloadChildIds.add(apeV2GenericItemValueId);
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD, also in test cases
       descMap.put(apeV2GenericItemPayloadId,
          new DataBlockDescription(apeV2GenericItemPayloadId, "APEv2 item payload", "The APEv2 item payload",
-            PhysicalDataBlockType.PAYLOAD, itemPayloadChildIds, ChildOrder.SEQUENTIAL, null, itemPayloadLocationProps,
-            0, DataBlockDescription.UNKNOWN_SIZE, null, null));
+            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, itemPayloadChildIds, ChildOrder.SEQUENTIAL, null,
+            itemPayloadLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 9. APEv2 item
       final List<DataBlockId> itemChildIds = new ArrayList<>();
@@ -437,11 +436,10 @@ public class APEv2Extension implements Extension {
       payloadLocationProps.put(apeV2TagId,
          new LocationProperties(4, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // FIXME: Change to CONTAINER_BASED_PAYLOAD, also in test cases
       descMap.put(apeV2PayloadId,
-         new DataBlockDescription(apeV2PayloadId, "APEv2 payload", "The APEv2 payload", PhysicalDataBlockType.PAYLOAD,
-            payloadChildIds, ChildOrder.SEQUENTIAL, null, payloadLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE,
-            null, null));
+         new DataBlockDescription(apeV2PayloadId, "APEv2 payload", "The APEv2 payload",
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, ChildOrder.SEQUENTIAL, null,
+            payloadLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 11. APEv2 tag
 

@@ -13,7 +13,6 @@ package com.github.jmeta.library.dataformats.api.types;
 public enum PhysicalDataBlockType {
    FIELD_BASED_PAYLOAD,
    CONTAINER_BASED_PAYLOAD,
-   PAYLOAD,
    FIELD,
    HEADER,
    FOOTER,

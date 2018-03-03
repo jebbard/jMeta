@@ -11,8 +11,8 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
@@ -23,8 +23,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
-public class PayloadContainerIterator
-   extends AbstractDataBlockIterator<Container> {
+public class PayloadContainerIterator extends AbstractDataBlockIterator<Container> {
 
    /**
     * Creates a new instance of {@link PayloadContainerIterator}.
@@ -33,11 +32,9 @@ public class PayloadContainerIterator
     * @param reader
     * @param reference
     * @param context
-    * @param previousFieldSize
     */
-   public PayloadContainerIterator(Payload parent, DataBlockReader reader,
-      MediumOffset reference, FieldFunctionStack context,
-      long previousFieldSize) {
+   public PayloadContainerIterator(Payload parent, DataBlockReader reader, MediumOffset reference,
+      FieldFunctionStack context) {
       Reject.ifNull(parent, "parent");
       Reject.ifNull(reader, "reader");
       Reject.ifNull(reference, "reference");
@@ -47,10 +44,9 @@ public class PayloadContainerIterator
       m_nextContainerReference = reference;
       m_reader = reader;
       m_context = context;
-      m_remainingParentSize = m_parent.getTotalSize() - previousFieldSize;
+      m_remainingParentSize = m_parent.getTotalSize();
 
-      m_containerDescs = DataBlockDescription.getChildDescriptionsOfType(
-         m_reader.getSpecification(), m_parent.getId(),
+      m_containerDescs = DataBlockDescription.getChildDescriptionsOfType(m_reader.getSpecification(), m_parent.getId(),
          PhysicalDataBlockType.CONTAINER);
    }
 
@@ -64,21 +60,15 @@ public class PayloadContainerIterator
       // payload => no further children available
       long remainingParentByteCount = DataBlockDescription.UNKNOWN_SIZE;
 
-      if (m_parent.getId().getGlobalId().equals("ogg.payload")) {
-         System.out.println("OGG payload");
-      }
-
       if (m_parent.getTotalSize() != DataBlockDescription.UNKNOWN_SIZE) {
-         remainingParentByteCount = m_parent.getTotalSize()
-            - (m_nextContainerReference.getAbsoluteMediumOffset()
-               - m_parent.getMediumReference().getAbsoluteMediumOffset());
+         remainingParentByteCount = m_parent.getTotalSize() - (m_nextContainerReference.getAbsoluteMediumOffset()
+            - m_parent.getMediumReference().getAbsoluteMediumOffset());
 
          if (remainingParentByteCount <= 0)
             return false;
       }
 
-      long minHeaderSize = m_reader
-         .getShortestMinimumContainerHeaderSize(m_parent.getId());
+      long minHeaderSize = m_reader.getShortestMinimumContainerHeaderSize(m_parent.getId());
 
       if (minHeaderSize != DataBlockDescription.UNKNOWN_SIZE)
          try {
@@ -92,8 +82,8 @@ public class PayloadContainerIterator
       for (int i = 0; i < m_containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = m_containerDescs.get(i);
 
-         if (m_reader.hasContainerWithId(m_nextContainerReference,
-            containerDesc.getId(), m_parent, remainingParentByteCount))
+         if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
+            remainingParentByteCount))
             return true;
       }
 
@@ -108,24 +98,18 @@ public class PayloadContainerIterator
    @Override
    public Container next() {
 
-	   Reject.ifFalse(hasNext(), "hasNext()");
-
-      if (m_parent.getId().getGlobalId().equals("ogg.payload")) {
-         System.out.println("OGG payload");
-      }
+      Reject.ifFalse(hasNext(), "hasNext()");
 
       for (int i = 0; i < m_containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = m_containerDescs.get(i);
 
-         if (m_reader.hasContainerWithId(m_nextContainerReference,
-            containerDesc.getId(), m_parent, m_remainingParentSize)) {
-            Container container = m_reader.readContainerWithId(
-               m_nextContainerReference, containerDesc.getId(), m_parent,
-               m_context, m_remainingParentSize);
+         if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
+            m_remainingParentSize)) {
+            Container container = m_reader.readContainerWithId(m_nextContainerReference, containerDesc.getId(),
+               m_parent, m_context, m_remainingParentSize);
 
             if (container != null) {
-               m_nextContainerReference = m_nextContainerReference
-                  .advance(container.getTotalSize());
+               m_nextContainerReference = m_nextContainerReference.advance(container.getTotalSize());
 
                if (m_remainingParentSize != DataBlockDescription.UNKNOWN_SIZE)
                   m_remainingParentSize -= container.getTotalSize();
@@ -135,8 +119,8 @@ public class PayloadContainerIterator
          }
       }
 
-      throw new IllegalStateException("No child container found for payload "
-         + m_parent + " at " + m_nextContainerReference);
+      throw new IllegalStateException(
+         "No child container found for payload " + m_parent + " at " + m_nextContainerReference);
    }
 
    private final FieldFunctionStack m_context;

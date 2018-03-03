@@ -138,10 +138,10 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
             // System.out.println("CRC NOT present: " + protectionBit);
             // System.out.println("Total size = " + totalPayloadSize);
 
-            // FIXME: Change to FIELD_BASED_PAYLOAD
-            context.pushFieldFunction(DataBlockDescription
-               .getChildDescriptionsOfType(getSpecification(), containerId, PhysicalDataBlockType.PAYLOAD).get(0)
-               .getId(), FieldFunctionType.SIZE_OF, totalPayloadSize);
+            context.pushFieldFunction(
+               DataBlockDescription.getChildDescriptionsOfType(getSpecification(), containerId,
+                  PhysicalDataBlockType.FIELD_BASED_PAYLOAD).get(0).getId(),
+               FieldFunctionType.SIZE_OF, totalPayloadSize);
          } catch (BinaryValueConversionException e) {
             throw new RuntimeException("No conversion possible", e);
          }

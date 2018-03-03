@@ -37,13 +37,12 @@ public class OggDataBlockReader extends StandardDataBlockReader {
    @Override
    protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD
       if (containerId.getGlobalId().equals("ogg")) {
-         final DataBlockId packetPayloadId = DataBlockDescription
-            .getChildDescriptionsOfType(getSpecification(), PACKET_CONTAINER_ID, PhysicalDataBlockType.PAYLOAD).get(0)
-            .getId();
+         final DataBlockId packetPayloadId = DataBlockDescription.getChildDescriptionsOfType(getSpecification(),
+            PACKET_CONTAINER_ID, PhysicalDataBlockType.FIELD_BASED_PAYLOAD).get(0).getId();
          final DataBlockId oggPagePayloadId = DataBlockDescription
-            .getChildDescriptionsOfType(getSpecification(), containerId, PhysicalDataBlockType.PAYLOAD).get(0).getId();
+            .getChildDescriptionsOfType(getSpecification(), containerId, PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)
+            .get(0).getId();
          final DataBlockId segmentFieldId = DataBlockDescription
             .getChildDescriptionsOfType(getSpecification(), packetPayloadId, PhysicalDataBlockType.FIELD).get(0)
             .getId();

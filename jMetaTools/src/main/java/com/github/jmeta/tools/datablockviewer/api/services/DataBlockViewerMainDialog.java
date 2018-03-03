@@ -34,7 +34,9 @@ import javax.swing.tree.DefaultTreeModel;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -206,9 +208,11 @@ public class DataBlockViewerMainDialog extends JFrame {
 
          parent.add(payloadNode);
 
-         fillInContainer(payload.getContainerIterator(), payloadNode);
-
-         fillInFields(payloadNode, payload.getFields());
+         if (payload instanceof ContainerBasedPayload) {
+            fillInContainer(((ContainerBasedPayload) payload).getContainerIterator(), payloadNode);
+         } else {
+            fillInFields(payloadNode, ((FieldBasedPayload) payload).getFields());
+         }
 
          fillInHeaders(nextOne, nextOne.getFooters(), tagNode);
       }

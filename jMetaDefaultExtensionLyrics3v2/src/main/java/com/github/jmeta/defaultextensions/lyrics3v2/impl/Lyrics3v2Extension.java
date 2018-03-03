@@ -74,7 +74,7 @@ public class Lyrics3v2Extension implements Extension {
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
-      return null;
+      return new ExtensionDescription("Lyrics3v2", "jMeta", "1.0", null, "Lyrics3v2 extension", null, null);
    }
 
    /**
@@ -295,11 +295,10 @@ public class Lyrics3v2Extension implements Extension {
       final List<DataBlockId> fieldPayloadChildIds = new ArrayList<>();
       fieldPayloadChildIds.add(lyrics3V2GenericFieldPayloadDataId);
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(lyrics3V2GenericFieldPayloadId,
          new DataBlockDescription(lyrics3V2GenericFieldPayloadId, "Lyrics3v2 field payload",
-            "The Lyrics3v2 field payload", PhysicalDataBlockType.PAYLOAD, fieldPayloadChildIds, ChildOrder.SEQUENTIAL,
-            null, fieldPayloadLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null, null));
+            "The Lyrics3v2 field payload", PhysicalDataBlockType.FIELD_BASED_PAYLOAD, fieldPayloadChildIds,
+            ChildOrder.SEQUENTIAL, null, fieldPayloadLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 10. Lyrics3v2 field
       final List<DataBlockId> fieldChildIds = new ArrayList<>();
@@ -331,11 +330,10 @@ public class Lyrics3v2Extension implements Extension {
       payloadLocationProps.put(lyrics3V2TagId, new LocationProperties(HEADER_BYTE_LENGTH, 1, 1,
          DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // FIXME: Change to CONTAINER_BASED_PAYLOAD
       descMap.put(lyrics3V2PayloadId,
          new DataBlockDescription(lyrics3V2PayloadId, "Lyrics3v2 payload", "The Lyrics3v2 payload",
-            PhysicalDataBlockType.PAYLOAD, payloadChildIds, ChildOrder.SEQUENTIAL, null, payloadLocationProps, 0,
-            DataBlockDescription.UNKNOWN_SIZE, null, null));
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, ChildOrder.SEQUENTIAL, null,
+            payloadLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 12. Lyrics3v2 tag
       final List<DataBlockId> tagChildIds = new ArrayList<>();

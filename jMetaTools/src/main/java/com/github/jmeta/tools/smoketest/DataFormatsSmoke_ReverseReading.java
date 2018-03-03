@@ -20,7 +20,9 @@ import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionE
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
@@ -124,9 +126,11 @@ public class DataFormatsSmoke_ReverseReading {
 
          System.out.println(prependWith + "\tPayload: " + payload);
 
-         printFields(payload.getFields(), level + 2);
-
-         printContainers(payload.getContainerIterator(), level + 2);
+         if (payload instanceof ContainerBasedPayload) {
+            printContainers(((ContainerBasedPayload) payload).getContainerIterator(), level + 2);
+         } else {
+            printFields(((FieldBasedPayload) payload).getFields(), level + 2);
+         }
       }
    }
 

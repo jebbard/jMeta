@@ -147,7 +147,7 @@ public class ID3v23Extension implements Extension {
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
-      return null;
+      return new ExtensionDescription("ID3v23", "jMeta", "1.0", null, "ID3v23 extension", null, null);
    }
 
    /**
@@ -193,8 +193,8 @@ public class ID3v23Extension implements Extension {
       FieldProperties<?> concreteFieldProperties = genericDesc.getFieldProperties();
 
       // Add payload children, if this is a PAYLOAD block
-      // FIXME: Change to FIELD_BASED_PAYLOAD or CONTAINER_BASED_PAYLOAD
-      if (genericDesc.getPhysicalType().equals(PhysicalDataBlockType.PAYLOAD))
+      if (genericDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD_BASED_PAYLOAD)
+         || genericDesc.getPhysicalType().equals(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD))
          if (concretePayloadChildren != null) {
             for (int i = 0; i < concretePayloadChildren.size(); ++i) {
                DataBlockId concretePayloadChildId = concretePayloadChildren.get(i);
@@ -578,13 +578,13 @@ public class ID3v23Extension implements Extension {
       genericFramePayloadLocationProps.put(GENERIC_FRAME_ID,
          new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD
-      descMap.put(GENERIC_FRAME_PAYLOAD_ID, new DataBlockDescription(GENERIC_FRAME_PAYLOAD_ID, "Generic frame payload",
-         "The generic frame payload", PhysicalDataBlockType.PAYLOAD, genericFramePayloadChildIds, ChildOrder.SEQUENTIAL,
-         new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
-            DataBlockDescription.UNKNOWN_SIZE, null, null, Byte.valueOf((byte) 0x80), Byte.valueOf((byte) 0xFF), null,
-            null, null, null),
-         genericFramePayloadLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null));
+      descMap.put(GENERIC_FRAME_PAYLOAD_ID,
+         new DataBlockDescription(GENERIC_FRAME_PAYLOAD_ID, "Generic frame payload", "The generic frame payload",
+            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, genericFramePayloadChildIds, ChildOrder.SEQUENTIAL,
+            new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
+               DataBlockDescription.UNKNOWN_SIZE, null, null, Byte.valueOf((byte) 0x80), Byte.valueOf((byte) 0xFF),
+               null, null, null, null),
+            genericFramePayloadLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null));
    }
 
    /**
@@ -759,10 +759,9 @@ public class ID3v23Extension implements Extension {
       paddingPayloadLocationProps.put(PADDING_ID,
          new LocationProperties(1, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(PADDING_PAYLOAD_ID,
          new DataBlockDescription(PADDING_PAYLOAD_ID, "Padding payload", "Padding payload",
-            PhysicalDataBlockType.PAYLOAD, paddingPayloadChildIds, ChildOrder.SEQUENTIAL, null,
+            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, paddingPayloadChildIds, ChildOrder.SEQUENTIAL, null,
             paddingPayloadLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 4. Padding Container
@@ -801,11 +800,10 @@ public class ID3v23Extension implements Extension {
       payloadLocationProps.put(ID3V23_TAG_ID,
          new LocationProperties(10, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // FIXME: Change to CONTAINER_BASED_PAYLOAD
       descMap.put(ID3V23_PAYLOAD_ID,
-         new DataBlockDescription(ID3V23_PAYLOAD_ID, "payload", "The id3v23 payload", PhysicalDataBlockType.PAYLOAD,
-            payloadChildIds, ChildOrder.UNORDERED, null, payloadLocationProps, 11, DataBlockDescription.UNKNOWN_SIZE,
-            null, null));
+         new DataBlockDescription(ID3V23_PAYLOAD_ID, "payload", "The id3v23 payload",
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, ChildOrder.UNORDERED, null,
+            payloadLocationProps, 11, DataBlockDescription.UNKNOWN_SIZE, null, null));
    }
 
    /**

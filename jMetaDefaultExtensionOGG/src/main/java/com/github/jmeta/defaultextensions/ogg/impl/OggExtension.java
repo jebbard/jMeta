@@ -66,7 +66,7 @@ public class OggExtension implements Extension {
     */
    @Override
    public ExtensionDescription getExtensionDescription() {
-      return null;
+      return new ExtensionDescription("Ogg", "jMeta", "1.0", null, "Ogg extension", null, null);
    }
 
    /**
@@ -290,11 +290,10 @@ public class OggExtension implements Extension {
       final List<DataBlockId> packetChildIds = new ArrayList<>();
       packetChildIds.add(oggSegmentId);
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(oggPacketPartId,
-         new DataBlockDescription(oggPacketPartId, "Ogg packet", "Ogg packet", PhysicalDataBlockType.PAYLOAD,
-            packetChildIds, ChildOrder.SEQUENTIAL, null, packetLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE,
-            null, null));
+         new DataBlockDescription(oggPacketPartId, "Ogg packet", "Ogg packet",
+            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, packetChildIds, ChildOrder.SEQUENTIAL, null, packetLocationProps,
+            1, DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 12. Ogg segment
       final Map<DataBlockId, LocationProperties> segmentLocationProps = new HashMap<>();
@@ -320,10 +319,10 @@ public class OggExtension implements Extension {
 
       pagePayloadChildIds.add(oggPacketPartContainerId);
 
-      // FIXME: Change to FIELD_BASED_PAYLOAD
       descMap.put(oggPayloadId,
-         new DataBlockDescription(oggPayloadId, "Ogg page payload", "Ogg page payload", PhysicalDataBlockType.PAYLOAD,
-            pagePayloadChildIds, ChildOrder.SEQUENTIAL, null, pagePayloadLocationProps, 0, 9999999, null, null));
+         new DataBlockDescription(oggPayloadId, "Ogg page payload", "Ogg page payload",
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, pagePayloadChildIds, ChildOrder.SEQUENTIAL, null,
+            pagePayloadLocationProps, 0, 9999999, null, null));
 
       // 14. Ogg page
 

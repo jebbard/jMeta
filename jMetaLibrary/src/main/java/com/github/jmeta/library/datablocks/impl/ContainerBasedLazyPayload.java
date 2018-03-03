@@ -1,21 +1,19 @@
 /**
  *
- * {@link FieldBasedLazyPayload}.java
+ * {@link ContainerBasedLazyPayload}.java
  *
  * @author Jens Ebert
  *
- * @date 02.03.2018
+ * @date 03.03.2018
  *
  */
 package com.github.jmeta.library.datablocks.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.types.Field;
-import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
+import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -23,14 +21,12 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link FieldBasedLazyPayload} is the default implementation of {@link FieldBasedPayload}. It lazily reads fields when
- * first requested.
+ * {@link ContainerBasedLazyPayload} is the default implementation of {@link ContainerBasedPayload}. It lazily reads
+ * child containers by providing a corresponding iterator when first requested.
  */
-public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBasedPayload {
+public class ContainerBasedLazyPayload extends AbstractDataBlock implements ContainerBasedPayload {
 
    private long totalSize;
-
-   private List<Field<?>> fields;
 
    private final FieldFunctionStack context;
 
@@ -48,31 +44,30 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     * @param context
     *           The current {@link FieldFunctionStack} context needed for parsing
     */
-   public FieldBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader,
-      FieldFunctionStack context) {
+   public ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize,
+      DataBlockReader dataBlockReader, FieldFunctionStack context) {
       super(id, null, offset, dataBlockReader);
 
       Reject.ifNull(context, "context");
 
       this.context = context;
 
+      this.totalSize = totalSize;
+
       // The size of the payload is still unknown - There is no other way than to read
-      // its children and sum up their sizes
+      // its children and sum up their sizes...
       if (totalSize == DataBlockDescription.UNKNOWN_SIZE) {
          long summedUpTotalSize = 0;
-         List<Field<?>> fields = getFields();
 
-         for (int i = 0; i < fields.size(); ++i) {
-            Field<?> field = fields.get(i);
+         AbstractDataBlockIterator<Container> containerIter = getContainerIterator();
 
-            summedUpTotalSize += field.getTotalSize();
+         while (containerIter.hasNext()) {
+            Container container = containerIter.next();
+
+            summedUpTotalSize += container.getTotalSize();
          }
 
          this.totalSize = summedUpTotalSize;
-      }
-
-      else {
-         this.totalSize = totalSize;
       }
    }
 
@@ -81,40 +76,14 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     */
    @Override
    public long getTotalSize() {
-      return totalSize;
+      return this.totalSize;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.FieldSequence#getFields()
+    * @see com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload#getContainerIterator()
     */
    @Override
-   public List<Field<?>> getFields() {
-      if (this.fields == null) {
-         this.fields = new ArrayList<>();
-
-         MediumOffset fieldReference = getMediumReference();
-
-         if (this.totalSize > 0) {
-            List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), this.context,
-               this.totalSize);
-
-            for (int i = 0; i < readFields.size(); ++i) {
-               Field<?> field = readFields.get(i);
-
-               addField(field);
-            }
-         }
-      }
-
-      return this.fields;
-   }
-
-   private void addField(Field<?> field) {
-
-      Reject.ifNull(field, "field");
-
-      field.initParent(this);
-
-      this.fields.add(field);
+   public AbstractDataBlockIterator<Container> getContainerIterator() {
+      return new PayloadContainerIterator(this, getDataBlockReader(), getMediumReference(), this.context);
    }
 }
