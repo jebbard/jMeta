@@ -8,13 +8,13 @@
 package com.github.jmeta.library.datablocks.api.exceptions;
 
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
- * Thrown whenever the {@link DataFormat} of a top-level {@link DataBlock} within a {@link AbstractMedium} is unknown.
- * I.e. whenever a {@link AbstractMedium} contains at least one top-level data block whose {@link DataFormat} could not
+ * Thrown whenever the {@link ContainerDataFormat} of a top-level {@link DataBlock} within a {@link AbstractMedium} is unknown.
+ * I.e. whenever a {@link AbstractMedium} contains at least one top-level data block whose {@link ContainerDataFormat} could not
  * be identified, this exception is thrown.
  */
 public class UnknownDataFormatException extends RuntimeException {

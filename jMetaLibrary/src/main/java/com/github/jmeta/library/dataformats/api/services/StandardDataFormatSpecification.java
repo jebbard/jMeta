@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -51,7 +51,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * @param supportedCharacterEncodings
     * @param transformations
     */
-   public StandardDataFormatSpecification(DataFormat dataFormat,
+   public StandardDataFormatSpecification(ContainerDataFormat dataFormat,
       Map<DataBlockId, DataBlockDescription> dataBlockDescriptions, Set<DataBlockId> topLevelDataBlockIds,
       Set<DataBlockId> genericDataBlocks, Set<DataBlockId> paddingDataBlocks, List<ByteOrder> supportedByteOrders,
       List<Charset> supportedCharacterEncodings, List<DataTransformationType> transformations) {
@@ -147,7 +147,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecification#getDataFormat()
     */
    @Override
-   public DataFormat getDataFormat() {
+   public ContainerDataFormat getDataFormat() {
 
       return m_dataFormat;
    }
@@ -291,7 +291,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
    private final List<Charset> m_supportedCharacterEncodings = new ArrayList<>();
 
-   private final DataFormat m_dataFormat;
+   private final ContainerDataFormat m_dataFormat;
 
    private final Set<DataBlockId> m_topLevelDataBlockIds = new HashSet<>();
 

@@ -3,7 +3,7 @@ package com.github.jmeta.library.datablocks.api.services;
 import java.util.List;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 
 /**
  * {@link DataBlockService}
@@ -12,9 +12,9 @@ import com.github.jmeta.library.dataformats.api.types.DataFormat;
 public interface DataBlockService {
 
    /**
-    * @return the {@link DataFormat}
+    * @return the {@link ContainerDataFormat}
     */
-   public DataFormat getDataFormat();
+   public ContainerDataFormat getDataFormat();
 
    /**
     * @return null to indicate usage of the default {@link ExtendedDataBlockFactory}

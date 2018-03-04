@@ -19,14 +19,14 @@ import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
  * {@link AbstractMediumExpectationProvider} provides expected test data for a single top-level data block of a single
- * {@link DataFormat} for testing {@link DataBlockAccessor} instances.
+ * {@link ContainerDataFormat} for testing {@link DataBlockAccessor} instances.
  */
 public abstract class AbstractMediumExpectationProvider {
 
@@ -176,14 +176,14 @@ public abstract class AbstractMediumExpectationProvider {
    }
 
    /**
-    * Returns the {@link DataFormatSpecification} corresponding to the given {@link DataFormat}.
+    * Returns the {@link DataFormatSpecification} corresponding to the given {@link ContainerDataFormat}.
     * 
     * @param format
-    *           The {@link DataFormat}
+    *           The {@link ContainerDataFormat}
     *
-    * @return the {@link DataFormatSpecification} corresponding to the given {@link DataFormat}.
+    * @return the {@link DataFormatSpecification} corresponding to the given {@link ContainerDataFormat}.
     */
-   protected DataFormatSpecification getDataFormatSpecification(DataFormat format) {
+   protected DataFormatSpecification getDataFormatSpecification(ContainerDataFormat format) {
 
       return dataFormatRepository.getDataFormatSpecification(format);
    }
@@ -193,7 +193,7 @@ public abstract class AbstractMediumExpectationProvider {
     * 
     * @return the overall supported data formats.
     */
-   protected Set<DataFormat> getSupportedDataFormats() {
+   protected Set<ContainerDataFormat> getSupportedDataFormats() {
 
       return dataFormatRepository.getSupportedDataFormats();
    }

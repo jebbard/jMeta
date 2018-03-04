@@ -5,5 +5,6 @@
     "sec:COMPdataFormatsDesign"
     "sec:FormatComparison"
     "sec:TheContainerMetamodel"
-    "fig:II_GeneralModel")))
+    "fig:II_GeneralModel"
+    "sec:RepresentingaDataFormat")))
 

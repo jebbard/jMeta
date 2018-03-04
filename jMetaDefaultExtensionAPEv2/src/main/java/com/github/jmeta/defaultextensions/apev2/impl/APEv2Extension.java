@@ -26,7 +26,7 @@ import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -57,7 +57,7 @@ public class APEv2Extension implements Extension {
    /**
     *
     */
-   public static final DataFormat APEv2 = new DataFormat("APEv2", new HashSet<String>(), new HashSet<String>(),
+   public static final ContainerDataFormat APEv2 = new ContainerDataFormat("APEv2", new HashSet<String>(), new HashSet<String>(),
       new ArrayList<String>(), "", new Date());
 
    /**

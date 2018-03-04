@@ -24,7 +24,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
@@ -49,7 +49,7 @@ public class ID3v1Extension implements Extension {
    /**
     *
     */
-   public static final DataFormat ID3v1 = new DataFormat("ID3v1", new HashSet<String>(), new HashSet<String>(),
+   public static final ContainerDataFormat ID3v1 = new ContainerDataFormat("ID3v1", new HashSet<String>(), new HashSet<String>(),
       new ArrayList<String>(), "M. Nilsson", new Date());
 
    /**

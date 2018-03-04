@@ -25,7 +25,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -280,7 +280,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
          String rowPrefix = "[ROW " + (rowCounter + rowOffset) + " of csv resource <"
             + CSV_READER.getCurrentCsvResource().getName() + ">] - ";
 
-         DataFormat dataFormat = processDataFormat(nextRow, rowPrefix);
+         ContainerDataFormat dataFormat = processDataFormat(nextRow, rowPrefix);
 
          DataBlockId id = processId(dataFormat, nextRow, rowPrefix);
 
@@ -307,19 +307,19 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
     * @param rowPrefix
     *           A string prefix describing the current row for informational output in error messages.
     *
-    * @return The {@link DataFormat}.
+    * @return The {@link ContainerDataFormat}.
     * @throws InvalidTestDataCsvFormatException
     *            If test data in the csv file is invalid.
     */
-   private DataFormat processDataFormat(Map<String, String> row, String rowPrefix)
+   private ContainerDataFormat processDataFormat(Map<String, String> row, String rowPrefix)
       throws InvalidTestDataCsvFormatException {
 
-      Set<DataFormat> dataFormats = getSupportedDataFormats();
+      Set<ContainerDataFormat> dataFormats = getSupportedDataFormats();
 
       String dfName = row.get(COL_DATA_FORMAT);
 
-      for (Iterator<DataFormat> iterator = dataFormats.iterator(); iterator.hasNext();) {
-         DataFormat dataFormat2 = iterator.next();
+      for (Iterator<ContainerDataFormat> iterator = dataFormats.iterator(); iterator.hasNext();) {
+         ContainerDataFormat dataFormat2 = iterator.next();
 
          if (dataFormat2.getName().equals(dfName))
             return dataFormat2;
@@ -334,7 +334,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
     * row.
     *
     * @param dataFormat
-    *           The {@link DataFormat} expected in the data.
+    *           The {@link ContainerDataFormat} expected in the data.
     * @param row
     *           The row in the csv file, column contents mapped to column names.
     * @param rowPrefix
@@ -343,7 +343,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
     * @throws InvalidTestDataCsvFormatException
     *            If test data in the csv file is invalid.
     */
-   private DataBlockId processId(DataFormat dataFormat, Map<String, String> row, String rowPrefix)
+   private DataBlockId processId(ContainerDataFormat dataFormat, Map<String, String> row, String rowPrefix)
       throws InvalidTestDataCsvFormatException {
 
       String idString = row.get(COL_ID);

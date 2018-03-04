@@ -14,12 +14,12 @@ import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
- * Represents the complete specification of a single {@link DataFormat}. The specification contains all
- * {@link DataBlockDescription}s for the {@link DataFormat}.
+ * Represents the complete specification of a single {@link ContainerDataFormat}. The specification contains all
+ * {@link DataBlockDescription}s for the {@link ContainerDataFormat}.
  */
 public interface DataFormatSpecification {
 
@@ -31,7 +31,7 @@ public interface DataFormatSpecification {
    /**
     * @return the data format
     */
-   public DataFormat getDataFormat();
+   public ContainerDataFormat getDataFormat();
 
    /**
     * @param id

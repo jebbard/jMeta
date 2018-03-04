@@ -38,7 +38,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -700,7 +700,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(ContainerDataFormat)
     */
    @Override
    public Map<DataTransformationType, TransformationHandler> getTransformationHandlers() {
@@ -709,7 +709,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(DataFormat,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(ContainerDataFormat,
     *      DataTransformationType, com.github.jmeta.library.datablocks.api.services.TransformationHandler)
     */
    @Override

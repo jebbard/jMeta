@@ -31,7 +31,7 @@ public class DataBlockId {
     * @param parent
     * @param localId
     */
-   public DataBlockId(DataFormat dataFormat, DataBlockId parent,
+   public DataBlockId(ContainerDataFormat dataFormat, DataBlockId parent,
       String localId) {
       Reject.ifNull(localId, "localId");
       Reject.ifNull(parent, "parent");
@@ -49,7 +49,7 @@ public class DataBlockId {
     * @param dataFormat
     * @param segments
     */
-   public DataBlockId(DataFormat dataFormat, List<String> segments) {
+   public DataBlockId(ContainerDataFormat dataFormat, List<String> segments) {
       Reject.ifNull(segments, "segments");
       Reject.ifTrue(segments.isEmpty(),
          "segments.isEmpty()");
@@ -65,7 +65,7 @@ public class DataBlockId {
     * @param dataFormat
     * @param globalId
     */
-   public DataBlockId(DataFormat dataFormat, String globalId) {
+   public DataBlockId(ContainerDataFormat dataFormat, String globalId) {
       Reject.ifNull(globalId, "globalId");
 
       m_globalId = globalId;
@@ -103,7 +103,7 @@ public class DataBlockId {
     *
     * @return dataFormat
     */
-   public DataFormat getDataFormat() {
+   public ContainerDataFormat getDataFormat() {
 
       return m_dataFormat;
    }
@@ -144,7 +144,7 @@ public class DataBlockId {
 
    private final List<String> m_idSegments = new ArrayList<>();
 
-   private final DataFormat m_dataFormat;
+   private final ContainerDataFormat m_dataFormat;
 
    /**
     * @see java.lang.Object#hashCode()

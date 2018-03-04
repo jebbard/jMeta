@@ -171,6 +171,26 @@ The only disadvantage possibly to be identified that there could be padding just
 }
 %%%% <-- DD %%%%
 
+% =======================================================================================================
+\subsection{Representing a Data Format}%
+\label{sec:RepresentingaDataFormat}%
+
+Data Formats need some kind of representation:
+%%%% DD --> %%%%
+\DD{dd:506}
+{% Title
+Class for data formats and especially for container formats
+}
+{% Short description
+There is a base class called \texttt{AbstractDataFormat} representing a general data format, which has a subclass called \texttt{ContainerDataFormat} that is used for all data formats listed in \SectionLink{sec:FormatComparison}. Each individual format is represented as an instance of \texttt{ContainerDataFormat}. These two classes are neither enums nor ``dynamic enums'', but just plain old java classes.
+}
+{% Rationale
+We need some way to identify which data format a container belongs to. A class allows to store additional format-wide properties for logging or even with a functional notion behind. Why not using an enum to identify each supported data format? Because enums are static, and we do not want to change the enum whenever a new format comes around. And it is not clear which formats are out there by 3rd party. A dynamic enum pattern is unnecessarily complexity here, so just a plain class. Why a just an instance of \texttt{ContainerDataFormat} rather than a new subclass for each format supported? First of all, data formats must be used as tokens by end-users of the library to refer to which tags or containers they want  to read. Creating a new sub-class instance everytime they want to have a token is strange. Instead, they can use a public constant instance as token. The next question: Why at all a \texttt{ContainerDataFormat} subclass? The reason is that \LibName{} might want to support even more different formats in future, e.g. XML. This can be a sibling subclass of \texttt{AbstractDataFormat}. From now on, everything described in this section is only covering container data formats.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 %###############################################################################################
 %###############################################################################################

@@ -26,7 +26,7 @@ import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
@@ -78,7 +78,7 @@ public class DataFormatsSmoke_ReverseReading {
          System.out.println("All data blocks in the AbstractMedium: " + medium);
          System.out.println("***********************************************************************");
 
-         printContainers(accessor.getReverseContainerIterator(medium, new ArrayList<DataFormat>(), false),
+         printContainers(accessor.getReverseContainerIterator(medium, new ArrayList<ContainerDataFormat>(), false),
             Integer.valueOf(1));
       }
    }
@@ -89,8 +89,8 @@ public class DataFormatsSmoke_ReverseReading {
 
       int index = 0;
 
-      for (Iterator<DataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
-         DataFormat dataFormat = iterator.next();
+      for (Iterator<ContainerDataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
+         ContainerDataFormat dataFormat = iterator.next();
 
          System.out.println("TEST Data format " + index + ": " + dataFormat);
 
@@ -156,7 +156,7 @@ public class DataFormatsSmoke_ReverseReading {
       }
    }
 
-   private final static Map<File, DataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, DataFormat>();
+   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, ContainerDataFormat>();
 
    static {
       TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);

@@ -24,7 +24,7 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -57,7 +57,7 @@ public class Lyrics3v2Extension implements Extension {
    /**
     *
     */
-   public static final DataFormat LYRICS3v2 = new DataFormat("Lyrics3v2", new HashSet<String>(), new HashSet<String>(),
+   public static final ContainerDataFormat LYRICS3v2 = new ContainerDataFormat("Lyrics3v2", new HashSet<String>(), new HashSet<String>(),
       new ArrayList<String>(), "", new Date());
 
    /**

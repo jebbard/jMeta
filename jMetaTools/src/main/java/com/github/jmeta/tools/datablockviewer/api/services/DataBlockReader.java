@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
 import com.github.jmeta.library.datablocks.api.types.Container;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -42,7 +42,7 @@ public class DataBlockReader {
 
       DataBlockAccessor accessor = m_context.getDataBlockAccessor();
 
-      return accessor.getContainerIterator(new FileMedium(file.toPath(), true), new ArrayList<DataFormat>(), false);
+      return accessor.getContainerIterator(new FileMedium(file.toPath(), true), new ArrayList<ContainerDataFormat>(), false);
    }
 
    private final LibraryJMeta m_context = LibraryJMeta.getLibrary();

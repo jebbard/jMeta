@@ -13,6 +13,7 @@ payload regions of the figure without potential outer whitespace).
 from sys import argv
 from os.path import join, sys
 from pdf import PdfFileWriter, PdfFileReader
+from generic import FloatObject
 from re import findall
 
 
@@ -137,6 +138,12 @@ def cropPDFPagePowerpoint(page, widthAmount, heightAmount):
     #    that FreePDF added.
     widthToScale = page.cropBox.getUpperRight_x()
     heightToScale = page.cropBox.getUpperRight_y()
+
+    if type(heightToScale) is FloatObject:
+        heightToScale = float(heightToScale.__repr__())
+
+    print "YUMMY: ", heightToScale, type(heightToScale)
+    print "HUMMY: ", heightAmount, type(heightAmount)
 
     page.cropBox.setLowerLeft([
         0,

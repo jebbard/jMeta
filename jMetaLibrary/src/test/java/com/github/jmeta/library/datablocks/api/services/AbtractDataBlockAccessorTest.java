@@ -24,7 +24,7 @@ import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
@@ -353,9 +353,9 @@ public abstract class AbtractDataBlockAccessorTest {
    protected abstract Path getFileForMediaContents();
 
    /**
-    * Creates an {@link AbstractMediumExpectationProvider} instance for the given {@link DataFormat}.
+    * Creates an {@link AbstractMediumExpectationProvider} instance for the given {@link ContainerDataFormat}.
     *
-    * @return an {@link AbstractMediumExpectationProvider} instance for the given {@link DataFormat}.
+    * @return an {@link AbstractMediumExpectationProvider} instance for the given {@link ContainerDataFormat}.
     * @throws InvalidTestDataCsvFormatException
     *            if the test data could not be read.
     */
@@ -399,7 +399,7 @@ public abstract class AbtractDataBlockAccessorTest {
     */
    private void assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
       AbstractDataBlockIterator<Container> topLevelContainerIterator = getTestling().getContainerIterator(medium,
-         new ArrayList<DataFormat>(), false);
+         new ArrayList<ContainerDataFormat>(), false);
 
       Assert.assertNotNull(topLevelContainerIterator);
 
@@ -417,7 +417,7 @@ public abstract class AbtractDataBlockAccessorTest {
     */
    private void assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
       AbstractDataBlockIterator<Container> topLevelReverseContainerIterator = getTestling()
-         .getReverseContainerIterator(medium, new ArrayList<DataFormat>(), false);
+         .getReverseContainerIterator(medium, new ArrayList<ContainerDataFormat>(), false);
 
       Assert.assertNotNull(topLevelReverseContainerIterator);
 

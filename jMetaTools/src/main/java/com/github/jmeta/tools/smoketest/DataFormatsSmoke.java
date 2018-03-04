@@ -29,7 +29,7 @@ import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
@@ -39,7 +39,7 @@ import com.github.jmeta.library.startup.api.services.LibraryJMeta;
  */
 public class DataFormatsSmoke {
 
-   private final static Map<File, DataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, DataFormat>();
+   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, ContainerDataFormat>();
 
    static {
       TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
@@ -102,7 +102,7 @@ public class DataFormatsSmoke {
          PRIVATE_LOGGER.info("All data blocks in the AbstractMedium: " + medium);
          PRIVATE_LOGGER.info("***********************************************************************");
 
-         printContainers(accessor.getContainerIterator(medium, new ArrayList<DataFormat>(), false), Integer.valueOf(1));
+         printContainers(accessor.getContainerIterator(medium, new ArrayList<ContainerDataFormat>(), false), Integer.valueOf(1));
       }
    }
 
@@ -112,8 +112,8 @@ public class DataFormatsSmoke {
 
       int index = 0;
 
-      for (Iterator<DataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
-         DataFormat dataFormat = iterator.next();
+      for (Iterator<ContainerDataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
+         ContainerDataFormat dataFormat = iterator.next();
 
          PRIVATE_LOGGER.info("TEST Data format " + index + ": " + dataFormat);
 

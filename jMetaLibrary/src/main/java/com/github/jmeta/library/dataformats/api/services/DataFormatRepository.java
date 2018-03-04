@@ -9,7 +9,7 @@ package com.github.jmeta.library.dataformats.api.services;
 
 import java.util.Set;
 
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 
 /**
  *
@@ -17,14 +17,14 @@ import com.github.jmeta.library.dataformats.api.types.DataFormat;
 public interface DataFormatRepository {
 
    /**
-    * @return the supported {@link DataFormat}s
+    * @return the supported {@link ContainerDataFormat}s
     */
-   public Set<DataFormat> getSupportedDataFormats();
+   public Set<ContainerDataFormat> getSupportedDataFormats();
 
    /**
     * @param dataFormat
-    * @return the {@link DataFormatSpecification} for the given {@link DataFormat}
+    * @return the {@link DataFormatSpecification} for the given {@link ContainerDataFormat}
     */
-   public DataFormatSpecification getDataFormatSpecification(DataFormat dataFormat);
+   public DataFormatSpecification getDataFormatSpecification(ContainerDataFormat dataFormat);
 
 }

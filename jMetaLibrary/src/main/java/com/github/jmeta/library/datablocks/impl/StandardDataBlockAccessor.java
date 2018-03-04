@@ -25,7 +25,7 @@ import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -54,8 +54,8 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       m_lazyFieldSize = lazyFieldSize;
 
-      for (Iterator<DataFormat> iterator = m_readers.keySet().iterator(); iterator.hasNext();) {
-         DataFormat nextKey = iterator.next();
+      for (Iterator<ContainerDataFormat> iterator = m_readers.keySet().iterator(); iterator.hasNext();) {
+         ContainerDataFormat nextKey = iterator.next();
          DataBlockReader nextValue = m_readers.get(nextKey);
 
          nextValue.setMaxFieldBlockSize(lazyFieldSize);
@@ -83,7 +83,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
          List<DataBlockService> bundleDataBlocksExtensions = iExtension2.getAllServiceProviders(DataBlockService.class);
 
          for (DataBlockService dataBlocksExtension : bundleDataBlocksExtensions) {
-            final DataFormat extensionDataFormat = dataBlocksExtension.getDataFormat();
+            final ContainerDataFormat extensionDataFormat = dataBlocksExtension.getDataFormat();
 
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataBlocksExtension
@@ -111,7 +111,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
    private void addDataBlockExtensions(Extension iExtension2, DataBlockService dataBlocksExtensions) {
 
-      DataFormat format = dataBlocksExtensions.getDataFormat();
+      ContainerDataFormat format = dataBlocksExtensions.getDataFormat();
 
       final DataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
 
@@ -161,7 +161,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
     * @see DataBlockAccessor#getContainerIterator
     */
    @Override
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints,
+   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, List<ContainerDataFormat> dataFormatHints,
       boolean forceMediumReadOnly) {
 
       Reject.ifNull(dataFormatHints, "dataFormatHints");
@@ -177,7 +177,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
    @Override
    public AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium,
-      List<DataFormat> dataFormatHints, boolean forceMediumReadOnly) {
+      List<ContainerDataFormat> dataFormatHints, boolean forceMediumReadOnly) {
 
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
@@ -194,19 +194,19 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getDataBlockFactory(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getDataBlockFactory(ContainerDataFormat)
     */
    @Override
-   public DataBlockFactory getDataBlockFactory(DataFormat dataFormat) {
+   public DataBlockFactory getDataBlockFactory(ContainerDataFormat dataFormat) {
 
       return m_factories.get(dataFormat);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(DataFormat)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(ContainerDataFormat)
     */
    @Override
-   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers(DataFormat dataFormat) {
+   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers(ContainerDataFormat dataFormat) {
 
       Reject.ifNull(dataFormat, "dataFormat");
 
@@ -214,11 +214,11 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(DataFormat,
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(ContainerDataFormat,
     *      DataTransformationType, com.github.jmeta.library.datablocks.api.services.TransformationHandler)
     */
    @Override
-   public void setTransformationHandler(DataFormat dataFormat, DataTransformationType transformationType,
+   public void setTransformationHandler(ContainerDataFormat dataFormat, DataTransformationType transformationType,
       TransformationHandler handler) {
 
       Reject.ifNull(dataFormat, "dataFormat");
@@ -232,9 +232,9 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
    private final MediaAPI m_mediumFactory;
 
-   private final Map<DataFormat, DataBlockReader> m_readers = new HashMap<>();
+   private final Map<ContainerDataFormat, DataBlockReader> m_readers = new HashMap<>();
 
-   private final Map<DataFormat, ExtendedDataBlockFactory> m_factories = new HashMap<>();
+   private final Map<ContainerDataFormat, ExtendedDataBlockFactory> m_factories = new HashMap<>();
 
    private final ExtensionManager extManager;
 

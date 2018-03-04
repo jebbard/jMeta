@@ -25,7 +25,7 @@ import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpeci
 import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -49,7 +49,7 @@ public class OggExtension implements Extension {
    /**
     *
     */
-   public static final DataFormat OGG = new DataFormat("Ogg", new HashSet<String>(), new HashSet<String>(),
+   public static final ContainerDataFormat OGG = new ContainerDataFormat("Ogg", new HashSet<String>(), new HashSet<String>(),
       new ArrayList<String>(), "", new Date());
 
    /**

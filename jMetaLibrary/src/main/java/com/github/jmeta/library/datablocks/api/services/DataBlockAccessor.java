@@ -13,7 +13,7 @@ import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.Medium;
@@ -27,13 +27,13 @@ public interface DataBlockAccessor {
 
    /**
     * Returns the {@link Iterator} for retrieving all the top-level {@link DataBlock}s in the given
-    * {@link AbstractMedium}. Optionally, a {@link List} of expected {@link DataFormat}s can be specified to support the
-    * library to identify the {@link DataFormat}s faster.
+    * {@link AbstractMedium}. Optionally, a {@link List} of expected {@link ContainerDataFormat}s can be specified to support the
+    * library to identify the {@link ContainerDataFormat}s faster.
     *
     * @param medium
     *           the {@link AbstractMedium} for which to get the top-level {@link DataBlock}s.
     * @param dataFormatHints
-    *           a {@link List} containing {@link DataFormat}s expected by the user in the {@link AbstractMedium} in
+    *           a {@link List} containing {@link ContainerDataFormat}s expected by the user in the {@link AbstractMedium} in
     *           their given order. This ensures best performance by facilitating the users knowledge. The {@link List}
     *           may be empty if there are no concrete hints.
     * @param forceMediumReadOnly
@@ -41,7 +41,7 @@ public interface DataBlockAccessor {
     *           false if the default behavior should be chosen.
     * @return the {@link Iterator} for iterating all the top-level {@link DataBlock}s of the {@link AbstractMedium}.
     */
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, List<DataFormat> dataFormatHints,
+   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, List<ContainerDataFormat> dataFormatHints,
       boolean forceMediumReadOnly);
 
    /**
@@ -51,7 +51,7 @@ public interface DataBlockAccessor {
     * @return a reverse {@link AbstractDataBlockIterator}
     */
    public AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium,
-      List<DataFormat> dataFormatHints, boolean forceMediumReadOnly);
+      List<ContainerDataFormat> dataFormatHints, boolean forceMediumReadOnly);
 
    /**
     * Returns an {@link DataBlockFactory} that is used for creating {@link DataBlock} instances.
@@ -60,7 +60,7 @@ public interface DataBlockAccessor {
     *
     * @return the {@link DataBlockFactory}.
     */
-   public DataBlockFactory getDataBlockFactory(DataFormat dataFormat);
+   public DataBlockFactory getDataBlockFactory(ContainerDataFormat dataFormat);
 
    /**
     * @param lazyFieldSize
@@ -78,7 +78,7 @@ public interface DataBlockAccessor {
     * @param dataFormat
     * @return
     */
-   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers(DataFormat dataFormat);
+   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers(ContainerDataFormat dataFormat);
 
    /**
     *
@@ -87,7 +87,7 @@ public interface DataBlockAccessor {
     * @param transformationType
     * @param handler
     */
-   public void setTransformationHandler(DataFormat dataFormat, DataTransformationType transformationType,
+   public void setTransformationHandler(ContainerDataFormat dataFormat, DataTransformationType transformationType,
       TransformationHandler handler);
 
 }

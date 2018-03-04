@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 
 /**
  * {@link AbstractDataBlockService} provides a default implementation of {@link DataBlockService} that only returns a
- * {@link DataFormat}. Methods can be overridden to change its behavior.
+ * {@link ContainerDataFormat}. Methods can be overridden to change its behavior.
  */
 public abstract class AbstractDataBlockService implements DataBlockService {
 
@@ -25,7 +25,7 @@ public abstract class AbstractDataBlockService implements DataBlockService {
     * 
     * @param myDataFormat
     */
-   public AbstractDataBlockService(DataFormat myDataFormat) {
+   public AbstractDataBlockService(ContainerDataFormat myDataFormat) {
       m_myDataFormat = myDataFormat;
    }
 
@@ -54,7 +54,7 @@ public abstract class AbstractDataBlockService implements DataBlockService {
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataFormat()
     */
    @Override
-   public DataFormat getDataFormat() {
+   public ContainerDataFormat getDataFormat() {
 
       return m_myDataFormat;
    }
@@ -70,5 +70,5 @@ public abstract class AbstractDataBlockService implements DataBlockService {
       return new ArrayList<>();
    }
 
-   private final DataFormat m_myDataFormat;
+   private final ContainerDataFormat m_myDataFormat;
 }

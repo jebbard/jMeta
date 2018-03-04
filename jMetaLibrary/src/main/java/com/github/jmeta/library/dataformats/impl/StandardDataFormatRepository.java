@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.exceptions.InvalidExtensionException;
@@ -56,7 +56,7 @@ public class StandardDataFormatRepository implements DataFormatRepository {
             .getAllServiceProviders(DataFormatSpecification.class);
 
          for (DataFormatSpecification dataFormatSpec : dataFormatSpecificationsInExtension) {
-            final DataFormat extensionDataFormat = dataFormatSpec.getDataFormat();
+            final ContainerDataFormat extensionDataFormat = dataFormatSpec.getDataFormat();
 
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataFormatSpec + " must not return null for its data format.";
@@ -82,10 +82,10 @@ public class StandardDataFormatRepository implements DataFormatRepository {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.types.DataFormat)
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.types.ContainerDataFormat)
     */
    @Override
-   public DataFormatSpecification getDataFormatSpecification(DataFormat dataFormat) {
+   public DataFormatSpecification getDataFormatSpecification(ContainerDataFormat dataFormat) {
 
       Reject.ifNull(dataFormat, "dataFormat");
       Reject.ifFalse(getSupportedDataFormats().contains(dataFormat), "getSupportedDataFormats().contains(dataFormat)");
@@ -97,12 +97,12 @@ public class StandardDataFormatRepository implements DataFormatRepository {
     * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getSupportedDataFormats()
     */
    @Override
-   public Set<DataFormat> getSupportedDataFormats() {
+   public Set<ContainerDataFormat> getSupportedDataFormats() {
 
       return Collections.unmodifiableSet(m_dataFormatMap.keySet());
    }
 
-   private final Map<DataFormat, DataFormatSpecification> m_dataFormatMap = new HashMap<>();
+   private final Map<ContainerDataFormat, DataFormatSpecification> m_dataFormatMap = new HashMap<>();
 
    private final ExtensionManager extManager;
 }

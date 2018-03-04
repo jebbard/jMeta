@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataFormat;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
@@ -23,7 +23,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
  * <li>Is currently stored on exactly one or no {@link AbstractMedium}</li>
  * <li>Has a total size in bytes</li>
  * <li>Refers to a {@link DataBlockId} to identify the {@link DataBlock} which makes the {@link DataBlock} belong to
- * exactly one {@link DataFormat}.</li>
+ * exactly one {@link ContainerDataFormat}.</li>
  * <li>Has zero or exactly one parent {@link DataBlock}</li>
  * <li>Has a {@link ByteOrder}, child blocks might however use different {@link ByteOrder}s than their parents</li>
  * <li>Has a {@link Charset}, child blocks might however use different {@link Charset}s than their parents</li>
