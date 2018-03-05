@@ -8,6 +8,7 @@
  */
 package com.github.jmeta.library.datablocks.impl;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
@@ -19,7 +20,6 @@ import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -31,8 +31,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public class LazyField extends AbstractDataBlock implements Field<Object> {
 
    @Override
-   public String getStringRepresentation()
-      throws BinaryValueConversionException {
+   public String getStringRepresentation() throws BinaryValueConversionException {
 
       return getClass().getName().toUpperCase();
    }
@@ -49,9 +48,8 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
     * @param byteOrder
     * @param characterEncoding
     */
-   public LazyField(DataBlockDescription fieldDesc, MediumOffset reference,
-      DataBlock parent, long totalSize, ExtendedDataBlockFactory factory,
-      DataBlockReader dataBlockReader, ByteOrder byteOrder,
+   public LazyField(DataBlockDescription fieldDesc, MediumOffset reference, DataBlock parent, long totalSize,
+      ExtendedDataBlockFactory factory, DataBlockReader dataBlockReader, ByteOrder byteOrder,
       Charset characterEncoding) {
       super(fieldDesc.getId(), parent, reference, dataBlockReader);
 
@@ -72,8 +70,8 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
     * @param characterEncoding
     * @param fieldByteCount
     */
-   public void convert(DataFormatSpecification spec, ByteOrder byteOrder,
-      Charset characterEncoding, long fieldByteCount) {
+   public void convert(DataFormatSpecification spec, ByteOrder byteOrder, Charset characterEncoding,
+      long fieldByteCount) {
 
       // Do nothing. Wrapped fields are first converted when getInterpretedValue is called
    }
@@ -99,8 +97,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
    }
 
    @Override
-   public BinaryValue getBinaryValue()
-      throws InterpretedValueConversionException {
+   public ByteBuffer getBinaryValue() throws InterpretedValueConversionException {
 
       lazilyReadField();
 
@@ -110,33 +107,10 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
    private void lazilyReadField() {
 
       if (m_wrappedField == null) {
-         int fragmentCount = (int) m_totalSize / Integer.MAX_VALUE;
-         int fragmentRemainder = (int) m_totalSize % Integer.MAX_VALUE;
+         ByteBuffer binaryData = getDataBlockReader().readBytes(getMediumReference(), (int) this.m_totalSize);
 
-         if (fragmentRemainder > 0)
-            fragmentCount++;
-
-         byte[][] binaryData = new byte[fragmentCount][];
-
-         MediumOffset mediumReference = getMediumReference();
-
-         int fragmentIndex = 0;
-
-         for (; fragmentIndex < fragmentCount - 1; fragmentIndex++) {
-            byte[] readData = getDataBlockReader()
-               .readBytes(mediumReference, Integer.MAX_VALUE).array();
-
-            binaryData[fragmentIndex] = readData;
-
-            mediumReference = mediumReference.advance(Integer.MAX_VALUE);
-         }
-
-         binaryData[fragmentIndex] = getDataBlockReader()
-            .readBytes(mediumReference, fragmentRemainder).array();
-
-         m_wrappedField = m_dbFactory.createFieldFromBytes(m_fieldDesc.getId(),
-            getDataBlockReader().getSpecification(), mediumReference,
-            new BinaryValue(binaryData), m_byteOrder, m_characterEncoding);
+         m_wrappedField = m_dbFactory.createFieldFromBytes(m_fieldDesc.getId(), getDataBlockReader().getSpecification(),
+            getMediumReference(), binaryData, m_byteOrder, m_characterEncoding);
       }
    }
 

@@ -8,10 +8,10 @@
  */
 package com.github.jmeta.library.datablocks.api.exceptions;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 
 /**
@@ -32,9 +32,8 @@ public class BinaryValueConversionException extends Exception {
     * @param byteOrder
     * @param characterEncoding
     */
-   public BinaryValueConversionException(String message, Throwable cause,
-      DataBlockDescription fieldDesc, BinaryValue binaryValue,
-      ByteOrder byteOrder, Charset characterEncoding) {
+   public BinaryValueConversionException(String message, Throwable cause, DataBlockDescription fieldDesc,
+      ByteBuffer binaryValue, ByteOrder byteOrder, Charset characterEncoding) {
       super(message, cause);
 
       m_binaryValue = binaryValue;
@@ -54,7 +53,7 @@ public class BinaryValueConversionException extends Exception {
    /**
     * @return the {@link BinaryValue}
     */
-   public BinaryValue getBinaryValue() {
+   public ByteBuffer getBinaryValue() {
 
       return m_binaryValue;
    }
@@ -77,7 +76,7 @@ public class BinaryValueConversionException extends Exception {
 
    private final DataBlockDescription m_fieldDescription;
 
-   private final BinaryValue m_binaryValue;
+   private final ByteBuffer m_binaryValue;
 
    private final Charset m_characterEncoding;
 

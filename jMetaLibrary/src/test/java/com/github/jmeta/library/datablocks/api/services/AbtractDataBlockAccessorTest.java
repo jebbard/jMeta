@@ -2,6 +2,7 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
@@ -625,7 +625,20 @@ public abstract class AbtractDataBlockAccessorTest {
          try {
             Object actualFieldValue = field.getInterpretedValue();
 
-            Assert.assertEquals(expectedFieldValue, actualFieldValue);
+            if (actualFieldValue instanceof ByteBuffer) {
+               ByteBuffer actualAsBB = (ByteBuffer) actualFieldValue;
+               byte[] actualFieldValueAsByteArray = new byte[actualAsBB.remaining()];
+
+               for (int j = 0; j < actualAsBB.remaining(); j++) {
+                  actualFieldValueAsByteArray[j] = actualAsBB.get(actualAsBB.position() + j);
+               }
+
+               actualFieldValue = actualFieldValueAsByteArray;
+
+               Assert.assertArrayEquals((byte[]) expectedFieldValue, actualFieldValueAsByteArray);
+            } else {
+               Assert.assertEquals(expectedFieldValue, actualFieldValue);
+            }
 
             String stringRepresentation = field.getStringRepresentation();
 
@@ -670,11 +683,11 @@ public abstract class AbtractDataBlockAccessorTest {
       for (int i = 0; i < readSizes.length; i++) {
 
          if (readSizes[i] != 0) {
-            byte[] expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
+            ByteBuffer expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
 
-            byte[] actualBytes = dataBlock.getBytes(readOffsets[i], readSizes[i]);
+            ByteBuffer actualBytes = dataBlock.getBytes(readOffsets[i], readSizes[i]);
 
-            org.junit.Assert.assertArrayEquals(expectedBytes, actualBytes);
+            org.junit.Assert.assertEquals(expectedBytes, actualBytes);
          }
       }
    }
@@ -696,14 +709,18 @@ public abstract class AbtractDataBlockAccessorTest {
       long absOffset = field.getMediumReference().getAbsoluteMediumOffset();
 
       for (int i = 0; i < readSizes.length; i++) {
-         byte[] expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
+         ByteBuffer expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
 
          try {
-            BinaryValue binaryValue = field.getBinaryValue();
+            ByteBuffer binaryValue = field.getBinaryValue();
 
-            byte[] actualBytes = binaryValue.getBytes(readOffsets[i], readSizes[i]);
+            byte[] actualBytes = new byte[readSizes[i]];
 
-            org.junit.Assert.assertArrayEquals(expectedBytes, actualBytes);
+            for (int j = 0; j < readSizes[i]; j++) {
+               actualBytes[j] = binaryValue.get(binaryValue.position() + (int) readOffsets[i] + j);
+            }
+
+            org.junit.Assert.assertEquals(expectedBytes, ByteBuffer.wrap(actualBytes));
          } catch (InterpretedValueConversionException e) {
             Assert.fail("Unexpected conversion exception" + e);
          }

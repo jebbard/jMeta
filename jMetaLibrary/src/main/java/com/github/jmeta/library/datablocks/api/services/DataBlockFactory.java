@@ -7,6 +7,7 @@
 
 package com.github.jmeta.library.datablocks.api.services;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -17,7 +18,6 @@ import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -57,7 +57,7 @@ public interface DataBlockFactory {
     * @return the {@link Field}
     */
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      BinaryValue fieldBytes, ByteOrder byteOrder, Charset characterEncoding);
+      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding);
 
    /**
     * @param fieldId

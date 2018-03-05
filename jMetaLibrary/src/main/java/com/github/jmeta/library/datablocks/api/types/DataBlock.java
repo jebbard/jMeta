@@ -7,12 +7,13 @@
 
 package com.github.jmeta.library.datablocks.api.types;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
@@ -73,7 +74,7 @@ public interface DataBlock {
     *           the size of the bytes to read. Must not reach beyond the total size of the {@link DataBlock}.
     * @return the bytes that build this {@link DataBlock} from the given offset and size.
     */
-   public byte[] getBytes(long offset, int size);
+   public ByteBuffer getBytes(long offset, int size);
 
    /**
     * Returns the {@link DataBlockId} of the {@link DataBlock}.

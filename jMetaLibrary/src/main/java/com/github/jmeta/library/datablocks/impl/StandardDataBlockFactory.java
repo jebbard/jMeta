@@ -7,6 +7,7 @@
 
 package com.github.jmeta.library.datablocks.impl;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -22,7 +23,6 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
@@ -60,11 +60,11 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
     */
    @Override
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      BinaryValue fieldBytes, ByteOrder byteOrder, Charset characterEncoding) {
+      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding) {
 
       Reject.ifNull(id, "fieldDesc");
       Reject.ifNull(reference, "reference");
-      Reject.ifNegative(fieldBytes.getTotalSize(), "fieldBytes.getTotalSize()");
+      Reject.ifNegative(fieldBytes.remaining(), "fieldBytes.remaining()");
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 

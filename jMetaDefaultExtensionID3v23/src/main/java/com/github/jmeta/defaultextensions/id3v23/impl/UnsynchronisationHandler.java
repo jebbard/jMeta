@@ -8,6 +8,7 @@
  */
 package com.github.jmeta.defaultextensions.id3v23.impl;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,16 +97,16 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
     */
    @Override
    // Synchronise
-   protected byte[][] untransformRawBytes(byte[] payloadBytes) {
+   protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 
-      if (payloadBytes.length < 1)
-         return new byte[][] { payloadBytes };
+      if (payloadBytes.remaining() < 1)
+         return new byte[][] { payloadBytes.array() };
 
-      List<Byte> synchronisedByteList = new ArrayList<>(payloadBytes.length);
+      List<Byte> synchronisedByteList = new ArrayList<>(payloadBytes.remaining());
 
-      for (int i = payloadBytes.length - 1; i > 0; i--) {
-         byte previousByte = payloadBytes[i - 1];
-         byte nextByte = payloadBytes[i];
+      for (int i = payloadBytes.remaining() - 1; i > 0; i--) {
+         byte previousByte = payloadBytes.get(i - 1);
+         byte nextByte = payloadBytes.get(i);
 
          if (previousByte == 0xFF && nextByte == 0x00)
             synchronisedByteList.add(previousByte);
@@ -114,7 +115,7 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
             synchronisedByteList.add(nextByte);
       }
 
-      synchronisedByteList.add(payloadBytes[payloadBytes.length - 1]);
+      synchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));
 
       Collections.reverse(synchronisedByteList);
 
@@ -125,16 +126,16 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
     * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
     */
    @Override
-   protected byte[][] transformRawBytes(byte[] payloadBytes) {
+   protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
 
-      if (payloadBytes.length < 1)
-         return new byte[][] { payloadBytes };
+      if (payloadBytes.remaining() < 1)
+         return new byte[][] { payloadBytes.array() };
 
-      List<Byte> unsynchronisedByteList = new ArrayList<>(payloadBytes.length);
+      List<Byte> unsynchronisedByteList = new ArrayList<>(payloadBytes.remaining());
 
-      for (int i = 0; i < payloadBytes.length - 1; i++) {
-         byte firstByte = payloadBytes[i];
-         byte secondByte = payloadBytes[i + 1];
+      for (int i = 0; i < payloadBytes.remaining() - 1; i++) {
+         byte firstByte = payloadBytes.get(i);
+         byte secondByte = payloadBytes.get(i + 1);
 
          unsynchronisedByteList.add(firstByte);
 
@@ -142,7 +143,7 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
             unsynchronisedByteList.add((byte) 0);
       }
 
-      unsynchronisedByteList.add(payloadBytes[payloadBytes.length - 1]);
+      unsynchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));
 
       return new byte[][] { ByteArrayUtils.toArray(unsynchronisedByteList) };
    }

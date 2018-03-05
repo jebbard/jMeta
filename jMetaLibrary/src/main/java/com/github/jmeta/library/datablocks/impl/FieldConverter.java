@@ -8,12 +8,12 @@
  */
 package com.github.jmeta.library.datablocks.impl;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 
 /**
@@ -31,9 +31,8 @@ public interface FieldConverter<T> {
     * @return the interpreted value
     * @throws BinaryValueConversionException
     */
-   public T toInterpreted(BinaryValue binaryValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws BinaryValueConversionException;
+   public T toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws BinaryValueConversionException;
 
    /**
     * @param interpretedValue
@@ -43,7 +42,6 @@ public interface FieldConverter<T> {
     * @return the binary value
     * @throws InterpretedValueConversionException
     */
-   public BinaryValue toBinary(T interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws InterpretedValueConversionException;
+   public ByteBuffer toBinary(T interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws InterpretedValueConversionException;
 }

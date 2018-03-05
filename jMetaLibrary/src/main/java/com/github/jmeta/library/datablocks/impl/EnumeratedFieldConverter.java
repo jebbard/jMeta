@@ -8,6 +8,7 @@
  */
 package com.github.jmeta.library.datablocks.impl;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -16,7 +17,6 @@ import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -31,7 +31,7 @@ public class EnumeratedFieldConverter<T> implements FieldConverter<T> {
 
    @SuppressWarnings("unchecked")
    @Override
-   public T toInterpreted(BinaryValue binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+   public T toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
@@ -39,10 +39,16 @@ public class EnumeratedFieldConverter<T> implements FieldConverter<T> {
       Reject.ifNull(desc, "desc");
       Reject.ifNull(binaryValue, "binaryValue");
 
-      if (binaryValue.getTotalSize() > Integer.MAX_VALUE)
+      if (binaryValue.remaining() > Integer.MAX_VALUE)
          throw new BinaryValueConversionException(
             "Enumerated fields may not be longer than " + Integer.MAX_VALUE + " bytes.", null, desc, binaryValue,
             byteOrder, characterEncoding);
+
+      byte[] copiedBytes = new byte[binaryValue.remaining()];
+
+      for (int i = 0; i < copiedBytes.length; i++) {
+         copiedBytes[i] = binaryValue.get(binaryValue.position() + i);
+      }
 
       // CONFIG_CHECK: byte values must only be present once
       Map<T, byte[]> enumValues = (Map<T, byte[]>) desc.getFieldProperties().getEnumeratedValues();
@@ -50,7 +56,7 @@ public class EnumeratedFieldConverter<T> implements FieldConverter<T> {
       for (Iterator<T> enumValuesIterator = enumValues.keySet().iterator(); enumValuesIterator.hasNext();) {
          T byteMapping = enumValuesIterator.next();
 
-         if (Arrays.equals(enumValues.get(byteMapping), binaryValue.getFragment(0)))
+         if (Arrays.equals(enumValues.get(byteMapping), copiedBytes))
             return byteMapping;
       }
 
@@ -58,7 +64,7 @@ public class EnumeratedFieldConverter<T> implements FieldConverter<T> {
    }
 
    @Override
-   public BinaryValue toBinary(T interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+   public ByteBuffer toBinary(T interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
@@ -74,7 +80,7 @@ public class EnumeratedFieldConverter<T> implements FieldConverter<T> {
             "Enumerated fields may not be longer than " + Integer.MAX_VALUE + " bytes.", null, desc, interpretedValue,
             byteOrder, characterEncoding);
 
-      return new BinaryValue(enumValues.get(interpretedValue));
+      return ByteBuffer.wrap(enumValues.get(interpretedValue));
    }
 
 }

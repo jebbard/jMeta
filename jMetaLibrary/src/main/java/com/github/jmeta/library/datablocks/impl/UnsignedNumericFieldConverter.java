@@ -14,7 +14,6 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
@@ -28,44 +27,41 @@ public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
    private static final int MAX_LONG_BYTE_SIZE = Long.SIZE / Byte.SIZE;
 
    @Override
-   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws BinaryValueConversionException {
+   public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
       Reject.ifNull(desc, "desc");
       Reject.ifNull(binaryValue, "binaryValue");
 
-      long fieldByteCount = binaryValue.getTotalSize();
+      long fieldByteCount = binaryValue.remaining();
 
       if (fieldByteCount > MAX_LONG_BYTE_SIZE)
          throw new BinaryValueConversionException(
-            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE
-               + " bytes.",
-            null, desc, binaryValue, byteOrder, characterEncoding);
+            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE + " bytes.", null, desc, binaryValue,
+            byteOrder, characterEncoding);
 
-      ByteBuffer buffer = ByteBuffer.wrap(binaryValue.getFragment(0));
+      ByteBuffer copiedBuffer = binaryValue.asReadOnlyBuffer();
 
-      buffer.order(byteOrder);
+      copiedBuffer.order(byteOrder);
 
       if (fieldByteCount == 1)
-         return (long) NumericDataTypeUtil.unsignedValue(buffer.get());
+         return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.get());
 
       else if (fieldByteCount == 2)
-         return (long) NumericDataTypeUtil.unsignedValue(buffer.getShort());
+         return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.getShort());
 
       else if (fieldByteCount <= 4)
-         return (long) NumericDataTypeUtil.unsignedValue(buffer.getInt());
+         return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.getInt());
 
       else if (fieldByteCount <= MAX_LONG_BYTE_SIZE) {
-         final long longValue = buffer.getLong();
+         final long longValue = copiedBuffer.getLong();
 
          if (longValue < 0)
             throw new BinaryValueConversionException(
-               "Negative long values currently cannot be represented as unsigned. Value: "
-                  + longValue + ".",
-               null, desc, binaryValue, byteOrder, characterEncoding);
+               "Negative long values currently cannot be represented as unsigned. Value: " + longValue + ".", null,
+               desc, copiedBuffer, byteOrder, characterEncoding);
 
          return longValue;
       }
@@ -74,9 +70,8 @@ public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
    }
 
    @Override
-   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws InterpretedValueConversionException {
+   public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
@@ -87,9 +82,8 @@ public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
 
       if (fieldByteCount > MAX_LONG_BYTE_SIZE)
          throw new InterpretedValueConversionException(
-            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE
-               + " bytes.",
-            null, desc, interpretedValue, byteOrder, characterEncoding);
+            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE + " bytes.", null, desc, interpretedValue,
+            byteOrder, characterEncoding);
 
       ByteBuffer buffer = ByteBuffer.wrap(new byte[(int) fieldByteCount]);
 
@@ -105,7 +99,9 @@ public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
       else if (fieldByteCount <= MAX_LONG_BYTE_SIZE)
          buffer.putLong(interpretedValue);
 
-      return new BinaryValue(buffer);
+      buffer.rewind();
+
+      return buffer;
    }
 
 }

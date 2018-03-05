@@ -8,6 +8,7 @@
  */
 package com.github.jmeta.defaultextensions.mp3.impl;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
       if (containerId.getGlobalId().equals("mp3")) {
          Header header = headers.get(0);
 
-         byte[] bytes = header.getBytes(0, 4);
+         ByteBuffer bytes = header.getBytes(0, 4);
          assert bytes != null;
 
          // System.out.println("########################");

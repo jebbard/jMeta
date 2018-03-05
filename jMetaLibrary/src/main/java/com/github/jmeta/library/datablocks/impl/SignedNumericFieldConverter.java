@@ -14,7 +14,6 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
@@ -28,46 +27,43 @@ public class SignedNumericFieldConverter implements FieldConverter<Long> {
    private static final int MAX_LONG_BYTE_SIZE = 8;
 
    @Override
-   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws BinaryValueConversionException {
+   public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
       Reject.ifNull(desc, "desc");
       Reject.ifNull(binaryValue, "binaryValue");
 
-      long fieldByteCount = binaryValue.getTotalSize();
+      long fieldByteCount = binaryValue.remaining();
 
       if (fieldByteCount > MAX_LONG_BYTE_SIZE)
          throw new BinaryValueConversionException(
-            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE
-               + " bytes.",
-            null, desc, binaryValue, byteOrder, characterEncoding);
+            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE + " bytes.", null, desc, binaryValue,
+            byteOrder, characterEncoding);
 
-      ByteBuffer buffer = ByteBuffer.wrap(binaryValue.getFragment(0));
+      ByteBuffer copiedBuffer = binaryValue.asReadOnlyBuffer();
 
-      buffer.order(byteOrder);
+      copiedBuffer.order(byteOrder);
 
       if (fieldByteCount == 1)
-         return (long) buffer.get();
+         return (long) copiedBuffer.get();
 
       else if (fieldByteCount == 2)
-         return (long) buffer.getShort();
+         return (long) copiedBuffer.getShort();
 
       else if (fieldByteCount <= 4)
-         return (long) buffer.getInt();
+         return (long) copiedBuffer.getInt();
 
       else if (fieldByteCount <= MAX_LONG_BYTE_SIZE)
-         return buffer.getLong();
+         return copiedBuffer.getLong();
 
       return null;
    }
 
    @Override
-   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding)
-         throws InterpretedValueConversionException {
+   public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
@@ -78,9 +74,8 @@ public class SignedNumericFieldConverter implements FieldConverter<Long> {
 
       if (fieldByteCount > MAX_LONG_BYTE_SIZE)
          throw new InterpretedValueConversionException(
-            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE
-               + " bytes.",
-            null, desc, interpretedValue, byteOrder, characterEncoding);
+            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE + " bytes.", null, desc, interpretedValue,
+            byteOrder, characterEncoding);
 
       ByteBuffer buffer = ByteBuffer.wrap(new byte[(int) fieldByteCount]);
 
@@ -88,8 +83,7 @@ public class SignedNumericFieldConverter implements FieldConverter<Long> {
          buffer.put(NumericDataTypeUtil.signedByteValue(interpretedValue));
 
       else if (fieldByteCount == 2)
-         buffer
-            .putShort(NumericDataTypeUtil.signedShortValue(interpretedValue));
+         buffer.putShort(NumericDataTypeUtil.signedShortValue(interpretedValue));
 
       else if (fieldByteCount <= 4)
          buffer.putInt(NumericDataTypeUtil.signedIntValue(interpretedValue));
@@ -97,7 +91,7 @@ public class SignedNumericFieldConverter implements FieldConverter<Long> {
       else if (fieldByteCount <= MAX_LONG_BYTE_SIZE)
          buffer.putLong(interpretedValue);
 
-      return new BinaryValue(buffer);
+      return buffer;
    }
 
 }

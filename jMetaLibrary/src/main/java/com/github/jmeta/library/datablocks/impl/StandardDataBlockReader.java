@@ -35,10 +35,9 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -793,7 +792,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       fieldBuffer = readBytes(reference, (int) fieldSize);
 
-      return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, new BinaryValue(fieldBuffer),
+      return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer,
          currentByteOrder, currentCharset);
    }
 
@@ -1204,9 +1203,9 @@ public class StandardDataBlockReader implements DataBlockReader {
       DataBlockId unknownBlockId = new DataBlockId(m_spec.getDataFormat(), parentId,
          DataFormatSpecification.UNKNOWN_FIELD_ID);
 
-      FieldProperties<BinaryValue> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY,
-         new BinaryValue(new byte[] { 0 }), null, null, DataBlockDescription.UNKNOWN_SIZE,
-         DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null);
+      FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
+         null, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
+         null, null);
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),

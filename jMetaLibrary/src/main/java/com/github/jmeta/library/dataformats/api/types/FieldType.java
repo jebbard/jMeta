@@ -21,7 +21,7 @@ public class FieldType<T> {
    /**
     *
     */
-   public static final FieldType<BinaryValue> BINARY = new FieldType<>("BINARY");
+   public static final FieldType<byte[]> BINARY = new FieldType<>("BINARY");
 
    /**
     *
@@ -43,7 +43,6 @@ public class FieldType<T> {
     */
    public static final FieldType<?> ENUMERATED = new FieldType<>("ENUMERATED");
 
-   
    public String getId() {
       return id;
    }

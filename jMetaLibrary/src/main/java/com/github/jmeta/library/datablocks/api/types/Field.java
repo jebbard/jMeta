@@ -1,9 +1,10 @@
 
 package com.github.jmeta.library.datablocks.api.types;
 
+import java.nio.ByteBuffer;
+
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 
 /**
  * {@link Field}
@@ -24,13 +25,11 @@ public interface Field<T> extends DataBlock {
     * @return the binary value
     * @throws InterpretedValueConversionException
     */
-   public BinaryValue getBinaryValue()
-      throws InterpretedValueConversionException;
+   public ByteBuffer getBinaryValue() throws InterpretedValueConversionException;
 
    /**
     * @return the string representation
     * @throws BinaryValueConversionException
     */
-   public String getStringRepresentation()
-      throws BinaryValueConversionException;
+   public String getStringRepresentation() throws BinaryValueConversionException;
 }

@@ -9,6 +9,7 @@
 package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -100,12 +101,12 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
     * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
     */
    @Override
-   protected byte[][] transformRawBytes(byte[] payloadBytes) {
+   protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
 
       final Deflater compressor = new Deflater();
-      compressor.setInput(payloadBytes);
+      compressor.setInput(payloadBytes.array());
 
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.length);
+      final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.remaining());
       byte[] buf = new byte[BLOCK_SIZE];
 
       try {
@@ -115,7 +116,7 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
             bos.write(buf, 0, count);
 
          if (!compressor.finished())
-            throw new RuntimeException("Bad zip data, size:" + payloadBytes.length);
+            throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
       } finally {
          compressor.end();
       }
@@ -127,17 +128,17 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
     * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
     */
    @Override
-   protected byte[][] untransformRawBytes(byte[] payloadBytes) {
+   protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 
       // The case where the output gets longer than Integer.MAX is not handled anywhere
       // An OutOfMemoryError is expected whenever this happens during writing to the
       // ByteArrayOutputStream. However, this should not happen as ID3v2 also has a
       // decompressed size field of int size
       final Inflater decompressor = new Inflater();
-      decompressor.setInput(payloadBytes);
+      decompressor.setInput(payloadBytes.array());
 
       // This output stream will grow, if necessary
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.length);
+      final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.remaining());
       byte[] buf = new byte[BLOCK_SIZE];
 
       try {
@@ -147,7 +148,7 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
             bos.write(buf, 0, count);
 
          if (!decompressor.finished())
-            throw new RuntimeException("Bad zip data, size:" + payloadBytes.length);
+            throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
       } catch (DataFormatException t) {
          throw new RuntimeException(t);
       } finally {

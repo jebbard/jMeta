@@ -15,7 +15,6 @@ import java.nio.charset.Charset;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.datablocks.impl.SignedNumericFieldConverter;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -32,25 +31,31 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
    private static final int MAX_SYNC_SAFE_INTEGER = 2 >> 28;
 
    @Override
-   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+   public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
       Reject.ifNull(byteOrder, "byteOrder");
       Reject.ifNull(desc, "desc");
       Reject.ifNull(binaryValue, "binaryValue");
-      if (binaryValue.getTotalSize() != Integer.SIZE / Byte.SIZE)
+      if (binaryValue.remaining() != Integer.SIZE / Byte.SIZE)
          throw new BinaryValueConversionException(
             "ID3v23 size fields must have integer (" + Integer.SIZE / Byte.SIZE + " bytes) size", null, desc,
             binaryValue, byteOrder, characterEncoding);
 
-      int size = ByteBuffer.wrap(binaryValue.getFragment(0)).getInt();
+      byte[] copiedBytes = new byte[binaryValue.remaining()];
+
+      for (int i = 0; i < copiedBytes.length; i++) {
+         copiedBytes[i] = binaryValue.get(binaryValue.position() + i);
+      }
+
+      int size = ByteBuffer.wrap(copiedBytes).getInt();
 
       return Long.valueOf(synchSafeToInt(size));
    }
 
    @Override
-   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+   public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");

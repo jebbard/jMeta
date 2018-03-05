@@ -23,9 +23,8 @@ import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -521,7 +520,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
                // Throw further, enriched with row index information
                throw new InvalidArrayStringFormatException(rowPrefix + e.getMessage());
             }
-            expectedFieldInterpretedValues.put(instanceId, new BinaryValue(parsedBytes));
+            expectedFieldInterpretedValues.put(instanceId, parsedBytes);
          }
 
          // Enumerated fields are either charsets, byte orders or arbitrary typed

@@ -7,6 +7,7 @@
 
 package com.github.jmeta.library.datablocks.impl;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
@@ -14,7 +15,6 @@ import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionE
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
@@ -52,8 +52,7 @@ public class StandardField<T> implements Field<T> {
       // TODO: How to implement free for fields?
    }
 
-   private StandardField(DataBlockDescription fieldDesc,
-      MediumOffset reference, FieldConverter<T> fieldConverter) {
+   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, FieldConverter<T> fieldConverter) {
       Reject.ifNull(fieldDesc, "fieldDesc");
       Reject.ifNull(fieldConverter, "fieldConverter");
 
@@ -68,8 +67,7 @@ public class StandardField<T> implements Field<T> {
    public void initByteOrder(ByteOrder byteOrder) {
 
       Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifFalse(m_byteOrder == null,
-         "m_byteOrder == null");
+      Reject.ifFalse(m_byteOrder == null, "m_byteOrder == null");
 
       m_byteOrder = byteOrder;
    }
@@ -80,8 +78,7 @@ public class StandardField<T> implements Field<T> {
    public void initCharacterEncoding(Charset characterEncoding) {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifFalse(m_characterEncoding == null,
-    	         "m_characterEncoding == null");
+      Reject.ifFalse(m_characterEncoding == null, "m_characterEncoding == null");
 
       m_characterEncoding = characterEncoding;
    }
@@ -94,8 +91,8 @@ public class StandardField<T> implements Field<T> {
     * @param reference
     * @param fieldConverter
     */
-   public StandardField(DataBlockDescription fieldDesc, T interpretedValue,
-      MediumOffset reference, FieldConverter<T> fieldConverter) {
+   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference,
+      FieldConverter<T> fieldConverter) {
       this(fieldDesc, reference, fieldConverter);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
@@ -112,19 +109,18 @@ public class StandardField<T> implements Field<T> {
     * @param reference
     * @param fieldConverter
     */
-   public StandardField(DataBlockDescription fieldDesc, BinaryValue byteValue,
-      MediumOffset reference, FieldConverter<T> fieldConverter) {
+   public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
+      FieldConverter<T> fieldConverter) {
       this(fieldDesc, reference, fieldConverter);
 
       Reject.ifNull(byteValue, "byteValue");
 
       m_byteValue = byteValue;
-      m_totalSize = byteValue.getTotalSize();
+      m_totalSize = byteValue.remaining();
    }
 
    @Override
-   public String getStringRepresentation()
-      throws BinaryValueConversionException {
+   public String getStringRepresentation() throws BinaryValueConversionException {
 
       return getInterpretedValue().toString();
    }
@@ -133,33 +129,36 @@ public class StandardField<T> implements Field<T> {
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(long, int)
     */
    @Override
-   public byte[] getBytes(long offset, int size) {
+   public ByteBuffer getBytes(long offset, int size) {
       Reject.ifNegative(offset, "offset");
       Reject.ifNegative(size, "size");
-   	  Reject.ifFalse(offset + size <= getTotalSize(),
-            "offset + size <= getTotalSize()");
+      Reject.ifFalse(offset + size <= getTotalSize(), "offset + size <= getTotalSize()");
 
-      byte[] byteValue = new byte[size];
+      ByteBuffer subBytes = ByteBuffer.allocate(size);
 
-      BinaryValue value;
+      ByteBuffer value;
       try {
          value = getBinaryValue();
+         for (int currentIndex = (int) offset; currentIndex < offset + size; currentIndex++) {
+            subBytes.put(value.get(value.position() + currentIndex));
+         }
       } catch (InterpretedValueConversionException e) {
          // TODO writeConcept003: log conversion error or return null?
          assert e != null;
-         return byteValue;
+         return null;
       }
 
-      return value.getBytes(offset, size);
+      subBytes.rewind();
+
+      return subBytes;
    }
 
    @Override
-   public BinaryValue getBinaryValue()
-      throws InterpretedValueConversionException {
+   public ByteBuffer getBinaryValue() throws InterpretedValueConversionException {
 
       if (m_byteValue == null) {
          m_byteValue = convertToBinary();
-         m_totalSize = m_byteValue.getTotalSize();
+         m_totalSize = m_byteValue.remaining();
       }
 
       return m_byteValue;
@@ -230,44 +229,35 @@ public class StandardField<T> implements Field<T> {
    private T convertToInterpreted() throws BinaryValueConversionException {
 
       if (m_fieldConverter == null)
-         throw new BinaryValueConversionException(
-            "No field converter found for field id " + m_desc.getId(), null,
+         throw new BinaryValueConversionException("No field converter found for field id " + m_desc.getId(), null,
             m_desc, m_byteValue, m_byteOrder, m_characterEncoding);
 
       if (m_byteOrder == null)
-         throw new BinaryValueConversionException(
-            "No byte order set for field id " + m_desc.getId(), null, m_desc,
+         throw new BinaryValueConversionException("No byte order set for field id " + m_desc.getId(), null, m_desc,
             m_byteValue, null, null);
 
       if (m_characterEncoding == null)
-         throw new BinaryValueConversionException(
-            "No character encoding set for field id " + m_desc.getId(), null,
+         throw new BinaryValueConversionException("No character encoding set for field id " + m_desc.getId(), null,
             m_desc, m_byteValue, null, null);
 
-      return m_fieldConverter.toInterpreted(m_byteValue, m_desc, m_byteOrder,
-         m_characterEncoding);
+      return m_fieldConverter.toInterpreted(m_byteValue, m_desc, m_byteOrder, m_characterEncoding);
    }
 
-   private BinaryValue convertToBinary()
-      throws InterpretedValueConversionException {
+   private ByteBuffer convertToBinary() throws InterpretedValueConversionException {
 
       if (m_fieldConverter == null)
-         throw new InterpretedValueConversionException(
-            "No field converter found for field id " + m_desc.getId(), null,
+         throw new InterpretedValueConversionException("No field converter found for field id " + m_desc.getId(), null,
             m_desc, m_interpretedValue, m_byteOrder, m_characterEncoding);
 
       if (m_byteOrder == null)
-         throw new InterpretedValueConversionException(
-            "No byte order set for field id " + m_desc.getId(), null, m_desc,
+         throw new InterpretedValueConversionException("No byte order set for field id " + m_desc.getId(), null, m_desc,
             m_interpretedValue, null, null);
 
       if (m_characterEncoding == null)
-         throw new InterpretedValueConversionException(
-            "No character encoding set for field id " + m_desc.getId(), null,
+         throw new InterpretedValueConversionException("No character encoding set for field id " + m_desc.getId(), null,
             m_desc, m_interpretedValue, null, null);
 
-      return m_fieldConverter.toBinary(m_interpretedValue, m_desc, m_byteOrder,
-         m_characterEncoding);
+      return m_fieldConverter.toBinary(m_interpretedValue, m_desc, m_byteOrder, m_characterEncoding);
    }
 
    /**
@@ -285,11 +275,9 @@ public class StandardField<T> implements Field<T> {
    @Override
    public String toString() {
 
-      return getClass().getSimpleName() + "[id=" + getId().getGlobalId()
-         + ", totalSize=" + getTotalSize() + ", m_interpretedValue="
-         + m_interpretedValue + ", parentId="
-         + (getParent() == null ? getParent() : getParent().getId())
-         + ", medium=" + getMediumReference() + "]";
+      return getClass().getSimpleName() + "[id=" + getId().getGlobalId() + ", totalSize=" + getTotalSize()
+         + ", m_interpretedValue=" + m_interpretedValue + ", parentId="
+         + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getMediumReference() + "]";
    }
 
    private final FieldConverter<T> m_fieldConverter;
@@ -306,7 +294,7 @@ public class StandardField<T> implements Field<T> {
 
    private long m_totalSize;
 
-   private BinaryValue m_byteValue;
+   private ByteBuffer m_byteValue;
 
    private T m_interpretedValue;
 }

@@ -8,13 +8,13 @@
  */
 package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.datablocks.impl.SignedNumericFieldConverter;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -33,7 +33,7 @@ public class Lyrics3v2StringSizeIntegerConverter extends SignedNumericFieldConve
 
    // TODO primeRefactor005: Finalize and document this method
    @Override
-   public Long toInterpreted(BinaryValue binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+   public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws BinaryValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");
@@ -41,18 +41,16 @@ public class Lyrics3v2StringSizeIntegerConverter extends SignedNumericFieldConve
       Reject.ifNull(desc, "desc");
       Reject.ifNull(binaryValue, "binaryValue");
 
-      if (binaryValue.getTotalSize() > MAX_LYRICS3v2_SIZE_FIELD_LENGTH)
+      if (binaryValue.remaining() > MAX_LYRICS3v2_SIZE_FIELD_LENGTH)
          throw new BinaryValueConversionException(
             "Total size of binary value containing Lyrics3v2 size information must not be bigger than 6 bytes", null,
             desc, binaryValue, byteOrder, characterEncoding);
 
-      byte[] lengthFieldBytes = binaryValue.getBytes(0, (int) binaryValue.getTotalSize());
-
       int totalSize = 0;
       int digitMultiplier = 1;
 
-      for (int i = lengthFieldBytes.length - 1; i >= 0; --i) {
-         int nextDigit = Character.digit(lengthFieldBytes[i], DECIMAL_RADIX);
+      for (int i = binaryValue.remaining() - 1; i >= 0; --i) {
+         int nextDigit = Character.digit(binaryValue.get(binaryValue.position() + i), DECIMAL_RADIX);
 
          if (nextDigit == -1)
             throw new BinaryValueConversionException("Size field's value <" + binaryValue + "> may contain digits only",
@@ -67,7 +65,7 @@ public class Lyrics3v2StringSizeIntegerConverter extends SignedNumericFieldConve
    }
 
    @Override
-   public BinaryValue toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+   public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws InterpretedValueConversionException {
 
       Reject.ifNull(characterEncoding, "characterEncoding");

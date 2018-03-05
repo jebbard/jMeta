@@ -9,6 +9,7 @@
  */
 package com.github.jmeta.defaultextensions.ogg.impl;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -22,10 +23,9 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.BinaryValue;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -49,8 +49,8 @@ public class OggExtension implements Extension {
    /**
     *
     */
-   public static final ContainerDataFormat OGG = new ContainerDataFormat("Ogg", new HashSet<String>(), new HashSet<String>(),
-      new ArrayList<String>(), "", new Date());
+   public static final ContainerDataFormat OGG = new ContainerDataFormat("Ogg", new HashSet<String>(),
+      new HashSet<String>(), new ArrayList<String>(), "", new Date());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -114,11 +114,12 @@ public class OggExtension implements Extension {
 
       final List<DataBlockId> capturePatternChildIds = new ArrayList<>();
 
-      descMap.put(oggPageHeaderCaptureId, new DataBlockDescription(oggPageHeaderCaptureId,
-         "Ogg page header capture pattern", "Ogg page header capture pattern", PhysicalDataBlockType.FIELD,
-         capturePatternChildIds, new FieldProperties<>(FieldType.STRING, OGG_MAGIC_KEY_STRING,
-            null, null, 4, 4, null, null, null, null, null, null, null, null), capturePatternLocationProps,
-         4, 4, null, null));
+      descMap.put(oggPageHeaderCaptureId,
+         new DataBlockDescription(
+            oggPageHeaderCaptureId, "Ogg page header capture pattern", "Ogg page header capture pattern",
+            PhysicalDataBlockType.FIELD, capturePatternChildIds, new FieldProperties<>(FieldType.STRING,
+               OGG_MAGIC_KEY_STRING, null, null, 4, 4, null, null, null, null, null, null, null, null),
+            capturePatternLocationProps, 4, 4, null, null));
 
       // 2. Ogg stream structure version
       final Map<DataBlockId, LocationProperties> streamStructVersionLocationProps = new HashMap<>();
@@ -127,12 +128,11 @@ public class OggExtension implements Extension {
 
       final List<DataBlockId> streamStructVersionChildIds = new ArrayList<>();
 
-      descMap.put(oggPageHeaderStreamStructVersionId,
-         new DataBlockDescription(oggPageHeaderStreamStructVersionId, "Ogg page header stream structure version",
-            "Ogg page header structure version", PhysicalDataBlockType.FIELD, streamStructVersionChildIds,
-            new FieldProperties<>(FieldType.BINARY, new BinaryValue(new byte[] { 0 }), null,
-               null, 1, 1, null, null, null, null, null, null, null, null), streamStructVersionLocationProps,
-            1, 1, null, null));
+      descMap.put(oggPageHeaderStreamStructVersionId, new DataBlockDescription(oggPageHeaderStreamStructVersionId,
+         "Ogg page header stream structure version", "Ogg page header structure version", PhysicalDataBlockType.FIELD,
+         streamStructVersionChildIds, new FieldProperties<>(FieldType.BINARY, ByteBuffer.wrap(new byte[] { 0 }), null,
+            null, 1, 1, null, null, null, null, null, null, null, null),
+         streamStructVersionLocationProps, 1, 1, null, null));
 
       // 3. Ogg header type flag
       // TODO doItFirst002: define flags
@@ -142,12 +142,12 @@ public class OggExtension implements Extension {
 
       final List<DataBlockId> headerTypeFlagChildIds = new ArrayList<>();
 
-      descMap
-         .put(oggPageHeaderHeaderTypeFlagId, new DataBlockDescription(oggPageHeaderHeaderTypeFlagId,
-            "Ogg page header type flag", "Ogg page header type flag", PhysicalDataBlockType.FIELD,
-            headerTypeFlagChildIds, new FieldProperties<BinaryValue>(FieldType.BINARY, null,
-               null, null, 1, 1, null, null, null, null, null, null, null, null), headerTypeFlagLocationProps,
-            1, 1, null, null));
+      descMap.put(oggPageHeaderHeaderTypeFlagId,
+         new DataBlockDescription(
+            oggPageHeaderHeaderTypeFlagId, "Ogg page header type flag", "Ogg page header type flag",
+            PhysicalDataBlockType.FIELD, headerTypeFlagChildIds, new FieldProperties<ByteBuffer>(FieldType.BINARY, null,
+               null, null, 1, 1, null, null, null, null, null, null, null, null),
+            headerTypeFlagLocationProps, 1, 1, null, null));
 
       // 4. Ogg absolute granule position
       final Map<DataBlockId, LocationProperties> absGranulePosLocationProps = new HashMap<>();
@@ -156,11 +156,11 @@ public class OggExtension implements Extension {
 
       final List<DataBlockId> absGranulePosChildIds = new ArrayList<>();
 
-      descMap.put(oggPageHeaderAbsoluteGranulePosId, new DataBlockDescription(oggPageHeaderAbsoluteGranulePosId,
-         "Ogg page absolute granule position", "Ogg page absolute granule position", PhysicalDataBlockType.FIELD,
-         absGranulePosChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null,
-            null, null, 8, 8, null, null, null, null, null, null, null, null), absGranulePosLocationProps,
-         8, 8, null, null));
+      descMap.put(oggPageHeaderAbsoluteGranulePosId, new DataBlockDescription(
+         oggPageHeaderAbsoluteGranulePosId, "Ogg page absolute granule position", "Ogg page absolute granule position",
+         PhysicalDataBlockType.FIELD, absGranulePosChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER,
+            null, null, null, 8, 8, null, null, null, null, null, null, null, null),
+         absGranulePosLocationProps, 8, 8, null, null));
 
       // 5. Ogg stream serial number
       final Map<DataBlockId, LocationProperties> streamSerialNoLocationProps = new HashMap<>();
@@ -169,11 +169,11 @@ public class OggExtension implements Extension {
 
       final List<DataBlockId> streamSerialNoChildIds = new ArrayList<>();
 
-      descMap.put(oggPageHeaderStreamSerialNoId, new DataBlockDescription(oggPageHeaderStreamSerialNoId,
-         "Ogg page stream serial number", "Ogg page stream serial number", PhysicalDataBlockType.FIELD,
-         streamSerialNoChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null,
-            null, null, 4, 4, null, null, null, null, null, null, null, null), streamSerialNoLocationProps,
-         4, 4, null, null));
+      descMap.put(oggPageHeaderStreamSerialNoId, new DataBlockDescription(
+         oggPageHeaderStreamSerialNoId, "Ogg page stream serial number", "Ogg page stream serial number",
+         PhysicalDataBlockType.FIELD, streamSerialNoChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER,
+            null, null, null, 4, 4, null, null, null, null, null, null, null, null),
+         streamSerialNoLocationProps, 4, 4, null, null));
 
       // 6. Ogg page sequence number
       final Map<DataBlockId, LocationProperties> pageSequNoLocationProps = new HashMap<>();
@@ -182,11 +182,11 @@ public class OggExtension implements Extension {
 
       final List<DataBlockId> pageSequNoChildIds = new ArrayList<>();
 
-      descMap.put(oggPageHeaderPageSequNoId, new DataBlockDescription(
-         oggPageHeaderPageSequNoId, "Ogg page sequence number", "Ogg page sequence number", PhysicalDataBlockType.FIELD,
-         pageSequNoChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null,
-            null, null, 4, 4, null, null, null, null, null, null, null, null), pageSequNoLocationProps,
-         4, 4, null, null));
+      descMap.put(oggPageHeaderPageSequNoId,
+         new DataBlockDescription(oggPageHeaderPageSequNoId, "Ogg page sequence number", "Ogg page sequence number",
+            PhysicalDataBlockType.FIELD, pageSequNoChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER,
+               null, null, null, 4, 4, null, null, null, null, null, null, null, null),
+            pageSequNoLocationProps, 4, 4, null, null));
 
       // 7. Ogg page checksum
       final Map<DataBlockId, LocationProperties> pageChecksumLocationProps = new HashMap<>();
@@ -196,11 +196,10 @@ public class OggExtension implements Extension {
       final List<DataBlockId> pageChecksumChildIds = new ArrayList<>();
 
       descMap.put(oggPageHeaderPageChecksumId,
-         new DataBlockDescription(
-            oggPageHeaderPageChecksumId, "Ogg page checksum", "Ogg page checksum", PhysicalDataBlockType.FIELD,
-            pageChecksumChildIds, new FieldProperties<BinaryValue>(FieldType.BINARY, null, null,
-               null, 4, 4, null, null, null, null, null, null, null, null), pageChecksumLocationProps,
-            4, 4, null, null));
+         new DataBlockDescription(oggPageHeaderPageChecksumId, "Ogg page checksum", "Ogg page checksum",
+            PhysicalDataBlockType.FIELD, pageChecksumChildIds, new FieldProperties<ByteBuffer>(FieldType.BINARY, null,
+               null, null, 4, 4, null, null, null, null, null, null, null, null),
+            pageChecksumLocationProps, 4, 4, null, null));
 
       // 8. Ogg page segments
       final Map<DataBlockId, LocationProperties> pageSegmentsLocationProps = new HashMap<>();
@@ -220,9 +219,9 @@ public class OggExtension implements Extension {
       descMap.put(oggPageHeaderSegmentsId,
          new DataBlockDescription(
             oggPageHeaderSegmentsId, "Ogg page segments", "Ogg page segments", PhysicalDataBlockType.FIELD,
-            pageSegmentsChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER,
-               null, null, null, 1, 1, null, null, null, null, null, null, null, pageSegmentsFunctions), pageSegmentsLocationProps,
-            1, 1, null, null));
+            pageSegmentsChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, 1, 1,
+               null, null, null, null, null, null, null, pageSegmentsFunctions),
+            pageSegmentsLocationProps, 1, 1, null, null));
 
       // 9. Ogg page segment table entry
       final Map<DataBlockId, LocationProperties> segmentTableLocationProps = new HashMap<>();
@@ -239,11 +238,11 @@ public class OggExtension implements Extension {
 
       final List<DataBlockId> segmentTableChildIds = new ArrayList<>();
 
-      descMap.put(oggPageHeaderSegmentTableEntryId, new DataBlockDescription(oggPageHeaderSegmentTableEntryId,
-         "Ogg page segment table entry", "Ogg segment table entry", PhysicalDataBlockType.FIELD, segmentTableChildIds,
-         new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, 1, 1, null,
-            null, null, null, null, null, null, segmentTableEntryFunctions), segmentTableLocationProps,
-         1, 1, null, null));
+      descMap.put(oggPageHeaderSegmentTableEntryId, new DataBlockDescription(
+         oggPageHeaderSegmentTableEntryId, "Ogg page segment table entry", "Ogg segment table entry",
+         PhysicalDataBlockType.FIELD, segmentTableChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER,
+            null, null, null, 1, 1, null, null, null, null, null, null, null, segmentTableEntryFunctions),
+         segmentTableLocationProps, 1, 1, null, null));
 
       // 10. The Ogg page header
       final Map<DataBlockId, LocationProperties> pageHeaderLocationProps = new HashMap<>();
@@ -265,8 +264,8 @@ public class OggExtension implements Extension {
 
       descMap.put(oggPageHeaderId,
          new DataBlockDescription(oggPageHeaderId, "Ogg page header", "Ogg page header", PhysicalDataBlockType.HEADER,
-            pageHeaderChildIds, null, pageHeaderLocationProps, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE,
-            null, null));
+            pageHeaderChildIds, null, pageHeaderLocationProps, DataBlockDescription.UNKNOWN_SIZE,
+            DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 11a. Ogg packet container
       final Map<DataBlockId, LocationProperties> packetContainerLocationProps = new HashMap<>();
@@ -278,8 +277,8 @@ public class OggExtension implements Extension {
 
       descMap.put(oggPacketPartContainerId,
          new DataBlockDescription(oggPacketPartContainerId, "Ogg packet", "Ogg packet", PhysicalDataBlockType.CONTAINER,
-            packetContainerChildIds, null, packetContainerLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE,
-            null, null));
+            packetContainerChildIds, null, packetContainerLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null,
+            null));
 
       // 11b. Ogg packet
       final Map<DataBlockId, LocationProperties> packetLocationProps = new HashMap<>();
@@ -303,10 +302,10 @@ public class OggExtension implements Extension {
 
       descMap.put(oggSegmentId,
          new DataBlockDescription(oggSegmentId, "Ogg segment", "Ogg segment", PhysicalDataBlockType.FIELD,
-            segmentChildIds, new FieldProperties<BinaryValue>(FieldType.BINARY, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
+            segmentChildIds,
+            new FieldProperties<ByteBuffer>(FieldType.BINARY, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null),
-            segmentLocationProps,
-            0, 999999, null, null));
+            segmentLocationProps, 0, 999999, null, null));
 
       // 13. The Ogg page payload
       final Map<DataBlockId, LocationProperties> pagePayloadLocationProps = new HashMap<>();
@@ -320,8 +319,8 @@ public class OggExtension implements Extension {
 
       descMap.put(oggPayloadId,
          new DataBlockDescription(oggPayloadId, "Ogg page payload", "Ogg page payload",
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, pagePayloadChildIds, null, pagePayloadLocationProps,
-            0, 9999999, null, null));
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, pagePayloadChildIds, null, pagePayloadLocationProps, 0,
+            9999999, null, null));
 
       // 14. Ogg page
 
@@ -342,8 +341,8 @@ public class OggExtension implements Extension {
 
       descMap.put(oggPageId,
          new DataBlockDescription(oggPageId, "Ogg page", "The ogg page", PhysicalDataBlockType.CONTAINER, pageChildIds,
-            null, pageLocationProps, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE,
-            oggMagicKeys, null));
+            null, pageLocationProps, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, oggMagicKeys,
+            null));
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(oggPageId);

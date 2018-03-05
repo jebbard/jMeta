@@ -138,10 +138,9 @@ public abstract class AbstractMediumExpectationProvider {
     * @return the expected data block bytes for the given {@link DataBlockInstanceId} at the given absolute offset with
     *         given size.
     */
-   public byte[] getExpectedBytes(long absoluteOffset, int size) {
+   public ByteBuffer getExpectedBytes(long absoluteOffset, int size) {
 
-      byte[] returnedExpectedBytes = new byte[size];
-      ByteBuffer result = ByteBuffer.wrap(returnedExpectedBytes);
+      ByteBuffer result = ByteBuffer.allocate(size);
 
       try {
          raf.getChannel().read(result, absoluteOffset);
@@ -150,7 +149,9 @@ public abstract class AbstractMediumExpectationProvider {
             + file.toAbsolutePath().toString() + "> at offset <" + absoluteOffset + ">.", e);
       }
 
-      return returnedExpectedBytes;
+      result.rewind();
+
+      return result;
    }
 
    /**

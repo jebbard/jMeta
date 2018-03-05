@@ -30,8 +30,7 @@ public abstract class AbstractDataBlock implements DataBlock {
     * @param reference
     * @param dataBlockReader
     */
-   public AbstractDataBlock(DataBlockId id, DataBlock parent,
-      MediumOffset reference, DataBlockReader dataBlockReader) {
+   public AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader) {
       Reject.ifNull(id, "id");
       Reject.ifNull(dataBlockReader, "dataBlockReader");
       Reject.ifNull(reference, "reference");
@@ -55,24 +54,16 @@ public abstract class AbstractDataBlock implements DataBlock {
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(long, int)
     */
    @Override
-   public byte[] getBytes(long offset, int size) {
+   public ByteBuffer getBytes(long offset, int size) {
 
       Reject.ifNegative(offset, "offset");
       Reject.ifNegative(size, "size");
       Reject.ifNull(getMediumReference(), "getMediumReference()");
 
       if (getTotalSize() != DataBlockDescription.UNKNOWN_SIZE)
-    	  Reject.ifFalse(offset + size <= getTotalSize(),
-            "offset + size <= getTotalSize()");
+         Reject.ifFalse(offset + size <= getTotalSize(), "offset + size <= getTotalSize()");
 
-      ByteBuffer readBuffer = getDataBlockReader()
-         .readBytes(m_mediumReference.advance(offset), size);
-
-      byte[] readBytes = new byte[readBuffer.remaining()];
-
-      readBuffer.get(readBytes);
-
-      return readBytes;
+      return getDataBlockReader().readBytes(m_mediumReference.advance(offset), size);
    }
 
    /**
@@ -121,9 +112,8 @@ public abstract class AbstractDataBlock implements DataBlock {
    public String toString() {
 
       return getClass().getName() + "[id=" + getId() + ", parentId="
-         + (getParent() == null ? getParent() : getParent().getId())
-         + ", medium=" + getMediumReference() + ", totalSize=" + getTotalSize()
-         + "]";
+         + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getMediumReference()
+         + ", totalSize=" + getTotalSize() + "]";
    }
 
    private DataBlock m_parent;

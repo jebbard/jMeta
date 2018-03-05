@@ -1,6 +1,8 @@
 
 package com.github.jmeta.defaultextensions.id3v23.impl;
 
+import java.nio.ByteBuffer;
+
 import com.github.jmeta.library.datablocks.api.services.AbstractTransformationHandler;
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
@@ -44,7 +46,7 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
       // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
       int size = (int) payload.getTotalSize();
 
-      byte[] payloadBytes = payload.getBytes(0, size);
+      ByteBuffer payloadBytes = payload.getBytes(0, size);
       byte[][] transformedPayloadBytes = transformRawBytes(payloadBytes);
 
       payload.setBytes(transformedPayloadBytes);
@@ -70,7 +72,7 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
       // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
       int size = (int) payload.getTotalSize();
 
-      byte[] payloadBytes = payload.getBytes(0, size);
+      ByteBuffer payloadBytes = payload.getBytes(0, size);
       byte[][] untransformedPayloadBytes = untransformRawBytes(payloadBytes);
 
       payload.setBytes(untransformedPayloadBytes);
@@ -83,11 +85,11 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
     * @param payloadBytes
     * @return the transformed bytes
     */
-   protected abstract byte[][] transformRawBytes(byte[] payloadBytes);
+   protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);
 
    /**
     * @param payloadBytes
     * @return the untransformed bytes
     */
-   protected abstract byte[][] untransformRawBytes(byte[] payloadBytes);
+   protected abstract byte[][] untransformRawBytes(ByteBuffer payloadBytes);
 }
