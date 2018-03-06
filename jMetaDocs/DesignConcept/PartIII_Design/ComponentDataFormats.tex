@@ -171,6 +171,8 @@ The only disadvantage possibly to be identified that there could be padding just
 }
 %%%% <-- DD %%%%
 
+The overall term for containers, headers, footers, fields and payload is a \textbf{datablock}. This term is used further on throughout this document.
+
 % =======================================================================================================
 \subsection{Representing a Data Format}%
 \label{sec:RepresentingaDataFormat}%
@@ -191,6 +193,169 @@ We need some way to identify which data format a container belongs to. A class a
 No disadvantages known
 }
 %%%% <-- DD %%%%
+
+But that's not all of it. If we structure data belonging to a format into containers, headers, footers and so on according to the generic metamodel, \emph{how exactly} is a correct datablock of a given format structured? Of course, each format individually specifies the exact structure of its containers (how many headers, footers etc., what the payload can contain), headers (which fields make up a header), fields (which type a field has, how long it is and which values it can have) and so on. Thus, we need a place where we describe the structure of all datablocks belonging to a data format in more detail, otherwise we could not parse this data generically.
+
+We define:
+%%%% DD --> %%%%
+\DD{dd:507}
+{% Title
+\texttt{DataFormatSpecification} provides \texttt{DataBlockDescription}s, \texttt{DataFormatRepository} maintains all \texttt{DataFormatSpecification}s
+}
+{% Short description
+The exact properties of a datablock is described by an instance of the class \texttt{DataBlockDescription}. Which properties are needed in detail is determined later in \SectionLink{sec:DatablockProperties}.
+The interface \texttt{DataFormatSpecification} provides access to all \texttt{DataBlockDescription}s offered by one specific data format. Last but not least there is a \texttt{DataFormatRepository} interface which basically only maintains a list of all supported data formats and their corresponding \texttt{DataFormatSpecification}s.
+
+A concrete \texttt{DataFormatSpecification} is defined in an extension and loaded when starting \LibName{}. 
+}
+{% Rationale
+For generically parsing data blocks according to a format definition, the parser code needs information about the exact structure of a data block. Thus, we need a place to maintain all data formats, their specifications and a description of each possible individual container, field etc.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% =======================================================================================================
+\subsection{\texttt{DataBlockDescription} Common Properties}%
+\label{sec:DatablockProperties}%
+
+First of all, we need a clear way to identify each specific datablock that might occur in the data format. Every container type, header, footer, field and payload needs an identifier:
+%%%% DD --> %%%%
+\DD{dd:508}
+{% Title
+Each datablock of a format has an specification id unique across all supported formats
+}
+{% Short description
+Each distinctly defined container, header, footer, field or payload block of a data format is assigned a unique specification id. Using this specification id, a parser implementation can lookup the \texttt{DataBlockDescription} of the block from its associated \texttt{DataFormatSpecification}. Specification ids are human-readble rather than generated GUIDs. The uniqueness is guaranteed by using a top-level prefix identifier that is directly checked to be unique upon all loaded data formats when loading the extension defining the data format. The ids reflect the hierarchical nature of a data format according to the container meta model, following these rules:
+\begin{itemize}
+\item Each id consists of one or more \emph{segments} separated by a dot.
+\item A segment name does only contain ASCII alphanumeric characters, starting always with a lower-case letter and preferring lower-case only letters, i.e. no special characters, no blanks etc. So a datablock id has much in common with a Java package name. 
+\item The first segment is the data format top-level prefix which equals the (single) top-level container id of the data format. So we have the implicit decision that each format starts off with a single container on top-level enclosing everything else. This is true for all data formats considered here.
+\item Each container consists of an arbitrary number of headers and footers as well as exactly one payload. The segment name of a container payload is always \texttt{payload}. If there is just a single header or footer, it is called header or footer respectively. Multiple headers or footers bear more specific, distinct names.
+\item Child fields of a header or footer have descriptive names and so on 
+\end{itemize}
+}
+{% Rationale
+When parsing, the format structure of a datablock must be clearly visible and available. By an id, this format structure is clearly adressable and the corresponding \texttt{DataBlockDescription} can be obtained from a \texttt{DataFormatSpecification}. The uniquenss of the id guarantees that the parsing logic cannot unintentially try to parse a block of bytes according to the incorrect format.
+
+The reason for not using generated unique ids such as counters or GUIDs is that we want to have memorable and recognizable names, both for library developers (e.g. during debugging) or \LibName{} end-users that need to work with datablock ids directly. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Besides their id, what else might be desirable on first glance when looking at a datablock taken from a data format's specification? Some descriptive stuff comes to mind. Second, it seems like every datablock must have exactly one type that is useful to store. So we can state:
+%%%% DD --> %%%%
+\DD{dd:509}
+{% Title
+Basic properties held in a \texttt{DataBlockDescription}
+}
+{% Short description
+Each \texttt{DataBlockDescription} instance holds the datablock id of the datablock according to \DesLink{dd:508}. In addition, it has:
+\begin{itemize}
+\item A more human-readable name of the datablock, if available; only for display or documentation purposes
+\item A description of the datablock, probably taken from the format specification, preferably in English. This is meant to give more information about the purpose of the datablock, but has no other meaning.
+\item The \texttt{DataBlockType} of the datablock, which is: \texttt{HEADER}, \texttt{FOOTER}, \texttt{CONTAINER}, \texttt{FIELD}, as well as \-- according to \DesLink{dd:504} \-- \texttt{FIELD\_BASED\_PAYLOAD} or \texttt{CONTAINER\_BASED\_PAYLOAD}.
+\end{itemize}
+}
+{% Rationale
+These properties are clear from the beginning, the concrete is known statically, and it is needed to take decisions during generic parsing. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+ 
+We defined that datablock ids are organized hierarchically as their real blocks are organized hierarchically. However, still, it is not sufficient to somehow maintain the ``hierarchy'' indicated by the metamodel only in the datablock ids. Instead, we define:
+%%%% DD --> %%%%
+\DD{dd:510}
+{% Title
+\texttt{DataBlockDescription}s contain a list of all child ids they might contain, where order matters
+}
+{% Short description
+A \texttt{DataBlockDescription} instance contains a list of all child datablock ids that form the structure of the datablock described. While headers, footers, containers and payload usually has child ids, \texttt{DataBlockDescription}s of fields must not define child datablock ids. The list of child ids is ordered with the following meaning:
+\begin{itemize}
+\item For containers, the child id list exactly matches the correct order of headers, payload and footers that build the container
+\item For headers, footers and field-based payload, the child id list exactly matches the order of child fields within the header, footer or field-based
+\item For container-based payloads, the child id list order does not have a meaning, i.e. if multiple different container types are allowed, they might appear in any order 
+\end{itemize}
+}
+{% Rationale
+The parsing code somehow needs information about what child blocks of which format to expect within a given datablock, otherwise parsing it correctly is simply impossible. Each data format clearly defines the order of fields, headers and footers. Usually, most container formats define just exactly one child container that can appear in a container-based payload. However, there are cases such as QuickTime (atom vs. QT atom container) that define multiple different container types that might appear in any possible order. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+We first have to define some limitations for these datablock ids that should be made clear:
+%%%% DD --> %%%%
+\DD{dd:511}
+{% Title
+Datablock ids and their segments MUST not be used for any logic 
+}
+{% Short description
+Especially, no assumptions about the hierarchical relations of distinct blocks must be done based on their id. E.g. a block with specification id \texttt{id3v23.payload.talb.encoding} not necessarily is a child of a block with id \texttt{id3v23.payload.talb}, as there could be multiple \texttt{talb} containers within an ID3v23 tag. So datablock ids are only specification ids, not instance ids! Even within the same specification, a case might occur where the same chunk of data with the exact structure appears in several places, e.g. as child of the top-level container, and also as deeper nested child. Moreover, some container formats encourage to embed datablocks belonging to even completely different data formats. How do we handle such cases? In no special way. Even if a container might appear on several levels, we just define its structure once in the data format with just one id. And if a datablock of a data format is embedded in another container of a different format, it still keeps its well-defined datablock id according to its data format. So this again shows that based on the id, we can never determine the real hierarchy level or instance relations of two datablocks during parsing! 
+}
+{% Rationale
+Quite clear, otherwise we would implement a lot of bullshit code
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% =======================================================================================================
+\subsection{Concrete and Generic Containers}%
+\label{sec:ConcreteandGenericContainers}%
+
+In the previous sections, we already vaguely mentioned the term of container types. We define a container type as follows: A container type is a container of a specific data format having exactly N (possibly optional) headers with a concrete structure, a single payload of arbitrary type, and exactly M (possibly optional) footers with a concrete structure. So a container type matches a \texttt{DataBlockDescription} of \texttt{DataBlockType=CONTAINER}. A data format might specify multiple different container types, even on the same level as we see in the following examples: 
+\begin{itemize}
+\item Most container formats such as RIFF or Matroska define exactly one container type. In these formats, those containers usually can be found on top-level as well as arbitrarily nested within parent containers   
+\item Some container formats such as ID3v23 use a slightly different container structure for the top-level (the tag) container as for the child (the frame) containers 
+\item Some container formats such as QuickTime even define multiple types of containers that can appear on the same level: First of all, there are the top-level containers called atoms; one variant of atoms are QT atoms, which just extend the header a bit, and thus, based on our definition above, are yet another container type. Both might appear on top-level. Furthermore, as child containers, not only atoms or QT atoms might appear, but also QT atom containers (a slightly confusing term here, but this is how QuickTime names them)
+\end{itemize}
+
+But this is not the only added complexity: Saying that we have commonly structured containers of various types is one thing. Of course, this allows us to implement parsing of these container types just once. One point to note is, that nevertheless there can be multiple concrete ``sub-types'' of a container type, that yet have their specialties. E.g. ID3v23 defines multiple concrete frame types: TALB, TART, COMM and others. Each of them has a specific semantics of what kind of metadata it stores. But semantic is only one part, based on the concrete frame type, their \emph{payload structure might differ} - while their headers and footers, of course, are still the same, because otherwise they would belong to even different container types.
+
+This is not a shameful design failure of these data formats, but in contrast it is the most basic property of most well-designed container formats: They define the structures of their basic buildings blocks (i.e. their container types) just once, and specialize this basic structure whenever needed. This at first allows to write generic parsers at all that may skip containers whose semantics and purpose they might not be aware of, but yet they still know their structure and thus are able to determine where the next container actually starts. This allows to extend data formats by new subtypes whereas existing parsers still work.
+
+What does it mean for us? Does it also allow us to specify their structure just once in a \texttt{DataFormatSpecification}, i.e. just a single \texttt{DataBlockDescription} per container type? Unfortunately, the answer is yes and no. The first requirement clearly is, that \LibName{} has to support basic generic container types:
+%%%% DD --> %%%%
+\DD{dd:512}
+{% Title
+\COMPdataFormatManagement{} must maintain \texttt{DataBlockDescription}s for generic container types
+}
+{% Short description
+\COMPdataFormatManagement{} has to define \texttt{DataBlockDescription}s for generic container types to allow parsers to still understand structure and determine size of a container and skip it if it does not know the detailed internal payload structure. A generic container always has only \texttt{FIELD\_BASED\_PAYLOAD}.
+}
+{% Rationale
+This is clear from what was said enough, flexible parsers must simply support this. They can consider unknown containers as having a raw binary field as their payload with unknown content, so \texttt{FIELD\_BASED\_PAYLOAD} is just right and we do not need to invent yet another type such as ``\texttt{GENERIC\_PAYLOAD}''.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now what about concrete sub-types of a generic container type? Of course we want to be able to specify a specific payload structure of a specific sub-type. So we define:
+%%%% DD --> %%%%
+\DD{dd:}
+{% Title
+
+}
+{% Short description
+
+}
+{% Rationale
+
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 
 %###############################################################################################
 %###############################################################################################
