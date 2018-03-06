@@ -20,6 +20,7 @@ import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionClipResult;
 import com.github.jmeta.library.media.api.types.MediumRegion.MediumRegionOverlapType;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
@@ -917,9 +918,7 @@ public class MediumRegionTest {
       int initialSize = regionToSplit.getSize();
 
       if (regionToSplit.getBytes() != null) {
-         byte[] byteCopy = new byte[regionToSplit.getBytes().remaining()];
-
-         regionToSplit.getBytes().get(byteCopy);
+         byte[] byteCopy = ByteBufferUtils.asByteArrayCopy(regionToSplit.getBytes());
 
          initialBytesCopy = ByteBuffer.wrap(byteCopy);
       }

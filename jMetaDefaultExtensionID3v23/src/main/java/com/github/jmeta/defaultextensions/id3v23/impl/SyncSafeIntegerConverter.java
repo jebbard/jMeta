@@ -16,6 +16,7 @@ import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionE
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.datablocks.impl.SignedNumericFieldConverter;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -43,11 +44,7 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
             "ID3v23 size fields must have integer (" + Integer.SIZE / Byte.SIZE + " bytes) size", null, desc,
             binaryValue, byteOrder, characterEncoding);
 
-      byte[] copiedBytes = new byte[binaryValue.remaining()];
-
-      for (int i = 0; i < copiedBytes.length; i++) {
-         copiedBytes[i] = binaryValue.get(binaryValue.position() + i);
-      }
+      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
 
       int size = ByteBuffer.wrap(copiedBytes).getInt();
 

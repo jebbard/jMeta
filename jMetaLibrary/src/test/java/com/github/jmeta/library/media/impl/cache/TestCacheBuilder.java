@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumRegion;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -74,10 +75,7 @@ class TestCacheBuilder {
        * @return the {@link TestCacheRegionInfo} converted from the {@link MediumRegion}
        */
       public static TestCacheRegionInfo fromMediumRegion(MediumRegion region) {
-         ByteBuffer bytes = region.getBytes();
-         byte[] regionBytes = new byte[bytes.remaining()];
-
-         bytes.get(regionBytes);
+         byte[] regionBytes = ByteBufferUtils.asByteArrayCopy(region.getBytes());
 
          TestCacheRegionInfo testCacheRegionInfoToAdd = new TestCacheRegionInfo(
             region.getStartOffset().getAbsoluteMediumOffset(), regionBytes);
@@ -221,7 +219,7 @@ class TestCacheBuilder {
       Reject.ifNull(region, "region");
 
       appendRegionInfo(new TestCacheRegionInfo(region.getStartOffset().getAbsoluteMediumOffset(),
-         regionBytesFromMediumRegion(region)));
+         ByteBufferUtils.asByteArrayCopy(region.getBytes())));
    }
 
    /**
@@ -397,22 +395,6 @@ class TestCacheBuilder {
       byte[] content = new byte[size];
 
       Arrays.fill(content, fillByte);
-
-      return content;
-   }
-
-   /**
-    * Extracts bytes from the given cached {@link MediumRegion}.
-    * 
-    * @param region
-    *           The {@link MediumRegion} to extract bytes from
-    * @return The bytes extracted from the given {@link MediumRegion}
-    */
-   private static byte[] regionBytesFromMediumRegion(MediumRegion region) {
-      ByteBuffer bytes = region.getBytes();
-      byte[] content = new byte[bytes.remaining()];
-
-      bytes.get(content);
 
       return content;
    }

@@ -32,6 +32,7 @@ import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
@@ -627,11 +628,7 @@ public abstract class AbtractDataBlockAccessorTest {
 
             if (actualFieldValue instanceof ByteBuffer) {
                ByteBuffer actualAsBB = (ByteBuffer) actualFieldValue;
-               byte[] actualFieldValueAsByteArray = new byte[actualAsBB.remaining()];
-
-               for (int j = 0; j < actualAsBB.remaining(); j++) {
-                  actualFieldValueAsByteArray[j] = actualAsBB.get(actualAsBB.position() + j);
-               }
+               byte[] actualFieldValueAsByteArray = ByteBufferUtils.asByteArrayCopy(actualAsBB);
 
                actualFieldValue = actualFieldValueAsByteArray;
 
@@ -714,11 +711,7 @@ public abstract class AbtractDataBlockAccessorTest {
          try {
             ByteBuffer binaryValue = field.getBinaryValue();
 
-            byte[] actualBytes = new byte[readSizes[i]];
-
-            for (int j = 0; j < readSizes[i]; j++) {
-               actualBytes[j] = binaryValue.get(binaryValue.position() + (int) readOffsets[i] + j);
-            }
+            byte[] actualBytes = ByteBufferUtils.asByteArrayCopy(binaryValue, (int) readOffsets[i], readSizes[i]);
 
             org.junit.Assert.assertEquals(expectedBytes, ByteBuffer.wrap(actualBytes));
          } catch (InterpretedValueConversionException e) {

@@ -13,6 +13,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtilsTest;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtilsTest;
 import com.github.jmeta.utility.csv.api.services.EmptyCsvFileTest;
 import com.github.jmeta.utility.csv.api.services.NineColumnCsvFileTest;
 import com.github.jmeta.utility.csv.api.services.OneColumnCsvFileTest;
@@ -27,7 +28,7 @@ import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeHelperT
 @RunWith(Suite.class)
 @SuiteClasses({ StandardExtensionManagerTest.class, ByteArrayUtilsTest.class, NumericDataTypeHelperTest.class,
    TwelveColumnCsvFileTest.class, NineColumnCsvFileTest.class, TwoColumnCsvFileTest.class, OneColumnCsvFileTest.class,
-   EmptyCsvFileTest.class, })
+   EmptyCsvFileTest.class, ByteBufferUtilsTest.class })
 public class AlljMetaUtilityTests {
    // Nothing necessary here
 }

@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -38,11 +39,7 @@ public class StringFieldConverter implements FieldConverter<String> {
             "String fields may not be longer than " + Integer.MAX_VALUE + " bytes.", null, desc, binaryValue, byteOrder,
             characterEncoding);
 
-      byte[] copiedBytes = new byte[binaryValue.remaining()];
-
-      for (int i = 0; i < copiedBytes.length; i++) {
-         copiedBytes[i] = binaryValue.get(binaryValue.position() + i);
-      }
+      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
 
       String stringValue;
       try {

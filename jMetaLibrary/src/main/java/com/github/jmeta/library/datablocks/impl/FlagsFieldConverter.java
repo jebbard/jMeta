@@ -17,6 +17,7 @@ import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConver
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -43,11 +44,7 @@ public class FlagsFieldConverter implements FieldConverter<Flags> {
 
       final Flags flags = new Flags(flagSpec);
 
-      byte[] copiedBytes = new byte[binaryValue.remaining()];
-
-      for (int i = 0; i < binaryValue.remaining(); i++) {
-         copiedBytes[i] = binaryValue.get(binaryValue.position() + i);
-      }
+      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
 
       flags.fromArray(copiedBytes);
 

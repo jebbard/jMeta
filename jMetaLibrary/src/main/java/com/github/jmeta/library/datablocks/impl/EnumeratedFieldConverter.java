@@ -18,6 +18,7 @@ import java.util.Map;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO stage2_006: For enumerated fields, ensure during load time that there is
@@ -44,11 +45,7 @@ public class EnumeratedFieldConverter<T> implements FieldConverter<T> {
             "Enumerated fields may not be longer than " + Integer.MAX_VALUE + " bytes.", null, desc, binaryValue,
             byteOrder, characterEncoding);
 
-      byte[] copiedBytes = new byte[binaryValue.remaining()];
-
-      for (int i = 0; i < copiedBytes.length; i++) {
-         copiedBytes[i] = binaryValue.get(binaryValue.position() + i);
-      }
+      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
 
       // CONFIG_CHECK: byte values must only be present once
       Map<T, byte[]> enumValues = (Map<T, byte[]>) desc.getFieldProperties().getEnumeratedValues();

@@ -44,6 +44,7 @@ import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
+import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -1705,10 +1706,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
          if (actionBytes != null) {
 
-            byte[] actionByteArray = new byte[actionBytes.remaining()];
-            actionBytes.mark();
-            actionBytes.get(actionByteArray);
-            actionBytes.reset();
+            byte[] actionByteArray = ByteBufferUtils.asByteArrayCopy(actionBytes);
             String actionBytesAsString = new String(actionByteArray, Charsets.CHARSET_UTF8);
 
             expectationBuilder.appendLiteralString(actionBytesAsString);
