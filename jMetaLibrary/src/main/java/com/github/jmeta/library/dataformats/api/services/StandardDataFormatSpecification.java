@@ -22,10 +22,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -49,13 +48,11 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * @param paddingDataBlocks
     * @param supportedByteOrders
     * @param supportedCharacterEncodings
-    * @param transformations
     */
    public StandardDataFormatSpecification(ContainerDataFormat dataFormat,
       Map<DataBlockId, DataBlockDescription> dataBlockDescriptions, Set<DataBlockId> topLevelDataBlockIds,
       Set<DataBlockId> genericDataBlocks, Set<DataBlockId> paddingDataBlocks, List<ByteOrder> supportedByteOrders,
-      List<Charset> supportedCharacterEncodings, List<DataTransformationType> transformations) {
-      Reject.ifNull(transformations, "transformations");
+      List<Charset> supportedCharacterEncodings) {
       Reject.ifNull(dataBlockDescriptions, "dataBlockDescriptions");
       Reject.ifNull(topLevelDataBlockIds, "topLevelDataBlockIds");
       Reject.ifNull(dataFormat, "dataFormat");
@@ -72,7 +69,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       m_dataFormat = dataFormat;
       m_topLevelDataBlockIds.addAll(topLevelDataBlockIds);
       m_dataBlockDescriptions.putAll(dataBlockDescriptions);
-      m_transformations.addAll(transformations);
    }
 
    /**
@@ -135,8 +131,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
             realChildIds.add(new DataBlockId(m_dataFormat, replacedChildId));
          }
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
-            genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(),
-            locationProps, genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(),
+            genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(), locationProps,
+            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(),
             genericDescription.getMagicKeys(), null);
       }
 
@@ -168,15 +164,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    public Charset getDefaultCharacterEncoding() {
 
       return m_supportedCharacterEncodings.get(0);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecification#getDataTransformations()
-    */
-   @Override
-   public List<DataTransformationType> getDataTransformations() {
-
-      return Collections.unmodifiableList(m_transformations);
    }
 
    /**
@@ -296,6 +283,4 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    private final Set<DataBlockId> m_topLevelDataBlockIds = new HashSet<>();
 
    private final Map<DataBlockId, DataBlockDescription> m_dataBlockDescriptions = new HashMap<>();
-
-   private final List<DataTransformationType> m_transformations = new ArrayList<>();
 }

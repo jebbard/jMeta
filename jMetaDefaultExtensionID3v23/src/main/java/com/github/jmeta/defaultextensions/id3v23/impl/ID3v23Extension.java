@@ -28,7 +28,6 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -105,7 +104,7 @@ public class ID3v23Extension implements Extension {
    private static final DataBlockId ID3V23_HEADER_VERSION_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.version");
    private static final DataBlockId ID3V23_PAYLOAD_ID = new DataBlockId(ID3v23, "id3v23.payload");
    private static final int ID3V23_TAG_FLAG_SIZE = 1;
-   private static final DataBlockId ID3V23_TAG_ID = new DataBlockId(ID3v23, "id3v23");
+   public static final DataBlockId ID3V23_TAG_ID = new DataBlockId(ID3v23, "id3v23");
    private static final byte[] ID3V23_TAG_ID_BYTES = new byte[] { 'I', 'D', '3' };
    private static final String ID3V23_TAG_ID_STRING = "ID3";
    private static final String ID3V23_TAG_VERSION_STRING = "\u0003\u0000";
@@ -943,16 +942,8 @@ public class ID3v23Extension implements Extension {
 
       paddingDataBlocks.add(PADDING_ID);
 
-      final ArrayList<DataTransformationType> transformations = new ArrayList<>();
-
-      List<DataBlockId> unsynchronisationContainers = new ArrayList<>();
-
-      unsynchronisationContainers.add(ID3V23_TAG_ID);
-
-      transformations.add(new DataTransformationType("Unsynchronisation", unsynchronisationContainers, true, 0, 0));
-
       DataFormatSpecification dummyID3v23Spec = new StandardDataFormatSpecification(ID3v23, descMap, topLevelIds,
-         genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets, transformations);
+         genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets);
       return dummyID3v23Spec;
    }
 

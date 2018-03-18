@@ -27,7 +27,6 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -482,8 +481,7 @@ public class APEv2Extension implements Extension {
       genericDataBlocks.add(apeV2GenericItemPayloadId);
 
       DataFormatSpecification dummyAPEv2Spec = new StandardDataFormatSpecification(APEv2, descMap, topLevelIds,
-         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
-         new ArrayList<DataTransformationType>());
+         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets);
 
       return dummyAPEv2Spec;
    }

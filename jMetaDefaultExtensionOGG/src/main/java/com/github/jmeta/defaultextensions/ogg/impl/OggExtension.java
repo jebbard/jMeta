@@ -26,7 +26,6 @@ import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpeci
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -358,8 +357,7 @@ public class OggExtension implements Extension {
       final Set<DataBlockId> genericDataBlocks = new HashSet<>();
 
       DataFormatSpecification dummyOggSpec = new StandardDataFormatSpecification(OGG, descMap, topLevelIds,
-         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
-         new ArrayList<DataTransformationType>());
+         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets);
 
       return dummyOggSpec;
    }

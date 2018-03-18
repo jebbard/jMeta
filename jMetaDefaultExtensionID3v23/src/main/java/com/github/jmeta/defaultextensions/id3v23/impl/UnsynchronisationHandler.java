@@ -21,7 +21,6 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Header;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 
@@ -50,7 +49,7 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractTransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractTransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public boolean requiresTransform(Container container) {
@@ -84,7 +83,7 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractTransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractTransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public boolean requiresUntransform(Container container) {

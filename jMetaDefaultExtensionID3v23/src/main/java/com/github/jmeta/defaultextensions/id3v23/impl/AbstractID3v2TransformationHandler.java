@@ -3,11 +3,9 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import java.nio.ByteBuffer;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractTransformationHandler;
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Payload;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -30,7 +28,7 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#transform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#transform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public Container transform(Container container) {
@@ -56,7 +54,7 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#untransform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#untransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public Container untransform(Container container) {

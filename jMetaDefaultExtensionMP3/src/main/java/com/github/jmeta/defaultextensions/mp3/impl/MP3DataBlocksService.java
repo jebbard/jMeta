@@ -8,13 +8,9 @@
  */
 package com.github.jmeta.defaultextensions.mp3.impl;
 
-import java.util.HashMap;
-
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
  * {@link MP3DataBlocksService}
@@ -32,6 +28,6 @@ public class MP3DataBlocksService extends AbstractDataBlockService {
    @Override
    public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
 
-      return new MP3DataBlockReader(spec, new HashMap<DataTransformationType, TransformationHandler>(), lazyFieldSize);
+      return new MP3DataBlockReader(spec, lazyFieldSize);
    }
 }

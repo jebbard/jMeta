@@ -8,9 +8,6 @@
  */
 package com.github.jmeta.library.datablocks.api.services;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 
@@ -57,17 +54,6 @@ public abstract class AbstractDataBlockService implements DataBlockService {
    public ContainerDataFormat getDataFormat() {
 
       return m_myDataFormat;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getTransformationHandlers(DataFormatSpecification,
-    *      DataBlockFactory)
-    */
-   @Override
-   public List<TransformationHandler> getTransformationHandlers(DataFormatSpecification spec,
-      DataBlockFactory dataBlockFactory) {
-
-      return new ArrayList<>();
    }
 
    private final ContainerDataFormat m_myDataFormat;

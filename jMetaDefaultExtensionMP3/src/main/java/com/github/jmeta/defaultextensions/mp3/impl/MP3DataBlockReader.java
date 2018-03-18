@@ -10,10 +10,8 @@ package com.github.jmeta.defaultextensions.mp3.impl;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
@@ -21,7 +19,6 @@ import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
@@ -156,8 +153,7 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
     * @param transformationHandlers
     * @param maxFieldBlockSize
     */
-   public MP3DataBlockReader(DataFormatSpecification spec,
-      Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {
-      super(spec, transformationHandlers, maxFieldBlockSize);
+   public MP3DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
+      super(spec, maxFieldBlockSize);
    }
 }

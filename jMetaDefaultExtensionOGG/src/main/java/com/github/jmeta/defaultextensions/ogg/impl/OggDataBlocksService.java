@@ -8,13 +8,9 @@
  */
 package com.github.jmeta.defaultextensions.ogg.impl;
 
-import java.util.HashMap;
-
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
  * {@link OggDataBlocksService}
@@ -32,6 +28,6 @@ public class OggDataBlocksService extends AbstractDataBlockService {
    @Override
    public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
 
-      return new OggDataBlockReader(spec, new HashMap<DataTransformationType, TransformationHandler>(), lazyFieldSize);
+      return new OggDataBlockReader(spec, lazyFieldSize);
    }
 }

@@ -3,7 +3,6 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
@@ -12,7 +11,6 @@ import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
@@ -165,17 +163,6 @@ public interface DataBlockReader {
     * @return the {@link DataFormatSpecification}
     */
    public DataFormatSpecification getSpecification();
-
-   /**
-    * @return the transformation handlers
-    */
-   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers();
-
-   /**
-    * @param transformationType
-    * @param handler
-    */
-   public void setTransformationHandler(DataTransformationType transformationType, TransformationHandler handler);
 
    /**
     * @param reference

@@ -26,7 +26,6 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -269,8 +268,7 @@ public class MP3Extension implements Extension {
       supportedCharsets.add(Charsets.CHARSET_ISO);
 
       DataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
-         new ArrayList<DataTransformationType>());
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets);
 
       return dummyMP3Spec;
    }

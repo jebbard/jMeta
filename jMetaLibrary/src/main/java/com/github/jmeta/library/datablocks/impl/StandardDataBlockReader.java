@@ -14,13 +14,8 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +23,14 @@ import org.slf4j.LoggerFactory;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -95,17 +87,12 @@ public class StandardDataBlockReader implements DataBlockReader {
     * @param transformationHandlers
     * @param maxFieldBlockSize
     */
-   public StandardDataBlockReader(DataFormatSpecification spec,
-      Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {
+   public StandardDataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
       Reject.ifNull(spec, "spec");
       Reject.ifTrue(maxFieldBlockSize < 1, "Maximum field block size may not be smaller than 1");
 
       m_spec = spec;
       m_maxFieldBlockSize = maxFieldBlockSize;
-
-      // Determine order of the transformations
-      if (!transformationHandlers.isEmpty())
-         addTransformationHandlers(transformationHandlers);
    }
 
    @Override
@@ -273,7 +260,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       final Container container = m_dataBlockFactory.createContainer(actualId, parent, reference, headers, payload,
          footers);
 
-      return applyTransformationsAfterRead(container);
+      return container;
    }
 
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
@@ -381,7 +368,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       final Container container = m_dataBlockFactory.createContainer(actualId, parent, nextReference, headers, payload,
          footers);
 
-      return applyTransformationsAfterRead(container);
+      return container;
    }
 
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
@@ -698,62 +685,6 @@ public class StandardDataBlockReader implements DataBlockReader {
       return m_spec;
    }
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(ContainerDataFormat)
-    */
-   @Override
-   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers() {
-
-      return Collections.unmodifiableMap(m_transformationsReadOrder);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(ContainerDataFormat,
-    *      DataTransformationType, com.github.jmeta.library.datablocks.api.services.TransformationHandler)
-    */
-   @Override
-   public void setTransformationHandler(DataTransformationType transformationType, TransformationHandler handler) {
-
-      Reject.ifFalse(m_transformationsReadOrder.containsKey(transformationType),
-         "m_transformationsReadOrder.containsKey(transformationType)");
-
-      if (handler != null)
-         Reject.ifFalse(transformationType.equals(handler.getTransformationType()),
-            "transformationType.equals(handler.getTransformationType())");
-
-      // Set the handler
-      if (handler != null)
-         m_transformationsReadOrder.put(transformationType, handler);
-
-      // Remove an already set handler
-      else
-         m_transformationsReadOrder.remove(transformationType);
-   }
-
-   private void addTransformationHandlers(Map<DataTransformationType, TransformationHandler> transformationHandlers) {
-
-      Map<Integer, DataTransformationType> transformationsReadOrder = new TreeMap<>();
-
-      for (int i = 0; i < m_spec.getDataTransformations().size(); ++i) {
-         DataTransformationType dtt = m_spec.getDataTransformations().get(i);
-
-         transformationsReadOrder.put(dtt.getReadOrder(), dtt);
-      }
-
-      // Add data transformation handlers
-      Iterator<DataTransformationType> readOrderIterator = transformationsReadOrder.values().iterator();
-
-      while (readOrderIterator.hasNext()) {
-         DataTransformationType nextTransformationType = readOrderIterator.next();
-
-         if (transformationHandlers.containsKey(nextTransformationType))
-            m_transformationsReadOrder.put(nextTransformationType, transformationHandlers.get(nextTransformationType));
-
-         else
-            m_transformationsReadOrder.put(nextTransformationType, null);
-      }
-   }
-
    private Field<?> readField(final MediumOffset reference, ByteOrder currentByteOrder, Charset currentCharset,
       DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount) {
 
@@ -794,33 +725,6 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer,
          currentByteOrder, currentCharset);
-   }
-
-   private Container applyTransformationsAfterRead(Container container) {
-
-      Reject.ifNull(container, "container");
-
-      Container transformedContainer = container;
-
-      Iterator<TransformationHandler> handlerIterator = m_transformationsReadOrder.values().iterator();
-
-      while (handlerIterator.hasNext()) {
-         TransformationHandler transformationHandler = handlerIterator.next();
-
-         if (transformationHandler.requiresUntransform(transformedContainer)) {
-            if (m_cache.getCachedByteCountAt(transformedContainer.getMediumReference()) < transformedContainer
-               .getTotalSize())
-               try {
-                  m_cache.cache(transformedContainer.getMediumReference(), (int) transformedContainer.getTotalSize());
-               } catch (EndOfMediumException e) {
-                  throw new IllegalStateException("Unexpected end of medium", e);
-               }
-
-            transformedContainer = transformationHandler.untransform(transformedContainer);
-         }
-      }
-
-      return transformedContainer;
    }
 
    private long getSizeFromFieldFunction(FieldFunctionStack context, DataBlockId sizeBlockId, DataBlockId parentId) {
@@ -1224,8 +1128,6 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    private final DataFormatSpecification m_spec;
 
-   private Map<DataTransformationType, TransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
-
    /**
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumOffset,
     *      int)
@@ -1252,7 +1154,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       m_cache.cache(reference, (int) size);
    }
 
-   private MediumStore m_cache;
+   protected MediumStore m_cache;
 
    private int m_maxFieldBlockSize;
 

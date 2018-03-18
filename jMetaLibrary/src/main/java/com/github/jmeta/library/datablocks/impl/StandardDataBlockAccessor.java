@@ -21,12 +21,10 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
-import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
@@ -74,8 +72,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       List<Extension> extBundles = extManager.getAllExtensions();
 
-      String validatingExtensions = "Validating registered data blocks extensions"
-         + LoggingConstants.SUFFIX_TASK;
+      String validatingExtensions = "Validating registered data blocks extensions" + LoggingConstants.SUFFIX_TASK;
 
       LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
@@ -88,8 +85,8 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataBlocksExtension
                   + " must not return null for its data format.";
-               LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR
-                  + validatingExtensions);
+               LOGGER.error(
+                  LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR + validatingExtensions);
                LOGGER.error(message);
                throw new InvalidExtensionException(message, iExtension2);
             }
@@ -132,25 +129,9 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       m_factories.put(format, dataBlockFactory);
 
-      List<TransformationHandler> transformationHandlers = dataBlocksExtensions.getTransformationHandlers(spec,
-         m_factories.get(format));
-
-      if (transformationHandlers == null) {
-         throw new InvalidExtensionException(
-            "Transformation handlers returned by " + iExtension2.getExtensionId() + " must not be null", iExtension2);
-      }
-
-      Map<DataTransformationType, TransformationHandler> transformationHandlersMap = new HashMap<>();
-
-      for (int i = 0; i < transformationHandlers.size(); ++i) {
-         TransformationHandler handler = transformationHandlers.get(i);
-
-         transformationHandlersMap.put(handler.getTransformationType(), handler);
-      }
-
       // Set default data block reader
       if (dataBlockReader == null) {
-         dataBlockReader = new StandardDataBlockReader(spec, transformationHandlersMap, m_lazyFieldSize);
+         dataBlockReader = new StandardDataBlockReader(spec, m_lazyFieldSize);
       }
 
       dataBlockReader.initDataBlockFactory(dataBlockFactory);
@@ -161,8 +142,8 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
     * @see DataBlockAccessor#getContainerIterator
     */
    @Override
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, List<ContainerDataFormat> dataFormatHints,
-      boolean forceMediumReadOnly) {
+   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium,
+      List<ContainerDataFormat> dataFormatHints, boolean forceMediumReadOnly) {
 
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
@@ -200,30 +181,6 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
    public DataBlockFactory getDataBlockFactory(ContainerDataFormat dataFormat) {
 
       return m_factories.get(dataFormat);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(ContainerDataFormat)
-    */
-   @Override
-   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers(ContainerDataFormat dataFormat) {
-
-      Reject.ifNull(dataFormat, "dataFormat");
-
-      return m_readers.get(dataFormat).getTransformationHandlers();
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(ContainerDataFormat,
-    *      DataTransformationType, com.github.jmeta.library.datablocks.api.services.TransformationHandler)
-    */
-   @Override
-   public void setTransformationHandler(ContainerDataFormat dataFormat, DataTransformationType transformationType,
-      TransformationHandler handler) {
-
-      Reject.ifNull(dataFormat, "dataFormat");
-
-      m_readers.get(dataFormat).setTransformationHandler(transformationType, handler);
    }
 
    private int m_lazyFieldSize = DEFAULT_LAZY_FIELD_SIZE;

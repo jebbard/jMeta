@@ -6,10 +6,10 @@
  *
  * @date 02.03.2011
  */
-package com.github.jmeta.library.datablocks.api.services;
+package com.github.jmeta.defaultextensions.id3v23.impl;
 
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -35,7 +35,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#getTransformationType()
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#getTransformationType()
     */
    @Override
    public DataTransformationType getTransformationType() {
@@ -44,7 +44,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public boolean requiresTransform(Container container) {
@@ -56,7 +56,7 @@ public abstract class AbstractTransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public boolean requiresUntransform(Container container) {

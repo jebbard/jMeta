@@ -25,7 +25,6 @@ import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpeci
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
@@ -308,8 +307,7 @@ public class ID3v1Extension implements Extension {
       supportedCharsets.add(Charsets.CHARSET_UTF8);
 
       DataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets,
-         new ArrayList<DataTransformationType>());
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets);
 
       return dummyID3v1Spec;
    }

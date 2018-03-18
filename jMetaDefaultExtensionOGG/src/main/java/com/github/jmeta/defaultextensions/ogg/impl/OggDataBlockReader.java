@@ -9,10 +9,8 @@
 package com.github.jmeta.defaultextensions.ogg.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.TransformationHandler;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
@@ -20,7 +18,6 @@ import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
@@ -88,8 +85,7 @@ public class OggDataBlockReader extends StandardDataBlockReader {
     * @param transformationHandlers
     * @param maxFieldBlockSize
     */
-   public OggDataBlockReader(DataFormatSpecification spec,
-      Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize) {
-      super(spec, transformationHandlers, maxFieldBlockSize);
+   public OggDataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
+      super(spec, maxFieldBlockSize);
    }
 }

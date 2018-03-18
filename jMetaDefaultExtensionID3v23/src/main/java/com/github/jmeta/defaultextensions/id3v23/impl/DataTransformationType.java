@@ -5,12 +5,14 @@
  * @date 31.12.10 19:47:07 (December 31, 2010)
  */
 
-package com.github.jmeta.library.dataformats.api.types;
+package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 /**
  *
@@ -26,8 +28,7 @@ public class DataTransformationType {
     * @param readOrder
     * @param writeOrder
     */
-   public DataTransformationType(String id,
-      List<DataBlockId> affectedContainers, boolean isBuiltIn, int readOrder,
+   public DataTransformationType(String id, List<DataBlockId> affectedContainers, boolean isBuiltIn, int readOrder,
       int writeOrder) {
       m_affectedContainers.addAll(affectedContainers);
       m_name = id;
@@ -84,10 +85,8 @@ public class DataTransformationType {
    @Override
    public String toString() {
 
-      return "DataTransformationType [m_affectedContainers="
-         + m_affectedContainers + ", m_isBuiltIn=" + m_isBuiltIn + ", m_name="
-         + m_name + ", m_readOrder=" + m_readOrder + ", m_writeOrder="
-         + m_writeOrder + "]";
+      return "DataTransformationType [m_affectedContainers=" + m_affectedContainers + ", m_isBuiltIn=" + m_isBuiltIn
+         + ", m_name=" + m_name + ", m_readOrder=" + m_readOrder + ", m_writeOrder=" + m_writeOrder + "]";
    }
 
    private final Set<DataBlockId> m_affectedContainers = new HashSet<>();

@@ -25,7 +25,6 @@ import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpeci
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -380,8 +379,7 @@ public class Lyrics3v2Extension implements Extension {
       genericDataBlocks.add(lyrics3V2GenericFieldPayloadId);
 
       DataFormatSpecification dummyLyrics3v2Spec = new StandardDataFormatSpecification(LYRICS3v2, descMap, topLevelIds,
-         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets,
-         new ArrayList<DataTransformationType>());
+         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets);
 
       return dummyLyrics3v2Spec;
    }

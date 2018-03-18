@@ -12,10 +12,9 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
  * Represents the complete specification of a single {@link ContainerDataFormat}. The specification contains all
@@ -69,11 +68,6 @@ public interface DataFormatSpecification {
     * @return the default {@link ByteOrder}
     */
    public ByteOrder getDefaultByteOrder();
-
-   /**
-    * @return the {@link DataTransformationType}s of this data format
-    */
-   public List<DataTransformationType> getDataTransformations();
 
    /**
     * @return All {@link DataBlockId}s used for padding

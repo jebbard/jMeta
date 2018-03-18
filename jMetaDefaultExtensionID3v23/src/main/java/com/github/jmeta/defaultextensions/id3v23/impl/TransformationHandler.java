@@ -5,10 +5,9 @@
  * @date 31.12.10 19:47:10 (December 31, 2010)
  */
 
-package com.github.jmeta.library.datablocks.api.services;
+package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
-import com.github.jmeta.library.dataformats.api.types.DataTransformationType;
 
 /**
  *
