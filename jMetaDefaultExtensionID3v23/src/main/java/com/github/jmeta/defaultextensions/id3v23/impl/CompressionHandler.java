@@ -26,8 +26,7 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link CompressionHandler}
- *
+ * {@link CompressionHandler} compresses ID3v2 frames
  */
 public class CompressionHandler extends AbstractID3v2TransformationHandler {
 
@@ -35,20 +34,14 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
 
    private static final int BLOCK_SIZE = 1024;
 
-   private static final int COMPRESSION_TRANSFORMATION_ID = 258;
-
-   private static final String COMPRESSION_FLAG_NAME = "COMPRESSION";
-
-   private static final String ID3V23_HEADER_FLAGS_ID = "id3v23.header.flags";
-
    /**
     * Creates a new {@link CompressionHandler}.
     * 
-    * @param dtt
     * @param dbFactory
+    *           The {@link DataBlockFactory}
     */
-   public CompressionHandler(DataTransformationType dtt, DataBlockFactory dbFactory) {
-      super(dtt, COMPRESSION_TRANSFORMATION_ID, dbFactory);
+   public CompressionHandler(DataBlockFactory dbFactory) {
+      super(ID3v2TransformationType.COMPRESSION, dbFactory);
    }
 
    /**
@@ -56,7 +49,6 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
     */
    @Override
    public boolean requiresTransform(Container container) {
-
       Reject.ifNull(container, "container");
 
       if (container.getHeaders().size() == 0)
@@ -67,11 +59,11 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
       for (int i = 0; i < firstHeader.getFields().size(); ++i) {
          Field<?> field = firstHeader.getFields().get(i);
 
-         if (field.getId().equals(ID3V23_HEADER_FLAGS_ID)) {
+         if (field.getId().equals(ID3v23Extension.GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID)) {
             try {
                Flags flags = (Flags) field.getInterpretedValue();
 
-               return flags.getFlag(COMPRESSION_FLAG_NAME);
+               return flags.getFlag(ID3v23Extension.FRAME_FLAGS_COMPRESSION);
             } catch (BinaryValueConversionException e) {
                LOGGER.warn(
                   "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.",

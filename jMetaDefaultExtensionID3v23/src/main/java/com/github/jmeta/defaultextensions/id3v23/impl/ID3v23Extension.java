@@ -50,7 +50,7 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 public class ID3v23Extension implements Extension {
 
    private static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
-   private static final String FRAME_FLAGS_COMPRESSION = "Compression";
+   public static final String FRAME_FLAGS_COMPRESSION = "Compression";
    private static final String FRAME_FLAGS_ENCRYPTION = "Encryption";
    private static final String FRAME_FLAGS_FILE_ALTER_PRESERVATION = "File Alter Preservation";
    private static final String FRAME_FLAGS_GROUP_IDENTITY = "Group Identity";
@@ -64,7 +64,7 @@ public class ID3v23Extension implements Extension {
     */
    public static final ContainerDataFormat ID3v23 = new ContainerDataFormat("ID3v2.3", new HashSet<String>(),
       new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
-   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
+   public static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
    private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header.id");
@@ -97,7 +97,7 @@ public class ID3v23Extension implements Extension {
       "id3v23.extHeader.size");
    private static final DataBlockId ID3V23_EXTENDED_HEADER_ID = new DataBlockId(ID3v23, "id3v23.extHeader");
    private static final int ID3V23_FRAME_FLAG_SIZE = 2;
-   private static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.flags");
+   public static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.flags");
    private static final DataBlockId ID3V23_HEADER_ID = new DataBlockId(ID3v23, "id3v23.header");
    private static final DataBlockId ID3V23_HEADER_ID_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.id");
    private static final DataBlockId ID3V23_HEADER_SIZE_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.size");
@@ -117,7 +117,7 @@ public class ID3v23Extension implements Extension {
    private static final DataBlockId PADDING_PAYLOAD_ID = new DataBlockId(ID3v23, "id3v23.payload.padding.payload");
    private static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
    private static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
-   private static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
+   public static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
    private static final String TIT2_LOCAL_ID = "TIT2";
    private static final String TPE1_LOCAL_ID = "TPE1";
    private static final String TRCK_LOCAL_ID = "TRCK";

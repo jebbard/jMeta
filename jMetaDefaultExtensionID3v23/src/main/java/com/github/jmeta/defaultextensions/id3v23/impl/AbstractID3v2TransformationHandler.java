@@ -9,37 +9,52 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractID3v2TransformationHandler}
- *
+ * {@link AbstractID3v2TransformationHandler} is the base class for all possible ID3v2 tag or frame transformations.
  */
-public abstract class AbstractID3v2TransformationHandler extends AbstractTransformationHandler {
+// TODO: Proper testing required
+public abstract class AbstractID3v2TransformationHandler {
 
    private static final int MAX_ID3V2_PAYLOAD_SIZE = (1 << 28) - 1;
+
+   private final ID3v2TransformationType transformationType;
+
+   private final DataBlockFactory dataBlockFactory;
 
    /**
     * Creates a new {@link AbstractID3v2TransformationHandler}.
     * 
-    * @param dtt
-    * @param handlerId
-    * @param dbFactory
+    * @param transformationType
+    *           The {@link ID3v2TransformationType} identifying the type of transformation
+    * @param dataBlockFactory
+    *           The {@link DataBlockFactory} for creating transformed containers
     */
-   public AbstractID3v2TransformationHandler(DataTransformationType dtt, int handlerId, DataBlockFactory dbFactory) {
-      super(dtt, dbFactory);
+   public AbstractID3v2TransformationHandler(ID3v2TransformationType transformationType,
+      DataBlockFactory dataBlockFactory) {
+      Reject.ifNull(transformationType, "transformationType");
+      Reject.ifNull(dataBlockFactory, "dataBlockFactory");
+
+      this.transformationType = transformationType;
+      this.dataBlockFactory = dataBlockFactory;
    }
 
-   /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#transform(com.github.jmeta.library.datablocks.api.types.Container)
-    */
-   @Override
-   public Container transform(Container container) {
+   public ID3v2TransformationType getTransformationType() {
 
+      return transformationType;
+   }
+
+   public abstract boolean requiresTransform(Container container);
+
+   public abstract boolean requiresUntransform(Container container);
+
+   public Container transform(Container container) {
       Reject.ifNull(container, "container");
       Reject.ifFalse(requiresTransform(container), "requiresTransform(container)");
 
       Payload payload = container.getPayload();
 
-      if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE)
+      if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE) {
          throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
+      }
 
       // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
       int size = (int) payload.getTotalSize();
@@ -53,10 +68,6 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
          container.getMediumReference(), container.getHeaders(), payload, container.getFooters());
    }
 
-   /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#untransform(com.github.jmeta.library.datablocks.api.types.Container)
-    */
-   @Override
    public Container untransform(Container container) {
 
       Reject.ifNull(container, "container");
@@ -64,8 +75,9 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
 
       Payload payload = container.getPayload();
 
-      if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE)
+      if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE) {
          throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
+      }
 
       // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
       int size = (int) payload.getTotalSize();
@@ -79,15 +91,17 @@ public abstract class AbstractID3v2TransformationHandler extends AbstractTransfo
          container.getMediumReference(), container.getHeaders(), payload, container.getFooters());
    }
 
-   /**
-    * @param payloadBytes
-    * @return the transformed bytes
-    */
    protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);
 
-   /**
-    * @param payloadBytes
-    * @return the untransformed bytes
-    */
    protected abstract byte[][] untransformRawBytes(ByteBuffer payloadBytes);
+
+   /**
+    * Returns the {@link DataBlockFactory} for creating transformed containers
+    *
+    * @return the {@link DataBlockFactory} for creating transformed containers
+    */
+   protected DataBlockFactory getDataBlockFactory() {
+
+      return dataBlockFactory;
+   }
 }

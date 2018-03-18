@@ -25,56 +25,47 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 
 /**
- * {@link UnsynchronisationHandler}
- *
+ * {@link UnsynchronisationHandler} performs the ID3v2 unsynchronization scheme.
  */
 public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(UnsynchronisationHandler.class);
 
-   private static final int UNSYNCHRONISATION_TRANSFORMATION_ID = 257;
-
-   private static final String ID3V2_HEADER_FLAGS_ID = "id3v23.header.flags";
-
-   private static final String UNSYNCHRONISATION_FLAG_NAME = "UNSYNCHRONISATION";
-
    /**
     * Creates a new {@link UnsynchronisationHandler}.
     * 
-    * @param dtt
     * @param dbFactory
+    *           The {@link DataBlockFactory}
     */
-   public UnsynchronisationHandler(DataTransformationType dtt, DataBlockFactory dbFactory) {
-      super(dtt, UNSYNCHRONISATION_TRANSFORMATION_ID, dbFactory);
+   public UnsynchronisationHandler(DataBlockFactory dbFactory) {
+      super(ID3v2TransformationType.UNSYNCHRONIZATION, dbFactory);
    }
 
    /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractTransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public boolean requiresTransform(Container container) {
 
-      if (super.requiresTransform(container)) {
-         if (container.getHeaders().size() == 0)
-            return false;
+      if (container.getHeaders().size() == 0)
+         return false;
 
-         Header id3v2Header = container.getHeaders().get(0);
+      Header id3v2Header = container.getHeaders().get(0);
 
-         for (int i = 0; i < id3v2Header.getFields().size(); ++i) {
-            Field<?> field = id3v2Header.getFields().get(i);
+      for (int i = 0; i < id3v2Header.getFields().size(); ++i) {
+         Field<?> field = id3v2Header.getFields().get(i);
 
-            if (field.getId().equals(ID3V2_HEADER_FLAGS_ID)) {
-               try {
-                  Flags flags = (Flags) field.getInterpretedValue();
+         if (field.getId().equals(ID3v23Extension.ID3V23_HEADER_FLAGS_FIELD_ID)) {
+            try {
+               Flags flags = (Flags) field.getInterpretedValue();
 
-                  return flags.getFlag(UNSYNCHRONISATION_FLAG_NAME);
-               } catch (BinaryValueConversionException e) {
-                  LOGGER.warn(
-                     "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.",
-                     field.getId());
-                  LOGGER.error("requiresTransform", e);
-                  return false;
-               }
+               return flags.getFlag(ID3v23Extension.TAG_FLAGS_UNSYNCHRONIZATION);
+            } catch (BinaryValueConversionException e) {
+               LOGGER.warn(
+                  "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.",
+                  field.getId());
+               LOGGER.error("requiresTransform", e);
+               return false;
             }
          }
       }
@@ -83,7 +74,7 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
    }
 
    /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractTransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
+    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
     */
    @Override
    public boolean requiresUntransform(Container container) {
@@ -95,7 +86,6 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
     * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
     */
    @Override
-   // Synchronise
    protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 
       if (payloadBytes.remaining() < 1)

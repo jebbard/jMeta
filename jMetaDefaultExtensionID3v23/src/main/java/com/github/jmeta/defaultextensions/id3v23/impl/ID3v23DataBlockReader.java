@@ -12,11 +12,10 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -24,7 +23,6 @@ import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -35,23 +33,26 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class ID3v23DataBlockReader extends StandardDataBlockReader implements DataBlockReader {
 
-   private Map<DataTransformationType, TransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
+   private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
 
    /**
     * Creates a new {@link ID3v23DataBlockReader}.
     * 
     * @param spec
-    * @param transformationHandlers
     * @param maxFieldBlockSize
     */
-   public ID3v23DataBlockReader(DataFormatSpecification spec,
-      Map<DataTransformationType, TransformationHandler> transformationHandlers, int maxFieldBlockSize,
-      List<DataTransformationType> trafos) {
+   public ID3v23DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
       super(spec, maxFieldBlockSize);
+   }
 
-      // Determine order of the transformations
-      if (!transformationHandlers.isEmpty())
-         addTransformationHandlers(transformationHandlers, spec, trafos);
+   @Override
+   public void initDataBlockFactory(ExtendedDataBlockFactory dataBlockFactory) {
+      super.initDataBlockFactory(dataBlockFactory);
+
+      m_transformationsReadOrder.put(ID3v2TransformationType.UNSYNCHRONIZATION,
+         new UnsynchronisationHandler(getDataBlockFactory()));
+      m_transformationsReadOrder.put(ID3v2TransformationType.COMPRESSION,
+         new CompressionHandler(getDataBlockFactory()));
    }
 
    /**
@@ -64,13 +65,6 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader implements Da
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
       Container container = super.readContainerWithId(reference, id, parent, context, remainingDirectParentByteCount);
-
-      // It is the tag
-      if (parent == null && context.hasFieldFunction(id, FieldFunctionType.TRANSFORMATION_OF)) {
-         // DO unynchronize
-      } else {
-         // do compress etc.
-      }
 
       return applyTransformationsAfterRead(container);
    }
@@ -91,16 +85,17 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader implements Da
    /**
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(ContainerDataFormat)
     */
-   public Map<DataTransformationType, TransformationHandler> getTransformationHandlers() {
+   public Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> getTransformationHandlers() {
 
       return Collections.unmodifiableMap(m_transformationsReadOrder);
    }
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(ContainerDataFormat,
-    *      DataTransformationType, com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler)
+    *      ID3v2TransformationType, com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler)
     */
-   public void setTransformationHandler(DataTransformationType transformationType, TransformationHandler handler) {
+   public void setTransformationHandler(ID3v2TransformationType transformationType,
+      AbstractID3v2TransformationHandler handler) {
 
       Reject.ifFalse(m_transformationsReadOrder.containsKey(transformationType),
          "m_transformationsReadOrder.containsKey(transformationType)");
@@ -118,44 +113,13 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader implements Da
          m_transformationsReadOrder.remove(transformationType);
    }
 
-   private void addTransformationHandlers(Map<DataTransformationType, TransformationHandler> transformationHandlers,
-      DataFormatSpecification spec, List<DataTransformationType> trafos) {
-
-      Map<Integer, DataTransformationType> transformationsReadOrder = new TreeMap<>();
-
-      for (int i = 0; i < trafos.size(); ++i) {
-         DataTransformationType dtt = trafos.get(i);
-
-         transformationsReadOrder.put(dtt.getReadOrder(), dtt);
-      }
-
-      // Add data transformation handlers
-      Iterator<DataTransformationType> readOrderIterator = transformationsReadOrder.values().iterator();
-
-      while (readOrderIterator.hasNext()) {
-         DataTransformationType nextTransformationType = readOrderIterator.next();
-
-         if (transformationHandlers.containsKey(nextTransformationType))
-            m_transformationsReadOrder.put(nextTransformationType, transformationHandlers.get(nextTransformationType));
-
-         else
-            m_transformationsReadOrder.put(nextTransformationType, null);
-      }
-   }
-
    private Container applyTransformationsAfterRead(Container container) {
-
-      // TODO: if id3v23.payload: Alles lesen, dann Unsynchro
-      // else if id3v2.frame.payload: Andere Trafos
-
-      Reject.ifNull(container, "container");
-
       Container transformedContainer = container;
 
-      Iterator<TransformationHandler> handlerIterator = m_transformationsReadOrder.values().iterator();
+      Iterator<AbstractID3v2TransformationHandler> handlerIterator = m_transformationsReadOrder.values().iterator();
 
       while (handlerIterator.hasNext()) {
-         TransformationHandler transformationHandler = handlerIterator.next();
+         AbstractID3v2TransformationHandler transformationHandler = handlerIterator.next();
 
          if (transformationHandler.requiresUntransform(transformedContainer)) {
             if (m_cache.getCachedByteCountAt(transformedContainer.getMediumReference()) < transformedContainer
