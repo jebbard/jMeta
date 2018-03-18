@@ -57,12 +57,6 @@ public class FieldFunctionType<T> {
     */
    public static final FieldFunctionType<String> ID_OF = new FieldFunctionType<>("ID_OF");
 
-   /**
-    *
-    */
-   public static final FieldFunctionType<Flags> TRANSFORMATION_OF = new FieldFunctionType<>("TRANSFORMATION_OF");
-
-   
    public String getId() {
       return id;
    }

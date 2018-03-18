@@ -33,7 +33,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class ID3v23DataBlockReader extends StandardDataBlockReader implements DataBlockReader {
 
-   private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> m_transformationsReadOrder = new LinkedHashMap<>();
+   private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> transformationsReadOrder = new LinkedHashMap<>();
 
    /**
     * Creates a new {@link ID3v23DataBlockReader}.
@@ -49,10 +49,9 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader implements Da
    public void initDataBlockFactory(ExtendedDataBlockFactory dataBlockFactory) {
       super.initDataBlockFactory(dataBlockFactory);
 
-      m_transformationsReadOrder.put(ID3v2TransformationType.UNSYNCHRONIZATION,
+      transformationsReadOrder.put(ID3v2TransformationType.UNSYNCHRONIZATION,
          new UnsynchronisationHandler(getDataBlockFactory()));
-      m_transformationsReadOrder.put(ID3v2TransformationType.COMPRESSION,
-         new CompressionHandler(getDataBlockFactory()));
+      transformationsReadOrder.put(ID3v2TransformationType.COMPRESSION, new CompressionHandler(getDataBlockFactory()));
    }
 
    /**
@@ -87,36 +86,23 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader implements Da
     */
    public Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> getTransformationHandlers() {
 
-      return Collections.unmodifiableMap(m_transformationsReadOrder);
+      return Collections.unmodifiableMap(transformationsReadOrder);
    }
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#setTransformationHandler(ContainerDataFormat,
-    *      ID3v2TransformationType, com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler)
-    */
-   public void setTransformationHandler(ID3v2TransformationType transformationType,
-      AbstractID3v2TransformationHandler handler) {
+   public void removeEncryptionHandler() {
+      transformationsReadOrder.remove(ID3v2TransformationType.ENCRYPTION);
+   }
 
-      Reject.ifFalse(m_transformationsReadOrder.containsKey(transformationType),
-         "m_transformationsReadOrder.containsKey(transformationType)");
+   public void setEncryptionHandler(AbstractID3v2TransformationHandler handler) {
+      Reject.ifNull(handler, "handler");
 
-      if (handler != null)
-         Reject.ifFalse(transformationType.equals(handler.getTransformationType()),
-            "transformationType.equals(handler.getTransformationType())");
-
-      // Set the handler
-      if (handler != null)
-         m_transformationsReadOrder.put(transformationType, handler);
-
-      // Remove an already set handler
-      else
-         m_transformationsReadOrder.remove(transformationType);
+      transformationsReadOrder.put(ID3v2TransformationType.ENCRYPTION, handler);
    }
 
    private Container applyTransformationsAfterRead(Container container) {
       Container transformedContainer = container;
 
-      Iterator<AbstractID3v2TransformationHandler> handlerIterator = m_transformationsReadOrder.values().iterator();
+      Iterator<AbstractID3v2TransformationHandler> handlerIterator = transformationsReadOrder.values().iterator();
 
       while (handlerIterator.hasNext()) {
          AbstractID3v2TransformationHandler transformationHandler = handlerIterator.next();

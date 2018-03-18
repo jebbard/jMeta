@@ -452,8 +452,6 @@ public class ID3v23Extension implements Extension {
 
       frameFlagFunctions.add(
          new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsCompression, FRAME_FLAGS_COMPRESSION, 1));
-      frameFlagFunctions.add(new FieldFunction(FieldFunctionType.TRANSFORMATION_OF,
-         affectedDataBlockIdsCompressionTrafo, FRAME_FLAGS_COMPRESSION, 1));
 
       Set<DataBlockId> affectedDataBlockIdsGroup = new HashSet<>();
 
@@ -472,8 +470,6 @@ public class ID3v23Extension implements Extension {
 
       frameFlagFunctions.add(
          new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsEncryption, FRAME_FLAGS_ENCRYPTION, 1));
-      frameFlagFunctions.add(new FieldFunction(FieldFunctionType.TRANSFORMATION_OF, affectedDataBlockIdsEncryptionTrafo,
-         FRAME_FLAGS_ENCRYPTION, 1));
 
       descMap.put(GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID,
          new DataBlockDescription(
@@ -655,8 +651,6 @@ public class ID3v23Extension implements Extension {
 
       tagFlagFunctions
          .add(new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIds, TAG_FLAGS_EXTENDED_HEADER, 1));
-      tagFlagFunctions.add(new FieldFunction(FieldFunctionType.TRANSFORMATION_OF, affectedDataBlockIdsUnsync,
-         TAG_FLAGS_UNSYNCHRONIZATION, 1));
 
       descMap.put(ID3V23_HEADER_FLAGS_FIELD_ID, new DataBlockDescription(ID3V23_HEADER_FLAGS_FIELD_ID,
          "id3v23 tag header flags", "The id3v23 tag header flags", PhysicalDataBlockType.FIELD, flagsChildIds,
