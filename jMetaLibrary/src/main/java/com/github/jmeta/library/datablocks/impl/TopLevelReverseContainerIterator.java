@@ -22,7 +22,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -151,14 +151,14 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
             DataBlockDescription containerDesc = topLevelContainerDescs.get(i);
 
             if (!containerDesc.getMagicKeys().isEmpty()) {
-               List<MagicKey> magicKeys = containerDesc.getMagicKeys();
+               List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
 
                for (int j = 0; j < magicKeys.size(); ++j) {
-                  MagicKey magicKey = magicKeys.get(j);
+                  AbstractMagicKey magicKey = magicKeys.get(j);
 
                   long offsetForBackwardReading = magicKey.getHeaderOrFooterOffsetForBackwardReading();
 
-                  if (offsetForBackwardReading != MagicKey.NO_BACKWARD_READING
+                  if (offsetForBackwardReading != AbstractMagicKey.NO_BACKWARD_READING
                      && reference.getAbsoluteMediumOffset() + offsetForBackwardReading >= 0) {
                      MediumOffset footerStartReference = reference.advance(offsetForBackwardReading);
                      try {
@@ -215,7 +215,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
 
    private MediumOffset m_previousFooterStartReference;
 
-   private MagicKey m_theMagicKey;
+   private AbstractMagicKey m_theMagicKey;
 
    private MediumStore m_mediumStore;
 

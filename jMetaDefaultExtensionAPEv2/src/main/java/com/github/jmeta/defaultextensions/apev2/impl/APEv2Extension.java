@@ -23,7 +23,9 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
+import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -34,8 +36,8 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.library.dataformats.api.types.ConcreteContainerAbsentPresentMagicKey;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -411,9 +413,10 @@ public class APEv2Extension implements Extension {
          new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      MagicKey genericItemMagicKey = new MagicKey(new byte[] { 0 }, Byte.SIZE, apeV2GenericItemId, 0);
+      AbstractMagicKey genericItemMagicKey = new ConcreteContainerAbsentPresentMagicKey(new byte[] { 0 }, apeV2GenericItemId, 0,
+         0);
 
-      List<MagicKey> apev2ItemMagicKeys = new ArrayList<>();
+      List<AbstractMagicKey> apev2ItemMagicKeys = new ArrayList<>();
       apev2ItemMagicKeys.add(genericItemMagicKey);
 
       descMap.put(apeV2GenericItemId,
@@ -446,12 +449,12 @@ public class APEv2Extension implements Extension {
          DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      MagicKey apev2FooterMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, APEv2_MAGIC_KEY_BYTES.length * Byte.SIZE, "",
-         apeV2FooterId, -APEv2_HEADER_FOOTER_BYTE_LENGTH, 0);
-      MagicKey apev2HeaderMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, APEv2_MAGIC_KEY_BYTES.length * Byte.SIZE, "",
-         apeV2HeaderId, MagicKey.NO_BACKWARD_READING, 0);
+      AbstractMagicKey apev2FooterMagicKey = new ConcreteContainerPresentMagicKey(APEv2_MAGIC_KEY_BYTES, apeV2FooterId,
+         -APEv2_HEADER_FOOTER_BYTE_LENGTH, 0);
+      AbstractMagicKey apev2HeaderMagicKey = new ConcreteContainerPresentMagicKey(APEv2_MAGIC_KEY_BYTES, apeV2HeaderId,
+         AbstractMagicKey.NO_BACKWARD_READING, 0);
 
-      List<MagicKey> apev2TagMagicKeys = new ArrayList<>();
+      List<AbstractMagicKey> apev2TagMagicKeys = new ArrayList<>();
       apev2TagMagicKeys.add(apev2HeaderMagicKey);
       apev2TagMagicKeys.add(apev2FooterMagicKey);
 

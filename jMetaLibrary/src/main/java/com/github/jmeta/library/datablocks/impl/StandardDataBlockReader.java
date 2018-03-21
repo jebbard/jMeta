@@ -29,6 +29,7 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
@@ -36,7 +37,6 @@ import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -120,7 +120,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       DataBlockDescription containerDesc = m_spec.getDataBlockDescription(id);
 
-      List<MagicKey> magicKeys = containerDesc.getMagicKeys();
+      List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
 
       // No magic key means: "Everything is a container"
       if (magicKeys.isEmpty())
@@ -129,29 +129,24 @@ public class StandardDataBlockReader implements DataBlockReader {
       // TODO primeRefactor001: Does this loop really always yields the wanted results?
       // Is it possible that sometimes the headers magic key gets preferred?
       for (int i = 0; i < magicKeys.size(); ++i) {
-         MagicKey magicKey = magicKeys.get(i);
+         AbstractMagicKey magicKey = magicKeys.get(i);
 
          // Does the magic key equal the medium bytes at the given reference?
-         int magicKeySize = magicKey.getBitLength() / Byte.SIZE + (magicKey.getBitLength() % Byte.SIZE != 0 ? 1 : 0);
+         int magicKeySizeInBytes = magicKey.getByteLength();
 
          // This container cannot be stored in the parent, as there are not enough bytes in
          // left the parent for its magic key.
          if (remainingDirectParentByteCount != DataBlockDescription.UNKNOWN_SIZE
-            && magicKeySize > remainingDirectParentByteCount)
+            && magicKeySizeInBytes > remainingDirectParentByteCount)
             return false;
 
          MediumOffset magicKeyReference = reference.advance(magicKey.getOffsetFromStartOfHeaderOrFooter());
 
-         final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySize);
-         final boolean equalsBytes = magicKey.equalsBytes(readBytes);
+         final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
 
-         // Everything BUT the something that starts with an exclusion key is a container
-         if (magicKey.isExclusionKey())
-            return !equalsBytes;
-
-         // Everything that starts with the magic key bytes is a container
-         if (equalsBytes)
-            return equalsBytes;
+         if (magicKey.isContainerPresent(readBytes)) {
+            return true;
+         }
       }
 
       return false;
@@ -613,10 +608,10 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         List<MagicKey> magicKeys = containerDesc.getMagicKeys();
+         List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
 
          for (int j = 0; j < magicKeys.size(); ++j) {
-            MagicKey magicKey = magicKeys.get(j);
+            AbstractMagicKey magicKey = magicKeys.get(j);
 
             DataBlockDescription desc = m_spec.getDataBlockDescription(magicKey.getHeaderOrFooterId());
 
@@ -640,10 +635,10 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         List<MagicKey> magicKeys = containerDesc.getMagicKeys();
+         List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
 
          for (int j = 0; j < magicKeys.size(); ++j) {
-            MagicKey magicKey = magicKeys.get(j);
+            AbstractMagicKey magicKey = magicKeys.get(j);
 
             DataBlockDescription desc = m_spec.getDataBlockDescription(magicKey.getHeaderOrFooterId());
 

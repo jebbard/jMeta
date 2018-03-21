@@ -23,6 +23,8 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
+import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -31,7 +33,6 @@ import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -332,10 +333,10 @@ public class OggExtension implements Extension {
          DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      MagicKey oggMagicKey = new MagicKey(OGG_MAGIC_KEY_BYTES, OGG_MAGIC_KEY_BYTES.length * Byte.SIZE,
-         OGG_MAGIC_KEY_STRING, oggPageHeaderId, MagicKey.NO_BACKWARD_READING, 0);
+      AbstractMagicKey oggMagicKey = new ConcreteContainerPresentMagicKey(OGG_MAGIC_KEY_STRING, oggPageHeaderId,
+         AbstractMagicKey.NO_BACKWARD_READING, 0);
 
-      List<MagicKey> oggMagicKeys = new ArrayList<>();
+      List<AbstractMagicKey> oggMagicKeys = new ArrayList<>();
       oggMagicKeys.add(oggMagicKey);
 
       descMap.put(oggPageId,

@@ -43,7 +43,7 @@ public class DataBlockDescription {
    public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
       List<DataBlockId> childIds, FieldProperties<?> fieldProperties,
       Map<DataBlockId, LocationProperties> locationProperties, long minimumByteLength, long maximumByteLength,
-      List<MagicKey> magicKeys, DataBlockId overriddenId) {
+      List<AbstractMagicKey> magicKeys, DataBlockId overriddenId) {
       Reject.ifNull(childIds, "childIds");
       Reject.ifNull(physicalType, "physicalType");
       Reject.ifNull(specDescription, "specDescription");
@@ -145,7 +145,7 @@ public class DataBlockDescription {
     *
     * @return magicKey
     */
-   public List<MagicKey> getMagicKeys() {
+   public List<AbstractMagicKey> getMagicKeys() {
 
       return Collections.unmodifiableList(m_magicKeys);
    }
@@ -294,7 +294,7 @@ public class DataBlockDescription {
 
    private final long m_minimumByteLength;
 
-   private final List<MagicKey> m_magicKeys;
+   private final List<AbstractMagicKey> m_magicKeys;
 
    private final DataBlockId m_overriddenId;
 

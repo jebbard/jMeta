@@ -24,7 +24,9 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
+import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -35,8 +37,8 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.library.dataformats.api.types.ConcreteContainerAbsentPresentMagicKey;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -748,10 +750,10 @@ public class ID3v23Extension implements Extension {
             DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 4. Padding Container
-      MagicKey paddingMagicKey = new MagicKey(paddingByte, Byte.SIZE, "\u0000", PADDING_PAYLOAD_ID,
-         MagicKey.NO_BACKWARD_READING, 0);
+      AbstractMagicKey paddingMagicKey = new ConcreteContainerPresentMagicKey(paddingByte, PADDING_PAYLOAD_ID,
+         AbstractMagicKey.NO_BACKWARD_READING, 0);
 
-      List<MagicKey> paddingMagicKeys = new ArrayList<>();
+      List<AbstractMagicKey> paddingMagicKeys = new ArrayList<>();
       paddingMagicKeys.add(paddingMagicKey);
 
       final List<DataBlockId> paddingChildIds = new ArrayList<>();
@@ -807,9 +809,10 @@ public class ID3v23Extension implements Extension {
          0, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      MagicKey genericFrameMagicKey = new MagicKey(new byte[] { 0 }, Byte.SIZE, GENERIC_FRAME_HEADER_ID, 0);
+      AbstractMagicKey genericFrameMagicKey = new ConcreteContainerAbsentPresentMagicKey(new byte[] { 0 },
+         GENERIC_FRAME_HEADER_ID, 0, 0);
 
-      List<MagicKey> id3v23GenericFrameMagicKeys = new ArrayList<>();
+      List<AbstractMagicKey> id3v23GenericFrameMagicKeys = new ArrayList<>();
       id3v23GenericFrameMagicKeys.add(genericFrameMagicKey);
 
       final DataBlockDescription genericBlockDesc = new DataBlockDescription(GENERIC_FRAME_ID, "GENERIC_ID3v23_FRAME",
@@ -893,10 +896,10 @@ public class ID3v23Extension implements Extension {
       tagChildIds.add(ID3V23_PAYLOAD_ID);
 
       // Magic Keys
-      MagicKey id3v23MagicKey = new MagicKey(ID3V23_TAG_MAGIC_KEY_BYTES, ID3V23_TAG_MAGIC_KEY_BYTES.length * Byte.SIZE,
-         ID3V23_TAG_MAGIC_KEY_STRING, ID3V23_HEADER_ID, MagicKey.NO_BACKWARD_READING, 0);
+      AbstractMagicKey id3v23MagicKey = new ConcreteContainerPresentMagicKey(ID3V23_TAG_MAGIC_KEY_STRING,
+         ID3V23_HEADER_ID, AbstractMagicKey.NO_BACKWARD_READING, 0);
 
-      List<MagicKey> id3v23TagMagicKeys = new ArrayList<>();
+      List<AbstractMagicKey> id3v23TagMagicKeys = new ArrayList<>();
       id3v23TagMagicKeys.add(id3v23MagicKey);
 
       descMap.put(ID3V23_TAG_ID,

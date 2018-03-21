@@ -22,13 +22,14 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
+import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -48,8 +49,8 @@ public class ID3v1Extension implements Extension {
    /**
     *
     */
-   public static final ContainerDataFormat ID3v1 = new ContainerDataFormat("ID3v1", new HashSet<String>(), new HashSet<String>(),
-      new ArrayList<String>(), "M. Nilsson", new Date());
+   public static final ContainerDataFormat ID3v1 = new ContainerDataFormat("ID3v1", new HashSet<String>(),
+      new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -115,8 +116,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(titleId, "title", "The ID3v1 title", PhysicalDataBlockType.FIELD, titleChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 30,
                nullCharacter, null, null, null, null, null, null, new ArrayList<>()),
-            titleLocationProps,
-            30, 30, null, null));
+            titleLocationProps, 30, 30, null, null));
 
       // 2. artist
       final List<DataBlockId> artistChildIds = new ArrayList<>();
@@ -129,8 +129,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(artistId, "artist", "The ID3v1 artist", PhysicalDataBlockType.FIELD, artistChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 30,
                nullCharacter, null, null, null, null, null, null, new ArrayList<>()),
-            artistLocationProps,
-            30, 30, null, null));
+            artistLocationProps, 30, 30, null, null));
 
       // 3. album
       final List<DataBlockId> albumChildIds = new ArrayList<>();
@@ -143,8 +142,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(albumId, "album", "The ID3v1 album", PhysicalDataBlockType.FIELD, albumChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 30,
                nullCharacter, null, null, null, null, null, null, new ArrayList<>()),
-            albumLocationProps,
-            30, 30, null, null));
+            albumLocationProps, 30, 30, null, null));
 
       // 4. year
       final List<DataBlockId> yearChildIds = new ArrayList<>();
@@ -157,8 +155,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(yearId, "year", "The ID3v1 year", PhysicalDataBlockType.FIELD, yearChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 4,
                nullCharacter, null, null, null, null, null, null, new ArrayList<>()),
-            yearLocationProps,
-            4, 4, null, null));
+            yearLocationProps, 4, 4, null, null));
 
       // 5. comment
       final List<DataBlockId> commentChildIds = new ArrayList<>();
@@ -169,10 +166,10 @@ public class ID3v1Extension implements Extension {
 
       descMap.put(commentId,
          new DataBlockDescription(commentId, "comment", "The ID3v1 comment", PhysicalDataBlockType.FIELD,
-            commentChildIds, new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 28,
+            commentChildIds,
+            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 28,
                nullCharacter, null, null, null, null, null, null, new ArrayList<>()),
-            commentLocationProps,
-            28, 28, null, null));
+            commentLocationProps, 28, 28, null, null));
 
       // 6. track indicator
       final List<DataBlockId> trackIndicatorChildIds = new ArrayList<>();
@@ -183,10 +180,10 @@ public class ID3v1Extension implements Extension {
 
       descMap.put(trackIndicatorId,
          new DataBlockDescription(trackIndicatorId, "track indicator", "The ID3v1 track indicator",
-            PhysicalDataBlockType.FIELD, trackIndicatorChildIds, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null, new byte[] { nullCharacter }, 1, 1,
+            PhysicalDataBlockType.FIELD, trackIndicatorChildIds,
+            new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null, new byte[] { nullCharacter }, 1, 1,
                null, null, null, null, null, null, null, new ArrayList<>()),
-            trackIndicatorLocationProps,
-            1, 1, null, null));
+            trackIndicatorLocationProps, 1, 1, null, null));
 
       // 7. track
       final List<DataBlockId> trackChildIds = new ArrayList<>();
@@ -198,8 +195,8 @@ public class ID3v1Extension implements Extension {
       descMap.put(trackId,
          new DataBlockDescription(trackId, "track indicator", "The ID3v1 track", PhysicalDataBlockType.FIELD,
             trackChildIds, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null,
-               new byte[] { nullCharacter }, 1, 1, null, null, null, null, null, null, null, new ArrayList<>()), trackLocationProps,
-            1, 1, null, null));
+               new byte[] { nullCharacter }, 1, 1, null, null, null, null, null, null, null, new ArrayList<>()),
+            trackLocationProps, 1, 1, null, null));
 
       // 8. genre
       final List<DataBlockId> genreChildIds = new ArrayList<>();
@@ -215,10 +212,10 @@ public class ID3v1Extension implements Extension {
       enumeratedGenres.put("Jazz", new byte[] { 2 });
 
       descMap.put(genreId, new DataBlockDescription(genreId, "genre", "The ID3v1 genre", PhysicalDataBlockType.FIELD,
-         genreChildIds, new FieldProperties<>(FieldType.ENUMERATED, "" + nullCharacter, enumeratedGenres, new byte[] { nullCharacter },
+         genreChildIds,
+         new FieldProperties<>(FieldType.ENUMERATED, "" + nullCharacter, enumeratedGenres, new byte[] { nullCharacter },
             0, 1, nullCharacter, null, null, null, null, null, null, new ArrayList<>()),
-         genreLocationProps,
-         1, 1, null, null));
+         genreLocationProps, 1, 1, null, null));
 
       // 9. tag id
       final List<DataBlockId> headerIdChildIds = new ArrayList<>();
@@ -232,11 +229,10 @@ public class ID3v1Extension implements Extension {
          new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       descMap.put(id3v1TagHeaderId,
-         new DataBlockDescription(
-            id3v1TagHeaderId, "ID3v1 tag header id", "The ID3v1 tag header id", PhysicalDataBlockType.FIELD,
-            headerIdChildIds, new FieldProperties<>(FieldType.STRING, ID3V1_TAG_ID_STRING,
-               tagIdEnumerated, null, 3, 3, null, null, null, null, null, null, null, new ArrayList<>()), idLocationProps,
-            3, 3, null, null));
+         new DataBlockDescription(id3v1TagHeaderId, "ID3v1 tag header id", "The ID3v1 tag header id",
+            PhysicalDataBlockType.FIELD, headerIdChildIds, new FieldProperties<>(FieldType.STRING, ID3V1_TAG_ID_STRING,
+               tagIdEnumerated, null, 3, 3, null, null, null, null, null, null, null, new ArrayList<>()),
+            idLocationProps, 3, 3, null, null));
 
       // 10. ID3v1 header
       final Map<DataBlockId, LocationProperties> headerLocationProps = new HashMap<>();
@@ -247,9 +243,8 @@ public class ID3v1Extension implements Extension {
       final List<DataBlockId> headerChildIds = new ArrayList<>();
       headerChildIds.add(id3v1TagHeaderId);
 
-      descMap.put(id3v1HeaderId,
-         new DataBlockDescription(id3v1HeaderId, "ID3v1 tag header", "The ID3v1 tag header",
-            PhysicalDataBlockType.HEADER, headerChildIds, null, headerLocationProps, 3, 3, null, null));
+      descMap.put(id3v1HeaderId, new DataBlockDescription(id3v1HeaderId, "ID3v1 tag header", "The ID3v1 tag header",
+         PhysicalDataBlockType.HEADER, headerChildIds, null, headerLocationProps, 3, 3, null, null));
 
       // 11. ID3v1 payload
       final List<DataBlockId> payloadChildIds = new ArrayList<>();
@@ -267,10 +262,8 @@ public class ID3v1Extension implements Extension {
       payloadLocationProps.put(id3v1TagId,
          new LocationProperties(3, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      descMap.put(id3v1PayloadId,
-         new DataBlockDescription(id3v1PayloadId, "payload", "The ID3v1 payload",
-            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps,
-            125, 125, null, null));
+      descMap.put(id3v1PayloadId, new DataBlockDescription(id3v1PayloadId, "payload", "The ID3v1 payload",
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 125, 125, null, null));
 
       // 12. ID3v1 tag
 
@@ -283,14 +276,14 @@ public class ID3v1Extension implements Extension {
          new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      MagicKey id3v1MagicKey = new MagicKey(ID3V1_TAG_ID, 24, ID3V1_TAG_ID_STRING, id3v1HeaderId, -id3v1TagLength, 0);
+      AbstractMagicKey id3v1MagicKey = new ConcreteContainerPresentMagicKey(ID3V1_TAG_ID_STRING, id3v1HeaderId,
+         -id3v1TagLength, 0);
 
-      List<MagicKey> id3v1TagMagicKeys = new ArrayList<>();
+      List<AbstractMagicKey> id3v1TagMagicKeys = new ArrayList<>();
       id3v1TagMagicKeys.add(id3v1MagicKey);
 
-      descMap.put(id3v1TagId,
-         new DataBlockDescription(id3v1TagId, "ID3v1 tag", "The ID3v1 tag", PhysicalDataBlockType.CONTAINER,
-            tagChildIds, null, tagLocationProps, 128, 128, id3v1TagMagicKeys, null));
+      descMap.put(id3v1TagId, new DataBlockDescription(id3v1TagId, "ID3v1 tag", "The ID3v1 tag",
+         PhysicalDataBlockType.CONTAINER, tagChildIds, null, tagLocationProps, 128, 128, id3v1TagMagicKeys, null));
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(id3v1TagId);
