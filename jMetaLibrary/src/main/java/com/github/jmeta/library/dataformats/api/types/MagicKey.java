@@ -14,6 +14,15 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
+// TODO Split into three classes:
+/*
+ * AbstractMagicKey - getMagicKeyBytes, protected equalsBytes, bitLength, stringRepresentation, getByteLength,
+ * headerorFooterforBackwReading, getOffsetFromStartOfHeaderOrFooter, getHeaderOrFooterId AbsenceMagicKey,
+ * PresenceMagicKey with corresponding Javadocs
+ */
+// TODO document and refactor class
+// TODO add testcase class for class
+// TODO refactor backward reading (later)
 public class MagicKey {
 
    /**
@@ -39,20 +48,15 @@ public class MagicKey {
     * @param offsetForBackwardReading
     * @param offsetFromStartOfHeaderOrFooter
     */
-   public MagicKey(byte[] magicKeyBytes, int bitLength,
-      String stringRepresentation, DataBlockId headerBlockId,
+   public MagicKey(byte[] magicKeyBytes, int bitLength, String stringRepresentation, DataBlockId headerBlockId,
       long offsetForBackwardReading, long offsetFromStartOfHeaderOrFooter) {
       Reject.ifNull(magicKeyBytes, "magicKeyBytes");
       Reject.ifNull(stringRepresentation, "stringRepresentation");
       Reject.ifNull(headerBlockId, "headerBlockId");
-      Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0,
-         "The offset from start of header or footer must be >= 0.");
-      Reject.ifNegativeOrZero(bitLength,
-         "bitLength");
-      Reject.ifFalse(bitLength <= magicKeyBytes.length * Byte.SIZE,
-         "bitLength <= magicKeyBytes.length * Byte.SIZE");
-      Reject.ifFalse(offsetForBackwardReading <= 0,
-         "offsetForBackwardReading <= 0");
+      Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0, "The offset from start of header or footer must be >= 0.");
+      Reject.ifNegativeOrZero(bitLength, "bitLength");
+      Reject.ifFalse(bitLength <= magicKeyBytes.length * Byte.SIZE, "bitLength <= magicKeyBytes.length * Byte.SIZE");
+      Reject.ifFalse(offsetForBackwardReading <= 0, "offsetForBackwardReading <= 0");
 
       m_magicKeyBytes = magicKeyBytes.clone();
       m_bitLength = bitLength;
@@ -79,15 +83,13 @@ public class MagicKey {
     * @param headerOfFooterBlockId
     * @param offsetFromStartOfHeaderOrFooter
     */
-   public MagicKey(byte[] exclusionBytes, int bitLength,
-      DataBlockId headerOfFooterBlockId, long offsetFromStartOfHeaderOrFooter) {
+   public MagicKey(byte[] exclusionBytes, int bitLength, DataBlockId headerOfFooterBlockId,
+      long offsetFromStartOfHeaderOrFooter) {
       Reject.ifNull(exclusionBytes, "exclusionBytes");
       Reject.ifNull(headerOfFooterBlockId, "headerBlockId");
       Reject.ifTrue(bitLength < 1, "The bit length must be bigger than 0.");
-      Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0,
-         "The offset from start of header or footer must be >= 0.");
-      Reject.ifFalse(bitLength <= exclusionBytes.length * Byte.SIZE,
-         "bitLength <= exclusionBytes.length * Byte.SIZE");
+      Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0, "The offset from start of header or footer must be >= 0.");
+      Reject.ifFalse(bitLength <= exclusionBytes.length * Byte.SIZE, "bitLength <= exclusionBytes.length * Byte.SIZE");
 
       m_magicKeyBytes = null;
       m_bitLength = bitLength;
@@ -103,8 +105,7 @@ public class MagicKey {
     */
    public byte[] getMagicKeyBytes() {
 
-	  Reject.ifTrue(isExclusionKey(),
-         "isExclusionKey()");
+      Reject.ifTrue(isExclusionKey(), "isExclusionKey()");
 
       return m_magicKeyBytes.clone();
    }
@@ -116,8 +117,7 @@ public class MagicKey {
     */
    public byte[] getExclusionBytes() {
 
-	   Reject.ifFalse(isExclusionKey(),
-         "isExclusionKey()");
+      Reject.ifFalse(isExclusionKey(), "isExclusionKey()");
 
       return m_exclusionBytes.clone();
    }
@@ -129,6 +129,8 @@ public class MagicKey {
 
       return m_exclusionBytes != null;
    }
+
+   // TODO Add new method "getByteLength"
 
    /**
     * @return the bit length
@@ -152,9 +154,8 @@ public class MagicKey {
    @Override
    public String toString() {
 
-      return getClass().getName() + "[" + "magicKeyBytes=" + m_magicKeyBytes
-         + ", bitLength=" + m_bitLength + ", stringRepresentation="
-         + m_stringRepresentation + "]";
+      return getClass().getName() + "[" + "magicKeyBytes=" + m_magicKeyBytes + ", bitLength=" + m_bitLength
+         + ", stringRepresentation=" + m_stringRepresentation + "]";
    }
 
    /**
@@ -175,8 +176,7 @@ public class MagicKey {
 
       int comparedBits = 0;
 
-      final byte[] magicKeyBytes = (isExclusionKey() ? getExclusionBytes()
-         : getMagicKeyBytes());
+      final byte[] magicKeyBytes = (isExclusionKey() ? getExclusionBytes() : getMagicKeyBytes());
 
       if (readBytes.remaining() < magicKeyBytes.length)
          return false;

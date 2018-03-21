@@ -406,7 +406,92 @@ TODO
 \subsection{Magic Keys}%
 \label{sec:MagicKeys}%
 
-TODO
+A magic key is a fundamental concept of most data formats: It allows to identify a block of bytes as belonging to a data format, enabling generic parsers to understand how to parse a byte sequence. Thus, it is usually located at the start of file. For example, an Ogg page is identified by the magic key string ``OggS'', encoded as ASCII. Of course, this somewhat implies that different data formats use different keys.
+
+Translated to this document, here are the main properties of magic keys:
+\begin{itemize}
+\item A magic key has a single fixed byte identification sequence that is usually an ASCII encoded string
+\item It is either starting at the beginning of a container, or at a well-defined fixed offset from the start of the container, thereby being a field in the container's header or footer
+\item That said, also footers have magic keys, e.g. for ID3v23, APEv2 or Lyrics3v2
+\item Data formats might have multiple magic keys identifying them - one example is RIFF where the magic key even identifies the byte order of the container
+\end{itemize}
+
+We summarize:
+%%%% DD --> %%%%
+\DD{dd:520}
+{% Title
+A top-level container defines one or several magic keys 
+}
+{% Short description
+Every top-level container must define one or multiple magic keys identifying the container and data format. The magic key is either at the start (header) or at the end (footer) of a container. We introduce a class \texttt{MagicKey} for describing the properties of a magic key. It defines:
+\begin{itemize}
+\item The magic key bytes plus its string representation
+\item Optional: A fixed byte-length distance from start of header or footer
+\item Whether the magic key is usable for backward reading or not
+\item A bit length of the magic key
+\end{itemize}
+}
+{% Rationale
+Every top-level container must at least have one magic key, because otherwise we cannot identify it. The possibility of multiple different magic keys is implied by e.g. RIFF. ID3v24 defines a header magic key as well as a different footer magic key for backward reading. Some data formats require or at least benefit ``backward reading'' which means to scan for e.g. tags at the end of a file. For this purpose, formats such as ID3v24, APEv2 and Lyrics3v2 define footers with specific magic keys. Thus, we need a byte-length distance to specify where exactly from start or end of file the magic key would start. The bit length in contrast to a byte length is necessary for the MP3 magic key which is not a multiple of 8 bits, but 11 bits long.  
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+What about nested containers? Do they also need to have magic keys? First of all, we have generic containers whose exact structure is only revealed at runtime during parsing. Having an id that is always different, they do not qualify to contain magic keys. However, we already defined that ID3v23 padding is treated as nested container. Likewise, we have QT atom containers that can reside next to sibiling QT atoms (which are generic), but are structured entirely different. If we parse the payload of a top-level containers, how can the parser know if it has a QT atom or a QT atom container for QuickTime, and for ID3v23, how can the parser know if it is a usual ID3v2 frame or already padding? This can be done by using magic keys:
+
+%%%% DD --> %%%%
+\DD{dd:521}
+{% Title
+Nested containers define magic keys if not generic
+}
+{% Short description
+All concrete child containers must define a magic key, while generic containers must not define magic keys. If a specific payload type is allowed to contain different generic container types - such as QuickTime with atoms and QT atoms - these container types must be structurally very similar such that during parsing, it is clear depending on the id which kind of container it is. 
+}
+{% Rationale
+With magic key, a parser can directly either identify a child as concrete container, or - if no identification was possible - as a generic container. In case of QuickTime, QT atoms just define additional fields in the header compared to simple atoms. Depending of the id of the atom, it is clear if it is a QT atom. By changing its runtime type, a parser can deal with it the same way as with all generic containers.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now the question arises how to identify if a byte sequence rather belongs to a generic container or to a container with a magic key. We could iterate all magic keys of all known containers. If a magic key is matching, we have the corresponding container. If it is not, we have the sole generic container before us. This would work quite well. However, there is a very special case for Lyrics3v2: This tag does not define a tag size, thus the payload size is not known in advance. Only if the magic key of the footer is found after a frame, we know that the payload parsing is finished. For the case of generic containers as well as the case of Lyrics3v2 - or more generally - containers not defining a size, we can also use a special form of magic keys:
+
+%%%% DD --> %%%%
+\DD{dd:522}
+{% Title
+Magic keys are also used to indicate absence of a generic container
+}
+{% Short description
+A special kind of magic keys can be used to indicate absence of a generic container type: If the parser finds a specific byte sequence (the magic key bytes), it knows that the follow-up bytes \emph{do not} belong to the generic container type tried to identify. So this kind of magic key is serving the exact opposite of the usual purpose of a magic key: Indicating presence of a container.
+}
+{% Rationale
+An ``absence'' magic key can solve two problems: First of all, if we do not find the absence key, we can assume that the follow-up bytes belong to a generic container. Second, if we find the bytes of an absence magic key, this is a signal that the follow-up bytes do not belong to a generic container. This can be used for Lyrics3v2. By using the end magic key of the Lyrics3v2 footer as absence magic key for the generic Lyrics3v2 frame container, the parser knows when it is finished parsing the payload.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+How to realize these things? We can think of a class hierarchy:
+%%%% DD --> %%%%
+\DD{dd:523}
+{% Title
+\texttt{AbstractMagicKey} as base class, with subclasses \texttt{AbsenceMagicKey} and \texttt{PresenceMagicKey}
+}
+{% Short description
+All commonalities of both kinds of magic keys are bundled in a base class, while all magic keys indicating a concrete container when a magic key is present are of concrete class \texttt{PresenceMagicKey}, and those indicating a generic onctainer when a magic key is \emph{not} found are of concrete class \texttt{AbsenceMagicKey}.
+}
+{% Rationale
+This clearly communicates intent in contrast to just using slightly different constructors. Furthermore it allows to handle this subtle semantic opposite situation within the code of these classes themselves instead of slipping into the parser code where everybode is wondering what the heck it means. Javadocs on the concrete classes can clearly say what the purpose of these classes is and when they are used.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 
 % =======================================================================================================
 \subsection{Header and Footer Properties}%
