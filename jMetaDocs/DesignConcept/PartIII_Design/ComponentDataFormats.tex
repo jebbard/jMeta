@@ -508,12 +508,12 @@ First of all, we summarize and define:
 A top-level container defines one or several magic keys in headers or footers 
 }
 {% Short description
-Every top-level container must define one or multiple magic keys identifying the container and data format. The magic key is either at the start (header) or at the end (footer) of a container. We introduce a class for describing the properties of a magic key. It defines:
+Every top-level container must define one or multiple magic keys identifying the container and data format. The magic key is either at the start (header) or at the end (footer) of a container. We introduce a class \texttt{MagicKey} for describing the properties of a magic key. It defines:
 \begin{itemize}
 \item The magic key bytes
 \item A bit length of the magic key
 \item Optional: A string representation of the magic key
-\item Optional: A fixed byte-length distance from start of header or footer
+\item Optional: A fixed byte-length distance from start of header (positive) or end of footer (negative)
 \end{itemize}
 }
 {% Rationale
@@ -620,7 +620,7 @@ Based on these definitions, we can be more detailed about the parsing strategies
 Parsing top-level containers (forward reading)
 }
 {% Short description
-For top-level containers, the data format idenfification is the first thing that happens. Each data format must define at least one type of default top-level container which can either be generic or concrete. Each top-level container type must at least define one header magic key that indicates presence of the format. If the current bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats the require deviating behaviour (e.g. VorbisComment) can override some aspects of this behaviour.
+For top-level containers, the data format idenfification is the first thing that happens. Each data format must define at least one type of default top-level container which can either be generic or concrete. Each top-level container type must at least define one header magic key that indicates presence of the format. If the current bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats that require deviating behaviour (e.g. VorbisComment) can override some aspects of this behaviour.
 }
 {% Rationale
 This is directly following from all previous design decisions
@@ -647,8 +647,100 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Now the topic of backward-reading containers is still open.
+Now the topic of backward-reading containers is still open. Again, there is a special case here: ID3v1 has no footer, but still is actually backward-readable. The reasons: It is defined to always be at the end of the file. Even if it is not, it could still be identified, as it has a fixed length. This means we would just need to look for the header magic key at a fixed offset from the end of the tag.
 
+To handle this, again, we have two alternatives: Either bring this special case into the generic layer, e.g. by adding a field to the magic key, which points to the offset for backward reading. Or we handle it only in the ID3v1 implementation. A third esoteric possibility would be to have a fake ``footer'' in ID3v1, such that we could just say: Whenever backward reading is necessary, just rely on footers only. But this would be very artificial and would lead to other problems. As was the case previously, we decide: 
+
+%%%% DD --> %%%%
+\DD{dd:525}
+{% Title
+Backward-reading for ID3v1 is implemented in the ID3v1 parser
+}
+{% Short description
+The special case for ID3v1 is not considered in the generic parser code, but it is specifically overridden for this purpose in the ID3v1-specific parsing code.
+}
+{% Rationale
+This decision is in line with the other design decisions. We want to keep the basic concepts and generic parser code and classes clear and clean of single-format special cases.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now, finally, let us define how backward reading is working overall. It is just a feature meant to be used for tags at the end of file. You cannot backward-read MP3 frames or Ogg pages, because they have no footer, such that you would need to ``scan backwards'' which we do not want to do. The second thought about backward-reading: It only affects the top-level, and not nested containers. To summarize:
+%%%% DD --> %%%%
+\DD{dd:526}
+{% Title
+Parsing top-level containers (backward reading)
+}
+{% Short description
+A prerequisite for backward-reading top-level containers is that the data format has a footer with a magic key. The user has to exyplicitly request backward reading. The parser checks if it finds a footer magic key for all backward-readable data formats, i.e. data format identification happens here. It starts reading bytes to compare at the end offset of the footer plus the magic key offset (i.e. it reuses the offset defined in the \texttt{MagicKey} class, which is negative in this case). If the read bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats that require deviating behaviour (e.g. ID3v1) can override some aspects of this behaviour. Backward reading stops as soon as no further backward-readable data format could be identified.
+
+It is not necessary to backward-read nested child containers. 
+}
+{% Rationale
+This is directly following from all previous design decisions. The reason why nested containers do not require backward-reading: Once you know were a backward-read top-level container starts, you can again forward-read its nested children.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now we have to clarify how the parsing code can best access the information about magic keys. We decide:
+%%%% DD --> %%%%
+\DD{dd:527}
+{% Title
+Obtain \texttt{MagicKey}s from \texttt{DataBlockDescription}s of containers
+}
+{% Short description
+For the parser code, \texttt{MagicKey}s can be obtained from a \texttt{DataBlockDescription} of a container data block. It offers a method for obtaining the backward-readable magic keys as well as a method for obtaining the forward-readable magic keys.
+}
+{% Rationale
+A magic key essentially belongs to a container. The top-level container \texttt{DataBlockDescription}s and the nested container \texttt{DataBlockDescription}s must anyway be available a the places where we need to parse them. By providing different methods for forward and backward reading, the intentions become very clear. Overall, it is most convenient for the parser code this way.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Strongly connected to this is the question how to represent magic keys in a data format while avoiding redundancies. We already defined a specific class called \texttt{MagicKey} and methods for obtaining the magic keys for this, which is a good choice as it bundles all the relevant information (and nothing more) for the parser code. But in the end, a magic key is nothing but a header or footer field with a fixed value. Thus we define:
+%%%% DD --> %%%%
+\DD{dd:528}
+{% Title
+\texttt{MagicKey} instances implicitly derived from field \texttt{DataBlockDescription}s 
+}
+{% Short description
+The \texttt{MagicKey} instances that can be queried by the parsing code are not defined/added in parallel to the field properties anyway needed. In contrast to this, a \texttt{DataDataBlockDescription} of type \texttt{FIELD} additionally contains a flag saying if it is a magic key or not. If this flag is set to true, all other properties of the \texttt{MagicKey} can implicitly derived from the other field properties and a plausibility check can happen. If one of the following plausibility checks is failing, the \texttt{DataFormatSpecification} is considered invalid. 
+\begin{itemize}
+\item A field marked as magic key must either have a fixed value of string or binary type, or it must be an enumerated field of string or binary type.
+\item The header that contains the magic key field must be either be the first header or the headers before it must be fixed length headers. For footers: The footer that contains the magic key field must be either be last footer or the footers behind it must be fixed length footers. Otherwise the field does not qualify as magic key, because it might have a variable offset from the start or end of its container and the \texttt{DataFormatSpecification} cannot derive the necessary offset from start or end of container.
+\item For the same reason, we define for headers: The fields in front of the magic key field (if any) must all be fixed length fields. And for footers: The fields behind the magic key field (if any) must all be fixed length fields.
+\end{itemize}
+}
+{% Rationale
+Redundancy is avoided, and it is more convenient to define a concrete \texttt{DataFormatSpecification}, as we do not need to repeat ourselves.
+}
+{% Disadvantes
+A \texttt{DataFormatSpecification} implementation must be slightly more complex to derive and check the necessary properties of the \texttt{MagicKey} instances.
+}
+%%%% <-- DD %%%%
+
+Last but not least, we want to discuss the topic of different data format versions and their magic keys. Specifically, one could ask: Does the version number belong to the magic key of a data format or not? We define:
+%%%% DD --> %%%%
+\DD{dd:529}
+{% Title
+Magic keys do not include a version number
+}
+{% Short description
+Magic keys never include the version number of the data format, even if it directly follows or preceedes the magic key and it might appear as solution to the problem of how to distignuish similar data formats.
+}
+{% Rationale
+First of all, a version number might be numeric, while magic keys are usually strings. Does the string representation of the version number would be slightly odd. Second and more importantly, it is actually a different field, and it could well be that a data format does not define the version field to be directly adjacent to the magic key field.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 % =======================================================================================================
 \subsection{Header and Footer Properties}%
