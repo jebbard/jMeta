@@ -595,6 +595,16 @@ Even though it would be tempting, \LibName{} currently is not a encoder or decod
 
 \textbf{Rationale:} Audio, video and image formats as well as corresponding encoders are extensively complex. A huge variety of great libraries and tools is already existing. For high-performance needs, especially GStreamer and FFMPEG seem to rule the scene. \LibName{} can never compete with that and it would mean to \emph{just stop} the project when trying to do just that. Instead, we can offer the primitives for Java developers who might want to develop their own (probably not very high-performance) codecs. Maybe in the very far future, \LibName{} could offer integration functionality to plug-in existing codec implementations somehow conveniently, such that it can be used on its own as a basis for Java transcoding and player/viewer applications.
 
+% -------------------------------------------------------------------------------------------------------
+%  EXCL 005: Scanning for data formats not supported
+% -------------------------------------------------------------------------------------------------------
+\section{EXCL 005: Scanning for data formats not supported}%
+\label{sec:EXCL005Scanningfordataformatsnotsupported}%
+
+\LibName{} in its current version does not yet support scanning a chunk of bytes for the occurrence of a data format. This functionality might be added in later versions.
+
+\textbf{Rationale:} This simplifies implementation of data format discovery for now. Furthermore, support for streaming media (where scanning is most likely to be necessary) is out-of-scope, too, see \SectionLink{sec:EXCL009LesenAusStreams}.
+
 %===============================================================================================
 %		Reference Examples
 %===============================================================================================

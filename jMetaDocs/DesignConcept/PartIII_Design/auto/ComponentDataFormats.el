@@ -11,8 +11,9 @@
     "sec:ConcreteandGenericContainers"
     "sec:InheritingandOverridingDatablockStructures"
     "sec:MagicKeys"
+    "tab:magicKeys"
     "sec:HeaderProperties"
     "sec:ContainerProperties"
     "sec:PayloadProperties"
-    "sec:FieldProperties")))
+    "sec:Sizes")))
 

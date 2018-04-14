@@ -403,43 +403,174 @@ If a \texttt{CONTAINER\_BASED\_PAYLOAD} might contain different types of contain
 TODO
 
 % =======================================================================================================
-\subsection{Magic Keys}%
+\subsection{Data Format Identification and Magic Keys}%
 \label{sec:MagicKeys}%
 
-A magic key is a fundamental concept of most data formats: It allows to identify a block of bytes as belonging to a data format, enabling generic parsers to understand how to parse a byte sequence. Thus, it is usually located at the start of file. For example, an Ogg page is identified by the magic key string ``OggS'', encoded as ASCII. Of course, this somewhat implies that different data formats use different keys.
-
-Translated to this document, here are the main properties of magic keys:
+This section deals with the question how to identify that a given chunk of bytes belongs to a specific data format. This is not an easy thing because of the following aspects:
 \begin{itemize}
-\item A magic key has a single fixed byte identification sequence that is usually an ASCII encoded string
-\item It is either starting at the beginning of a container, or at a well-defined fixed offset from the start of the container, thereby being a field in the container's header or footer
-\item That said, also footers have magic keys, e.g. for ID3v23, APEv2 or Lyrics3v2
-\item Data formats might have multiple magic keys identifying them - one example is RIFF where the magic key even identifies the byte order of the container
+\item There are different media types such as files, continuous streams and in-memory bytes
+\item Different strategies of reading data formats are (partly) supported in \LibName{}: Most data formats are designed for the default way of reading, i.e. \textbf{forward reading} starting from the beginning of the medium from offset zero towards higher offsets. However, sometimes \textbf{backward reading} is much more performant, especially for multimedia tags. Last but not least, you can think of \textbf{scanning} to search a chunk of bytes for the first occurrence of a known format.
+\item Some data formats are extremely similar to each other, either due to the fact that they are different revisions of the same family of formats (e.g. ID3v23 and ID3v24) or due to decisions of standardization boards (e.g. the ISO base multimedia format with its children JPEG 2000, MPEG-4 and others which are nearly identical to QuickTime) - how to distinguish them.
+\item A few data formats such as MP3 allow coexistence of multiple unrelated data formats on top-level of a medium, usually a file. An MP3 file not only contains MP3 frames, but also ID3v1, ID3v3, LyricsV3 or APE tags, all of which are entirely different data formats specified on their own. This is a special case as most other multimedia data formats such as RIFF, QuickTime, Matroska and Ogg require to only have data blocks of RIFF, QuickTime, Matroska and Ogg on top-level in the same medium.
 \end{itemize}
 
-We summarize:
+What are the different possibilities of identifying the data format of a medium?
+\begin{itemize}
+\item \emph{Based on the file extension:} In 80 percent of the cases, you could think of identifying a data format based on its file extension. This requires a mapping of extensions to data formats. While this could be a feasible approach, its downsides are clear: If the file has no extension (e.g. on Unix systems this could be the case), you cannot identify it. Furthermore, this approach is not feasible for streaming media and in-memory bytes.
+\item \emph{Using other external hints:} You can use other external hints, e.g. external metadata (provided in separate files, in an HTTP header for streams) or let the user select or hint at the data format. Obviously, this could never be a possibility covering all cases and requires a lot of very diverse strategies to implement. 
+\item \emph{Based on information in the data:} You read the bytes and try to identify the data format based on the bytes in the data itself. Mostly, this translates into using magic keys which we will cover immediately or scanning. While this might seem strenuous, it is actually the only proven way to ensure proper identification that even works for all different media.
+\end{itemize}
+
+So we decide:
 %%%% DD --> %%%%
-\DD{dd:520}
+\DD{dd:520a}
 {% Title
-A top-level container defines one or several magic keys 
+Default identification mechanism uses magic keys
 }
 {% Short description
-Every top-level container must define one or multiple magic keys identifying the container and data format. The magic key is either at the start (header) or at the end (footer) of a container. We introduce a class for describing the properties of a magic key. It defines:
-\begin{itemize}
-\item The magic key bytes plus its string representation
-\item Optional: A fixed byte-length distance from start of header or footer
-\item Whether the magic key is usable for backward reading or not
-\item A bit length of the magic key
-\end{itemize}
+\LibName{} uses magic keys to identify the data format of a given chunk of data bytes. Scanning is not used for identifaction for now.
 }
 {% Rationale
-Every top-level container must at least have one magic key, because otherwise we cannot identify it. The possibility of multiple different magic keys is implied by e.g. RIFF. ID3v24 defines a header magic key as well as a different footer magic key for backward reading. Some data formats require or at least benefit from ``backward reading'' which means to scan for e.g. tags at the end of a file. For this purpose, formats such as ID3v24, APEv2 and Lyrics3v2 define footers with specific magic keys. Thus, we need a byte-length distance to specify where the magic key starts exactly. The bit length in contrast to a byte length is necessary for the MP3 magic key which is not a multiple of 8 bits, but 11 bits long.  
+Its the only reliable way to identify a data format, and we anyway need to parse the data. It works for all media types. Regarding scanning:  It is currently excluded, see \SectionLink{sec:EXCL005Scanningfordataformatsnotsupported}.
 }
 {% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-What about nested containers? Do they also need to have magic keys? First of all, we have generic containers whose exact structure is only revealed at runtime during parsing. Having an id that is always different, they usually do not qualify to contain magic keys. However, we already defined that ID3v23 padding is treated as nested container. Likewise, we have QT atom containers that can reside next to sibiling QT atoms (which are generic), but are structured entirely different. If we parse the payload of a top-level container, how can the parser know if it has a QT atom or a QT atom container for QuickTime, and for ID3v23, how can the parser know if it is a usual ID3v2 frame or already padding? This can be done by using magic keys:
+Now we want to deal with the very basic and central concept common to most if not all of those data formats: \textbf{Magic Keys}. A magic key is a sequence of bytes with a fixed, well-known value, which allows to identify a block of bytes as belonging to a data format, enabling generic parsers to understand how to parse a byte sequence. Thus, it is usually located at the start of the medium. For example, an Ogg page is identified by the magic key string ``OggS'', encoded as ASCII. Of course, this implies that different data formats use different magic keys.
+
+These are the main properties of magic keys we are most interested in:
+\begin{itemize}
+\item A magic key has a single fixed byte identification sequence that is usually an ASCII encoded string
+\item It is either starting at the beginning of a container, or at a well-defined fixed offset from the start of the container, thereby being a field in the container's header or footer
+\item That said, also footers have magic keys to be used for backward reading, e.g. for ID3v23, APEv2 or Lyrics3v2
+\item Data formats might have multiple magic keys identifying them - one example is RIFF where the magic key also identifies the byte order of the container
+\end{itemize}
+
+Let's list all magic keys of the data formats we care about in \ref{tab:magicKeys}.
+
+\begin{longtable}{|p{0.2\linewidth}|p{0.35\linewidth}|p{0.35\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Data Format} & \textbf{Header Keys} & \textbf{Footer Keys} \\
+\endhead
+\hline
+Ogg  & ``OggS'' at start of page header & -  \\
+\hline
+Matroska  & 1A45DFA3h & -  \\
+\hline
+RIFF  & ``RIFF'' (big endian) or ``RIFX'' (little endian) at start of chunk header & -  \\
+\hline
+AIFF  & ``FORM'' at start of chunk header & -  \\
+\hline
+QuickTime  & ``ftyp'' or ``moov'' or ``pnot'' or ``mdat'' or ``skip'' as atom type (starting with 5th byte) in atom header & -  \\
+\hline
+MP3  & Evelen 1 bits at start of frame header & -  \\
+\hline
+ID3v1 and ID3v1.1  & ``TAG'' at start of tag header & -  \\
+\hline
+ID3v22  & ``ID3'' followed by version number 0200h at start of tag header & -  \\
+\hline
+ID3v23  & ``ID3'' followed by version number 0300h at start of tag header & -  \\
+\hline
+ID3v24  & ``ID3'' followed by version number 0400h at start of tag header & ``3DI'' followed by version number 0400h at start of tag footer \\
+\hline
+APEv1  & ``APETAGEX'' followed by version number 1000 at start of tag header & ``APETAGEX'' followed by version number 1000 at start of tag footer \\
+\hline
+APEv2  & ``APETAGEX'' followed by version number 2000 at start of tag header & ``APETAGEX'' followed by version number 2000 at start of tag footer \\
+\hline
+Lyrics3v1  & ``LYRICSBEGIN'' at start of tag header & ``LYRICSEND'' at start of tag footer  \\
+\hline
+Lyrics3v2  & ``LYRICSBEGIN'' at start of tag header & ``LYRICS200'' at start of tag footer  \\
+\hline
+VorbisComment  & \emph{No magic key} & -  \\
+\hline
+\caption{Magic keys of all relevant data formats}
+\label{tab:magicKeys}
+\end{longtable}
+
+Let us look at the odd exceptions in this list:
+\begin{enumerate}
+\item [(1)] We see that the only format not having a magic key is the VorbisComment
+\item [(2)] MP3 as the only format does not have a string magic key, but rather a bit sequence
+\item [(3)] RIFF as the only format defines multiple different magic keys in its header
+\item [(4)] Lyrics 3 and ID3v24 are the only formats where header and footer magic keys differ
+\item [(5)] QuickTime as only format has the magic key not at the beginning of its header, but at fixed byte offset 4
+\item [(6)] QuickTime is very vague about its magic key, it actually defines all top-level atoms as optional, but recommends to usually start a QuickTime file with the ftyp atom
+\end{enumerate}
+
+Gradually, we will develop a strategy that includes all of those special cases.
+
+First of all, we summarize and define:
+%%%% DD --> %%%%
+\DD{dd:520}
+{% Title
+A top-level container defines one or several magic keys in headers or footers 
+}
+{% Short description
+Every top-level container must define one or multiple magic keys identifying the container and data format. The magic key is either at the start (header) or at the end (footer) of a container. We introduce a class for describing the properties of a magic key. It defines:
+\begin{itemize}
+\item The magic key bytes
+\item A bit length of the magic key
+\item Optional: A string representation of the magic key
+\item Optional: A fixed byte-length distance from start of header or footer
+\end{itemize}
+}
+{% Rationale
+Every top-level container must at least have one magic key, because otherwise we cannot identify it. The possibility of multiple different magic keys is implied by e.g. RIFF and QuickTime. ID3v24 defines a header magic key as well as a different footer magic key for backward reading. The bit length in contrast to a byte length is necessary for the MP3 magic key which is not a multiple of 8 bits, but 11 bits long. The fixed byte-length distance from start of header or footer is necessary for formats such as QuickTime. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Having defined this, we already covered the exceptions number (2), (3), (4) and (5). Now let's tackle QuickTime:
+%%%% DD --> %%%%
+\DD{dd:520b}
+{% Title
+ftyp, pnot, mdat and moov as magic keys for QuickTime
+}
+{% Short description
+ftyp, pnot, mdat and moov are defined as the magic keys for QuickTime. If none of these atoms is found, a byte chunk cannot be identified as QuickTime.
+}
+{% Rationale
+The vagueness of the specification is a problem, but we can reasonably handle it like that and be quite sure that in 90 percent of the cases, we can read QuickTime files properly.
+}
+{% Disadvantes
+Some very special QuickTime byte sequence might not be readable with \LibName{}.
+}
+%%%% <-- DD %%%%
+
+Now we are left with the VorbisComment special case. Unfortunately, you need external context knowledge to just know that the chunk of bytes is a Vorbis Comment. As described in \cite{MC17}[MC17]:
+\begin{itemize}
+\item In Vorbis bitstreams, it always is embedded in the second page of the stream
+\item In FLAC, Speex and theora bitstreams, it is always starting with the second packet of the stream, it is actually not quite clear if this is the same thing as for Vobis, but note that Vorbis says page and the other say packet which is conceptually different in Ogg!
+\end{itemize}
+
+The VorbisComment, to say it cleary, seems quite oddly designed. We will not invent a generic solution for this, thus we define:
+%%%% DD --> %%%%
+\DD{dd:521}
+{% Title
+VorbisComment oddities are only handled in the Ogg and VorbisComment implementations
+}
+{% Short description
+The generic parsing algorithm of \LibName{} does not provide any support for data formats that have no magic keys such as VorbisComment. Instead, such oddities need to be handled in the individual implementations. We assume that this can be done quite easily in the Ogg and VorbisComment parsing implementations.
+}
+{% Rationale
+Handling such a singular special case in a generic way is quite hard and would greatly complicate the generic parser. Implementations should be able to handle it with their special knowledge, which does not need to leak into the generic parser.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+We have already covered top-level containers and data format identification. But what about nested containers? Do they also need to have magic keys? In most cases, we have generic nested containers whose exact structure is only revealed at runtime during parsing, e.g. ID3v2 frames, RIFF chunks, Matroska elements and so on. Having an id that is always different, they usually do not qualify to contain magic keys. If all data formats would define a generic nested container type, all would be fine. But again, we have candidates for problems:
+\begin{itemize}
+\item QuickTime defines two different types of nested containers that have a completely different structure: atoms and QT atom containers
+\item ID3v2 has an odd use of padding by defining it as special null bytes behind the payload and before the footer (if any), thus he have defined to treat padding as special container, see \DesLink{dd:505} 
+\end{itemize}
+
+Here, we can use magic keys to the rescue:
 
 %%%% DD --> %%%%
 \DD{dd:521}
@@ -447,50 +578,76 @@ What about nested containers? Do they also need to have magic keys? First of all
 Nested containers define magic keys if not generic
 }
 {% Short description
-All concrete child containers must define a magic key, while generic containers could but usually do not define magic keys. If a specific payload type is allowed to contain different generic container types - such as QuickTime with atoms and QT atoms - these container types must be structurally very similar such that during parsing, it is clear depending on the id which generic container type it is exactly. 
+Usually, nested containers are generic. Non-generic nested containers are allowed to define one or multiple magic keys in their headers or footers. 
 }
 {% Rationale
-With a magic key, a parser can directly either identify a child as concrete container, or - if no identification was possible - as a generic container. In case of QuickTime, QT atoms just define additional fields in the header compared to simple atoms. Depending on the id of the atom, it is clear if it is a QT atom or a usual atom. By changing its runtime type, a parser can deal with it the same way as with all generic containers.
+QT atom containers have 10 zero-bytes at start which can be used as magic key. Likewise, padding always must start with a zero byte which is then the magic key.
+
+Parsers reading payload bytes of a top-level container can first check for the presence of any magic key bytes of defined child containers. Only if these are not found, the single generic child container is assumed to be present. 
 }
 {% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Now the question arises how to identify if a byte sequence rather belongs to a generic container or to a container with a magic key. We could iterate all magic keys of all known containers. If a magic key is matching, we have the corresponding container. If it is not, we have the sole generic container before us. This would work quite well. However, there is a very special case for Lyrics3v2: This tag does not define a tag size, thus the payload size is not known in advance. Only if the magic key of the footer is found after a frame, we know that the payload parsing is finished. For the case of generic containers as well as the case of Lyrics3v2 - or more generally - containers not defining a size, we can also use a special form of magic keys:
+Note that there are still two problems with the formats to solve when doing it like this:
+\begin{itemize}
+\item QuickTime (again) defines atoms and QT atoms as generic container types that can also be nested containers. QT atoms start with the same structure as atoms, but add some header fields.
+\item When parsing child content like defined in \DesLink{dd:521}, there is a special case for Lyrics3v2: Unfortunately, the payload size of this tag is not known in andvance, but its end is only identified by the magic key in its footer. This special case is treated in \DesLink{dd:550} in another section. 
+\end{itemize}
 
+So let us check how to handle yet another QuickTime oddity:
 %%%% DD --> %%%%
 \DD{dd:522}
 {% Title
-Magic keys are also used to indicate absence of a generic container
+QT atoms can be identified at runtime
 }
 {% Short description
-A special kind of magic key is used to indicate absence of a generic container type: If the parser finds the defined byte sequence of this magic key, it knows that the follow-up bytes \emph{do not} belong to the generic container type tried to identify. And: If the parser \emph{does not} find the magic key bytes, it assumes the generic container is present. So this kind of magic key is serving the exact opposite of the usual purpose of a magic key: It indicates the absence of a container instead of its presence.
+QuickTime as only format relevant for us defines two different generic container types: Atoms and QT atoms. Thus, we define these two types of generic containers and use the generic container identification schemes to handle the situation. At runtime, if a specific id is found, the atom type is known to be an atom or QT atom, and further parsing is going on correspondly. See \DesLink{dd:513} for the runtime concrete container identification.
 }
 {% Rationale
-An ``absence'' magic key can solve two problems: If we do not find the absence magic key, we can assume that the follow-up bytes belong to the current generic container type tried to identify. Otherwise, if we find the bytes of an absence magic key, this is prooving that the follow-up bytes do not belong to the current generic container type tried to identify. Second, this can be used for Lyrics3v2: By using the magic key of the Lyrics3v2 footer as absence magic key for the generic Lyrics3v2 frame container, the parser knows when it is finished parsing the payload.
+Luckily, QT atoms just extend the header of atoms and otherwise are structure the same way. Thus this mechanism will resolve the problem.
 }
 {% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-How to realize these things? We can think of a class hierarchy:
+Based on these definitions, we can be more detailed about the parsing strategies:
 %%%% DD --> %%%%
 \DD{dd:523}
 {% Title
-\texttt{AbstractMagicKey} as base class, with subclasses \texttt{GenericContainerPresentMagicKey} and \texttt{ConcreteContainerPresentMagicKey}
+Parsing top-level containers (forward reading)
 }
 {% Short description
-All commonalities of both kinds of magic keys are bundled in a base class. All magic keys indicating a concrete container when a magic key is present are of concrete class \texttt{PresenceMagicKey}, and those indicating absence of a concrete and presence of a generic onctainer when a magic key is \emph{not} found are of concrete class \texttt{AbsenceMagicKey}.
+For top-level containers, the data format idenfification is the first thing that happens. Each data format must define at least one type of default top-level container which can either be generic or concrete. Each top-level container type must at least define one header magic key that indicates presence of the format. If the current bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats the require deviating behaviour (e.g. VorbisComment) can override some aspects of this behaviour.
 }
 {% Rationale
-This clearly communicates intent in contrast to just using slightly different constructors. Furthermore it allows to handle this subtle semantic opposite situation within the code of these classes themselves instead of slipping into the parser code where everybody is wondering what the heck it means. Javadocs on the concrete classes can clearly say what the purpose of these classes is and when they are used.
+This is directly following from all previous design decisions
 }
 {% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
+
+For nested containers, forward reading basically works like this:
+%%%% DD --> %%%%
+\DD{dd:524}
+{% Title
+Parsing nested containers (forward reading)
+}
+{% Short description
+For nested containers, no data format idenfification is needed. The data format defined all possible containers that might occur in the container-based payload of the parent container. Each of these containers can either be generic or concrete. Any defined nested container might define a magic key. The parser first tries to match the current bytes with these magic key bytes. If they match, the child container is found. Further on, if the nested container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. There must be exactly one \emph{default nested container} which can be obtained from the \texttt{DataFormatSpecification}. If the container-based payload does not define any containers with magic keys, or if none of them matches, the parser expects to find the default nested container. If this container is generic, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. This might e.g. reveal that an atom (default nested container for QuickTime) is actually a QT atom of a concrete type, see \DesLink{dd:522}.
+}
+{% Rationale
+This is directly following from all previous design decisions. We have to define a default nested container just because of QuickTime as sole exception defining two very similar generic nested container types.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now the topic of backward-reading containers is still open.
 
 
 % =======================================================================================================
@@ -509,9 +666,26 @@ No disadvantages known
 
 
 % =======================================================================================================
-\subsection{Field Properties}%
-\label{sec:FieldProperties}%
+\subsection{Sizes}%
+\label{sec:Sizes}%
 
+In \DesLink{dd:521} and the follow-up discussion, we already noted that Lyrics3v2 is somewhat special in terms of how to determine its payload size: It cannot be done before parsing it. Instead, it is only known to end when the footer's magic key is found. Thus it is kind of ``terminated''. In a first design, this was handled by some kind of special magic keys, so-called ``exclusion keys'' that where defined to state ``if you find this key, a container of the current type IS NOT present''. However, we decided to redesign this to be less odd:
+
+%%%% DD --> %%%%
+\DD{dd:550}
+{% Title
+Lyrics3v2 payload size is determined in custom implementation
+}
+{% Short description
+Lyrics3v2 special case is treated in a custom implementation by overriding the process of determining the payload length in the Lyrics3v2 parser implementation.
+}
+{% Rationale
+This case is only known for Lyrics3v2, thus we do not want to handle it in the generic parsing code. The Lyrics3v2 implementation is the right place to handle it.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 
 
