@@ -1,5 +1,5 @@
 /**
- * {@link AbstractMagicKey}.java
+ * {@link MagicKey}.java
  *
  * @author Jens Ebert
  * @date 31.12.10 19:47:06 (December 31, 2010)
@@ -19,13 +19,13 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * sequence of bytes <i>is absent</i>. Thus, there are two concrete flavors of this class:
  * 
  * <ul>
- * <li>{@link ConcreteContainerPresentMagicKey} - For detecting presence of a concrete container</li>
+ * <li>{@link MagicKey} - For detecting presence of a concrete container</li>
  * <li>{@link ConcreteContainerAbsentPresentMagicKey}</li>
  * </ul>
  */
 // TODO add testcase class for class
 // TODO refactor backward reading (later)
-public abstract class AbstractMagicKey {
+public class MagicKey {
 
    /**
     *
@@ -45,8 +45,8 @@ public abstract class AbstractMagicKey {
    private final String stringRepresentation;
 
    /**
-    * Creates a new {@link AbstractMagicKey}. Use this constructor if the magic key has no human-readable string
-    * representation and an odd length, i.e. only covers bytes partially.
+    * Creates a new {@link MagicKey}. Use this constructor if the magic key has no human-readable string representation
+    * and an odd length, i.e. only covers bytes partially.
     * 
     * @param magicKeyBytes
     *           The magic key's bytes indicating presence of a container if found or not found, depending on the
@@ -61,8 +61,8 @@ public abstract class AbstractMagicKey {
     * @param offsetFromStartOfHeaderOrFooter
     *           TODO
     */
-   public AbstractMagicKey(byte[] magicKeyBytes, int bitLength, DataBlockId headerBlockId,
-      long offsetForBackwardReading, long offsetFromStartOfHeaderOrFooter) {
+   public MagicKey(byte[] magicKeyBytes, int bitLength, DataBlockId headerBlockId, long offsetForBackwardReading,
+      long offsetFromStartOfHeaderOrFooter) {
       Reject.ifNull(magicKeyBytes, "magicKeyBytes");
       Reject.ifNull(headerBlockId, "headerBlockId");
       Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0, "The offset from start of header or footer must be >= 0.");
@@ -79,8 +79,8 @@ public abstract class AbstractMagicKey {
    }
 
    /**
-    * Creates a new {@link AbstractMagicKey}. Use this constructor if the magic key has no human-readable string
-    * representation but only covers full bytes.
+    * Creates a new {@link MagicKey}. Use this constructor if the magic key has no human-readable string representation
+    * but only covers full bytes.
     * 
     * @param magicKeyBytes
     *           The magic key's bytes indicating presence of a container if found or not found, depending on the
@@ -93,14 +93,14 @@ public abstract class AbstractMagicKey {
     * @param offsetFromStartOfHeaderOrFooter
     *           TODO
     */
-   public AbstractMagicKey(byte[] magicKeyBytes, DataBlockId headerBlockId, long offsetForBackwardReading,
+   public MagicKey(byte[] magicKeyBytes, DataBlockId headerBlockId, long offsetForBackwardReading,
       long offsetFromStartOfHeaderOrFooter) {
       this(magicKeyBytes, magicKeyBytes != null ? magicKeyBytes.length * Byte.SIZE : 0, headerBlockId,
          offsetForBackwardReading, offsetFromStartOfHeaderOrFooter);
    }
 
    /**
-    * Creates a new {@link AbstractMagicKey}. Use this constructor if the magic key has a human-readable ASCII string
+    * Creates a new {@link MagicKey}. Use this constructor if the magic key has a human-readable ASCII string
     * representation and only covers full bytes.
     * 
     * @param asciiKey
@@ -112,7 +112,7 @@ public abstract class AbstractMagicKey {
     * @param offsetFromStartOfHeaderOrFooter
     *           TODO
     */
-   public AbstractMagicKey(String asciiKey, DataBlockId headerBlockId, long offsetForBackwardReading,
+   public MagicKey(String asciiKey, DataBlockId headerBlockId, long offsetForBackwardReading,
       long offsetFromStartOfHeaderOrFooter) {
       this(asciiKey != null ? asciiKey.getBytes(Charsets.CHARSET_ASCII) : null, headerBlockId, offsetForBackwardReading,
          offsetFromStartOfHeaderOrFooter);
@@ -179,7 +179,9 @@ public abstract class AbstractMagicKey {
     *           The bytes to look for the magic key
     * @return true if the container's presence is indicated by the given bytes, false otherwise
     */
-   public abstract boolean isContainerPresent(ByteBuffer bytesToCheckForMagicKey);
+   public boolean isContainerPresent(ByteBuffer readBytes) {
+      return equalsBytes(readBytes);
+   }
 
    /**
     * @see java.lang.Object#toString()
@@ -197,7 +199,7 @@ public abstract class AbstractMagicKey {
     *           The bytes to check, must not be null
     * @return true if matching, false otherwise
     */
-   protected boolean equalsBytes(ByteBuffer readBytes) {
+   private boolean equalsBytes(ByteBuffer readBytes) {
       Reject.ifNull(readBytes, "readBytes");
 
       int comparedBits = 0;

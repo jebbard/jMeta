@@ -29,7 +29,6 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
@@ -37,10 +36,10 @@ import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
-import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -118,18 +117,25 @@ public class StandardDataBlockReader implements DataBlockReader {
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
 
+      DataBlockDescription defaultNestedContainerDescription = getSpecification()
+         .getDefaultNestedContainerDescription();
+
+      if (defaultNestedContainerDescription != null && id.equals(defaultNestedContainerDescription.getId())) {
+         return true;
+      }
+
       DataBlockDescription containerDesc = m_spec.getDataBlockDescription(id);
 
-      List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
+      List<MagicKey> magicKeys = containerDesc.getMagicKeys();
 
       // No magic key means: "Everything is a container"
       if (magicKeys.isEmpty())
-         return true;
+         throw new IllegalStateException("The container with id <" + id + "> must have at least one magic key");
 
       // TODO primeRefactor001: Does this loop really always yields the wanted results?
       // Is it possible that sometimes the headers magic key gets preferred?
       for (int i = 0; i < magicKeys.size(); ++i) {
-         AbstractMagicKey magicKey = magicKeys.get(i);
+         MagicKey magicKey = magicKeys.get(i);
 
          // Does the magic key equal the medium bytes at the given reference?
          int magicKeySizeInBytes = magicKey.getByteLength();
@@ -187,7 +193,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < headerDescs.size(); ++i) {
          DataBlockDescription headerDesc = headerDescs.get(i);
 
-         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers, theContext);
+         List<Header> nextHeaders = readHeadersOrFootersWithId(nextReference, headerDesc.getId(), actualId, headers,
+            theContext, true);
 
          long totalHeaderSize = 0;
 
@@ -232,7 +239,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers, theContext);
+         List<Header> nextFooters = readHeadersOrFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
+            theContext, true);
 
          long totalFooterSize = 0;
 
@@ -287,7 +295,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         List<Header> nextFooters = readFootersWithId(nextReference, footerDesc.getId(), actualId, footers, theContext);
+         List<Header> nextFooters = readHeadersOrFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
+            theContext, true);
 
          @SuppressWarnings("unused")
          long totalFooterSize = 0;
@@ -339,7 +348,8 @@ public class StandardDataBlockReader implements DataBlockReader {
          // TODO primeRefactor003: expects static header size?
          nextReference = nextReference.advance(-headerDesc.getMaximumByteLength());
 
-         List<Header> nextHeaders = readHeadersWithId(nextReference, headerDesc.getId(), actualId, headers, theContext);
+         List<Header> nextHeaders = readHeadersOrFootersWithId(nextReference, headerDesc.getId(), actualId, headers,
+            theContext, false);
 
          @SuppressWarnings("unused")
          long totalHeaderSize = 0;
@@ -391,86 +401,35 @@ public class StandardDataBlockReader implements DataBlockReader {
       return createPayloadAfterRead;
    }
 
-   /**
-    * Returns the next {@link Header} with the given {@link DataBlockId} assumed to be stored starting at the given
-    * {@link MediumOffset} or null. If the {@link Header}s presence is optional, its actual presence is determined using
-    * the given previous {@link Header}s. The method returns null if no {@link Header} with the {@link DataBlockId} is
-    * present at the given {@link MediumOffset}.
-    *
-    * @param reference
-    *           The {@link MediumOffset} pointing to the location of the assumed {@link Header} in the
-    *           {@link AbstractMedium}.
-    * @param headerId
-    *           The {@link DataBlockId} of the assumed {@link Header}.
-    * @param parentId
-    * @param previousHeaders
-    *           The {@link List} of previous {@link Header}s belonging to the same {@link Container}. Have been already
-    *           read beforehand. These {@link Header}s can be used to determine the presence of the currently requested
-    *           {@link Header}. If there are no {@link Header}s that have been read beforehand, this {@link List} must
-    *           be empty.
-    * @return The {@link Header} with the given {@link DataBlockId} with its {@link StandardField}s read from the given
-    *         {@link MediumOffset}.
-    */
    @Override
-   public List<Header> readHeadersWithId(MediumOffset reference, DataBlockId headerId, DataBlockId parentId,
-      List<Header> previousHeaders, FieldFunctionStack context) {
+   public List<Header> readHeadersOrFootersWithId(MediumOffset reference, DataBlockId headerOrFooterId,
+      DataBlockId parentId, List<Header> previousHeadersOrFooters, FieldFunctionStack context, boolean isFooter) {
 
-      Reject.ifNull(previousHeaders, "previousHeaders");
-      Reject.ifNull(headerId, "headerId");
+      Reject.ifNull(previousHeadersOrFooters, "previousHeadersOrFooters");
+      Reject.ifNull(headerOrFooterId, "headerOrFooterId");
       Reject.ifNull(reference, "reference");
-      Reject.ifFalse(m_spec.specifiesBlockWithId(headerId), "m_spec.specifiesBlockWithId(headerId)");
+      Reject.ifFalse(m_spec.specifiesBlockWithId(headerOrFooterId), "m_spec.specifiesBlockWithId(headerOrFooterId)");
 
-      DataBlockDescription headerDesc = m_spec.getDataBlockDescription(headerId);
+      DataBlockDescription desc = m_spec.getDataBlockDescription(headerOrFooterId);
 
-      List<Header> nextHeaders = new ArrayList<>();
+      List<Header> nextHeadersOrFooters = new ArrayList<>();
 
       // Get the actual occurrences of this headerId based on the fields of the previous
       // headers
-      int actualOccurrences = determineActualOccurrences(parentId, headerDesc, context);
+      int actualOccurrences = determineActualOccurrences(parentId, desc, context);
 
-      long staticHeaderLength = (headerDesc.getMaximumByteLength() == headerDesc.getMinimumByteLength())
-         ? headerDesc.getMaximumByteLength()
+      long staticLength = (desc.getMaximumByteLength() == desc.getMinimumByteLength()) ? desc.getMaximumByteLength()
          : DataBlockDescription.UNKNOWN_SIZE;
 
       // Read all header occurrences
       for (int i = 0; i < actualOccurrences; i++) {
-         List<Field<?>> headerFields = readFields(reference, headerId, context, staticHeaderLength);
+         List<Field<?>> headerFields = readFields(reference, headerOrFooterId, context, staticLength);
 
-         nextHeaders.add(m_dataBlockFactory.createHeader(headerId, reference, headerFields, false));
+         nextHeadersOrFooters
+            .add(m_dataBlockFactory.createHeaderOrFooter(headerOrFooterId, reference, headerFields, isFooter));
       }
 
-      return nextHeaders;
-   }
-
-   @Override
-   public List<Header> readFootersWithId(MediumOffset reference, DataBlockId footerId, DataBlockId parentId,
-      List<Header> previousFooters, FieldFunctionStack context) {
-
-      Reject.ifNull(previousFooters, "previousFooters");
-      Reject.ifNull(footerId, "footerId");
-      Reject.ifNull(reference, "reference");
-      Reject.ifFalse(m_spec.specifiesBlockWithId(footerId), "m_spec.specifiesBlockWithId(footerId)");
-
-      DataBlockDescription footerDesc = m_spec.getDataBlockDescription(footerId);
-
-      List<Header> nextFooters = new ArrayList<>();
-
-      // Get the actual occurrences of this footerId based on the fields of the previous
-      // headers
-      int actualOccurrences = determineActualOccurrences(parentId, footerDesc, context);
-
-      long staticFooterLength = (footerDesc.getMaximumByteLength() == footerDesc.getMinimumByteLength())
-         ? footerDesc.getMaximumByteLength()
-         : DataBlockDescription.UNKNOWN_SIZE;
-
-      // Read all footer occurrences
-      for (int i = 0; i < actualOccurrences; i++) {
-         List<Field<?>> footerFields = readFields(reference, footerId, context, staticFooterLength);
-
-         nextFooters.add(m_dataBlockFactory.createHeader(footerId, reference, footerFields, true));
-      }
-
-      return nextFooters;
+      return nextHeadersOrFooters;
    }
 
    /**
@@ -608,10 +567,10 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
+         List<MagicKey> magicKeys = containerDesc.getMagicKeys();
 
          for (int j = 0; j < magicKeys.size(); ++j) {
-            AbstractMagicKey magicKey = magicKeys.get(j);
+            MagicKey magicKey = magicKeys.get(j);
 
             DataBlockDescription desc = m_spec.getDataBlockDescription(magicKey.getHeaderOrFooterId());
 
@@ -635,10 +594,10 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
+         List<MagicKey> magicKeys = containerDesc.getMagicKeys();
 
          for (int j = 0; j < magicKeys.size(); ++j) {
-            AbstractMagicKey magicKey = magicKeys.get(j);
+            MagicKey magicKey = magicKeys.get(j);
 
             DataBlockDescription desc = m_spec.getDataBlockDescription(magicKey.getHeaderOrFooterId());
 

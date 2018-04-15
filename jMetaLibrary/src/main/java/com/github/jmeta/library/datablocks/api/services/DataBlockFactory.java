@@ -73,6 +73,6 @@ public interface DataBlockFactory {
     * @param isFooter
     * @return the {@link Header}
     */
-   public Header createHeader(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter);
+   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter);
 
 }

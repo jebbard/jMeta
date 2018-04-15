@@ -24,9 +24,9 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
-import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -37,7 +37,6 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
-import com.github.jmeta.library.dataformats.api.types.ConcreteContainerAbsentPresentMagicKey;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -750,10 +749,10 @@ public class ID3v23Extension implements Extension {
             DataBlockDescription.UNKNOWN_SIZE, null, null));
 
       // 4. Padding Container
-      AbstractMagicKey paddingMagicKey = new ConcreteContainerPresentMagicKey(paddingByte, PADDING_PAYLOAD_ID,
-         AbstractMagicKey.NO_BACKWARD_READING, 0);
+      MagicKey paddingMagicKey = new MagicKey(paddingByte, PADDING_PAYLOAD_ID,
+         MagicKey.NO_BACKWARD_READING, 0);
 
-      List<AbstractMagicKey> paddingMagicKeys = new ArrayList<>();
+      List<MagicKey> paddingMagicKeys = new ArrayList<>();
       paddingMagicKeys.add(paddingMagicKey);
 
       final List<DataBlockId> paddingChildIds = new ArrayList<>();
@@ -809,11 +808,11 @@ public class ID3v23Extension implements Extension {
          0, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      AbstractMagicKey genericFrameMagicKey = new ConcreteContainerAbsentPresentMagicKey(new byte[] { 0 },
-         GENERIC_FRAME_HEADER_ID, 0, 0);
+      // AbstractMagicKey genericFrameMagicKey = new ConcreteContainerAbsentPresentMagicKey(new byte[] { 0 },
+      // GENERIC_FRAME_HEADER_ID, 0, 0);
 
-      List<AbstractMagicKey> id3v23GenericFrameMagicKeys = new ArrayList<>();
-      id3v23GenericFrameMagicKeys.add(genericFrameMagicKey);
+      List<MagicKey> id3v23GenericFrameMagicKeys = new ArrayList<>();
+      // id3v23GenericFrameMagicKeys.add(genericFrameMagicKey);
 
       final DataBlockDescription genericBlockDesc = new DataBlockDescription(GENERIC_FRAME_ID, "GENERIC_ID3v23_FRAME",
          "The id3v23 GENERIC_FRAME", PhysicalDataBlockType.CONTAINER, genericFrameChildIds, null,
@@ -896,10 +895,10 @@ public class ID3v23Extension implements Extension {
       tagChildIds.add(ID3V23_PAYLOAD_ID);
 
       // Magic Keys
-      AbstractMagicKey id3v23MagicKey = new ConcreteContainerPresentMagicKey(ID3V23_TAG_MAGIC_KEY_STRING,
-         ID3V23_HEADER_ID, AbstractMagicKey.NO_BACKWARD_READING, 0);
+      MagicKey id3v23MagicKey = new MagicKey(ID3V23_TAG_MAGIC_KEY_STRING,
+         ID3V23_HEADER_ID, MagicKey.NO_BACKWARD_READING, 0);
 
-      List<AbstractMagicKey> id3v23TagMagicKeys = new ArrayList<>();
+      List<MagicKey> id3v23TagMagicKeys = new ArrayList<>();
       id3v23TagMagicKeys.add(id3v23MagicKey);
 
       descMap.put(ID3V23_TAG_ID,
@@ -940,7 +939,7 @@ public class ID3v23Extension implements Extension {
       paddingDataBlocks.add(PADDING_ID);
 
       DataFormatSpecification dummyID3v23Spec = new StandardDataFormatSpecification(ID3v23, descMap, topLevelIds,
-         genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets);
+         genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets, GENERIC_FRAME_ID);
       return dummyID3v23Spec;
    }
 

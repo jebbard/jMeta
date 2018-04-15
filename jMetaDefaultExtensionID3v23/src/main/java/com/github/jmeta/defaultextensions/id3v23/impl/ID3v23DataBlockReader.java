@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
@@ -31,7 +30,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link ID3v23DataBlockReader}
  *
  */
-public class ID3v23DataBlockReader extends StandardDataBlockReader implements DataBlockReader {
+public class ID3v23DataBlockReader extends StandardDataBlockReader {
 
    private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> transformationsReadOrder = new LinkedHashMap<>();
 

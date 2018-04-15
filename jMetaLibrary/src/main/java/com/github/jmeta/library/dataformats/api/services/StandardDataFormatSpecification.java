@@ -26,6 +26,7 @@ import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -48,11 +49,13 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * @param paddingDataBlocks
     * @param supportedByteOrders
     * @param supportedCharacterEncodings
+    * @param defaultNestedContainerId
+    *           TODO
     */
    public StandardDataFormatSpecification(ContainerDataFormat dataFormat,
       Map<DataBlockId, DataBlockDescription> dataBlockDescriptions, Set<DataBlockId> topLevelDataBlockIds,
       Set<DataBlockId> genericDataBlocks, Set<DataBlockId> paddingDataBlocks, List<ByteOrder> supportedByteOrders,
-      List<Charset> supportedCharacterEncodings) {
+      List<Charset> supportedCharacterEncodings, DataBlockId defaultNestedContainerId) {
       Reject.ifNull(dataBlockDescriptions, "dataBlockDescriptions");
       Reject.ifNull(topLevelDataBlockIds, "topLevelDataBlockIds");
       Reject.ifNull(dataFormat, "dataFormat");
@@ -69,6 +72,46 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       m_dataFormat = dataFormat;
       m_topLevelDataBlockIds.addAll(topLevelDataBlockIds);
       m_dataBlockDescriptions.putAll(dataBlockDescriptions);
+      this.defaultNestedContainerId = defaultNestedContainerId;
+
+      validateTopLevelMagicKeys();
+      validateDefaultNestedContainerDefined(defaultNestedContainerId);
+   }
+
+   private void validateTopLevelMagicKeys() {
+      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
+         DataBlockId dataBlockId = iterator.next();
+
+         if (getDataBlockDescription(dataBlockId).getMagicKeys().isEmpty()) {
+            throw new IllegalArgumentException("Every lop-level container must define at least one magic key");
+         }
+      }
+   }
+
+   private void validateDefaultNestedContainerDefined(DataBlockId defaultNestedContainerId) {
+      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
+         DataBlockId dataBlockId = iterator.next();
+
+         List<DataBlockDescription> descs = DataBlockDescription.getChildDescriptionsOfType(this, dataBlockId,
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+
+         if (descs.size() > 0) {
+            if (defaultNestedContainerId == null) {
+               throw new IllegalArgumentException(
+                  "Each data format with nested containers must define a default nested container");
+            }
+         }
+      }
+   }
+
+   @Override
+   public DataBlockDescription getDefaultNestedContainerDescription() {
+
+      if (defaultNestedContainerId == null) {
+         return null;
+      }
+
+      return getDataBlockDescription(defaultNestedContainerId);
    }
 
    /**
@@ -269,6 +312,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          m_genericDataBlocks.put(genericBlockId, idPattern.toString());
       }
    }
+
+   private final DataBlockId defaultNestedContainerId;
 
    private final Map<DataBlockId, String> m_genericDataBlocks = new HashMap<>();
 

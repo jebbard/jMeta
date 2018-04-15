@@ -22,8 +22,8 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
-import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -276,10 +276,10 @@ public class ID3v1Extension implements Extension {
          new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      AbstractMagicKey id3v1MagicKey = new ConcreteContainerPresentMagicKey(ID3V1_TAG_ID_STRING, id3v1HeaderId,
+      MagicKey id3v1MagicKey = new MagicKey(ID3V1_TAG_ID_STRING, id3v1HeaderId,
          -id3v1TagLength, 0);
 
-      List<AbstractMagicKey> id3v1TagMagicKeys = new ArrayList<>();
+      List<MagicKey> id3v1TagMagicKeys = new ArrayList<>();
       id3v1TagMagicKeys.add(id3v1MagicKey);
 
       descMap.put(id3v1TagId, new DataBlockDescription(id3v1TagId, "ID3v1 tag", "The ID3v1 tag",
@@ -300,7 +300,7 @@ public class ID3v1Extension implements Extension {
       supportedCharsets.add(Charsets.CHARSET_UTF8);
 
       DataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets);
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
 
       return dummyID3v1Spec;
    }

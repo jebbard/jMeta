@@ -49,6 +49,8 @@ public interface DataFormatSpecification {
     */
    public DataBlockDescription getDataBlockDescription(DataBlockId id);
 
+   public DataBlockDescription getDefaultNestedContainerDescription();
+
    /**
     * @return the {@link Charset}s supported
     */

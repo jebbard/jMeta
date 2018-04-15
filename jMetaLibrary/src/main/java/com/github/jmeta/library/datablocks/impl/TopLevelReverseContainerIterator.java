@@ -17,12 +17,13 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
-import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -69,13 +70,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
    public boolean hasNext() {
 
       // Already read the first (=last) container
-      if (m_currentReference.getAbsoluteMediumOffset() == 0)
-         return false;
-
-      ContainerDataFormat dataFormat = identifyDataFormat(m_currentReference);
-
-      // Do NOT throw UnknownDataFormatException, instead, make the iteration stop "silently"
-      return dataFormat != null;
+      return m_currentReference.getAbsoluteMediumOffset() != 0;
    }
 
    /**
@@ -87,6 +82,10 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
       Reject.ifFalse(hasNext(), "hasNext()");
 
       ContainerDataFormat dataFormat = identifyDataFormat(m_currentReference);
+
+      if (dataFormat == null)
+         throw new UnknownDataFormatException(m_currentReference,
+            "Could not identify data format of top-level block at " + m_currentReference);
 
       DataBlockReader reader = m_readerMap.get(dataFormat);
 
@@ -103,12 +102,12 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
 
          // The magic key is contained in a footer and needs to be read "backward" (as is usually the case)
          if (headerOrFooterDesc.getPhysicalType().equals(PhysicalDataBlockType.FOOTER))
-            container = reader.readContainerWithIdBackwards(m_previousFooterStartReference, containerDesc.getId(), null,
-               null, DataBlockDescription.UNKNOWN_SIZE);
+            container = reader.readContainerWithIdBackwards(m_previousIdentificationReference, containerDesc.getId(),
+               null, null, DataBlockDescription.UNKNOWN_SIZE);
 
          // Otherwise if the backwards read magic key is contained in a header (especially for ID3v1...)
          else
-            container = reader.readContainerWithId(m_previousFooterStartReference, containerDesc.getId(), null, null,
+            container = reader.readContainerWithId(m_previousIdentificationReference, containerDesc.getId(), null, null,
                DataBlockDescription.UNKNOWN_SIZE);
 
          if (container != null) {
@@ -151,14 +150,14 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
             DataBlockDescription containerDesc = topLevelContainerDescs.get(i);
 
             if (!containerDesc.getMagicKeys().isEmpty()) {
-               List<AbstractMagicKey> magicKeys = containerDesc.getMagicKeys();
+               List<MagicKey> magicKeys = containerDesc.getMagicKeys();
 
                for (int j = 0; j < magicKeys.size(); ++j) {
-                  AbstractMagicKey magicKey = magicKeys.get(j);
+                  MagicKey magicKey = magicKeys.get(j);
 
                   long offsetForBackwardReading = magicKey.getHeaderOrFooterOffsetForBackwardReading();
 
-                  if (offsetForBackwardReading != AbstractMagicKey.NO_BACKWARD_READING
+                  if (offsetForBackwardReading != MagicKey.NO_BACKWARD_READING
                      && reference.getAbsoluteMediumOffset() + offsetForBackwardReading >= 0) {
                      MediumOffset footerStartReference = reference.advance(offsetForBackwardReading);
                      try {
@@ -176,7 +175,7 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
 
                      if (dataBlockReader.identifiesDataFormat(footerStartReference)) {
                         m_theMagicKey = magicKey;
-                        m_previousFooterStartReference = footerStartReference;
+                        m_previousIdentificationReference = footerStartReference;
                         return dataFormat;
                      }
                   }
@@ -211,13 +210,13 @@ public class TopLevelReverseContainerIterator extends AbstractDataBlockIterator<
 
    private MediumOffset m_currentReference;
 
-   private final List<ContainerDataFormat> m_precedenceList = new ArrayList<>();
-
-   private MediumOffset m_previousFooterStartReference;
-
-   private AbstractMagicKey m_theMagicKey;
+   private MagicKey m_theMagicKey;
 
    private MediumStore m_mediumStore;
+
+   private final List<ContainerDataFormat> m_precedenceList = new ArrayList<>();
+
+   private MediumOffset m_previousIdentificationReference;
 
    private final Map<ContainerDataFormat, DataBlockReader> m_readerMap = new LinkedHashMap<>();
 }

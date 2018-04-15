@@ -22,9 +22,9 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
-import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -245,10 +245,10 @@ public class MP3Extension implements Extension {
          DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       // Magic Keys
-      AbstractMagicKey mp3MagicKey = new ConcreteContainerPresentMagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT,
-         mp3HeaderId, AbstractMagicKey.NO_BACKWARD_READING, 0);
+      MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT,
+         mp3HeaderId, MagicKey.NO_BACKWARD_READING, 0);
 
-      List<AbstractMagicKey> mp3FrameMagicKeys = new ArrayList<>();
+      List<MagicKey> mp3FrameMagicKeys = new ArrayList<>();
       mp3FrameMagicKeys.add(mp3MagicKey);
 
       descMap.put(mp3FrameId, new DataBlockDescription(mp3FrameId, "MP3 Frame", "The MP3 Frame",
@@ -267,7 +267,7 @@ public class MP3Extension implements Extension {
       supportedCharsets.add(Charsets.CHARSET_ISO);
 
       DataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets);
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
 
       return dummyMP3Spec;
    }

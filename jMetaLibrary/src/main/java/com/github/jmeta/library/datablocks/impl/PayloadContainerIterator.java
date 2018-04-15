@@ -8,6 +8,7 @@
 package com.github.jmeta.library.datablocks.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
@@ -78,18 +79,32 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
             return false;
          }
 
+      List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
+
       // We need to evaluate whether there still is a container child
-      for (int i = 0; i < m_containerDescs.size(); ++i) {
-         DataBlockDescription containerDesc = m_containerDescs.get(i);
+      for (int i = 0; i < nestedContainerDescsWithMagicKeys.size(); ++i) {
+         DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
          if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
             remainingParentByteCount))
             return true;
       }
 
+      // If no nested container with magic key was found, we assume the default nested container
+      DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
+      if (containerDesc != null) {
+         return m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
+            remainingParentByteCount);
+      }
+
       // The payload has no container children at all OR no containers have been
       // identified
       return false;
+   }
+
+   private List<DataBlockDescription> getNestedContainerDescsWithMagicKeys() {
+      return m_containerDescs.stream()
+         .filter((desc) -> !desc.getMagicKeys().isEmpty()).collect(Collectors.toList());
    }
 
    /**
@@ -100,8 +115,10 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
 
       Reject.ifFalse(hasNext(), "hasNext()");
 
-      for (int i = 0; i < m_containerDescs.size(); ++i) {
-         DataBlockDescription containerDesc = m_containerDescs.get(i);
+      List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
+
+      for (int i = 0; i < nestedContainerDescsWithMagicKeys.size(); ++i) {
+         DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
          if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
             m_remainingParentSize)) {
@@ -109,18 +126,36 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
                m_parent, m_context, m_remainingParentSize);
 
             if (container != null) {
-               m_nextContainerReference = m_nextContainerReference.advance(container.getTotalSize());
-
-               if (m_remainingParentSize != DataBlockDescription.UNKNOWN_SIZE)
-                  m_remainingParentSize -= container.getTotalSize();
+               updateProgress(container);
 
                return container;
             }
          }
       }
 
+      // If no nested container with magic key was found, we assume the default nested container
+      DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
+
+      if (containerDesc != null) {
+         Container container = m_reader.readContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
+            m_context, m_remainingParentSize);
+
+         if (container != null) {
+            updateProgress(container);
+
+            return container;
+         }
+      }
+
       throw new IllegalStateException(
          "No child container found for payload " + m_parent + " at " + m_nextContainerReference);
+   }
+
+   private void updateProgress(Container container) {
+      m_nextContainerReference = m_nextContainerReference.advance(container.getTotalSize());
+
+      if (m_remainingParentSize != DataBlockDescription.UNKNOWN_SIZE)
+         m_remainingParentSize -= container.getTotalSize();
    }
 
    private final FieldFunctionStack m_context;

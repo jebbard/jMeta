@@ -102,11 +102,11 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeaderOrFooter(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      MediumOffset, java.util.List, boolean)
     */
    @Override
-   public Header createHeader(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter) {
+   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter) {
 
       Reject.ifNull(id, "headerRef");
       Reject.ifNull(reference, "parent");

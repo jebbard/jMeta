@@ -21,8 +21,8 @@ import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatExcep
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
-import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -48,8 +48,8 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
     * @param readers
     * @param mediumStore
     */
-   public TopLevelContainerIterator(Medium<?> medium, List<ContainerDataFormat> dataFormatHints, boolean forceMediumReadOnly,
-      Map<ContainerDataFormat, DataBlockReader> readers, MediumStore mediumStore) {
+   public TopLevelContainerIterator(Medium<?> medium, List<ContainerDataFormat> dataFormatHints,
+      boolean forceMediumReadOnly, Map<ContainerDataFormat, DataBlockReader> readers, MediumStore mediumStore) {
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
@@ -88,7 +88,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
       if (dataFormat == null)
          throw new UnknownDataFormatException(m_currentReference,
-            "Could not identify data format of next top-level block at " + m_currentReference);
+            "Could not identify data format of top-level block at " + m_currentReference);
 
       DataBlockReader reader = m_readerMap.get(dataFormat);
 
@@ -119,7 +119,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    private List<ContainerDataFormat> determineDataFormatPrecedence(List<ContainerDataFormat> dataFormatHints,
       Set<ContainerDataFormat> allFormats) {
 
-      // TODO stage2_009: Smarter implementation of determineDataFormatPrecedence using the hints
       return new ArrayList<>(allFormats);
    }
 
@@ -186,7 +185,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       for (Iterator<ContainerDataFormat> iterator = m_readerMap.keySet().iterator(); iterator.hasNext();) {
          ContainerDataFormat dataFormat = iterator.next();
          DataBlockReader reader = m_readerMap.get(dataFormat);
-
          reader.setMediumCache(m_mediumStore);
       }
    }

@@ -22,8 +22,8 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.AbstractMagicKey;
-import com.github.jmeta.library.dataformats.api.types.ConcreteContainerPresentMagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -31,7 +31,6 @@ import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.ConcreteContainerAbsentPresentMagicKey;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -55,11 +54,16 @@ public class Lyrics3v2Extension implements Extension {
       '0' };
    private static final byte[] LYRICS3v2_MAGIC_KEY_HEADER_BYTES = new byte[] { 'L', 'Y', 'R', 'I', 'C', 'S', 'B', 'E',
       'G', 'I', 'N' };
+
    /**
     *
     */
    public static final ContainerDataFormat LYRICS3v2 = new ContainerDataFormat("Lyrics3v2", new HashSet<String>(),
       new HashSet<String>(), new ArrayList<String>(), "", new Date());
+
+   private static final DataBlockId lyrics3V2FooterId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer");
+   public final static MagicKey lyrics3v2FooterMagicKey = new MagicKey(
+      LYRICS3v2_MAGIC_FOOTER_STRING, lyrics3V2FooterId, -FOOTER_BYTE_LENGTH, FOOTER_SIZE_FIELD_LENGTH);
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -99,7 +103,6 @@ public class Lyrics3v2Extension implements Extension {
       final DataBlockId lyrics3V2TagId = new DataBlockId(LYRICS3v2, "lyrics3v2");
       final DataBlockId lyrics3V2HeaderId = new DataBlockId(LYRICS3v2, "lyrics3v2.header");
       final DataBlockId lyrics3V2PayloadId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload");
-      final DataBlockId lyrics3V2FooterId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer");
 
       final DataBlockId lyrics3V2HeaderMagicKeyId = new DataBlockId(LYRICS3v2, "lyrics3v2.header.id");
       final DataBlockId lyrics3V2FooterMagicKeyId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer.id");
@@ -309,12 +312,7 @@ public class Lyrics3v2Extension implements Extension {
       fieldLocationProps.put(lyrics3V2PayloadId,
          new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // Magic Keys
-      AbstractMagicKey genericFieldMagicKey = new ConcreteContainerAbsentPresentMagicKey(LYRICS3v2_MAGIC_KEY_FOOTER_BYTES,
-         lyrics3V2GenericFieldId, 0, FOOTER_SIZE_FIELD_LENGTH);
-
-      List<AbstractMagicKey> fieldMagicKeys = new ArrayList<>();
-      fieldMagicKeys.add(genericFieldMagicKey);
+      List<MagicKey> fieldMagicKeys = new ArrayList<>();
 
       descMap.put(lyrics3V2GenericFieldId,
          new DataBlockDescription(lyrics3V2GenericFieldId, "Lyrics3v2 field", "The Lyrics3v2 field",
@@ -345,13 +343,10 @@ public class Lyrics3v2Extension implements Extension {
       tagLocationProps.put(null, new LocationProperties(DataBlockDescription.UNKNOWN_SIZE, 1, 1,
          DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // Magic Keys
-      AbstractMagicKey lyrics3v2FooterMagicKey = new ConcreteContainerPresentMagicKey(LYRICS3v2_MAGIC_FOOTER_STRING,
-         lyrics3V2FooterId, -FOOTER_BYTE_LENGTH, FOOTER_SIZE_FIELD_LENGTH);
-      AbstractMagicKey lyrics3v2HeaderMagicKey = new ConcreteContainerPresentMagicKey(LYRICS3v2_MAGIC_HEADER_STRING,
-         lyrics3V2HeaderId, AbstractMagicKey.NO_BACKWARD_READING, 0);
+      MagicKey lyrics3v2HeaderMagicKey = new MagicKey(LYRICS3v2_MAGIC_HEADER_STRING,
+         lyrics3V2HeaderId, MagicKey.NO_BACKWARD_READING, 0);
 
-      List<AbstractMagicKey> tagMagicKeys = new ArrayList<>();
+      List<MagicKey> tagMagicKeys = new ArrayList<>();
       tagMagicKeys.add(lyrics3v2FooterMagicKey);
       tagMagicKeys.add(lyrics3v2HeaderMagicKey);
 
@@ -380,7 +375,7 @@ public class Lyrics3v2Extension implements Extension {
       genericDataBlocks.add(lyrics3V2GenericFieldPayloadId);
 
       DataFormatSpecification dummyLyrics3v2Spec = new StandardDataFormatSpecification(LYRICS3v2, descMap, topLevelIds,
-         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets);
+         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets, lyrics3V2GenericFieldId);
 
       return dummyLyrics3v2Spec;
    }

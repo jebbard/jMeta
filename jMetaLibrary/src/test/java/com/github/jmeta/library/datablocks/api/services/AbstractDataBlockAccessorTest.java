@@ -43,8 +43,8 @@ import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 // notion of data block instance ids OR saving parent IDataBlock reference...
 
 /**
- * {@link AbstractDataBlockAccessorTest} tests the {@link DataBlockAccessor} interface. Basically, a file medium contains
- * the data to read. Using the file contents, the three media types file, memory and stream are tested.
+ * {@link AbstractDataBlockAccessorTest} tests the {@link DataBlockAccessor} interface. Basically, a file medium
+ * contains the data to read. Using the file contents, the three media types file, memory and stream are tested.
  */
 public abstract class AbstractDataBlockAccessorTest {
 
@@ -490,7 +490,7 @@ public abstract class AbstractDataBlockAccessorTest {
             PhysicalDataBlockType.CONTAINER);
       }
 
-      if (expectedIds.size() == 0)
+      if (expectedIds.size() == 0 && !reverseReading)
          Assert.assertFalse(containerIterator.hasNext());
 
       for (int j = 0; j < expectedIds.size(); ++j) {
@@ -519,7 +519,9 @@ public abstract class AbstractDataBlockAccessorTest {
       }
 
       // There must not be any further containers
-      Assert.assertFalse(containerIterator.hasNext());
+      if (!reverseReading) {
+         Assert.assertFalse(containerIterator.hasNext());
+      }
    }
 
    /**

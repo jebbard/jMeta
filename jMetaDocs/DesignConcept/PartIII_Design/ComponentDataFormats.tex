@@ -465,7 +465,7 @@ AIFF  & ``FORM'' at start of chunk header & -  \\
 \hline
 QuickTime  & ``ftyp'' or ``moov'' or ``pnot'' or ``mdat'' or ``skip'' as atom type (starting with 5th byte) in atom header & -  \\
 \hline
-MP3  & Evelen 1 bits at start of frame header & -  \\
+MP3  & Eleven 1 bits at start of frame header & -  \\
 \hline
 ID3v1 and ID3v1.1  & ``TAG'' at start of tag header & -  \\
 \hline
@@ -479,9 +479,9 @@ APEv1  & ``APETAGEX'' followed by version number 1000 at start of tag header & `
 \hline
 APEv2  & ``APETAGEX'' followed by version number 2000 at start of tag header & ``APETAGEX'' followed by version number 2000 at start of tag footer \\
 \hline
-Lyrics3v1  & ``LYRICSBEGIN'' at start of tag header & ``LYRICSEND'' at start of tag footer  \\
+Lyrics3v1  & ``LYRICSBEGIN'' at start of tag header & ``LYRICSEND'' starting with 7th byte of tag footer  \\
 \hline
-Lyrics3v2  & ``LYRICSBEGIN'' at start of tag header & ``LYRICS200'' at start of tag footer  \\
+Lyrics3v2  & ``LYRICSBEGIN'' at start of tag header & ``LYRICS200'' starting with 7th byte of tag footer  \\
 \hline
 VorbisComment  & \emph{No magic key} & -  \\
 \hline
@@ -494,8 +494,8 @@ Let us look at the odd exceptions in this list:
 \item [(1)] We see that the only format not having a magic key is the VorbisComment
 \item [(2)] MP3 as the only format does not have a string magic key, but rather a bit sequence
 \item [(3)] RIFF as the only format defines multiple different magic keys in its header
-\item [(4)] Lyrics 3 and ID3v24 are the only formats where header and footer magic keys differ
-\item [(5)] QuickTime as only format has the magic key not at the beginning of its header, but at fixed byte offset 4
+\item [(4)] Lyrics3v2 and ID3v24 are the only formats where header and footer magic keys differ
+\item [(5)] QuickTime and Lyrics3v2 are the only formats where the magic key does not start at the beginning of its header/footer, but at a fixed byte offset
 \item [(6)] QuickTime is very vague about its magic key, it actually defines all top-level atoms as optional, but recommends to usually start a QuickTime file with the ftyp atom
 \end{enumerate}
 
@@ -620,7 +620,7 @@ Based on these definitions, we can be more detailed about the parsing strategies
 Parsing top-level containers (forward reading)
 }
 {% Short description
-For top-level containers, the data format idenfification is the first thing that happens. Each data format must define at least one type of default top-level container which can either be generic or concrete. Each top-level container type must at least define one header magic key that indicates presence of the format. If the current bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats that require deviating behaviour (e.g. VorbisComment) can override some aspects of this behaviour.
+For top-level containers, the data format idenfification is the first thing that happens. Each data format must define at least one top-level container which can either be generic or concrete. Each top-level container type must at least define one header magic key that indicates presence of the format. If the current bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats that require deviating behaviour (e.g. VorbisComment) can override some aspects of this behaviour.
 }
 {% Rationale
 This is directly following from all previous design decisions
@@ -637,7 +637,7 @@ For nested containers, forward reading basically works like this:
 Parsing nested containers (forward reading)
 }
 {% Short description
-For nested containers, no data format idenfification is needed. The data format defined all possible containers that might occur in the container-based payload of the parent container. Each of these containers can either be generic or concrete. Any defined nested container might define a magic key. The parser first tries to match the current bytes with these magic key bytes. If they match, the child container is found. Further on, if the nested container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. There must be exactly one \emph{default nested container} which can be obtained from the \texttt{DataFormatSpecification}. If the container-based payload does not define any containers with magic keys, or if none of them matches, the parser expects to find the default nested container. If this container is generic, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. This might e.g. reveal that an atom (default nested container for QuickTime) is actually a QT atom of a concrete type, see \DesLink{dd:522}.
+For nested containers, no data format identification is needed. The data format defines all possible containers that might occur in the container-based payload of the parent container. Each of these containers can either be generic or concrete. Any defined nested container might define a magic key. The parser first gets all child containers of the current payload who have a magic key defined and  tries to match the current bytes with these magic key bytes. If they match, the child container is found. Further on, if the nested container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. If none of the child containers with magic keys match, the parser gets the \emph{default nested container} which can be obtained from the \texttt{DataFormatSpecification}, if set. If this is the case, the parser assumes that the next container is the default nested container, otherwise it cannot identify the next container. If a container is found and this container is generic, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. This might e.g. reveal that an atom (default nested container for QuickTime) is actually a QT atom of a concrete type, see \DesLink{dd:522}.
 }
 {% Rationale
 This is directly following from all previous design decisions. We have to define a default nested container just because of QuickTime as sole exception defining two very similar generic nested container types.
@@ -647,7 +647,7 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Now the topic of backward-reading containers is still open. Again, there is a special case here: ID3v1 has no footer, but still is actually backward-readable. The reasons: It is defined to always be at the end of the file. Even if it is not, it could still be identified, as it has a fixed length. This means we would just need to look for the header magic key at a fixed offset from the end of the tag.
+Now the topic of backward-reading containers is still open. Again, there is a special case here: ID3v1 has no footer, but still is actually backward-readable. The reasons: It is defined to always be at the end of the file. Even if it is not, it could still be identified, as it has a fixed length. This means we would just need to look for the header magic key at a fixed offset from the end of the tag. However, there is a rather hidden special logic that additionally needs to be applied: If you identify the presence of a container by its footer magic key, you yet have to still read backward to obtain its payload. In case of ID3v1, you have arrived at the header already, such that you actually need to read forward to get its payload. 
 
 To handle this, again, we have two alternatives: Either bring this special case into the generic layer, e.g. by adding a field to the magic key, which points to the offset for backward reading. Or we handle it only in the ID3v1 implementation. A third esoteric possibility would be to have a fake ``footer'' in ID3v1, such that we could just say: Whenever backward reading is necessary, just rely on footers only. But this would be very artificial and would lead to other problems. As was the case previously, we decide: 
 
