@@ -86,7 +86,7 @@ public class ID3v1Extension implements Extension {
    }
 
    public final static int id3v1TagLength = 128;
-   public final static MagicKey id3v1MagicKey = new MagicKey(ID3V1_TAG_ID_STRING, id3v1HeaderId, -id3v1TagLength, 0);
+   public final static MagicKey id3v1MagicKey = new MagicKey(ID3V1_TAG_ID_STRING, id3v1HeaderId, 0);
 
    private DataFormatSpecification createSpecification() {
 

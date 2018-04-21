@@ -62,7 +62,7 @@ public class Lyrics3v2Extension implements Extension {
 
    private static final DataBlockId lyrics3V2FooterId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer");
    public final static MagicKey lyrics3v2FooterMagicKey = new MagicKey(LYRICS3v2_MAGIC_FOOTER_STRING, lyrics3V2FooterId,
-      -FOOTER_BYTE_LENGTH, -LYRICS3v2_MAGIC_FOOTER_STRING.length());
+      -LYRICS3v2_MAGIC_FOOTER_STRING.length());
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -343,7 +343,7 @@ public class Lyrics3v2Extension implements Extension {
          DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       MagicKey lyrics3v2HeaderMagicKey = new MagicKey(LYRICS3v2_MAGIC_HEADER_STRING, lyrics3V2HeaderId,
-         MagicKey.NO_BACKWARD_READING, 0);
+         0);
 
       List<MagicKey> tagMagicKeys = new ArrayList<>();
       tagMagicKeys.add(lyrics3v2HeaderMagicKey);

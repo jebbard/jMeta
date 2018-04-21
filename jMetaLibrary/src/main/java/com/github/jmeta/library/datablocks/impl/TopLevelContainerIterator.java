@@ -12,10 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
@@ -23,39 +19,65 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
+/**
+ * {@link TopLevelContainerIterator} is used to read all {@link Container}s present in a {@link Medium}. It can be
+ * operated in two modes: Forward reading (the default mode) where the medium is iterated with increasing offsets and
+ * backward reading for reading a medium (mainly: files or byte arrays) from back to front.
+ */
 public class TopLevelContainerIterator extends AbstractDataBlockIterator<Container> {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(TopLevelContainerIterator.class);
+   private MediumOffset currentOffset;
+
+   private final boolean forwardRead;
+
+   private final MediumStore mediumStore;
+
+   private final List<ContainerDataFormat> precedenceList = new ArrayList<>();
+
+   private final Map<ContainerDataFormat, DataBlockReader> readerMap = new LinkedHashMap<>();
+
+   // TODO: Really use data format hints as documented
 
    /**
     * Creates a new {@link TopLevelContainerIterator}.
     * 
     * @param medium
+    *           The {@link Medium} to iterate
     * @param dataFormatHints
-    * @param forceMediumReadOnly
+    *           A list of {@link ContainerDataFormat} preferably checked to be present in that order
     * @param readers
+    *           All {@link DataBlockReader}s per supported {@link ContainerDataFormat}
     * @param mediumStore
+    *           The {@link MediumStore} used to read from the {@link Medium}
+    * @param forwardRead
+    *           true for forward reading, false for backward reading
     */
    public TopLevelContainerIterator(Medium<?> medium, List<ContainerDataFormat> dataFormatHints,
-      boolean forceMediumReadOnly, Map<ContainerDataFormat, DataBlockReader> readers, MediumStore mediumStore) {
+      Map<ContainerDataFormat, DataBlockReader> readers, MediumStore mediumStore, boolean forwardRead) {
       Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
       Reject.ifNull(mediumStore, "mediumFactory");
 
-      m_readerMap.putAll(readers);
-      m_mediumStore = mediumStore;
+      this.readerMap.putAll(readers);
+      this.mediumStore = mediumStore;
+      this.forwardRead = forwardRead;
+
+      if (this.forwardRead) {
+         currentOffset = mediumStore.createMediumOffset(0);
+      } else {
+         currentOffset = mediumStore.createMediumOffset(medium.getCurrentLength());
+      }
 
       setDataFormatHints(dataFormatHints);
-      setMedium(medium, forceMediumReadOnly);
-      m_currentReference = m_mediumStore.createMediumOffset(0);
+      setMedium(medium);
    }
 
    /**
@@ -63,12 +85,15 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
     */
    @Override
    public boolean hasNext() {
-
-      // TODO stage2_004: Heavy problem with stream based media: When caching, the
-      // end of medium is reached SOONER, which is NOT an indication that no more
-      // containers are left, but that the whole data of the stream has been cached, before
-      // being really accessed...
-      return !m_mediumStore.isAtEndOfMedium(m_currentReference);
+      if (forwardRead) {
+         // TODO stage2_004: Heavy problem with stream based media: When caching, the
+         // end of medium is reached SOONER, which is NOT an indication that no more
+         // containers are left, but that the whole data of the stream has been cached, before
+         // being really accessed...
+         return !mediumStore.isAtEndOfMedium(currentOffset);
+      } else {
+         return currentOffset.getAbsoluteMediumOffset() != 0;
+      }
    }
 
    /**
@@ -79,13 +104,14 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
       Reject.ifFalse(hasNext(), "hasNext()");
 
-      ContainerDataFormat dataFormat = identifyDataFormat(m_currentReference);
+      ContainerDataFormat dataFormat = identifyDataFormat(currentOffset);
 
-      if (dataFormat == null)
-         throw new UnknownDataFormatException(m_currentReference,
-            "Could not identify data format of top-level block at " + m_currentReference);
+      if (dataFormat == null) {
+         throw new UnknownDataFormatException(currentOffset,
+            "Could not identify data format of top-level block at " + currentOffset);
+      }
 
-      DataBlockReader reader = m_readerMap.get(dataFormat);
+      DataBlockReader reader = readerMap.get(dataFormat);
 
       List<DataBlockDescription> containerDescs = DataBlockDescription
          .getChildDescriptionsOfType(reader.getSpecification(), null, PhysicalDataBlockType.CONTAINER);
@@ -93,11 +119,10 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         Container container = reader.readContainerWithId(m_previousIdentificationReference, containerDesc.getId(),
-            null, null, DataBlockDescription.UNKNOWN_SIZE);
+         Container container = readContainerWithId(reader, currentOffset, containerDesc.getId());
 
          if (container != null) {
-            m_currentReference = m_currentReference.advance(container.getTotalSize());
+            currentOffset = currentOffset.advance(getBytesToAdvance(container));
 
             return container;
          }
@@ -107,92 +132,61 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    }
 
    /**
-    * @param dataFormatHints
-    * @param allFormats
-    * @return the list of {@link ContainerDataFormat}s
+    * Identifies the {@link ContainerDataFormat} present at the given {@link MediumOffset}
+    * 
+    * @param reference
+    *           The {@link MediumOffset} to start scanning. For forward reading, it is the start offset of an assumed
+    *           container, for backward reading, it is the end offset of an assumed container.
+    * @return The {@link ContainerDataFormat} identified or null if none could be identified
     */
-   private List<ContainerDataFormat> determineDataFormatPrecedence(List<ContainerDataFormat> dataFormatHints,
-      Set<ContainerDataFormat> allFormats) {
-
-      return new ArrayList<>(allFormats);
-   }
-
    private ContainerDataFormat identifyDataFormat(MediumOffset reference) {
 
-      Reject.ifNull(reference, "reference");
-      Reject.ifNull(m_precedenceList, "setDataFormatHints() must have been called before");
-
-      if (m_precedenceList.isEmpty())
+      if (precedenceList.isEmpty()) {
          return null;
-
-      // The whole header size is cached intentionally due to the premise of small headers
-      long bytesToRead = m_longestHeaderSize;
-
-      m_previousIdentificationReference = reference;
-
-      try {
-         m_readerMap.get(m_precedenceList.iterator().next()).cache(reference, bytesToRead);
       }
 
-      catch (EndOfMediumException e) {
-         // bytes really read are ignored as the read ByteBuffers.remaining() contains
-         // the read byte count
-         LOGGER.info("End of medium exception occurred during data format identification (see below).");
-         LOGGER.info(
-            "Read " + e.getByteCountActuallyRead() + " of " + e.getByteCountTriedToRead() + " bytes tried to read.");
-         LOGGER.error("identifyDataFormat", e);
-      }
-
-      for (Iterator<ContainerDataFormat> iterator = m_precedenceList.iterator(); iterator.hasNext();) {
+      for (Iterator<ContainerDataFormat> iterator = precedenceList.iterator(); iterator.hasNext();) {
          ContainerDataFormat dataFormat = iterator.next();
-         DataBlockReader reader = m_readerMap.get(dataFormat);
+         DataBlockReader reader = readerMap.get(dataFormat);
 
-         if (reader.identifiesDataFormat(m_previousIdentificationReference, true))
+         if (reader.identifiesDataFormat(reference, forwardRead)) {
             return dataFormat;
+         }
       }
 
       return null;
    }
 
+   private Container readContainerWithId(DataBlockReader reader, MediumOffset currentMediumOffset,
+      DataBlockId containerId) {
+      if (forwardRead) {
+         return reader.readContainerWithId(currentMediumOffset, containerId, null, null,
+            DataBlockDescription.UNKNOWN_SIZE);
+      } else {
+         return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null, null,
+            DataBlockDescription.UNKNOWN_SIZE);
+      }
+   }
+
+   private long getBytesToAdvance(Container container) {
+      if (forwardRead) {
+         return container.getTotalSize();
+      } else {
+         return -container.getTotalSize();
+      }
+   }
+
    private void setDataFormatHints(List<ContainerDataFormat> dataFormatHints) {
-
-      Reject.ifNull(dataFormatHints, "dataFormatHints");
-
-      m_precedenceList.clear();
-      m_precedenceList.addAll(determineDataFormatPrecedence(dataFormatHints, m_readerMap.keySet()));
-
-      for (Iterator<ContainerDataFormat> iterator = m_precedenceList.iterator(); iterator.hasNext();) {
-         ContainerDataFormat dataFormat = iterator.next();
-
-         final long longestHeaderMinimumSize = m_readerMap.get(dataFormat).getLongestMinimumContainerHeaderSize(null);
-
-         if (m_longestHeaderSize < longestHeaderMinimumSize)
-            m_longestHeaderSize = longestHeaderMinimumSize;
-      }
+      precedenceList.clear();
+      precedenceList.addAll(new ArrayList<>(readerMap.keySet()));
    }
 
-   /**
-    * @param medium
-    * @param forceMediumReadOnly
-    */
-   private void setMedium(Medium<?> medium, boolean forceMediumReadOnly) {
+   private void setMedium(Medium<?> medium) {
 
-      for (Iterator<ContainerDataFormat> iterator = m_readerMap.keySet().iterator(); iterator.hasNext();) {
+      for (Iterator<ContainerDataFormat> iterator = readerMap.keySet().iterator(); iterator.hasNext();) {
          ContainerDataFormat dataFormat = iterator.next();
-         DataBlockReader reader = m_readerMap.get(dataFormat);
-         reader.setMediumCache(m_mediumStore);
+         DataBlockReader reader = readerMap.get(dataFormat);
+         reader.setMediumCache(mediumStore);
       }
    }
-
-   private MediumOffset m_currentReference;
-
-   private long m_longestHeaderSize = 0;
-
-   private MediumStore m_mediumStore;
-
-   private final List<ContainerDataFormat> m_precedenceList = new ArrayList<>();
-
-   private MediumOffset m_previousIdentificationReference;
-
-   private final Map<ContainerDataFormat, DataBlockReader> m_readerMap = new LinkedHashMap<>();
 }

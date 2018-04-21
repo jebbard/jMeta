@@ -443,9 +443,8 @@ public class APEv2Extension implements Extension {
 
       // Magic Keys
       MagicKey apev2FooterMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, apeV2FooterId,
-         -APEv2_HEADER_FOOTER_BYTE_LENGTH, -APEv2_HEADER_FOOTER_BYTE_LENGTH);
-      MagicKey apev2HeaderMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, apeV2HeaderId, MagicKey.NO_BACKWARD_READING,
-         0);
+         -APEv2_HEADER_FOOTER_BYTE_LENGTH);
+      MagicKey apev2HeaderMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, apeV2HeaderId, 0);
 
       List<MagicKey> apev2TagMagicKeys = new ArrayList<>();
       apev2TagMagicKeys.add(apev2HeaderMagicKey);

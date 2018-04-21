@@ -14,31 +14,16 @@ import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * This class represents a magic key used for identifying the data format of a given container. While this is the main
- * purpose of this class, there are also cases where the presence of a generic container is detected only if a specific
- * sequence of bytes <i>is absent</i>. Thus, there are two concrete flavors of this class:
- * 
- * <ul>
- * <li>{@link MagicKey} - For detecting presence of a concrete container</li>
- * <li>{@link ConcreteContainerAbsentPresentMagicKey}</li>
- * </ul>
+ * This class represents a magic key used for identifying the data format of a given container.
  */
 // TODO add testcase class for class
-// TODO refactor backward reading (later)
 public class MagicKey {
-
-   /**
-    *
-    */
-   public final static long NO_BACKWARD_READING = 0;
 
    private final byte[] magicKeyBytes;
 
    private final int bitLength;
 
-   private final long headerOrFooterOffsetForBackwardReading;
-
-   private final long offsetFromStartOfHeaderOrFooter;
+   private final long deltaOffset;
 
    private final DataBlockId headerOrFooterBlockId;
 
@@ -56,26 +41,21 @@ public class MagicKey {
     *           The length of the magic key in bits
     * @param headerBlockId
     *           The id of the header or footer this magic key is occurring in
-    * @param offsetForBackwardReading
-    *           TODO
-    * @param offsetFromStartOfHeaderOrFooter
-    *           TODO
+    * @param deltaOffset
+    *           The delta offset of the first byte of the magic key from start of header (positive offset) or from the
+    *           end of the footer (negative offset) it is contained in
     */
-   public MagicKey(byte[] magicKeyBytes, int bitLength, DataBlockId headerBlockId, long offsetForBackwardReading,
-      long offsetFromStartOfHeaderOrFooter) {
+   public MagicKey(byte[] magicKeyBytes, int bitLength, DataBlockId headerBlockId, long deltaOffset) {
       Reject.ifNull(magicKeyBytes, "magicKeyBytes");
       Reject.ifNull(headerBlockId, "headerBlockId");
-      // Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0, "The offset from start of header or footer must be >= 0.");
       Reject.ifNegativeOrZero(bitLength, "bitLength");
       Reject.ifFalse(bitLength <= magicKeyBytes.length * Byte.SIZE, "bitLength <= magicKeyBytes.length * Byte.SIZE");
-      Reject.ifFalse(offsetForBackwardReading <= 0, "offsetForBackwardReading <= 0");
 
       this.magicKeyBytes = magicKeyBytes.clone();
       this.bitLength = bitLength;
       this.stringRepresentation = Arrays.toString(magicKeyBytes);
       this.headerOrFooterBlockId = headerBlockId;
-      this.headerOrFooterOffsetForBackwardReading = offsetForBackwardReading;
-      this.offsetFromStartOfHeaderOrFooter = offsetFromStartOfHeaderOrFooter;
+      this.deltaOffset = deltaOffset;
    }
 
    /**
@@ -88,15 +68,12 @@ public class MagicKey {
     *           e.g. "[1, 2, 144]"
     * @param headerBlockId
     *           The id of the header or footer this magic key is occurring in
-    * @param offsetForBackwardReading
-    *           TODO
-    * @param offsetFromStartOfHeaderOrFooter
-    *           TODO
+    * @param deltaOffset
+    *           The delta offset of the first byte of the magic key from start of header (positive offset) or from the
+    *           end of the footer (negative offset) it is contained in
     */
-   public MagicKey(byte[] magicKeyBytes, DataBlockId headerBlockId, long offsetForBackwardReading,
-      long offsetFromStartOfHeaderOrFooter) {
-      this(magicKeyBytes, magicKeyBytes != null ? magicKeyBytes.length * Byte.SIZE : 0, headerBlockId,
-         offsetForBackwardReading, offsetFromStartOfHeaderOrFooter);
+   public MagicKey(byte[] magicKeyBytes, DataBlockId headerBlockId, long deltaOffset) {
+      this(magicKeyBytes, magicKeyBytes != null ? magicKeyBytes.length * Byte.SIZE : 0, headerBlockId, deltaOffset);
    }
 
    /**
@@ -107,15 +84,12 @@ public class MagicKey {
     *           A string containing only 7 bit standard ASCII characters which is the human-readable magic key
     * @param headerBlockId
     *           The id of the header or footer this magic key is occurring in
-    * @param offsetForBackwardReading
-    *           TODO
-    * @param offsetFromStartOfHeaderOrFooter
-    *           TODO
+    * @param deltaOffset
+    *           The delta offset of the first byte of the magic key from start of header (positive offset) or from the
+    *           end of the footer (negative offset) it is contained in
     */
-   public MagicKey(String asciiKey, DataBlockId headerBlockId, long offsetForBackwardReading,
-      long offsetFromStartOfHeaderOrFooter) {
-      this(asciiKey != null ? asciiKey.getBytes(Charsets.CHARSET_ASCII) : null, headerBlockId, offsetForBackwardReading,
-         offsetFromStartOfHeaderOrFooter);
+   public MagicKey(String asciiKey, DataBlockId headerBlockId, long deltaOffset) {
+      this(asciiKey != null ? asciiKey.getBytes(Charsets.CHARSET_ASCII) : null, headerBlockId, deltaOffset);
    }
 
    /**
@@ -154,17 +128,10 @@ public class MagicKey {
    }
 
    /**
-    * @return header or footer offset for backward reading
+    * @return delta offset from start of header or end of footer
     */
-   public long getHeaderOrFooterOffsetForBackwardReading() {
-      return headerOrFooterOffsetForBackwardReading;
-   }
-
-   /**
-    * @return offset from start of header or footer
-    */
-   public long getOffsetFromStartOfHeaderOrFooter() {
-      return offsetFromStartOfHeaderOrFooter;
+   public long getDeltaOffset() {
+      return deltaOffset;
    }
 
    /**
@@ -180,26 +147,6 @@ public class MagicKey {
     * @return true if the container's presence is indicated by the given bytes, false otherwise
     */
    public boolean isContainerPresent(ByteBuffer readBytes) {
-      return equalsBytes(readBytes);
-   }
-
-   /**
-    * @see java.lang.Object#toString()
-    */
-   @Override
-   public String toString() {
-      return getClass().getName() + "[" + "magicKeyBytes=" + magicKeyBytes + ", bitLength=" + bitLength
-         + ", stringRepresentation=" + stringRepresentation + "]";
-   }
-
-   /**
-    * Checks if the start of the given bytes match the magic key
-    * 
-    * @param readBytes
-    *           The bytes to check, must not be null
-    * @return true if matching, false otherwise
-    */
-   private boolean equalsBytes(ByteBuffer readBytes) {
       Reject.ifNull(readBytes, "readBytes");
 
       int comparedBits = 0;
@@ -232,5 +179,14 @@ public class MagicKey {
       }
 
       return true;
+   }
+
+   /**
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      return getClass().getName() + "[" + "magicKeyBytes=" + magicKeyBytes + ", bitLength=" + bitLength
+         + ", stringRepresentation=" + stringRepresentation + "]";
    }
 }

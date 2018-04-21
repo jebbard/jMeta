@@ -334,7 +334,7 @@ public class OggExtension implements Extension {
 
       // Magic Keys
       MagicKey oggMagicKey = new MagicKey(OGG_MAGIC_KEY_STRING, oggPageHeaderId,
-         MagicKey.NO_BACKWARD_READING, 0);
+         0);
 
       List<MagicKey> oggMagicKeys = new ArrayList<>();
       oggMagicKeys.add(oggMagicKey);

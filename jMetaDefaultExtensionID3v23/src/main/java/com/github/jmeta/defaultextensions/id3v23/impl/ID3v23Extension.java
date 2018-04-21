@@ -750,7 +750,7 @@ public class ID3v23Extension implements Extension {
 
       // 4. Padding Container
       MagicKey paddingMagicKey = new MagicKey(paddingByte, PADDING_PAYLOAD_ID,
-         MagicKey.NO_BACKWARD_READING, 0);
+         0);
 
       List<MagicKey> paddingMagicKeys = new ArrayList<>();
       paddingMagicKeys.add(paddingMagicKey);
@@ -896,7 +896,7 @@ public class ID3v23Extension implements Extension {
 
       // Magic Keys
       MagicKey id3v23MagicKey = new MagicKey(ID3V23_TAG_MAGIC_KEY_STRING,
-         ID3V23_HEADER_ID, MagicKey.NO_BACKWARD_READING, 0);
+         ID3V23_HEADER_ID, 0);
 
       List<MagicKey> id3v23TagMagicKeys = new ArrayList<>();
       id3v23TagMagicKeys.add(id3v23MagicKey);

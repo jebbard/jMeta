@@ -294,7 +294,7 @@ public class DataBlockDescription {
 
    private final FieldProperties<?> m_fieldProperties;
 
-   public List<MagicKey> getM_footerMagicKeys() {
+   public List<MagicKey> getFooterMagicKeys() {
       return m_footerMagicKeys;
    }
 

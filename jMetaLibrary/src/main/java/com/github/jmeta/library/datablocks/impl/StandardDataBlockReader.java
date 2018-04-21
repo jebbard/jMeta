@@ -45,7 +45,6 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
-// TODO document001: MagicKey inclusion and exclusion key mechanism
 // TODO document002: Determine payload size by reading children
 // TODO document003: ID_OF facility
 // TODO document004: Reverse reading: Rules, preconditions, implementation, testing
@@ -126,15 +125,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       DataBlockDescription containerDesc = m_spec.getDataBlockDescription(id);
 
-      List<MagicKey> magicKeys = forwardRead ? containerDesc.getHeaderMagicKeys()
-         : containerDesc.getM_footerMagicKeys();
+      List<MagicKey> magicKeys = forwardRead ? containerDesc.getHeaderMagicKeys() : containerDesc.getFooterMagicKeys();
 
-      // No magic key means: "Everything is a container"
-      // if (magicKeys.isEmpty())
-      // throw new IllegalStateException("The container with id <" + id + "> must have at least one magic key");
-
-      // TODO primeRefactor001: Does this loop really always yields the wanted results?
-      // Is it possible that sometimes the headers magic key gets preferred?
       for (int i = 0; i < magicKeys.size(); ++i) {
          MagicKey magicKey = magicKeys.get(i);
 
@@ -148,12 +140,12 @@ public class StandardDataBlockReader implements DataBlockReader {
                && magicKeySizeInBytes > remainingDirectParentByteCount)
                return false;
          } else {
-            if (reference.getAbsoluteMediumOffset() + magicKey.getOffsetFromStartOfHeaderOrFooter() < 0) {
+            if (reference.getAbsoluteMediumOffset() + magicKey.getDeltaOffset() < 0) {
                return false;
             }
          }
 
-         MediumOffset magicKeyReference = reference.advance(magicKey.getOffsetFromStartOfHeaderOrFooter());
+         MediumOffset magicKeyReference = reference.advance(magicKey.getDeltaOffset());
 
          final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
 

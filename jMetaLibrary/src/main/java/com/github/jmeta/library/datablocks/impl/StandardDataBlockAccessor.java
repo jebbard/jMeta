@@ -153,7 +153,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       mediumStores.put(medium, mediumStore);
 
-      return new TopLevelContainerIterator(medium, dataFormatHints, forceMediumReadOnly, m_readers, mediumStore);
+      return new TopLevelContainerIterator(medium, dataFormatHints, m_readers, mediumStore, true);
    }
 
    @Override
@@ -171,7 +171,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       mediumStores.put(medium, mediumStore);
 
-      return new TopLevelReverseContainerIterator(medium, dataFormatHints, forceMediumReadOnly, m_readers, mediumStore);
+      return new TopLevelContainerIterator(medium, dataFormatHints, m_readers, mediumStore, false);
    }
 
    /**

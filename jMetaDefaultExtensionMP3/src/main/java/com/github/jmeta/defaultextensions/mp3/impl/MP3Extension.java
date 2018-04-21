@@ -246,7 +246,7 @@ public class MP3Extension implements Extension {
 
       // Magic Keys
       MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT,
-         mp3HeaderId, MagicKey.NO_BACKWARD_READING, 0);
+         mp3HeaderId, 0);
 
       List<MagicKey> mp3FrameMagicKeys = new ArrayList<>();
       mp3FrameMagicKeys.add(mp3MagicKey);
