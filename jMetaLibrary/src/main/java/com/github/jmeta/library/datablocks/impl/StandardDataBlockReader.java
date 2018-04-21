@@ -108,11 +108,11 @@ public class StandardDataBlockReader implements DataBlockReader {
    /**
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#hasContainerWithId(MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.Payload, long)
+    *      com.github.jmeta.library.datablocks.api.types.Payload, long, boolean)
     */
    @Override
    public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount) {
+      long remainingDirectParentByteCount, boolean forwardRead) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
@@ -126,11 +126,12 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       DataBlockDescription containerDesc = m_spec.getDataBlockDescription(id);
 
-      List<MagicKey> magicKeys = containerDesc.getMagicKeys();
+      List<MagicKey> magicKeys = forwardRead ? containerDesc.getHeaderMagicKeys()
+         : containerDesc.getM_footerMagicKeys();
 
       // No magic key means: "Everything is a container"
-      if (magicKeys.isEmpty())
-         throw new IllegalStateException("The container with id <" + id + "> must have at least one magic key");
+      // if (magicKeys.isEmpty())
+      // throw new IllegalStateException("The container with id <" + id + "> must have at least one magic key");
 
       // TODO primeRefactor001: Does this loop really always yields the wanted results?
       // Is it possible that sometimes the headers magic key gets preferred?
@@ -142,9 +143,15 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          // This container cannot be stored in the parent, as there are not enough bytes in
          // left the parent for its magic key.
-         if (remainingDirectParentByteCount != DataBlockDescription.UNKNOWN_SIZE
-            && magicKeySizeInBytes > remainingDirectParentByteCount)
-            return false;
+         if (forwardRead) {
+            if (remainingDirectParentByteCount != DataBlockDescription.UNKNOWN_SIZE
+               && magicKeySizeInBytes > remainingDirectParentByteCount)
+               return false;
+         } else {
+            if (reference.getAbsoluteMediumOffset() + magicKey.getOffsetFromStartOfHeaderOrFooter() < 0) {
+               return false;
+            }
+         }
 
          MediumOffset magicKeyReference = reference.advance(magicKey.getOffsetFromStartOfHeaderOrFooter());
 
@@ -170,7 +177,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
-      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount),
+      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, true),
          "hasContainerWithId(reference, id, parent, remainingDirectParentByteCount)");
 
       // TODO the actual current charset and byte order must be known here!
@@ -274,7 +281,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
-      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount),
+      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, false),
          "hasContainerWithId(reference, id, parent, remainingDirectParentByteCount)");
 
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
@@ -294,6 +301,12 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
+
+         long staticLength = (footerDesc.getMaximumByteLength() == footerDesc.getMinimumByteLength())
+            ? footerDesc.getMaximumByteLength()
+            : DataBlockDescription.UNKNOWN_SIZE;
+
+         nextReference = nextReference.advance(-staticLength);
 
          List<Header> nextFooters = readHeadersOrFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
             theContext, true);
@@ -567,7 +580,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         List<MagicKey> magicKeys = containerDesc.getMagicKeys();
+         List<MagicKey> magicKeys = containerDesc.getHeaderMagicKeys();
 
          for (int j = 0; j < magicKeys.size(); ++j) {
             MagicKey magicKey = magicKeys.get(j);
@@ -594,7 +607,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         List<MagicKey> magicKeys = containerDesc.getMagicKeys();
+         List<MagicKey> magicKeys = containerDesc.getHeaderMagicKeys();
 
          for (int j = 0; j < magicKeys.size(); ++j) {
             MagicKey magicKey = magicKeys.get(j);
@@ -611,10 +624,10 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumOffset)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumOffset, boolean)
     */
    @Override
-   public boolean identifiesDataFormat(MediumOffset reference) {
+   public boolean identifiesDataFormat(MediumOffset reference, boolean forwardRead) {
 
       List<DataBlockDescription> topLevelContainerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, null,
          PhysicalDataBlockType.CONTAINER);
@@ -623,7 +636,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataBlockDescription desc = topLevelContainerDescs.get(i);
 
          // TODO stage2_010: What value should remaining parent byte count really have here?
-         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNKNOWN_SIZE))
+         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNKNOWN_SIZE, forwardRead))
             return true;
       }
 
@@ -1068,7 +1081,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
          unknownFieldProperties, new HashMap<DataBlockId, LocationProperties>(), DataBlockDescription.UNKNOWN_SIZE,
-         DataBlockDescription.UNKNOWN_SIZE, null, null);
+         DataBlockDescription.UNKNOWN_SIZE, null, null, null);
    }
 
    private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {

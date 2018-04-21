@@ -33,10 +33,11 @@ public interface DataBlockReader {
     * @param id
     * @param parent
     * @param remainingDirectParentByteCount
+    * @param forwardRead TODO
     * @return true if it has, false otherwise
     */
    public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount);
+      long remainingDirectParentByteCount, boolean forwardRead);
 
    /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
@@ -183,9 +184,10 @@ public interface DataBlockReader {
 
    /**
     * @param reference
+    * @param forwardRead TODO
     * @return true if it identifies, false otherwise
     */
-   public boolean identifiesDataFormat(MediumOffset reference);
+   public boolean identifiesDataFormat(MediumOffset reference, boolean forwardRead);
 
    /**
     * @return the {@link DataFormatSpecification}

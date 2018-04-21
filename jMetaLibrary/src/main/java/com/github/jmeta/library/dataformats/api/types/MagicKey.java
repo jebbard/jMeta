@@ -65,7 +65,7 @@ public class MagicKey {
       long offsetFromStartOfHeaderOrFooter) {
       Reject.ifNull(magicKeyBytes, "magicKeyBytes");
       Reject.ifNull(headerBlockId, "headerBlockId");
-      Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0, "The offset from start of header or footer must be >= 0.");
+      // Reject.ifTrue(offsetFromStartOfHeaderOrFooter < 0, "The offset from start of header or footer must be >= 0.");
       Reject.ifNegativeOrZero(bitLength, "bitLength");
       Reject.ifFalse(bitLength <= magicKeyBytes.length * Byte.SIZE, "bitLength <= magicKeyBytes.length * Byte.SIZE");
       Reject.ifFalse(offsetForBackwardReading <= 0, "offsetForBackwardReading <= 0");

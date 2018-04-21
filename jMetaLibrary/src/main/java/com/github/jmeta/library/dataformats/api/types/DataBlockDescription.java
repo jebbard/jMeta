@@ -32,18 +32,20 @@ public class DataBlockDescription {
     * @param specDescription
     * @param physicalType
     * @param childIds
-    * @param childOrder
     * @param fieldProperties
     * @param locationProperties
     * @param minimumByteLength
     * @param maximumByteLength
-    * @param magicKeys
+    * @param headerMagicKeys
+    * @param footerMagicKeys
+    *           TODO
     * @param overriddenId
+    * @param childOrder
     */
    public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
       List<DataBlockId> childIds, FieldProperties<?> fieldProperties,
       Map<DataBlockId, LocationProperties> locationProperties, long minimumByteLength, long maximumByteLength,
-      List<MagicKey> magicKeys, DataBlockId overriddenId) {
+      List<MagicKey> headerMagicKeys, List<MagicKey> footerMagicKeys, DataBlockId overriddenId) {
       Reject.ifNull(childIds, "childIds");
       Reject.ifNull(physicalType, "physicalType");
       Reject.ifNull(specDescription, "specDescription");
@@ -66,10 +68,14 @@ public class DataBlockDescription {
 
       if (locationProperties != null)
          m_locationProperties.putAll(locationProperties);
-      m_magicKeys = new ArrayList<>();
+      m_headerMagicKeys = new ArrayList<>();
+      m_footerMagicKeys = new ArrayList<>();
 
-      if (magicKeys != null)
-         m_magicKeys.addAll(magicKeys);
+      if (headerMagicKeys != null)
+         m_headerMagicKeys.addAll(headerMagicKeys);
+
+      if (footerMagicKeys != null)
+         m_footerMagicKeys.addAll(footerMagicKeys);
    }
 
    /**
@@ -145,9 +151,9 @@ public class DataBlockDescription {
     *
     * @return magicKey
     */
-   public List<MagicKey> getMagicKeys() {
+   public List<MagicKey> getHeaderMagicKeys() {
 
-      return Collections.unmodifiableList(m_magicKeys);
+      return Collections.unmodifiableList(m_headerMagicKeys);
    }
 
    /**
@@ -288,13 +294,19 @@ public class DataBlockDescription {
 
    private final FieldProperties<?> m_fieldProperties;
 
+   public List<MagicKey> getM_footerMagicKeys() {
+      return m_footerMagicKeys;
+   }
+
    private final Map<DataBlockId, LocationProperties> m_locationProperties = new HashMap<>();
 
    private final long m_maximumByteLength;
 
    private final long m_minimumByteLength;
 
-   private final List<MagicKey> m_magicKeys;
+   private final List<MagicKey> m_headerMagicKeys;
+
+   private final List<MagicKey> m_footerMagicKeys;
 
    private final DataBlockId m_overriddenId;
 

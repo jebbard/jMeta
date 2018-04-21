@@ -35,14 +35,13 @@ public class Lyrics3v2DataBlockReader extends StandardDataBlockReader {
 
    @Override
    public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount) {
+      long remainingDirectParentByteCount, boolean forwardRead) {
 
       if (parent == null) {
-         return super.hasContainerWithId(reference, id, parent, remainingDirectParentByteCount);
+         return super.hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, forwardRead);
       }
 
-      final ByteBuffer readBytes = readBytes(
-         reference.advance(Lyrics3v2Extension.lyrics3v2FooterMagicKey.getOffsetFromStartOfHeaderOrFooter()),
+      final ByteBuffer readBytes = readBytes(reference.advance(Lyrics3v2Extension.FOOTER_SIZE_FIELD_LENGTH),
          Lyrics3v2Extension.lyrics3v2FooterMagicKey.getByteLength());
 
       if (Lyrics3v2Extension.lyrics3v2FooterMagicKey.isContainerPresent(readBytes)) {

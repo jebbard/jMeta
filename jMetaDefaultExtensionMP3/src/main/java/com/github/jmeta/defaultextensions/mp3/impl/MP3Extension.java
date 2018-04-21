@@ -166,7 +166,7 @@ public class MP3Extension implements Extension {
             PhysicalDataBlockType.FIELD, headerContentChildIds,
             new FieldProperties<>(FieldType.FLAGS, defaultFlags, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, mp3HeaderFlagSpec, null, null, null),
-            headerContentLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null, null));
+            headerContentLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null, null, null));
 
       // 02. MP3 header
       final Map<DataBlockId, LocationProperties> headerLocationProps = new HashMap<>();
@@ -179,7 +179,7 @@ public class MP3Extension implements Extension {
 
       descMap.put(mp3HeaderId,
          new DataBlockDescription(mp3HeaderId, "MP3 header", "The MP3 header", PhysicalDataBlockType.HEADER,
-            headerChildIds, null, headerLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null, null));
+            headerChildIds, null, headerLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null, null, null));
 
       // 03. CRC field
       final Map<DataBlockId, LocationProperties> crcFieldLocationProps = new HashMap<>();
@@ -194,7 +194,7 @@ public class MP3Extension implements Extension {
          new DataBlockDescription(mp3CRCId, "MP3 CRC data", "The MP3 CRC data", PhysicalDataBlockType.FIELD,
             crcFieldChildIds, new FieldProperties<>(FieldType.BINARY, null, null, null, 2, 2, null, null, null, null,
                null, null, null, null),
-            crcFieldLocationProps, 2, 2, null, null));
+            crcFieldLocationProps, 2, 2, null, null, null));
 
       // 04. CRC
       final Map<DataBlockId, LocationProperties> crcLocationProps = new HashMap<>();
@@ -206,7 +206,7 @@ public class MP3Extension implements Extension {
       crcChildIds.add(mp3CRCFieldId);
 
       descMap.put(mp3CRCId, new DataBlockDescription(mp3CRCId, "MP3 CRC", "The MP3 CRC", PhysicalDataBlockType.HEADER,
-         crcChildIds, null, crcLocationProps, 2, 2, null, null));
+         crcChildIds, null, crcLocationProps, 2, 2, null, null, null));
 
       // 05. MP3 frame payload dataa
       final List<DataBlockId> payloadDataChildIds = new ArrayList<>();
@@ -220,7 +220,7 @@ public class MP3Extension implements Extension {
             payloadDataChildIds,
             new FieldProperties<>(FieldType.BINARY, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null),
-            payloadDataLocationProps, 1, 998, null, null));
+            payloadDataLocationProps, 1, 998, null, null, null));
 
       // 06. MP3 frame payload
       final List<DataBlockId> payloadChildIds = new ArrayList<>();
@@ -232,7 +232,7 @@ public class MP3Extension implements Extension {
          new LocationProperties(4, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       descMap.put(mp3PayloadId, new DataBlockDescription(mp3PayloadId, "payload", "The MP3 payload",
-         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 1, 998, null, null));
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 1, 998, null, null, null));
 
       // 08. MP3 tag
 
@@ -252,7 +252,7 @@ public class MP3Extension implements Extension {
       mp3FrameMagicKeys.add(mp3MagicKey);
 
       descMap.put(mp3FrameId, new DataBlockDescription(mp3FrameId, "MP3 Frame", "The MP3 Frame",
-         PhysicalDataBlockType.CONTAINER, frameChildIds, null, frameLocationProps, 33, 1024, mp3FrameMagicKeys, null));
+         PhysicalDataBlockType.CONTAINER, frameChildIds, null, frameLocationProps, 33, 1024, mp3FrameMagicKeys, null, null));
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(mp3FrameId);

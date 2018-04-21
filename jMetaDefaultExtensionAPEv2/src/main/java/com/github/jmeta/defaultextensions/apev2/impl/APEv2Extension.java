@@ -23,7 +23,6 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -36,6 +35,7 @@ import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -125,7 +125,7 @@ public class APEv2Extension implements Extension {
             PhysicalDataBlockType.FIELD, headerPreampleChildIds,
             new FieldProperties<>(FieldType.STRING, APE_MAGIC_KEY_STRING, null, null, PREAMPLE_BYTE_LENGTH,
                PREAMPLE_BYTE_LENGTH, null, null, null, null, null, null, null, null),
-            headerPreampleLocationProps, PREAMPLE_BYTE_LENGTH, PREAMPLE_BYTE_LENGTH, null, null));
+            headerPreampleLocationProps, PREAMPLE_BYTE_LENGTH, PREAMPLE_BYTE_LENGTH, null, null, null));
 
       // 2. Header version number
       final Map<DataBlockId, LocationProperties> headerVersionNumberLocationProps = new HashMap<>();
@@ -140,7 +140,7 @@ public class APEv2Extension implements Extension {
             PhysicalDataBlockType.FIELD, headerVersionNumberChildIds,
             new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, Long.valueOf(0x2000), null, null, 4, 4, null, null,
                null, null, null, null, null, null),
-            headerVersionNumberLocationProps, 4, 4, null, null));
+            headerVersionNumberLocationProps, 4, 4, null, null, null));
 
       // 3. Header tag size
       final Map<DataBlockId, LocationProperties> headerTagSizeLocationProps = new HashMap<>();
@@ -164,7 +164,7 @@ public class APEv2Extension implements Extension {
             apeV2TagSizeId, "APEv2 header tag size", "APEv2 header tag size", PhysicalDataBlockType.FIELD,
             headerTagSizeChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, 4, 4,
                null, null, null, null, null, null, null, tagSizeFunctions),
-            headerTagSizeLocationProps, 4, 4, null, null));
+            headerTagSizeLocationProps, 4, 4, null, null, null));
 
       // 4. Header item count
       final Map<DataBlockId, LocationProperties> headerItemCountLocationProps = new HashMap<>();
@@ -187,7 +187,7 @@ public class APEv2Extension implements Extension {
             apeV2ItemCountId, "APEv2 header item count", "APEv2 header item count", PhysicalDataBlockType.FIELD,
             headerItemCountChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, 4, 4,
                null, null, null, null, null, null, null, itemCountFunctions),
-            headerItemCountLocationProps, 4, 4, null, null));
+            headerItemCountLocationProps, 4, 4, null, null, null));
 
       // 5. Tag flags
       final Map<DataBlockId, LocationProperties> headerFlagsLocationProps = new HashMap<>();
@@ -215,7 +215,7 @@ public class APEv2Extension implements Extension {
          new DataBlockDescription(apeV2TagFlagsId, "APEv2 header tag flags", "APEv2 header tag flags",
             PhysicalDataBlockType.FIELD, headerFlagsChildIds, new FieldProperties<>(FieldType.FLAGS, defaultTagFlags,
                null, null, 4, 4, null, null, null, null, apev2HeaderFlagSpec, null, null, tagFlagsFunctions),
-            headerFlagsLocationProps, 4, 4, null, null));
+            headerFlagsLocationProps, 4, 4, null, null, null));
 
       // 6. Header reserved
       final Map<DataBlockId, LocationProperties> headerReservedLocationProps = new HashMap<>();
@@ -225,13 +225,12 @@ public class APEv2Extension implements Extension {
 
       final List<DataBlockId> headerReservedChildIds = new ArrayList<>();
 
-      descMap
-         .put(apeV2ReservedId,
-            new DataBlockDescription(apeV2ReservedId, "APEv2 header reserved", "APEv2 header reserved",
-               PhysicalDataBlockType.FIELD, headerReservedChildIds,
-               new FieldProperties<>(FieldType.BINARY, ByteBuffer.wrap(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }), null,
-                  null, 8, 8, null, null, null, null, null, null, null, null),
-               headerReservedLocationProps, 8, 8, null, null));
+      descMap.put(apeV2ReservedId,
+         new DataBlockDescription(apeV2ReservedId, "APEv2 header reserved", "APEv2 header reserved",
+            PhysicalDataBlockType.FIELD, headerReservedChildIds,
+            new FieldProperties<>(FieldType.BINARY, ByteBuffer.wrap(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }), null, null,
+               8, 8, null, null, null, null, null, null, null, null),
+            headerReservedLocationProps, 8, 8, null, null, null));
 
       return returnedList;
    }
@@ -273,7 +272,7 @@ public class APEv2Extension implements Extension {
       descMap.put(apeV2HeaderId,
          new DataBlockDescription(apeV2HeaderId, "APEv2 header", "The APEv2 header", PhysicalDataBlockType.HEADER,
             headerChildIds, null, headerLocationProps, APEv2_HEADER_FOOTER_BYTE_LENGTH, APEv2_HEADER_FOOTER_BYTE_LENGTH,
-            null, null));
+            null, null, null));
 
       // 2. The APEv2 footer
       final Map<DataBlockId, LocationProperties> footerLocationProps = new HashMap<>();
@@ -287,7 +286,7 @@ public class APEv2Extension implements Extension {
       descMap.put(apeV2FooterId,
          new DataBlockDescription(apeV2FooterId, "APEv2 footer", "The APEv2 footer", PhysicalDataBlockType.FOOTER,
             footerChildIds, null, footerLocationProps, APEv2_HEADER_FOOTER_BYTE_LENGTH, APEv2_HEADER_FOOTER_BYTE_LENGTH,
-            null, null));
+            null, null, null));
 
       // 3. Item (value) size
       final Map<DataBlockId, LocationProperties> itemSizeLocationProps = new HashMap<>();
@@ -309,7 +308,7 @@ public class APEv2Extension implements Extension {
          new DataBlockDescription(apeV2GenericItemValueSizeId, "APEv2 item value size", "APEv2 item value size",
             PhysicalDataBlockType.FIELD, itemSizeChildIds, new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER,
                null, null, null, 4, 4, null, null, null, null, null, null, null, itemValueSizeFunctions),
-            itemSizeLocationProps, 4, 4, null, null));
+            itemSizeLocationProps, 4, 4, null, null, null));
 
       // 4. Item flags
       final Map<DataBlockId, LocationProperties> itemFlagsLocationProps = new HashMap<>();
@@ -330,7 +329,7 @@ public class APEv2Extension implements Extension {
          new DataBlockDescription(apeV2GenericItemFlagsId, "APEv2 item flags", "APEv2 item flags",
             PhysicalDataBlockType.FIELD, itemFlagsChildIds, new FieldProperties<>(FieldType.FLAGS, defaultItemFlags,
                null, null, 4, 4, null, null, null, null, apev2ItemFlagSpec, null, null, itemFlagsFunctions),
-            itemFlagsLocationProps, 4, 4, null, null));
+            itemFlagsLocationProps, 4, 4, null, null, null));
 
       // 5. Item key
       final Map<DataBlockId, LocationProperties> itemKeyLocationProps = new HashMap<>();
@@ -354,7 +353,7 @@ public class APEv2Extension implements Extension {
          new DataBlockDescription(apeV2GenericItemKeyId, "APEv2 item key", "APEv2 item key",
             PhysicalDataBlockType.FIELD, itemKeyChildIds, new FieldProperties<String>(FieldType.STRING, null, null,
                /* new byte[] {0} */null, 2, 255, '\u0000', null, null, null, null, null, null, itemKeyFunctions),
-            itemKeyLocationProps, 2, 255, null, null));
+            itemKeyLocationProps, 2, 255, null, null, null));
 
       // 6. Item value
       final Map<DataBlockId, LocationProperties> itemValueLocationProps = new HashMap<>();
@@ -369,7 +368,7 @@ public class APEv2Extension implements Extension {
             PhysicalDataBlockType.FIELD, itemValueChildIds,
             new FieldProperties<String>(FieldType.STRING, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null),
-            itemValueLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null, null));
+            itemValueLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null, null, null));
 
       // 7. APEv2 item header
       final Map<DataBlockId, LocationProperties> itemHeaderLocationProps = new HashMap<>();
@@ -385,7 +384,7 @@ public class APEv2Extension implements Extension {
       descMap.put(apeV2GenericItemHeaderId,
          new DataBlockDescription(apeV2GenericItemHeaderId, "APEv2 item header", "The APEv2 item header",
             PhysicalDataBlockType.HEADER, itemHeaderChildIds, null, itemHeaderLocationProps,
-            APEv2_MIN_ITEM_HEADER_LENGTH, DataBlockDescription.UNKNOWN_SIZE, null, null));
+            APEv2_MIN_ITEM_HEADER_LENGTH, DataBlockDescription.UNKNOWN_SIZE, null, null, null));
 
       // 8. APEv2 item payload
       final Map<DataBlockId, LocationProperties> itemPayloadLocationProps = new HashMap<>();
@@ -399,7 +398,7 @@ public class APEv2Extension implements Extension {
       descMap.put(apeV2GenericItemPayloadId,
          new DataBlockDescription(apeV2GenericItemPayloadId, "APEv2 item payload", "The APEv2 item payload",
             PhysicalDataBlockType.FIELD_BASED_PAYLOAD, itemPayloadChildIds, null, itemPayloadLocationProps, 0,
-            DataBlockDescription.UNKNOWN_SIZE, null, null));
+            DataBlockDescription.UNKNOWN_SIZE, null, null, null));
 
       // 9. APEv2 item
       final List<DataBlockId> itemChildIds = new ArrayList<>();
@@ -414,7 +413,8 @@ public class APEv2Extension implements Extension {
 
       descMap.put(apeV2GenericItemId,
          new DataBlockDescription(apeV2GenericItemId, "APEv2 item", "The APEv2 item", PhysicalDataBlockType.CONTAINER,
-            itemChildIds, null, itemLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, apev2ItemMagicKeys, null));
+            itemChildIds, null, itemLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, apev2ItemMagicKeys, null,
+            null));
 
       // 10. APEv2 payload
       final List<DataBlockId> payloadChildIds = new ArrayList<>();
@@ -428,7 +428,7 @@ public class APEv2Extension implements Extension {
       descMap.put(apeV2PayloadId,
          new DataBlockDescription(apeV2PayloadId, "APEv2 payload", "The APEv2 payload",
             PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 0,
-            DataBlockDescription.UNKNOWN_SIZE, null, null));
+            DataBlockDescription.UNKNOWN_SIZE, null, null, null));
 
       // 11. APEv2 tag
 
@@ -443,17 +443,20 @@ public class APEv2Extension implements Extension {
 
       // Magic Keys
       MagicKey apev2FooterMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, apeV2FooterId,
-         -APEv2_HEADER_FOOTER_BYTE_LENGTH, 0);
-      MagicKey apev2HeaderMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, apeV2HeaderId,
-         MagicKey.NO_BACKWARD_READING, 0);
+         -APEv2_HEADER_FOOTER_BYTE_LENGTH, -APEv2_HEADER_FOOTER_BYTE_LENGTH);
+      MagicKey apev2HeaderMagicKey = new MagicKey(APEv2_MAGIC_KEY_BYTES, apeV2HeaderId, MagicKey.NO_BACKWARD_READING,
+         0);
 
       List<MagicKey> apev2TagMagicKeys = new ArrayList<>();
       apev2TagMagicKeys.add(apev2HeaderMagicKey);
-      apev2TagMagicKeys.add(apev2FooterMagicKey);
+
+      List<MagicKey> apev2TagFooterMagicKeys = new ArrayList<>();
+      apev2TagFooterMagicKeys.add(apev2FooterMagicKey);
 
       descMap.put(apeV2TagId,
          new DataBlockDescription(apeV2TagId, "APEv2 Tag", "The APEv2 Tag", PhysicalDataBlockType.CONTAINER,
-            tagChildIds, null, tagLocationProps, 4, DataBlockDescription.UNKNOWN_SIZE, apev2TagMagicKeys, null));
+            tagChildIds, null, tagLocationProps, 4, DataBlockDescription.UNKNOWN_SIZE, apev2TagMagicKeys,
+            apev2TagFooterMagicKeys, null));
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(apeV2TagId);

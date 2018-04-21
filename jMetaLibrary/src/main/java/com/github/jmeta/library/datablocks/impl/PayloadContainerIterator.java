@@ -86,7 +86,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
          if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            remainingParentByteCount))
+            remainingParentByteCount, true))
             return true;
       }
 
@@ -94,7 +94,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
       if (containerDesc != null) {
          return m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            remainingParentByteCount);
+            remainingParentByteCount, true);
       }
 
       // The payload has no container children at all OR no containers have been
@@ -104,7 +104,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
 
    private List<DataBlockDescription> getNestedContainerDescsWithMagicKeys() {
       return m_containerDescs.stream()
-         .filter((desc) -> !desc.getMagicKeys().isEmpty()).collect(Collectors.toList());
+         .filter((desc) -> !desc.getHeaderMagicKeys().isEmpty()).collect(Collectors.toList());
    }
 
    /**
@@ -121,7 +121,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
          if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            m_remainingParentSize)) {
+            m_remainingParentSize, true)) {
             Container container = m_reader.readContainerWithId(m_nextContainerReference, containerDesc.getId(),
                m_parent, m_context, m_remainingParentSize);
 

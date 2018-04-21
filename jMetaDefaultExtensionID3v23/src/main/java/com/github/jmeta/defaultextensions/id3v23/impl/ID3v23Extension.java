@@ -260,7 +260,7 @@ public class ID3v23Extension implements Extension {
       // Create concrete block description
       DataBlockDescription concreteDesc = new DataBlockDescription(concreteId, concreteName, concreteSpecDesc,
          genericDesc.getPhysicalType(), concreteChildren, concreteFieldProperties, concreteLocationProperties,
-         genericDesc.getMinimumByteLength(), genericDesc.getMaximumByteLength(), genericDesc.getMagicKeys(), null);
+         genericDesc.getMinimumByteLength(), genericDesc.getMaximumByteLength(), genericDesc.getHeaderMagicKeys(), null, null);
 
       descMap.put(concreteId, concreteDesc);
    }
@@ -278,7 +278,7 @@ public class ID3v23Extension implements Extension {
          "id3v23 extended header size", "The id3v23 extended header size", PhysicalDataBlockType.FIELD,
          extHeaderSizeChildIds, new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, 4, 4,
             null, null, null, null, null, null, null, new ArrayList<>()),
-         extHeaderSizeLocationProps, 4, 4, null, null));
+         extHeaderSizeLocationProps, 4, 4, null, null, null));
 
       // 2. Extended header flags
       final List<DataBlockId> flagsChildIds = new ArrayList<>();
@@ -315,7 +315,7 @@ public class ID3v23Extension implements Extension {
             "The id3v23 extended header flags", PhysicalDataBlockType.FIELD, flagsChildIds,
             new FieldProperties<>(FieldType.FLAGS, defaultExtHeaderFlags, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, extHeaderFlagFunctions),
-            flagsLocationProps, ID3V23_TAG_FLAG_SIZE, ID3V23_TAG_FLAG_SIZE, null, null));
+            flagsLocationProps, ID3V23_TAG_FLAG_SIZE, ID3V23_TAG_FLAG_SIZE, null, null, null));
 
       // 3. Ext header padding size
       final List<DataBlockId> paddingSizeChildIds = new ArrayList<>();
@@ -330,7 +330,7 @@ public class ID3v23Extension implements Extension {
             new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null,
                DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
                null, new ArrayList<>()),
-            paddingSizeLocationProps, 4, 4, null, null));
+            paddingSizeLocationProps, 4, 4, null, null, null));
 
       // 4. Ext header CRC
       final List<DataBlockId> crcChildIds = new ArrayList<>();
@@ -345,7 +345,7 @@ public class ID3v23Extension implements Extension {
             new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null,
                DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
                null, new ArrayList<>()),
-            crcLocationProps, 4, 4, null, null));
+            crcLocationProps, 4, 4, null, null, null));
 
       // 5. id3v23 extended header
       final Map<DataBlockId, LocationProperties> extHeaderLocationProps = new HashMap<>();
@@ -361,7 +361,7 @@ public class ID3v23Extension implements Extension {
 
       descMap.put(ID3V23_EXTENDED_HEADER_ID,
          new DataBlockDescription(ID3V23_EXTENDED_HEADER_ID, "id3v23 extended header", "The id3v23 extended header",
-            PhysicalDataBlockType.HEADER, extHeaderChildIds, null, extHeaderLocationProps, 10, 14, null, null));
+            PhysicalDataBlockType.HEADER, extHeaderChildIds, null, extHeaderLocationProps, 10, 14, null, null, null));
    }
 
    /**
@@ -391,7 +391,7 @@ public class ID3v23Extension implements Extension {
             "The generic frame id field", PhysicalDataBlockType.FIELD, frameIdChildIds,
             new FieldProperties<>(FieldType.STRING, null, null, null, FRAME_ID_SIZE, FRAME_ID_SIZE, null, null, null,
                null, null, Charsets.CHARSET_ISO, null, genericIdFieldFunction),
-            frameIdLocationProps, FRAME_ID_SIZE, FRAME_ID_SIZE, null, null));
+            frameIdLocationProps, FRAME_ID_SIZE, FRAME_ID_SIZE, null, null, null));
 
       // 2 Frame size
       final List<DataBlockId> frameSizeChildIds = new ArrayList<>();
@@ -413,7 +413,7 @@ public class ID3v23Extension implements Extension {
             "The generic frame size field", PhysicalDataBlockType.FIELD, frameSizeChildIds,
             new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, 4, 4, null, null, null,
                null, null, Charsets.CHARSET_ISO, null, genericFrameSizeFieldFunction),
-            frameSizeLocationProps, 4, 4, null, null));
+            frameSizeLocationProps, 4, 4, null, null, null));
 
       // 3 Frame flags
       final List<DataBlockId> frameFlagsChildIds = new ArrayList<>();
@@ -477,7 +477,7 @@ public class ID3v23Extension implements Extension {
             GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID, "Generic frame flags field", "The generic frame flags field",
             PhysicalDataBlockType.FIELD, frameFlagsChildIds, new FieldProperties<>(FieldType.FLAGS, defaultFrameFlags,
                null, null, 2, 2, null, null, null, null, id3v23FrameFlagSpec, null, null, frameFlagFunctions),
-            frameFlagsLocationProps, 2, 2, null, null));
+            frameFlagsLocationProps, 2, 2, null, null, null));
 
       // 4. Frame header
       final List<DataBlockId> frameHeaderChildIds = new ArrayList<>();
@@ -490,7 +490,7 @@ public class ID3v23Extension implements Extension {
 
       descMap.put(GENERIC_FRAME_HEADER_ID,
          new DataBlockDescription(GENERIC_FRAME_HEADER_ID, "Generic frame header", "The generic frame header",
-            PhysicalDataBlockType.HEADER, frameHeaderChildIds, null, frameHeaderLocationProps, 10, 10, null, null));
+            PhysicalDataBlockType.HEADER, frameHeaderChildIds, null, frameHeaderLocationProps, 10, 10, null, null, null));
    }
 
    /**
@@ -511,7 +511,7 @@ public class ID3v23Extension implements Extension {
             new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null,
                DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
                null, null),
-            decompressedSizeLocationProps, 4, 4, null, null));
+            decompressedSizeLocationProps, 4, 4, null, null, null));
 
       // 2 Encryption method
       final List<DataBlockId> encryptionMethodChildIds = new ArrayList<>();
@@ -526,7 +526,7 @@ public class ID3v23Extension implements Extension {
             new FieldProperties<Byte>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null,
                DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
                null, null),
-            encryptionMethodLocationProps, 1, 1, null, null));
+            encryptionMethodLocationProps, 1, 1, null, null, null));
 
       // 3 Group Id
       final List<DataBlockId> groupIdChildIds = new ArrayList<>();
@@ -541,7 +541,7 @@ public class ID3v23Extension implements Extension {
             new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, Byte.valueOf((byte) 0x80), Byte.valueOf((byte) 0xFF),
                null, null, null, null),
-            groupIdLocationProps, 1, 1, null, null));
+            groupIdLocationProps, 1, 1, null, null, null));
 
       // 4 Payload data
       final List<DataBlockId> payloadDataChildIds = new ArrayList<>();
@@ -555,7 +555,7 @@ public class ID3v23Extension implements Extension {
             PhysicalDataBlockType.FIELD, payloadDataChildIds,
             new FieldProperties<ByteBuffer>(FieldType.BINARY, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null),
-            payloadDataLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null));
+            payloadDataLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null, null));
 
       // 5 Generic Frame Payload
       final List<DataBlockId> genericFramePayloadChildIds = new ArrayList<>();
@@ -573,7 +573,7 @@ public class ID3v23Extension implements Extension {
          new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
             DataBlockDescription.UNKNOWN_SIZE, null, null, Byte.valueOf((byte) 0x80), Byte.valueOf((byte) 0xFF), null,
             null, null, null),
-         genericFramePayloadLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null));
+         genericFramePayloadLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null, null));
    }
 
    /**
@@ -597,7 +597,7 @@ public class ID3v23Extension implements Extension {
             ID3V23_HEADER_ID_FIELD_ID, "id3v23 tag header id", "The id3v23 tag header id", PhysicalDataBlockType.FIELD,
             tagIdChildIds, new FieldProperties<>(FieldType.STRING, ID3V23_TAG_ID_STRING, tagIdEnumerated, null, 3, 3,
                null, null, null, null, null, Charsets.CHARSET_ISO, null, new ArrayList<>()),
-            tagIdLocationProps, 3, 3, null, null));
+            tagIdLocationProps, 3, 3, null, null, null));
 
       // 2. tag version
       final List<DataBlockId> versionChildIds = new ArrayList<>();
@@ -614,7 +614,7 @@ public class ID3v23Extension implements Extension {
          ID3V23_HEADER_VERSION_FIELD_ID, "id3v23 tag header version", "The id3v23 tag header version",
          PhysicalDataBlockType.FIELD, versionChildIds, new FieldProperties<>(FieldType.BINARY, ID3V23_TAG_VERSION_BYTES,
             versionEnumerated, null, 2, 2, null, null, null, null, null, null, null, new ArrayList<>()),
-         versionLocationProps, 2, 2, null, null));
+         versionLocationProps, 2, 2, null, null, null));
 
       // 3. tag flags
       final List<DataBlockId> flagsChildIds = new ArrayList<>();
@@ -657,7 +657,7 @@ public class ID3v23Extension implements Extension {
          "id3v23 tag header flags", "The id3v23 tag header flags", PhysicalDataBlockType.FIELD, flagsChildIds,
          new FieldProperties<>(FieldType.FLAGS, defaultTagFlags, null, null, DataBlockDescription.UNKNOWN_SIZE,
             DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, id3v23TagFlagSpec, null, null, tagFlagFunctions),
-         flagsLocationProps, ID3V23_TAG_FLAG_SIZE, ID3V23_TAG_FLAG_SIZE, null, null));
+         flagsLocationProps, ID3V23_TAG_FLAG_SIZE, ID3V23_TAG_FLAG_SIZE, null, null, null));
 
       // 4. tag size
       final List<DataBlockId> sizeChildIds = new ArrayList<>();
@@ -680,7 +680,7 @@ public class ID3v23Extension implements Extension {
             new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null,
                DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
                null, tagSizeFunc),
-            sizeLocationProps, 4, 4, null, null));
+            sizeLocationProps, 4, 4, null, null, null));
 
       // 5. id3v23 header
       List<byte[]> fixedByteValueBytes = new ArrayList<>();
@@ -702,7 +702,7 @@ public class ID3v23Extension implements Extension {
 
       descMap.put(ID3V23_HEADER_ID,
          new DataBlockDescription(ID3V23_HEADER_ID, "id3v23 tag header", "The id3v23 tag header",
-            PhysicalDataBlockType.HEADER, headerChildIds, null, headerLocationProps, 10, 10, null, null));
+            PhysicalDataBlockType.HEADER, headerChildIds, null, headerLocationProps, 10, 10, null, null, null));
    }
 
    /**
@@ -731,7 +731,7 @@ public class ID3v23Extension implements Extension {
             paddingBytesChildIds,
             new FieldProperties<>(FieldType.BINARY, paddingByte, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, new ArrayList<>()),
-            paddingBytesLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null));
+            paddingBytesLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null, null));
 
       // 3. Padding Payload
       final List<DataBlockId> paddingPayloadChildIds = new ArrayList<>();
@@ -746,7 +746,7 @@ public class ID3v23Extension implements Extension {
       descMap.put(PADDING_PAYLOAD_ID,
          new DataBlockDescription(PADDING_PAYLOAD_ID, "Padding payload", "Padding payload",
             PhysicalDataBlockType.FIELD_BASED_PAYLOAD, paddingPayloadChildIds, null, paddingPayloadLocationProps, 1,
-            DataBlockDescription.UNKNOWN_SIZE, null, null));
+            DataBlockDescription.UNKNOWN_SIZE, null, null, null));
 
       // 4. Padding Container
       MagicKey paddingMagicKey = new MagicKey(paddingByte, PADDING_PAYLOAD_ID,
@@ -765,7 +765,7 @@ public class ID3v23Extension implements Extension {
 
       descMap.put(PADDING_ID,
          new DataBlockDescription(PADDING_ID, "Padding", "Padding", PhysicalDataBlockType.CONTAINER, paddingChildIds,
-            null, paddingLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, paddingMagicKeys, null));
+            null, paddingLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, paddingMagicKeys, null, null));
    }
 
    /**
@@ -786,7 +786,7 @@ public class ID3v23Extension implements Extension {
       descMap.put(ID3V23_PAYLOAD_ID,
          new DataBlockDescription(ID3V23_PAYLOAD_ID, "payload", "The id3v23 payload",
             PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 11,
-            DataBlockDescription.UNKNOWN_SIZE, null, null));
+            DataBlockDescription.UNKNOWN_SIZE, null, null, null));
    }
 
    /**
@@ -816,7 +816,7 @@ public class ID3v23Extension implements Extension {
 
       final DataBlockDescription genericBlockDesc = new DataBlockDescription(GENERIC_FRAME_ID, "GENERIC_ID3v23_FRAME",
          "The id3v23 GENERIC_FRAME", PhysicalDataBlockType.CONTAINER, genericFrameChildIds, null,
-         genericFrameLocationProps, 11, DataBlockDescription.UNKNOWN_SIZE, id3v23GenericFrameMagicKeys, null);
+         genericFrameLocationProps, 11, DataBlockDescription.UNKNOWN_SIZE, id3v23GenericFrameMagicKeys, null, null);
 
       descMap.put(GENERIC_FRAME_ID, genericBlockDesc);
 
@@ -845,7 +845,7 @@ public class ID3v23Extension implements Extension {
          new FieldProperties<>(FieldType.ENUMERATED, Charsets.CHARSET_ISO, charsetsEnumerated, null,
             DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
             null, textEncFieldFunctions),
-         textEncLocationProps, 1, 1, null, GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID);
+         textEncLocationProps, 1, 1, null, null, GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID);
 
       descMap.put(GENERIC_TEXT_ENCODING_ID, textEncDesc);
 
@@ -860,7 +860,7 @@ public class ID3v23Extension implements Extension {
             informationChildIds,
             new FieldProperties<>(FieldType.STRING, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
                DataBlockDescription.UNKNOWN_SIZE, '\u0000', null, null, null, null, null, null, new ArrayList<>()),
-            informationLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID));
+            informationLocationProps, 1, DataBlockDescription.UNKNOWN_SIZE, null, null, GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID));
 
       // 4. Generic (text information frame) infos
       List<DataBlockId> textFrameChildren = new ArrayList<>();
@@ -903,7 +903,7 @@ public class ID3v23Extension implements Extension {
 
       descMap.put(ID3V23_TAG_ID,
          new DataBlockDescription(ID3V23_TAG_ID, "id3v23 tag", "The id3v23 tag", PhysicalDataBlockType.CONTAINER,
-            tagChildIds, null, null, 21, DataBlockDescription.UNKNOWN_SIZE, id3v23TagMagicKeys, null));
+            tagChildIds, null, null, 21, DataBlockDescription.UNKNOWN_SIZE, id3v23TagMagicKeys, null, null));
    }
 
    private DataFormatSpecification createSpecification(Map<DataBlockId, DataBlockDescription> descMap) {

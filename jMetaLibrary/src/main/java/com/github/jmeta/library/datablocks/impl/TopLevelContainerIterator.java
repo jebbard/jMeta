@@ -30,11 +30,6 @@ import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
-// TODO stage2_002: Implement timeout when reading from stream-based medium
-
-/**
- *
- */
 public class TopLevelContainerIterator extends AbstractDataBlockIterator<Container> {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(TopLevelContainerIterator.class);
@@ -152,7 +147,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
          ContainerDataFormat dataFormat = iterator.next();
          DataBlockReader reader = m_readerMap.get(dataFormat);
 
-         if (reader.identifiesDataFormat(m_previousIdentificationReference))
+         if (reader.identifiesDataFormat(m_previousIdentificationReference, true))
             return dataFormat;
       }
 

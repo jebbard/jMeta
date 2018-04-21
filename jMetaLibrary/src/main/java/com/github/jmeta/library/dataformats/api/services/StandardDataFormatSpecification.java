@@ -82,7 +82,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
          DataBlockId dataBlockId = iterator.next();
 
-         if (getDataBlockDescription(dataBlockId).getMagicKeys().isEmpty()) {
+         if (getDataBlockDescription(dataBlockId).getHeaderMagicKeys().isEmpty()) {
             throw new IllegalArgumentException("Every lop-level container must define at least one magic key");
          }
       }
@@ -176,7 +176,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
             genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(), locationProps,
             genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(),
-            genericDescription.getMagicKeys(), null);
+            genericDescription.getHeaderMagicKeys(), null, null);
       }
 
       return m_dataBlockDescriptions.get(id);

@@ -9,6 +9,8 @@
 package com.github.jmeta.defaultextensions.id3v1.impl;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 
 /**
  * {@link ID3v1DataBlocksService}
@@ -22,4 +24,10 @@ public class ID3v1DataBlocksService extends AbstractDataBlockService {
    public ID3v1DataBlocksService() {
       super(ID3v1Extension.ID3v1);
    }
+
+   @Override
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
+      return new ID3v1DataBlockReader(spec, lazyFieldSize);
+   }
+
 }
