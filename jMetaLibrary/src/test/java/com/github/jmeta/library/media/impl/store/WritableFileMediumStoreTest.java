@@ -10,22 +10,24 @@
 package com.github.jmeta.library.media.impl.store;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.helper.TestMedia;
-import com.github.jmeta.library.media.api.services.AbstractCachedAndWritableRandomAccessMediumStoreTest;
+import com.github.jmeta.library.media.api.services.AbstractWritableRandomAccessMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.utility.charset.api.services.Charsets;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link CachedWritableFileMediumStoreTest} tests a {@link MediumStore} backed by {@link FileMedium} instances.
+ * {@link WritableFileMediumStoreTest} tests a {@link MediumStore} backed by {@link FileMedium} instances.
  */
-public class CachedWritableFileMediumStoreTest
-   extends AbstractCachedAndWritableRandomAccessMediumStoreTest<FileMedium> {
+public class WritableFileMediumStoreTest extends AbstractWritableRandomAccessMediumStoreTest<FileMedium> {
 
    /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createEmptyMedium(java.lang.String)
@@ -64,5 +66,32 @@ public class CachedWritableFileMediumStoreTest
    @Override
    protected String getMediumContentAsString(FileMedium medium) {
       return new String(MediaTestUtility.readFileContent(medium.getWrappedMedium()), Charsets.CHARSET_UTF8);
+   }
+
+   /**
+    * Creates a copy of the indicated file in a temporary folder with the given name parts.
+    * 
+    * @param pathToFile
+    *           The path to the file to copy
+    * @param mediumType
+    *           The type of medium as string, concatenated to the target file name
+    * @param testMethodName
+    *           The name of the test method currently executed, concatenated to the target file name
+    * @return a Path to a copied file
+    * @throws IOException
+    *            if anything bad happens during I/O
+    */
+   private Path getCopiedFile(Path pathToFile, String mediumType, String testMethodName) throws IOException {
+      Reject.ifNull(testMethodName, "testMethodName");
+      Reject.ifNull(mediumType, "mediumType");
+      Reject.ifNull(pathToFile, "pathToFile");
+
+      Reject.ifFalse(Files.isRegularFile(pathToFile), "Files.isRegularFile(pathToFile)");
+
+      Path copiedFile = Files.copy(pathToFile,
+         TestMedia.TEST_FILE_TEMP_OUTPUT_DIRECTORY_PATH
+            .resolve(getClass().getSimpleName() + "_" + mediumType + testMethodName + ".txt"),
+         StandardCopyOption.REPLACE_EXISTING);
+      return copiedFile;
    }
 }

@@ -49,7 +49,7 @@ public class InputStreamMedium extends AbstractMedium<InputStream> {
     * @param name
     *           A name of the {@link InputStream} to be able to identify it. Optional, null may be passed
     * @param maxCacheSizeInBytes
-    *           see #getMaxCacheSizeInBytes(), set to 0 to disable caching
+    *           see #getMaxCacheSizeInBytes(), must be bigger than {@link Medium#MIN_CACHE_SIZE_IN_BYTES}
     * @param maxReadWriteBlockSizeInBytes
     *           see #getMaxReadWriteBlockSizeInBytes()
     */

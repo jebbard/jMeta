@@ -166,13 +166,13 @@ public abstract class AbstractMedium<T> implements Medium<T> {
       return isReadOnly;
    }
 
-   /**
-    * @see com.github.jmeta.library.media.api.types.Medium#isCachingEnabled()
-    */
-   @Override
-   public boolean isCachingEnabled() {
-      return maxCacheSizeInBytes > 0;
-   }
+   // /**
+   // * @see com.github.jmeta.library.media.api.types.Medium#isCachingEnabled()
+   // */
+   // @Override
+   // public boolean isCachingEnabled() {
+   // return maxCacheSizeInBytes > 0;
+   // }
 
    /**
     * @see com.github.jmeta.library.media.api.types.Medium#getMaxCacheSizeInBytes()

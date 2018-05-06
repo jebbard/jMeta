@@ -41,7 +41,7 @@ public class FileMedium extends AbstractMedium<Path> {
     * @param isReadOnly
     *           true to make this {@link FileMedium} read-only, false enables read and write.
     * @param maxCacheSizeInBytes
-    *           see #getMaxCacheSizeInBytes(), set to 0 to disable caching for this medium
+    *           see #getMaxCacheSizeInBytes(), must be bigger than {@link Medium#MIN_CACHE_SIZE_IN_BYTES}
     * @param maxReadWriteBlockSizeInBytes
     *           see #getMaxReadWriteBlockSizeInBytes()
     */

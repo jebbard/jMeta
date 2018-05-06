@@ -23,8 +23,8 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  * 
  * In addition, there are several configuration values that can be used to configure the {@link Medium} for later access
  * by an {@link MediumStore}. These need to be set in the corresponding implementation classes. This interface only
- * offers methods for reading them: See {@link #getMaxReadWriteBlockSizeInBytes()}, {@link #getMaxCacheSizeInBytes()}
- * and {@link #isCachingEnabled()}.
+ * offers methods for reading them: See {@link #getMaxReadWriteBlockSizeInBytes()} and
+ * {@link #getMaxCacheSizeInBytes()}.
  * 
  * @param <T>
  *           The concrete type of wrapped medium object.
@@ -47,6 +47,11 @@ public interface Medium<T> {
     * for more details.
     */
    public static long DEFAULT_MAX_CACHE_SIZE_IN_BYTES = 1_048_576L;
+
+   /**
+    * The minimum cache size in bytes. See {@link #getMaxCacheSizeInBytes()} for more details.
+    */
+   public static long MIN_CACHE_SIZE_IN_BYTES = 65_536L;
 
    /**
     * Returns whether this {@link Medium} supports random-access or not.
@@ -114,27 +119,18 @@ public interface Medium<T> {
    public int getMaxReadWriteBlockSizeInBytes();
 
    /**
-    * Returns the currently configured maximum cache size in bytes. If caching is enabled, this value is used when data
-    * read from the {@link Medium} is stored in an internal cache by an {@link MediumStore}. The cache must not exceed
-    * this size, if it does, cached data is automatically freed. In detail, the cached data read the longest time ago is
-    * freed first to ensure the new cache size is again below the maximum configured size. This size must be bigger than
-    * the currently configured maximum cache region size in bytes. If caching is disabled, this value must not be used
-    * or interpreted in any way.
+    * Returns the currently configured maximum cache size in bytes. This value is used when data read from the
+    * {@link Medium} is stored in an internal cache by an {@link MediumStore}. The cache must not exceed this size, if
+    * it does, cached data is automatically freed. In detail, the cached data read the longest time ago is freed first
+    * to ensure the new cache size is again below the maximum configured size. This size must be bigger than the
+    * currently configured maximum cache region size in bytes. Furthermore it must be bigger than the minimum cache size
+    * {@link #MIN_CACHE_SIZE_IN_BYTES}.
     * 
-    * The default value, if caching is enabled and if it is not explicitly set is
-    * {@link #DEFAULT_MAX_CACHE_SIZE_IN_BYTES}.
+    * The default value if it is not explicitly set is {@link #DEFAULT_MAX_CACHE_SIZE_IN_BYTES}.
     * 
     * @return the currently configured maximum cache size in bytes
     */
    public long getMaxCacheSizeInBytes();
-
-   /**
-    * Returns the current configuration for enabling caching (true) or disabling caching (false) for this
-    * {@link Medium}.
-    * 
-    * @return the current configuration for enabling caching (true) or disabling caching (false)
-    */
-   public boolean isCachingEnabled();
 
    /**
     * @see java.lang.Object#equals(java.lang.Object)

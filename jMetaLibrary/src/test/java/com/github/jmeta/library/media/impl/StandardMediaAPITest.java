@@ -30,10 +30,10 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
 public class StandardMediaAPITest {
 
    /**
-    * {@link FakeMediumClass} is a fake class for testing
+    * {@link FakeMedium} is a fake class for testing
     * {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}
     */
-   private class FakeMediumClass extends AbstractMedium<Object> {
+   private class FakeMedium extends AbstractMedium<Object> {
 
       /**
        * @see com.github.jmeta.library.media.api.types.Medium#getCurrentLength()
@@ -44,12 +44,12 @@ public class StandardMediaAPITest {
       }
 
       /**
-       * Creates a new {@link FakeMediumClass}.
+       * Creates a new {@link FakeMedium}.
        * 
        * @param medium
        *           The fake medium
        */
-      public FakeMediumClass(Object medium) {
+      public FakeMedium(Object medium) {
          super(medium, "Fake test medium", false, false, 0, 0);
       }
    }
@@ -76,7 +76,7 @@ public class StandardMediaAPITest {
    public void createMediumStore_forInMemoryMedium_returnsProperStoreInstance() {
       MediaAPI mediaAPI = new StandardMediaAPI();
 
-      InMemoryMedium mediumDefinition = new InMemoryMedium(new byte[] { 100 }, "My Medium", false, 500);
+      InMemoryMedium mediumDefinition = new InMemoryMedium(new byte[] { 100 }, "My Medium", false, 1000, 500);
 
       MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 
@@ -112,6 +112,6 @@ public class StandardMediaAPITest {
    public void createMediumStore_forUnsupportedMediumType_throwsException() {
       MediaAPI mediaAPI = new StandardMediaAPI();
 
-      mediaAPI.createMediumStore(new FakeMediumClass("test"));
+      mediaAPI.createMediumStore(new FakeMedium("test"));
    }
 }

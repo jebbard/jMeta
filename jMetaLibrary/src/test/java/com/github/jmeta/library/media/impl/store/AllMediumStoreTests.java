@@ -17,9 +17,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ ReadOnlyFileMediumStoreTest.class, ReadOnlyInMemoryMediumStoreTest.class,
-   ReadOnlyStreamMediumStoreTest.class, CachedStreamMediumStoreTest.class, CachedWritableFileMediumStoreTest.class,
-   UnCachedStreamMediumStoreTest.class, UnCachedWritableFileMediumStoreTest.class,
-   UnCachedWritableInMemoryMediumStoreTest.class, })
+   ReadOnlyStreamMediumStoreTest.class, StreamMediumStoreTest.class, WritableFileMediumStoreTest.class,
+   WritableInMemoryMediumStoreTest.class, })
 public class AllMediumStoreTests {
    // Nothing necessary here
 }
