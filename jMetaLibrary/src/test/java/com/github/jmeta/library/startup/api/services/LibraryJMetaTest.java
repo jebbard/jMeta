@@ -12,7 +12,6 @@ package com.github.jmeta.library.startup.api.services;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 
 /**

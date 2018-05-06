@@ -22,9 +22,7 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -36,6 +34,7 @@ import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -50,6 +49,7 @@ public class MP3Extension implements Extension {
    private static final int FRAME_SYNC_BIT_COUNT = 11;
    private static final byte[] MP3_FRAME_SYNC = new byte[] { -1, -32 }; // 11 one bits
    private static final int MP3_HEADER_BYTE_LENGTH = 4;
+
    /**
     *
     */
@@ -98,6 +98,7 @@ public class MP3Extension implements Extension {
       final DataBlockId mp3PayloadId = new DataBlockId(MP3, "mp3.payload");
       final DataBlockId mp3PayloadDataId = new DataBlockId(MP3, "mp3.payload.data");
       final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
+      final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
 
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 
@@ -165,8 +166,8 @@ public class MP3Extension implements Extension {
          new DataBlockDescription(mp3HeaderContentId, "MP3 header contents", "The MP3 header contents",
             PhysicalDataBlockType.FIELD, headerContentChildIds,
             new FieldProperties<>(FieldType.FLAGS, defaultFlags, null, null, DataBlockDescription.UNKNOWN_SIZE,
-               DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, mp3HeaderFlagSpec, null, null, null),
-            headerContentLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null, null, null));
+               DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, mp3HeaderFlagSpec, null, null, null, false),
+            headerContentLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null));
 
       // 02. MP3 header
       final Map<DataBlockId, LocationProperties> headerLocationProps = new HashMap<>();
@@ -179,7 +180,7 @@ public class MP3Extension implements Extension {
 
       descMap.put(mp3HeaderId,
          new DataBlockDescription(mp3HeaderId, "MP3 header", "The MP3 header", PhysicalDataBlockType.HEADER,
-            headerChildIds, null, headerLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null, null, null));
+            headerChildIds, null, headerLocationProps, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null));
 
       // 03. CRC field
       final Map<DataBlockId, LocationProperties> crcFieldLocationProps = new HashMap<>();
@@ -193,8 +194,8 @@ public class MP3Extension implements Extension {
       descMap.put(mp3CRCId,
          new DataBlockDescription(mp3CRCId, "MP3 CRC data", "The MP3 CRC data", PhysicalDataBlockType.FIELD,
             crcFieldChildIds, new FieldProperties<>(FieldType.BINARY, null, null, null, 2, 2, null, null, null, null,
-               null, null, null, null),
-            crcFieldLocationProps, 2, 2, null, null, null));
+               null, null, null, null, false),
+            crcFieldLocationProps, 2, 2, null));
 
       // 04. CRC
       final Map<DataBlockId, LocationProperties> crcLocationProps = new HashMap<>();
@@ -206,7 +207,7 @@ public class MP3Extension implements Extension {
       crcChildIds.add(mp3CRCFieldId);
 
       descMap.put(mp3CRCId, new DataBlockDescription(mp3CRCId, "MP3 CRC", "The MP3 CRC", PhysicalDataBlockType.HEADER,
-         crcChildIds, null, crcLocationProps, 2, 2, null, null, null));
+         crcChildIds, null, crcLocationProps, 2, 2, null));
 
       // 05. MP3 frame payload dataa
       final List<DataBlockId> payloadDataChildIds = new ArrayList<>();
@@ -219,8 +220,8 @@ public class MP3Extension implements Extension {
          new DataBlockDescription(mp3PayloadDataId, "payloadData", "The MP3 payload data", PhysicalDataBlockType.FIELD,
             payloadDataChildIds,
             new FieldProperties<>(FieldType.BINARY, null, null, null, DataBlockDescription.UNKNOWN_SIZE,
-               DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null),
-            payloadDataLocationProps, 1, 998, null, null, null));
+               DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null, null, null, false),
+            payloadDataLocationProps, 1, 998, null));
 
       // 06. MP3 frame payload
       final List<DataBlockId> payloadChildIds = new ArrayList<>();
@@ -232,7 +233,7 @@ public class MP3Extension implements Extension {
          new LocationProperties(4, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
       descMap.put(mp3PayloadId, new DataBlockDescription(mp3PayloadId, "payload", "The MP3 payload",
-         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 1, 998, null, null, null));
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 1, 998, null));
 
       // 08. MP3 tag
 
@@ -244,15 +245,11 @@ public class MP3Extension implements Extension {
       frameLocationProps.put(null, new LocationProperties(DataBlockDescription.UNKNOWN_SIZE, 1, 1,
          DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
 
-      // Magic Keys
-      MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT,
-         mp3HeaderId, 0);
+      DataBlockDescription mp3Frame = new DataBlockDescription(mp3FrameId, "MP3 Frame", "The MP3 Frame",
+         PhysicalDataBlockType.CONTAINER, frameChildIds, null, frameLocationProps, 33, 1024, null);
+      descMap.put(mp3FrameId, mp3Frame);
 
-      List<MagicKey> mp3FrameMagicKeys = new ArrayList<>();
-      mp3FrameMagicKeys.add(mp3MagicKey);
-
-      descMap.put(mp3FrameId, new DataBlockDescription(mp3FrameId, "MP3 Frame", "The MP3 Frame",
-         PhysicalDataBlockType.CONTAINER, frameChildIds, null, frameLocationProps, 33, 1024, mp3FrameMagicKeys, null, null));
+      mp3Frame.addHeaderMagicKey(mp3MagicKey);
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(mp3FrameId);

@@ -15,6 +15,7 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
@@ -41,10 +42,13 @@ public class Lyrics3v2DataBlockReader extends StandardDataBlockReader {
          return super.hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, forwardRead);
       }
 
-      final ByteBuffer readBytes = readBytes(reference.advance(Lyrics3v2Extension.FOOTER_SIZE_FIELD_LENGTH),
-         Lyrics3v2Extension.lyrics3v2FooterMagicKey.getByteLength());
+      MagicKey lyrics3v2FooterMagicKey = getSpecification().getDataBlockDescription(Lyrics3v2Extension.lyrics3V2TagId)
+         .getFooterMagicKeys().get(0);
 
-      if (Lyrics3v2Extension.lyrics3v2FooterMagicKey.isContainerPresent(readBytes)) {
+      final ByteBuffer readBytes = readBytes(reference.advance(Lyrics3v2Extension.FOOTER_SIZE_FIELD_LENGTH),
+         lyrics3v2FooterMagicKey.getByteLength());
+
+      if (lyrics3v2FooterMagicKey.isPresentIn(readBytes)) {
          return false;
       }
 

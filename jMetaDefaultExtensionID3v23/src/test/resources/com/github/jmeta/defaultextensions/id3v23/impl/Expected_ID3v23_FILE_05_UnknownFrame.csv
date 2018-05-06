@@ -38,5 +38,7 @@ ID3v2.3;id3v23.payload.TRCK.header.flags;0;32;2;;;;;No flags are set
 ID3v2.3;id3v23.payload.TRCK.payload.textEncoding;0;33;1;UTF-16;;;;
 ID3v2.3;id3v23.payload.TRCK.payload.information;0;33;8;A2;;;;trck end
 ID3v2.3;id3v23.payload.padding;0;3;1876;;;;;padding
-ID3v2.3;id3v23.payload.padding.payload;0;39;1876;;;;;padding
-ID3v2.3;id3v23.payload.padding.payload.bytes;0;40;1876;{0,}*1876;;;;padding
+ID3v2.3;id3v23.payload.padding.header;0;39;1;;;;;padding
+ID3v2.3;id3v23.payload.padding.header.key;0;40;1;{0,};;;;padding
+ID3v2.3;id3v23.payload.padding.payload;0;39;1875;;;;;padding
+ID3v2.3;id3v23.payload.padding.payload.bytes;0;42;1875;{0,}*1875;;;;padding

@@ -41,18 +41,17 @@ public class FieldProperties<T> {
     * @param fixedCharset
     * @param fixedByteOrder
     * @param functions
+    * @param isMagicKey
+    *           TODO
     */
-   public FieldProperties(FieldType<?> fieldType, T defaultValue,
-      Map<T, byte[]> enumeratedValues, byte[] terminationBytes,
-      long minimumCharacterLength, long maximumCharacterLength,
-      Character terminationCharacter, List<String> patterns, T minimumValue,
-      T maximumValue, FlagSpecification flagSpecification, Charset fixedCharset,
-      ByteOrder fixedByteOrder, List<FieldFunction> functions) {
+   public FieldProperties(FieldType<?> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
+      byte[] terminationBytes, long minimumCharacterLength, long maximumCharacterLength, Character terminationCharacter,
+      List<String> patterns, T minimumValue, T maximumValue, FlagSpecification flagSpecification, Charset fixedCharset,
+      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey) {
       // TODO writeConcept001: Is default value a mandatory property for a FieldProperties<> instance?
       // Reject.ifNull(defaultValue, "defaultValue");
 
-	  Reject.ifFalse(
-         minimumCharacterLength <= maximumCharacterLength,
+      Reject.ifFalse(minimumCharacterLength <= maximumCharacterLength,
          "minimumCharacterLength <= maximumCharacterLength");
 
       m_fieldType = fieldType;
@@ -67,12 +66,42 @@ public class FieldProperties<T> {
       m_flagSpecification = flagSpecification;
       m_fixedCharset = fixedCharset;
       m_fixedByteOrder = fixedByteOrder;
+      this.isMagicKey = isMagicKey;
 
       if (functions != null)
          m_functions.addAll(functions);
 
       if (enumeratedValues != null)
          m_enumeratedValues.putAll(enumeratedValues);
+
+      if (isMagicKey) {
+         validateMagicKeyPreconditions();
+      }
+   }
+
+   /**
+    * 
+    */
+   private void validateMagicKeyPreconditions() {
+      if (getMaximumCharacterLength() != getMinimumCharacterLength()
+         || getMinimumCharacterLength() == DataBlockDescription.UNKNOWN_SIZE) {
+         throw new IllegalArgumentException(
+            "Found field that is tagged as magic key must have a fixed size, but min length = <"
+               + getMinimumCharacterLength() + ">, max length = <" + getMaximumCharacterLength() + ">.");
+      }
+
+      if (m_fieldType != FieldType.STRING && m_fieldType != FieldType.BINARY && m_fieldType != FieldType.ENUMERATED) {
+         throw new IllegalArgumentException(
+            "A field that is tagged as magic key must have a field type of STRING, BINARY or ENUMERATED");
+      }
+
+      if (m_fieldType == FieldType.ENUMERATED) {
+         Class<? extends Object> enumeratedKeyClass = m_enumeratedValues.keySet().iterator().next().getClass();
+         if (!String.class.isAssignableFrom(enumeratedKeyClass) || !byte[].class.isAssignableFrom(enumeratedKeyClass)) {
+            throw new IllegalArgumentException(
+               "A field that is tagged as magic key and of an enumerated type must have an enumerated string or byte array type");
+         }
+      }
    }
 
    /**
@@ -210,9 +239,8 @@ public class FieldProperties<T> {
    @Override
    public String toString() {
 
-      return getClass().getName() + "[" + ", termination=" + m_terminationBytes
-         + ", defaultValue=" + m_defaultValue + ", enumeratedValues="
-         + m_enumeratedValues + ", blockFunction=" + m_functions + "]";
+      return getClass().getName() + "[" + ", termination=" + m_terminationBytes + ", defaultValue=" + m_defaultValue
+         + ", enumeratedValues=" + m_enumeratedValues + ", blockFunction=" + m_functions + "]";
    }
 
    private final byte[] m_terminationBytes;
@@ -242,4 +270,15 @@ public class FieldProperties<T> {
    private final ByteOrder m_fixedByteOrder;
 
    private final List<FieldFunction> m_functions = new ArrayList<>();
+
+   /**
+    * Returns the attribute {@link #isMagicKey}.
+    * 
+    * @return the attribute {@link #isMagicKey}
+    */
+   public boolean isMagicKey() {
+      return isMagicKey;
+   }
+
+   private final boolean isMagicKey;
 }

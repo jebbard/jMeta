@@ -25,7 +25,7 @@ public class MagicKey {
 
    private final long deltaOffset;
 
-   private final DataBlockId headerOrFooterBlockId;
+   private final DataBlockId fieldId;
 
    private final String stringRepresentation;
 
@@ -39,22 +39,22 @@ public class MagicKey {
     *           e.g. "[1, 2, 144]"
     * @param bitLength
     *           The length of the magic key in bits
-    * @param headerBlockId
-    *           The id of the header or footer this magic key is occurring in
+    * @param fieldId
+    *           The id of the field this magic key corresponds to
     * @param deltaOffset
     *           The delta offset of the first byte of the magic key from start of header (positive offset) or from the
     *           end of the footer (negative offset) it is contained in
     */
-   public MagicKey(byte[] magicKeyBytes, int bitLength, DataBlockId headerBlockId, long deltaOffset) {
+   public MagicKey(byte[] magicKeyBytes, int bitLength, DataBlockId fieldId, long deltaOffset) {
       Reject.ifNull(magicKeyBytes, "magicKeyBytes");
-      Reject.ifNull(headerBlockId, "headerBlockId");
+      Reject.ifNull(fieldId, "fieldId");
       Reject.ifNegativeOrZero(bitLength, "bitLength");
       Reject.ifFalse(bitLength <= magicKeyBytes.length * Byte.SIZE, "bitLength <= magicKeyBytes.length * Byte.SIZE");
 
       this.magicKeyBytes = magicKeyBytes.clone();
       this.bitLength = bitLength;
       this.stringRepresentation = Arrays.toString(magicKeyBytes);
-      this.headerOrFooterBlockId = headerBlockId;
+      this.fieldId = fieldId;
       this.deltaOffset = deltaOffset;
    }
 
@@ -66,14 +66,14 @@ public class MagicKey {
     *           The magic key's bytes indicating presence of a container if found or not found, depending on the
     *           concrete subclass; the string representation of the magic key is just containing the raw bytes as array,
     *           e.g. "[1, 2, 144]"
-    * @param headerBlockId
-    *           The id of the header or footer this magic key is occurring in
+    * @param fieldId
+    *           The id of the field this magic key corresponds to
     * @param deltaOffset
     *           The delta offset of the first byte of the magic key from start of header (positive offset) or from the
     *           end of the footer (negative offset) it is contained in
     */
-   public MagicKey(byte[] magicKeyBytes, DataBlockId headerBlockId, long deltaOffset) {
-      this(magicKeyBytes, magicKeyBytes != null ? magicKeyBytes.length * Byte.SIZE : 0, headerBlockId, deltaOffset);
+   public MagicKey(byte[] magicKeyBytes, DataBlockId fieldId, long deltaOffset) {
+      this(magicKeyBytes, magicKeyBytes != null ? magicKeyBytes.length * Byte.SIZE : 0, fieldId, deltaOffset);
    }
 
    /**
@@ -82,14 +82,14 @@ public class MagicKey {
     * 
     * @param asciiKey
     *           A string containing only 7 bit standard ASCII characters which is the human-readable magic key
-    * @param headerBlockId
-    *           The id of the header or footer this magic key is occurring in
+    * @param fieldId
+    *           The id of the field this magic key corresponds to
     * @param deltaOffset
     *           The delta offset of the first byte of the magic key from start of header (positive offset) or from the
     *           end of the footer (negative offset) it is contained in
     */
-   public MagicKey(String asciiKey, DataBlockId headerBlockId, long deltaOffset) {
-      this(asciiKey != null ? asciiKey.getBytes(Charsets.CHARSET_ASCII) : null, headerBlockId, deltaOffset);
+   public MagicKey(String asciiKey, DataBlockId fieldId, long deltaOffset) {
+      this(asciiKey != null ? asciiKey.getBytes(Charsets.CHARSET_ASCII) : null, fieldId, deltaOffset);
    }
 
    /**
@@ -121,10 +121,10 @@ public class MagicKey {
    }
 
    /**
-    * @return the header or footer id this magic key can be found in
+    * @return the id of the field this magic key corresponds to
     */
-   public DataBlockId getHeaderOrFooterId() {
-      return headerOrFooterBlockId;
+   public DataBlockId getFieldId() {
+      return fieldId;
    }
 
    /**
@@ -135,18 +135,14 @@ public class MagicKey {
    }
 
    /**
-    * Indicates whether the container whose presence is determined by this magic key is present at the beginning of the
-    * given bytes or not. The bytes are NOT scanned for the magic key. Either the magic key is found at the beginning of
-    * the bytes, or not.
-    * 
-    * <b>NOTE:</b> A concrete implementation might detect presence (i.e. return true) if the magic key bytes are found,
-    * or it might also detect presence if the magic key is not found.
+    * Indicates whether the bytes of this magic key are present at the beginning of the given bytes or not. The bytes
+    * are NOT scanned for the magic key. Either the magic key is found at the beginning of the bytes, or not.
     * 
     * @param bytesToCheckForMagicKey
     *           The bytes to look for the magic key
-    * @return true if the container's presence is indicated by the given bytes, false otherwise
+    * @return true if the magic key's presence is indicated by the given bytes, false otherwise
     */
-   public boolean isContainerPresent(ByteBuffer readBytes) {
+   public boolean isPresentIn(ByteBuffer readBytes) {
       Reject.ifNull(readBytes, "readBytes");
 
       int comparedBits = 0;
@@ -186,7 +182,9 @@ public class MagicKey {
     */
    @Override
    public String toString() {
-      return getClass().getName() + "[" + "magicKeyBytes=" + magicKeyBytes + ", bitLength=" + bitLength
+      return getClass().getName() + "[" + "magicKeyBytes=" + Arrays.toString(magicKeyBytes) + ", bitLength=" + bitLength
+         + ", byte length=" + getByteLength() + ", deltaOffset=" + deltaOffset + ", fieldId=" + fieldId
          + ", stringRepresentation=" + stringRepresentation + "]";
    }
+
 }

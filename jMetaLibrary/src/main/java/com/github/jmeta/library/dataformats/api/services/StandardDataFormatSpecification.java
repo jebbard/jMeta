@@ -21,11 +21,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.LocationProperties;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -74,8 +77,11 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       m_dataBlockDescriptions.putAll(dataBlockDescriptions);
       this.defaultNestedContainerId = defaultNestedContainerId;
 
-      validateTopLevelMagicKeys();
       validateDefaultNestedContainerDefined(defaultNestedContainerId);
+
+      autoDetectMagicKeys(m_topLevelDataBlockIds);
+
+      validateTopLevelMagicKeys();
    }
 
    private void validateTopLevelMagicKeys() {
@@ -175,8 +181,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          }
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
             genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(), locationProps,
-            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(),
-            genericDescription.getHeaderMagicKeys(), null, null);
+            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), null);
       }
 
       return m_dataBlockDescriptions.get(id);
@@ -311,6 +316,96 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
          m_genericDataBlocks.put(genericBlockId, idPattern.toString());
       }
+   }
+
+   private void autoDetectMagicKeys(Set<DataBlockId> containerIds) {
+      for (DataBlockId containerId : containerIds) {
+         DataBlockDescription containerDescription = getDataBlockDescription(containerId);
+
+         List<MagicKey> headerMagicKeys = getMagicKeysOfContainer(containerDescription, PhysicalDataBlockType.HEADER);
+         headerMagicKeys.forEach(key -> containerDescription.addHeaderMagicKey(key));
+         List<MagicKey> footerMagicKeys = getMagicKeysOfContainer(containerDescription, PhysicalDataBlockType.FOOTER);
+         footerMagicKeys.forEach(key -> containerDescription.addFooterMagicKey(key));
+
+         List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(this, containerId,
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+
+         if (payloadDescs.size() == 1) {
+            List<DataBlockDescription> childContainerDescriptions = DataBlockDescription
+               .getChildDescriptionsOfType(this, payloadDescs.get(0).getId(), PhysicalDataBlockType.CONTAINER);
+
+            autoDetectMagicKeys(childContainerDescriptions.stream().map(cd -> cd.getId()).collect(Collectors.toSet()));
+         }
+      }
+   }
+
+   /**
+    * @param containerDescription
+    * @param header
+    *           TODO
+    */
+   private List<MagicKey> getMagicKeysOfContainer(DataBlockDescription containerDescription,
+      PhysicalDataBlockType type) {
+      List<MagicKey> magicKeys = new ArrayList<>();
+
+      List<DataBlockDescription> headerOrFooterDescs = DataBlockDescription.getChildDescriptionsOfType(this,
+         containerDescription.getId(), type);
+
+      List<DataBlockId> variableSizeFieldIds = new ArrayList<>();
+
+      long magicKeyOffset = 0;
+
+      if (type == PhysicalDataBlockType.FOOTER) {
+         Collections.reverse(headerOrFooterDescs);
+      }
+
+      for (DataBlockDescription headerOrFooterDesc : headerOrFooterDescs) {
+         List<DataBlockDescription> fieldDescs = DataBlockDescription.getChildDescriptionsOfType(this,
+            headerOrFooterDesc.getId(), PhysicalDataBlockType.FIELD);
+
+         if (type == PhysicalDataBlockType.FOOTER) {
+            Collections.reverse(fieldDescs);
+         }
+
+         for (DataBlockDescription fieldDesc : fieldDescs) {
+
+            if (fieldDesc.getMaximumByteLength() != fieldDesc.getMinimumByteLength()) {
+               variableSizeFieldIds.add(fieldDesc.getId());
+            }
+
+            if (fieldDesc.getFieldProperties().isMagicKey()) {
+               if (!variableSizeFieldIds.isEmpty()) {
+                  throw new IllegalArgumentException(
+                     "Found variable size fields in front of or behind magic key field with id <" + fieldDesc.getId()
+                        + ">: " + variableSizeFieldIds);
+               }
+
+               if (type == PhysicalDataBlockType.FOOTER) {
+                  magicKeyOffset -= fieldDesc.getMinimumByteLength();
+               }
+
+               if (fieldDesc.getFieldProperties().getFieldType() == FieldType.STRING) {
+                  magicKeys.add(new MagicKey((String) fieldDesc.getFieldProperties().getDefaultValue(),
+                     fieldDesc.getId(), magicKeyOffset));
+               } else if (fieldDesc.getFieldProperties().getFieldType() == FieldType.BINARY) {
+                  magicKeys.add(new MagicKey((byte[]) fieldDesc.getFieldProperties().getDefaultValue(),
+                     fieldDesc.getId(), magicKeyOffset));
+               } else if (fieldDesc.getFieldProperties().getFieldType() == FieldType.ENUMERATED) {
+                  for (Object enumeratedValue : fieldDesc.getFieldProperties().getEnumeratedValues().keySet()) {
+                     magicKeys.add(new MagicKey((String) enumeratedValue, fieldDesc.getId(), magicKeyOffset));
+                  }
+               }
+            } else {
+               if (type == PhysicalDataBlockType.HEADER) {
+                  magicKeyOffset += fieldDesc.getMinimumByteLength();
+               } else {
+                  magicKeyOffset -= fieldDesc.getMinimumByteLength();
+               }
+            }
+         }
+      }
+
+      return magicKeys;
    }
 
    private final DataBlockId defaultNestedContainerId;

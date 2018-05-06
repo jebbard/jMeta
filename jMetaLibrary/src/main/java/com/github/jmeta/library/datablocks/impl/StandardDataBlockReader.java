@@ -149,7 +149,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
 
-         if (magicKey.isContainerPresent(readBytes)) {
+         if (magicKey.isPresentIn(readBytes)) {
             return true;
          }
       }
@@ -189,6 +189,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       List<DataBlockDescription> headerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
          PhysicalDataBlockType.HEADER);
 
+      long overallHeaderSize = 0;
+
       for (int i = 0; i < headerDescs.size(); ++i) {
          DataBlockDescription headerDesc = headerDescs.get(i);
 
@@ -202,6 +204,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
             totalHeaderSize += nextHeader.getTotalSize();
          }
+
+         overallHeaderSize += totalHeaderSize;
 
          nextReference = nextReference.advance(totalHeaderSize);
 
@@ -225,8 +229,14 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       DataBlockDescription payloadDesc = payloadDescs.get(0);
 
+      long remainingPayloadByteCount = DataBlockDescription.UNKNOWN_SIZE;
+
+      if (remainingDirectParentByteCount != DataBlockDescription.UNKNOWN_SIZE) {
+         remainingPayloadByteCount = remainingDirectParentByteCount - overallHeaderSize;
+      }
+
       Payload payload = readPayload(nextReference, payloadDesc.getId(), actualId, headers, theContext,
-         remainingDirectParentByteCount);
+         remainingPayloadByteCount);
 
       // Read footers
       nextReference = nextReference.advance(payload.getTotalSize());
@@ -556,63 +566,6 @@ public class StandardDataBlockReader implements DataBlockReader {
       Reject.ifNull(cache, "cache");
 
       m_cache = cache;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#getLongestMinimumContainerHeaderSize(DataBlockId)
-    */
-   @Override
-   public long getLongestMinimumContainerHeaderSize(DataBlockId payloadId) {
-
-      long m_longestMinHeaderSize = 0;
-
-      List<DataBlockDescription> containerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, payloadId,
-         PhysicalDataBlockType.CONTAINER);
-
-      for (int i = 0; i < containerDescs.size(); ++i) {
-         DataBlockDescription containerDesc = containerDescs.get(i);
-
-         List<MagicKey> magicKeys = containerDesc.getHeaderMagicKeys();
-
-         for (int j = 0; j < magicKeys.size(); ++j) {
-            MagicKey magicKey = magicKeys.get(j);
-
-            DataBlockDescription desc = m_spec.getDataBlockDescription(magicKey.getHeaderOrFooterId());
-
-            final long minimumHeaderSize = DataBlockDescription.getTotalMinimumSize(m_spec, desc);
-            if (minimumHeaderSize > m_longestMinHeaderSize)
-               m_longestMinHeaderSize = minimumHeaderSize;
-         }
-      }
-
-      return m_longestMinHeaderSize;
-   }
-
-   @Override
-   public long getShortestMinimumContainerHeaderSize(DataBlockId payloadId) {
-
-      long shortestMinHeaderSize = DataBlockDescription.UNKNOWN_SIZE;
-
-      List<DataBlockDescription> containerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, payloadId,
-         PhysicalDataBlockType.CONTAINER);
-
-      for (int i = 0; i < containerDescs.size(); ++i) {
-         DataBlockDescription containerDesc = containerDescs.get(i);
-
-         List<MagicKey> magicKeys = containerDesc.getHeaderMagicKeys();
-
-         for (int j = 0; j < magicKeys.size(); ++j) {
-            MagicKey magicKey = magicKeys.get(j);
-
-            DataBlockDescription desc = m_spec.getDataBlockDescription(magicKey.getHeaderOrFooterId());
-
-            final long minimumHeaderSize = DataBlockDescription.getTotalMinimumSize(m_spec, desc);
-            if (minimumHeaderSize != DataBlockDescription.UNKNOWN_SIZE && minimumHeaderSize < shortestMinHeaderSize)
-               shortestMinHeaderSize = minimumHeaderSize;
-         }
-      }
-
-      return shortestMinHeaderSize;
    }
 
    /**
@@ -1068,12 +1021,12 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
          null, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
-         null, null);
+         null, null, false);
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
          unknownFieldProperties, new HashMap<DataBlockId, LocationProperties>(), DataBlockDescription.UNKNOWN_SIZE,
-         DataBlockDescription.UNKNOWN_SIZE, null, null, null);
+         DataBlockDescription.UNKNOWN_SIZE, null);
    }
 
    private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {

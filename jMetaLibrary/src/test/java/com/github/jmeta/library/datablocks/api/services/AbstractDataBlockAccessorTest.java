@@ -541,31 +541,34 @@ public abstract class AbstractDataBlockAccessorTest {
       DataBlockInstanceId expectedPayloadId = null;
       boolean hasFieldBasedPayload = false;
 
-      List<DataBlockInstanceId> fieldBasedPayloadChildren = expectationProvider
+      List<DataBlockInstanceId> payloadChildren = expectationProvider
          .getExpectedChildBlocksOfType(parentContainerInstanceId, PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
-      if (fieldBasedPayloadChildren.size() > 0) {
-         expectedPayloadId = fieldBasedPayloadChildren.get(0);
+      if (payloadChildren.size() > 0) {
+         expectedPayloadId = payloadChildren.get(0);
          hasFieldBasedPayload = true;
       } else {
-         expectedPayloadId = expectationProvider
-            .getExpectedChildBlocksOfType(parentContainerInstanceId, PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)
-            .get(0);
+         payloadChildren = expectationProvider.getExpectedChildBlocksOfType(parentContainerInstanceId,
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+
+         if (payloadChildren.size() > 0) {
+            expectedPayloadId = payloadChildren.get(0);
+         }
       }
 
-      Assert.assertEquals(expectedPayloadId.getId(), payload.getId());
-      // Check size of the payload
-      checkDataBlockSize(payload, expectedPayloadId);
+      if (expectedPayloadId != null) {
+         Assert.assertEquals(expectedPayloadId.getId(), payload.getId());
+         // Check size of the payload
+         checkDataBlockSize(payload, expectedPayloadId);
 
-      // Check the bytes of the payload
-      checkDataBlockBytes(payload);
+         // Check the bytes of the payload
+         checkDataBlockBytes(payload);
 
-      if (hasFieldBasedPayload) {
-         checkFields((FieldBasedPayload) payload, expectedPayloadId);
-      }
-
-      else {
-         checkContainers(((ContainerBasedPayload) payload).getContainerIterator(), expectedPayloadId, false);
+         if (hasFieldBasedPayload) {
+            checkFields((FieldBasedPayload) payload, expectedPayloadId);
+         } else {
+            checkContainers(((ContainerBasedPayload) payload).getContainerIterator(), expectedPayloadId, false);
+         }
       }
    }
 
@@ -769,7 +772,7 @@ public abstract class AbstractDataBlockAccessorTest {
 
       long expectedSize = expectationProvider.getExpectedDataBlockSize(instanceId);
 
-      Assert.assertEquals(expectedSize, dataBlock.getTotalSize());
+      Assert.assertEquals("Block size for instance: <" + instanceId + "> ", expectedSize, dataBlock.getTotalSize());
    }
 
    /**

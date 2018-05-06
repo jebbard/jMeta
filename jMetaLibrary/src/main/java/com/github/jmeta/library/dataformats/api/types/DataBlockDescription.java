@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -23,6 +24,97 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public class DataBlockDescription {
+
+   /**
+    * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
+    * {@link DataBlock#getTotalSize()}.
+    */
+   public final static long UNKNOWN_SIZE = -1;
+
+   private final DataBlockId m_id;
+
+   private final String m_name;
+
+   private final String m_specDescription;
+
+   private final PhysicalDataBlockType m_physicalType;
+
+   private final List<DataBlockId> m_childIds = new ArrayList<>();
+
+   private final FieldProperties<?> m_fieldProperties;
+
+   private final Map<DataBlockId, LocationProperties> m_locationProperties = new HashMap<>();
+
+   private final long m_maximumByteLength;
+
+   private final long m_minimumByteLength;
+
+   private final List<MagicKey> m_headerMagicKeys = new ArrayList<>();
+
+   private final List<MagicKey> m_footerMagicKeys = new ArrayList<>();
+
+   private final DataBlockId m_overriddenId;
+
+   /**
+    * @param spec
+    * @param headerDesc
+    * @return the total minimum size of the data block
+    */
+   public static long getTotalMinimumSize(DataFormatSpecification spec, DataBlockDescription headerDesc) {
+
+      Reject.ifNull(headerDesc, "headerDesc");
+      Reject.ifNull(spec, "spec");
+
+      long totalMinimumSize = 0;
+
+      for (Iterator<DataBlockId> childIterator = headerDesc.getOrderedChildIds().iterator(); childIterator.hasNext();) {
+         DataBlockId childId = childIterator.next();
+
+         DataBlockDescription childDesc = spec.getDataBlockDescription(childId);
+
+         totalMinimumSize += childDesc.getMinimumByteLength();
+      }
+
+      return totalMinimumSize;
+   }
+
+   /**
+    * @param spec
+    * @param parentId
+    * @param type
+    * @return a list of child {@link DataBlockDescription}s
+    */
+   public static List<DataBlockDescription> getChildDescriptionsOfType(DataFormatSpecification spec,
+      DataBlockId parentId, PhysicalDataBlockType type) {
+
+      Reject.ifNull(spec, "spec");
+      Reject.ifNull(type, "type");
+
+      List<DataBlockDescription> childDescs = new ArrayList<>();
+
+      Iterator<DataBlockId> childIterator = null;
+
+      // Need to get the top-level children
+      if (parentId == null)
+         childIterator = spec.getTopLevelDataBlockIds().iterator();
+
+      else {
+         DataBlockDescription parentDesc = spec.getDataBlockDescription(parentId);
+
+         childIterator = parentDesc.getOrderedChildIds().iterator();
+      }
+
+      while (childIterator.hasNext()) {
+         DataBlockId childId = childIterator.next();
+
+         DataBlockDescription childDesc = spec.getDataBlockDescription(childId);
+
+         if (childDesc.getPhysicalType().equals(type))
+            childDescs.add(childDesc);
+      }
+
+      return childDescs;
+   }
 
    /**
     * Creates a new {@link DataBlockDescription}.
@@ -36,16 +128,13 @@ public class DataBlockDescription {
     * @param locationProperties
     * @param minimumByteLength
     * @param maximumByteLength
-    * @param headerMagicKeys
-    * @param footerMagicKeys
-    *           TODO
     * @param overriddenId
     * @param childOrder
     */
    public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
       List<DataBlockId> childIds, FieldProperties<?> fieldProperties,
       Map<DataBlockId, LocationProperties> locationProperties, long minimumByteLength, long maximumByteLength,
-      List<MagicKey> headerMagicKeys, List<MagicKey> footerMagicKeys, DataBlockId overriddenId) {
+      DataBlockId overriddenId) {
       Reject.ifNull(childIds, "childIds");
       Reject.ifNull(physicalType, "physicalType");
       Reject.ifNull(specDescription, "specDescription");
@@ -68,14 +157,6 @@ public class DataBlockDescription {
 
       if (locationProperties != null)
          m_locationProperties.putAll(locationProperties);
-      m_headerMagicKeys = new ArrayList<>();
-      m_footerMagicKeys = new ArrayList<>();
-
-      if (headerMagicKeys != null)
-         m_headerMagicKeys.addAll(headerMagicKeys);
-
-      if (footerMagicKeys != null)
-         m_footerMagicKeys.addAll(footerMagicKeys);
    }
 
    /**
@@ -156,6 +237,26 @@ public class DataBlockDescription {
       return Collections.unmodifiableList(m_headerMagicKeys);
    }
 
+   public List<MagicKey> getFooterMagicKeys() {
+      return m_footerMagicKeys;
+   }
+
+   public void addHeaderMagicKey(MagicKey magicKey) {
+      Reject.ifNull(magicKey, "magicKey");
+
+      m_headerMagicKeys.add(magicKey);
+
+      validateMagicKeys(m_headerMagicKeys, PhysicalDataBlockType.HEADER);
+   }
+
+   public void addFooterMagicKey(MagicKey magicKey) {
+      Reject.ifNull(magicKey, "magicKey");
+
+      m_footerMagicKeys.add(magicKey);
+
+      validateMagicKeys(m_footerMagicKeys, PhysicalDataBlockType.FOOTER);
+   }
+
    /**
     * Returns maximumByteLength
     *
@@ -222,106 +323,29 @@ public class DataBlockDescription {
    }
 
    /**
-    * @param spec
-    * @param headerDesc
-    * @return the total minimum size of the data block
-    */
-   public static long getTotalMinimumSize(DataFormatSpecification spec, DataBlockDescription headerDesc) {
-
-      Reject.ifNull(headerDesc, "headerDesc");
-      Reject.ifNull(spec, "spec");
-
-      long totalMinimumSize = 0;
-
-      for (Iterator<DataBlockId> childIterator = headerDesc.getOrderedChildIds().iterator(); childIterator.hasNext();) {
-         DataBlockId childId = childIterator.next();
-
-         DataBlockDescription childDesc = spec.getDataBlockDescription(childId);
-
-         totalMinimumSize += childDesc.getMinimumByteLength();
-      }
-
-      return totalMinimumSize;
-   }
-
-   /**
-    * @param spec
-    * @param parentId
-    * @param type
-    * @return a list of child {@link DataBlockDescription}s
-    */
-   public static List<DataBlockDescription> getChildDescriptionsOfType(DataFormatSpecification spec,
-      DataBlockId parentId, PhysicalDataBlockType type) {
-
-      Reject.ifNull(spec, "spec");
-      Reject.ifNull(type, "type");
-
-      List<DataBlockDescription> childDescs = new ArrayList<>();
-
-      Iterator<DataBlockId> childIterator = null;
-
-      // Need to get the top-level children
-      if (parentId == null)
-         childIterator = spec.getTopLevelDataBlockIds().iterator();
-
-      else {
-         DataBlockDescription parentDesc = spec.getDataBlockDescription(parentId);
-
-         childIterator = parentDesc.getOrderedChildIds().iterator();
-      }
-
-      while (childIterator.hasNext()) {
-         DataBlockId childId = childIterator.next();
-
-         DataBlockDescription childDesc = spec.getDataBlockDescription(childId);
-
-         if (childDesc.getPhysicalType().equals(type))
-            childDescs.add(childDesc);
-      }
-
-      return childDescs;
-   }
-
-   private final DataBlockId m_id;
-
-   private final String m_name;
-
-   private final String m_specDescription;
-
-   private final PhysicalDataBlockType m_physicalType;
-
-   private final List<DataBlockId> m_childIds = new ArrayList<>();
-
-   private final FieldProperties<?> m_fieldProperties;
-
-   public List<MagicKey> getFooterMagicKeys() {
-      return m_footerMagicKeys;
-   }
-
-   private final Map<DataBlockId, LocationProperties> m_locationProperties = new HashMap<>();
-
-   private final long m_maximumByteLength;
-
-   private final long m_minimumByteLength;
-
-   private final List<MagicKey> m_headerMagicKeys;
-
-   private final List<MagicKey> m_footerMagicKeys;
-
-   private final DataBlockId m_overriddenId;
-
-   /**
     * @return the overridden id
     */
    public DataBlockId getOverriddenId() {
-
+   
       return m_overriddenId;
    }
 
    /**
-    * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
-    * {@link DataBlock#getTotalSize()}.
+    * @param magicKeys
+    * @param header
     */
-   public final static long UNKNOWN_SIZE = -1;
+   private void validateMagicKeys(List<MagicKey> magicKeys, PhysicalDataBlockType type) {
+   
+      Set<Long> distinctMagicKeyOffsets = magicKeys.stream().map(key -> key.getDeltaOffset())
+         .collect(Collectors.toSet());
+   
+      if (distinctMagicKeyOffsets.size() > 1) {
+         throw new IllegalArgumentException(
+            "Multiple <" + type + "> magic keys at different offsets specified for container id <" + getId()
+               + ">. At max one header or footer magic key field is allowed. Magic key fields found: "
+               + magicKeys.stream().map(key -> key.getFieldId()).collect(Collectors.toList()));
+      }
+   
+   }
 
 }

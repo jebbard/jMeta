@@ -33,7 +33,8 @@ public interface DataBlockReader {
     * @param id
     * @param parent
     * @param remainingDirectParentByteCount
-    * @param forwardRead TODO
+    * @param forwardRead
+    *           TODO
     * @return true if it has, false otherwise
     */
    public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
@@ -171,20 +172,9 @@ public interface DataBlockReader {
    public void setMediumCache(MediumStore cache);
 
    /**
-    * @param payloadId
-    * @return the longest minimum header size
-    */
-   public long getLongestMinimumContainerHeaderSize(DataBlockId payloadId);
-
-   /**
-    * @param payloadId
-    * @return the shortest minimum header size
-    */
-   public long getShortestMinimumContainerHeaderSize(DataBlockId payloadId);
-
-   /**
     * @param reference
-    * @param forwardRead TODO
+    * @param forwardRead
+    *           TODO
     * @return true if it identifies, false otherwise
     */
    public boolean identifiesDataFormat(MediumOffset reference, boolean forwardRead);

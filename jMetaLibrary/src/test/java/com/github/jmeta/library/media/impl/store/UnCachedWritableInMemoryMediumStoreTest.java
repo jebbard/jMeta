@@ -11,8 +11,8 @@ package com.github.jmeta.library.media.impl.store;
 
 import java.io.IOException;
 
-import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
+import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.services.AbstractUnCachedAndWritableRandomAccessMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;

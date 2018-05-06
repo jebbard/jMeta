@@ -161,7 +161,7 @@ Based on these alternatives, we can really only decide the following:
 Padding in ID3v2 is modeled as very special child container of the tag
 }
 {% Short description
-Padding in ID3v2 is modeled as very special child container of the tag, where the header is the first null byte, and all follow-up bytes form the payload. 
+Padding in ID3v2 is modeled as very special child container of the tag, where the header is the first null byte, and all follow-up bytes form the payload. Note that for this to work, \LibName{} must support containers with no (i.e. empty) payload for the very special case that the padding only consists of one byte: The header magic key identifying the padding. 
 }
 {% Rationale
 Modeling it as child field of the payload is not possible as it would contradict \DesLink{dd:504}. Modeling as part of the footer would be odd, as not every version of ID3v2 defines a footer at all, and we would have a variable sized footer optionally starting with an arbitrary number of nullbytes, which would not be very intuitive from a library users perspective, too.
@@ -448,7 +448,7 @@ These are the main properties of magic keys we are most interested in:
 \item Data formats might have multiple magic keys identifying them - one example is RIFF where the magic key also identifies the byte order of the container
 \end{itemize}
 
-Let's list all magic keys of the data formats we care about in \ref{tab:magicKeys}.
+Let's list all magic keys of the data formats we care about in table \ref{tab:magicKeys}.
 
 \begin{longtable}{|p{0.2\linewidth}|p{0.35\linewidth}|p{0.35\linewidth}|}
 \hline
@@ -497,6 +497,7 @@ Let us look at the odd exceptions in this list:
 \item [(4)] Lyrics3v2 and ID3v24 are the only formats where header and footer magic keys differ
 \item [(5)] QuickTime and Lyrics3v2 are the only formats where the magic key does not start at the beginning of its header/footer, but at a fixed byte offset
 \item [(6)] QuickTime is very vague about its magic key, it actually defines all top-level atoms as optional, but recommends to usually start a QuickTime file with the ftyp atom
+\item [(7)] Matroska seems to have an integer magic key
 \end{enumerate}
 
 Gradually, we will develop a strategy that includes all of those special cases.
@@ -541,7 +542,7 @@ Some very special QuickTime byte sequence might not be readable with \LibName{}.
 }
 %%%% <-- DD %%%%
 
-Now we are left with the VorbisComment special case. Unfortunately, you need external context knowledge to just know that the chunk of bytes is a Vorbis Comment. As described in \cite{MC17}[MC17]:
+Now we are left with the VorbisComment special case. Unfortunately, you need external context knowledge to just know that the chunk of bytes is a Vorbis Comment. As described in \cite[MC17]{MC17}:
 \begin{itemize}
 \item In Vorbis bitstreams, it always is embedded in the second page of the stream
 \item In FLAC, Speex and theora bitstreams, it is always starting with the second packet of the stream, it is actually not quite clear if this is the same thing as for Vobis, but note that Vorbis says page and the other say packet which is conceptually different in Ogg!
@@ -620,7 +621,7 @@ Based on these definitions, we can be more detailed about the parsing strategies
 Parsing top-level containers (forward reading)
 }
 {% Short description
-For top-level containers, the data format idenfification is the first thing that happens. Each data format must define at least one top-level container which can either be generic or concrete. Each top-level container type must at least define one header magic key that indicates presence of the format. If the current bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats that require deviating behaviour (e.g. VorbisComment) can override some aspects of this behaviour.
+For top-level containers, the data format identification is the first thing that happens. Each data format must define at least one top-level container which can either be generic or concrete. Each top-level container type must at least define one header magic key that indicates presence of the format. If the current bytes match the magic key, the data format is identified. Further on, if the top-level container is a generic container, the runtime identification of its concrete type is following as defined in \DesLink{dd:513}. Data formats that require deviating behaviour (e.g. VorbisComment) can override some aspects of this behaviour.
 }
 {% Rationale
 This is directly following from all previous design decisions
@@ -693,7 +694,7 @@ Now we have to clarify how the parsing code can best access the information abou
 Obtain \texttt{MagicKey}s from \texttt{DataBlockDescription}s of containers
 }
 {% Short description
-For the parser code, \texttt{MagicKey}s can be obtained from a \texttt{DataBlockDescription} of a container data block. It offers a method for obtaining the backward-readable magic keys as well as a method for obtaining the forward-readable magic keys.
+For the parser code, \texttt{MagicKey}s can be obtained from a \texttt{DataBlockDescription} of a container data block. It offers a method for obtaining the backward-readable (i.e. footer) magic keys as well as a method for obtaining the forward-readable (i.e. header) magic keys.
 }
 {% Rationale
 A magic key essentially belongs to a container. The top-level container \texttt{DataBlockDescription}s and the nested container \texttt{DataBlockDescription}s must anyway be available a the places where we need to parse them. By providing different methods for forward and backward reading, the intentions become very clear. Overall, it is most convenient for the parser code this way.
@@ -712,9 +713,10 @@ Strongly connected to this is the question how to represent magic keys in a data
 {% Short description
 The \texttt{MagicKey} instances that can be queried by the parsing code are not defined/added in parallel to the field properties anyway needed. In contrast to this, a \texttt{DataDataBlockDescription} of type \texttt{FIELD} additionally contains a flag saying if it is a magic key or not. If this flag is set to true, all other properties of the \texttt{MagicKey} can implicitly derived from the other field properties and a plausibility check can happen. If one of the following plausibility checks is failing, the \texttt{DataFormatSpecification} is considered invalid. 
 \begin{itemize}
-\item A field marked as magic key must either have a fixed value of string or binary type, or it must be an enumerated field of string or binary type.
+\item A field marked as magic key must either have a fixed value, or it must be an enumerated field (i.e. with multiple alternative values).
 \item The header that contains the magic key field must be either be the first header or the headers before it must be fixed length headers. For footers: The footer that contains the magic key field must be either be last footer or the footers behind it must be fixed length footers. Otherwise the field does not qualify as magic key, because it might have a variable offset from the start or end of its container and the \texttt{DataFormatSpecification} cannot derive the necessary offset from start or end of container.
 \item For the same reason, we define for headers: The fields in front of the magic key field (if any) must all be fixed length fields. And for footers: The fields behind the magic key field (if any) must all be fixed length fields.
+\item There must be only at maximum one header magic key field and only at maximum one footer magic key field
 \end{itemize}
 }
 {% Rationale
@@ -722,6 +724,24 @@ Redundancy is avoided, and it is more convenient to define a concrete \texttt{Da
 }
 {% Disadvantes
 A \texttt{DataFormatSpecification} implementation must be slightly more complex to derive and check the necessary properties of the \texttt{MagicKey} instances.
+}
+%%%% <-- DD %%%%
+
+There is a special case with MP3 here: It has an odd number of bits. This makes defining the magic key as single field very hard. Instead, it needs to be defined as flag field and cannot be derived automatically:
+
+%%%% DD --> %%%%
+\DD{dd:528b}
+{% Title
+MP3 magic key is added manually to the specification
+}
+{% Short description
+The MP3 magic key with 11 one bits is added manually to the MP3 \texttt{DataFormatSpecification}. Thus \texttt{DataBlockDescription} offers a method for adding a header or footer magic key manually. So auto-derival of magic keys is not used for MP3.
+}
+{% Rationale
+The odd bit length does not allow to define the 11 bit field as field on its own, but it needs to use flags, and flags do not have individual default values. Thus it is not possible in the generic code to derive the magic key for MP3 automatically. Instead, the field is not tagged as magic key, but it is manually created in the MP3 extension and added using the \texttt{DataBlockDescription} method.
+}
+{% Disadvantes
+No disadvantages known
 }
 %%%% <-- DD %%%%
 

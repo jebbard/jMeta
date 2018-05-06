@@ -19,7 +19,6 @@ import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
-import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**

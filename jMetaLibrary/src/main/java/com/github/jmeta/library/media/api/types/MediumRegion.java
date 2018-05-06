@@ -343,20 +343,23 @@ public class MediumRegion {
       int secondRegionSize = (int) (myEndOffset - at.getAbsoluteMediumOffset());
 
       if (isCached()) {
+         // TODO Check this again for any unwanted side effects
          // NOTE: It is important here to NOT call getBytes() multiple times for each region, but just once,
          // because it always returns a new read only ByteBuffer copy with its own new position and limit
          // This has, however, the advantage, that we do not change the original ByteBuffer of this region
          // unintentionally.
-         ByteBuffer originalBytes = getBytes();
+         // ByteBuffer originalBytes = getBytes();
+         //
+         // byte[] firstRegionBytes = new byte[firstRegionSize];
+         // byte[] secondRegionBytes = new byte[secondRegionSize];
+         //
+         // originalBytes.get(firstRegionBytes);
+         // originalBytes.get(secondRegionBytes);
 
-         byte[] firstRegionBytes = new byte[firstRegionSize];
-         byte[] secondRegionBytes = new byte[secondRegionSize];
-
-         originalBytes.get(firstRegionBytes);
-         originalBytes.get(secondRegionBytes);
-
-         ByteBuffer firstRegionBuffer = ByteBuffer.wrap(firstRegionBytes);
-         ByteBuffer secondRegionBuffer = ByteBuffer.wrap(secondRegionBytes);
+         ByteBuffer firstRegionBuffer = getBytes();// ByteBuffer.wrap(firstRegionBytes);
+         firstRegionBuffer.limit(firstRegionBuffer.position() + firstRegionSize);
+         ByteBuffer secondRegionBuffer = getBytes();// ByteBuffer.wrap(secondRegionBytes);
+         secondRegionBuffer.position(firstRegionBuffer.position() + firstRegionSize);
 
          returnedSplitRegions[0] = new MediumRegion(getStartOffset(), firstRegionBuffer);
          returnedSplitRegions[1] = new MediumRegion(at, secondRegionBuffer);

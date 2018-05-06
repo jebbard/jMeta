@@ -17,7 +17,6 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -69,16 +68,6 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
             return false;
       }
 
-      long minHeaderSize = m_reader.getShortestMinimumContainerHeaderSize(m_parent.getId());
-
-      if (minHeaderSize != DataBlockDescription.UNKNOWN_SIZE)
-         try {
-            // The whole header size is cached intentionally due to the premise of small headers
-            m_reader.cache(m_nextContainerReference, minHeaderSize);
-         } catch (EndOfMediumException e) {
-            return false;
-         }
-
       List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
 
       // We need to evaluate whether there still is a container child
@@ -103,8 +92,8 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
    }
 
    private List<DataBlockDescription> getNestedContainerDescsWithMagicKeys() {
-      return m_containerDescs.stream()
-         .filter((desc) -> !desc.getHeaderMagicKeys().isEmpty()).collect(Collectors.toList());
+      return m_containerDescs.stream().filter((desc) -> !desc.getHeaderMagicKeys().isEmpty())
+         .collect(Collectors.toList());
    }
 
    /**

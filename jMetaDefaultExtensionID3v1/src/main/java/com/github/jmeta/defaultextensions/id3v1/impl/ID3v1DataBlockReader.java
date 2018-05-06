@@ -17,6 +17,7 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
@@ -53,13 +54,15 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
             return false;
          }
 
-         int magicKeySizeInBytes = ID3v1Extension.id3v1MagicKey.getByteLength();
+         MagicKey id3v1TagMagicKey = getSpecification().getDataBlockDescription(id).getHeaderMagicKeys().get(0);
+
+         int magicKeySizeInBytes = id3v1TagMagicKey.getByteLength();
 
          MediumOffset magicKeyReference = reference.advance(-ID3v1Extension.id3v1TagLength);
 
          final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
 
-         return ID3v1Extension.id3v1MagicKey.isContainerPresent(readBytes);
+         return id3v1TagMagicKey.isPresentIn(readBytes);
       }
    }
 
