@@ -19,15 +19,15 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
- * This class provides the mechanisms to read data from and write data to an {@link Medium}. We can basically
- * distinguish two types of media for which the behavior differs correspondingly:
+ * This class provides the mechanisms to read data from and write data to a {@link Medium}. We can basically distinguish
+ * two types of media for which the behavior differs correspondingly:
  * <ul>
  * <li><b>Random-access media:</b> Allow random-access to all bytes of the medium. You can use
  * {@link #setCurrentPosition(MediumOffset)} to jump to a specific {@link MediumOffset} on the medium and then call
- * {@link #read(ByteBuffer)}, {@link #write(ByteBuffer)}, {@link #truncate()} or {@link #isAtEndOfMedium()}.</li>
+ * {@link #read(int)}, {@link #write(ByteBuffer)}, {@link #truncate()} or {@link #isAtEndOfMedium()}.</li>
  * <li><b>Stream-based media:</b> Doe not allow random-access but only sequential reading of medium bytes.
- * {@link #setCurrentPosition(MediumOffset)} does not have an effect, only {@link #read(ByteBuffer)} advances the
- * current position.</li>
+ * {@link #setCurrentPosition(MediumOffset)} does not have an effect, only {@link #read(int)} advances the current
+ * position.</li>
  * </ul>
  * 
  * In addition, an {@link Medium} might be read-only, such that the methods {@link #write(ByteBuffer)} and
@@ -35,7 +35,7 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  * 
  * Stream-based media are always also read-only, while random-access media might or might not be read-only.
  *
- * There should only be one {@link MediumAccessor} per process for the same {@link Medium}, i.e. when multithreading,
+ * There should only be one {@link MediumAccessor} per process for the same {@link Medium}, i.e. when multi-threading,
  * the same instance must be used by all threads for accessing the same {@link Medium}. This is because the locking
  * mechanism: When writing with two different {@link MediumAccessor} instances to the same {@link Medium}, an exception
  * is likely to occur or one thread will block. The implementations of {@link MediumAccessor} should prohibit creating
@@ -77,15 +77,15 @@ public interface MediumAccessor<T extends Medium<?>> {
 
    /**
     * Returns the current {@link MediumOffset} position of this {@link MediumAccessor}. The current position is the
-    * position used for the next calls to {@link #read(ByteBuffer)}, {@link #truncate()} and {@link #write(ByteBuffer)}
-    * as well as for calls to {@link #isAtEndOfMedium()}.
+    * position used for the next calls to {@link #read(int)}, {@link #truncate()} and {@link #write(ByteBuffer)} as well
+    * as for calls to {@link #isAtEndOfMedium()}.
     * 
     * For random-access media, the current position can be changed using {@link #setCurrentPosition(MediumOffset)},
-    * {@link #write(ByteBuffer)} (changes by the number of written bytes) and {@link #read(ByteBuffer)} (changes by the
-    * number of read bytes).
+    * {@link #write(ByteBuffer)} (changes by the number of written bytes) and {@link #read(int)} (changes by the number
+    * of read bytes).
     * 
     * For non-random-access media, calls to {@link #setCurrentPosition(MediumOffset)} do not have any effect. Only calls
-    * to {@link #read(ByteBuffer)} will change the current position for these media types.
+    * to {@link #read(int)} will change the current position for these media types.
     * 
     * After opening an {@link MediumAccessor}, the current position always points to medium offset 0.
     * 
@@ -118,24 +118,23 @@ public interface MediumAccessor<T extends Medium<?>> {
     * {@link #getCurrentPosition()}. This method may block until the number of bytes requested are available
     * (potentially forever). This method advances the current position of the medium by the bytes really read.
     * 
-    * The position and the limit of the provided {@link ByteBuffer} will be the same after the method returns.
+    * The position and the limit of the returned {@link ByteBuffer} will be the same after the method returns.
     * 
-    * @param buffer
-    *           The {@link ByteBuffer} to be filled with read bytes. The buffer is filled starting with its current
-    *           position up to its limit, i.e. the read byte count, at maximum, is buffer.remaining() at the moment of
-    *           method invocation. The returned {@link ByteBuffer} is reset, i.e. its position is set to its position
-    *           before the method call. Its mark is also set to that position. Its limit is set to its position plus the
-    *           bytes really read.
+    * @param numberOfBytes
+    *           The number of bytes to read, must not be negative.
     * 
     * @throws EndOfMediumException
-    *            If the end of {@link Medium} has been reached during reading. The {@link ByteBuffer} returned is
-    *            guaranteed to hold all the bytes up to end of {@link Medium} when this exception is thrown. The
-    *            exception itself contains the number of bytes really read, the {@link ByteBuffer}s remaining bytes
-    *            equals that value.
+    *            If the end of {@link Medium} has been reached during reading. The {@link ByteBuffer} returned in the
+    *            exception is guaranteed to hold all the bytes up to end of {@link Medium} when this exception is
+    *            thrown. The exception itself contains the number of bytes really read, the {@link ByteBuffer}s
+    *            remaining bytes equals that value.
     * @throws MediumAccessException
     *            in case of any errors during medium access
+    * 
+    * @return The bytes read. The returned {@link ByteBuffer} is reset, i.e. its position and mark are set to 0. Its
+    *         limit is set to the number of bytes really read.
     */
-   public void read(ByteBuffer buffer) throws EndOfMediumException;
+   public ByteBuffer read(int numberOfBytes) throws EndOfMediumException;
 
    /**
     * Writes bytes to the {@link MediumAccessor} starting at the current position as returned by

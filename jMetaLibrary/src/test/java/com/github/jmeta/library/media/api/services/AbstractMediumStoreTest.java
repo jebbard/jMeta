@@ -1089,7 +1089,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    protected void verifyExactlyNReads(int N) {
       try {
-         Mockito.verify(mediumAccessorSpy, Mockito.times(N)).read(Mockito.any());
+         Mockito.verify(mediumAccessorSpy, Mockito.times(N)).read(Mockito.anyInt());
       } catch (EndOfMediumException e) {
          throw new RuntimeException("Unexpected end of medium", e);
       }
@@ -1163,7 +1163,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       int rangeSize1 = expectedRangeString.length();
       String actualRangeString = getCacheContentInRangeAsString(rangeStartOffset, rangeSize1);
-      
+
       Assert.assertEquals(expectedRangeString, actualRangeString);
    }
 
@@ -1278,20 +1278,20 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    private MediumStore createMediumStoreToTest(T mediumToUse) {
       Reject.ifNull(mediumToUse, "mediumToUse");
-   
+
       mediumAccessorSpy = Mockito.spy(createMediumAccessor(mediumToUse));
-   
+
       int maxCacheRegionSize = 0;
-   
+
       if (mediumToUse.getMaxCacheSizeInBytes() > 0) {
          maxCacheRegionSize = mediumToUse.getMaxReadWriteBlockSizeInBytes();
       }
-   
+
       mediumCacheSpy = Mockito
          .spy(new MediumCache(mediumToUse, mediumToUse.getMaxCacheSizeInBytes(), maxCacheRegionSize));
       mediumReferenceFactorySpy = Mockito.spy(new MediumOffsetFactory(mediumToUse));
       mediumChangeManagerSpy = Mockito.spy(new MediumChangeManager(mediumReferenceFactorySpy));
-   
+
       return new StandardMediumStore<>(mediumAccessorSpy, mediumCacheSpy, mediumReferenceFactorySpy,
          mediumChangeManagerSpy);
    }

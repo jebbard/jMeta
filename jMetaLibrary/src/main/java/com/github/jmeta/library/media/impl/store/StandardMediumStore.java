@@ -166,7 +166,6 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          }
       }
 
-      // if (getMedium().isCachingEnabled()) {
       if (getMedium().isRandomAccess()) {
          logDebugMessage(() -> "Caching is enabled, working on random access medium");
 
@@ -209,7 +208,6 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
          regionsToAdd.forEach(cache::addRegion);
       }
-      // }
 
       logDebugMessage(() -> "DONE Cache <" + numberOfBytes + "> bytes at <" + offset + ">");
    }
@@ -248,7 +246,6 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          }
       }
 
-      // if (getMedium().isCachingEnabled()) {
       long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
 
       logDebugMessage(() -> "Caching is enabled, current cache size: " + initialCacheSize);
@@ -305,21 +302,6 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
          returnedBytes = cachedBytes;
       }
-      // } else {
-      // logDebugMessage(() -> "Caching is not enabled");
-      //
-      // readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
-      //
-      // ByteBuffer readBytes = ByteBuffer.allocate(numberOfBytes);
-      //
-      // List<MediumRegion> regionsRead = readRegionWise(offset, numberOfBytes);
-      //
-      // regionsRead.forEach((region) -> readBytes.put(region.getBytes()));
-      //
-      // readBytes.rewind();
-      //
-      // returnedBytes = readBytes;
-      // }
 
       logDebugMessage(() -> "DONE getData of <" + numberOfBytes + "> bytes at <" + offset + ">");
 
@@ -488,7 +470,6 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                // If there is an existing cached region containing the insert offset, we must split it there,
                // to ensure the part of the region behind the insert offset is shifted correspondingly to leave room
                // for the inserts
-               // if (getMedium().isCachingEnabled()) {
                MediumRegion existingRegionContainingInsertOffset = cache
                   .getRegionsInRange(scheduledAction.getRegion().getStartOffset(), 1).get(0);
 
@@ -498,36 +479,27 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                      .split(scheduledAction.getRegion().getStartOffset())[0];
 
                   cache.addRegion(existingRegionSplitAtInsertOffset);
-                  // }
                }
 
                offsetFactory.updateOffsets(scheduledAction);
 
-               // if (getMedium().isCachingEnabled()) {
                // Please note the comment in ShiftedMediumBlock.initStartReference()
                cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
-            // }
             break;
 
             case REMOVE:
-               // if (getMedium().isCachingEnabled()) {
                cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
                   scheduledAction.getRegion().getSize());
-               // }
                changeManager.undo(scheduledAction);
                offsetFactory.updateOffsets(scheduledAction);
             break;
 
             case REPLACE:
                changeManager.undo(scheduledAction);
-               // if (getMedium().isCachingEnabled()) {
                cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
                   scheduledAction.getRegion().getSize());
-               // }
                offsetFactory.updateOffsets(scheduledAction);
-               // if (getMedium().isCachingEnabled()) {
                cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
-            // }
             break;
 
             default:
@@ -654,23 +626,18 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     *            in case of EOM was reached during reading
     */
    private MediumRegion readRegion(MediumOffset regionOffset, int regionSize) throws EndOfMediumException {
-      ByteBuffer dataRead = ByteBuffer.allocate(regionSize);
-
       mediumAccessor.setCurrentPosition(regionOffset);
 
       try {
-         mediumAccessor.read(dataRead);
+         ByteBuffer dataRead = mediumAccessor.read(regionSize);
+         return new MediumRegion(regionOffset, dataRead);
       } catch (EndOfMediumException e) {
-         // if (getMedium().isCachingEnabled()) {
          if (e.getByteCountActuallyRead() > 0) {
             cache.addRegion(new MediumRegion(e.getReadStartReference(), e.getBytesReadSoFar()));
          }
-         // }
 
          throw e;
       }
-
-      return new MediumRegion(regionOffset, dataRead);
    }
 
    /**

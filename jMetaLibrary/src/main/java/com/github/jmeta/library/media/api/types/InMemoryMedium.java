@@ -10,11 +10,12 @@
 package com.github.jmeta.library.media.api.types;
 
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 /**
  * {@link InMemoryMedium} represents data stored already in memory.
  */
-public class InMemoryMedium extends AbstractMedium<byte[]> {
+public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
 
    /**
     * Creates a new {@link InMemoryMedium} with default values for all properties that influence reading and writing.
@@ -47,7 +48,7 @@ public class InMemoryMedium extends AbstractMedium<byte[]> {
     */
    public InMemoryMedium(byte[] medium, String name, boolean isReadOnly, long maxCacheSizeInBytes,
       int maxReadWriteBlockSizeInBytes) {
-      super(medium, name, true, isReadOnly, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
+      super(ByteBuffer.wrap(medium), name, true, isReadOnly, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
    }
 
    /**
@@ -56,7 +57,7 @@ public class InMemoryMedium extends AbstractMedium<byte[]> {
    @Override
    public long getCurrentLength() {
 
-      return getWrappedMedium().length;
+      return getWrappedMedium().remaining();
    }
 
    /**
@@ -65,7 +66,7 @@ public class InMemoryMedium extends AbstractMedium<byte[]> {
     * @param mediumBytes
     *           The bytes to set
     */
-   public void setBytes(byte[] mediumBytes) {
+   public void setBytes(ByteBuffer mediumBytes) {
 
       setNewMediumContent(mediumBytes);
    }

@@ -9,10 +9,12 @@
  */
 package com.github.jmeta.library.media.api.types;
 
+import java.nio.ByteBuffer;
+
 /**
  * {@link InMemoryMediumTest} tests the {@link InMemoryMedium} class.
  */
-public class InMemoryMediumTest extends AbstractMediumTest<byte[]> {
+public class InMemoryMediumTest extends AbstractMediumTest<ByteBuffer> {
 
    private static final byte[] WRAPPED_MEDIUM = new byte[] { 1, 2, 3, 4, 5, 6 };
 
@@ -33,7 +35,7 @@ public class InMemoryMediumTest extends AbstractMediumTest<byte[]> {
     * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getMediumToTest()
     */
    @Override
-   protected Medium<byte[]> getMediumToTest() {
+   protected Medium<ByteBuffer> getMediumToTest() {
 
       return new InMemoryMedium(WRAPPED_MEDIUM, EXTERNAL_NAME, READ_ONLY);
    }
@@ -60,9 +62,9 @@ public class InMemoryMediumTest extends AbstractMediumTest<byte[]> {
     * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedWrappedMedium()
     */
    @Override
-   protected byte[] getExpectedWrappedMedium() {
+   protected ByteBuffer getExpectedWrappedMedium() {
 
-      return WRAPPED_MEDIUM;
+      return ByteBuffer.wrap(WRAPPED_MEDIUM);
    }
 
    /**

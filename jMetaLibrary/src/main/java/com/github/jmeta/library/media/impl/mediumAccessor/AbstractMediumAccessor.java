@@ -127,30 +127,24 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#read(java.nio.ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#read(int)
     */
    @Override
-   public void read(ByteBuffer buffer) throws EndOfMediumException {
+   public ByteBuffer read(int numberOfBytes) throws EndOfMediumException {
 
       Reject.ifFalse(isOpened(), "isOpened()");
-      Reject.ifNull(buffer, "buffer");
+      Reject.ifNegative(numberOfBytes, "numberOfBytes");
 
-      if (buffer.remaining() == 0) {
-         return;
+      if (numberOfBytes == 0) {
+         return ByteBuffer.allocate(0);
       }
 
       try {
-         buffer.mark();
-
-         mediumSpecificRead(buffer);
+         return mediumSpecificRead(numberOfBytes);
       }
 
       catch (IOException e) {
          throw new MediumAccessException("Could not not read from " + getMedium(), e);
-      }
-
-      finally {
-         buffer.reset();
       }
    }
 
@@ -231,7 +225,7 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
     * @throws IOException
     *            in case of anything goes wrong in the concrete implementation
     */
-   protected abstract void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException;
+   protected abstract ByteBuffer mediumSpecificRead(int numberOfBytes) throws IOException, EndOfMediumException;
 
    /**
     * Concrete core implementation of {@link #write(ByteBuffer)}

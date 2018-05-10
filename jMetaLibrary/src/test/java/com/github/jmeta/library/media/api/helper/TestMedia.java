@@ -213,5 +213,5 @@ public interface TestMedia {
     * A second test {@link Medium} to be used whenever checks require another {@link Medium} than the
     * {@link #DEFAULT_TEST_MEDIUM}.
     */
-   public static final InMemoryMedium OTHER_MEDIUM = new InMemoryMedium(new byte[] {}, "Fake", false);
+   public static final InMemoryMedium OTHER_MEDIUM = new InMemoryMedium(new byte[] { '1' }, "Fake", false);
 }

@@ -14,7 +14,6 @@ import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
-import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -22,7 +21,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium> {
 
-   private byte[] memory;
+   private ByteBuffer memory;
 
    /**
     * Creates a new {@link MemoryMediumAccessor}.
@@ -61,38 +60,40 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(int)
     */
    @Override
-   protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
+   protected ByteBuffer mediumSpecificRead(int numberOfBytes) throws IOException, EndOfMediumException {
+      ByteBuffer buffer = memory.asReadOnlyBuffer();
 
-      MediumOffset currentPosition = getCurrentPosition();
-      final int currentOffset = (int) currentPosition.getAbsoluteMediumOffset();
-      final int currentLength = (int) getMedium().getCurrentLength();
+      try {
+         MediumOffset currentPosition = getCurrentPosition();
+         final int currentOffset = (int) currentPosition.getAbsoluteMediumOffset();
+         final int currentLength = (int) getMedium().getCurrentLength();
 
-      int bytesToRead = buffer.remaining();
-      int bytesReallyRead = bytesToRead;
-      int initialPosition = buffer.position();
+         buffer.position(currentOffset);
 
-      // The end offset MUST point 1 byte behind the last byte to be read
-      int readEndOffset = bytesToRead + currentOffset;
+         int bufferLimit = currentOffset + numberOfBytes;
 
-      final boolean readBeyondEOF = readEndOffset > currentLength;
+         final boolean readBeyondEOF = bufferLimit > currentLength;
 
-      if (readBeyondEOF) {
-         readEndOffset = currentLength;
-         bytesReallyRead = readEndOffset - currentOffset;
+         if (readBeyondEOF) {
+            buffer.mark();
+
+            updateCurrentPosition(currentPosition.advance(currentLength - currentOffset));
+            throw new EndOfMediumException(currentPosition, numberOfBytes, currentLength - currentOffset, buffer);
+         }
+
+         buffer.limit(numberOfBytes + currentOffset);
+
+         buffer.mark();
+
+         updateCurrentPosition(currentPosition.advance(numberOfBytes));
+
+         return buffer;
+      } finally {
+         buffer.reset();
       }
-
-      buffer.put(ByteArrayUtils.copyOfRange(memory, currentOffset, readEndOffset));
-
-      if (readBeyondEOF) {
-         buffer.limit(initialPosition + bytesReallyRead);
-         updateCurrentPosition(currentPosition.advance(bytesReallyRead));
-         throw new EndOfMediumException(currentPosition, bytesToRead, bytesReallyRead, buffer);
-      }
-
-      updateCurrentPosition(currentPosition.advance(bytesReallyRead));
    }
 
    /**
@@ -100,26 +101,53 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
     */
    @Override
    protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
-
       final int numberOfBytesToWrite = buffer.remaining();
-
-      final byte[] bytesToWrite = new byte[numberOfBytesToWrite];
-
-      buffer.get(bytesToWrite);
 
       // Note: setCurrentPosition prevents offsets bigger than Integert.MAX_VALUE
       int absoluteMediumOffset = (int) getCurrentPosition().getAbsoluteMediumOffset();
 
-      if (absoluteMediumOffset + bytesToWrite.length >= memory.length) {
-         byte[] finalMediumBytes = new byte[absoluteMediumOffset + bytesToWrite.length];
-         System.arraycopy(memory, 0, finalMediumBytes, 0, memory.length);
-         memory = finalMediumBytes;
-         getMedium().setBytes(finalMediumBytes);
+      ByteBuffer bufferToChange = null;
+
+      if (absoluteMediumOffset + numberOfBytesToWrite >= memory.remaining()) {
+         bufferToChange = ByteBuffer.allocate(absoluteMediumOffset + numberOfBytesToWrite);
+         bufferToChange.put(memory);
+      } else {
+         bufferToChange = memory;
       }
 
-      System.arraycopy(bytesToWrite, 0, memory, absoluteMediumOffset, numberOfBytesToWrite);
+      bufferToChange.position(absoluteMediumOffset);
 
-      buffer.position(buffer.limit());
+      bufferToChange.put(buffer);
+      bufferToChange.rewind();
+      memory = bufferToChange;
+      getMedium().setBytes(bufferToChange);
+
+      //
+      // final int numberOfBytesToWrite = buffer.remaining();
+      //
+      // final byte[] bytesToWrite = new byte[numberOfBytesToWrite];
+      //
+      // buffer.get(bytesToWrite);
+      //
+      // // Note: setCurrentPosition prevents offsets bigger than Integert.MAX_VALUE
+      // int absoluteMediumOffset = (int) getCurrentPosition().getAbsoluteMediumOffset();
+      //
+      // if (buffer.remaining() + absoluteMediumOffset > memory.remaining()) {
+      // ByteBuffer newMemory = ByteBuffer.allocate(buffer.remaining() + absoluteMediumOffset);
+      //
+      // newMemory.put(memory);
+      // }
+      //
+      // if (absoluteMediumOffset + bytesToWrite.length >= memory.length) {
+      // byte[] finalMediumBytes = new byte[absoluteMediumOffset + bytesToWrite.length];
+      // System.arraycopy(memory, 0, finalMediumBytes, 0, memory.length);
+      // memory = finalMediumBytes;
+      // getMedium().setBytes(finalMediumBytes);
+      // }
+      //
+      // System.arraycopy(bytesToWrite, 0, memory, absoluteMediumOffset, numberOfBytesToWrite);
+      //
+      // buffer.position(buffer.limit());
 
       updateCurrentPosition(getCurrentPosition().advance(numberOfBytesToWrite));
    }
@@ -130,12 +158,13 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
    @Override
    protected void mediumSpecificTruncate() {
       int newSize = (int) getCurrentPosition().getAbsoluteMediumOffset();
+      ByteBuffer bufferToChange = ByteBuffer.allocate(newSize);
+      memory.limit(newSize);
+      bufferToChange.put(memory);
+      bufferToChange.rewind();
 
-      byte[] newBytes = ByteArrayUtils.copyOfRange(memory, 0, newSize);
-
-      memory = newBytes;
-      getMedium().setBytes(newBytes);
-
+      memory = bufferToChange;
+      getMedium().setBytes(bufferToChange);
    }
 
    /**

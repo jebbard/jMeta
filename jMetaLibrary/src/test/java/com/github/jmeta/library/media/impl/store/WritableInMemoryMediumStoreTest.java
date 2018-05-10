@@ -23,8 +23,7 @@ import com.github.jmeta.utility.charset.api.services.Charsets;
 /**
  * {@link WritableInMemoryMediumStoreTest} tests a {@link MediumStore} backed by {@link InMemoryMedium} instances.
  */
-public class WritableInMemoryMediumStoreTest
-   extends AbstractWritableRandomAccessMediumStoreTest<InMemoryMedium> {
+public class WritableInMemoryMediumStoreTest extends AbstractWritableRandomAccessMediumStoreTest<InMemoryMedium> {
 
    /**
     * @see com.github.jmeta.library.media.api.services.AbstractMediumStoreTest#createEmptyMedium(java.lang.String)
@@ -58,6 +57,6 @@ public class WritableInMemoryMediumStoreTest
     */
    @Override
    protected String getMediumContentAsString(InMemoryMedium medium) {
-      return new String(medium.getWrappedMedium(), Charsets.CHARSET_UTF8);
+      return new String(medium.getWrappedMedium().array(), Charsets.CHARSET_UTF8);
    }
 }

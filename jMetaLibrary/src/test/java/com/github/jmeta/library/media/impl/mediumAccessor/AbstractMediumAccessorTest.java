@@ -263,9 +263,8 @@ public abstract class AbstractMediumAccessorTest {
 
       mediumAccessor.setCurrentPosition(initialPosition);
 
-      ByteBuffer readContent = ByteBuffer.allocate(sizeToRead);
       try {
-         mediumAccessor.read(readContent);
+         mediumAccessor.read(sizeToRead);
 
          Assert.fail("Expected end of medium exception, but it did not occur!");
       }
@@ -296,8 +295,7 @@ public abstract class AbstractMediumAccessorTest {
       for (ReadTestData readTestDataRecord : readTestData) {
          ByteBuffer readContent = performReadNoEOMExpected(mediumAccessor, readTestDataRecord);
 
-         Assert.assertEquals(0, readContent.position());
-         Assert.assertEquals(readTestDataRecord.sizeToRead, readContent.limit());
+         Assert.assertEquals(readTestDataRecord.sizeToRead, readContent.remaining());
 
          // Reads the correct contents
          assertEqualsFileContent(readContent, readTestDataRecord.expectedBytesOffset);
@@ -324,14 +322,12 @@ public abstract class AbstractMediumAccessorTest {
       Integer readOffset = readOverEndOfMedium.offsetToRead;
       int readSize = readOverEndOfMedium.sizeToRead + 20;
 
-      ByteBuffer readContent = ByteBuffer.allocate(readSize);
-
       MediumOffset readReference = at(medium, readOffset);
 
       mediumAccessor.setCurrentPosition(readReference);
 
       try {
-         mediumAccessor.read(readContent);
+         mediumAccessor.read(readSize);
 
          Assert.fail("Expected end of medium exception, but it did not occur!");
       }
@@ -471,19 +467,19 @@ public abstract class AbstractMediumAccessorTest {
     * @return The {@link ByteBuffer} of data read, returned by {@link MediumAccessor#read(ByteBuffer)}
     */
    protected static ByteBuffer performReadNoEOMExpected(MediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
-      ByteBuffer readContent = ByteBuffer.allocate(readTestData.sizeToRead);
-
       mediumAccessor.setCurrentPosition(at(mediumAccessor.getMedium(), readTestData.offsetToRead));
 
       try {
-         mediumAccessor.read(readContent);
+         ByteBuffer readContent = mediumAccessor.read(readTestData.sizeToRead);
+
+         return readContent;
       }
 
       catch (EndOfMediumException e) {
          Assert.fail("Unexpected end of medium detected! Exception: " + e);
       }
 
-      return readContent;
+      return null;
    }
 
    /**

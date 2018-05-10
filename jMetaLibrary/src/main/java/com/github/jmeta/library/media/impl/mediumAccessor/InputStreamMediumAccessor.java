@@ -96,32 +96,43 @@ public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStrea
    }
 
    /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(ByteBuffer)
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(int)
     */
    @Override
-   protected void mediumSpecificRead(ByteBuffer buffer) throws IOException, EndOfMediumException {
-      int bytesRead = 0;
-      int size = buffer.remaining();
-      int initialPosition = buffer.position();
+   protected ByteBuffer mediumSpecificRead(int numberOfBytes) throws IOException, EndOfMediumException {
 
-      byte[] byteBuffer = new byte[size];
+      ByteBuffer buffer = ByteBuffer.allocate(numberOfBytes);
 
-      MediumOffset currentPosition = getCurrentPosition();
-      while (bytesRead < size) {
-         int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
+      buffer.mark();
 
-         if (returnCode == -1) {
-            buffer.limit(initialPosition + bytesRead);
-            updateCurrentPosition(currentPosition.advance(bytesRead));
-            throw new EndOfMediumException(currentPosition, size, bytesRead, buffer);
+      try {
+         int bytesRead = 0;
+         int size = buffer.remaining();
+         int initialPosition = buffer.position();
+
+         byte[] byteBuffer = new byte[size];
+
+         MediumOffset currentPosition = getCurrentPosition();
+         while (bytesRead < size) {
+            int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
+
+            if (returnCode == -1) {
+               buffer.limit(initialPosition + bytesRead);
+               updateCurrentPosition(currentPosition.advance(bytesRead));
+               throw new EndOfMediumException(currentPosition, size, bytesRead, buffer);
+            }
+
+            bytesRead += returnCode;
+
+            buffer.put(byteBuffer, buffer.position(), bytesRead);
          }
 
-         bytesRead += returnCode;
+         updateCurrentPosition(currentPosition.advance(bytesRead));
 
-         buffer.put(byteBuffer, buffer.position(), bytesRead);
+         return buffer;
+      } finally {
+         buffer.reset();
       }
-
-      updateCurrentPosition(currentPosition.advance(bytesRead));
    }
 
    /**
