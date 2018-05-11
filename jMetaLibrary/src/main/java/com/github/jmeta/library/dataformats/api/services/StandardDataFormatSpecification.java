@@ -27,7 +27,6 @@ import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -119,24 +118,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                matchingStrings.add(matcher.group(i));
          }
 
-         // Replace parent ids in location properties
-         Map<DataBlockId, LocationProperties> locationProps = new HashMap<>();
-
-         for (Iterator<DataBlockId> iterator = genericDescription.getAllParentsForLocationProperties()
-            .iterator(); iterator.hasNext();) {
-            DataBlockId parentId = iterator.next();
-            String replacedParentId = parentId.getGlobalId();
-
-            for (int j = 0; j < matchingStrings.size(); ++j) {
-               String matchingString = matchingStrings.get(j);
-
-               replacedParentId = replacedParentId.replaceFirst(GENERIC_PLACEHOLDER_PATTERN.pattern(), matchingString);
-            }
-
-            locationProps.put(new DataBlockId(m_dataFormat, replacedParentId),
-               genericDescription.getLocationPropertiesForParent(parentId));
-         }
-
          // Replace child ids
          List<DataBlockId> realChildIds = new ArrayList<>();
 
@@ -154,8 +135,10 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
             realChildIds.add(new DataBlockId(m_dataFormat, replacedChildId));
          }
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
-            genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(), locationProps,
-            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), null);
+            genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(),
+            genericDescription.getFixedByteOffsetInContainer(), genericDescription.getMinimumOccurrences(),
+            genericDescription.getMaximumOccurrences(), genericDescription.getMinimumByteLength(),
+            genericDescription.getMaximumByteLength(), null);
       }
 
       return m_dataBlockDescriptions.get(id);
@@ -269,7 +252,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    private void validateTopLevelMagicKeys() {
       for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
          DataBlockId dataBlockId = iterator.next();
-   
+
          if (getDataBlockDescription(dataBlockId).getHeaderMagicKeys().isEmpty()) {
             throw new IllegalArgumentException("Every lop-level container must define at least one magic key");
          }
@@ -279,10 +262,10 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    private void validateDefaultNestedContainerDefined(DataBlockId defaultNestedContainerId) {
       for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
          DataBlockId dataBlockId = iterator.next();
-   
+
          List<DataBlockDescription> descs = DataBlockDescription.getChildDescriptionsOfType(this, dataBlockId,
             PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
-   
+
          if (descs.size() > 0) {
             if (defaultNestedContainerId == null) {
                throw new IllegalArgumentException(
@@ -379,12 +362,13 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                      "Found variable size fields in front of or behind magic key field with id <" + fieldDesc.getId()
                         + ">: " + variableSizeFieldIds);
                }
-               
+
                if (fieldDesc.getMaximumByteLength() != fieldDesc.getMinimumByteLength()
                   || fieldDesc.getMaximumByteLength() == DataBlockDescription.UNKNOWN_SIZE) {
                   throw new IllegalArgumentException(
                      "Field that is tagged as magic key must have a fixed size, but min length = <"
-                        + fieldDesc.getMinimumByteLength() + ">, max length = <" + fieldDesc.getMaximumByteLength() + ">.");
+                        + fieldDesc.getMinimumByteLength() + ">, max length = <" + fieldDesc.getMaximumByteLength()
+                        + ">.");
                }
 
                if (type == PhysicalDataBlockType.FOOTER) {
@@ -411,15 +395,15 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
             }
          }
       }
-      
+
       Set<Long> distinctMagicKeyOffsets = magicKeys.stream().map(key -> key.getDeltaOffset())
          .collect(Collectors.toSet());
-   
+
       if (distinctMagicKeyOffsets.size() > 1) {
-         throw new IllegalArgumentException(
-            "Multiple <" + type + "> magic keys at different offsets specified for container id <" + containerDescription.getId()
-               + ">. At max one header or footer magic key field is allowed. Magic key fields found: "
-               + magicKeys.stream().map(key -> key.getFieldId()).collect(Collectors.toList()));
+         throw new IllegalArgumentException("Multiple <" + type
+            + "> magic keys at different offsets specified for container id <" + containerDescription.getId()
+            + ">. At max one header or footer magic key field is allowed. Magic key fields found: "
+            + magicKeys.stream().map(key -> key.getFieldId()).collect(Collectors.toList()));
       }
 
       return magicKeys;

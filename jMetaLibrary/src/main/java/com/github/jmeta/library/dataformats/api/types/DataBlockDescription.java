@@ -9,11 +9,8 @@ package com.github.jmeta.library.dataformats.api.types;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -23,6 +20,18 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public class DataBlockDescription {
+
+   public int getMinimumOccurrences() {
+      return minimumOccurrences;
+   }
+
+   public int getMaximumOccurrences() {
+      return maximumOccurrences;
+   }
+
+   public long getFixedByteOffsetInContainer() {
+      return fixedByteOffsetInContainer;
+   }
 
    /**
     * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
@@ -42,8 +51,6 @@ public class DataBlockDescription {
 
    private final FieldProperties<?> m_fieldProperties;
 
-   private final Map<DataBlockId, LocationProperties> m_locationProperties = new HashMap<>();
-
    private final long m_maximumByteLength;
 
    private final long m_minimumByteLength;
@@ -53,6 +60,10 @@ public class DataBlockDescription {
    private final List<MagicKey> m_footerMagicKeys = new ArrayList<>();
 
    private final DataBlockId m_overriddenId;
+
+   private final int minimumOccurrences;
+   private final int maximumOccurrences;
+   private final long fixedByteOffsetInContainer;
 
    /**
     * @param spec
@@ -124,15 +135,20 @@ public class DataBlockDescription {
     * @param physicalType
     * @param childIds
     * @param fieldProperties
-    * @param locationProperties
+    * @param fixedByteOffsetInContainer
+    *           TODO
+    * @param minimumOccurrences
+    *           TODO
+    * @param maximumOccurrences
+    *           TODO
     * @param minimumByteLength
     * @param maximumByteLength
     * @param overriddenId
     * @param childOrder
     */
    public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
-      List<DataBlockId> childIds, FieldProperties<?> fieldProperties,
-      Map<DataBlockId, LocationProperties> locationProperties, long minimumByteLength, long maximumByteLength,
+      List<DataBlockId> childIds, FieldProperties<?> fieldProperties, long fixedByteOffsetInContainer,
+      int minimumOccurrences, int maximumOccurrences, long minimumByteLength, long maximumByteLength,
       DataBlockId overriddenId) {
       Reject.ifNull(childIds, "childIds");
       Reject.ifNull(physicalType, "physicalType");
@@ -144,6 +160,9 @@ public class DataBlockDescription {
          && maximumByteLength != DataBlockDescription.UNKNOWN_SIZE)
          Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
 
+      this.fixedByteOffsetInContainer = fixedByteOffsetInContainer;
+      this.minimumOccurrences = minimumOccurrences;
+      this.maximumOccurrences = maximumOccurrences;
       m_id = id;
       m_name = name;
       m_specDescription = specDescription;
@@ -153,9 +172,6 @@ public class DataBlockDescription {
       m_minimumByteLength = minimumByteLength;
       m_maximumByteLength = maximumByteLength;
       m_overriddenId = overriddenId;
-
-      if (locationProperties != null)
-         m_locationProperties.putAll(locationProperties);
    }
 
    /**
@@ -204,26 +220,6 @@ public class DataBlockDescription {
    public FieldProperties<?> getFieldProperties() {
 
       return m_fieldProperties;
-   }
-
-   /**
-    * @return the parents for the location properties
-    */
-   public Set<DataBlockId> getAllParentsForLocationProperties() {
-
-      return Collections.unmodifiableSet(m_locationProperties.keySet());
-   }
-
-   /**
-    * @param parentId
-    * @return the {@link LocationProperties}
-    */
-   public LocationProperties getLocationPropertiesForParent(DataBlockId parentId) {
-
-      Reject.ifFalse(getAllParentsForLocationProperties().contains(parentId),
-         "getAllParentsForLocationProperties().contains(parentId)");
-
-      return m_locationProperties.get(parentId);
    }
 
    /**
@@ -280,8 +276,7 @@ public class DataBlockDescription {
 
       return getClass().getName() + "[" + "id=" + m_id + ", name=" + m_name + ", specDescription=" + m_specDescription
          + ", physicalType=" + m_physicalType + ", childIds=" + m_childIds + ", fieldProperties=" + m_fieldProperties
-         + ", locationProperties=" + m_locationProperties + ", maximumLength=" + m_maximumByteLength
-         + ", minimumLength=" + m_minimumByteLength + "]";
+         + ", maximumLength=" + m_maximumByteLength + ", minimumLength=" + m_minimumByteLength + "]";
    }
 
    /**

@@ -29,7 +29,6 @@ import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -115,41 +114,24 @@ public class Lyrics3v2Extension implements Extension {
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 
       // 1. Header id
-      final Map<DataBlockId, LocationProperties> headerIdLocationProps = new HashMap<>();
-
-      headerIdLocationProps.put(lyrics3V2HeaderId,
-         new LocationProperties(0, 1, 1));
-
       final List<DataBlockId> headerIdChildIds = new ArrayList<>();
 
       descMap.put(lyrics3V2HeaderMagicKeyId,
          new DataBlockDescription(lyrics3V2HeaderMagicKeyId, "Lyrics3v2 header id", "Lyrics3v2 header id",
-            PhysicalDataBlockType.FIELD, headerIdChildIds,
-            new FieldProperties<>(FieldType.STRING, LYRICS3v2_MAGIC_HEADER_STRING, null, null, null,
-               null, null, null, true),
-            headerIdLocationProps, HEADER_BYTE_LENGTH, HEADER_BYTE_LENGTH, null));
+            PhysicalDataBlockType.FIELD, headerIdChildIds, new FieldProperties<>(FieldType.STRING,
+               LYRICS3v2_MAGIC_HEADER_STRING, null, null, null, null, null, null, true),
+            0, 1, 1, HEADER_BYTE_LENGTH, HEADER_BYTE_LENGTH, null));
 
       // 2. The Lyrics3v2 header
-      final Map<DataBlockId, LocationProperties> headerLocationProps = new HashMap<>();
-
-      headerLocationProps.put(lyrics3V2TagId,
-         new LocationProperties(0, 1, 1));
-
       final List<DataBlockId> headerChildIds = new ArrayList<>();
 
       headerChildIds.add(lyrics3V2HeaderMagicKeyId);
 
       descMap.put(lyrics3V2HeaderId,
          new DataBlockDescription(lyrics3V2HeaderId, "Lyrics3v2 header", "The Lyrics3v2 header",
-            PhysicalDataBlockType.HEADER, headerChildIds, null, headerLocationProps, HEADER_BYTE_LENGTH,
-            HEADER_BYTE_LENGTH, null));
+            PhysicalDataBlockType.HEADER, headerChildIds, null, 0, 1, 1, HEADER_BYTE_LENGTH, HEADER_BYTE_LENGTH, null));
 
       // 3. Footer tag size
-      final Map<DataBlockId, LocationProperties> footerTagSizeLocationProps = new HashMap<>();
-
-      footerTagSizeLocationProps.put(lyrics3V2FooterId,
-         new LocationProperties(0, 1, 1));
-
       final List<DataBlockId> footerTagSizeChildIds = new ArrayList<>();
 
       List<FieldFunction> tagSizeFunctions = new ArrayList<>();
@@ -164,31 +146,22 @@ public class Lyrics3v2Extension implements Extension {
       descMap.put(lyrics3V2FooterSizeId,
          new DataBlockDescription(lyrics3V2FooterSizeId, "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size",
             PhysicalDataBlockType.FIELD, footerTagSizeChildIds,
-            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null,
-               null, null, tagSizeFunctions, false),
-            footerTagSizeLocationProps, FOOTER_SIZE_FIELD_LENGTH, FOOTER_SIZE_FIELD_LENGTH, null));
+            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null,
+               tagSizeFunctions, false),
+            0, 1, 1, FOOTER_SIZE_FIELD_LENGTH, FOOTER_SIZE_FIELD_LENGTH, null));
 
       // 4. Footer id
-      final Map<DataBlockId, LocationProperties> footerIdLocationProps = new HashMap<>();
-
-      footerIdLocationProps.put(lyrics3V2FooterId, new LocationProperties(FOOTER_SIZE_FIELD_LENGTH, 1, 1));
-
       final List<DataBlockId> footerIdChildIds = new ArrayList<>();
 
       descMap.put(lyrics3V2FooterMagicKeyId,
          new DataBlockDescription(lyrics3V2FooterMagicKeyId, "Lyrics3v2 footer id", "Lyrics3v2 footer id",
             PhysicalDataBlockType.FIELD, footerIdChildIds,
-            new FieldProperties<>(FieldType.STRING, LYRICS3v2_MAGIC_FOOTER_STRING, null, null,
-               null, null, null, null, true),
-            footerIdLocationProps, LYRICS3v2_MAGIC_FOOTER_STRING.length(), LYRICS3v2_MAGIC_FOOTER_STRING.length(),
-            null));
+            new FieldProperties<>(FieldType.STRING, LYRICS3v2_MAGIC_FOOTER_STRING, null, null, null, null, null, null,
+               true),
+            FOOTER_SIZE_FIELD_LENGTH, 1, 1, LYRICS3v2_MAGIC_FOOTER_STRING.length(),
+            LYRICS3v2_MAGIC_FOOTER_STRING.length(), null));
 
       // 5. The Lyrics3v2 footer
-      final Map<DataBlockId, LocationProperties> footerLocationProps = new HashMap<>();
-
-      footerLocationProps.put(lyrics3V2TagId,
-         new LocationProperties(0, 1, 1));
-
       final List<DataBlockId> footerChildIds = new ArrayList<>();
 
       footerChildIds.add(lyrics3V2FooterSizeId);
@@ -196,16 +169,9 @@ public class Lyrics3v2Extension implements Extension {
 
       descMap.put(lyrics3V2FooterId,
          new DataBlockDescription(lyrics3V2FooterId, "Lyrics3v2 footer", "The Lyrics3v2 footer",
-            PhysicalDataBlockType.FOOTER, footerChildIds, null, footerLocationProps, FOOTER_BYTE_LENGTH,
-            FOOTER_BYTE_LENGTH, null));
+            PhysicalDataBlockType.FOOTER, footerChildIds, null, 0, 1, 1, FOOTER_BYTE_LENGTH, FOOTER_BYTE_LENGTH, null));
 
       // 5. Field id
-      final Map<DataBlockId, LocationProperties> fieldIdLocationProps = new HashMap<>();
-
-      final LocationProperties itemKeyLocProps = new LocationProperties(0, 1, 1);
-      fieldIdLocationProps.put(lyrics3V2GenericFieldHeaderId, itemKeyLocProps);
-      fieldIdLocationProps.put(lyrics3V2GenericFieldId, itemKeyLocProps);
-
       final List<DataBlockId> fieldIdChildIds = new ArrayList<>();
 
       List<FieldFunction> fieldIdFunctions = new ArrayList<>();
@@ -219,15 +185,10 @@ public class Lyrics3v2Extension implements Extension {
       descMap.put(lyrics3V2GenericFieldHeaderIdId,
          new DataBlockDescription(lyrics3V2GenericFieldHeaderIdId, "Lyrics3v2 field id", "Lyrics3v2 field id",
             PhysicalDataBlockType.FIELD, fieldIdChildIds,
-            new FieldProperties<>(FieldType.STRING, null, null, null, null, null,
-               null, fieldIdFunctions, false),
-            fieldIdLocationProps, LYRICS3v2_FIELD_ID_SIZE, LYRICS3v2_FIELD_ID_SIZE, null));
+            new FieldProperties<>(FieldType.STRING, null, null, null, null, null, null, fieldIdFunctions, false), 0, 1,
+            1, LYRICS3v2_FIELD_ID_SIZE, LYRICS3v2_FIELD_ID_SIZE, null));
 
       // 6. Field size
-      final Map<DataBlockId, LocationProperties> fieldSizeLocationProps = new HashMap<>();
-
-      fieldSizeLocationProps.put(lyrics3V2GenericFieldHeaderId, new LocationProperties(LYRICS3v2_FIELD_ID_SIZE, 1, 1));
-
       final List<DataBlockId> fieldSizeChildIds = new ArrayList<>();
 
       List<FieldFunction> fieldSizeFunctions = new ArrayList<>();
@@ -241,80 +202,56 @@ public class Lyrics3v2Extension implements Extension {
       descMap.put(lyrics3V2GenericFieldHeaderSizeId,
          new DataBlockDescription(lyrics3V2GenericFieldHeaderSizeId, "Lyrics3v2 item value size",
             "Lyrics3v2 item value size", PhysicalDataBlockType.FIELD, fieldSizeChildIds,
-            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null,
-               null, null, fieldSizeFunctions, false),
-            fieldSizeLocationProps, LYRICS3v2_FIELD_SIZE_LENGTH, LYRICS3v2_FIELD_SIZE_LENGTH, null));
+            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null,
+               fieldSizeFunctions, false),
+            LYRICS3v2_FIELD_ID_SIZE, 1, 1, LYRICS3v2_FIELD_SIZE_LENGTH, LYRICS3v2_FIELD_SIZE_LENGTH, null));
 
       // 7. Field header
-      final Map<DataBlockId, LocationProperties> fieldHeaderLocationProps = new HashMap<>();
-
-      fieldHeaderLocationProps.put(lyrics3V2GenericFieldId,
-         new LocationProperties(0, 1, 1));
-
       final List<DataBlockId> fieldHeaderChildIds = new ArrayList<>();
       fieldHeaderChildIds.add(lyrics3V2GenericFieldHeaderIdId);
       fieldHeaderChildIds.add(lyrics3V2GenericFieldHeaderSizeId);
 
       descMap.put(lyrics3V2GenericFieldHeaderId,
          new DataBlockDescription(lyrics3V2GenericFieldHeaderId, "Lyrics3v2 field header", "The Lyrics3v2 field header",
-            PhysicalDataBlockType.HEADER, fieldHeaderChildIds, null, fieldHeaderLocationProps,
+            PhysicalDataBlockType.HEADER, fieldHeaderChildIds, null, 0, 1, 1,
             LYRICS3v2_FIELD_SIZE_LENGTH + LYRICS3v2_FIELD_ID_SIZE,
             LYRICS3v2_FIELD_SIZE_LENGTH + LYRICS3v2_FIELD_ID_SIZE, null));
 
       // 8. Field data
-      final Map<DataBlockId, LocationProperties> fieldDataLocationProps = new HashMap<>();
-
-      fieldDataLocationProps.put(lyrics3V2GenericFieldPayloadId,
-         new LocationProperties(LYRICS3v2_FIELD_SIZE_LENGTH + LYRICS3v2_FIELD_ID_SIZE, 1, 1));
-
       final List<DataBlockId> fieldDataChildIds = new ArrayList<>();
 
       descMap.put(lyrics3V2GenericFieldPayloadDataId,
          new DataBlockDescription(lyrics3V2GenericFieldPayloadDataId, "Lyrics3v2 field data", "Lyrics3v2 field data",
             PhysicalDataBlockType.FIELD, fieldDataChildIds,
-            new FieldProperties<>(FieldType.STRING, null, null, null, null,
-               null, null, null, false),
-            fieldDataLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null));
+            new FieldProperties<>(FieldType.STRING, null, null, null, null, null, null, null, false),
+            LYRICS3v2_FIELD_SIZE_LENGTH + LYRICS3v2_FIELD_ID_SIZE, 1, 1, 0, DataBlockDescription.UNKNOWN_SIZE, null));
 
       // 9. Lyrics3v2 field payload
-      final Map<DataBlockId, LocationProperties> fieldPayloadLocationProps = new HashMap<>();
-
-      fieldPayloadLocationProps.put(lyrics3V2GenericFieldId,
-         new LocationProperties(0, 1, 1));
-
       final List<DataBlockId> fieldPayloadChildIds = new ArrayList<>();
       fieldPayloadChildIds.add(lyrics3V2GenericFieldPayloadDataId);
 
       descMap.put(lyrics3V2GenericFieldPayloadId,
          new DataBlockDescription(lyrics3V2GenericFieldPayloadId, "Lyrics3v2 field payload",
-            "The Lyrics3v2 field payload", PhysicalDataBlockType.FIELD_BASED_PAYLOAD, fieldPayloadChildIds, null,
-            fieldPayloadLocationProps, 0, DataBlockDescription.UNKNOWN_SIZE, null));
+            "The Lyrics3v2 field payload", PhysicalDataBlockType.FIELD_BASED_PAYLOAD, fieldPayloadChildIds, null, 0, 1,
+            1, 0, DataBlockDescription.UNKNOWN_SIZE, null));
 
       // 10. Lyrics3v2 field
       final List<DataBlockId> fieldChildIds = new ArrayList<>();
       fieldChildIds.add(lyrics3V2GenericFieldHeaderId);
       fieldChildIds.add(lyrics3V2GenericFieldPayloadId);
 
-      final Map<DataBlockId, LocationProperties> fieldLocationProps = new HashMap<>();
-      fieldLocationProps.put(lyrics3V2PayloadId,
-         new LocationProperties(0, 1, 1));
-
       descMap.put(lyrics3V2GenericFieldId,
          new DataBlockDescription(lyrics3V2GenericFieldId, "Lyrics3v2 field", "The Lyrics3v2 field",
-            PhysicalDataBlockType.CONTAINER, fieldChildIds, null, fieldLocationProps, 1,
-            DataBlockDescription.UNKNOWN_SIZE, null));
+            PhysicalDataBlockType.CONTAINER, fieldChildIds, null, 0, 1, 1, 1, DataBlockDescription.UNKNOWN_SIZE, null));
 
       // 11. Lyrics3v2 payload
       final List<DataBlockId> payloadChildIds = new ArrayList<>();
 
       payloadChildIds.add(lyrics3V2GenericFieldId);
 
-      final Map<DataBlockId, LocationProperties> payloadLocationProps = new HashMap<>();
-      payloadLocationProps.put(lyrics3V2TagId, new LocationProperties(HEADER_BYTE_LENGTH, 1, 1));
-
       descMap.put(lyrics3V2PayloadId,
          new DataBlockDescription(lyrics3V2PayloadId, "Lyrics3v2 payload", "The Lyrics3v2 payload",
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 0,
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, null, HEADER_BYTE_LENGTH, 1, 1, 0,
             DataBlockDescription.UNKNOWN_SIZE, null));
 
       // 12. Lyrics3v2 tag
@@ -323,12 +260,9 @@ public class Lyrics3v2Extension implements Extension {
       tagChildIds.add(lyrics3V2PayloadId);
       tagChildIds.add(lyrics3V2FooterId);
 
-      final Map<DataBlockId, LocationProperties> tagLocationProps = new HashMap<>();
-      tagLocationProps.put(null, new LocationProperties(DataBlockDescription.UNKNOWN_SIZE, 1, 1));
-
       descMap.put(lyrics3V2TagId,
          new DataBlockDescription(lyrics3V2TagId, "Lyrics3v2 Tag", "The Lyrics3v2 Tag", PhysicalDataBlockType.CONTAINER,
-            tagChildIds, null, tagLocationProps, 4, DataBlockDescription.UNKNOWN_SIZE, null));
+            tagChildIds, null, DataBlockDescription.UNKNOWN_SIZE, 1, 1, 4, DataBlockDescription.UNKNOWN_SIZE, null));
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(lyrics3V2TagId);

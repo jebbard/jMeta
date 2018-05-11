@@ -14,7 +14,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -35,7 +34,6 @@ import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.LocationProperties;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
@@ -904,13 +902,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          final DataBlockDescription idFieldDesc = m_spec.getDataBlockDescription(idFieldId);
 
-         long byteOffset = DataBlockDescription.UNKNOWN_SIZE;
-
-         if (idFieldDesc.getAllParentsForLocationProperties().contains(id)) {
-            LocationProperties locProps = idFieldDesc.getLocationPropertiesForParent(id);
-
-            byteOffset = locProps.getByteOffset();
-         }
+         long byteOffset = idFieldDesc.getFixedByteOffsetInContainer();
 
          if (byteOffset == DataBlockDescription.UNKNOWN_SIZE)
             throw new IllegalStateException("For generic data block " + id
@@ -967,11 +959,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       int maxOccurrences = 0;
       int actualOccurrences = 0;
 
-      if (desc.getAllParentsForLocationProperties().contains(parentId)) {
-         LocationProperties location = desc.getLocationPropertiesForParent(parentId);
-         maxOccurrences = location.getMaxOccurrences();
-         minOccurrences = location.getMinOccurrences();
-      }
+      maxOccurrences = desc.getMaximumOccurrences();
+      minOccurrences = desc.getMinimumOccurrences();
 
       // Data block has fixed amount of mandatory occurrences
       if (minOccurrences == maxOccurrences)
@@ -1024,7 +1013,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
-         unknownFieldProperties, new HashMap<DataBlockId, LocationProperties>(), DataBlockDescription.UNKNOWN_SIZE,
+         unknownFieldProperties, 0, 1, 1, DataBlockDescription.UNKNOWN_SIZE,
          DataBlockDescription.UNKNOWN_SIZE, null);
    }
 
