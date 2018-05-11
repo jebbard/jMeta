@@ -1,6 +1,6 @@
 /**
  *
- * {@link StreamMediumStoreTest}.java
+ * {@link CachedStreamMediumStoreTest}.java
  *
  * @author Jens Ebert
  *
@@ -20,7 +20,7 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.exceptions.InvalidMediumOffsetException;
 import com.github.jmeta.library.media.api.helper.TestMedia;
-import com.github.jmeta.library.media.api.services.AbstractMediumStoreTest;
+import com.github.jmeta.library.media.api.services.AbstractCachedMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -28,10 +28,10 @@ import com.github.jmeta.library.media.impl.mediumAccessor.InputStreamMediumAcces
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 
 /**
- * {@link StreamMediumStoreTest} tests a {@link MediumStore} backed by {@link InputStreamMedium} instances with a
+ * {@link CachedStreamMediumStoreTest} tests a {@link MediumStore} backed by {@link InputStreamMedium} instances with a
  * cache.
  */
-public class StreamMediumStoreTest extends AbstractMediumStoreTest<InputStreamMedium> {
+public class CachedStreamMediumStoreTest extends AbstractCachedMediumStoreTest<InputStreamMedium> {
 
    private static final String STREAM_BASED_FILLED_MEDIUM_NAME = "Stream based filled medium";
    private static final String STREAM_BASED_EMPTY_MEDIUM_NAME = "Stream based empty medium";

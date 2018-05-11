@@ -1,6 +1,6 @@
 /**
  *
- * {@link StreamMediumStoreTest}.java
+ * {@link ReadOnlyStreamMediumStoreTest}.java
  *
  * @author Jens Ebert
  *
