@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
-import com.github.jmeta.library.media.impl.offset.StandardMediumOffsetTest;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**

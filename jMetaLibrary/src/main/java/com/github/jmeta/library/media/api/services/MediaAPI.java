@@ -10,7 +10,6 @@
 package com.github.jmeta.library.media.api.services;
 
 import com.github.jmeta.library.media.api.types.Medium;
-import com.github.jmeta.library.media.impl.StandardMediaAPI;
 
 /**
  * {@link MediaAPI} provides access to all functionality of the component Media.

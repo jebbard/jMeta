@@ -23,7 +23,6 @@ import com.github.jmeta.library.dataformats.api.types.Flags6ByteTest;
 import com.github.jmeta.library.dataformats.api.types.Flags7ByteTest;
 import com.github.jmeta.library.dataformats.api.types.Flags8ByteTest;
 import com.github.jmeta.library.dataformats.api.types.FlagsMultibitTest;
-import com.github.jmeta.library.media.impl.store.AllMediumStoreTests;
 
 /**
  * {@link AllDataFormatsTests} is used for running all test cases of the extension management component.

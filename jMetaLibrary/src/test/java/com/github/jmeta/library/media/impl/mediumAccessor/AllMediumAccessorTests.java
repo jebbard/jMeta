@@ -12,8 +12,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.github.jmeta.library.media.impl.store.AllMediumStoreTests;
-
 /**
  * {@link AllMediumAccessorTests} is used for running all test cases of the extension management component.
  */

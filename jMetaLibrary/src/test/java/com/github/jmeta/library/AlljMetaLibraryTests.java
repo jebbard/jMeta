@@ -14,7 +14,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.github.jmeta.library.dataformats.AllDataFormatsTests;
 import com.github.jmeta.library.media.AllMediaTests;
-import com.github.jmeta.library.media.impl.store.AllMediumStoreTests;
 import com.github.jmeta.library.startup.AllStartupTests;
 
 /**

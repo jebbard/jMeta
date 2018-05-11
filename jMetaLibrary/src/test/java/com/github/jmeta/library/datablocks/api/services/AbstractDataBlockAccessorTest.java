@@ -28,11 +28,13 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
+import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
 import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.impl.StandardMediaAPI;
 import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -155,8 +157,12 @@ public abstract class AbstractDataBlockAccessorTest {
     */
    @Test
    public void getContainerIterator_forWritableFileMediumWithSmallCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+
+      int maxCacheSizeToUse = 101;
+      resetMaxCacheSize(maxCacheSizeToUse);
+
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createFileMedium(getFileForMediaContents(), false, 101, 7));
+         createFileMedium(getFileForMediaContents(), false, maxCacheSizeToUse, 7));
    }
 
    /**
@@ -164,46 +170,39 @@ public abstract class AbstractDataBlockAccessorTest {
     */
    @Test
    public void getContainerIterator_forWritableFileMediumWithRidiculouslySmallCacheAndRWBSize_returnsExpectedContainersAndFields() {
+
+      int maxCacheSizeToUse = 1;
+      resetMaxCacheSize(maxCacheSizeToUse);
+
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createFileMedium(getFileForMediaContents(), false, 1, 1));
+         createFileMedium(getFileForMediaContents(), false, maxCacheSizeToUse, maxCacheSizeToUse));
    }
 
    /**
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
-   public void getContainerIterator_forReadOnlyInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+   public void getContainerIterator_forReadOnlyUncachedInMemoryMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createInMemoryMedium(getFileForMediaContents(), true, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-            Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+         createInMemoryMedium(getFileForMediaContents(), true, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
    }
 
    /**
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
-   public void getContainerIterator_forWritableInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+   public void getContainerIterator_forWritableUncachedInMemoryMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-            Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+         createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
    }
 
    /**
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
-   public void getContainerIterator_forWritableInMemoryMediumWithDefaultCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+   public void getContainerIterator_forWritableUncachedInMemoryMediumWithSmallRWBSize_returnsExpectedContainersAndFields() {
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, 10));
-   }
-
-   /**
-    * Tests {@link DataBlockAccessor#getContainerIterator}.
-    */
-   @Test
-   public void getContainerIterator_forWritableInMemoryMediumWithSmallCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
-      assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createInMemoryMedium(getFileForMediaContents(), false, 101, 7));
+         createInMemoryMedium(getFileForMediaContents(), false, 10));
    }
 
    // TODO: Currently assertion fails for Multi MP3 file (expects Lyrics Tag as next container, but EOM is wrongly
@@ -276,8 +275,12 @@ public abstract class AbstractDataBlockAccessorTest {
     */
    @Test
    public void getReverseContainerIterator_forWritableFileMediumWithSmallCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+
+      int maxCacheSizeToUse = 101;
+      resetMaxCacheSize(maxCacheSizeToUse);
+
       assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createFileMedium(getFileForMediaContents(), false, 101, 7));
+         createFileMedium(getFileForMediaContents(), false, maxCacheSizeToUse, 7));
    }
 
    /**
@@ -285,37 +288,39 @@ public abstract class AbstractDataBlockAccessorTest {
     */
    @Test
    public void getReverseContainerIterator_forWritableFileMediumWithRidiculouslySmallCacheAndRWBSize_returnsExpectedContainersAndFields() {
+
+      int maxCacheSizeToUse = 1;
+      resetMaxCacheSize(maxCacheSizeToUse);
+
       assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createFileMedium(getFileForMediaContents(), false, 1, 1));
+         createFileMedium(getFileForMediaContents(), false, maxCacheSizeToUse, maxCacheSizeToUse));
    }
 
    /**
     * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
     */
    @Test
-   public void getReverseContainerIterator_forReadOnlyInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+   public void getReverseContainerIterator_forReadOnlyUncachedInMemoryMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
       assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createInMemoryMedium(getFileForMediaContents(), true, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-            Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+         createInMemoryMedium(getFileForMediaContents(), true, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
    }
 
    /**
     * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
     */
    @Test
-   public void getReverseContainerIterator_forWritableInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+   public void getReverseContainerIterator_forWritableUncachedInMemoryMediumWithDefaultRWBSize_returnsExpectedContainersAndFields() {
       assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-            Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+         createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
    }
 
    /**
     * Tests {@link DataBlockAccessor#getReverseContainerIterator}.
     */
    @Test
-   public void getReverseContainerIterator_forWritableInMemoryMediumWithDefaultCacheAndSmallRWBSize_returnsExpectedContainersAndFields() {
+   public void getReverseContainerIterator_forWritableUncachedInMemoryMediumWithSmallRWBSize_returnsExpectedContainersAndFields() {
       assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
-         createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, 10));
+         createInMemoryMedium(getFileForMediaContents(), false, 10));
    }
 
    /**
@@ -362,6 +367,12 @@ public abstract class AbstractDataBlockAccessorTest {
       return testling;
    }
 
+   private void resetMaxCacheSize(long maxCacheSizeToUse) {
+      MediaAPI mediaAPI = ComponentRegistry.lookupService(MediaAPI.class);
+
+      ((StandardMediaAPI) mediaAPI).setMinimumCacheSize(maxCacheSizeToUse);
+   }
+
    /**
     * Checks the given {@link Path} for plausibility.
     * 
@@ -385,12 +396,11 @@ public abstract class AbstractDataBlockAccessorTest {
    /**
     * Creates an {@link InMemoryMedium}.
     */
-   private Medium<?> createInMemoryMedium(Path baseFile, boolean isReadOnly, long maxCacheSize,
-      int maxReadWriteBlockSize) {
+   private Medium<?> createInMemoryMedium(Path baseFile, boolean isReadOnly, int maxReadWriteBlockSize) {
 
       byte[] byteContent = MediaTestUtility.readFileContent(baseFile);
 
-      return new InMemoryMedium(byteContent, "TestMemMedium", isReadOnly, maxCacheSize, maxReadWriteBlockSize);
+      return new InMemoryMedium(byteContent, "TestMemMedium", isReadOnly, maxReadWriteBlockSize);
    }
 
    /**

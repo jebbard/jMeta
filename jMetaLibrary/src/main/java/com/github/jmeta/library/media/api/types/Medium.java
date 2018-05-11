@@ -19,6 +19,7 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  * <li>Random-access media have a current length in bytes, stream-based media have {@link #UNKNOWN_LENGTH}</li>
  * <li>Has a human-readable name</li>
  * <li>Has a wrapped underlying {@link Medium} object</li>
+ * <li>Requires to be backed by a cache or not</li>
  * </ul>
  * 
  * In addition, there are several configuration values that can be used to configure the {@link Medium} for later access
@@ -47,11 +48,6 @@ public interface Medium<T> {
     * for more details.
     */
    public static long DEFAULT_MAX_CACHE_SIZE_IN_BYTES = 1_048_576L;
-
-   /**
-    * The minimum cache size in bytes. See {@link #getMaxCacheSizeInBytes()} for more details.
-    */
-   public static long MIN_CACHE_SIZE_IN_BYTES = 65_536L;
 
    /**
     * Returns whether this {@link Medium} supports random-access or not.
@@ -90,19 +86,19 @@ public interface Medium<T> {
 
    /**
     * Returns the currently configured maximum read-write block size. This essentially influences the behavior of medium
-    * access, i.e. how often it is done and what the maximum number of bytes read from or written to the medium at once.
-    * There are two aspects to it: First of all, you want to read as much bytes as possible at once, on the other hand
-    * this size should not get too big to ensure you are not wasting too much heap, especially for temporary "garbage"
-    * reads that occur e.g. during flushing. Second, you want this size to be bigger than the usual header sizes.
-    * Headers play a very important role when processing data formats. You do not want to read multiple times to get
-    * headers into memory. So choose a size that is bigger than the headers you need.
+    * access, i.e. how often it is done and what the maximum number of bytes read from or written to the medium at once
+    * is. There are two aspects to it: First of all, you want to read as much bytes as possible at once, on the other
+    * hand this size should not get too big to ensure you are not wasting too much heap, especially for temporary
+    * "garbage" reads that occur e.g. during flushing. Second, you want this size to be bigger than the usual header
+    * sizes. Headers play a very important role when processing data formats. You do not want to read multiple times to
+    * get headers into memory. So choose a size that is bigger than the headers you need.
     * 
     * The read-write block size is used at several places:
     * <ol>
     * <li>When reading bytes during {@link MediumStore#getData(MediumOffset, int)} or
     * {@link MediumStore#cache(MediumOffset, int)}, at max this number of bytes is read at once. Thus a chunk-wise read
     * is done in case more bytes need to be read from the medium.</li>
-    * <li>It is also used as the maximum size of cache segments created during
+    * <li>It is also used as the maximum size of cache regions created during
     * {@link MediumStore#getData(MediumOffset, int)} or {@link MediumStore#cache(MediumOffset, int)} for a cached
     * medium.</li>
     * <li>When the need arises to read and write bytes before a written change in the medium during
@@ -119,18 +115,25 @@ public interface Medium<T> {
    public int getMaxReadWriteBlockSizeInBytes();
 
    /**
-    * Returns the currently configured maximum cache size in bytes. This value is used when data read from the
-    * {@link Medium} is stored in an internal cache by an {@link MediumStore}. The cache must not exceed this size, if
-    * it does, cached data is automatically freed. In detail, the cached data read the longest time ago is freed first
-    * to ensure the new cache size is again below the maximum configured size. This size must be bigger than the
-    * currently configured maximum cache region size in bytes. Furthermore it must be bigger than the minimum cache size
-    * {@link #MIN_CACHE_SIZE_IN_BYTES}.
+    * Returns the currently configured maximum cache size in bytes. The cache must not exceed this size, if it does,
+    * cached data is automatically freed. In detail, the cached data read the longest time ago is freed first to ensure
+    * the new cache size is again below the maximum configured size. This size must be bigger than 0 and bigger than the
+    * currently configured maximum cache region size in bytes. If this medium does not require caching, i.e.
+    * {@link #requiresCaching()} returns false, this configuration parameter has no meaning and is ignored.
     * 
-    * The default value if it is not explicitly set is {@link #DEFAULT_MAX_CACHE_SIZE_IN_BYTES}.
+    * The default value, if caching is enabled and if it is not explicitly set is
+    * {@link #DEFAULT_MAX_CACHE_SIZE_IN_BYTES}.
     * 
     * @return the currently configured maximum cache size in bytes
     */
    public long getMaxCacheSizeInBytes();
+
+   /**
+    * Tells whether this {@link Medium} requires to be backed by a cache or not
+    * 
+    * @return the {@link Medium} needs to be backed by a cache (true) or not (false)
+    */
+   public boolean requiresCaching();
 
    /**
     * @see java.lang.Object#equals(java.lang.Object)

@@ -122,33 +122,6 @@ public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium>
       memory = bufferToChange;
       getMedium().setBytes(bufferToChange);
 
-      //
-      // final int numberOfBytesToWrite = buffer.remaining();
-      //
-      // final byte[] bytesToWrite = new byte[numberOfBytesToWrite];
-      //
-      // buffer.get(bytesToWrite);
-      //
-      // // Note: setCurrentPosition prevents offsets bigger than Integert.MAX_VALUE
-      // int absoluteMediumOffset = (int) getCurrentPosition().getAbsoluteMediumOffset();
-      //
-      // if (buffer.remaining() + absoluteMediumOffset > memory.remaining()) {
-      // ByteBuffer newMemory = ByteBuffer.allocate(buffer.remaining() + absoluteMediumOffset);
-      //
-      // newMemory.put(memory);
-      // }
-      //
-      // if (absoluteMediumOffset + bytesToWrite.length >= memory.length) {
-      // byte[] finalMediumBytes = new byte[absoluteMediumOffset + bytesToWrite.length];
-      // System.arraycopy(memory, 0, finalMediumBytes, 0, memory.length);
-      // memory = finalMediumBytes;
-      // getMedium().setBytes(finalMediumBytes);
-      // }
-      //
-      // System.arraycopy(bytesToWrite, 0, memory, absoluteMediumOffset, numberOfBytesToWrite);
-      //
-      // buffer.position(buffer.limit());
-
       updateCurrentPosition(getCurrentPosition().advance(numberOfBytesToWrite));
    }
 

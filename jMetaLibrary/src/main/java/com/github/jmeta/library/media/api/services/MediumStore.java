@@ -49,6 +49,11 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 public interface MediumStore {
 
    /**
+    * The minimum cache size in bytes, if the medium requires caching.
+    */
+   public static long MIN_CACHE_SIZE_IN_BYTES = 65_536L;
+
+   /**
     * Tells whether this {@link MediumStore} is opened (true) or already closed (false). On a closed {@link MediumStore}
     * , all access methods cannot be used anymore and will throw a {@link MediumStoreClosedException}.
     * 

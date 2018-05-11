@@ -49,13 +49,13 @@ public class InputStreamMedium extends AbstractMedium<InputStream> {
     * @param name
     *           A name of the {@link InputStream} to be able to identify it. Optional, null may be passed
     * @param maxCacheSizeInBytes
-    *           see #getMaxCacheSizeInBytes(), must be bigger than {@link Medium#MIN_CACHE_SIZE_IN_BYTES}
+    *           see #getMaxCacheSizeInBytes(), must be bigger than 0
     * @param maxReadWriteBlockSizeInBytes
     *           see #getMaxReadWriteBlockSizeInBytes()
     */
    public InputStreamMedium(InputStream medium, String name, long maxCacheSizeInBytes,
       int maxReadWriteBlockSizeInBytes) {
-      super(medium, name, false, true, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
+      super(medium, name, false, true, true, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
    }
 
    /**

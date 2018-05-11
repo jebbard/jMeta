@@ -41,6 +41,19 @@ public class StandardMediaAPI implements MediaAPI {
       SUPORTED_MEDIA_CLASSES.add(InputStreamMedium.class);
    }
 
+   private long minimumCacheSize = MediumStore.MIN_CACHE_SIZE_IN_BYTES;
+
+   /**
+    * Allows test cases to manipulate the minimum cache size to even smaller values than
+    * {@link MediumStore#MIN_CACHE_SIZE_IN_BYTES} (the default).
+    * 
+    * @param minumumCacheSize
+    *           The new minimum cache size to set.
+    */
+   public void setMinimumCacheSize(long minumumCacheSize) {
+      this.minimumCacheSize = minumumCacheSize;
+   }
+
    /**
     * @see com.github.jmeta.library.media.api.services.MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)
     */
@@ -63,14 +76,21 @@ public class StandardMediaAPI implements MediaAPI {
 
       MediumOffsetFactory offsetFactory = new MediumOffsetFactory(medium);
 
-      long maxCacheSizeToUse = medium.getMaxCacheSizeInBytes();
+      long maxCacheSizeToUse = 0;
+      int maxReadWriteBlockSizeToUse = 0;
 
-      if (maxCacheSizeToUse == 0) {
-         maxCacheSizeToUse = medium.getMaxReadWriteBlockSizeInBytes();
+      if (medium.requiresCaching()) {
+         maxCacheSizeToUse = medium.getMaxCacheSizeInBytes();
+         maxReadWriteBlockSizeToUse = medium.getMaxReadWriteBlockSizeInBytes();
+
+         if (maxCacheSizeToUse < this.minimumCacheSize) {
+            throw new IllegalArgumentException("Invalid maximum cache size <" + maxCacheSizeToUse
+               + ">given, it must be at least <" + minimumCacheSize + "> bytes.");
+         }
       }
 
       return new StandardMediumStore<>(mediumAccessor,
-         new MediumCache(medium, maxCacheSizeToUse, medium.getMaxReadWriteBlockSizeInBytes()), offsetFactory,
+         new MediumCache(medium, maxCacheSizeToUse, maxReadWriteBlockSizeToUse), offsetFactory,
          new MediumChangeManager(offsetFactory));
    }
 }
