@@ -84,32 +84,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       validateTopLevelMagicKeys();
    }
 
-   private void validateTopLevelMagicKeys() {
-      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
-         DataBlockId dataBlockId = iterator.next();
-
-         if (getDataBlockDescription(dataBlockId).getHeaderMagicKeys().isEmpty()) {
-            throw new IllegalArgumentException("Every lop-level container must define at least one magic key");
-         }
-      }
-   }
-
-   private void validateDefaultNestedContainerDefined(DataBlockId defaultNestedContainerId) {
-      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
-         DataBlockId dataBlockId = iterator.next();
-
-         List<DataBlockDescription> descs = DataBlockDescription.getChildDescriptionsOfType(this, dataBlockId,
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
-
-         if (descs.size() > 0) {
-            if (defaultNestedContainerId == null) {
-               throw new IllegalArgumentException(
-                  "Each data format with nested containers must define a default nested container");
-            }
-         }
-      }
-   }
-
    @Override
    public DataBlockDescription getDefaultNestedContainerDescription() {
 
@@ -292,6 +266,32 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       return null;
    }
 
+   private void validateTopLevelMagicKeys() {
+      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
+         DataBlockId dataBlockId = iterator.next();
+   
+         if (getDataBlockDescription(dataBlockId).getHeaderMagicKeys().isEmpty()) {
+            throw new IllegalArgumentException("Every lop-level container must define at least one magic key");
+         }
+      }
+   }
+
+   private void validateDefaultNestedContainerDefined(DataBlockId defaultNestedContainerId) {
+      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
+         DataBlockId dataBlockId = iterator.next();
+   
+         List<DataBlockDescription> descs = DataBlockDescription.getChildDescriptionsOfType(this, dataBlockId,
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+   
+         if (descs.size() > 0) {
+            if (defaultNestedContainerId == null) {
+               throw new IllegalArgumentException(
+                  "Each data format with nested containers must define a default nested container");
+            }
+         }
+      }
+   }
+
    private void initGenericIdPatterns(Set<DataBlockId> genericDataBlocks) {
 
       for (Iterator<DataBlockId> iterator = genericDataBlocks.iterator(); iterator.hasNext();) {
@@ -379,6 +379,13 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                      "Found variable size fields in front of or behind magic key field with id <" + fieldDesc.getId()
                         + ">: " + variableSizeFieldIds);
                }
+               
+               if (fieldDesc.getMaximumByteLength() != fieldDesc.getMinimumByteLength()
+                  || fieldDesc.getMaximumByteLength() == DataBlockDescription.UNKNOWN_SIZE) {
+                  throw new IllegalArgumentException(
+                     "Field that is tagged as magic key must have a fixed size, but min length = <"
+                        + fieldDesc.getMinimumByteLength() + ">, max length = <" + fieldDesc.getMaximumByteLength() + ">.");
+               }
 
                if (type == PhysicalDataBlockType.FOOTER) {
                   magicKeyOffset -= fieldDesc.getMinimumByteLength();
@@ -403,6 +410,16 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                }
             }
          }
+      }
+      
+      Set<Long> distinctMagicKeyOffsets = magicKeys.stream().map(key -> key.getDeltaOffset())
+         .collect(Collectors.toSet());
+   
+      if (distinctMagicKeyOffsets.size() > 1) {
+         throw new IllegalArgumentException(
+            "Multiple <" + type + "> magic keys at different offsets specified for container id <" + containerDescription.getId()
+               + ">. At max one header or footer magic key field is allowed. Magic key fields found: "
+               + magicKeys.stream().map(key -> key.getFieldId()).collect(Collectors.toList()));
       }
 
       return magicKeys;

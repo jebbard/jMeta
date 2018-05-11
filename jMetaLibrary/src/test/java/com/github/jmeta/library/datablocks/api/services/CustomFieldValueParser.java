@@ -9,7 +9,7 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  * {@link CustomFieldValueParser} represents a class that can parse a fields expected value from a given string and
  * convert it to an arbitrary data type.
  *
- * This is necessary for field types {@link FieldType#ENUMERATED} and {@link FieldType#ANY}.
+ * This is necessary for field type {@link FieldType#ENUMERATED}.
  */
 public interface CustomFieldValueParser {
 

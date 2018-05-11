@@ -767,16 +767,16 @@ public class StandardDataBlockReader implements DataBlockReader {
          }
 
          if (actualBlockSize == DataBlockDescription.UNKNOWN_SIZE) {
-            byte[] terminationBytes = fieldDesc.getFieldProperties().getTerminationBytes();
             final Character terminationCharacter = fieldDesc.getFieldProperties().getTerminationCharacter();
 
             // Determine termination bytes from termination character
-            if (terminationCharacter != null)
-               terminationBytes = Charsets.getBytesWithoutBOM(new String("" + terminationCharacter), characterEncoding);
+            if (terminationCharacter != null) {
+               byte[] terminationBytes = Charsets.getBytesWithoutBOM(new String("" + terminationCharacter),
+                  characterEncoding);
 
-            if (terminationBytes != null)
                actualBlockSize = getSizeUpToTerminationBytes(reference, byteOrder, terminationBytes,
                   remainingDirectParentByteCount);
+            }
          }
       }
 
@@ -1020,8 +1020,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataFormatSpecification.UNKNOWN_FIELD_ID);
 
       FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
-         null, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null, null, null, null, null, null,
-         null, null, false);
+         null, null, null, null, null, false);
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),

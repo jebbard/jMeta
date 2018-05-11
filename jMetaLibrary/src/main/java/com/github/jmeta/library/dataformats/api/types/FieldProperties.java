@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.jmeta.utility.dbc.api.services.Reject;
-
 /**
  * {@link FieldProperties}
  *
@@ -30,13 +28,7 @@ public class FieldProperties<T> {
     * @param fieldType
     * @param defaultValue
     * @param enumeratedValues
-    * @param terminationBytes
-    * @param minimumCharacterLength
-    * @param maximumCharacterLength
     * @param terminationCharacter
-    * @param patterns
-    * @param minimumValue
-    * @param maximumValue
     * @param flagSpecification
     * @param fixedCharset
     * @param fixedByteOrder
@@ -45,24 +37,14 @@ public class FieldProperties<T> {
     *           TODO
     */
    public FieldProperties(FieldType<?> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
-      byte[] terminationBytes, long minimumCharacterLength, long maximumCharacterLength, Character terminationCharacter,
-      List<String> patterns, T minimumValue, T maximumValue, FlagSpecification flagSpecification, Charset fixedCharset,
+      Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
       ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey) {
       // TODO writeConcept001: Is default value a mandatory property for a FieldProperties<> instance?
       // Reject.ifNull(defaultValue, "defaultValue");
 
-      Reject.ifFalse(minimumCharacterLength <= maximumCharacterLength,
-         "minimumCharacterLength <= maximumCharacterLength");
-
       m_fieldType = fieldType;
       m_defaultValue = defaultValue;
-      m_terminationBytes = terminationBytes;
-      m_minimumCharacterLength = minimumCharacterLength;
-      m_maximumCharacterLength = maximumCharacterLength;
       m_terminationCharacter = terminationCharacter;
-      m_patterns = patterns;
-      m_minimumValue = minimumValue;
-      m_maximumValue = maximumValue;
       m_flagSpecification = flagSpecification;
       m_fixedCharset = fixedCharset;
       m_fixedByteOrder = fixedByteOrder;
@@ -73,65 +55,6 @@ public class FieldProperties<T> {
 
       if (enumeratedValues != null)
          m_enumeratedValues.putAll(enumeratedValues);
-
-      if (isMagicKey) {
-         validateMagicKeyPreconditions();
-      }
-   }
-
-   /**
-    * 
-    */
-   private void validateMagicKeyPreconditions() {
-      if (getMaximumCharacterLength() != getMinimumCharacterLength()
-         || getMinimumCharacterLength() == DataBlockDescription.UNKNOWN_SIZE) {
-         throw new IllegalArgumentException(
-            "Found field that is tagged as magic key must have a fixed size, but min length = <"
-               + getMinimumCharacterLength() + ">, max length = <" + getMaximumCharacterLength() + ">.");
-      }
-
-      if (m_fieldType != FieldType.STRING && m_fieldType != FieldType.BINARY && m_fieldType != FieldType.ENUMERATED) {
-         throw new IllegalArgumentException(
-            "A field that is tagged as magic key must have a field type of STRING, BINARY or ENUMERATED");
-      }
-
-      if (m_fieldType == FieldType.ENUMERATED) {
-         Class<? extends Object> enumeratedKeyClass = m_enumeratedValues.keySet().iterator().next().getClass();
-         if (!String.class.isAssignableFrom(enumeratedKeyClass) || !byte[].class.isAssignableFrom(enumeratedKeyClass)) {
-            throw new IllegalArgumentException(
-               "A field that is tagged as magic key and of an enumerated type must have an enumerated string or byte array type");
-         }
-      }
-   }
-
-   /**
-    * Returns terminationBytes
-    *
-    * @return terminationBytes
-    */
-   public byte[] getTerminationBytes() {
-
-      return m_terminationBytes;
-   }
-
-   /**
-    * Returns maximumCharacterLength
-    *
-    * @return maximumCharacterLength
-    */
-   public long getMaximumCharacterLength() {
-
-      return m_maximumCharacterLength;
-   }
-
-   /**
-    * Returns minimumCharacterLength
-    *
-    * @return minimumCharacterLength
-    */
-   public long getMinimumCharacterLength() {
-
-      return m_minimumCharacterLength;
    }
 
    /**
@@ -171,33 +94,6 @@ public class FieldProperties<T> {
    }
 
    /**
-    * @return the patterns
-    */
-   public List<String> getPatterns() {
-
-      if (m_patterns == null)
-         return null;
-
-      return Collections.unmodifiableList(m_patterns);
-   }
-
-   /**
-    * @return the minimum value
-    */
-   public T getMinimumValue() {
-
-      return m_minimumValue;
-   }
-
-   /**
-    * @return the maximum value
-    */
-   public T getMaximumValue() {
-
-      return m_maximumValue;
-   }
-
-   /**
     * @return the {@link FlagSpecification}
     */
    public FlagSpecification getFlagSpecification() {
@@ -234,32 +130,29 @@ public class FieldProperties<T> {
    }
 
    /**
+    * Returns the attribute {@link #isMagicKey}.
+    * 
+    * @return the attribute {@link #isMagicKey}
+    */
+   public boolean isMagicKey() {
+      return isMagicKey;
+   }
+
+   /**
     * @see java.lang.Object#toString()
     */
    @Override
    public String toString() {
 
-      return getClass().getName() + "[" + ", termination=" + m_terminationBytes + ", defaultValue=" + m_defaultValue
+      return getClass().getName() + "[" + ", termination=" + m_terminationCharacter + ", defaultValue=" + m_defaultValue
          + ", enumeratedValues=" + m_enumeratedValues + ", blockFunction=" + m_functions + "]";
    }
-
-   private final byte[] m_terminationBytes;
-
-   private final long m_maximumCharacterLength;
-
-   private final long m_minimumCharacterLength;
 
    private final Character m_terminationCharacter;
 
    private final T m_defaultValue;
 
    private final Map<T, byte[]> m_enumeratedValues = new HashMap<>();
-
-   private final List<String> m_patterns;
-
-   private final T m_minimumValue;
-
-   private final T m_maximumValue;
 
    private final FlagSpecification m_flagSpecification;
 
@@ -270,15 +163,6 @@ public class FieldProperties<T> {
    private final ByteOrder m_fixedByteOrder;
 
    private final List<FieldFunction> m_functions = new ArrayList<>();
-
-   /**
-    * Returns the attribute {@link #isMagicKey}.
-    * 
-    * @return the attribute {@link #isMagicKey}
-    */
-   public boolean isMagicKey() {
-      return isMagicKey;
-   }
 
    private final boolean isMagicKey;
 }

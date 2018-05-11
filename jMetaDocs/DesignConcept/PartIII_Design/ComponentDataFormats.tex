@@ -397,12 +397,6 @@ Now we already mentioned in \DesLink{dd:513} that there is ``usually'' only a si
 If a \texttt{CONTAINER\_BASED\_PAYLOAD} might contain different types of containers in arbitrary order, how is a parser able to tell which generic container type he is handling currently? This is all based on magic keys and described in \SectionLink{sec:MagicKeys}.
 
 % =======================================================================================================
-\subsection{Inheriting and Overriding Datablock Structures}%
-\label{sec:InheritingandOverridingDatablockStructures}%
-
-TODO
-
-% =======================================================================================================
 \subsection{Data Format Identification and Magic Keys}%
 \label{sec:MagicKeys}%
 
@@ -763,25 +757,66 @@ No disadvantages known
 %%%% <-- DD %%%%
 
 % =======================================================================================================
-\subsection{Header and Footer Properties}%
-\label{sec:HeaderProperties}%
+\subsection{Inheriting and Overriding Datablock Structures}%
+\label{sec:InheritingandOverridingDatablockStructures}%
+
+TODO
 
 
 % =======================================================================================================
-\subsection{Container Properties}%
-\label{sec:ContainerProperties}%
-
-
-% =======================================================================================================
-\subsection{Payload Properties}%
-\label{sec:PayloadProperties}%
-
-
-% =======================================================================================================
-\subsection{Sizes}%
+\subsection{Occurrences and Sizes}%
 \label{sec:Sizes}%
 
-In \DesLink{dd:521} and the follow-up discussion, we already noted that Lyrics3v2 is somewhat special in terms of how to determine its payload size: It cannot be done before parsing it. Instead, it is only known to end when the footer's magic key is found. Thus it is kind of ``terminated''. In a first design, this was handled by some kind of special magic keys, so-called ``exclusion keys'' that where defined to state ``if you find this key, a container of the current type IS NOT present''. However, we decided to redesign this to be less odd:
+In this section, we discuss the topics of how often does a data block occur, and how long is it?
+
+The ``how often'' (occurrences) part is treated as follows:
+%%%% DD --> %%%%
+\DD{dd:529a}
+{% Title
+\texttt{DataBlockDescription} contains minimum and maximum occurrences
+}
+{% Short description
+For every data block, its \texttt{DataBlockDescription} can specify the number of occurrences by giving its minimum and maximum occurrences. The rules:
+\begin{itemize}
+\item Either both are null, or both are set to ``unlimited occurrences'', or minimum occurrences is set to a positive number (including zero) and maximum occurrences is set to ``unlimited occurrences'', or both are set to a positive number (including zero)
+\item If both are set, minimum occurrences must be smaller or equal compared to maximum occurrences
+\end{itemize}
+}
+{% Rationale
+A few formats have fields whose occurrence count instead of their length is given: Vorbis comment (number of user comments), APEv2 (number of items, in addition to size), Ogg (number of segments, which is equal to size, as each segment has one byte as length).
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+ 
+For the size of a data block, we have basically three possibilities:
+\begin{itemize}
+\item The data block has a constant, fixed size which is always the same. Most fields have this property, but also static format containers such as ID3v1. 
+\item The data block is a variable-size field and it is terminated, see \SectionLink{sec:FieldProperties} for more details about this case. This leads to variable-size headers, footers, payload and containers that have a variable size because one of their fields is a variable-size field.
+\item The data block size is dynamically determined by a previously read field value or a combination of such field values. This case is further detailed in section \SectionLink{sec:FieldFunctions}.
+\end{itemize}
+
+For each case, we need the following:
+%%%% DD --> %%%%
+\DD{dd:529b}
+{% Title
+\texttt{DataBlockDescription} contains minimum and maximum byte length
+}
+{% Short description
+\texttt{DataBlockDescription} allows to set a minimum and maximum length of the data block in bytes. Either both are null (meaning: ``unknown length''), or the minimum length is set to a positive number (bigger than zero!) and the maximum length is set to ``unknown length'', or both are non-null and set to a positive number (bigger than zero), where the maximum length must be equal to or bigger than the minimum length.
+
+The fixed size case is covered by setting both to the same value. Differing values have no specific influence for the parser, but can be later used for format validation of a chunk of bytes. If not set or the values differ, this is a signal that the data block is either terminated or its size needs to be determined dynamically using other field values.
+}
+{% Rationale
+\LibName{} needs to be able to reflect both static sizes as well as dynamic sizes, and to be future-proof, it is also good to have differeng min and max sizes given for data format validation.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+We just cover one additional special case here: In \DesLink{dd:521} and the follow-up discussion, we already noted that Lyrics3v2 is somewhat special in terms of how to determine its payload size: It cannot be done before parsing it. Instead, it is only known to end when the footer's magic key is found. Thus it is kind of ``terminated''. In a first design, this was handled by some kind of special magic keys, so-called ``exclusion keys'' that where defined to state ``if you find this key, a container of the current type IS NOT present''. However, we decided to redesign this to be less odd:
 
 %%%% DD --> %%%%
 \DD{dd:550}
@@ -799,15 +834,170 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+% =======================================================================================================
+\subsection{Field Properties}%
+\label{sec:FieldProperties}%
+
+Now we look into properties that are specific to data blocks of type \texttt{FIELD}. Here, we cover other properties specific to fields. However, we do not cover the details of how field conversion (interpreted value to binary value and vice versa) is working and how some special cases of field interpretation are handled. This is a topic for the \COMPdataPartManagement{} component. 
+
+We already covered sizes of data blocks (including fields) and we already defined one property of a field: It might be a magic key field, see \DesLink{dd:528}. The fields are the leafs of the data block hierarchy, thus, ultimately, they represent concrete values. While we could decide to treat them only as raw bytes, this is counter-productive as it would make parsing less convenient. Thus we define:
+%%%% DD --> %%%%
+\DD{dd:530}
+{% Title
+Fields have one of the types binary, string, numeric, enumerated or flags
+}
+{% Short description
+Every field has a field type, and thus not only a \textbf{binary value}, but also an \textbf{interpreted value}. The field types are:
+\begin{itemize}
+\item \textbf{String:} The field's value is representing a string in a specific encoding.
+\item \textbf{Binary:} The field's value is not further interpreted, i.e. the interpreted value is identical to the binary value of the field. I.e. this could be used to represent raw encoded bytes of a codec.
+\item \textbf{Numeric:} The field's value is representing a numeric value with a specific byte order.
+\item \textbf{Enumerated:} The field's value must be one out of a fixed set of values; the interpreted value is allowed to have an arbitrary type, but the field's specification must provide a static map of all allowed byte values (keys) mapped to their interpreted values.
+\item \textbf{Flags:} The field's value is representing flags, i.e. a set of bit toggles, e.g. vital for parsing. 
+\end{itemize}
+}
+{% Rationale
+Parsers can directly read the interpreted values of the fields they need for parsing (e.g. sizes, flags or others) without needing to implement conversion to an interpreted value themselves. Interpretation should be kept inside the format specific code - in this case in the data format specification.
+
+All of the field types of our reference data formats can be covered by these types. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+First, we will care about the string fields:
+%%%% DD --> %%%%
+\DD{dd:531}
+{% Title
+String fields support termination characters and fixed character encoding as specific properties
+}
+{% Short description
+A non-fixed-size string field can be terminated by a single termination character given in the field's character encoding known at parsing time. Second, a string field might have a fixed character encoding to be used. Both are optional properties.  
+}
+{% Rationale
+String fields can be terminated by termination characters, this is needed e.g. in ID3v1 and ID3v23 data formats, where the actual number of termination bytes depends on the current character encoding. Thus, it is best to define a termination character and then decide at parsing time, which bytes according to the current character encoding are expected as termination bytes. See also \DesLink{dd:532}.
+
+Some specifications define fixed character encodings for specific string fields that might deviate from the data format's default character encoding.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+What about binary fields? Basically, they do not need any additional properties, but we want to make one thing clear about termination:
+%%%% DD --> %%%%
+\DD{dd:532}
+{% Title
+Binary fields do not support termination bytes
+}
+{% Short description
+While string fields can define a fixed termination character, binary fields do not support termination bytes. 
+}
+{% Rationale
+The reason is simple: Within our reference formats, there is no single case where a terminated field exists that is not a string field. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Numeric fields require a byte order such that their numeric value can be interpreted:
+%%%% DD --> %%%%
+\DD{dd:533}
+{% Title
+Numeric fields support a fixed byte order
+}
+{% Short description
+Numeric fields define a fixed byte order to use during conversion. It is an optional property.
+}
+{% Rationale
+To be convertible into a numeric value, the parsers need to have information about a byte order to use.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+For enumerate fields, we define the following:
+%%%% DD --> %%%%
+\DD{dd:534}
+{% Title
+Enumerated fields require a static mapping of allowed enumerated values
+}
+{% Short description
+Every enumerated field must define a static map of all enumerated values that are allowed for the field. The mapping contains an interpreted value as key and maps it to its byte representation. Not only the keys must be (of course) unique, but also the values.
+}
+{% Rationale
+This is the nature of enumerations.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+For flags, it would be convenient to describe them in particular, e.g. which flags are there, where are they and what is their meaning. Thus we introduce a new class:
+%%%% DD --> %%%%
+\DD{dd:535}
+{% Title
+Flag fields require an instance of \texttt{FlagSpecification} that describes all flags in a flags field
+}
+{% Short description
+The class \texttt{FlagSpecification} describes a flags field having following properties:
+\begin{itemize}
+\item The fixed byte length of the flags field
+\item The positions (byte and bit adress) and unique names of flags together with their specification descriptions 
+\item A byte order
+\end{itemize}
+
+It also supports multi-bit-flags.
+}
+{% Rationale
+It is more convenient to access the flags, in contrast to doing bitwise OR and AND yourself.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Finally, some fields - no matter what type - have always the same static value. We join this requirement with the notion of a default value, i.e. a value to be preferred when it is not known which would be the right value of a field.
+%%%% DD --> %%%%
+\DD{dd:536}
+{% Title
+Each field has an optional default (interpreted) value
+}
+{% Short description
+Each field has an optional default (interpreted) value.
+}
+{% Rationale
+The default values are needed for fields with fixed values, and might be used to fill field values in cases where they are unknown.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% =======================================================================================================
+\subsection{Field Functions}%
+\label{sec:FieldFunctions}%
 
 
 
 
 
+% =======================================================================================================
+\subsection{Header and Footer Properties}%
+\label{sec:HeaderProperties}%
 
 
+% =======================================================================================================
+\subsection{Container Properties}%
+\label{sec:ContainerProperties}%
 
 
+% =======================================================================================================
+\subsection{Payload Properties}%
+\label{sec:PayloadProperties}%
 
 
 %###############################################################################################

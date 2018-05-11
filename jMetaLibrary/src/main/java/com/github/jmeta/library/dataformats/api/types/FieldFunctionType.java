@@ -39,11 +39,6 @@ public class FieldFunctionType<T> {
    /**
     *
     */
-   public static final FieldFunctionType<byte[]> CRC_32_OF = new FieldFunctionType<>("CRC_32_OF");
-
-   /**
-    *
-    */
    public static final FieldFunctionType<Charset> CHARACTER_ENCODING_OF = new FieldFunctionType<>(
       "CHARACTER_ENCODING_OF");
 

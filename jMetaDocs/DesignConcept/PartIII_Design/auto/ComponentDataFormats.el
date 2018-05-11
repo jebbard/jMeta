@@ -9,11 +9,13 @@
     "sec:RepresentingaDataFormat"
     "sec:DatablockProperties"
     "sec:ConcreteandGenericContainers"
-    "sec:InheritingandOverridingDatablockStructures"
     "sec:MagicKeys"
     "tab:magicKeys"
+    "sec:InheritingandOverridingDatablockStructures"
+    "sec:Sizes"
+    "sec:FieldProperties"
+    "sec:FieldFunctions"
     "sec:HeaderProperties"
     "sec:ContainerProperties"
-    "sec:PayloadProperties"
-    "sec:Sizes")))
+    "sec:PayloadProperties")))
 

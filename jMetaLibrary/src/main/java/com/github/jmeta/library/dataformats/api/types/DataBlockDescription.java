@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -245,16 +244,12 @@ public class DataBlockDescription {
       Reject.ifNull(magicKey, "magicKey");
 
       m_headerMagicKeys.add(magicKey);
-
-      validateMagicKeys(m_headerMagicKeys, PhysicalDataBlockType.HEADER);
    }
 
    public void addFooterMagicKey(MagicKey magicKey) {
       Reject.ifNull(magicKey, "magicKey");
 
       m_footerMagicKeys.add(magicKey);
-
-      validateMagicKeys(m_footerMagicKeys, PhysicalDataBlockType.FOOTER);
    }
 
    /**
@@ -326,26 +321,8 @@ public class DataBlockDescription {
     * @return the overridden id
     */
    public DataBlockId getOverriddenId() {
-   
-      return m_overriddenId;
-   }
 
-   /**
-    * @param magicKeys
-    * @param header
-    */
-   private void validateMagicKeys(List<MagicKey> magicKeys, PhysicalDataBlockType type) {
-   
-      Set<Long> distinctMagicKeyOffsets = magicKeys.stream().map(key -> key.getDeltaOffset())
-         .collect(Collectors.toSet());
-   
-      if (distinctMagicKeyOffsets.size() > 1) {
-         throw new IllegalArgumentException(
-            "Multiple <" + type + "> magic keys at different offsets specified for container id <" + getId()
-               + ">. At max one header or footer magic key field is allowed. Magic key fields found: "
-               + magicKeys.stream().map(key -> key.getFieldId()).collect(Collectors.toList()));
-      }
-   
+      return m_overriddenId;
    }
 
 }

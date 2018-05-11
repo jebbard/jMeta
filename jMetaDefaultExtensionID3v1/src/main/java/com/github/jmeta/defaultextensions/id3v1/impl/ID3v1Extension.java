@@ -110,11 +110,11 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> titleLocationProps = new HashMap<>();
       titleLocationProps.put(id3v1PayloadId,
-         new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(0, 1, 1));
       descMap.put(titleId,
          new DataBlockDescription(titleId, "title", "The ID3v1 title", PhysicalDataBlockType.FIELD, titleChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 30,
-               nullCharacter, null, null, null, null, null, null, new ArrayList<>(), false),
+            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter,
+               null, null, null, new ArrayList<>(), false),
             titleLocationProps, 30, 30, null));
 
       // 2. artist
@@ -122,12 +122,12 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> artistLocationProps = new HashMap<>();
       artistLocationProps.put(id3v1PayloadId,
-         new LocationProperties(30, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(30, 1, 1));
 
       descMap.put(artistId,
          new DataBlockDescription(artistId, "artist", "The ID3v1 artist", PhysicalDataBlockType.FIELD, artistChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 30,
-               nullCharacter, null, null, null, null, null, null, new ArrayList<>(), false),
+            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter,
+               null, null, null, new ArrayList<>(), false),
             artistLocationProps, 30, 30, null));
 
       // 3. album
@@ -135,12 +135,12 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> albumLocationProps = new HashMap<>();
       albumLocationProps.put(id3v1PayloadId,
-         new LocationProperties(60, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(60, 1, 1));
 
       descMap.put(albumId,
          new DataBlockDescription(albumId, "album", "The ID3v1 album", PhysicalDataBlockType.FIELD, albumChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 30,
-               nullCharacter, null, null, null, null, null, null, new ArrayList<>(), false),
+            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter,
+               null, null, null, new ArrayList<>(), false),
             albumLocationProps, 30, 30, null));
 
       // 4. year
@@ -148,12 +148,12 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> yearLocationProps = new HashMap<>();
       yearLocationProps.put(id3v1PayloadId,
-         new LocationProperties(90, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(90, 1, 1));
 
       descMap.put(yearId,
          new DataBlockDescription(yearId, "year", "The ID3v1 year", PhysicalDataBlockType.FIELD, yearChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 4,
-               nullCharacter, null, null, null, null, null, null, new ArrayList<>(), false),
+            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter,
+               null, null, null, new ArrayList<>(), false),
             yearLocationProps, 4, 4, null));
 
       // 5. comment
@@ -161,13 +161,13 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> commentLocationProps = new HashMap<>();
       commentLocationProps.put(id3v1PayloadId,
-         new LocationProperties(94, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(94, 1, 1));
 
       descMap.put(commentId,
          new DataBlockDescription(commentId, "comment", "The ID3v1 comment", PhysicalDataBlockType.FIELD,
             commentChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, new byte[] { nullCharacter }, 0, 28,
-               nullCharacter, null, null, null, null, null, null, new ArrayList<>(), false),
+            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter,
+               null, null, null, new ArrayList<>(), false),
             commentLocationProps, 28, 28, null));
 
       // 6. track indicator
@@ -175,13 +175,13 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> trackIndicatorLocationProps = new HashMap<>();
       trackIndicatorLocationProps.put(id3v1PayloadId,
-         new LocationProperties(122, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(122, 1, 1));
 
       descMap.put(trackIndicatorId,
          new DataBlockDescription(trackIndicatorId, "track indicator", "The ID3v1 track indicator",
             PhysicalDataBlockType.FIELD, trackIndicatorChildIds,
-            new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null, new byte[] { nullCharacter }, 1, 1,
-               null, null, null, null, null, null, null, new ArrayList<>(), false),
+            new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null,
+               null, null, null, null, new ArrayList<>(), false),
             trackIndicatorLocationProps, 1, 1, null));
 
       // 7. track
@@ -189,12 +189,13 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> trackLocationProps = new HashMap<>();
       trackLocationProps.put(id3v1PayloadId,
-         new LocationProperties(123, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(123, 1, 1));
 
       descMap.put(trackId,
          new DataBlockDescription(trackId, "track indicator", "The ID3v1 track", PhysicalDataBlockType.FIELD,
-            trackChildIds, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null,
-               new byte[] { nullCharacter }, 1, 1, null, null, null, null, null, null, null, new ArrayList<>(), false),
+            trackChildIds,
+            new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null,
+               null, null, null, null, new ArrayList<>(), false),
             trackLocationProps, 1, 1, null));
 
       // 8. genre
@@ -202,7 +203,7 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> genreLocationProps = new HashMap<>();
       genreLocationProps.put(id3v1PayloadId,
-         new LocationProperties(124, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(124, 1, 1));
 
       final Map<String, byte[]> enumeratedGenres = new HashMap<>();
 
@@ -210,11 +211,11 @@ public class ID3v1Extension implements Extension {
       enumeratedGenres.put("Gabber", new byte[] { 99 });
       enumeratedGenres.put("Jazz", new byte[] { 2 });
 
-      descMap.put(genreId, new DataBlockDescription(genreId, "genre", "The ID3v1 genre", PhysicalDataBlockType.FIELD,
-         genreChildIds,
-         new FieldProperties<>(FieldType.ENUMERATED, "" + nullCharacter, enumeratedGenres, new byte[] { nullCharacter },
-            0, 1, nullCharacter, null, null, null, null, null, null, new ArrayList<>(), false),
-         genreLocationProps, 1, 1, null));
+      descMap.put(genreId,
+         new DataBlockDescription(genreId, "genre", "The ID3v1 genre", PhysicalDataBlockType.FIELD, genreChildIds,
+            new FieldProperties<>(FieldType.ENUMERATED, "" + nullCharacter, enumeratedGenres,
+               nullCharacter, null, null, null, new ArrayList<>(), false),
+            genreLocationProps, 1, 1, null));
 
       // 9. tag id
       final List<DataBlockId> headerIdChildIds = new ArrayList<>();
@@ -225,19 +226,19 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> idLocationProps = new HashMap<>();
       idLocationProps.put(id3v1HeaderId,
-         new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(0, 1, 1));
 
       descMap.put(id3v1TagHeaderId,
          new DataBlockDescription(id3v1TagHeaderId, "ID3v1 tag header id", "The ID3v1 tag header id",
             PhysicalDataBlockType.FIELD, headerIdChildIds, new FieldProperties<>(FieldType.STRING, ID3V1_TAG_ID_STRING,
-               tagIdEnumerated, null, 3, 3, null, null, null, null, null, null, null, new ArrayList<>(), true),
+               tagIdEnumerated, null, null, null, null, new ArrayList<>(), true),
             idLocationProps, 3, 3, null));
 
       // 10. ID3v1 header
       final Map<DataBlockId, LocationProperties> headerLocationProps = new HashMap<>();
 
       headerLocationProps.put(id3v1TagId,
-         new LocationProperties(0, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(0, 1, 1));
 
       final List<DataBlockId> headerChildIds = new ArrayList<>();
       headerChildIds.add(id3v1TagHeaderId);
@@ -259,7 +260,7 @@ public class ID3v1Extension implements Extension {
 
       final Map<DataBlockId, LocationProperties> payloadLocationProps = new HashMap<>();
       payloadLocationProps.put(id3v1TagId,
-         new LocationProperties(3, 1, 1, DataBlockDescription.UNKNOWN_SIZE, new ArrayList<>(), new ArrayList<>()));
+         new LocationProperties(3, 1, 1));
 
       descMap.put(id3v1PayloadId, new DataBlockDescription(id3v1PayloadId, "payload", "The ID3v1 payload",
          PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, payloadLocationProps, 125, 125, null));
@@ -271,8 +272,7 @@ public class ID3v1Extension implements Extension {
       tagChildIds.add(id3v1PayloadId);
 
       final Map<DataBlockId, LocationProperties> tagLocationProps = new HashMap<>();
-      tagLocationProps.put(null, new LocationProperties(-id3v1TagLength, 1, 1, DataBlockDescription.UNKNOWN_SIZE,
-         new ArrayList<>(), new ArrayList<>()));
+      tagLocationProps.put(null, new LocationProperties(-id3v1TagLength, 1, 1));
 
       descMap.put(id3v1TagId, new DataBlockDescription(id3v1TagId, "ID3v1 tag", "The ID3v1 tag",
          PhysicalDataBlockType.CONTAINER, tagChildIds, null, tagLocationProps, 128, 128, null));

@@ -47,11 +47,6 @@ public class FieldType<T> {
       return id;
    }
 
-   /**
-    *
-    */
-   public static final FieldType<?> ANY = new FieldType<>("ANY");
-
    private final String id;
 
    /**

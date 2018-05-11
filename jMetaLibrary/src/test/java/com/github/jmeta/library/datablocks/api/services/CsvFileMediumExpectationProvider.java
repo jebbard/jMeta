@@ -569,18 +569,6 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
                      customFieldValueParsers.get(id).parse(expInterpretedFieldValueString));
             }
          }
-
-         // Enumerated fields are either charsets, byte orders or arbitrary typed
-         else if (fieldProps.getFieldType().equals(FieldType.ANY)) {
-            // If no custom parser for the expected field value is registered,
-            // take the read string as expected value
-            if (!customFieldValueParsers.containsKey(id))
-               expectedFieldInterpretedValues.put(instanceId, expInterpretedFieldValueString);
-
-            else
-               expectedFieldInterpretedValues.put(instanceId,
-                  customFieldValueParsers.get(id).parse(expInterpretedFieldValueString));
-         }
       }
    }
 
