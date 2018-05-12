@@ -81,6 +81,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       autoDetectMagicKeys(m_topLevelDataBlockIds);
 
       validateTopLevelMagicKeys();
+
+      calculateContainerFieldsFixedByteOffsets(m_topLevelDataBlockIds);
    }
 
    @Override
@@ -136,9 +138,9 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          }
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
             genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(),
-            genericDescription.getFixedByteOffsetInContainer(), genericDescription.getMinimumOccurrences(),
-            genericDescription.getMaximumOccurrences(), genericDescription.getMinimumByteLength(),
-            genericDescription.getMaximumByteLength(), null);
+            genericDescription.getMinimumOccurrences(), genericDescription.getMaximumOccurrences(),
+            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(),
+            null);
       }
 
       return m_dataBlockDescriptions.get(id);
@@ -322,6 +324,56 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       }
    }
 
+   private void calculateContainerFieldsFixedByteOffsets(Set<DataBlockId> containerIds) {
+      for (DataBlockId containerId : containerIds) {
+         DataBlockDescription containerDescription = getDataBlockDescription(containerId);
+
+         List<DataBlockDescription> parentsWithFields = new ArrayList<>();
+
+         parentsWithFields.addAll(DataBlockDescription.getChildDescriptionsOfType(this, containerDescription.getId(),
+            PhysicalDataBlockType.HEADER));
+         parentsWithFields.addAll(DataBlockDescription.getChildDescriptionsOfType(this, containerDescription.getId(),
+            PhysicalDataBlockType.FOOTER));
+         parentsWithFields.addAll(DataBlockDescription.getChildDescriptionsOfType(this, containerDescription.getId(),
+            PhysicalDataBlockType.FIELD_BASED_PAYLOAD));
+
+         setFieldsFixedByteOffsets(parentsWithFields);
+
+         List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(this, containerId,
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+
+         if (payloadDescs.size() == 1) {
+            List<DataBlockDescription> childContainerDescriptions = DataBlockDescription
+               .getChildDescriptionsOfType(this, payloadDescs.get(0).getId(), PhysicalDataBlockType.CONTAINER);
+
+            calculateContainerFieldsFixedByteOffsets(
+               childContainerDescriptions.stream().map(cd -> cd.getId()).collect(Collectors.toSet()));
+         }
+      }
+   }
+
+   /**
+    * @param parentsWithFields
+    */
+   private void setFieldsFixedByteOffsets(List<DataBlockDescription> parentsWithFields) {
+      long currentOffset = 0;
+
+      for (DataBlockDescription parentDesc : parentsWithFields) {
+         List<DataBlockDescription> fieldDescs = DataBlockDescription.getChildDescriptionsOfType(this,
+            parentDesc.getId(), PhysicalDataBlockType.FIELD);
+
+         for (DataBlockDescription fieldDesc : fieldDescs) {
+            fieldDesc.setFixedByteOffsetInContainer(currentOffset);
+
+            if (fieldDesc.hasFixedSize()) {
+               currentOffset += fieldDesc.getMaximumByteLength();
+            } else {
+               currentOffset = DataBlockDescription.UNKNOWN_OFFSET;
+            }
+         }
+      }
+   }
+
    /**
     * @param containerDescription
     * @param header
@@ -352,7 +404,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
          for (DataBlockDescription fieldDesc : fieldDescs) {
 
-            if (fieldDesc.getMaximumByteLength() != fieldDesc.getMinimumByteLength()) {
+            if (!fieldDesc.hasFixedSize()) {
                variableSizeFieldIds.add(fieldDesc.getId());
             }
 
@@ -363,8 +415,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                         + ">: " + variableSizeFieldIds);
                }
 
-               if (fieldDesc.getMaximumByteLength() != fieldDesc.getMinimumByteLength()
-                  || fieldDesc.getMaximumByteLength() == DataBlockDescription.UNKNOWN_SIZE) {
+               if (!fieldDesc.hasFixedSize() || fieldDesc.getMaximumByteLength() == DataBlockDescription.UNKNOWN_SIZE) {
                   throw new IllegalArgumentException(
                      "Field that is tagged as magic key must have a fixed size, but min length = <"
                         + fieldDesc.getMinimumByteLength() + ">, max length = <" + fieldDesc.getMaximumByteLength()

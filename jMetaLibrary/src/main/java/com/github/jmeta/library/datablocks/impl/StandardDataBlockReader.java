@@ -302,8 +302,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         long staticLength = (footerDesc.getMaximumByteLength() == footerDesc.getMinimumByteLength())
-            ? footerDesc.getMaximumByteLength()
+         long staticLength = footerDesc.hasFixedSize() ? footerDesc.getMaximumByteLength()
             : DataBlockDescription.UNKNOWN_SIZE;
 
          nextReference = nextReference.advance(-staticLength);
@@ -431,8 +430,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       // headers
       int actualOccurrences = determineActualOccurrences(parentId, desc, context);
 
-      long staticLength = (desc.getMaximumByteLength() == desc.getMinimumByteLength()) ? desc.getMaximumByteLength()
-         : DataBlockDescription.UNKNOWN_SIZE;
+      long staticLength = desc.hasFixedSize() ? desc.getMaximumByteLength() : DataBlockDescription.UNKNOWN_SIZE;
 
       // Read all header occurrences
       for (int i = 0; i < actualOccurrences; i++) {
@@ -660,7 +658,7 @@ public class StandardDataBlockReader implements DataBlockReader {
             DataBlockDescription headerOrFooterDesc = headerAndFooterDescs.get(i);
 
             if (context.hasFieldFunction(headerOrFooterDesc.getId(), FieldFunctionType.SIZE_OF)) {
-               if (headerOrFooterDesc.getMinimumByteLength() != headerOrFooterDesc.getMaximumByteLength())
+               if (!headerOrFooterDesc.hasFixedSize())
                   return DataBlockDescription.UNKNOWN_SIZE;
 
                int actualOccurrences = determineActualOccurrences(parentId, headerOrFooterDesc, context);
@@ -718,7 +716,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       long actualBlockSize = DataBlockDescription.UNKNOWN_SIZE;
 
       // Payload has a dynamic size which is determined by further context information
-      if (payloadDesc.getMinimumByteLength() != payloadDesc.getMaximumByteLength()) {
+      if (!payloadDesc.hasFixedSize()) {
          // Search for a SIZE_OF function, i.e. the size of the current payload is
          // determined by the value of a field already read before
          if (context.hasFieldFunction(payloadDesc.getId(), FieldFunctionType.SIZE_OF))
@@ -750,7 +748,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       long actualBlockSize = DataBlockDescription.UNKNOWN_SIZE;
 
       // Field has a dynamic size which is determined by further context information
-      if (fieldDesc.getMinimumByteLength() != fieldDesc.getMaximumByteLength()) {
+      if (!fieldDesc.hasFixedSize()) {
          // Search for a SIZE_OF function, i.e. the size of the current field is
          // determined by the value of a field already read before
          if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.SIZE_OF))
@@ -1013,8 +1011,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
-         unknownFieldProperties, 0, 1, 1, DataBlockDescription.UNKNOWN_SIZE,
-         DataBlockDescription.UNKNOWN_SIZE, null);
+         unknownFieldProperties, 1, 1, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null);
    }
 
    private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {

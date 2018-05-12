@@ -33,11 +33,18 @@ public class DataBlockDescription {
       return fixedByteOffsetInContainer;
    }
 
+   public boolean hasFixedSize() {
+      return getMaximumByteLength() == getMinimumByteLength();
+   }
+
+   public final static long UNLIMITED = Long.MAX_VALUE;
+
    /**
     * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
     * {@link DataBlock#getTotalSize()}.
     */
    public final static long UNKNOWN_SIZE = -1;
+   public final static long UNKNOWN_OFFSET = -1;
 
    private final DataBlockId m_id;
 
@@ -63,7 +70,11 @@ public class DataBlockDescription {
 
    private final int minimumOccurrences;
    private final int maximumOccurrences;
-   private final long fixedByteOffsetInContainer;
+   private long fixedByteOffsetInContainer;
+
+   public void setFixedByteOffsetInContainer(long fixedByteOffsetInContainer) {
+      this.fixedByteOffsetInContainer = fixedByteOffsetInContainer;
+   }
 
    /**
     * @param spec
@@ -135,8 +146,6 @@ public class DataBlockDescription {
     * @param physicalType
     * @param childIds
     * @param fieldProperties
-    * @param fixedByteOffsetInContainer
-    *           TODO
     * @param minimumOccurrences
     *           TODO
     * @param maximumOccurrences
@@ -147,20 +156,19 @@ public class DataBlockDescription {
     * @param childOrder
     */
    public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
-      List<DataBlockId> childIds, FieldProperties<?> fieldProperties, long fixedByteOffsetInContainer,
-      int minimumOccurrences, int maximumOccurrences, long minimumByteLength, long maximumByteLength,
-      DataBlockId overriddenId) {
+      List<DataBlockId> childIds, FieldProperties<?> fieldProperties, int minimumOccurrences, int maximumOccurrences,
+      long minimumByteLength, long maximumByteLength, DataBlockId overriddenId) {
       Reject.ifNull(childIds, "childIds");
       Reject.ifNull(physicalType, "physicalType");
       Reject.ifNull(specDescription, "specDescription");
       Reject.ifNull(name, "name");
       Reject.ifNull(id, "id");
 
-      if (minimumByteLength != DataBlockDescription.UNKNOWN_SIZE
-         && maximumByteLength != DataBlockDescription.UNKNOWN_SIZE)
-         Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
+      Reject.ifNegative(minimumByteLength, "minimumByteLength");
+      Reject.ifNegative(maximumByteLength, "maximumByteLength");
+      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
+      Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
 
-      this.fixedByteOffsetInContainer = fixedByteOffsetInContainer;
       this.minimumOccurrences = minimumOccurrences;
       this.maximumOccurrences = maximumOccurrences;
       m_id = id;

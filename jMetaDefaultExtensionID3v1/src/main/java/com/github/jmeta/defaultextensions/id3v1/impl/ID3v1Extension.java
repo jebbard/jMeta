@@ -110,7 +110,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(titleId, "title", "The ID3v1 title", PhysicalDataBlockType.FIELD, titleChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
                new ArrayList<>(), false),
-            0, 1, 1, 30, 30, null));
+            1, 1, 30, 30, null));
 
       // 2. artist
       final List<DataBlockId> artistChildIds = new ArrayList<>();
@@ -119,7 +119,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(artistId, "artist", "The ID3v1 artist", PhysicalDataBlockType.FIELD, artistChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
                new ArrayList<>(), false),
-            30, 1, 1, 30, 30, null));
+            1, 1, 30, 30, null));
 
       // 3. album
       final List<DataBlockId> albumChildIds = new ArrayList<>();
@@ -128,7 +128,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(albumId, "album", "The ID3v1 album", PhysicalDataBlockType.FIELD, albumChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
                new ArrayList<>(), false),
-            60, 1, 1, 30, 30, null));
+            1, 1, 30, 30, null));
 
       // 4. year
       final List<DataBlockId> yearChildIds = new ArrayList<>();
@@ -137,7 +137,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(yearId, "year", "The ID3v1 year", PhysicalDataBlockType.FIELD, yearChildIds,
             new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
                new ArrayList<>(), false),
-            90, 1, 1, 4, 4, null));
+            1, 1, 4, 4, null));
 
       // 5. comment
       final List<DataBlockId> commentChildIds = new ArrayList<>();
@@ -146,7 +146,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(commentId, "comment", "The ID3v1 comment", PhysicalDataBlockType.FIELD,
             commentChildIds, new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null,
                null, null, new ArrayList<>(), false),
-            94, 1, 1, 28, 28, null));
+            1, 1, 28, 28, null));
 
       // 6. track indicator
       final List<DataBlockId> trackIndicatorChildIds = new ArrayList<>();
@@ -155,7 +155,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(trackIndicatorId, "track indicator", "The ID3v1 track indicator",
             PhysicalDataBlockType.FIELD, trackIndicatorChildIds, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER,
                (long) 0, null, null, null, null, null, new ArrayList<>(), false),
-            122, 1, 1, 1, 1, null));
+            1, 1, 1, 1, null));
 
       // 7. track
       final List<DataBlockId> trackChildIds = new ArrayList<>();
@@ -164,7 +164,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(trackId, "track indicator", "The ID3v1 track", PhysicalDataBlockType.FIELD,
             trackChildIds, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null, null, null, null,
                null, new ArrayList<>(), false),
-            123, 1, 1, 1, 1, null));
+            1, 1, 1, 1, null));
 
       // 8. genre
       final List<DataBlockId> genreChildIds = new ArrayList<>();
@@ -179,7 +179,7 @@ public class ID3v1Extension implements Extension {
          new DataBlockDescription(genreId, "genre", "The ID3v1 genre", PhysicalDataBlockType.FIELD, genreChildIds,
             new FieldProperties<>(FieldType.ENUMERATED, "" + nullCharacter, enumeratedGenres, nullCharacter, null, null,
                null, new ArrayList<>(), false),
-            124, 1, 1, 1, 1, null));
+            1, 1, 1, 1, null));
 
       // 9. tag id
       final List<DataBlockId> headerIdChildIds = new ArrayList<>();
@@ -193,14 +193,14 @@ public class ID3v1Extension implements Extension {
             new DataBlockDescription(id3v1TagHeaderId, "ID3v1 tag header id", "The ID3v1 tag header id",
                PhysicalDataBlockType.FIELD, headerIdChildIds, new FieldProperties<>(FieldType.STRING,
                   ID3V1_TAG_ID_STRING, tagIdEnumerated, null, null, null, null, new ArrayList<>(), true),
-               0, 1, 1, 3, 3, null));
+               1, 1, 3, 3, null));
 
       // 10. ID3v1 header
       final List<DataBlockId> headerChildIds = new ArrayList<>();
       headerChildIds.add(id3v1TagHeaderId);
 
       descMap.put(id3v1HeaderId, new DataBlockDescription(id3v1HeaderId, "ID3v1 tag header", "The ID3v1 tag header",
-         PhysicalDataBlockType.HEADER, headerChildIds, null, 0, 1, 1, 3, 3, null));
+         PhysicalDataBlockType.HEADER, headerChildIds, null, 1, 1, 3, 3, null));
 
       // 11. ID3v1 payload
       final List<DataBlockId> payloadChildIds = new ArrayList<>();
@@ -215,7 +215,7 @@ public class ID3v1Extension implements Extension {
       payloadChildIds.add(genreId);
 
       descMap.put(id3v1PayloadId, new DataBlockDescription(id3v1PayloadId, "payload", "The ID3v1 payload",
-         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, 3, 1, 1, 125, 125, null));
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, 1, 1, 125, 125, null));
 
       // 12. ID3v1 tag
 
@@ -224,7 +224,7 @@ public class ID3v1Extension implements Extension {
       tagChildIds.add(id3v1PayloadId);
 
       descMap.put(id3v1TagId, new DataBlockDescription(id3v1TagId, "ID3v1 tag", "The ID3v1 tag",
-         PhysicalDataBlockType.CONTAINER, tagChildIds, null, -id3v1TagLength, 1, 1, 128, 128, null));
+         PhysicalDataBlockType.CONTAINER, tagChildIds, null, 1, 1, 128, 128, null));
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(id3v1TagId);

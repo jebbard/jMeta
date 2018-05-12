@@ -778,7 +778,7 @@ The ``how often'' (occurrences) part is treated as follows:
 {% Short description
 For every data block, its \texttt{DataBlockDescription} can specify the number of occurrences by giving its minimum and maximum occurrences. The rules:
 \begin{itemize}
-\item Either both are null, or both are set to ``unlimited occurrences'', or minimum occurrences is set to a positive number (including zero) and maximum occurrences is set to ``unlimited occurrences'', or both are set to a positive number (including zero)
+\item Either both are set to ``unlimited occurrences'', or minimum occurrences is set to a positive number (including zero) and maximum occurrences is set to ``unlimited occurrences'', or both are set to a positive number (including zero)
 \item If both are set, minimum occurrences must be smaller or equal compared to maximum occurrences
 \end{itemize}
 }
@@ -804,7 +804,7 @@ For each case, we need the following:
 \texttt{DataBlockDescription} contains minimum and maximum byte length
 }
 {% Short description
-\texttt{DataBlockDescription} allows to set a minimum and maximum length of the data block in bytes. Either both are null (meaning: ``unknown length''), or the minimum length is set to a positive number (bigger than zero!) and the maximum length is set to ``unknown length'', or both are non-null and set to a positive number (bigger than zero), where the maximum length must be equal to or bigger than the minimum length.
+\texttt{DataBlockDescription} allows to set a minimum and maximum length of the data block in bytes. Either the minimum length is set to a positive number (bigger than zero!) and the maximum length is set to ``unknown length'', or both are set to a positive number (bigger than zero), where the maximum length must be equal to or bigger than the minimum length.
 
 The fixed size case is covered by setting both to the same value. Differing values have no specific influence for the parser, but can be later used for format validation of a chunk of bytes. If not set or the values differ, this is a signal that the data block is either terminated or its size needs to be determined dynamically using other field values.
 }
