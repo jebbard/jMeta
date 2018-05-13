@@ -15,10 +15,12 @@ import java.nio.charset.Charset;
  * {@link StringFieldBuilder}
  *
  */
-public interface StringFieldBuilder<ParentBuilder> extends FieldBuilder<ParentBuilder, String> {
+public interface StringFieldBuilder<ParentBuilder> extends FieldBuilder<ParentBuilder, String>,
+   FieldDescriptionModifier<ParentBuilder, String, StringFieldBuilder<ParentBuilder>>,
+   DataBlockDescriptionModifier<StringFieldBuilder<ParentBuilder>> {
 
-   void withTerminationCharacter(Character terminationChar);
+   StringFieldBuilder<ParentBuilder> withTerminationCharacter(Character terminationChar);
 
-   void withFixedCharset(Charset charset);
+   StringFieldBuilder<ParentBuilder> withFixedCharset(Charset charset);
 
 }

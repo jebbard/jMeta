@@ -15,9 +15,5 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  */
 public interface FieldBuilder<ParentBuilder, FieldInterpretedType> extends DataFormatSpecificationBuilder {
 
-   void withDefaultValue(FieldInterpretedType value);
-
-   void asMagicKey();
-
    ParentBuilder finishField();
 }

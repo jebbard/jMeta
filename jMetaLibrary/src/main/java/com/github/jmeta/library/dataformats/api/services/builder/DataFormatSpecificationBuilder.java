@@ -23,4 +23,6 @@ public interface DataFormatSpecificationBuilder {
    public void addChildDescription(DataBlockDescription childDesc);
 
    public ContainerDataFormat getDataFormat();
+
+   public DescriptionCollector getDescriptionCollector();
 }

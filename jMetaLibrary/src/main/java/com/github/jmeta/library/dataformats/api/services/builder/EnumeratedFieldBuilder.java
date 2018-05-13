@@ -14,8 +14,15 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  *
  */
 public interface EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>
-   extends FieldBuilder<ParentBuilder, FieldInterpretedType> {
+   extends FieldBuilder<ParentBuilder, FieldInterpretedType>,
+   FieldDescriptionModifier<ParentBuilder, FieldInterpretedType, EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>>,
+   DataBlockDescriptionModifier<EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>> {
 
-   void addEnumeratedValue(byte[] binaryValue, FieldInterpretedType interpretedValue);
+   EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> withDefaultValue(FieldInterpretedType value);
+
+   EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> asMagicKey();
+
+   EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> addEnumeratedValue(byte[] binaryValue,
+      FieldInterpretedType interpretedValue);
 
 }

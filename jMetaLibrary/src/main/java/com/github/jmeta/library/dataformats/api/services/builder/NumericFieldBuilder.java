@@ -15,8 +15,9 @@ import java.nio.ByteOrder;
  * {@link NumericFieldBuilder}
  *
  */
-public interface NumericFieldBuilder<ParentBuilder> extends FieldBuilder<ParentBuilder, Long> {
+public interface NumericFieldBuilder<ParentBuilder> extends FieldBuilder<ParentBuilder, Long>,
+   FieldDescriptionModifier<ParentBuilder, Long, NumericFieldBuilder<ParentBuilder>>,
+   DataBlockDescriptionModifier<NumericFieldBuilder<ParentBuilder>> {
 
-   void withFixedByteOrder(ByteOrder byteOrder);
-
+   NumericFieldBuilder<ParentBuilder> withFixedByteOrder(ByteOrder byteOrder);
 }
