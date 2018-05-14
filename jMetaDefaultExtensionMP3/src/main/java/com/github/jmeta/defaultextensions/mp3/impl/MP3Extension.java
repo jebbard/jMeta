@@ -13,28 +13,26 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.types.FieldProperties;
-import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
-import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -91,19 +89,31 @@ public class MP3Extension implements Extension {
 
       // Data blocks
       final DataBlockId mp3FrameId = new DataBlockId(MP3, "mp3");
-      final DataBlockId mp3HeaderId = new DataBlockId(MP3, "mp3.header");
-      final DataBlockId mp3CRCId = new DataBlockId(MP3, "mp3.crc");
-      final DataBlockId mp3CRCFieldId = new DataBlockId(MP3, "mp3.crc.data");
-      final DataBlockId mp3PayloadId = new DataBlockId(MP3, "mp3.payload");
-      final DataBlockId mp3PayloadDataId = new DataBlockId(MP3, "mp3.payload.data");
-      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
-      final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
+      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(mp3FrameId);
 
-      Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
+      Set<DataBlockId> topLevelIds = new HashSet<>();
+      topLevelIds.add(mp3FrameId);
 
-      // 1. MP3 header content
-      final List<DataBlockId> headerContentChildIds = new ArrayList<>();
+      // Byte orders and charsets
+      List<ByteOrder> supportedByteOrders = new ArrayList<>();
+      List<Charset> supportedCharsets = new ArrayList<>();
 
+      // There is no ByteOrder relevant for MP3
+      supportedByteOrders.add(ByteOrder.BIG_ENDIAN);
+
+      supportedCharsets.add(Charsets.CHARSET_ISO);
+
+      DataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
+
+      return dummyMP3Spec;
+   }
+
+   /**
+    * @param mp3FrameId
+    * @return
+    */
+   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId mp3FrameId) {
       List<FlagDescription> flagDescriptions = new ArrayList<>();
 
       /*
@@ -146,90 +156,34 @@ public class MP3Extension implements Extension {
       FlagSpecification mp3HeaderFlagSpec = new FlagSpecification(flagDescriptions, MP3_HEADER_BYTE_LENGTH,
          ByteOrder.BIG_ENDIAN, new byte[MP3_HEADER_BYTE_LENGTH]);
 
-      Flags defaultFlags = new Flags(mp3HeaderFlagSpec);
-
-      List<FieldFunction> functions = new ArrayList<>();
-
       Set<DataBlockId> affectedBlocks = new HashSet<>();
 
-      affectedBlocks.add(mp3CRCId);
+      affectedBlocks.add(new DataBlockId(MP3Extension.MP3, "mp3.crc"));
 
-      functions.add(new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedBlocks, "No protection bit", 0));
+      FieldFunction crcFunc = new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedBlocks, "No protection bit", 0);
 
-      descMap.put(mp3HeaderContentId,
-         new DataBlockDescription(mp3HeaderContentId, "MP3 header contents", "The MP3 header contents",
-            PhysicalDataBlockType.FIELD, headerContentChildIds, new FieldProperties<>(FieldType.FLAGS, defaultFlags,
-               null, null, mp3HeaderFlagSpec, null, null, null, false),
-            1, 1, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null));
+      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(MP3Extension.MP3);
 
-      // 02. MP3 header
-      final List<DataBlockId> headerChildIds = new ArrayList<>();
-      headerChildIds.add(mp3HeaderContentId);
+      builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame").withLengthOf(33, 1024)
+         .addHeader("header", "MP3 header", "The MP3 header").withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
+         .addFlagsField("content", "MP3 header contents", "The MP3 header contents")
+         .withStaticLengthOf(MP3_HEADER_BYTE_LENGTH).withFlagSpecification(mp3HeaderFlagSpec).withFieldFunction(crcFunc)
+         .finishField().finishHeader().addHeader("crc", "MP3 CRC", "The MP3 CRC").withStaticLengthOf(2)
+         .withOccurrences(0, 1).addBinaryField("data", "MP3 CRC data", "The MP3 CRC data").withStaticLengthOf(2)
+         .finishField().finishHeader().getPayload().withLengthOf(1, 998)
+         .addBinaryField("data", "payloadData", "The MP3 payload data").withLengthOf(1, 998).finishField()
+         .finishFieldBasedPayload().finishContainer();
 
-      descMap.put(mp3HeaderId,
-         new DataBlockDescription(mp3HeaderId, "MP3 header", "The MP3 header", PhysicalDataBlockType.HEADER,
-            headerChildIds, null, 1, 1, MP3_HEADER_BYTE_LENGTH, MP3_HEADER_BYTE_LENGTH, null));
+      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
 
-      // 03. CRC field
-      final List<DataBlockId> crcFieldChildIds = new ArrayList<>();
-      crcFieldChildIds.add(mp3CRCFieldId);
+      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
+         .collect(Collectors.toMap(b -> b.getId(), b -> b));
+      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
+      final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
 
-      descMap.put(mp3CRCId,
-         new DataBlockDescription(mp3CRCId, "MP3 CRC data", "The MP3 CRC data", PhysicalDataBlockType.FIELD,
-            crcFieldChildIds, new FieldProperties<>(FieldType.BINARY, null, null, null, null, null, null, null, false),
-            0, 1, 2, 2, null));
+      topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
 
-      // 04. CRC
-      final List<DataBlockId> crcChildIds = new ArrayList<>();
-      crcChildIds.add(mp3CRCFieldId);
-
-      descMap.put(mp3CRCId, new DataBlockDescription(mp3CRCId, "MP3 CRC", "The MP3 CRC", PhysicalDataBlockType.HEADER,
-         crcChildIds, null, 0, 1, 2, 2, null));
-
-      // 05. MP3 frame payload dataa
-      final List<DataBlockId> payloadDataChildIds = new ArrayList<>();
-
-      descMap.put(mp3PayloadDataId,
-         new DataBlockDescription(mp3PayloadDataId, "payloadData", "The MP3 payload data", PhysicalDataBlockType.FIELD,
-            payloadDataChildIds,
-            new FieldProperties<>(FieldType.BINARY, null, null, null, null, null, null, null, false), 1, 1, 1, 998, null));
-
-      // 06. MP3 frame payload
-      final List<DataBlockId> payloadChildIds = new ArrayList<>();
-
-      payloadChildIds.add(mp3PayloadDataId);
-
-      descMap.put(mp3PayloadId, new DataBlockDescription(mp3PayloadId, "payload", "The MP3 payload",
-         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, 1, 1, 1, 998, null));
-
-      // 08. MP3 tag
-
-      final List<DataBlockId> frameChildIds = new ArrayList<>();
-      frameChildIds.add(mp3HeaderId);
-      frameChildIds.add(mp3PayloadId);
-
-      DataBlockDescription mp3Frame = new DataBlockDescription(mp3FrameId, "MP3 Frame", "The MP3 Frame",
-         PhysicalDataBlockType.CONTAINER, frameChildIds, null, 1, 1, 33, 1024, null);
-      descMap.put(mp3FrameId, mp3Frame);
-
-      mp3Frame.addHeaderMagicKey(mp3MagicKey);
-
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(mp3FrameId);
-
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      // There is no ByteOrder relevant for MP3
-      supportedByteOrders.add(ByteOrder.BIG_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-
-      DataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
-
-      return dummyMP3Spec;
+      return topLevelContainerMap;
    }
 
 }

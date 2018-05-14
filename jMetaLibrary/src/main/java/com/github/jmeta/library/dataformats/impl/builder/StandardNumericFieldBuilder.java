@@ -14,6 +14,7 @@ import java.nio.ByteOrder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
@@ -22,6 +23,12 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  */
 public class StandardNumericFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
    extends AbstractFieldBuilder<ParentBuilder, Long> implements NumericFieldBuilder<ParentBuilder> {
+
+   @Override
+   public NumericFieldBuilder<ParentBuilder> withFieldFunction(FieldFunction function) {
+      getFunctions().add(function);
+      return this;
+   }
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder#withDefaultValue(java.lang.Long)

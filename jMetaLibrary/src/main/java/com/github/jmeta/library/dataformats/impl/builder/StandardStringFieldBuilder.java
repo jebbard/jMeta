@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
@@ -22,6 +23,12 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  */
 public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
    extends AbstractFieldBuilder<ParentBuilder, String> implements StringFieldBuilder<ParentBuilder> {
+
+   @Override
+   public StringFieldBuilder<ParentBuilder> withFieldFunction(FieldFunction function) {
+      getFunctions().add(function);
+      return this;
+   }
 
    /**
     * Creates a new {@link StandardStringFieldBuilder}.

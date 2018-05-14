@@ -65,7 +65,8 @@ public class StandardContainerBasedPayloadContainerBuilder
       return this;
    }
 
-   private final ContainerBasedPayloadBuilder payloadBuilder = null;
+   private final ContainerBasedPayloadBuilder payloadBuilder = new StandardContainerBasedPayloadBuilder(this, "payload",
+      "payload", "The payload");
 
    /**
     * Creates a new {@link StandardContainerBasedPayloadContainerBuilder}.

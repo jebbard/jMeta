@@ -13,21 +13,20 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldProperties;
-import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -41,7 +40,6 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  */
 public class ID3v1Extension implements Extension {
 
-   private static final byte[] ID3V1_TAG_ID = new byte[] { 'T', 'A', 'G' };
    private static final String ID3V1_TAG_ID_STRING = "TAG";
 
    /**
@@ -49,7 +47,6 @@ public class ID3v1Extension implements Extension {
     */
    public static final ContainerDataFormat ID3v1 = new ContainerDataFormat("ID3v1", new HashSet<String>(),
       new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
-   private static final DataBlockId id3v1HeaderId = new DataBlockId(ID3v1, "id3v1.header");
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -111,144 +108,57 @@ public class ID3v1Extension implements Extension {
    }
 
    public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId id3v1TagId) {
+      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(ID3v1Extension.ID3v1);
+
       final char nullCharacter = '\0';
 
-      // Data blocks
-      final DataBlockId id3v1PayloadId = new DataBlockId(ID3v1, "id3v1.payload");
-      final DataBlockId id3v1TagHeaderId = new DataBlockId(ID3v1, "id3v1.header.id");
-      final DataBlockId titleId = new DataBlockId(ID3v1, "id3v1.payload.title");
-      final DataBlockId artistId = new DataBlockId(ID3v1, "id3v1.payload.artist");
-      final DataBlockId albumId = new DataBlockId(ID3v1, "id3v1.payload.album");
-      final DataBlockId yearId = new DataBlockId(ID3v1, "id3v1.payload.year");
-      final DataBlockId commentId = new DataBlockId(ID3v1, "id3v1.payload.comment");
-      final DataBlockId trackIndicatorId = new DataBlockId(ID3v1, "id3v1.payload.trackIndicator");
-      final DataBlockId trackId = new DataBlockId(ID3v1, "id3v1.payload.track");
-      final DataBlockId genreId = new DataBlockId(ID3v1, "id3v1.payload.genre");
+      builder
+          .addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
+             .withStaticLengthOf(id3v1TagLength)
+             .addHeader("header", "ID3v1 tag header", "The ID3v1 tag header")
+                .withStaticLengthOf(3)
+                .addStringField("id", "ID3v1 tag header id", "The ID3v1 tag header id")
+                   .asMagicKey().withDefaultValue(ID3V1_TAG_ID_STRING).withStaticLengthOf(3)
+                .finishField()
+             .finishHeader()
+             .getPayload()
+                .withStaticLengthOf(125)
+                .addStringField("title", "title", "The ID3v1 title")
+                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
+                .finishField()
+                .addStringField("artist", "artist", "The ID3v1 artist")
+                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
+                .finishField()
+                .addStringField("album", "album", "The ID3v1 album")
+                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
+                .finishField()
+                .addStringField("year", "year", "The ID3v1 year")
+                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(4)
+                .finishField()
+                .addStringField("comment", "comment", "The ID3v1 comment")
+                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(28)
+                .finishField()
+                .addNumericField("trackIndicator", "track indicator", "The ID3v1 track indicator")
+                   .withDefaultValue(0L).withStaticLengthOf(1)
+                .finishField()
+                .addNumericField("track", "track", "The ID3v1 track")
+                   .withDefaultValue(0L).withStaticLengthOf(1)
+                .finishField()
+                .addEnumeratedField(String.class, "genre", "genre", "The ID3v1 genre")
+                   .withDefaultValue(""+nullCharacter).withStaticLengthOf(1)
+                   .addEnumeratedValue(new byte[]{-1}, "Unknown")
+                   .addEnumeratedValue(new byte[]{99}, "Rock")
+                   .addEnumeratedValue(new byte[]{2}, "Jazz")
+                .finishField()
+             .finishFieldBasedPayload()
+          .finishContainer();
+      
+      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
 
-      Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
+      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
+         .collect(Collectors.toMap(b -> b.getId(), b -> b));
 
-      // 1. title
-      final List<DataBlockId> titleChildIds = new ArrayList<>();
-      descMap.put(titleId,
-         new DataBlockDescription(titleId, "title", "The ID3v1 title", PhysicalDataBlockType.FIELD, titleChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
-               new ArrayList<>(), false),
-            1, 1, 30, 30, null));
-
-      // 2. artist
-      final List<DataBlockId> artistChildIds = new ArrayList<>();
-
-      descMap.put(artistId,
-         new DataBlockDescription(artistId, "artist", "The ID3v1 artist", PhysicalDataBlockType.FIELD, artistChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
-               new ArrayList<>(), false),
-            1, 1, 30, 30, null));
-
-      // 3. album
-      final List<DataBlockId> albumChildIds = new ArrayList<>();
-
-      descMap.put(albumId,
-         new DataBlockDescription(albumId, "album", "The ID3v1 album", PhysicalDataBlockType.FIELD, albumChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
-               new ArrayList<>(), false),
-            1, 1, 30, 30, null));
-
-      // 4. year
-      final List<DataBlockId> yearChildIds = new ArrayList<>();
-
-      descMap.put(yearId,
-         new DataBlockDescription(yearId, "year", "The ID3v1 year", PhysicalDataBlockType.FIELD, yearChildIds,
-            new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null, null, null,
-               new ArrayList<>(), false),
-            1, 1, 4, 4, null));
-
-      // 5. comment
-      final List<DataBlockId> commentChildIds = new ArrayList<>();
-
-      descMap.put(commentId,
-         new DataBlockDescription(commentId, "comment", "The ID3v1 comment", PhysicalDataBlockType.FIELD,
-            commentChildIds, new FieldProperties<>(FieldType.STRING, "" + nullCharacter, null, nullCharacter, null,
-               null, null, new ArrayList<>(), false),
-            1, 1, 28, 28, null));
-
-      // 6. track indicator
-      final List<DataBlockId> trackIndicatorChildIds = new ArrayList<>();
-
-      descMap.put(trackIndicatorId,
-         new DataBlockDescription(trackIndicatorId, "track indicator", "The ID3v1 track indicator",
-            PhysicalDataBlockType.FIELD, trackIndicatorChildIds, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER,
-               (long) 0, null, null, null, null, null, new ArrayList<>(), false),
-            1, 1, 1, 1, null));
-
-      // 7. track
-      final List<DataBlockId> trackChildIds = new ArrayList<>();
-
-      descMap.put(trackId,
-         new DataBlockDescription(trackId, "track indicator", "The ID3v1 track", PhysicalDataBlockType.FIELD,
-            trackChildIds, new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, (long) 0, null, null, null, null,
-               null, new ArrayList<>(), false),
-            1, 1, 1, 1, null));
-
-      // 8. genre
-      final List<DataBlockId> genreChildIds = new ArrayList<>();
-
-      final Map<String, byte[]> enumeratedGenres = new HashMap<>();
-
-      enumeratedGenres.put("Unknown", new byte[] { -1 });
-      enumeratedGenres.put("Gabber", new byte[] { 99 });
-      enumeratedGenres.put("Jazz", new byte[] { 2 });
-
-      descMap.put(genreId,
-         new DataBlockDescription(genreId, "genre", "The ID3v1 genre", PhysicalDataBlockType.FIELD, genreChildIds,
-            new FieldProperties<>(FieldType.ENUMERATED, "" + nullCharacter, enumeratedGenres, nullCharacter, null, null,
-               null, new ArrayList<>(), false),
-            1, 1, 1, 1, null));
-
-      // 9. tag id
-      final List<DataBlockId> headerIdChildIds = new ArrayList<>();
-
-      Map<String, byte[]> tagIdEnumerated = new HashMap<>();
-
-      tagIdEnumerated.put(ID3V1_TAG_ID_STRING, ID3V1_TAG_ID);
-
-      descMap
-         .put(id3v1TagHeaderId,
-            new DataBlockDescription(id3v1TagHeaderId, "ID3v1 tag header id", "The ID3v1 tag header id",
-               PhysicalDataBlockType.FIELD, headerIdChildIds, new FieldProperties<>(FieldType.STRING,
-                  ID3V1_TAG_ID_STRING, tagIdEnumerated, null, null, null, null, new ArrayList<>(), true),
-               1, 1, 3, 3, null));
-
-      // 10. ID3v1 header
-      final List<DataBlockId> headerChildIds = new ArrayList<>();
-      headerChildIds.add(id3v1TagHeaderId);
-
-      descMap.put(id3v1HeaderId, new DataBlockDescription(id3v1HeaderId, "ID3v1 tag header", "The ID3v1 tag header",
-         PhysicalDataBlockType.HEADER, headerChildIds, null, 1, 1, 3, 3, null));
-
-      // 11. ID3v1 payload
-      final List<DataBlockId> payloadChildIds = new ArrayList<>();
-
-      payloadChildIds.add(titleId);
-      payloadChildIds.add(artistId);
-      payloadChildIds.add(albumId);
-      payloadChildIds.add(yearId);
-      payloadChildIds.add(commentId);
-      payloadChildIds.add(trackIndicatorId);
-      payloadChildIds.add(trackId);
-      payloadChildIds.add(genreId);
-
-      descMap.put(id3v1PayloadId, new DataBlockDescription(id3v1PayloadId, "payload", "The ID3v1 payload",
-         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, payloadChildIds, null, 1, 1, 125, 125, null));
-
-      // 12. ID3v1 tag
-
-      final List<DataBlockId> tagChildIds = new ArrayList<>();
-      tagChildIds.add(id3v1HeaderId);
-      tagChildIds.add(id3v1PayloadId);
-
-      descMap.put(id3v1TagId, new DataBlockDescription(id3v1TagId, "ID3v1 tag", "The ID3v1 tag",
-         PhysicalDataBlockType.CONTAINER, tagChildIds, null, 1, 1, 128, 128, null));
-      return descMap;
+      return topLevelContainerMap;
    }
 
 }

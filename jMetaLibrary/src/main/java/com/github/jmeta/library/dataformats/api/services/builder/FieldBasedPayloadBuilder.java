@@ -16,5 +16,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
 public interface FieldBasedPayloadBuilder
    extends FieldSequenceBuilder<FieldBasedPayloadBuilder>, DataBlockDescriptionModifier<FieldBasedPayloadBuilder> {
 
+   FieldBasedPayloadBuilder withDescription(String name, String description);
+
    ContainerBuilder<FieldBasedPayloadBuilder> finishFieldBasedPayload();
 }

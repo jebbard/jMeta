@@ -9,28 +9,26 @@
  */
 package com.github.jmeta.defaultextensions.ogg.impl;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.types.FieldProperties;
-import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -84,186 +82,8 @@ public class OggExtension implements Extension {
 
       // Data blocks
       final DataBlockId oggPageId = new DataBlockId(OGG, "ogg");
-      final DataBlockId oggPageHeaderId = new DataBlockId(OGG, "ogg.header");
-      final DataBlockId oggPayloadId = new DataBlockId(OGG, "ogg.payload");
-
-      final DataBlockId oggPageHeaderCaptureId = new DataBlockId(OGG, "ogg.header.capturePattern");
-      final DataBlockId oggPageHeaderStreamStructVersionId = new DataBlockId(OGG, "ogg.header.streamStructureVersion");
-      final DataBlockId oggPageHeaderHeaderTypeFlagId = new DataBlockId(OGG, "ogg.header.headerTypeFlag");
-      final DataBlockId oggPageHeaderAbsoluteGranulePosId = new DataBlockId(OGG, "ogg.header.absoluteGranulePos");
-      final DataBlockId oggPageHeaderStreamSerialNoId = new DataBlockId(OGG, "ogg.header.streamSerialNumber");
-      final DataBlockId oggPageHeaderPageSequNoId = new DataBlockId(OGG, "ogg.header.pageSequenceNumber");
-      final DataBlockId oggPageHeaderPageChecksumId = new DataBlockId(OGG, "ogg.header.pageChecksum");
-      final DataBlockId oggPageHeaderSegmentsId = new DataBlockId(OGG, "ogg.header.pageSegments");
-      final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(OGG, "ogg.header.segmentTableEntry");
-
       final DataBlockId oggPacketPartContainerId = new DataBlockId(OGG, "ogg.payload.packetPartContainer");
-      final DataBlockId oggPacketPartId = new DataBlockId(OGG, "ogg.payload.packetPartContainer.payload");
-      final DataBlockId oggSegmentId = new DataBlockId(OGG, "ogg.payload.packetPartContainer.payload.segment");
-
-      Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
-
-      // 1. Ogg capture pattern
-      final List<DataBlockId> capturePatternChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderCaptureId,
-         new DataBlockDescription(oggPageHeaderCaptureId, "Ogg page header capture pattern",
-            "Ogg page header capture pattern", PhysicalDataBlockType.FIELD, capturePatternChildIds,
-            new FieldProperties<>(FieldType.STRING, OGG_MAGIC_KEY_STRING, null, null, null, null, null, null, true), 1,
-            1, 4, 4, null));
-
-      // 2. Ogg stream structure version
-      final List<DataBlockId> streamStructVersionChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderStreamStructVersionId,
-         new DataBlockDescription(oggPageHeaderStreamStructVersionId, "Ogg page header stream structure version",
-            "Ogg page header structure version", PhysicalDataBlockType.FIELD, streamStructVersionChildIds,
-            new FieldProperties<>(FieldType.BINARY, ByteBuffer.wrap(new byte[] { 0 }), null, null, null, null, null,
-               null, false),
-            1, 1, 1, 1, null));
-
-      // 3. Ogg header type flag
-      // TODO doItFirst002: define flags
-      final List<DataBlockId> headerTypeFlagChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderHeaderTypeFlagId,
-         new DataBlockDescription(oggPageHeaderHeaderTypeFlagId, "Ogg page header type flag",
-            "Ogg page header type flag", PhysicalDataBlockType.FIELD, headerTypeFlagChildIds,
-            new FieldProperties<ByteBuffer>(FieldType.BINARY, null, null, null, null, null, null, null, false), 1, 1, 1,
-            1, null));
-
-      // 4. Ogg absolute granule position
-      final List<DataBlockId> absGranulePosChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderAbsoluteGranulePosId,
-         new DataBlockDescription(oggPageHeaderAbsoluteGranulePosId, "Ogg page absolute granule position",
-            "Ogg page absolute granule position", PhysicalDataBlockType.FIELD, absGranulePosChildIds,
-            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null, null, false),
-            1, 1, 8, 8, null));
-
-      // 5. Ogg stream serial number
-      final List<DataBlockId> streamSerialNoChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderStreamSerialNoId,
-         new DataBlockDescription(oggPageHeaderStreamSerialNoId, "Ogg page stream serial number",
-            "Ogg page stream serial number", PhysicalDataBlockType.FIELD, streamSerialNoChildIds,
-            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null, null, false),
-            1, 1, 4, 4, null));
-
-      // 6. Ogg page sequence number
-      final List<DataBlockId> pageSequNoChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderPageSequNoId,
-         new DataBlockDescription(oggPageHeaderPageSequNoId, "Ogg page sequence number", "Ogg page sequence number",
-            PhysicalDataBlockType.FIELD, pageSequNoChildIds,
-            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null, null, false),
-            1, 1, 4, 4, null));
-
-      // 7. Ogg page checksum
-      final List<DataBlockId> pageChecksumChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderPageChecksumId,
-         new DataBlockDescription(oggPageHeaderPageChecksumId, "Ogg page checksum", "Ogg page checksum",
-            PhysicalDataBlockType.FIELD, pageChecksumChildIds,
-            new FieldProperties<ByteBuffer>(FieldType.BINARY, null, null, null, null, null, null, null, false), 1, 1,
-            4, 4, null));
-
-      // 8. Ogg page segments
-      List<FieldFunction> pageSegmentsFunctions = new ArrayList<>();
-
-      Set<DataBlockId> affectedBlocks = new HashSet<>();
-
-      affectedBlocks.add(oggPageHeaderSegmentTableEntryId);
-
-      pageSegmentsFunctions.add(new FieldFunction(FieldFunctionType.COUNT_OF, affectedBlocks, null, 0));
-
-      final List<DataBlockId> pageSegmentsChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderSegmentsId,
-         new DataBlockDescription(oggPageHeaderSegmentsId, "Ogg page segments", "Ogg page segments",
-            PhysicalDataBlockType.FIELD, pageSegmentsChildIds,
-            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null,
-               pageSegmentsFunctions, false),
-            1, 1, 1, 1, null));
-
-      // 9. Ogg page segment table entry
-      List<FieldFunction> segmentTableEntryFunctions = new ArrayList<>();
-
-      Set<DataBlockId> affectedBlocks2 = new HashSet<>();
-
-      affectedBlocks2.add(oggSegmentId);
-
-      segmentTableEntryFunctions.add(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocks2, null, 0));
-
-      final List<DataBlockId> segmentTableChildIds = new ArrayList<>();
-
-      descMap.put(oggPageHeaderSegmentTableEntryId,
-         new DataBlockDescription(oggPageHeaderSegmentTableEntryId, "Ogg page segment table entry",
-            "Ogg segment table entry", PhysicalDataBlockType.FIELD, segmentTableChildIds,
-            new FieldProperties<Long>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null,
-               segmentTableEntryFunctions, false),
-            0, 99999, 1, 1, null));
-
-      // 10. The Ogg page header
-      final List<DataBlockId> pageHeaderChildIds = new ArrayList<>();
-
-      pageHeaderChildIds.add(oggPageHeaderCaptureId);
-      pageHeaderChildIds.add(oggPageHeaderStreamStructVersionId);
-      pageHeaderChildIds.add(oggPageHeaderHeaderTypeFlagId);
-      pageHeaderChildIds.add(oggPageHeaderAbsoluteGranulePosId);
-      pageHeaderChildIds.add(oggPageHeaderStreamSerialNoId);
-      pageHeaderChildIds.add(oggPageHeaderPageSequNoId);
-      pageHeaderChildIds.add(oggPageHeaderPageChecksumId);
-      pageHeaderChildIds.add(oggPageHeaderSegmentsId);
-      pageHeaderChildIds.add(oggPageHeaderSegmentTableEntryId);
-
-      descMap.put(oggPageHeaderId, new DataBlockDescription(oggPageHeaderId, "Ogg page header", "Ogg page header",
-         PhysicalDataBlockType.HEADER, pageHeaderChildIds, null, 1, 1, 20, DataBlockDescription.UNLIMITED, null));
-
-      // 11a. Ogg packet container
-      final List<DataBlockId> packetContainerChildIds = new ArrayList<>();
-      packetContainerChildIds.add(oggPacketPartId);
-
-      descMap.put(oggPacketPartContainerId,
-         new DataBlockDescription(oggPacketPartContainerId, "Ogg packet", "Ogg packet", PhysicalDataBlockType.CONTAINER,
-            packetContainerChildIds, null, 1, 999999, 1, DataBlockDescription.UNLIMITED, null));
-
-      // 11b. Ogg packet
-      final List<DataBlockId> packetChildIds = new ArrayList<>();
-      packetChildIds.add(oggSegmentId);
-
-      descMap.put(oggPacketPartId,
-         new DataBlockDescription(oggPacketPartId, "Ogg packet", "Ogg packet",
-            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, packetChildIds, null, 1, 1, 1, DataBlockDescription.UNLIMITED, null));
-
-      // 12. Ogg segment
-      final List<DataBlockId> segmentChildIds = new ArrayList<>();
-
-      descMap.put(oggSegmentId,
-         new DataBlockDescription(oggSegmentId, "Ogg segment", "Ogg segment", PhysicalDataBlockType.FIELD,
-            segmentChildIds,
-            new FieldProperties<ByteBuffer>(FieldType.BINARY, null, null, null, null, null, null, null, false), 1, 999999,
-            0, DataBlockDescription.UNLIMITED, null));
-
-      // 13. The Ogg page payload
-      final List<DataBlockId> pagePayloadChildIds = new ArrayList<>();
-
-      pagePayloadChildIds.add(oggPacketPartContainerId);
-
-      descMap.put(oggPayloadId,
-         new DataBlockDescription(oggPayloadId, "Ogg page payload", "Ogg page payload",
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, pagePayloadChildIds, null, 1, 1, 0, DataBlockDescription.UNLIMITED,
-            null));
-
-      // 14. Ogg page
-
-      final List<DataBlockId> pageChildIds = new ArrayList<>();
-      pageChildIds.add(oggPageHeaderId);
-      pageChildIds.add(oggPayloadId);
-
-      descMap.put(oggPageId,
-         new DataBlockDescription(oggPageId, "Ogg page", "The ogg page", PhysicalDataBlockType.CONTAINER, pageChildIds,
-            null, 1, 1, 20, DataBlockDescription.UNLIMITED, null));
+      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(oggPageId, oggPacketPartContainerId);
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
       topLevelIds.add(oggPageId);
@@ -282,6 +102,91 @@ public class OggExtension implements Extension {
          genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets, oggPacketPartContainerId);
 
       return dummyOggSpec;
+   }
+
+   /**
+    * @param oggPageId
+    * @param oggPacketPartContainerId
+    * @return
+    */
+   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId oggPageId,
+      final DataBlockId oggPacketPartContainerId) {
+      final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(OggExtension.OGG, "ogg.header.segmentTableEntry");
+      final DataBlockId oggSegmentId = new DataBlockId(OggExtension.OGG, "ogg.payload.packetPartContainer.payload.segment");
+
+      Set<DataBlockId> affectedBlocks = new HashSet<>();
+
+      affectedBlocks.add(oggPageHeaderSegmentTableEntryId);
+      
+      Set<DataBlockId> affectedBlocks2 = new HashSet<>();
+
+      affectedBlocks2.add(oggSegmentId);
+
+
+      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(OggExtension.OGG);
+      
+      builder
+          .addContainerWithContainerBasedPayload("ogg", "Ogg page", "The ogg page")
+             .withLengthOf(20, DataBlockDescription.UNLIMITED)
+             .addHeader("header", "Ogg page header", "Ogg page header")
+                .withLengthOf(20, DataBlockDescription.UNLIMITED)
+                .addStringField("capturePattern", "Ogg page header capture pattern", "Ogg page header capture pattern")
+                   .withStaticLengthOf(4)
+                   .withDefaultValue(OGG_MAGIC_KEY_STRING)
+                   .asMagicKey()
+                .finishField()
+                .addBinaryField("streamStructureVersion", "Ogg page header stream structure version", "Ogg page header structure version")
+                   .withStaticLengthOf(1)
+                   .withDefaultValue(new byte[] { 0 })
+                .finishField()
+                .addBinaryField("headerTypeFlag", "Ogg page header type flag", "Ogg page header type flag")
+                   .withStaticLengthOf(1)
+                .finishField()
+                .addNumericField("absoluteGranulePos", "Ogg page absolute granule position", "Ogg page absolute granule position")
+                   .withStaticLengthOf(8)
+                .finishField()
+                .addNumericField("streamSerialNumber", "Ogg page stream serial number", "Ogg page stream serial number")
+                   .withStaticLengthOf(4)
+                .finishField()
+                .addNumericField("pageSequenceNumber", "Ogg page sequence number", "Ogg page sequence number")
+                   .withStaticLengthOf(4)
+                .finishField()
+                .addBinaryField("pageChecksum", "Ogg page checksum", "Ogg page checksum")
+                   .withStaticLengthOf(4)
+                .finishField()
+                .addNumericField("pageSegments", "Ogg page segments", "Ogg page segments")
+                   .withStaticLengthOf(1)
+                   .withFieldFunction(new FieldFunction(FieldFunctionType.COUNT_OF, affectedBlocks, null, 0))
+                .finishField()
+                .addNumericField("segmentTableEntry", "Ogg page segment table entry", "Ogg segment table entry")
+                   .withStaticLengthOf(1)
+                   .withOccurrences(0, 99999)
+                   .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocks2, null, 0))
+                .finishField()
+             .finishHeader()
+             .getPayload()
+                .withLengthOf(0, DataBlockDescription.UNLIMITED)
+                .addContainerWithFieldBasedPayload("packetPartContainer", "Ogg packet", "Ogg packet")
+                   .withOccurrences(1, 999999)
+                   .withLengthOf(1, DataBlockDescription.UNLIMITED)
+                   .getPayload()
+                      .withDescription("Ogg packet", "Ogg packet")
+                      .withLengthOf(1, DataBlockDescription.UNLIMITED)
+                      .addBinaryField("segment", "Ogg segment", "Ogg segment")
+                         .withLengthOf(0, DataBlockDescription.UNLIMITED)
+                         .withOccurrences(1, 999999)
+                      .finishField()
+                   .finishFieldBasedPayload()
+                .finishContainer()
+             .finishContainerBasedPayload()
+          .finishContainer();
+      
+      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
+
+      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
+         .collect(Collectors.toMap(b -> b.getId(), b -> b));
+
+      return topLevelContainerMap;
    }
 
 }

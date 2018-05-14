@@ -42,6 +42,17 @@ public class StandardFieldBasedPayloadBuilder
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder#withDescription(java.lang.String,
+    *      java.lang.String)
+    */
+   @Override
+   public FieldBasedPayloadBuilder withDescription(String name, String description) {
+      setName(name);
+      setDescription(description);
+      return this;
+   }
+
+   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOccurrences(int,
     *      int)
     */
@@ -70,7 +81,7 @@ public class StandardFieldBasedPayloadBuilder
 
    @Override
    public ContainerBuilder<FieldBasedPayloadBuilder> finishFieldBasedPayload() {
-      return super.finish();
+      return finish();
    }
 
 }

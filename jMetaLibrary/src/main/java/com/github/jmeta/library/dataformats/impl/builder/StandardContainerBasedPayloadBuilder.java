@@ -72,6 +72,17 @@ public class StandardContainerBasedPayloadBuilder
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder#withDescription(java.lang.String,
+    *      java.lang.String)
+    */
+   @Override
+   public ContainerBasedPayloadBuilder withDescription(String name, String description) {
+      setName(name);
+      setDescription(description);
+      return this;
+   }
+
+   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withLengthOf(long,
     *      long)
     */
@@ -79,6 +90,14 @@ public class StandardContainerBasedPayloadBuilder
    public ContainerBasedPayloadBuilder withLengthOf(long minimumByteLength, long maximumByteLength) {
       setLength(minimumByteLength, maximumByteLength);
       return this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder#finishContainerBasedPayload()
+    */
+   @Override
+   public ContainerBuilder<ContainerBasedPayloadBuilder> finishContainerBasedPayload() {
+      return finish();
    }
 
    /**

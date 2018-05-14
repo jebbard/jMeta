@@ -50,9 +50,9 @@ public abstract class AbstractDataFormatSpecificationBuilder<Result> implements 
    private final List<DataBlockDescription> childDescriptions = new ArrayList<>();
 
    private final ContainerDataFormat dataFormat;
-   private final String globalId;
-   private final String name;
-   private final String description;
+   private String globalId;
+   private String name;
+   private String description;
    private final PhysicalDataBlockType type;
    private FieldProperties<?> fieldProperties;
    private DataBlockId overriddenId;
@@ -60,6 +60,26 @@ public abstract class AbstractDataFormatSpecificationBuilder<Result> implements 
    private long maximumByteLength = DataBlockDescription.UNLIMITED;
    private int minimumOccurrences = 1;
    private int maximumOccurrences = 1;
+
+   /**
+    * Sets the attribute {@link #name}.
+    *
+    * @param new
+    *           vakue for attribute {@link #name name}.
+    */
+   protected void setName(String name) {
+      this.name = name;
+   }
+
+   /**
+    * Sets the attribute {@link #description}.
+    *
+    * @param new
+    *           vakue for attribute {@link #description description}.
+    */
+   protected void setDescription(String description) {
+      this.description = description;
+   }
 
    public AbstractDataFormatSpecificationBuilder(DescriptionCollector descriptionCollector,
       ContainerDataFormat dataFormat, String localId, String name, String description, PhysicalDataBlockType type) {
@@ -111,6 +131,10 @@ public abstract class AbstractDataFormatSpecificationBuilder<Result> implements 
    @Override
    public String getGlobalId() {
       return globalId;
+   }
+
+   protected void setGlobalId(String globalId) {
+      this.globalId = globalId;
    }
 
    /**

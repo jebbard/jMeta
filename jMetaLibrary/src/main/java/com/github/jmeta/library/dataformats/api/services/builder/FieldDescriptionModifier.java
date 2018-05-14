@@ -9,6 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+
 /**
  * {@link FieldPropertyHolder}
  *
@@ -18,4 +20,6 @@ public interface FieldDescriptionModifier<ParentBuilder, FieldInterpretedType, C
    ConcreteFieldBuilder withDefaultValue(FieldInterpretedType value);
 
    ConcreteFieldBuilder asMagicKey();
+
+   ConcreteFieldBuilder withFieldFunction(FieldFunction function);
 }

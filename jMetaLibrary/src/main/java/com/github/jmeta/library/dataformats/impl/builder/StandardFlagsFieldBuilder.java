@@ -12,6 +12,7 @@ package com.github.jmeta.library.dataformats.impl.builder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
@@ -22,6 +23,12 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
  */
 public class StandardFlagsFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
    extends AbstractFieldBuilder<ParentBuilder, Flags> implements FlagsFieldBuilder<ParentBuilder> {
+
+   @Override
+   public FlagsFieldBuilder<ParentBuilder> withFieldFunction(FieldFunction function) {
+      getFunctions().add(function);
+      return this;
+   }
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldDescriptionModifier#asMagicKey()

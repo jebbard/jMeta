@@ -28,6 +28,8 @@ public abstract class AbstractDataFormatSpecificationBuilderWithParent<P extends
       String description, PhysicalDataBlockType type) {
       super(parentBuilder.getDescriptionCollector(), parentBuilder.getDataFormat(), localId, name, description, type);
 
+      setGlobalId(parentBuilder.getGlobalId() + "." + localId);
+
       this.parentBuilder = parentBuilder;
    }
 

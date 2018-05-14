@@ -33,6 +33,15 @@ public abstract class AbstractFieldBuilder<ParentBuilder extends DataFormatSpeci
    extends AbstractDataFormatSpecificationBuilderWithParent<ParentBuilder>
    implements FieldBuilder<ParentBuilder, FieldInterpretedType> {
 
+   /**
+    * Returns the attribute {@link #functions}.
+    * 
+    * @return the attribute {@link #functions}
+    */
+   public List<FieldFunction> getFunctions() {
+      return functions;
+   }
+
    private Character terminationCharacter;
    private FieldInterpretedType defaultValue;
    private final Map<FieldInterpretedType, byte[]> enumeratedValues = new HashMap<>();

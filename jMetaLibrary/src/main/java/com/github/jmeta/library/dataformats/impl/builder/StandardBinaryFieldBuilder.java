@@ -12,6 +12,7 @@ package com.github.jmeta.library.dataformats.impl.builder;
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
@@ -20,6 +21,12 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  */
 public class StandardBinaryFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
    extends AbstractFieldBuilder<ParentBuilder, byte[]> implements BinaryFieldBuilder<ParentBuilder> {
+
+   @Override
+   public BinaryFieldBuilder<ParentBuilder> withFieldFunction(FieldFunction function) {
+      getFunctions().add(function);
+      return this;
+   }
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOverriddenId(com.github.jmeta.library.dataformats.api.types.DataBlockId)
