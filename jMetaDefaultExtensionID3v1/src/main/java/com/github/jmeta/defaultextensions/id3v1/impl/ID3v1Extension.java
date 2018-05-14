@@ -87,10 +87,33 @@ public class ID3v1Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
+      final DataBlockId id3v1TagId = new DataBlockId(ID3v1, "id3v1");
+      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(id3v1TagId);
+
+      Set<DataBlockId> topLevelIds = new HashSet<>();
+      topLevelIds.add(id3v1TagId);
+
+      // Byte orders and charsets
+      List<ByteOrder> supportedByteOrders = new ArrayList<>();
+      List<Charset> supportedCharsets = new ArrayList<>();
+
+      // There is no ByteOrder relevant for ID3v1
+      supportedByteOrders.add(ByteOrder.BIG_ENDIAN);
+
+      supportedCharsets.add(Charsets.CHARSET_ISO);
+      supportedCharsets.add(Charsets.CHARSET_ASCII);
+      supportedCharsets.add(Charsets.CHARSET_UTF8);
+
+      DataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
+         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
+
+      return dummyID3v1Spec;
+   }
+
+   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId id3v1TagId) {
       final char nullCharacter = '\0';
 
       // Data blocks
-      final DataBlockId id3v1TagId = new DataBlockId(ID3v1, "id3v1");
       final DataBlockId id3v1PayloadId = new DataBlockId(ID3v1, "id3v1.payload");
       final DataBlockId id3v1TagHeaderId = new DataBlockId(ID3v1, "id3v1.header.id");
       final DataBlockId titleId = new DataBlockId(ID3v1, "id3v1.payload.title");
@@ -225,25 +248,7 @@ public class ID3v1Extension implements Extension {
 
       descMap.put(id3v1TagId, new DataBlockDescription(id3v1TagId, "ID3v1 tag", "The ID3v1 tag",
          PhysicalDataBlockType.CONTAINER, tagChildIds, null, 1, 1, 128, 128, null));
-
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(id3v1TagId);
-
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      // There is no ByteOrder relevant for ID3v1
-      supportedByteOrders.add(ByteOrder.BIG_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-      supportedCharsets.add(Charsets.CHARSET_ASCII);
-      supportedCharsets.add(Charsets.CHARSET_UTF8);
-
-      DataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
-
-      return dummyID3v1Spec;
+      return descMap;
    }
 
 }

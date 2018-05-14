@@ -52,13 +52,15 @@ public class TopLevelContainerBuilder extends AbstractDataFormatSpecificationBui
    @Override
    public ContainerBuilder<FieldBasedPayloadBuilder> addContainerWithFieldBasedPayload(String localId, String name,
       String description) {
-      return new StandardFieldBasedPayloadContainerBuilder(null, localId, name, description);
+      return new StandardFieldBasedPayloadContainerBuilder(getDescriptionCollector(), getDataFormat(), localId, name,
+         description);
    }
 
    @Override
    public ContainerBuilder<ContainerBasedPayloadBuilder> addContainerWithContainerBasedPayload(String localId,
       String name, String description) {
-      return new StandardContainerBasedPayloadContainerBuilder(null, localId, name, description);
+      return new StandardContainerBasedPayloadContainerBuilder(getDescriptionCollector(), getDataFormat(), localId,
+         name, description);
    }
 
    @Override

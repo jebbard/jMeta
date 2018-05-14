@@ -11,8 +11,10 @@ package com.github.jmeta.library.dataformats.impl.builder;
 
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector;
 import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.HeaderBuilder;
+import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
@@ -71,6 +73,14 @@ public class StandardContainerBasedPayloadContainerBuilder
    public StandardContainerBasedPayloadContainerBuilder(ContainerBasedPayloadBuilder parentBuilder, String localId,
       String name, String description) {
       super(parentBuilder, localId, name, description, PhysicalDataBlockType.CONTAINER);
+   }
+
+   /**
+    * Creates a new {@link StandardContainerBasedPayloadContainerBuilder}.
+    */
+   public StandardContainerBasedPayloadContainerBuilder(DescriptionCollector collector, ContainerDataFormat dataFormat,
+      String localId, String name, String description) {
+      super(collector, dataFormat, localId, name, description, PhysicalDataBlockType.CONTAINER);
    }
 
    @Override
