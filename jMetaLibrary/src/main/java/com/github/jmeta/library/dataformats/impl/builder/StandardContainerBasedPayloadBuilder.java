@@ -46,15 +46,13 @@ public class StandardContainerBasedPayloadBuilder
    @Override
    public ContainerBuilder<FieldBasedPayloadBuilder> addGenericContainerWithFieldBasedPayload(String localId,
       String name, String description) {
-      // TODO implement
-      return null;
+      return new StandardFieldBasedPayloadContainerBuilder(this, "${" + localId + "}", name, description);
    }
 
    @Override
    public ContainerBuilder<ContainerBasedPayloadBuilder> addGenericContainerWithContainerBasedPayload(String localId,
       String name, String description) {
-      // TODO implement
-      return null;
+      return new StandardContainerBasedPayloadContainerBuilder(this, "${" + localId + "}", name, description);
    }
 
    @Override

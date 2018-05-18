@@ -241,9 +241,9 @@ public class ID3v23Extension implements Extension {
 
       // Create concrete block description
       DataBlockDescription concreteDesc = new DataBlockDescription(concreteId, concreteName, concreteSpecDesc,
-         genericDesc.getPhysicalType(), concreteChildren, concreteFieldProperties,
-         genericDesc.getMinimumOccurrences(), genericDesc.getMaximumOccurrences(),
-         genericDesc.getMinimumByteLength(), genericDesc.getMaximumByteLength(), null);
+         genericDesc.getPhysicalType(), concreteChildren, concreteFieldProperties, genericDesc.getMinimumOccurrences(),
+         genericDesc.getMaximumOccurrences(), genericDesc.getMinimumByteLength(), genericDesc.getMaximumByteLength(),
+         null);
 
       descMap.put(concreteId, concreteDesc);
    }
@@ -505,12 +505,10 @@ public class ID3v23Extension implements Extension {
 
       tagIdEnumerated.put(ID3V23_TAG_ID_STRING, ID3V23_TAG_ID_BYTES);
 
-      descMap
-         .put(ID3V23_HEADER_ID_FIELD_ID,
-            new DataBlockDescription(ID3V23_HEADER_ID_FIELD_ID, "id3v23 tag header id", "The id3v23 tag header id",
-               PhysicalDataBlockType.FIELD, tagIdChildIds, new FieldProperties<>(FieldType.STRING, ID3V23_TAG_ID_STRING,
-                  tagIdEnumerated, null, null, Charsets.CHARSET_ISO, null, new ArrayList<>(), true),
-               1, 1, 3, 3, null));
+      descMap.put(ID3V23_HEADER_ID_FIELD_ID, new DataBlockDescription(ID3V23_HEADER_ID_FIELD_ID, "id3v23 tag header id",
+         "The id3v23 tag header id", PhysicalDataBlockType.FIELD, tagIdChildIds, new FieldProperties<>(FieldType.STRING,
+            ID3V23_TAG_ID_STRING, tagIdEnumerated, null, null, Charsets.CHARSET_ISO, null, new ArrayList<>(), true),
+         1, 1, 3, 3, null));
 
       // 2. tag version
       final List<DataBlockId> versionChildIds = new ArrayList<>();
@@ -644,8 +642,8 @@ public class ID3v23Extension implements Extension {
 
       descMap.put(PADDING_PAYLOAD_ID,
          new DataBlockDescription(PADDING_PAYLOAD_ID, "Padding payload", "Padding payload",
-            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, paddingPayloadChildIds, null, 1, 1, 0, DataBlockDescription.UNLIMITED,
-            null));
+            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, paddingPayloadChildIds, null, 1, 1, 0,
+            DataBlockDescription.UNLIMITED, null));
 
       // 4. Padding Container
       final List<DataBlockId> paddingChildIds = new ArrayList<>();
@@ -653,9 +651,8 @@ public class ID3v23Extension implements Extension {
       paddingChildIds.add(paddingHeaderId);
       paddingChildIds.add(PADDING_PAYLOAD_ID);
 
-      descMap.put(PADDING_ID,
-         new DataBlockDescription(PADDING_ID, "Padding", "Padding", PhysicalDataBlockType.CONTAINER, paddingChildIds,
-            null, 0, 1, 1, DataBlockDescription.UNLIMITED, null));
+      descMap.put(PADDING_ID, new DataBlockDescription(PADDING_ID, "Padding", "Padding",
+         PhysicalDataBlockType.CONTAINER, paddingChildIds, null, 0, 1, 1, DataBlockDescription.UNLIMITED, null));
    }
 
    /**
@@ -671,8 +668,8 @@ public class ID3v23Extension implements Extension {
 
       descMap.put(ID3V23_PAYLOAD_ID,
          new DataBlockDescription(ID3V23_PAYLOAD_ID, "payload", "The id3v23 payload",
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, null, 1, 1, 11, DataBlockDescription.UNLIMITED,
-            null));
+            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, null, 1, 1, 11,
+            DataBlockDescription.UNLIMITED, null));
    }
 
    /**
@@ -690,8 +687,8 @@ public class ID3v23Extension implements Extension {
       genericFrameChildIds.add(GENERIC_FRAME_PAYLOAD_ID);
 
       final DataBlockDescription genericBlockDesc = new DataBlockDescription(GENERIC_FRAME_ID, "GENERIC_ID3v23_FRAME",
-         "The id3v23 GENERIC_FRAME", PhysicalDataBlockType.CONTAINER, genericFrameChildIds, null,
-         0, 999999, 11, DataBlockDescription.UNLIMITED, null);
+         "The id3v23 GENERIC_FRAME", PhysicalDataBlockType.CONTAINER, genericFrameChildIds, null, 0, 999999, 11,
+         DataBlockDescription.UNLIMITED, null);
 
       descMap.put(GENERIC_FRAME_ID, genericBlockDesc);
 
@@ -802,6 +799,15 @@ public class ID3v23Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
+      Map<DataBlockId, DataBlockDescription> descMap = getDescMap();
+
+      return createSpecification(descMap);
+   }
+
+   /**
+    * @return
+    */
+   public Map<DataBlockId, DataBlockDescription> getDescMap() {
       Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
 
       addPayloadFrames(descMap);
@@ -812,8 +818,7 @@ public class ID3v23Extension implements Extension {
       addPayload(descMap);
 
       addTag(descMap);
-
-      return createSpecification(descMap);
+      return descMap;
    }
 
    private DataBlockId replaceId(DataBlockId genericId, String genericLocalId, String concreteLocalId) {
