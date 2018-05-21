@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -28,7 +27,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -111,20 +110,24 @@ public class OggExtension implements Extension {
     */
    public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId oggPageId,
       final DataBlockId oggPacketPartContainerId) {
-      final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(OggExtension.OGG, "ogg.header.segmentTableEntry");
-      final DataBlockId oggSegmentId = new DataBlockId(OggExtension.OGG, "ogg.payload.packetPartContainer.payload.segment");
+      final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(OggExtension.OGG,
+         "ogg.header.segmentTableEntry");
+      final DataBlockId oggSegmentId = new DataBlockId(OggExtension.OGG,
+         "ogg.payload.packetPartContainer.payload.segment");
 
       Set<DataBlockId> affectedBlocks = new HashSet<>();
 
       affectedBlocks.add(oggPageHeaderSegmentTableEntryId);
-      
+
       Set<DataBlockId> affectedBlocks2 = new HashSet<>();
 
       affectedBlocks2.add(oggSegmentId);
 
+      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
+         OggExtension.OGG);
 
-      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(OggExtension.OGG);
-      
+      // @formatter:off
+
       builder
           .addContainerWithContainerBasedPayload("ogg", "Ogg page", "The ogg page")
              .withLengthOf(20, DataBlockDescription.UNLIMITED)
@@ -178,15 +181,12 @@ public class OggExtension implements Extension {
                       .finishField()
                    .finishFieldBasedPayload()
                 .finishContainer()
-             .finishContainerBasedPayload()
+             .finishContainerSequence()
           .finishContainer();
-      
-      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
 
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
-         .collect(Collectors.toMap(b -> b.getId(), b -> b));
+      // @formatter:on
 
-      return topLevelContainerMap;
+      return builder.finishContainerSequence();
    }
 
 }

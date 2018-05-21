@@ -25,4 +25,5 @@ public interface DataBlockDescriptionModifier<ConcreteBuilder extends DataFormat
 
    public ConcreteBuilder withOverriddenId(DataBlockId overriddenId);
 
+   public ConcreteBuilder withDescription(String name, String description);
 }

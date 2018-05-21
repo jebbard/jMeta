@@ -29,9 +29,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractFieldBuilder}
  *
  */
-public abstract class AbstractFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder, FieldInterpretedType>
-   extends AbstractDataFormatSpecificationBuilderWithParent<ParentBuilder>
-   implements FieldBuilder<ParentBuilder, FieldInterpretedType> {
+public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuilder, C extends DataFormatSpecificationBuilder, FieldInterpretedType>
+   extends AbstractDataFormatSpecificationBuilderWithParent<P, C> implements FieldBuilder<P, FieldInterpretedType> {
 
    /**
     * Returns the attribute {@link #functions}.
@@ -69,7 +68,7 @@ public abstract class AbstractFieldBuilder<ParentBuilder extends DataFormatSpeci
     * @param description
     * @param type
     */
-   public AbstractFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description,
+   public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description,
       FieldType<FieldInterpretedType> fieldType) {
       super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD);
       Reject.ifNull(fieldType, "fieldType");
@@ -81,7 +80,7 @@ public abstract class AbstractFieldBuilder<ParentBuilder extends DataFormatSpeci
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#finishField()
     */
    @Override
-   public ParentBuilder finishField() {
+   public P finishField() {
       FieldProperties<FieldInterpretedType> fieldProperties = new FieldProperties<>(fieldType, defaultValue,
          enumeratedValues, terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions,
          isMagicKey);
@@ -138,6 +137,27 @@ public abstract class AbstractFieldBuilder<ParentBuilder extends DataFormatSpeci
     */
    public void setFixedByteOrder(ByteOrder fixedByteOrder) {
       this.fixedByteOrder = fixedByteOrder;
+   }
+
+   public C withFieldFunction(FieldFunction function) {
+      getFunctions().add(function);
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
+    */
+   public C withDefaultValue(FieldInterpretedType value) {
+      setDefaultValue(value);
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
+    */
+   public C asMagicKey() {
+      setAsMagicKey();
+      return (C) this;
    }
 
 }

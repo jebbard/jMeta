@@ -276,15 +276,14 @@ public class DataBlockDescription {
       return m_minimumByteLength;
    }
 
-   /**
-    * @see java.lang.Object#toString()
-    */
    @Override
    public String toString() {
-
-      return getClass().getName() + "[" + "id=" + m_id + ", name=" + m_name + ", specDescription=" + m_specDescription
-         + ", physicalType=" + m_physicalType + ", childIds=" + m_childIds + ", fieldProperties=" + m_fieldProperties
-         + ", maximumLength=" + m_maximumByteLength + ", minimumLength=" + m_minimumByteLength + "]";
+      return "DataBlockDescription [m_id=" + m_id + ", m_name=" + m_name + ", m_specDescription=" + m_specDescription
+         + ", m_physicalType=" + m_physicalType + ", m_childIds=" + m_childIds + ", m_fieldProperties="
+         + m_fieldProperties + ", m_maximumByteLength=" + m_maximumByteLength + ", m_minimumByteLength="
+         + m_minimumByteLength + ", m_headerMagicKeys=" + m_headerMagicKeys + ", m_footerMagicKeys=" + m_footerMagicKeys
+         + ", m_overriddenId=" + m_overriddenId + ", minimumOccurrences=" + minimumOccurrences + ", maximumOccurrences="
+         + maximumOccurrences + ", fixedByteOffsetInContainer=" + fixedByteOffsetInContainer + "]";
    }
 
    /**

@@ -10,8 +10,10 @@ package com.github.jmeta.library.dataformats.api.types;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -137,15 +139,37 @@ public class FieldProperties<T> {
    public boolean isMagicKey() {
       return isMagicKey;
    }
+   //
+   // /**
+   // * @see java.lang.Object#toString()
+   // */
+   // @Override
+   // public String toString() {
+   //
+   // return getClass().getName() + "[" + ", termination=" + m_terminationCharacter + ", defaultValue="
+   // + (m_defaultValue instanceof byte[] ? Arrays.toString((byte[]) m_defaultValue) : m_defaultValue)
+   // + ", enumeratedValues=" + enumValuesToString() + ", blockFunction=" + m_functions + "]";
+   // }
 
-   /**
-    * @see java.lang.Object#toString()
-    */
    @Override
    public String toString() {
+      return "FieldProperties [m_terminationCharacter=" + m_terminationCharacter + ", m_defaultValue="
+         + (m_defaultValue instanceof byte[] ? Arrays.toString((byte[]) m_defaultValue) : m_defaultValue)
+         + ", m_enumeratedValues=" + enumValuesToString() + ", m_flagSpecification=" + m_flagSpecification
+         + ", m_fieldType=" + m_fieldType + ", m_fixedCharset=" + m_fixedCharset + ", m_fixedByteOrder="
+         + m_fixedByteOrder + ", m_functions=" + m_functions + ", isMagicKey=" + isMagicKey + "]";
+   }
 
-      return getClass().getName() + "[" + ", termination=" + m_terminationCharacter + ", defaultValue=" + m_defaultValue
-         + ", enumeratedValues=" + m_enumeratedValues + ", blockFunction=" + m_functions + "]";
+   private String enumValuesToString() {
+      String toString = "{";
+
+      for (Iterator<T> iterator = m_enumeratedValues.keySet().iterator(); iterator.hasNext();) {
+         T nextKey = iterator.next();
+         byte[] nextValue = m_enumeratedValues.get(nextKey);
+         toString += nextKey + "=" + Arrays.toString(nextValue);
+      }
+
+      return toString + "}";
    }
 
    private final Character m_terminationCharacter;

@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -32,7 +31,7 @@ import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -162,28 +161,45 @@ public class MP3Extension implements Extension {
 
       FieldFunction crcFunc = new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedBlocks, "No protection bit", 0);
 
-      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(MP3Extension.MP3);
+      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
+         MP3Extension.MP3);
 
-      builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame").withLengthOf(33, 1024)
-         .addHeader("header", "MP3 header", "The MP3 header").withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
-         .addFlagsField("content", "MP3 header contents", "The MP3 header contents")
-         .withStaticLengthOf(MP3_HEADER_BYTE_LENGTH).withFlagSpecification(mp3HeaderFlagSpec).withFieldFunction(crcFunc)
-         .finishField().finishHeader().addHeader("crc", "MP3 CRC", "The MP3 CRC").withStaticLengthOf(2)
-         .withOccurrences(0, 1).addBinaryField("data", "MP3 CRC data", "The MP3 CRC data").withStaticLengthOf(2)
-         .finishField().finishHeader().getPayload().withLengthOf(1, 998)
-         .addBinaryField("data", "payloadData", "The MP3 payload data").withLengthOf(1, 998).finishField()
-         .finishFieldBasedPayload().finishContainer();
+      // @formatter:off
 
-      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
+      builder
+         .addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
+            .withLengthOf(33, 1024)
+            .addHeader("header", "MP3 header", "The MP3 header").withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
+               .addFlagsField("content", "MP3 header contents", "The MP3 header contents")
+                  .withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
+                  .withFlagSpecification(mp3HeaderFlagSpec)
+                  .withFieldFunction(crcFunc)
+               .finishField()
+            .finishHeader()
+            .addHeader("crc", "MP3 CRC", "The MP3 CRC")
+               .withStaticLengthOf(2)
+               .withOccurrences(0, 1)
+               .addBinaryField("data", "MP3 CRC data", "The MP3 CRC data")
+                  .withStaticLengthOf(2)
+               .finishField()
+            .finishHeader()
+            .getPayload()
+               .withLengthOf(1, 998)
+               .addBinaryField("data", "payloadData", "The MP3 payload data")
+                  .withLengthOf(1, 998)
+               .finishField()
+            .finishFieldBasedPayload()
+         .finishContainer();
+      // @formatter:on
 
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
-         .collect(Collectors.toMap(b -> b.getId(), b -> b));
+      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = builder.finishContainerSequence();
+
       final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
       final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
 
       topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
 
-      return topLevelContainerMap;
+      return builder.finishContainerSequence();
    }
 
 }

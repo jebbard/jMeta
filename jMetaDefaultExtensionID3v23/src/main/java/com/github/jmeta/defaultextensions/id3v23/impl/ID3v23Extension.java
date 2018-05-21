@@ -9,14 +9,11 @@
  */
 package com.github.jmeta.defaultextensions.id3v23.impl;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,20 +21,18 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.types.FieldProperties;
-import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
-import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
@@ -87,19 +82,9 @@ public class ID3v23Extension implements Extension {
       ID3V23_GENERIC_CONTAINER_ID + ".payload.textEncoding");
    private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_CRC_ID = new DataBlockId(ID3v23,
       "id3v23.extHeader.crc");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_FLAGS_ID = new DataBlockId(ID3v23,
-      "id3v23.extHeader.flags");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_PADDINGSIZE_ID = new DataBlockId(ID3v23,
-      "id3v23.extHeader.paddingSize");
-   private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_SIZE_ID = new DataBlockId(ID3v23,
-      "id3v23.extHeader.size");
    private static final DataBlockId ID3V23_EXTENDED_HEADER_ID = new DataBlockId(ID3v23, "id3v23.extHeader");
    private static final int ID3V23_FRAME_FLAG_SIZE = 2;
    public static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.flags");
-   private static final DataBlockId ID3V23_HEADER_ID = new DataBlockId(ID3v23, "id3v23.header");
-   private static final DataBlockId ID3V23_HEADER_ID_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.id");
-   private static final DataBlockId ID3V23_HEADER_SIZE_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.size");
-   private static final DataBlockId ID3V23_HEADER_VERSION_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.version");
    private static final DataBlockId ID3V23_PAYLOAD_ID = new DataBlockId(ID3v23, "id3v23.payload");
    private static final int ID3V23_TAG_FLAG_SIZE = 1;
    public static final DataBlockId ID3V23_TAG_ID = new DataBlockId(ID3v23, "id3v23");
@@ -107,16 +92,10 @@ public class ID3v23Extension implements Extension {
    private static final String ID3V23_TAG_ID_STRING = "ID3";
    private static final byte[] ID3V23_TAG_MAGIC_KEY_BYTES = new byte[ID3V23_TAG_ID_BYTES.length
       + ID3V23_TAG_VERSION_BYTES.length];
-   private static final DataBlockId PADDING_BYTES_FIELD_ID = new DataBlockId(ID3v23,
-      "id3v23.payload.padding.payload.bytes");
    private static final DataBlockId PADDING_ID = new DataBlockId(ID3v23, "id3v23.payload.padding");
-   private static final DataBlockId PADDING_PAYLOAD_ID = new DataBlockId(ID3v23, "id3v23.payload.padding.payload");
    private static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
    private static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
    public static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
-   private static final String TIT2_LOCAL_ID = "TIT2";
-   private static final String TPE1_LOCAL_ID = "TPE1";
-   private static final String TRCK_LOCAL_ID = "TRCK";
 
    static {
       for (int i = 0; i < ID3V23_TAG_ID_BYTES.length; i++) {
@@ -160,606 +139,6 @@ public class ID3v23Extension implements Extension {
       return serviceProviders;
    }
 
-   @SuppressWarnings({ "unchecked", "rawtypes" })
-   private void addConcreteContainerDescriptionFromGeneric(Map<DataBlockId, DataBlockDescription> descMap,
-      DataBlockId genericId, String genericLocalId, String concreteLocalId, List<DataBlockId> concretePayloadChildren) {
-
-      Reject.ifNull(concreteLocalId, "concreteLocalId");
-      Reject.ifNull(genericLocalId, "genericLocalId");
-      Reject.ifNull(genericId, "genericId");
-      Reject.ifNull(descMap, "descMap");
-
-      Reject.ifFalse(descMap.containsKey(genericId), "descMap.containsKey(genericId)");
-
-      // Get generic block description
-      DataBlockDescription genericDesc = descMap.get(genericId);
-
-      // Replace id, name and spec desc
-      DataBlockId concreteId = replaceId(genericId, genericLocalId, concreteLocalId);
-      String concreteSpecDesc = genericDesc.getSpecDescription().replace(genericLocalId, concreteLocalId);
-      String concreteName = genericDesc.getName().replace(genericLocalId, concreteLocalId);
-
-      // Define all other items to replace
-      List<DataBlockId> genericChildren = new ArrayList<>(genericDesc.getOrderedChildIds());
-      List<DataBlockId> concreteChildren = new ArrayList<>();
-      FieldProperties<?> genericFieldProperties = genericDesc.getFieldProperties();
-      FieldProperties<?> concreteFieldProperties = genericDesc.getFieldProperties();
-
-      // Add payload children, if this is a PAYLOAD block
-      if (genericDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD_BASED_PAYLOAD)
-         || genericDesc.getPhysicalType().equals(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD))
-         if (concretePayloadChildren != null) {
-            for (int i = 0; i < concretePayloadChildren.size(); ++i) {
-               DataBlockId concretePayloadChildId = concretePayloadChildren.get(i);
-
-               final DataBlockId overriddenId = descMap.get(concretePayloadChildId).getOverriddenId();
-
-               if (overriddenId != null && genericChildren.contains(overriddenId))
-                  genericChildren.remove(overriddenId);
-            }
-
-            genericChildren.addAll(concretePayloadChildren);
-         }
-
-      // Replace child IDs, create concrete block descriptions for them
-      for (int i = 0; i < genericChildren.size(); ++i) {
-         DataBlockId genericChildId = genericChildren.get(i);
-
-         // Add a new concrete block description for each child
-         addConcreteContainerDescriptionFromGeneric(descMap, genericChildId, genericLocalId, concreteLocalId,
-            concretePayloadChildren);
-
-         concreteChildren.add(replaceId(genericChildId, genericLocalId, concreteLocalId));
-      }
-
-      // Replace field functions
-      if (genericFieldProperties != null) {
-         List<FieldFunction> concreteFieldFunctions = new ArrayList<>();
-
-         for (int i = 0; i < genericFieldProperties.getFieldFunctions().size(); ++i) {
-            FieldFunction genericFunction = genericFieldProperties.getFieldFunctions().get(i);
-
-            Set<DataBlockId> concreteAffectedIds = new HashSet<>();
-
-            for (Iterator<DataBlockId> affectedBlockIterator = genericFunction.getAffectedBlockIds()
-               .iterator(); affectedBlockIterator.hasNext();) {
-               DataBlockId genericAffectedBlockId = affectedBlockIterator.next();
-
-               concreteAffectedIds.add(replaceId(genericAffectedBlockId, genericLocalId, concreteLocalId));
-            }
-
-            concreteFieldFunctions.add(new FieldFunction(genericFunction.getFieldFunctionType(), concreteAffectedIds,
-               genericFunction.getFlagName(), genericFunction.getFlagValue()));
-         }
-
-         concreteFieldProperties = new FieldProperties(genericFieldProperties.getFieldType(),
-            genericFieldProperties.getDefaultValue(), genericFieldProperties.getEnumeratedValues(),
-            genericFieldProperties.getTerminationCharacter(), genericFieldProperties.getFlagSpecification(),
-            genericFieldProperties.getFixedCharacterEncoding(), genericFieldProperties.getFixedByteOrder(),
-            concreteFieldFunctions, false);
-      }
-
-      // Create concrete block description
-      DataBlockDescription concreteDesc = new DataBlockDescription(concreteId, concreteName, concreteSpecDesc,
-         genericDesc.getPhysicalType(), concreteChildren, concreteFieldProperties, genericDesc.getMinimumOccurrences(),
-         genericDesc.getMaximumOccurrences(), genericDesc.getMinimumByteLength(), genericDesc.getMaximumByteLength(),
-         null);
-
-      descMap.put(concreteId, concreteDesc);
-   }
-
-   private void addExtendedHeader(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      // 1. Extended Header Size
-      final List<DataBlockId> extHeaderSizeChildIds = new ArrayList<>();
-
-      descMap.put(ID3V23_EXTENDED_HEADER_FIELD_SIZE_ID,
-         new DataBlockDescription(ID3V23_EXTENDED_HEADER_FIELD_SIZE_ID, "id3v23 extended header size",
-            "The id3v23 extended header size", PhysicalDataBlockType.FIELD, extHeaderSizeChildIds,
-            new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null,
-               new ArrayList<>(), false),
-            1, 1, 4, 4, null));
-
-      // 2. Extended header flags
-      final List<DataBlockId> flagsChildIds = new ArrayList<>();
-
-      List<FlagDescription> extendedHeaderFlagDescriptions = new ArrayList<>();
-
-      extendedHeaderFlagDescriptions
-         .add(new FlagDescription(EXT_HEADER_FLAG_CRC_DATA_PRESENT, new BitAddress(0, 0), "", 1, null));
-
-      final byte[] defaultTagFlagBytes = new byte[] { 0 };
-
-      FlagSpecification id3v23TagFlagSpec = new FlagSpecification(extendedHeaderFlagDescriptions, 1,
-         ByteOrder.BIG_ENDIAN, defaultTagFlagBytes);
-
-      Flags defaultExtHeaderFlags = new Flags(id3v23TagFlagSpec);
-
-      defaultExtHeaderFlags.fromArray(defaultTagFlagBytes);
-
-      final ArrayList<FieldFunction> extHeaderFlagFunctions = new ArrayList<>();
-
-      Set<DataBlockId> affectedDataBlockIds = new HashSet<>();
-
-      affectedDataBlockIds.add(ID3V23_EXTENDED_HEADER_FIELD_CRC_ID);
-
-      extHeaderFlagFunctions.add(
-         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIds, EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1));
-
-      descMap.put(ID3V23_EXTENDED_HEADER_FIELD_FLAGS_ID,
-         new DataBlockDescription(
-            ID3V23_EXTENDED_HEADER_FIELD_FLAGS_ID, "id3v23 extended header flags", "The id3v23 extended header flags",
-            PhysicalDataBlockType.FIELD, flagsChildIds, new FieldProperties<>(FieldType.FLAGS, defaultExtHeaderFlags,
-               null, null, null, null, null, extHeaderFlagFunctions, false),
-            1, 1, ID3V23_TAG_FLAG_SIZE, ID3V23_TAG_FLAG_SIZE, null));
-
-      // 3. Ext header padding size
-      final List<DataBlockId> paddingSizeChildIds = new ArrayList<>();
-
-      descMap.put(ID3V23_EXTENDED_HEADER_FIELD_PADDINGSIZE_ID,
-         new DataBlockDescription(ID3V23_EXTENDED_HEADER_FIELD_PADDINGSIZE_ID, "id3v23 extended header padding size",
-            "The id3v23 extended header padding size", PhysicalDataBlockType.FIELD, paddingSizeChildIds,
-            new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null,
-               new ArrayList<>(), false),
-            1, 1, 4, 4, null));
-
-      // 4. Ext header CRC
-      final List<DataBlockId> crcChildIds = new ArrayList<>();
-
-      descMap.put(ID3V23_EXTENDED_HEADER_FIELD_CRC_ID,
-         new DataBlockDescription(ID3V23_EXTENDED_HEADER_FIELD_CRC_ID, "id3v23 extended header CRC",
-            "The id3v23 extended header CRC", PhysicalDataBlockType.FIELD, crcChildIds,
-            new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null,
-               new ArrayList<>(), false),
-            1, 1, 4, 4, null));
-
-      // 5. id3v23 extended header
-      final List<DataBlockId> extHeaderChildIds = new ArrayList<>();
-      extHeaderChildIds.add(ID3V23_EXTENDED_HEADER_FIELD_SIZE_ID);
-      extHeaderChildIds.add(ID3V23_EXTENDED_HEADER_FIELD_FLAGS_ID);
-      extHeaderChildIds.add(ID3V23_EXTENDED_HEADER_FIELD_PADDINGSIZE_ID);
-      extHeaderChildIds.add(ID3V23_EXTENDED_HEADER_FIELD_CRC_ID);
-
-      descMap.put(ID3V23_EXTENDED_HEADER_ID,
-         new DataBlockDescription(ID3V23_EXTENDED_HEADER_ID, "id3v23 extended header", "The id3v23 extended header",
-            PhysicalDataBlockType.HEADER, extHeaderChildIds, null, 0, 1, 10, 14, null));
-   }
-
-   /**
-    * @param descMap
-    */
-   private void addGenericFrameHeader(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      // 1 Frame id
-      final List<DataBlockId> frameIdChildIds = new ArrayList<>();
-
-      List<FieldFunction> genericIdFieldFunction = new ArrayList<>();
-
-      Set<DataBlockId> affectedBlocks = new HashSet<>();
-
-      affectedBlocks.add(GENERIC_FRAME_ID);
-
-      genericIdFieldFunction.add(new FieldFunction(FieldFunctionType.ID_OF, affectedBlocks, null, null));
-
-      descMap.put(GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID,
-         new DataBlockDescription(
-            GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID, "Generic frame id field", "The generic frame id field",
-            PhysicalDataBlockType.FIELD, frameIdChildIds, new FieldProperties<>(FieldType.STRING, null, null, null,
-               null, Charsets.CHARSET_ISO, null, genericIdFieldFunction, false),
-            1, 1, FRAME_ID_SIZE, FRAME_ID_SIZE, null));
-
-      // 2 Frame size
-      final List<DataBlockId> frameSizeChildIds = new ArrayList<>();
-
-      List<FieldFunction> genericFrameSizeFieldFunction = new ArrayList<>();
-
-      Set<DataBlockId> affectedFrameSizeBlocks = new HashSet<>();
-
-      affectedFrameSizeBlocks.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      genericFrameSizeFieldFunction
-         .add(new FieldFunction(FieldFunctionType.SIZE_OF, affectedFrameSizeBlocks, null, null));
-
-      descMap.put(GENERIC_FRAME_HEADER_FRAME_SIZE_FIELD_ID, new DataBlockDescription(
-         GENERIC_FRAME_HEADER_FRAME_SIZE_FIELD_ID, "Generic frame size field", "The generic frame size field",
-         PhysicalDataBlockType.FIELD, frameSizeChildIds, new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER,
-            null, null, null, null, Charsets.CHARSET_ISO, null, genericFrameSizeFieldFunction, false),
-         1, 1, 4, 4, null));
-
-      // 3 Frame flags
-      final List<DataBlockId> frameFlagsChildIds = new ArrayList<>();
-
-      List<FlagDescription> frameFlagDescriptions = new ArrayList<>();
-
-      frameFlagDescriptions
-         .add(new FlagDescription(FRAME_FLAGS_TAG_ALTER_PRESERVATION, new BitAddress(0, 0), "", 1, null));
-      frameFlagDescriptions
-         .add(new FlagDescription(FRAME_FLAGS_FILE_ALTER_PRESERVATION, new BitAddress(0, 1), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_READ_ONLY, new BitAddress(0, 2), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_COMPRESSION, new BitAddress(1, 0), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_ENCRYPTION, new BitAddress(1, 1), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_GROUP_IDENTITY, new BitAddress(1, 2), "", 1, null));
-
-      final byte[] defaultTagFlagBytes = new byte[] { 0, 0 };
-
-      FlagSpecification id3v23FrameFlagSpec = new FlagSpecification(frameFlagDescriptions, ID3V23_FRAME_FLAG_SIZE,
-         ByteOrder.BIG_ENDIAN, defaultTagFlagBytes);
-
-      Flags defaultFrameFlags = new Flags(id3v23FrameFlagSpec);
-
-      defaultFrameFlags.fromArray(defaultTagFlagBytes);
-
-      final ArrayList<FieldFunction> frameFlagFunctions = new ArrayList<>();
-
-      Set<DataBlockId> affectedDataBlockIdsCompression = new HashSet<>();
-
-      affectedDataBlockIdsCompression.add(GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsCompressionTrafo = new HashSet<>();
-
-      affectedDataBlockIdsCompressionTrafo.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      frameFlagFunctions.add(
-         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsCompression, FRAME_FLAGS_COMPRESSION, 1));
-
-      Set<DataBlockId> affectedDataBlockIdsGroup = new HashSet<>();
-
-      affectedDataBlockIdsGroup.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
-
-      frameFlagFunctions.add(
-         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsGroup, FRAME_FLAGS_GROUP_IDENTITY, 1));
-
-      Set<DataBlockId> affectedDataBlockIdsEncryption = new HashSet<>();
-
-      affectedDataBlockIdsEncryption.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsEncryptionTrafo = new HashSet<>();
-
-      affectedDataBlockIdsEncryptionTrafo.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      frameFlagFunctions.add(
-         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsEncryption, FRAME_FLAGS_ENCRYPTION, 1));
-
-      descMap
-         .put(GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID,
-            new DataBlockDescription(
-               GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID, "Generic frame flags field", "The generic frame flags field",
-               PhysicalDataBlockType.FIELD, frameFlagsChildIds, new FieldProperties<>(FieldType.FLAGS,
-                  defaultFrameFlags, null, null, id3v23FrameFlagSpec, null, null, frameFlagFunctions, false),
-               1, 1, 2, 2, null));
-
-      // 4. Frame header
-      final List<DataBlockId> frameHeaderChildIds = new ArrayList<>();
-      frameHeaderChildIds.add(GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID);
-      frameHeaderChildIds.add(GENERIC_FRAME_HEADER_FRAME_SIZE_FIELD_ID);
-      frameHeaderChildIds.add(GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID);
-
-      descMap.put(GENERIC_FRAME_HEADER_ID, new DataBlockDescription(GENERIC_FRAME_HEADER_ID, "Generic frame header",
-         "The generic frame header", PhysicalDataBlockType.HEADER, frameHeaderChildIds, null, 1, 1, 10, 10, null));
-   }
-
-   /**
-    * @param descMap
-    */
-   private void addGenericFramePayload(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      // 1 Decompressed size
-      final List<DataBlockId> decompressedSizeChildIds = new ArrayList<>();
-
-      descMap.put(GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID, new DataBlockDescription(
-         GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID, "Decompressed size field", "The decompressed size field",
-         PhysicalDataBlockType.FIELD, decompressedSizeChildIds,
-         new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null, null, false),
-         0, 1, 4, 4, null));
-
-      // 2 Encryption method
-      final List<DataBlockId> encryptionMethodChildIds = new ArrayList<>();
-
-      descMap.put(GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID,
-         new DataBlockDescription(GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID, "Encryption method field",
-            "The encryption method field", PhysicalDataBlockType.FIELD, encryptionMethodChildIds,
-            new FieldProperties<Byte>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null, null, false),
-            0, 1, 1, 1, null));
-
-      // 3 Group Id
-      final List<DataBlockId> groupIdChildIds = new ArrayList<>();
-
-      descMap.put(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID,
-         new DataBlockDescription(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID, "Group id field", "The group id field",
-            PhysicalDataBlockType.FIELD, groupIdChildIds,
-            new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null, null, false), 0,
-            1, 1, 1, null));
-
-      // 4 Payload data
-      final List<DataBlockId> payloadDataChildIds = new ArrayList<>();
-
-      descMap.put(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID,
-         new DataBlockDescription(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID, "Payload data field", "The payload data field",
-            PhysicalDataBlockType.FIELD, payloadDataChildIds,
-            new FieldProperties<ByteBuffer>(FieldType.BINARY, null, null, null, null, null, null, null, false), 1, 1, 1,
-            DataBlockDescription.UNLIMITED, null));
-
-      // 5 Generic Frame Payload
-      final List<DataBlockId> genericFramePayloadChildIds = new ArrayList<>();
-      genericFramePayloadChildIds.add(GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID);
-      genericFramePayloadChildIds.add(GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID);
-      genericFramePayloadChildIds.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
-      genericFramePayloadChildIds.add(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID);
-
-      descMap.put(GENERIC_FRAME_PAYLOAD_ID,
-         new DataBlockDescription(GENERIC_FRAME_PAYLOAD_ID, "Generic frame payload", "The generic frame payload",
-            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, genericFramePayloadChildIds,
-            new FieldProperties<>(FieldType.UNSIGNED_WHOLE_NUMBER, null, null, null, null, null, null, null, false), 1,
-            1, 1, DataBlockDescription.UNLIMITED, null));
-   }
-
-   /**
-    * @param descMap
-    */
-   private void addHeader(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      // 1. tag id
-      final List<DataBlockId> tagIdChildIds = new ArrayList<>();
-
-      Map<String, byte[]> tagIdEnumerated = new HashMap<>();
-
-      tagIdEnumerated.put(ID3V23_TAG_ID_STRING, ID3V23_TAG_ID_BYTES);
-
-      descMap.put(ID3V23_HEADER_ID_FIELD_ID, new DataBlockDescription(ID3V23_HEADER_ID_FIELD_ID, "id3v23 tag header id",
-         "The id3v23 tag header id", PhysicalDataBlockType.FIELD, tagIdChildIds, new FieldProperties<>(FieldType.STRING,
-            ID3V23_TAG_ID_STRING, tagIdEnumerated, null, null, Charsets.CHARSET_ISO, null, new ArrayList<>(), true),
-         1, 1, 3, 3, null));
-
-      // 2. tag version
-      final List<DataBlockId> versionChildIds = new ArrayList<>();
-
-      Map<byte[], byte[]> versionEnumerated = new HashMap<>();
-
-      versionEnumerated.put(ID3V23_TAG_VERSION_BYTES, ID3V23_TAG_VERSION_BYTES);
-
-      descMap.put(ID3V23_HEADER_VERSION_FIELD_ID,
-         new DataBlockDescription(
-            ID3V23_HEADER_VERSION_FIELD_ID, "id3v23 tag header version", "The id3v23 tag header version",
-            PhysicalDataBlockType.FIELD, versionChildIds, new FieldProperties<>(FieldType.BINARY,
-               ID3V23_TAG_VERSION_BYTES, versionEnumerated, null, null, null, null, new ArrayList<>(), false),
-            1, 1, 2, 2, null));
-
-      // 3. tag flags
-      final List<DataBlockId> flagsChildIds = new ArrayList<>();
-
-      List<FlagDescription> tagFlagDescriptions = new ArrayList<>();
-
-      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_UNSYNCHRONIZATION, new BitAddress(0, 0), "", 1, null));
-      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_EXTENDED_HEADER, new BitAddress(0, 1), "", 1, null));
-      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_EXPERIMENTAL_INDICATOR, new BitAddress(0, 2), "", 1, null));
-
-      final byte[] defaultTagFlagBytes = new byte[] { 0 };
-
-      FlagSpecification id3v23TagFlagSpec = new FlagSpecification(tagFlagDescriptions, ID3V23_TAG_FLAG_SIZE,
-         ByteOrder.BIG_ENDIAN, defaultTagFlagBytes);
-
-      Flags defaultTagFlags = new Flags(id3v23TagFlagSpec);
-
-      defaultTagFlags.fromArray(defaultTagFlagBytes);
-
-      final ArrayList<FieldFunction> tagFlagFunctions = new ArrayList<>();
-
-      Set<DataBlockId> affectedDataBlockIds = new HashSet<>();
-
-      affectedDataBlockIds.add(ID3V23_EXTENDED_HEADER_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsUnsync = new HashSet<>();
-
-      affectedDataBlockIdsUnsync.add(GENERIC_FRAME_HEADER_ID);
-      affectedDataBlockIdsUnsync.add(GENERIC_FRAME_PAYLOAD_ID);
-      affectedDataBlockIdsUnsync.add(ID3V23_EXTENDED_HEADER_ID);
-
-      tagFlagFunctions
-         .add(new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIds, TAG_FLAGS_EXTENDED_HEADER, 1));
-
-      descMap.put(ID3V23_HEADER_FLAGS_FIELD_ID,
-         new DataBlockDescription(
-            ID3V23_HEADER_FLAGS_FIELD_ID, "id3v23 tag header flags", "The id3v23 tag header flags",
-            PhysicalDataBlockType.FIELD, flagsChildIds, new FieldProperties<>(FieldType.FLAGS, defaultTagFlags, null,
-               null, id3v23TagFlagSpec, null, null, tagFlagFunctions, false),
-            1, 1, ID3V23_TAG_FLAG_SIZE, ID3V23_TAG_FLAG_SIZE, null));
-
-      // 4. tag size
-      final List<DataBlockId> sizeChildIds = new ArrayList<>();
-
-      Set<DataBlockId> affectedTagSizeBlocks = new HashSet<>();
-
-      affectedTagSizeBlocks.add(ID3V23_PAYLOAD_ID);
-
-      List<FieldFunction> tagSizeFunc = new ArrayList<>();
-
-      tagSizeFunc.add(new FieldFunction(FieldFunctionType.SIZE_OF, affectedTagSizeBlocks, null, null));
-
-      descMap.put(ID3V23_HEADER_SIZE_FIELD_ID,
-         new DataBlockDescription(ID3V23_HEADER_SIZE_FIELD_ID, "id3v23 tag size", "The id3v23 tag size",
-            PhysicalDataBlockType.FIELD, sizeChildIds, new FieldProperties<Integer>(FieldType.UNSIGNED_WHOLE_NUMBER,
-               null, null, null, null, null, null, tagSizeFunc, false),
-            1, 1, 4, 4, null));
-
-      // 5. id3v23 header
-      List<byte[]> fixedByteValueBytes = new ArrayList<>();
-      List<String> fixedStringValue = new ArrayList<>();
-
-      fixedByteValueBytes.add(ID3V23_TAG_ID_BYTES);
-      fixedStringValue.add(ID3V23_TAG_ID_STRING);
-
-      final List<DataBlockId> headerChildIds = new ArrayList<>();
-      headerChildIds.add(ID3V23_HEADER_ID_FIELD_ID);
-      headerChildIds.add(ID3V23_HEADER_VERSION_FIELD_ID);
-      headerChildIds.add(ID3V23_HEADER_FLAGS_FIELD_ID);
-      headerChildIds.add(ID3V23_HEADER_SIZE_FIELD_ID);
-
-      descMap.put(ID3V23_HEADER_ID, new DataBlockDescription(ID3V23_HEADER_ID, "id3v23 tag header",
-         "The id3v23 tag header", PhysicalDataBlockType.HEADER, headerChildIds, null, 1, 1, 10, 10, null));
-   }
-
-   /**
-    *
-    */
-   private void addPaddingContainer(Map<DataBlockId, DataBlockDescription> descMap) {
-      final byte[] paddingByte = new byte[] { 0 };
-
-      // 1a. Padding id header field
-      DataBlockId paddingHeaderId = new DataBlockId(ID3v23, "id3v23.payload.padding.header");
-
-      final List<DataBlockId> paddingIdChildIds = new ArrayList<>();
-
-      DataBlockId paddingKeyField = new DataBlockId(ID3v23, "id3v23.payload.padding.header.key");
-      descMap.put(paddingKeyField,
-         new DataBlockDescription(paddingKeyField, "id3v23 padding header key", "The id3v23 padding header key",
-            PhysicalDataBlockType.FIELD, paddingIdChildIds, new FieldProperties<>(FieldType.BINARY, paddingByte, null,
-               null, null, Charsets.CHARSET_ISO, null, new ArrayList<>(), true),
-            1, 1, 1, 1, null));
-
-      // 1b. padding header
-
-      final List<DataBlockId> paddingHeaderChildIds = new ArrayList<>();
-
-      paddingHeaderChildIds.add(paddingKeyField);
-
-      descMap.put(paddingHeaderId, new DataBlockDescription(paddingHeaderId, "Padding header", "Padding header",
-         PhysicalDataBlockType.HEADER, paddingHeaderChildIds, null, 1, 1, 1, 1, null));
-
-      // 2. Padding bytes
-      final List<DataBlockId> paddingBytesChildIds = new ArrayList<>();
-
-      descMap
-         .put(PADDING_BYTES_FIELD_ID,
-            new DataBlockDescription(PADDING_BYTES_FIELD_ID, "Padding bytes", "Padding bytes",
-               PhysicalDataBlockType.FIELD, paddingBytesChildIds, new FieldProperties<>(FieldType.BINARY, paddingByte,
-                  null, null, null, null, null, new ArrayList<>(), false),
-               1, 1, 0, DataBlockDescription.UNLIMITED, null));
-
-      // 3. Padding Payload
-      final List<DataBlockId> paddingPayloadChildIds = new ArrayList<>();
-
-      paddingPayloadChildIds.add(PADDING_BYTES_FIELD_ID);
-
-      descMap.put(PADDING_PAYLOAD_ID,
-         new DataBlockDescription(PADDING_PAYLOAD_ID, "Padding payload", "Padding payload",
-            PhysicalDataBlockType.FIELD_BASED_PAYLOAD, paddingPayloadChildIds, null, 1, 1, 0,
-            DataBlockDescription.UNLIMITED, null));
-
-      // 4. Padding Container
-      final List<DataBlockId> paddingChildIds = new ArrayList<>();
-
-      paddingChildIds.add(paddingHeaderId);
-      paddingChildIds.add(PADDING_PAYLOAD_ID);
-
-      descMap.put(PADDING_ID, new DataBlockDescription(PADDING_ID, "Padding", "Padding",
-         PhysicalDataBlockType.CONTAINER, paddingChildIds, null, 0, 1, 1, DataBlockDescription.UNLIMITED, null));
-   }
-
-   /**
-    * @param descMap
-    */
-   private void addPayload(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      // 10. id3v23 payload
-      final List<DataBlockId> payloadChildIds = new ArrayList<>();
-
-      payloadChildIds.add(GENERIC_FRAME_ID);
-      payloadChildIds.add(PADDING_ID);
-
-      descMap.put(ID3V23_PAYLOAD_ID,
-         new DataBlockDescription(ID3V23_PAYLOAD_ID, "payload", "The id3v23 payload",
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, payloadChildIds, null, 1, 1, 11,
-            DataBlockDescription.UNLIMITED, null));
-   }
-
-   /**
-    * @param descMap
-    */
-   private void addPayloadFrames(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      // 1. generic frame
-      addGenericFramePayload(descMap);
-      addGenericFrameHeader(descMap);
-
-      final List<DataBlockId> genericFrameChildIds = new ArrayList<>();
-
-      genericFrameChildIds.add(GENERIC_FRAME_HEADER_ID);
-      genericFrameChildIds.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      final DataBlockDescription genericBlockDesc = new DataBlockDescription(GENERIC_FRAME_ID, "GENERIC_ID3v23_FRAME",
-         "The id3v23 GENERIC_FRAME", PhysicalDataBlockType.CONTAINER, genericFrameChildIds, null, 0, 999999, 11,
-         DataBlockDescription.UNLIMITED, null);
-
-      descMap.put(GENERIC_FRAME_ID, genericBlockDesc);
-
-      final List<DataBlockId> textEncChildIds = new ArrayList<>();
-
-      Map<Charset, byte[]> charsetsEnumerated = new HashMap<>();
-
-      charsetsEnumerated.put(Charsets.CHARSET_ISO, new byte[] { 00 });
-      charsetsEnumerated.put(Charsets.CHARSET_UTF16, new byte[] { 01 });
-
-      List<FieldFunction> textEncFieldFunctions = new ArrayList<>();
-
-      Set<DataBlockId> affectedTextEncIds = new HashSet<>();
-
-      affectedTextEncIds.add(GENERIC_INFORMATION_ID);
-
-      textEncFieldFunctions
-         .add(new FieldFunction(FieldFunctionType.CHARACTER_ENCODING_OF, affectedTextEncIds, null, null));
-
-      DataBlockDescription textEncDesc = new DataBlockDescription(GENERIC_TEXT_ENCODING_ID, "Text encoding",
-         "Text encoding", PhysicalDataBlockType.FIELD, textEncChildIds, new FieldProperties<>(FieldType.ENUMERATED,
-            Charsets.CHARSET_ISO, charsetsEnumerated, null, null, null, null, textEncFieldFunctions, false),
-         1, 1, 1, 1, GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID);
-
-      descMap.put(GENERIC_TEXT_ENCODING_ID, textEncDesc);
-
-      final List<DataBlockId> informationChildIds = new ArrayList<>();
-
-      descMap
-         .put(GENERIC_INFORMATION_ID,
-            new DataBlockDescription(GENERIC_INFORMATION_ID, "Information", "Information", PhysicalDataBlockType.FIELD,
-               informationChildIds, new FieldProperties<>(FieldType.STRING, null, null, '\u0000', null, null, null,
-                  new ArrayList<>(), false),
-               1, 1, 1, DataBlockDescription.UNLIMITED, GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID));
-
-      // 4. Generic (text information frame) infos
-      List<DataBlockId> textFrameChildren = new ArrayList<>();
-
-      textFrameChildren.add(GENERIC_TEXT_ENCODING_ID);
-      textFrameChildren.add(GENERIC_INFORMATION_ID);
-
-      final DataBlockId genericId = genericBlockDesc.getId();
-      final String genericLocalId = genericId.getIdSegments().get(genericId.getIdSegments().size() - 1);
-
-      // 5. tpe1
-      addConcreteContainerDescriptionFromGeneric(descMap, genericId, genericLocalId, TPE1_LOCAL_ID, textFrameChildren);
-
-      // 6. tit2
-      addConcreteContainerDescriptionFromGeneric(descMap, genericId, genericLocalId, TIT2_LOCAL_ID, textFrameChildren);
-
-      // 7. trck
-      addConcreteContainerDescriptionFromGeneric(descMap, genericId, genericLocalId, TRCK_LOCAL_ID, textFrameChildren);
-
-      // 8. Padding
-      addPaddingContainer(descMap);
-   }
-
-   /**
-    * @param descMap
-    */
-   private void addTag(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      // 11. id3v23 tag
-      final List<DataBlockId> tagChildIds = new ArrayList<>();
-      tagChildIds.add(ID3V23_HEADER_ID);
-      tagChildIds.add(ID3V23_PAYLOAD_ID);
-
-      descMap.put(ID3V23_TAG_ID, new DataBlockDescription(ID3V23_TAG_ID, "id3v23 tag", "The id3v23 tag",
-         PhysicalDataBlockType.CONTAINER, tagChildIds, null, 1, 1, 21, DataBlockDescription.UNLIMITED, null));
-   }
-
    private DataFormatSpecification createSpecification(Map<DataBlockId, DataBlockDescription> descMap) {
 
       Set<DataBlockId> topLevelIds = new HashSet<>();
@@ -787,6 +166,8 @@ public class ID3v23Extension implements Extension {
       genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID);
       genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
       genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID);
+      genericDataBlocks.add(GENERIC_INFORMATION_ID);
+      genericDataBlocks.add(GENERIC_TEXT_ENCODING_ID);
 
       final Set<DataBlockId> paddingDataBlocks = new HashSet<>();
 
@@ -808,27 +189,253 @@ public class ID3v23Extension implements Extension {
     * @return
     */
    public Map<DataBlockId, DataBlockDescription> getDescMap() {
-      Map<DataBlockId, DataBlockDescription> descMap = new HashMap<>();
+      // 3. tag flags
+      List<FlagDescription> tagFlagDescriptions = new ArrayList<>();
 
-      addPayloadFrames(descMap);
+      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_UNSYNCHRONIZATION, new BitAddress(0, 0), "", 1, null));
+      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_EXTENDED_HEADER, new BitAddress(0, 1), "", 1, null));
+      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_EXPERIMENTAL_INDICATOR, new BitAddress(0, 2), "", 1, null));
 
-      addHeader(descMap);
-      addExtendedHeader(descMap);
+      final byte[] defaultTagFlagBytes = new byte[] { 0 };
 
-      addPayload(descMap);
+      FlagSpecification id3v23TagFlagSpec = new FlagSpecification(tagFlagDescriptions, ID3V23_TAG_FLAG_SIZE,
+         ByteOrder.BIG_ENDIAN, defaultTagFlagBytes);
 
-      addTag(descMap);
-      return descMap;
+      Flags defaultTagFlags = new Flags(id3v23TagFlagSpec);
+
+      defaultTagFlags.fromArray(defaultTagFlagBytes);
+
+      Set<DataBlockId> affectedDataBlockIds = new HashSet<>();
+
+      affectedDataBlockIds.add(ID3V23_EXTENDED_HEADER_ID);
+
+      Set<DataBlockId> affectedDataBlockIdsUnsync = new HashSet<>();
+
+      affectedDataBlockIdsUnsync.add(GENERIC_FRAME_HEADER_ID);
+      affectedDataBlockIdsUnsync.add(GENERIC_FRAME_PAYLOAD_ID);
+      affectedDataBlockIdsUnsync.add(ID3V23_EXTENDED_HEADER_ID);
+
+      // 4. tag size
+      Set<DataBlockId> affectedTagSizeBlocks = new HashSet<>();
+
+      affectedTagSizeBlocks.add(ID3V23_PAYLOAD_ID);
+
+      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
+         ID3v23Extension.ID3v23);
+
+      // 2. Extended header flags
+      List<FlagDescription> extendedHeaderFlagDescriptions = new ArrayList<>();
+
+      extendedHeaderFlagDescriptions
+         .add(new FlagDescription(EXT_HEADER_FLAG_CRC_DATA_PRESENT, new BitAddress(0, 0), "", 1, null));
+
+      final byte[] defaultExtHeaderFlagBytes = new byte[] { 0 };
+
+      FlagSpecification id3v23ExtHeaderFlagSpec = new FlagSpecification(extendedHeaderFlagDescriptions, 1,
+         ByteOrder.BIG_ENDIAN, defaultExtHeaderFlagBytes);
+
+      Flags defaultExtHeaderFlags = new Flags(id3v23TagFlagSpec);
+
+      defaultExtHeaderFlags.fromArray(defaultTagFlagBytes);
+
+      Set<DataBlockId> affectedDataBlockIdsExtHead = new HashSet<>();
+
+      affectedDataBlockIdsExtHead.add(ID3V23_EXTENDED_HEADER_FIELD_CRC_ID);
+
+      // 1 Frame id
+      Set<DataBlockId> affectedBlocks = new HashSet<>();
+
+      affectedBlocks.add(GENERIC_FRAME_ID);
+
+      // 2 Frame size
+      Set<DataBlockId> affectedFrameSizeBlocks = new HashSet<>();
+
+      affectedFrameSizeBlocks.add(GENERIC_FRAME_PAYLOAD_ID);
+
+      // 3 Frame flags
+      List<FlagDescription> frameFlagDescriptions = new ArrayList<>();
+
+      frameFlagDescriptions
+         .add(new FlagDescription(FRAME_FLAGS_TAG_ALTER_PRESERVATION, new BitAddress(0, 0), "", 1, null));
+      frameFlagDescriptions
+         .add(new FlagDescription(FRAME_FLAGS_FILE_ALTER_PRESERVATION, new BitAddress(0, 1), "", 1, null));
+      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_READ_ONLY, new BitAddress(0, 2), "", 1, null));
+      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_COMPRESSION, new BitAddress(1, 0), "", 1, null));
+      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_ENCRYPTION, new BitAddress(1, 1), "", 1, null));
+      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_GROUP_IDENTITY, new BitAddress(1, 2), "", 1, null));
+
+      final byte[] defaultFrameFlagBytes = new byte[] { 0, 0 };
+
+      FlagSpecification id3v23FrameFlagSpec = new FlagSpecification(frameFlagDescriptions, ID3V23_FRAME_FLAG_SIZE,
+         ByteOrder.BIG_ENDIAN, defaultFrameFlagBytes);
+
+      Flags defaultFrameFlags = new Flags(id3v23FrameFlagSpec);
+
+      defaultFrameFlags.fromArray(defaultFrameFlagBytes);
+
+      Set<DataBlockId> affectedDataBlockIdsCompression = new HashSet<>();
+
+      affectedDataBlockIdsCompression.add(GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID);
+
+      Set<DataBlockId> affectedDataBlockIdsCompressionTrafo = new HashSet<>();
+
+      affectedDataBlockIdsCompressionTrafo.add(GENERIC_FRAME_PAYLOAD_ID);
+
+      Set<DataBlockId> affectedDataBlockIdsGroup = new HashSet<>();
+
+      affectedDataBlockIdsGroup.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
+
+      Set<DataBlockId> affectedDataBlockIdsEncryption = new HashSet<>();
+
+      affectedDataBlockIdsEncryption.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
+
+      Set<DataBlockId> affectedDataBlockIdsEncryptionTrafo = new HashSet<>();
+
+      affectedDataBlockIdsEncryptionTrafo.add(GENERIC_FRAME_PAYLOAD_ID);
+
+      Set<DataBlockId> affectedTextEncIds = new HashSet<>();
+
+      affectedTextEncIds.add(GENERIC_INFORMATION_ID);
+      affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TPE1.payload.information"));
+      affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TIT2.payload.information"));
+      affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TRCK.payload.information"));
+      // affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TALB.payload.information"));
+
+   // @formatter:off
+      builder
+      .addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
+         .withLengthOf(21, DataBlockDescription.UNLIMITED)
+         .addHeader("header", "id3v23 tag header", "The id3v23 tag header")
+            .withStaticLengthOf(10)
+            .addStringField("id", "id3v23 tag header id", "The id3v23 tag header id")
+               .withStaticLengthOf(3)
+               .withDefaultValue(ID3V23_TAG_ID_STRING)
+               .withFixedCharset(Charsets.CHARSET_ISO)
+               .asMagicKey()
+            .finishField()
+            .addBinaryField("version", "id3v23 tag header version", "The id3v23 tag header version")
+               .withStaticLengthOf(2)
+               .withDefaultValue(ID3V23_TAG_VERSION_BYTES)
+            .finishField()
+            .addFlagsField("flags", "id3v23 tag header flags", "The id3v23 tag header flags")
+               .withStaticLengthOf(ID3V23_TAG_FLAG_SIZE)
+               .withDefaultValue(defaultTagFlags)
+               .withFlagSpecification(id3v23TagFlagSpec)
+               .withFieldFunction(new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIds, TAG_FLAGS_EXTENDED_HEADER, 1))
+            .finishField()
+            .addNumericField("size", "id3v23 tag size", "The id3v23 tag size")
+               .withStaticLengthOf(4)
+               .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedTagSizeBlocks, null, null))
+            .finishField()
+         .finishHeader()
+         .addHeader("extHeader", "id3v23 extended header", "The id3v23 extended header")
+            .withLengthOf(10, 14)
+            .withOccurrences(0, 1)
+            .addNumericField("size", "id3v23 extended header size", "The id3v23 extended header size")
+               .withStaticLengthOf(4)
+               .withDefaultValue(Long.valueOf(0x2000))
+            .finishField()
+            .addFlagsField("flags", "id3v23 extended header flags", "The id3v23 extended header flags")
+               .withStaticLengthOf(ID3V23_TAG_FLAG_SIZE)
+               .withFlagSpecification(id3v23ExtHeaderFlagSpec)
+               .withDefaultValue(defaultExtHeaderFlags)
+               .withFieldFunction(
+         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsExtHead, EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1))
+            .finishField()
+            .addNumericField("paddingSize", "id3v23 extended header padding size", "The id3v23 extended header padding size")
+               .withStaticLengthOf(4)
+            .finishField()
+            .addNumericField("crc", "id3v23 extended header CRC", "The id3v23 extended header CRC")
+               .withStaticLengthOf(4)
+            .finishField()
+         .finishHeader()
+         .getPayload()
+            .withDescription("payload", "The id3v23 payload")
+            .withLengthOf(11, DataBlockDescription.UNLIMITED)
+            .addGenericContainerWithFieldBasedPayload("FRAME_ID", "GENERIC_ID3v23_FRAME", "The id3v23 GENERIC_FRAME")
+               .withLengthOf(11, DataBlockDescription.UNLIMITED)
+               .withOccurrences(0, 999999)
+               .addHeader("header", "Generic frame header", "The generic frame header")
+                  .withLengthOf(10, 10)
+                  .addStringField("id", "Generic frame id field", "The generic frame id field")
+                     .withStaticLengthOf(FRAME_ID_SIZE)
+                     .withFieldFunction(new FieldFunction(FieldFunctionType.ID_OF, affectedBlocks, null, null))
+                     .withFixedCharset(Charsets.CHARSET_ISO)
+                  .finishField()
+                  .addNumericField("size", "Generic frame size field", "The generic frame size field")
+                     .withStaticLengthOf(4)
+                     .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedFrameSizeBlocks, null, null))
+                  .finishField()
+                  .addFlagsField("flags", "Generic frame flags field", "The generic frame flags field")
+                     .withStaticLengthOf(2)
+                     .withFlagSpecification(id3v23FrameFlagSpec)
+                     .withDefaultValue(defaultFrameFlags)
+                     .withFieldFunction(
+         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsCompression, FRAME_FLAGS_COMPRESSION, 1))
+                     .withFieldFunction(
+                        new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsGroup, FRAME_FLAGS_GROUP_IDENTITY, 1))
+                     .withFieldFunction(
+                        new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsEncryption, FRAME_FLAGS_ENCRYPTION, 1))
+                  .finishField()
+               .finishHeader()
+               .getPayload()
+                  .withDescription("Generic frame payload", "The generic frame payload")
+                  .withLengthOf(1, DataBlockDescription.UNLIMITED)
+                  .addNumericField("decompressedSize", "Decompressed size field", "The decompressed size field")
+                     .withStaticLengthOf(4)
+                     .withOccurrences(0, 1)
+                  .finishField()
+                  .addNumericField("encryptionMethod", "Encryption method field", "The encryption method field")
+                     .withStaticLengthOf(1)
+                     .withOccurrences(0, 1)
+                  .finishField()
+                  .addNumericField("groupId", "Decompressed size field", "The decompressed size field")
+                     .withStaticLengthOf(1)
+                     .withOccurrences(0, 1)
+                  .finishField()
+                  .addEnumeratedField(Charset.class, "textEncoding", "Text encoding", "Text encoding")
+                     .withStaticLengthOf(1)
+                     .withDefaultValue(Charsets.CHARSET_ISO)
+                     .withFieldFunction(new FieldFunction(FieldFunctionType.CHARACTER_ENCODING_OF, affectedTextEncIds, null, null))
+                     .addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO)
+                     .addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16)
+                     .withOverriddenId(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID)
+                  .finishField()
+                  .addStringField("information", "Information", "Information")
+                     .withTerminationCharacter('\u0000')
+                     .withLengthOf(1, DataBlockDescription.UNLIMITED)
+                     .withOverriddenId(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID)
+                  .finishField()
+//                  .addBinaryField("data", "Payload data field", "The payload data field")
+//                     .withLengthOf(1, DataBlockDescription.UNLIMITED)
+//                  .finishField()
+               .finishFieldBasedPayload()
+            .finishContainer()
+            .addContainerWithFieldBasedPayload("padding", "Padding", "Padding")
+               .withOccurrences(0, 1)
+               .withLengthOf(1, DataBlockDescription.UNLIMITED)
+               .addHeader("header", "Padding header", "Padding header")
+                  .withStaticLengthOf(1)
+                  .addBinaryField("key", "id3v23 padding header key", "The id3v23 padding header key")
+                     .withDefaultValue(new byte[] { 0 })
+                     .withStaticLengthOf(1)
+                     .asMagicKey()
+                  .finishField()
+               .finishHeader()
+               .getPayload()
+                  .withDescription("Padding payload", "Padding payload")
+                  .withLengthOf(0, DataBlockDescription.UNLIMITED)
+                  .addBinaryField("bytes", "Padding bytes", "Padding bytes")
+                     .withDefaultValue(new byte[] { 0 })
+                     .withLengthOf(0, DataBlockDescription.UNLIMITED)
+                  .finishField()
+               .finishFieldBasedPayload()
+            .finishContainer()
+        .finishContainerSequence()
+     .finishContainer();
+
+      // @formatter:on
+
+      return builder.finishContainerSequence();
    }
-
-   private DataBlockId replaceId(DataBlockId genericId, String genericLocalId, String concreteLocalId) {
-
-      DataBlockId concreteId = genericId;
-
-      if (genericId.getGlobalId().contains(genericLocalId))
-         concreteId = new DataBlockId(ID3v23, genericId.getGlobalId().replace(genericLocalId, concreteLocalId));
-
-      return concreteId;
-   }
-
 }

@@ -13,8 +13,6 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
@@ -22,13 +20,8 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  *
  */
 public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
-   extends AbstractFieldBuilder<ParentBuilder, String> implements StringFieldBuilder<ParentBuilder> {
-
-   @Override
-   public StringFieldBuilder<ParentBuilder> withFieldFunction(FieldFunction function) {
-      getFunctions().add(function);
-      return this;
-   }
+   extends AbstractFieldBuilder<ParentBuilder, StringFieldBuilder<ParentBuilder>, String>
+   implements StringFieldBuilder<ParentBuilder> {
 
    /**
     * Creates a new {@link StandardStringFieldBuilder}.
@@ -41,24 +34,6 @@ public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecific
     */
    public StandardStringFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description) {
       super(parentBuilder, localId, name, description, FieldType.STRING);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder#withDefaultValue(java.lang.String)
-    */
-   @Override
-   public StringFieldBuilder<ParentBuilder> withDefaultValue(String value) {
-      setDefaultValue(value);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
-    */
-   @Override
-   public StringFieldBuilder<ParentBuilder> asMagicKey() {
-      setAsMagicKey();
-      return this;
    }
 
    /**
@@ -76,44 +51,6 @@ public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecific
    @Override
    public StringFieldBuilder<ParentBuilder> withFixedCharset(Charset charset) {
       setFixedCharset(charset);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOverriddenId(com.github.jmeta.library.dataformats.api.types.DataBlockId)
-    */
-   @Override
-   public StringFieldBuilder<ParentBuilder> withOverriddenId(DataBlockId overriddenId) {
-      setOverriddenId(overriddenId);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withStaticLengthOf(long)
-    */
-   @Override
-   public StringFieldBuilder<ParentBuilder> withStaticLengthOf(long staticByteLength) {
-      setStaticLength(staticByteLength);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withLengthOf(long,
-    *      long)
-    */
-   @Override
-   public StringFieldBuilder<ParentBuilder> withLengthOf(long minimumByteLength, long maximumByteLength) {
-      setLength(minimumByteLength, maximumByteLength);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOccurrences(int,
-    *      int)
-    */
-   @Override
-   public StringFieldBuilder<ParentBuilder> withOccurrences(int minimumOccurrences, int maximumOccurrences) {
-      setOccurrences(minimumOccurrences, maximumOccurrences);
       return this;
    }
 

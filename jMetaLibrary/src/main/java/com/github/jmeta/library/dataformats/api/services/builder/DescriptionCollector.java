@@ -9,9 +9,10 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
-import java.util.List;
+import java.util.Map;
 
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 /**
  * {@link DescriptionCollector}
@@ -21,5 +22,5 @@ public interface DescriptionCollector {
 
    public void addDataBlockDescription(DataBlockDescription newDescription);
 
-   public List<DataBlockDescription> getAllDescriptions();
+   public Map<DataBlockId, DataBlockDescription> getAllDescriptions();
 }

@@ -21,6 +21,11 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class FieldFunctionType<T> {
 
+   @Override
+   public String toString() {
+      return "FieldFunctionType [id=" + id + "]";
+   }
+
    /**
     *
     */

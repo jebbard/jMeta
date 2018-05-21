@@ -18,10 +18,6 @@ public interface EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>
    FieldDescriptionModifier<ParentBuilder, FieldInterpretedType, EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>>,
    DataBlockDescriptionModifier<EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>> {
 
-   EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> withDefaultValue(FieldInterpretedType value);
-
-   EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> asMagicKey();
-
    EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> addEnumeratedValue(byte[] binaryValue,
       FieldInterpretedType interpretedValue);
 

@@ -37,8 +37,7 @@ public class FieldFunction {
     * @param flagName
     * @param requiredFlagValue
     */
-   public FieldFunction(FieldFunctionType<?> fieldFunctionType,
-      Set<DataBlockId> affectedBlockIds, String flagName,
+   public FieldFunction(FieldFunctionType<?> fieldFunctionType, Set<DataBlockId> affectedBlockIds, String flagName,
       Integer requiredFlagValue) {
       Reject.ifNull(affectedBlockIds, "affectedBlockIds");
       Reject.ifNull(fieldFunctionType, "fieldFunctionType");
@@ -86,4 +85,10 @@ public class FieldFunction {
 
       return m_flagValue;
    }
+
+   @Override
+   public String toString() {
+      return m_fieldFunctionType + ", " + getAffectedBlockIds();
+   }
+
 }

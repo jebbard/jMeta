@@ -15,55 +15,15 @@ import com.github.jmeta.library.dataformats.api.services.builder.DescriptionColl
 import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.HeaderBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
 /**
  * {@link StandardContainerBasedPayloadContainerBuilder}
  *
  */
-public class StandardContainerBasedPayloadContainerBuilder
-   extends AbstractDataFormatSpecificationBuilderWithParent<ContainerBasedPayloadBuilder>
+public class StandardContainerBasedPayloadContainerBuilder extends
+   AbstractDataFormatSpecificationBuilderWithParent<ContainerBasedPayloadBuilder, ContainerBuilder<ContainerBasedPayloadBuilder>>
    implements ContainerBuilder<ContainerBasedPayloadBuilder> {
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withStaticLengthOf(long)
-    */
-   @Override
-   public ContainerBuilder<ContainerBasedPayloadBuilder> withStaticLengthOf(long staticByteLength) {
-      setStaticLength(staticByteLength);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withLengthOf(long,
-    *      long)
-    */
-   @Override
-   public ContainerBuilder<ContainerBasedPayloadBuilder> withLengthOf(long minimumByteLength, long maximumByteLength) {
-      setLength(minimumByteLength, maximumByteLength);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOccurrences(int,
-    *      int)
-    */
-   @Override
-   public ContainerBuilder<ContainerBasedPayloadBuilder> withOccurrences(int minimumOccurrences,
-      int maximumOccurrences) {
-      setOccurrences(minimumOccurrences, maximumOccurrences);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOverriddenId(com.github.jmeta.library.dataformats.api.types.DataBlockId)
-    */
-   @Override
-   public ContainerBuilder<ContainerBasedPayloadBuilder> withOverriddenId(DataBlockId overriddenId) {
-      setOverriddenId(overriddenId);
-      return this;
-   }
 
    private final ContainerBasedPayloadBuilder payloadBuilder = new StandardContainerBasedPayloadBuilder(this, "payload",
       "payload", "The payload");

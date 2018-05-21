@@ -351,9 +351,9 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
 
       DataBlockId id = new DataBlockId(dataFormat, idString);
 
-      if (!spec.specifiesBlockWithId(id))
-         throw new InvalidTestDataCsvFormatException(
-            rowPrefix + "Data format <" + dataFormat + "> does not specify a block with id <" + id + ">.", null);
+      // if (!spec.specifiesBlockWithId(id))
+      // throw new InvalidTestDataCsvFormatException(
+      // rowPrefix + "Data format <" + dataFormat + "> does not specify a block with id <" + id + ">.", null);
       return id;
    }
 

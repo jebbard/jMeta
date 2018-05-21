@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -26,7 +25,7 @@ import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequen
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -108,10 +107,12 @@ public class ID3v1Extension implements Extension {
    }
 
    public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId id3v1TagId) {
-      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(ID3v1Extension.ID3v1);
+      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
+         ID3v1Extension.ID3v1);
 
       final char nullCharacter = '\0';
 
+      // @formatter:off
       builder
           .addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
              .withStaticLengthOf(id3v1TagLength)
@@ -152,13 +153,9 @@ public class ID3v1Extension implements Extension {
                 .finishField()
              .finishFieldBasedPayload()
           .finishContainer();
-      
-      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
+      // @formatter:on
 
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
-         .collect(Collectors.toMap(b -> b.getId(), b -> b));
-
-      return topLevelContainerMap;
+      return builder.finishContainerSequence();
    }
 
 }

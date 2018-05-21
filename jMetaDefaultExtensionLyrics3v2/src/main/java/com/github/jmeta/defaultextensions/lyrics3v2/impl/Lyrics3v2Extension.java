@@ -13,12 +13,10 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -29,10 +27,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.types.FieldProperties;
-import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -57,8 +52,6 @@ public class Lyrics3v2Extension implements Extension {
    public static final ContainerDataFormat LYRICS3v2 = new ContainerDataFormat("Lyrics3v2", new HashSet<String>(),
       new HashSet<String>(), new ArrayList<String>(), "", new Date());
    public static final DataBlockId lyrics3V2TagId = new DataBlockId(LYRICS3v2, "lyrics3v2");
-
-   private static final DataBlockId lyrics3V2FooterId = new DataBlockId(LYRICS3v2, "lyrics3v2.footer");
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -152,7 +145,7 @@ public class Lyrics3v2Extension implements Extension {
       final DataBlockId lyrics3V2GenericFieldHeaderId, final DataBlockId lyrics3V2GenericFieldPayloadId,
       final DataBlockId lyrics3V2GenericFieldHeaderSizeId, final DataBlockId lyrics3V2GenericFieldHeaderIdId,
       final DataBlockId lyrics3V2GenericFieldPayloadDataId, final DataBlockId lyrics3V2HeaderId) {
-      
+
       final DataBlockId lyrics3V2PayloadId = new DataBlockId(Lyrics3v2Extension.LYRICS3v2, "lyrics3v2.payload");
 
       Set<DataBlockId> affectedBlocks = new HashSet<>();
@@ -168,8 +161,10 @@ public class Lyrics3v2Extension implements Extension {
 
       fieldSizeAffectedBlocks.add(lyrics3V2GenericFieldPayloadId);
 
-      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(
+      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
          Lyrics3v2Extension.LYRICS3v2);
+
+      // @formatter:off
 
       builder
       .addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
@@ -218,15 +213,12 @@ public class Lyrics3v2Extension implements Extension {
                   .finishField()
                .finishFieldBasedPayload()
             .finishContainer()
-         .finishContainerBasedPayload()
+         .finishContainerSequence()
       .finishContainer();
 
-      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
+      // @formatter:on
 
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
-         .collect(Collectors.toMap(b -> b.getId(), b -> b));
-
-      return topLevelContainerMap;
+      return builder.finishContainerSequence();
    }
 
 }

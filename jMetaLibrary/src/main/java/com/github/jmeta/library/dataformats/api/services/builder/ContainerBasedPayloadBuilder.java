@@ -17,7 +17,7 @@ public interface ContainerBasedPayloadBuilder
    extends ContainerSequenceBuilder<ContainerBuilder<ContainerBasedPayloadBuilder>>,
    DataBlockDescriptionModifier<ContainerBasedPayloadBuilder> {
 
-   ContainerBasedPayloadBuilder withDescription(String name, String description);
+   // ContainerBasedPayloadBuilder withDescription(String name, String description);
 
    ContainerBuilder<ContainerBasedPayloadBuilder> finishContainerBasedPayload();
 }

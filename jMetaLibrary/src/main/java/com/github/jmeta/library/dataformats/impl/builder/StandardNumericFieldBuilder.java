@@ -13,8 +13,6 @@ import java.nio.ByteOrder;
 
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
@@ -22,31 +20,8 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  *
  */
 public class StandardNumericFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
-   extends AbstractFieldBuilder<ParentBuilder, Long> implements NumericFieldBuilder<ParentBuilder> {
-
-   @Override
-   public NumericFieldBuilder<ParentBuilder> withFieldFunction(FieldFunction function) {
-      getFunctions().add(function);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder#withDefaultValue(java.lang.Long)
-    */
-   @Override
-   public NumericFieldBuilder<ParentBuilder> withDefaultValue(Long value) {
-      setDefaultValue(value);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
-    */
-   @Override
-   public NumericFieldBuilder<ParentBuilder> asMagicKey() {
-      setAsMagicKey();
-      return this;
-   }
+   extends AbstractFieldBuilder<ParentBuilder, NumericFieldBuilder<ParentBuilder>, Long>
+   implements NumericFieldBuilder<ParentBuilder> {
 
    /**
     * Creates a new {@link StandardNumericFieldBuilder}.
@@ -67,44 +42,6 @@ public class StandardNumericFieldBuilder<ParentBuilder extends DataFormatSpecifi
    @Override
    public NumericFieldBuilder<ParentBuilder> withFixedByteOrder(ByteOrder byteOrder) {
       setFixedByteOrder(byteOrder);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOverriddenId(com.github.jmeta.library.dataformats.api.types.DataBlockId)
-    */
-   @Override
-   public NumericFieldBuilder<ParentBuilder> withOverriddenId(DataBlockId overriddenId) {
-      setOverriddenId(overriddenId);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withStaticLengthOf(long)
-    */
-   @Override
-   public NumericFieldBuilder<ParentBuilder> withStaticLengthOf(long staticByteLength) {
-      setStaticLength(staticByteLength);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withLengthOf(long,
-    *      long)
-    */
-   @Override
-   public NumericFieldBuilder<ParentBuilder> withLengthOf(long minimumByteLength, long maximumByteLength) {
-      setLength(minimumByteLength, maximumByteLength);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier#withOccurrences(int,
-    *      int)
-    */
-   @Override
-   public NumericFieldBuilder<ParentBuilder> withOccurrences(int minimumOccurrences, int maximumOccurrences) {
-      setOccurrences(minimumOccurrences, maximumOccurrences);
       return this;
    }
 

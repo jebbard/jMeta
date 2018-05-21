@@ -1,6 +1,6 @@
 /**
  *
- * {@link TopLevelContainerBuilder}.java
+ * {@link TopLevelContainerSequenceBuilder}.java
  *
  * @author Jens Ebert
  *
@@ -9,8 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.impl.builder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
@@ -19,15 +19,17 @@ import com.github.jmeta.library.dataformats.api.services.builder.DescriptionColl
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link TopLevelContainerBuilder}
+ * {@link TopLevelContainerSequenceBuilder}
  *
  */
-public class TopLevelContainerBuilder extends AbstractDataFormatSpecificationBuilder<List<DataBlockDescription>>
-   implements ContainerSequenceBuilder<List<DataBlockDescription>> {
+public class TopLevelContainerSequenceBuilder
+   extends AbstractDataFormatSpecificationBuilder<Map<DataBlockId, DataBlockDescription>>
+   implements ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> {
 
    private static class TopLevelDescriptionCollector implements DescriptionCollector {
 
@@ -35,17 +37,17 @@ public class TopLevelContainerBuilder extends AbstractDataFormatSpecificationBui
        * @see com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector#getAllDescriptions()
        */
       @Override
-      public List<DataBlockDescription> getAllDescriptions() {
+      public Map<DataBlockId, DataBlockDescription> getAllDescriptions() {
          return overallDescriptions;
       }
 
-      final List<DataBlockDescription> overallDescriptions = new ArrayList<>();
+      final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
 
       @Override
       public void addDataBlockDescription(DataBlockDescription newDescription) {
          Reject.ifNull(newDescription, "newDescription");
 
-         overallDescriptions.add(newDescription);
+         overallDescriptions.put(newDescription.getId(), newDescription);
       }
    };
 
@@ -81,17 +83,17 @@ public class TopLevelContainerBuilder extends AbstractDataFormatSpecificationBui
     * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#finishContainerSequence()
     */
    @Override
-   public List<DataBlockDescription> finishContainerSequence() {
+   public Map<DataBlockId, DataBlockDescription> finishContainerSequence() {
       return finish();
    }
 
    /**
-    * Creates a new {@link TopLevelContainerBuilder}.
+    * Creates a new {@link TopLevelContainerSequenceBuilder}.
     * 
     * @param dataFormat
     * @param type
     */
-   public TopLevelContainerBuilder(ContainerDataFormat dataFormat) {
+   public TopLevelContainerSequenceBuilder(ContainerDataFormat dataFormat) {
       super(new TopLevelDescriptionCollector(), dataFormat, "dummy", "dummy", "dummy", PhysicalDataBlockType.CONTAINER);
    }
 
@@ -99,7 +101,7 @@ public class TopLevelContainerBuilder extends AbstractDataFormatSpecificationBui
     * @see com.github.jmeta.library.dataformats.impl.builder.AbstractDataFormatSpecificationBuilder#finish()
     */
    @Override
-   protected List<DataBlockDescription> finish() {
+   protected Map<DataBlockId, DataBlockDescription> finish() {
       return getDescriptionCollector().getAllDescriptions();
    }
 }

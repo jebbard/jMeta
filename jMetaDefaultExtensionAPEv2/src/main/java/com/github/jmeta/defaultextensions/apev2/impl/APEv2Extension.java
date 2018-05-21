@@ -9,17 +9,14 @@
  */
 package com.github.jmeta.defaultextensions.apev2.impl;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -31,13 +28,10 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
-import com.github.jmeta.library.dataformats.api.types.FieldProperties;
-import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerBuilder;
+import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
@@ -153,7 +147,7 @@ public class APEv2Extension implements Extension {
       final DataBlockId apeV2HeaderId = new DataBlockId(APEv2Extension.APEv2, "apev2.header");
       final DataBlockId apeV2PayloadId = new DataBlockId(APEv2Extension.APEv2, "apev2.payload");
       final DataBlockId apeV2FooterId = new DataBlockId(APEv2Extension.APEv2, "apev2.footer");
-     
+
       Set<DataBlockId> affectedBlocksHeader = new HashSet<>();
 
       affectedBlocksHeader.add(apeV2PayloadId);
@@ -166,7 +160,7 @@ public class APEv2Extension implements Extension {
       Set<DataBlockId> itemCountAffectedBlocks = new HashSet<>();
 
       itemCountAffectedBlocks.add(apeV2GenericItemId);
-      
+
       List<FlagDescription> itemFlagDescriptions = new ArrayList<>();
 
       itemFlagDescriptions.add(new FlagDescription("Read-only", new BitAddress(0, 0), "", 1, null));
@@ -198,8 +192,9 @@ public class APEv2Extension implements Extension {
 
       Flags defaultItemFlags = new Flags(apev2ItemFlagSpec);
 
-      ContainerSequenceBuilder<List<DataBlockDescription>> builder = new TopLevelContainerBuilder(APEv2Extension.APEv2);
-
+      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
+         APEv2Extension.APEv2);
+   // @formatter:off
       builder
       .addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
          .withLengthOf(4, DataBlockDescription.UNLIMITED)
@@ -293,13 +288,9 @@ public class APEv2Extension implements Extension {
             .finishContainer()
          .finishContainerBasedPayload()
       .finishContainer();
+   // @formatter:on
 
-      List<DataBlockDescription> topLevelContainers = builder.finishContainerSequence();
-
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = topLevelContainers.stream()
-         .collect(Collectors.toMap(b -> b.getId(), b -> b));
-
-      return topLevelContainerMap;
+      return builder.finishContainerSequence();
    }
 
 }

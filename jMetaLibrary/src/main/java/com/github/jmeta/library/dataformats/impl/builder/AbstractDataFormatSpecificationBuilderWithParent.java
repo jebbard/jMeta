@@ -13,13 +13,14 @@ import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpeci
 import com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
 /**
  * {@link AbstractDataFormatSpecificationBuilderWithParent}
  *
  */
-public abstract class AbstractDataFormatSpecificationBuilderWithParent<P extends DataFormatSpecificationBuilder>
+public abstract class AbstractDataFormatSpecificationBuilderWithParent<P extends DataFormatSpecificationBuilder, C extends DataFormatSpecificationBuilder>
    extends AbstractDataFormatSpecificationBuilder<P> {
 
    private final P parentBuilder;
@@ -50,4 +51,31 @@ public abstract class AbstractDataFormatSpecificationBuilderWithParent<P extends
 
       return parentBuilder;
    }
+
+   public C withStaticLengthOf(long staticByteLength) {
+      setStaticLength(staticByteLength);
+      return (C) this;
+   }
+
+   public C withLengthOf(long minimumByteLength, long maximumByteLength) {
+      setLength(minimumByteLength, maximumByteLength);
+      return (C) this;
+   }
+
+   public C withOccurrences(int minimumOccurrences, int maximumOccurrences) {
+      setOccurrences(minimumOccurrences, maximumOccurrences);
+      return (C) this;
+   }
+
+   public C withOverriddenId(DataBlockId overriddenId) {
+      setOverriddenId(overriddenId);
+      return (C) this;
+   }
+
+   public C withDescription(String name, String description) {
+      setName(name);
+      setDescription(description);
+      return (C) this;
+   }
+
 }
