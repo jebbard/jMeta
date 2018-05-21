@@ -27,8 +27,6 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
-import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -128,50 +126,19 @@ public class ID3v23Extension implements Extension {
       return serviceProviders;
    }
 
-   private DataFormatSpecification createSpecification(TopLevelContainerSequenceBuilder builder) {
-
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      // There is no ByteOrder relevant for id3v23
-      supportedByteOrders.add(ByteOrder.BIG_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-      supportedCharsets.add(Charsets.CHARSET_UTF16);
-
-      return new StandardDataFormatSpecification(ID3v23, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
-         GENERIC_FRAME_ID);
-   }
-
    private DataFormatSpecification createSpecification() {
 
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      return createSpecification(builder);
+      return new StandardDataFormatSpecification(ID3v23, builder.finishContainerSequence(),
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
+         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16), builder.getDefaultNestedContainer());
    }
 
    /**
     * @return
     */
    public TopLevelContainerSequenceBuilder getDescMap() {
-      // 3. tag flags
-      List<FlagDescription> tagFlagDescriptions = new ArrayList<>();
-
-      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_UNSYNCHRONIZATION, new BitAddress(0, 0), "", 1, null));
-      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_EXTENDED_HEADER, new BitAddress(0, 1), "", 1, null));
-      tagFlagDescriptions.add(new FlagDescription(TAG_FLAGS_EXPERIMENTAL_INDICATOR, new BitAddress(0, 2), "", 1, null));
-
-      final byte[] defaultTagFlagBytes = new byte[] { 0 };
-
-      FlagSpecification id3v23TagFlagSpec = new FlagSpecification(tagFlagDescriptions, ID3V23_TAG_FLAG_SIZE,
-         ByteOrder.BIG_ENDIAN, defaultTagFlagBytes);
-
-      Flags defaultTagFlags = new Flags(id3v23TagFlagSpec);
-
-      defaultTagFlags.fromArray(defaultTagFlagBytes);
-
       Set<DataBlockId> affectedDataBlockIds = new HashSet<>();
 
       affectedDataBlockIds.add(ID3V23_EXTENDED_HEADER_ID);
@@ -189,21 +156,6 @@ public class ID3v23Extension implements Extension {
 
       TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(ID3v23Extension.ID3v23);
 
-      // 2. Extended header flags
-      List<FlagDescription> extendedHeaderFlagDescriptions = new ArrayList<>();
-
-      extendedHeaderFlagDescriptions
-         .add(new FlagDescription(EXT_HEADER_FLAG_CRC_DATA_PRESENT, new BitAddress(0, 0), "", 1, null));
-
-      final byte[] defaultExtHeaderFlagBytes = new byte[] { 0 };
-
-      FlagSpecification id3v23ExtHeaderFlagSpec = new FlagSpecification(extendedHeaderFlagDescriptions, 1,
-         ByteOrder.BIG_ENDIAN, defaultExtHeaderFlagBytes);
-
-      Flags defaultExtHeaderFlags = new Flags(id3v23TagFlagSpec);
-
-      defaultExtHeaderFlags.fromArray(defaultTagFlagBytes);
-
       Set<DataBlockId> affectedDataBlockIdsExtHead = new HashSet<>();
 
       affectedDataBlockIdsExtHead.add(ID3V23_EXTENDED_HEADER_FIELD_CRC_ID);
@@ -217,27 +169,6 @@ public class ID3v23Extension implements Extension {
       Set<DataBlockId> affectedFrameSizeBlocks = new HashSet<>();
 
       affectedFrameSizeBlocks.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      // 3 Frame flags
-      List<FlagDescription> frameFlagDescriptions = new ArrayList<>();
-
-      frameFlagDescriptions
-         .add(new FlagDescription(FRAME_FLAGS_TAG_ALTER_PRESERVATION, new BitAddress(0, 0), "", 1, null));
-      frameFlagDescriptions
-         .add(new FlagDescription(FRAME_FLAGS_FILE_ALTER_PRESERVATION, new BitAddress(0, 1), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_READ_ONLY, new BitAddress(0, 2), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_COMPRESSION, new BitAddress(1, 0), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_ENCRYPTION, new BitAddress(1, 1), "", 1, null));
-      frameFlagDescriptions.add(new FlagDescription(FRAME_FLAGS_GROUP_IDENTITY, new BitAddress(1, 2), "", 1, null));
-
-      final byte[] defaultFrameFlagBytes = new byte[] { 0, 0 };
-
-      FlagSpecification id3v23FrameFlagSpec = new FlagSpecification(frameFlagDescriptions, ID3V23_FRAME_FLAG_SIZE,
-         ByteOrder.BIG_ENDIAN, defaultFrameFlagBytes);
-
-      Flags defaultFrameFlags = new Flags(id3v23FrameFlagSpec);
-
-      defaultFrameFlags.fromArray(defaultFrameFlagBytes);
 
       Set<DataBlockId> affectedDataBlockIdsCompression = new HashSet<>();
 
@@ -285,8 +216,12 @@ public class ID3v23Extension implements Extension {
             .finishField()
             .addFlagsField("flags", "id3v23 tag header flags", "The id3v23 tag header flags")
                .withStaticLengthOf(ID3V23_TAG_FLAG_SIZE)
-               .withDefaultValue(defaultTagFlags)
-               .withFlagSpecification(id3v23TagFlagSpec)
+               .withFlagSpecification(1,ByteOrder.BIG_ENDIAN)
+                  .withDefaultFlagBytes(new byte[] { 0 })
+                  .addFlagDescription(new FlagDescription(TAG_FLAGS_UNSYNCHRONIZATION, new BitAddress(0, 0), "", 1, null))
+                  .addFlagDescription(new FlagDescription(TAG_FLAGS_EXTENDED_HEADER, new BitAddress(0, 1), "", 1, null))
+                  .addFlagDescription(new FlagDescription(TAG_FLAGS_EXPERIMENTAL_INDICATOR, new BitAddress(0, 2), "", 1, null))
+               .finishFlagSpecification()
                .withFieldFunction(new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIds, TAG_FLAGS_EXTENDED_HEADER, 1))
             .finishField()
             .addNumericField("size", "id3v23 tag size", "The id3v23 tag size")
@@ -303,8 +238,10 @@ public class ID3v23Extension implements Extension {
             .finishField()
             .addFlagsField("flags", "id3v23 extended header flags", "The id3v23 extended header flags")
                .withStaticLengthOf(ID3V23_TAG_FLAG_SIZE)
-               .withFlagSpecification(id3v23ExtHeaderFlagSpec)
-               .withDefaultValue(defaultExtHeaderFlags)
+               .withFlagSpecification(1, ByteOrder.BIG_ENDIAN)
+                  .withDefaultFlagBytes(new byte[] { 0 })
+                  .addFlagDescription(new FlagDescription(EXT_HEADER_FLAG_CRC_DATA_PRESENT, new BitAddress(0, 0), "", 1, null))
+               .finishFlagSpecification()
                .withFieldFunction(
          new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsExtHead, EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1))
             .finishField()
@@ -320,6 +257,7 @@ public class ID3v23Extension implements Extension {
             .withLengthOf(11, DataBlockDescription.UNLIMITED)
             .addGenericContainerWithFieldBasedPayload("FRAME_ID", "GENERIC_ID3v23_FRAME", "The id3v23 GENERIC_FRAME")
                .withLengthOf(11, DataBlockDescription.UNLIMITED)
+               .asDefaultNestedContainer()
                .withOccurrences(0, 999999)
                .addHeader("header", "Generic frame header", "The generic frame header")
                   .withLengthOf(10, 10)
@@ -334,8 +272,15 @@ public class ID3v23Extension implements Extension {
                   .finishField()
                   .addFlagsField("flags", "Generic frame flags field", "The generic frame flags field")
                      .withStaticLengthOf(2)
-                     .withFlagSpecification(id3v23FrameFlagSpec)
-                     .withDefaultValue(defaultFrameFlags)
+                     .withFlagSpecification(ID3V23_FRAME_FLAG_SIZE, ByteOrder.BIG_ENDIAN)
+                        .withDefaultFlagBytes(new byte[] { 0, 0 })
+                        .addFlagDescription(new FlagDescription(FRAME_FLAGS_TAG_ALTER_PRESERVATION, new BitAddress(0, 0), "", 1, null))
+                        .addFlagDescription(new FlagDescription(FRAME_FLAGS_FILE_ALTER_PRESERVATION, new BitAddress(0, 1), "", 1, null))
+                        .addFlagDescription(new FlagDescription(FRAME_FLAGS_READ_ONLY, new BitAddress(0, 2), "", 1, null))
+                        .addFlagDescription(new FlagDescription(FRAME_FLAGS_COMPRESSION, new BitAddress(1, 0), "", 1, null))
+                        .addFlagDescription(new FlagDescription(FRAME_FLAGS_ENCRYPTION, new BitAddress(1, 1), "", 1, null))
+                        .addFlagDescription(new FlagDescription(FRAME_FLAGS_GROUP_IDENTITY, new BitAddress(1, 2), "", 1, null))
+                     .finishFlagSpecification()
                      .withFieldFunction(
          new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsCompression, FRAME_FLAGS_COMPRESSION, 1))
                      .withFieldFunction(

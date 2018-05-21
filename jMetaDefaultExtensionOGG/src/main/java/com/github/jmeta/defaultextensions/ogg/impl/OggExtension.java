@@ -10,7 +10,6 @@
 package com.github.jmeta.defaultextensions.ogg.impl;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -78,20 +77,11 @@ public class OggExtension implements Extension {
    private DataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId oggPacketPartContainerId = new DataBlockId(OGG, "ogg.payload.packetPartContainer");
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      supportedByteOrders.add(ByteOrder.LITTLE_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-
       return new StandardDataFormatSpecification(OGG, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
-         oggPacketPartContainerId);
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN),
+         List.of(Charsets.CHARSET_ISO), builder.getDefaultNestedContainer());
    }
 
    /**
@@ -161,6 +151,7 @@ public class OggExtension implements Extension {
                 .addContainerWithFieldBasedPayload("packetPartContainer", "Ogg packet", "Ogg packet")
                    .withOccurrences(1, 999999)
                    .withLengthOf(1, DataBlockDescription.UNLIMITED)
+                   .asDefaultNestedContainer()
                    .getPayload()
                       .withDescription("Ogg packet", "Ogg packet")
                       .withLengthOf(1, DataBlockDescription.UNLIMITED)

@@ -23,4 +23,6 @@ public interface ContainerBuilder<PayloadBuilder>
    FooterBuilder<PayloadBuilder> addFooter(String localId, String name, String description);
 
    ContainerBasedPayloadBuilder finishContainer();
+
+   ContainerBuilder<PayloadBuilder> asDefaultNestedContainer();
 }

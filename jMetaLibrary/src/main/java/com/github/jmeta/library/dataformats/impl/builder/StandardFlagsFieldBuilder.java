@@ -9,10 +9,12 @@
  */
 package com.github.jmeta.library.dataformats.impl.builder;
 
+import java.nio.ByteOrder;
+
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 
 /**
@@ -30,10 +32,12 @@ public class StandardFlagsFieldBuilder<ParentBuilder extends DataFormatSpecifica
     * @param localId
     * @param name
     * @param description
-    * @param isGeneric TODO
+    * @param isGeneric
+    *           TODO
     * @param fieldType
     */
-   public StandardFlagsFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description, boolean isGeneric) {
+   public StandardFlagsFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description,
+      boolean isGeneric) {
       super(parentBuilder, localId, name, description, FieldType.FLAGS, isGeneric);
    }
 
@@ -41,9 +45,8 @@ public class StandardFlagsFieldBuilder<ParentBuilder extends DataFormatSpecifica
     * @see com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder#withFlagSpecification(com.github.jmeta.library.dataformats.api.types.FlagSpecification)
     */
    @Override
-   public FlagsFieldBuilder<ParentBuilder> withFlagSpecification(FlagSpecification spec) {
-      setFlagSpecification(spec);
-      return this;
+   public FlagSpecificationBuilder<ParentBuilder> withFlagSpecification(int byteLength, ByteOrder byteOrder) {
+      return new StandardFlagSpecificationBuilder<>(this, byteLength, byteOrder);
    }
 
 }

@@ -10,7 +10,6 @@
 package com.github.jmeta.defaultextensions.apev2.impl;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,8 +26,6 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
-import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -87,18 +84,9 @@ public class APEv2Extension implements Extension {
       // Data blocks
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      supportedByteOrders.add(ByteOrder.LITTLE_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-      final DataBlockId apeV2GenericItemId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}");
-
       return new StandardDataFormatSpecification(APEv2, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
-         apeV2GenericItemId);
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN),
+         List.of(Charsets.CHARSET_ISO), builder.getDefaultNestedContainer());
    }
 
    /**
@@ -125,23 +113,15 @@ public class APEv2Extension implements Extension {
 
       itemCountAffectedBlocks.add(apeV2GenericItemId);
 
-      List<FlagDescription> itemFlagDescriptions = new ArrayList<>();
+      FlagDescription readOnlyFlag = new FlagDescription("Read-only", new BitAddress(0, 0), "", 1, null);
+      FlagDescription itemTypeFlag = new FlagDescription("Item type", new BitAddress(0, 1), "", 2, null);
 
-      itemFlagDescriptions.add(new FlagDescription("Read-only", new BitAddress(0, 0), "", 1, null));
-
-      itemFlagDescriptions.add(new FlagDescription("Item type", new BitAddress(0, 1), "", 2, null));
-
-      List<FlagDescription> tagFlagDescriptions = new ArrayList<>();
-
-      tagFlagDescriptions.addAll(itemFlagDescriptions);
-      tagFlagDescriptions.add(new FlagDescription("This is the header", new BitAddress(3, 5), "", 1, null));
-      tagFlagDescriptions.add(new FlagDescription("Tag contains no footer", new BitAddress(3, 6), "", 1, null));
-      tagFlagDescriptions.add(new FlagDescription("Tag contains header", new BitAddress(3, 7), "", 1, null));
-
-      FlagSpecification apev2HeaderFlagSpec = new FlagSpecification(tagFlagDescriptions, 4, ByteOrder.LITTLE_ENDIAN,
-         new byte[4]);
-
-      Flags defaultTagFlags = new Flags(apev2HeaderFlagSpec);
+      FlagDescription thisIsTheHeaderFlag = new FlagDescription("This is the header", new BitAddress(3, 5), "", 1,
+         null);
+      FlagDescription tagContainsNoFooterFlag = new FlagDescription("Tag contains no footer", new BitAddress(3, 6), "",
+         1, null);
+      FlagDescription tagContainsHeaderFlag = new FlagDescription("Tag contains header", new BitAddress(3, 7), "", 1,
+         null);
 
       Set<DataBlockId> itemValueSizeAffectedBlocks = new HashSet<>();
 
@@ -150,11 +130,6 @@ public class APEv2Extension implements Extension {
       Set<DataBlockId> itemKeyAffectedBlocks = new HashSet<>();
 
       itemKeyAffectedBlocks.add(apeV2GenericItemId);
-
-      FlagSpecification apev2ItemFlagSpec = new FlagSpecification(itemFlagDescriptions, 4, ByteOrder.LITTLE_ENDIAN,
-         new byte[4]);
-
-      Flags defaultItemFlags = new Flags(apev2ItemFlagSpec);
 
       TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(APEv2Extension.APEv2);
    // @formatter:off
@@ -182,8 +157,14 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addFlagsField("tagFlags", "APEv2 header tag flags", "APEv2 header tag flags")
                .withStaticLengthOf(4)
-               .withFlagSpecification(apev2HeaderFlagSpec)
-               .withDefaultValue(defaultTagFlags)
+               .withFlagSpecification(4, ByteOrder.LITTLE_ENDIAN)
+                  .withDefaultFlagBytes(new byte[4])
+                  .addFlagDescription(readOnlyFlag)
+                  .addFlagDescription(itemTypeFlag)
+                  .addFlagDescription(thisIsTheHeaderFlag)
+                  .addFlagDescription(tagContainsNoFooterFlag)
+                  .addFlagDescription(tagContainsHeaderFlag)
+               .finishFlagSpecification()
             .finishField()
             .addBinaryField("reserved", "APEv2 header reserved", "APEv2 header reserved")
                .withStaticLengthOf(8)
@@ -211,8 +192,14 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addFlagsField("tagFlags", "APEv2 footer tag flags", "APEv2 footer tag flags")
                .withStaticLengthOf(4)
-               .withFlagSpecification(apev2HeaderFlagSpec)
-               .withDefaultValue(defaultTagFlags)
+               .withFlagSpecification(4, ByteOrder.LITTLE_ENDIAN)
+               .withDefaultFlagBytes(new byte[4])
+                  .addFlagDescription(readOnlyFlag)
+                  .addFlagDescription(itemTypeFlag)
+                  .addFlagDescription(thisIsTheHeaderFlag)
+                  .addFlagDescription(tagContainsNoFooterFlag)
+                  .addFlagDescription(tagContainsHeaderFlag)
+               .finishFlagSpecification()
             .finishField()
             .addBinaryField("reserved", "APEv2 footer reserved", "APEv2 footer reserved")
                .withStaticLengthOf(8)
@@ -224,6 +211,7 @@ public class APEv2Extension implements Extension {
             .withLengthOf(0, DataBlockDescription.UNLIMITED)
             .addGenericContainerWithFieldBasedPayload("ITEM_ID", "APEv2 item", "The APEv2 item")
                .withLengthOf(1, DataBlockDescription.UNLIMITED)
+               .asDefaultNestedContainer()
                .addHeader("header", "APEv2 item header", "The APEv2 item header")
                   .withLengthOf(APEv2_MIN_ITEM_HEADER_LENGTH, DataBlockDescription.UNLIMITED)
                   .addNumericField("size", "APEv2 item value size", "APEv2 item value size")
@@ -232,8 +220,11 @@ public class APEv2Extension implements Extension {
                   .finishField()
                   .addFlagsField("flags", "APEv2 item flags", "APEv2 item flags")
                      .withStaticLengthOf(4)
-                     .withFlagSpecification(apev2ItemFlagSpec)
-                     .withDefaultValue(defaultItemFlags)
+                     .withFlagSpecification(4, ByteOrder.LITTLE_ENDIAN)
+                        .withDefaultFlagBytes(new byte[4])
+                        .addFlagDescription(readOnlyFlag)
+                        .addFlagDescription(itemTypeFlag)
+                     .finishFlagSpecification()
                   .finishField()
                   .addStringField("key", "APEv2 item key", "APEv2 item key")
                      .withLengthOf(2, 255)

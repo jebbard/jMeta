@@ -10,7 +10,6 @@
 package com.github.jmeta.defaultextensions.id3v1.impl;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -80,20 +79,9 @@ public class ID3v1Extension implements Extension {
 
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      // There is no ByteOrder relevant for ID3v1
-      supportedByteOrders.add(ByteOrder.BIG_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-      supportedCharsets.add(Charsets.CHARSET_ASCII);
-      supportedCharsets.add(Charsets.CHARSET_UTF8);
-
       return new StandardDataFormatSpecification(ID3v1, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
-         null);
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
+         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_ASCII, Charsets.CHARSET_UTF8), null);
    }
 
    public TopLevelContainerSequenceBuilder getDescMap() {

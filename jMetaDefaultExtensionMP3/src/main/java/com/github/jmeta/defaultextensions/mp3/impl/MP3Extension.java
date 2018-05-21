@@ -10,7 +10,6 @@
 package com.github.jmeta.defaultextensions.mp3.impl;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -28,7 +27,6 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -96,18 +94,9 @@ public class MP3Extension implements Extension {
 
       topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
 
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      // There is no ByteOrder relevant for MP3
-      supportedByteOrders.add(ByteOrder.BIG_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-
       return new StandardDataFormatSpecification(MP3, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
-         null);
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
+         List.of(Charsets.CHARSET_ISO), null);
    }
 
    /**
@@ -115,48 +104,12 @@ public class MP3Extension implements Extension {
     * @return
     */
    public TopLevelContainerSequenceBuilder getDescMap() {
-      List<FlagDescription> flagDescriptions = new ArrayList<>();
-
       /*
        * Bit layout of the MPEG-1 Audio header Byte: -- 00 -- -- 01 -- -- 02 -- -- 03 -- Bit index in byte: 76543210
        * 76543210 76543210 76543210 Bit contents: AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM Description: A: Frame sync B: MPEG
        * audio version ID C: Layer description D: Protection bit E: Bitrate index F: Sampling rate frequency index G:
        * Padding bit H: Private bit I: Channel mode J: Mode extension K: Copyright L: Original M: Emphasis
        */
-
-      flagDescriptions.add(new FlagDescription("Frame sync", new BitAddress(0, 0), "", FRAME_SYNC_BIT_COUNT, null));
-
-      flagDescriptions.add(new FlagDescription("No protection bit", new BitAddress(1, 0), "", 1, null));
-
-      List<String> layerValueNames = new ArrayList<>();
-      layerValueNames.add("reserved");
-      layerValueNames.add("Layer III");
-      layerValueNames.add("Layer II");
-      layerValueNames.add("Layer I");
-
-      flagDescriptions.add(new FlagDescription("Layer", new BitAddress(1, 1), "", 2, layerValueNames));
-
-      List<String> idValueNames = new ArrayList<>();
-      idValueNames.add("MPEG Version 2.5");
-      idValueNames.add("reserved");
-      idValueNames.add("MPEG Version 2 (ISO/IEC 13818-3)");
-      idValueNames.add("MPEG Version 1 (ISO/IEC 11172-3)");
-
-      flagDescriptions.add(new FlagDescription("Id", new BitAddress(1, 3), "", 2, idValueNames));
-
-      flagDescriptions.add(new FlagDescription("Private bit", new BitAddress(2, 0), "", 1, null));
-      flagDescriptions.add(new FlagDescription("Padding bit", new BitAddress(2, 1), "", 1, null));
-      flagDescriptions.add(new FlagDescription("Sampling frequency", new BitAddress(2, 2), "", 2, null));
-      flagDescriptions.add(new FlagDescription("Bitrate index", new BitAddress(2, 4), "", 4, null));
-      flagDescriptions.add(new FlagDescription("Emphasis bit", new BitAddress(3, 0), "", 2, null));
-      flagDescriptions.add(new FlagDescription("Original or copy", new BitAddress(3, 2), "", 1, null));
-      flagDescriptions.add(new FlagDescription("Copyright bit", new BitAddress(3, 3), "", 1, null));
-      flagDescriptions.add(new FlagDescription("Mode extension bit", new BitAddress(3, 4), "", 2, null));
-      flagDescriptions.add(new FlagDescription("Mode bit", new BitAddress(3, 6), "", 2, null));
-
-      FlagSpecification mp3HeaderFlagSpec = new FlagSpecification(flagDescriptions, MP3_HEADER_BYTE_LENGTH,
-         ByteOrder.BIG_ENDIAN, new byte[MP3_HEADER_BYTE_LENGTH]);
-
       Set<DataBlockId> affectedBlocks = new HashSet<>();
 
       affectedBlocks.add(new DataBlockId(MP3Extension.MP3, "mp3.crc"));
@@ -173,7 +126,23 @@ public class MP3Extension implements Extension {
             .addHeader("header", "MP3 header", "The MP3 header").withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
                .addFlagsField("content", "MP3 header contents", "The MP3 header contents")
                   .withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
-                  .withFlagSpecification(mp3HeaderFlagSpec)
+                  .withFlagSpecification(MP3_HEADER_BYTE_LENGTH,
+                     ByteOrder.BIG_ENDIAN)
+                     .withDefaultFlagBytes(new byte[MP3_HEADER_BYTE_LENGTH])
+                     .addFlagDescription(new FlagDescription("Frame sync", new BitAddress(0, 0), "", FRAME_SYNC_BIT_COUNT, null))
+                     .addFlagDescription(new FlagDescription("No protection bit", new BitAddress(1, 0), "", 1, null))
+                     .addFlagDescription(new FlagDescription("Layer", new BitAddress(1, 1), "", 2, List.of("reserved", "Layer III", "Layer II", "Layer I")))
+                     .addFlagDescription(new FlagDescription("Id", new BitAddress(1, 3), "", 2, List.of("MPEG Version 2.5", "reserved", "MPEG Version 2 (ISO/IEC 13818-3)", "MPEG Version 1 (ISO/IEC 11172-3)")))
+                     .addFlagDescription(new FlagDescription("Private bit", new BitAddress(2, 0), "", 1, null))
+                     .addFlagDescription(new FlagDescription("Padding bit", new BitAddress(2, 1), "", 1, null))
+                     .addFlagDescription(new FlagDescription("Sampling frequency", new BitAddress(2, 2), "", 2, null))
+                     .addFlagDescription(new FlagDescription("Bitrate index", new BitAddress(2, 4), "", 4, null))
+                     .addFlagDescription(new FlagDescription("Emphasis bit", new BitAddress(3, 0), "", 2, null))
+                     .addFlagDescription(new FlagDescription("Original or copy", new BitAddress(3, 2), "", 1, null))
+                     .addFlagDescription(new FlagDescription("Copyright bit", new BitAddress(3, 3), "", 1, null))
+                     .addFlagDescription(new FlagDescription("Mode extension bit", new BitAddress(3, 4), "", 2, null))
+                     .addFlagDescription(new FlagDescription("Mode bit", new BitAddress(3, 6), "", 2, null))
+                  .finishFlagSpecification()
                   .withFieldFunction(crcFunc)
                .finishField()
             .finishHeader()

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
@@ -27,9 +28,26 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public abstract class AbstractDataFormatSpecificationBuilder<P extends DataFormatSpecificationBuilder, C extends DataFormatSpecificationBuilder>
-   implements DataFormatSpecificationBuilder {
+   implements DataFormatSpecificationBuilder, DataBlockDescriptionModifier<C> {
 
    private final P parentBuilder;
+
+   private boolean isDefaultNestedContainer = false;
+
+   private final DescriptionCollector descriptionCollector;
+   private final List<DataBlockDescription> childDescriptions = new ArrayList<>();
+   private final ContainerDataFormat dataFormat;
+   private String globalId;
+   private String name;
+   private String description;
+   private final PhysicalDataBlockType type;
+   private FieldProperties<?> fieldProperties;
+   private DataBlockId overriddenId;
+   private long minimumByteLength = 0;
+   private long maximumByteLength = DataBlockDescription.UNLIMITED;
+   private int minimumOccurrences = 1;
+   private int maximumOccurrences = 1;
+   private final boolean isGeneric;
 
    public AbstractDataFormatSpecificationBuilder(P parentBuilder, String localId, String name, String description,
       PhysicalDataBlockType type, boolean isGeneric) {
@@ -60,17 +78,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
       this.parentBuilder = parentBuilder;
    }
 
-   protected P finish() {
-      DataBlockDescription myDescription = createDescriptionFromProperties();
-
-      if (parentBuilder != null) {
-         parentBuilder.addChildDescription(myDescription);
-      }
-      getDescriptionCollector().addDataBlockDescription(myDescription, isGeneric(), parentBuilder == null);
-
-      return parentBuilder;
-   }
-
    public C withStaticLengthOf(long staticByteLength) {
       setStaticLength(staticByteLength);
       return (C) this;
@@ -97,26 +104,49 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
       return (C) this;
    }
 
+   public C asDefaultNestedContainer() {
+      this.isDefaultNestedContainer = true;
+      return (C) this;
+   }
+
    public DescriptionCollector getDescriptionCollector() {
       return descriptionCollector;
    }
 
-   private final DescriptionCollector descriptionCollector;
-   private final List<DataBlockDescription> childDescriptions = new ArrayList<>();
+   @Override
+   public ContainerDataFormat getDataFormat() {
+      return dataFormat;
+   }
 
-   private final ContainerDataFormat dataFormat;
-   private String globalId;
-   private String name;
-   private String description;
-   private final PhysicalDataBlockType type;
-   private FieldProperties<?> fieldProperties;
-   private DataBlockId overriddenId;
-   private long minimumByteLength = 0;
-   private long maximumByteLength = DataBlockDescription.UNLIMITED;
-   private int minimumOccurrences = 1;
-   private int maximumOccurrences = 1;
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder#getGlobalId()
+    */
+   @Override
+   public String getGlobalId() {
+      return globalId;
+   }
 
-   private final boolean isGeneric;
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder#addChildDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
+    */
+   @Override
+   public void addChildDescription(DataBlockDescription childDesc) {
+      Reject.ifNull(childDesc, "childDesc");
+
+      childDescriptions.add(childDesc);
+   }
+
+   protected P finish() {
+      DataBlockDescription myDescription = createDescriptionFromProperties();
+
+      if (parentBuilder != null) {
+         parentBuilder.addChildDescription(myDescription);
+      }
+      getDescriptionCollector().addDataBlockDescription(myDescription, isGeneric(), parentBuilder == null,
+         this.isDefaultNestedContainer);
+
+      return parentBuilder;
+   }
 
    /**
     * Sets the attribute {@link #name}.
@@ -142,11 +172,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
       this.description = description;
    }
 
-   @Override
-   public ContainerDataFormat getDataFormat() {
-      return dataFormat;
-   }
-
    protected void setStaticLength(long staticByteLength) {
       setLength(staticByteLength, staticByteLength);
    }
@@ -169,26 +194,8 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
       this.fieldProperties = fieldProperties;
    }
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder#getGlobalId()
-    */
-   @Override
-   public String getGlobalId() {
-      return globalId;
-   }
-
    protected void setGlobalId(String globalId) {
       this.globalId = globalId;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder#addChildDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
-    */
-   @Override
-   public void addChildDescription(DataBlockDescription childDesc) {
-      Reject.ifNull(childDesc, "childDesc");
-
-      childDescriptions.add(childDesc);
    }
 
    protected DataBlockDescription createDescriptionFromProperties() {

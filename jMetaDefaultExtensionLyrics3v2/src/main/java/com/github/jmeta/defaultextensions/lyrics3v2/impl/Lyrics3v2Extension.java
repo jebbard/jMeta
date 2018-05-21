@@ -10,7 +10,6 @@
 package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -88,19 +87,9 @@ public class Lyrics3v2Extension implements Extension {
       // Data blocks
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload.${FIELD_ID}");
-
-      // Byte orders and charsets
-      List<ByteOrder> supportedByteOrders = new ArrayList<>();
-      List<Charset> supportedCharsets = new ArrayList<>();
-
-      supportedByteOrders.add(ByteOrder.LITTLE_ENDIAN);
-
-      supportedCharsets.add(Charsets.CHARSET_ISO);
-
       return new StandardDataFormatSpecification(LYRICS3v2, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
-         lyrics3V2GenericFieldId);
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN),
+         List.of(Charsets.CHARSET_ISO), builder.getDefaultNestedContainer());
    }
 
    /**
@@ -166,6 +155,7 @@ public class Lyrics3v2Extension implements Extension {
             .withLengthOf(0, DataBlockDescription.UNLIMITED)
             .addGenericContainerWithFieldBasedPayload("FIELD_ID", "Lyrics3v2 field", "The Lyrics3v2 field")
                .withLengthOf(1, DataBlockDescription.UNLIMITED)
+               .asDefaultNestedContainer()
                .addHeader("header", "Lyrics3v2 field header", "The Lyrics3v2 field header")
                   .withStaticLengthOf(LYRICS3v2_FIELD_SIZE_LENGTH + LYRICS3v2_FIELD_ID_SIZE)
                   .addStringField("id", "Lyrics3v2 field id", "Lyrics3v2 field id")

@@ -9,7 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
-import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
+import java.nio.ByteOrder;
+
 import com.github.jmeta.library.dataformats.api.types.Flags;
 
 /**
@@ -20,5 +21,5 @@ public interface FlagsFieldBuilder<ParentBuilder> extends FieldBuilder<ParentBui
    FieldDescriptionModifier<ParentBuilder, Flags, FlagsFieldBuilder<ParentBuilder>>,
    DataBlockDescriptionModifier<FlagsFieldBuilder<ParentBuilder>> {
 
-   FlagsFieldBuilder<ParentBuilder> withFlagSpecification(FlagSpecification spec);
+   FlagSpecificationBuilder<ParentBuilder> withFlagSpecification(int byteLength, ByteOrder byteOrder);
 }

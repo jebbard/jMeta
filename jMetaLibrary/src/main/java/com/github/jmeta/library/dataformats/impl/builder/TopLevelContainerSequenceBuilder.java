@@ -28,49 +28,66 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public class TopLevelContainerSequenceBuilder
-   implements ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> {
+   implements ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>>, DescriptionCollector {
 
-   private static class TopLevelDescriptionCollector implements DescriptionCollector {
+   private final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
+   private final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
+   private final Map<DataBlockId, DataBlockDescription> topLevelDescriptions = new HashMap<>();
+   private final ContainerDataFormat dataFormat;
 
-      @Override
-      public Map<DataBlockId, DataBlockDescription> getGenericDescriptions() {
-         return genericDescriptions;
+   /**
+    * Creates a new {@link TopLevelContainerSequenceBuilder}.
+    * 
+    * @param dataFormat
+    * @param type
+    */
+   public TopLevelContainerSequenceBuilder(ContainerDataFormat dataFormat) {
+      this.dataFormat = dataFormat;
+   }
+
+   @Override
+   public Map<DataBlockId, DataBlockDescription> getGenericDescriptions() {
+      return genericDescriptions;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector#getAllDescriptions()
+    */
+   @Override
+   public Map<DataBlockId, DataBlockDescription> getAllDescriptions() {
+      return overallDescriptions;
+   }
+
+   @Override
+   public Map<DataBlockId, DataBlockDescription> getTopLevelDescriptions() {
+      return topLevelDescriptions;
+   }
+
+   @Override
+   public void addDataBlockDescription(DataBlockDescription newDescription, boolean isGeneric, boolean isTopLevel,
+      boolean isDefaultNestedContainer) {
+      Reject.ifNull(newDescription, "newDescription");
+
+      overallDescriptions.put(newDescription.getId(), newDescription);
+
+      if (isGeneric) {
+         genericDescriptions.put(newDescription.getId(), newDescription);
       }
 
-      /**
-       * @see com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector#getAllDescriptions()
-       */
-      @Override
-      public Map<DataBlockId, DataBlockDescription> getAllDescriptions() {
-         return overallDescriptions;
+      if (isTopLevel) {
+         topLevelDescriptions.put(newDescription.getId(), newDescription);
       }
 
-      final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
-
-      final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
-
-      final Map<DataBlockId, DataBlockDescription> topLevelDescriptions = new HashMap<>();
-
-      @Override
-      public Map<DataBlockId, DataBlockDescription> getTopLevelDescriptions() {
-         return topLevelDescriptions;
-      }
-
-      @Override
-      public void addDataBlockDescription(DataBlockDescription newDescription, boolean isGeneric, boolean isTopLevel) {
-         Reject.ifNull(newDescription, "newDescription");
-
-         overallDescriptions.put(newDescription.getId(), newDescription);
-
-         if (isGeneric) {
-            genericDescriptions.put(newDescription.getId(), newDescription);
+      if (isDefaultNestedContainer) {
+         if (this.defaultNestedContainerDesc != null) {
+            throw new IllegalArgumentException(
+               "Already have a default nested container, you may only define one default nested container. Already set default nested container: "
+                  + this.defaultNestedContainerDesc);
          }
 
-         if (isTopLevel) {
-            topLevelDescriptions.put(newDescription.getId(), newDescription);
-         }
+         this.defaultNestedContainerDesc = newDescription;
       }
-   };
+   }
 
    @Override
    public ContainerBuilder<FieldBasedPayloadBuilder> addContainerWithFieldBasedPayload(String localId, String name,
@@ -105,7 +122,7 @@ public class TopLevelContainerSequenceBuilder
     */
    @Override
    public Map<DataBlockId, DataBlockDescription> finishContainerSequence() {
-      return collector.getAllDescriptions();
+      return getAllDescriptions();
    }
 
    public Set<DataBlockId> getGenericDataBlocks() {
@@ -116,19 +133,7 @@ public class TopLevelContainerSequenceBuilder
       return getDescriptionCollector().getTopLevelDescriptions().keySet();
    }
 
-   private final DescriptionCollector collector;
-   private final ContainerDataFormat dataFormat;
-
-   /**
-    * Creates a new {@link TopLevelContainerSequenceBuilder}.
-    * 
-    * @param dataFormat
-    * @param type
-    */
-   public TopLevelContainerSequenceBuilder(ContainerDataFormat dataFormat) {
-      this.collector = new TopLevelDescriptionCollector();
-      this.dataFormat = dataFormat;
-   }
+   private DataBlockDescription defaultNestedContainerDesc;
 
    @Override
    public String getGlobalId() {
@@ -146,6 +151,10 @@ public class TopLevelContainerSequenceBuilder
 
    @Override
    public DescriptionCollector getDescriptionCollector() {
-      return collector;
+      return this;
+   }
+
+   public DataBlockId getDefaultNestedContainer() {
+      return defaultNestedContainerDesc.getId();
    }
 }
