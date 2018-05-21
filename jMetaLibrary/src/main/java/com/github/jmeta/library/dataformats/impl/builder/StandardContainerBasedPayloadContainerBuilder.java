@@ -22,7 +22,7 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  *
  */
 public class StandardContainerBasedPayloadContainerBuilder extends
-   AbstractDataFormatSpecificationBuilderWithParent<ContainerBasedPayloadBuilder, ContainerBuilder<ContainerBasedPayloadBuilder>>
+   AbstractDataFormatSpecificationBuilder<ContainerBasedPayloadBuilder, ContainerBuilder<ContainerBasedPayloadBuilder>>
    implements ContainerBuilder<ContainerBasedPayloadBuilder> {
 
    private final ContainerBasedPayloadBuilder payloadBuilder = new StandardContainerBasedPayloadBuilder(this, "payload",
@@ -30,18 +30,24 @@ public class StandardContainerBasedPayloadContainerBuilder extends
 
    /**
     * Creates a new {@link StandardContainerBasedPayloadContainerBuilder}.
+    * 
+    * @param isGeneric
+    *           TODO
     */
    public StandardContainerBasedPayloadContainerBuilder(ContainerBasedPayloadBuilder parentBuilder, String localId,
-      String name, String description) {
-      super(parentBuilder, localId, name, description, PhysicalDataBlockType.CONTAINER);
+      String name, String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, PhysicalDataBlockType.CONTAINER, isGeneric);
    }
 
    /**
     * Creates a new {@link StandardContainerBasedPayloadContainerBuilder}.
+    * 
+    * @param isGeneric
+    *           TODO
     */
    public StandardContainerBasedPayloadContainerBuilder(DescriptionCollector collector, ContainerDataFormat dataFormat,
-      String localId, String name, String description) {
-      super(collector, dataFormat, localId, name, description, PhysicalDataBlockType.CONTAINER);
+      String localId, String name, String description, boolean isGeneric) {
+      super(null, collector, dataFormat, localId, name, description, PhysicalDataBlockType.CONTAINER, isGeneric);
    }
 
    @Override
@@ -51,12 +57,12 @@ public class StandardContainerBasedPayloadContainerBuilder extends
 
    @Override
    public HeaderBuilder<ContainerBasedPayloadBuilder> addHeader(String localId, String name, String description) {
-      return new StandardHeaderBuilder<>(this, localId, name, description);
+      return new StandardHeaderBuilder<>(this, localId, name, description, isGeneric());
    }
 
    @Override
    public FooterBuilder<ContainerBasedPayloadBuilder> addFooter(String localId, String name, String description) {
-      return new StandardFooterBuilder<>(this, localId, name, description);
+      return new StandardFooterBuilder<>(this, localId, name, description, isGeneric());
    }
 
    @Override

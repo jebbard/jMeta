@@ -25,10 +25,11 @@ public class StandardHeaderBuilder<PayloadBuilder>
 
    /**
     * Creates a new {@link StandardHeaderBuilder}.
+    * @param isGeneric TODO
     */
    public StandardHeaderBuilder(ContainerBuilder<PayloadBuilder> parentBuilder, String localId, String name,
-      String description) {
-      super(parentBuilder, localId, name, description, PhysicalDataBlockType.HEADER);
+      String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, PhysicalDataBlockType.HEADER, isGeneric);
    }
 
    @Override

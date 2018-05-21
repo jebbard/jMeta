@@ -30,10 +30,11 @@ public class StandardFlagsFieldBuilder<ParentBuilder extends DataFormatSpecifica
     * @param localId
     * @param name
     * @param description
+    * @param isGeneric TODO
     * @param fieldType
     */
-   public StandardFlagsFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description) {
-      super(parentBuilder, localId, name, description, FieldType.FLAGS);
+   public StandardFlagsFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, FieldType.FLAGS, isGeneric);
    }
 
    /**

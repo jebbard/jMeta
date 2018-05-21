@@ -15,13 +15,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -87,26 +85,10 @@ public class Lyrics3v2Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
-      final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload.${FIELD_ID}");
-      final DataBlockId lyrics3V2GenericFieldHeaderId = new DataBlockId(LYRICS3v2,
-         "lyrics3v2.payload.${FIELD_ID}.header");
-      final DataBlockId lyrics3V2GenericFieldPayloadId = new DataBlockId(LYRICS3v2,
-         "lyrics3v2.payload.${FIELD_ID}.payload");
-      final DataBlockId lyrics3V2GenericFieldHeaderSizeId = new DataBlockId(LYRICS3v2,
-         "lyrics3v2.payload.${FIELD_ID}.header.size");
-      final DataBlockId lyrics3V2GenericFieldHeaderIdId = new DataBlockId(LYRICS3v2,
-         "lyrics3v2.payload.${FIELD_ID}.header.id");
-      final DataBlockId lyrics3V2GenericFieldPayloadDataId = new DataBlockId(LYRICS3v2,
-         "lyrics3v2.payload.${FIELD_ID}.payload.value");
-
       // Data blocks
-      final DataBlockId lyrics3V2HeaderId = new DataBlockId(LYRICS3v2, "lyrics3v2.header");
-      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(lyrics3V2GenericFieldId,
-         lyrics3V2GenericFieldHeaderId, lyrics3V2GenericFieldPayloadId, lyrics3V2GenericFieldHeaderSizeId,
-         lyrics3V2GenericFieldHeaderIdId, lyrics3V2GenericFieldPayloadDataId, lyrics3V2HeaderId);
+      TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(lyrics3V2TagId);
+      final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload.${FIELD_ID}");
 
       // Byte orders and charsets
       List<ByteOrder> supportedByteOrders = new ArrayList<>();
@@ -116,19 +98,9 @@ public class Lyrics3v2Extension implements Extension {
 
       supportedCharsets.add(Charsets.CHARSET_ISO);
 
-      final Set<DataBlockId> genericDataBlocks = new HashSet<>();
-
-      genericDataBlocks.add(lyrics3V2GenericFieldId);
-      genericDataBlocks.add(lyrics3V2GenericFieldHeaderIdId);
-      genericDataBlocks.add(lyrics3V2GenericFieldPayloadDataId);
-      genericDataBlocks.add(lyrics3V2GenericFieldHeaderSizeId);
-      genericDataBlocks.add(lyrics3V2GenericFieldHeaderId);
-      genericDataBlocks.add(lyrics3V2GenericFieldPayloadId);
-
-      DataFormatSpecification dummyLyrics3v2Spec = new StandardDataFormatSpecification(LYRICS3v2, descMap, topLevelIds,
-         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets, lyrics3V2GenericFieldId);
-
-      return dummyLyrics3v2Spec;
+      return new StandardDataFormatSpecification(LYRICS3v2, builder.finishContainerSequence(),
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
+         lyrics3V2GenericFieldId);
    }
 
    /**
@@ -141,12 +113,13 @@ public class Lyrics3v2Extension implements Extension {
     * @param lyrics3V2HeaderId
     * @return
     */
-   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId lyrics3V2GenericFieldId,
-      final DataBlockId lyrics3V2GenericFieldHeaderId, final DataBlockId lyrics3V2GenericFieldPayloadId,
-      final DataBlockId lyrics3V2GenericFieldHeaderSizeId, final DataBlockId lyrics3V2GenericFieldHeaderIdId,
-      final DataBlockId lyrics3V2GenericFieldPayloadDataId, final DataBlockId lyrics3V2HeaderId) {
+   public TopLevelContainerSequenceBuilder getDescMap() {
 
       final DataBlockId lyrics3V2PayloadId = new DataBlockId(Lyrics3v2Extension.LYRICS3v2, "lyrics3v2.payload");
+      final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload.${FIELD_ID}");
+      final DataBlockId lyrics3V2GenericFieldPayloadId = new DataBlockId(LYRICS3v2,
+         "lyrics3v2.payload.${FIELD_ID}.payload");
+      final DataBlockId lyrics3V2HeaderId = new DataBlockId(LYRICS3v2, "lyrics3v2.header");
 
       Set<DataBlockId> affectedBlocks = new HashSet<>();
 
@@ -161,8 +134,7 @@ public class Lyrics3v2Extension implements Extension {
 
       fieldSizeAffectedBlocks.add(lyrics3V2GenericFieldPayloadId);
 
-      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
-         Lyrics3v2Extension.LYRICS3v2);
+      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(Lyrics3v2Extension.LYRICS3v2);
 
       // @formatter:off
 
@@ -218,7 +190,7 @@ public class Lyrics3v2Extension implements Extension {
 
       // @formatter:on
 
-      return builder.finishContainerSequence();
+      return builder;
    }
 
 }

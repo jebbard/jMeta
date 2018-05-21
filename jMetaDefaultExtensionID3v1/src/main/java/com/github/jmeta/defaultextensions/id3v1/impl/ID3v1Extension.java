@@ -15,16 +15,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -83,11 +78,7 @@ public class ID3v1Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
-      final DataBlockId id3v1TagId = new DataBlockId(ID3v1, "id3v1");
-      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(id3v1TagId);
-
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(id3v1TagId);
+      TopLevelContainerSequenceBuilder builder = getDescMap();
 
       // Byte orders and charsets
       List<ByteOrder> supportedByteOrders = new ArrayList<>();
@@ -100,15 +91,13 @@ public class ID3v1Extension implements Extension {
       supportedCharsets.add(Charsets.CHARSET_ASCII);
       supportedCharsets.add(Charsets.CHARSET_UTF8);
 
-      DataFormatSpecification dummyID3v1Spec = new StandardDataFormatSpecification(ID3v1, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
-
-      return dummyID3v1Spec;
+      return new StandardDataFormatSpecification(ID3v1, builder.finishContainerSequence(),
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
+         null);
    }
 
-   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId id3v1TagId) {
-      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
-         ID3v1Extension.ID3v1);
+   public TopLevelContainerSequenceBuilder getDescMap() {
+      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(ID3v1Extension.ID3v1);
 
       final char nullCharacter = '\0';
 
@@ -155,7 +144,7 @@ public class ID3v1Extension implements Extension {
           .finishContainer();
       // @formatter:on
 
-      return builder.finishContainerSequence();
+      return builder;
    }
 
 }

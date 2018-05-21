@@ -26,24 +26,79 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractDataFormatSpecificationBuilder}
  *
  */
-public abstract class AbstractDataFormatSpecificationBuilder<Result> implements DataFormatSpecificationBuilder {
+public abstract class AbstractDataFormatSpecificationBuilder<P extends DataFormatSpecificationBuilder, C extends DataFormatSpecificationBuilder>
+   implements DataFormatSpecificationBuilder {
 
-   /**
-    * Returns the attribute {@link #descriptionCollector}.
-    * 
-    * @return the attribute {@link #descriptionCollector}
-    */
-   public DescriptionCollector getDescriptionCollector() {
-      return descriptionCollector;
+   private final P parentBuilder;
+
+   public AbstractDataFormatSpecificationBuilder(P parentBuilder, String localId, String name, String description,
+      PhysicalDataBlockType type, boolean isGeneric) {
+      this(parentBuilder, parentBuilder.getDescriptionCollector(), parentBuilder.getDataFormat(), localId, name,
+         description, type, isGeneric);
+
+      setGlobalId(parentBuilder.getGlobalId() + "." + localId);
    }
 
-   /**
-    * Returns the attribute {@link #childDescriptions}.
-    * 
-    * @return the attribute {@link #childDescriptions}
-    */
-   public List<DataBlockDescription> getChildDescriptions() {
-      return childDescriptions;
+   public AbstractDataFormatSpecificationBuilder(P parentBuilder, DescriptionCollector descriptionCollector,
+      ContainerDataFormat dataFormat, String localId, String name, String description, PhysicalDataBlockType type,
+      boolean isGeneric) {
+      Reject.ifNull(localId, "localId");
+      Reject.ifNull(type, "type");
+      Reject.ifNull(dataFormat, "dataFormat");
+      Reject.ifNull(descriptionCollector, "descriptionCollector");
+
+      // TODO check local Id for validity
+
+      this.descriptionCollector = descriptionCollector;
+      this.dataFormat = dataFormat;
+      this.name = name;
+      this.description = description;
+      this.type = type;
+      this.globalId = localId;
+      this.isGeneric = isGeneric;
+
+      this.parentBuilder = parentBuilder;
+   }
+
+   protected P finish() {
+      DataBlockDescription myDescription = createDescriptionFromProperties();
+
+      if (parentBuilder != null) {
+         parentBuilder.addChildDescription(myDescription);
+      }
+      getDescriptionCollector().addDataBlockDescription(myDescription, isGeneric(), parentBuilder == null);
+
+      return parentBuilder;
+   }
+
+   public C withStaticLengthOf(long staticByteLength) {
+      setStaticLength(staticByteLength);
+      return (C) this;
+   }
+
+   public C withLengthOf(long minimumByteLength, long maximumByteLength) {
+      setLength(minimumByteLength, maximumByteLength);
+      return (C) this;
+   }
+
+   public C withOccurrences(int minimumOccurrences, int maximumOccurrences) {
+      setOccurrences(minimumOccurrences, maximumOccurrences);
+      return (C) this;
+   }
+
+   public C withOverriddenId(DataBlockId overriddenId) {
+      setOverriddenId(overriddenId);
+      return (C) this;
+   }
+
+   public C withDescription(String name, String description) {
+      setName(name);
+      setDescription(description);
+      return (C) this;
+   }
+
+   public DescriptionCollector getDescriptionCollector() {
+      return descriptionCollector;
    }
 
    private final DescriptionCollector descriptionCollector;
@@ -61,6 +116,8 @@ public abstract class AbstractDataFormatSpecificationBuilder<Result> implements 
    private int minimumOccurrences = 1;
    private int maximumOccurrences = 1;
 
+   private final boolean isGeneric;
+
    /**
     * Sets the attribute {@link #name}.
     *
@@ -71,6 +128,10 @@ public abstract class AbstractDataFormatSpecificationBuilder<Result> implements 
       this.name = name;
    }
 
+   protected boolean isGeneric() {
+      return isGeneric;
+   }
+
    /**
     * Sets the attribute {@link #description}.
     *
@@ -79,23 +140,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<Result> implements 
     */
    protected void setDescription(String description) {
       this.description = description;
-   }
-
-   public AbstractDataFormatSpecificationBuilder(DescriptionCollector descriptionCollector,
-      ContainerDataFormat dataFormat, String localId, String name, String description, PhysicalDataBlockType type) {
-      Reject.ifNull(localId, "localId");
-      Reject.ifNull(type, "type");
-      Reject.ifNull(dataFormat, "dataFormat");
-      Reject.ifNull(descriptionCollector, "descriptionCollector");
-
-      // TODO check local Id for validity
-
-      this.descriptionCollector = descriptionCollector;
-      this.dataFormat = dataFormat;
-      this.name = name;
-      this.description = description;
-      this.type = type;
-      this.globalId = localId;
    }
 
    @Override
@@ -152,6 +196,4 @@ public abstract class AbstractDataFormatSpecificationBuilder<Result> implements 
          childDescriptions.stream().map(desc -> desc.getId()).collect(Collectors.toList()), fieldProperties,
          minimumOccurrences, maximumOccurrences, minimumByteLength, maximumByteLength, overriddenId);
    }
-
-   protected abstract Result finish();
 }

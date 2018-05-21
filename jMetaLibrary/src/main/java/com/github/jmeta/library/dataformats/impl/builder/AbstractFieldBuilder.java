@@ -30,16 +30,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuilder, C extends DataFormatSpecificationBuilder, FieldInterpretedType>
-   extends AbstractDataFormatSpecificationBuilderWithParent<P, C> implements FieldBuilder<P, FieldInterpretedType> {
-
-   /**
-    * Returns the attribute {@link #functions}.
-    * 
-    * @return the attribute {@link #functions}
-    */
-   public List<FieldFunction> getFunctions() {
-      return functions;
-   }
+   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FieldInterpretedType> {
 
    private Character terminationCharacter;
    private FieldInterpretedType defaultValue;
@@ -51,14 +42,6 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
    private final List<FieldFunction> functions = new ArrayList<>();
    private boolean isMagicKey = false;
 
-   protected void setDefaultValue(FieldInterpretedType defaultValue) {
-      this.defaultValue = defaultValue;
-   }
-
-   protected void setAsMagicKey() {
-      this.isMagicKey = true;
-   }
-
    /**
     * Creates a new {@link AbstractFieldBuilder}.
     * 
@@ -66,14 +49,37 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
     * @param localId
     * @param name
     * @param description
+    * @param isGeneric
+    *           TODO
     * @param type
     */
    public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description,
-      FieldType<FieldInterpretedType> fieldType) {
-      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD);
+      FieldType<FieldInterpretedType> fieldType, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD, isGeneric);
       Reject.ifNull(fieldType, "fieldType");
 
       this.fieldType = fieldType;
+   }
+
+   public C withFieldFunction(FieldFunction function) {
+      functions.add(function);
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
+    */
+   public C withDefaultValue(FieldInterpretedType value) {
+      this.defaultValue = value;
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
+    */
+   public C asMagicKey() {
+      this.isMagicKey = true;
+      return (C) this;
    }
 
    /**
@@ -95,18 +101,8 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
     * 
     * @return the attribute {@link #enumeratedValues}
     */
-   public Map<FieldInterpretedType, byte[]> getEnumeratedValues() {
+   protected Map<FieldInterpretedType, byte[]> getEnumeratedValues() {
       return enumeratedValues;
-   }
-
-   /**
-    * Sets the attribute {@link #terminationCharacter}.
-    *
-    * @param new
-    *           vakue for attribute {@link #terminationCharacter terminationCharacter}.
-    */
-   public void setTerminationCharacter(Character terminationCharacter) {
-      this.terminationCharacter = terminationCharacter;
    }
 
    /**
@@ -115,7 +111,7 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
     * @param new
     *           vakue for attribute {@link #flagSpecification flagSpecification}.
     */
-   public void setFlagSpecification(FlagSpecification flagSpecification) {
+   protected void setFlagSpecification(FlagSpecification flagSpecification) {
       this.flagSpecification = flagSpecification;
    }
 
@@ -125,8 +121,12 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
     * @param new
     *           vakue for attribute {@link #fixedCharset fixedCharset}.
     */
-   public void setFixedCharset(Charset fixedCharset) {
+   protected void setFixedCharset(Charset fixedCharset) {
       this.fixedCharset = fixedCharset;
+   }
+
+   protected void setTerminationCharacter(Character terminationCharacter) {
+      this.terminationCharacter = terminationCharacter;
    }
 
    /**
@@ -135,29 +135,8 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
     * @param new
     *           vakue for attribute {@link #fixedByteOrder fixedByteOrder}.
     */
-   public void setFixedByteOrder(ByteOrder fixedByteOrder) {
+   protected void setFixedByteOrder(ByteOrder fixedByteOrder) {
       this.fixedByteOrder = fixedByteOrder;
-   }
-
-   public C withFieldFunction(FieldFunction function) {
-      getFunctions().add(function);
-      return (C) this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
-    */
-   public C withDefaultValue(FieldInterpretedType value) {
-      setDefaultValue(value);
-      return (C) this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
-    */
-   public C asMagicKey() {
-      setAsMagicKey();
-      return (C) this;
    }
 
 }

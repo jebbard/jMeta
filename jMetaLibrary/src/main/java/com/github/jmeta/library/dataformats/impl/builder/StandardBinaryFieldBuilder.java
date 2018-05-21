@@ -28,9 +28,10 @@ public class StandardBinaryFieldBuilder<ParentBuilder extends DataFormatSpecific
     * @param localId
     * @param name
     * @param description
+    * @param isGeneric TODO
     * @param fieldType
     */
-   public StandardBinaryFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description) {
-      super(parentBuilder, localId, name, description, FieldType.BINARY);
+   public StandardBinaryFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, FieldType.BINARY, isGeneric);
    }
 }

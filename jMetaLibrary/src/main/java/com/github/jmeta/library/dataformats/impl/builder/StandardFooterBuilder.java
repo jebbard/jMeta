@@ -23,10 +23,11 @@ public class StandardFooterBuilder<PayloadBuilder>
 
    /**
     * Creates a new {@link StandardFooterBuilder}.
+    * @param isGeneric TODO
     */
    public StandardFooterBuilder(ContainerBuilder<PayloadBuilder> parentBuilder, String localId, String name,
-      String description) {
-      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FOOTER);
+      String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FOOTER, isGeneric);
    }
 
    @Override

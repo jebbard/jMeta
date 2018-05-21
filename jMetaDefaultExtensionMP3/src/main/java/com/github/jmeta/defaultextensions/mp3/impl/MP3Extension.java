@@ -21,7 +21,6 @@ import java.util.Set;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -88,10 +87,14 @@ public class MP3Extension implements Extension {
 
       // Data blocks
       final DataBlockId mp3FrameId = new DataBlockId(MP3, "mp3");
-      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(mp3FrameId);
+      TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(mp3FrameId);
+      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = builder.finishContainerSequence();
+
+      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
+      final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
+
+      topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
 
       // Byte orders and charsets
       List<ByteOrder> supportedByteOrders = new ArrayList<>();
@@ -102,17 +105,16 @@ public class MP3Extension implements Extension {
 
       supportedCharsets.add(Charsets.CHARSET_ISO);
 
-      DataFormatSpecification dummyMP3Spec = new StandardDataFormatSpecification(MP3, descMap, topLevelIds,
-         new HashSet<>(), new HashSet<>(), supportedByteOrders, supportedCharsets, null);
-
-      return dummyMP3Spec;
+      return new StandardDataFormatSpecification(MP3, builder.finishContainerSequence(),
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
+         null);
    }
 
    /**
     * @param mp3FrameId
     * @return
     */
-   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId mp3FrameId) {
+   public TopLevelContainerSequenceBuilder getDescMap() {
       List<FlagDescription> flagDescriptions = new ArrayList<>();
 
       /*
@@ -161,8 +163,7 @@ public class MP3Extension implements Extension {
 
       FieldFunction crcFunc = new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedBlocks, "No protection bit", 0);
 
-      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
-         MP3Extension.MP3);
+      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(MP3Extension.MP3);
 
       // @formatter:off
 
@@ -192,14 +193,7 @@ public class MP3Extension implements Extension {
          .finishContainer();
       // @formatter:on
 
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = builder.finishContainerSequence();
-
-      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
-      final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
-
-      topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
-
-      return builder.finishContainerSequence();
+      return builder;
    }
 
 }

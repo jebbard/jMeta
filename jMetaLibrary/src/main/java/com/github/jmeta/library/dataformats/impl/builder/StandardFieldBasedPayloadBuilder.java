@@ -23,10 +23,11 @@ public class StandardFieldBasedPayloadBuilder
 
    /**
     * Creates a new {@link StandardFieldBasedPayloadBuilder}.
+    * @param isGeneric TODO
     */
    public StandardFieldBasedPayloadBuilder(ContainerBuilder<FieldBasedPayloadBuilder> parentBuilder, String localId,
-      String name, String description) {
-      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+      String name, String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD_BASED_PAYLOAD, isGeneric);
    }
 
    @Override

@@ -23,26 +23,35 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  *
  */
 public class StandardFieldBasedPayloadContainerBuilder extends
-   AbstractDataFormatSpecificationBuilderWithParent<ContainerBasedPayloadBuilder, ContainerBuilder<FieldBasedPayloadBuilder>>
+   AbstractDataFormatSpecificationBuilder<ContainerBasedPayloadBuilder, ContainerBuilder<FieldBasedPayloadBuilder>>
    implements ContainerBuilder<FieldBasedPayloadBuilder> {
 
-   private final FieldBasedPayloadBuilder payloadBuilder = new StandardFieldBasedPayloadBuilder(this, "payload",
-      "payload", "The payload");
+   private final FieldBasedPayloadBuilder payloadBuilder;
 
    /**
     * Creates a new {@link StandardFieldBasedPayloadContainerBuilder}.
+    * 
+    * @param isGeneric
+    *           TODO
     */
    public StandardFieldBasedPayloadContainerBuilder(ContainerBasedPayloadBuilder parentBuilder, String localId,
-      String name, String description) {
-      super(parentBuilder, localId, name, description, PhysicalDataBlockType.CONTAINER);
+      String name, String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, PhysicalDataBlockType.CONTAINER, isGeneric);
+
+      payloadBuilder = new StandardFieldBasedPayloadBuilder(this, "payload", "payload", "The payload", isGeneric());
    }
 
    /**
     * Creates a new {@link StandardFieldBasedPayloadContainerBuilder}.
+    * 
+    * @param isGeneric
+    *           TODO
     */
    public StandardFieldBasedPayloadContainerBuilder(DescriptionCollector collector, ContainerDataFormat dataFormat,
-      String localId, String name, String description) {
-      super(collector, dataFormat, localId, name, description, PhysicalDataBlockType.CONTAINER);
+      String localId, String name, String description, boolean isGeneric) {
+      super(null, collector, dataFormat, localId, name, description, PhysicalDataBlockType.CONTAINER, isGeneric);
+
+      payloadBuilder = new StandardFieldBasedPayloadBuilder(this, "payload", "payload", "The payload", isGeneric());
    }
 
    @Override
@@ -52,12 +61,12 @@ public class StandardFieldBasedPayloadContainerBuilder extends
 
    @Override
    public HeaderBuilder<FieldBasedPayloadBuilder> addHeader(String localId, String name, String description) {
-      return new StandardHeaderBuilder<>(this, localId, name, description);
+      return new StandardHeaderBuilder<>(this, localId, name, description, isGeneric());
    }
 
    @Override
    public FooterBuilder<FieldBasedPayloadBuilder> addFooter(String localId, String name, String description) {
-      return new StandardFooterBuilder<>(this, localId, name, description);
+      return new StandardFooterBuilder<>(this, localId, name, description, isGeneric());
    }
 
    @Override

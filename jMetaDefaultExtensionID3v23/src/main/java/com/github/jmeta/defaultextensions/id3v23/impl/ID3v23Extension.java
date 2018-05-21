@@ -15,13 +15,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -59,10 +57,6 @@ public class ID3v23Extension implements Extension {
       new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
    public static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
-   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".header.id");
-   private static final DataBlockId GENERIC_FRAME_HEADER_FRAME_SIZE_FIELD_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".header.size");
    private static final DataBlockId GENERIC_FRAME_HEADER_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header");
    private static final DataBlockId GENERIC_FRAME_ID = new DataBlockId(ID3v23, ID3V23_GENERIC_CONTAINER_ID);
@@ -70,16 +64,12 @@ public class ID3v23Extension implements Extension {
       ID3V23_GENERIC_CONTAINER_ID + ".payload.data");
    private static final DataBlockId GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload.decompressedSize");
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".payload.encryptionMethod");
    private static final DataBlockId GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload.groupId");
    private static final DataBlockId GENERIC_FRAME_PAYLOAD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload");
    private static final DataBlockId GENERIC_INFORMATION_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload.information");
-   private static final DataBlockId GENERIC_TEXT_ENCODING_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".payload.textEncoding");
    private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_CRC_ID = new DataBlockId(ID3v23,
       "id3v23.extHeader.crc");
    private static final DataBlockId ID3V23_EXTENDED_HEADER_ID = new DataBlockId(ID3v23, "id3v23.extHeader");
@@ -92,7 +82,6 @@ public class ID3v23Extension implements Extension {
    private static final String ID3V23_TAG_ID_STRING = "ID3";
    private static final byte[] ID3V23_TAG_MAGIC_KEY_BYTES = new byte[ID3V23_TAG_ID_BYTES.length
       + ID3V23_TAG_VERSION_BYTES.length];
-   private static final DataBlockId PADDING_ID = new DataBlockId(ID3v23, "id3v23.payload.padding");
    private static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
    private static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
    public static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
@@ -139,10 +128,7 @@ public class ID3v23Extension implements Extension {
       return serviceProviders;
    }
 
-   private DataFormatSpecification createSpecification(Map<DataBlockId, DataBlockDescription> descMap) {
-
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(ID3V23_TAG_ID);
+   private DataFormatSpecification createSpecification(TopLevelContainerSequenceBuilder builder) {
 
       // Byte orders and charsets
       List<ByteOrder> supportedByteOrders = new ArrayList<>();
@@ -154,41 +140,22 @@ public class ID3v23Extension implements Extension {
       supportedCharsets.add(Charsets.CHARSET_ISO);
       supportedCharsets.add(Charsets.CHARSET_UTF16);
 
-      final Set<DataBlockId> genericDataBlocks = new HashSet<>();
-
-      genericDataBlocks.add(GENERIC_FRAME_ID);
-      genericDataBlocks.add(GENERIC_FRAME_HEADER_ID);
-      genericDataBlocks.add(GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID);
-      genericDataBlocks.add(GENERIC_FRAME_HEADER_FRAME_ID_FIELD_ID);
-      genericDataBlocks.add(GENERIC_FRAME_HEADER_FRAME_SIZE_FIELD_ID);
-      genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_ID);
-      genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID);
-      genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_ENCRYPTION_METHOD_FIELD_ID);
-      genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
-      genericDataBlocks.add(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID);
-      genericDataBlocks.add(GENERIC_INFORMATION_ID);
-      genericDataBlocks.add(GENERIC_TEXT_ENCODING_ID);
-
-      final Set<DataBlockId> paddingDataBlocks = new HashSet<>();
-
-      paddingDataBlocks.add(PADDING_ID);
-
-      DataFormatSpecification dummyID3v23Spec = new StandardDataFormatSpecification(ID3v23, descMap, topLevelIds,
-         genericDataBlocks, paddingDataBlocks, supportedByteOrders, supportedCharsets, GENERIC_FRAME_ID);
-      return dummyID3v23Spec;
+      return new StandardDataFormatSpecification(ID3v23, builder.finishContainerSequence(),
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
+         GENERIC_FRAME_ID);
    }
 
    private DataFormatSpecification createSpecification() {
 
-      Map<DataBlockId, DataBlockDescription> descMap = getDescMap();
+      TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      return createSpecification(descMap);
+      return createSpecification(builder);
    }
 
    /**
     * @return
     */
-   public Map<DataBlockId, DataBlockDescription> getDescMap() {
+   public TopLevelContainerSequenceBuilder getDescMap() {
       // 3. tag flags
       List<FlagDescription> tagFlagDescriptions = new ArrayList<>();
 
@@ -220,8 +187,7 @@ public class ID3v23Extension implements Extension {
 
       affectedTagSizeBlocks.add(ID3V23_PAYLOAD_ID);
 
-      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
-         ID3v23Extension.ID3v23);
+      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(ID3v23Extension.ID3v23);
 
       // 2. Extended header flags
       List<FlagDescription> extendedHeaderFlagDescriptions = new ArrayList<>();
@@ -436,6 +402,6 @@ public class ID3v23Extension implements Extension {
 
       // @formatter:on
 
-      return builder.finishContainerSequence();
+      return builder;
    }
 }

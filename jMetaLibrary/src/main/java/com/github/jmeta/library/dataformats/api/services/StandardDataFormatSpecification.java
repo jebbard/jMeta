@@ -48,7 +48,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * @param dataBlockDescriptions
     * @param topLevelDataBlockIds
     * @param genericDataBlocks
-    * @param paddingDataBlocks
     * @param supportedByteOrders
     * @param supportedCharacterEncodings
     * @param defaultNestedContainerId
@@ -56,19 +55,17 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     */
    public StandardDataFormatSpecification(ContainerDataFormat dataFormat,
       Map<DataBlockId, DataBlockDescription> dataBlockDescriptions, Set<DataBlockId> topLevelDataBlockIds,
-      Set<DataBlockId> genericDataBlocks, Set<DataBlockId> paddingDataBlocks, List<ByteOrder> supportedByteOrders,
+      Set<DataBlockId> genericDataBlocks, List<ByteOrder> supportedByteOrders,
       List<Charset> supportedCharacterEncodings, DataBlockId defaultNestedContainerId) {
       Reject.ifNull(dataBlockDescriptions, "dataBlockDescriptions");
       Reject.ifNull(topLevelDataBlockIds, "topLevelDataBlockIds");
       Reject.ifNull(dataFormat, "dataFormat");
       Reject.ifNull(supportedCharacterEncodings, "supportedCharacterEncodings");
       Reject.ifNull(supportedByteOrders, "supportedByteOrders");
-      Reject.ifNull(paddingDataBlocks, "paddingDataBlocks");
       Reject.ifNull(genericDataBlocks, "genericDataBlocks");
 
       initGenericIdPatterns(genericDataBlocks);
 
-      m_paddingDataBlocks.addAll(paddingDataBlocks);
       m_supportedByteOrders.addAll(supportedByteOrders);
       m_supportedCharacterEncodings.addAll(supportedCharacterEncodings);
       m_dataFormat = dataFormat;
@@ -139,8 +136,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
             genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(),
             genericDescription.getMinimumOccurrences(), genericDescription.getMaximumOccurrences(),
-            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(),
-            null);
+            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), null);
       }
 
       return m_dataBlockDescriptions.get(id);
@@ -209,15 +205,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       Reject.ifFalse(specifiesBlockWithId(id), "specifiesBlockWithId(id)");
 
       return m_genericDataBlocks.containsKey(id);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecification#getPaddingBlockIds()
-    */
-   @Override
-   public Set<DataBlockId> getPaddingBlockIds() {
-
-      return Collections.unmodifiableSet(m_paddingDataBlocks);
    }
 
    /**
@@ -463,8 +450,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    private final DataBlockId defaultNestedContainerId;
 
    private final Map<DataBlockId, String> m_genericDataBlocks = new HashMap<>();
-
-   private final Set<DataBlockId> m_paddingDataBlocks = new HashSet<>();
 
    private final List<ByteOrder> m_supportedByteOrders = new ArrayList<>();
 

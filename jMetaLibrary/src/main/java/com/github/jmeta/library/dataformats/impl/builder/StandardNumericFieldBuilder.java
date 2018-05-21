@@ -30,10 +30,11 @@ public class StandardNumericFieldBuilder<ParentBuilder extends DataFormatSpecifi
     * @param localId
     * @param name
     * @param description
+    * @param isGeneric TODO
     * @param fieldType
     */
-   public StandardNumericFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description) {
-      super(parentBuilder, localId, name, description, FieldType.UNSIGNED_WHOLE_NUMBER);
+   public StandardNumericFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, FieldType.UNSIGNED_WHOLE_NUMBER, isGeneric);
    }
 
    /**

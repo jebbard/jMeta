@@ -29,10 +29,11 @@ public class StandardEnumeratedFieldBuilder<ParentBuilder extends DataFormatSpec
     * @param localId
     * @param name
     * @param description
+    * @param isGeneric TODO
     * @param fieldType
     */
-   public StandardEnumeratedFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description) {
-      super(parentBuilder, localId, name, description, (FieldType<FieldInterpretedType>) FieldType.ENUMERATED);
+   public StandardEnumeratedFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, (FieldType<FieldInterpretedType>) FieldType.ENUMERATED, isGeneric);
    }
 
    /**

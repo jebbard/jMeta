@@ -72,11 +72,6 @@ public interface DataFormatSpecification {
    public ByteOrder getDefaultByteOrder();
 
    /**
-    * @return All {@link DataBlockId}s used for padding
-    */
-   public Set<DataBlockId> getPaddingBlockIds();
-
-   /**
     * @param id
     * @return true if it is a generic block, false otherwise
     */

@@ -15,13 +15,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -80,12 +78,8 @@ public class OggExtension implements Extension {
    private DataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId oggPageId = new DataBlockId(OGG, "ogg");
       final DataBlockId oggPacketPartContainerId = new DataBlockId(OGG, "ogg.payload.packetPartContainer");
-      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(oggPageId, oggPacketPartContainerId);
-
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(oggPageId);
+      TopLevelContainerSequenceBuilder builder = getDescMap();
 
       // Byte orders and charsets
       List<ByteOrder> supportedByteOrders = new ArrayList<>();
@@ -95,12 +89,9 @@ public class OggExtension implements Extension {
 
       supportedCharsets.add(Charsets.CHARSET_ISO);
 
-      final Set<DataBlockId> genericDataBlocks = new HashSet<>();
-
-      DataFormatSpecification dummyOggSpec = new StandardDataFormatSpecification(OGG, descMap, topLevelIds,
-         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets, oggPacketPartContainerId);
-
-      return dummyOggSpec;
+      return new StandardDataFormatSpecification(OGG, builder.finishContainerSequence(),
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
+         oggPacketPartContainerId);
    }
 
    /**
@@ -108,8 +99,7 @@ public class OggExtension implements Extension {
     * @param oggPacketPartContainerId
     * @return
     */
-   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId oggPageId,
-      final DataBlockId oggPacketPartContainerId) {
+   public TopLevelContainerSequenceBuilder getDescMap() {
       final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(OggExtension.OGG,
          "ogg.header.segmentTableEntry");
       final DataBlockId oggSegmentId = new DataBlockId(OggExtension.OGG,
@@ -123,8 +113,7 @@ public class OggExtension implements Extension {
 
       affectedBlocks2.add(oggSegmentId);
 
-      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
-         OggExtension.OGG);
+      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(OggExtension.OGG);
 
       // @formatter:off
 
@@ -186,7 +175,7 @@ public class OggExtension implements Extension {
 
       // @formatter:on
 
-      return builder.finishContainerSequence();
+      return builder;
    }
 
 }

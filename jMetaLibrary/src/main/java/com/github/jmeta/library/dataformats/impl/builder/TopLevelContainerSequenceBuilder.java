@@ -11,6 +11,7 @@ package com.github.jmeta.library.dataformats.impl.builder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
@@ -20,7 +21,6 @@ import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPaylo
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -28,10 +28,14 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public class TopLevelContainerSequenceBuilder
-   extends AbstractDataFormatSpecificationBuilder<Map<DataBlockId, DataBlockDescription>>
    implements ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> {
 
    private static class TopLevelDescriptionCollector implements DescriptionCollector {
+
+      @Override
+      public Map<DataBlockId, DataBlockDescription> getGenericDescriptions() {
+         return genericDescriptions;
+      }
 
       /**
        * @see com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector#getAllDescriptions()
@@ -43,11 +47,28 @@ public class TopLevelContainerSequenceBuilder
 
       final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
 
+      final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
+
+      final Map<DataBlockId, DataBlockDescription> topLevelDescriptions = new HashMap<>();
+
       @Override
-      public void addDataBlockDescription(DataBlockDescription newDescription) {
+      public Map<DataBlockId, DataBlockDescription> getTopLevelDescriptions() {
+         return topLevelDescriptions;
+      }
+
+      @Override
+      public void addDataBlockDescription(DataBlockDescription newDescription, boolean isGeneric, boolean isTopLevel) {
          Reject.ifNull(newDescription, "newDescription");
 
          overallDescriptions.put(newDescription.getId(), newDescription);
+
+         if (isGeneric) {
+            genericDescriptions.put(newDescription.getId(), newDescription);
+         }
+
+         if (isTopLevel) {
+            topLevelDescriptions.put(newDescription.getId(), newDescription);
+         }
       }
    };
 
@@ -55,14 +76,14 @@ public class TopLevelContainerSequenceBuilder
    public ContainerBuilder<FieldBasedPayloadBuilder> addContainerWithFieldBasedPayload(String localId, String name,
       String description) {
       return new StandardFieldBasedPayloadContainerBuilder(getDescriptionCollector(), getDataFormat(), localId, name,
-         description);
+         description, false);
    }
 
    @Override
    public ContainerBuilder<ContainerBasedPayloadBuilder> addContainerWithContainerBasedPayload(String localId,
       String name, String description) {
       return new StandardContainerBasedPayloadContainerBuilder(getDescriptionCollector(), getDataFormat(), localId,
-         name, description);
+         name, description, false);
    }
 
    @Override
@@ -84,8 +105,19 @@ public class TopLevelContainerSequenceBuilder
     */
    @Override
    public Map<DataBlockId, DataBlockDescription> finishContainerSequence() {
-      return finish();
+      return collector.getAllDescriptions();
    }
+
+   public Set<DataBlockId> getGenericDataBlocks() {
+      return getDescriptionCollector().getGenericDescriptions().keySet();
+   }
+
+   public Set<DataBlockId> getTopLevelDataBlocks() {
+      return getDescriptionCollector().getTopLevelDescriptions().keySet();
+   }
+
+   private final DescriptionCollector collector;
+   private final ContainerDataFormat dataFormat;
 
    /**
     * Creates a new {@link TopLevelContainerSequenceBuilder}.
@@ -94,14 +126,26 @@ public class TopLevelContainerSequenceBuilder
     * @param type
     */
    public TopLevelContainerSequenceBuilder(ContainerDataFormat dataFormat) {
-      super(new TopLevelDescriptionCollector(), dataFormat, "dummy", "dummy", "dummy", PhysicalDataBlockType.CONTAINER);
+      this.collector = new TopLevelDescriptionCollector();
+      this.dataFormat = dataFormat;
    }
 
-   /**
-    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractDataFormatSpecificationBuilder#finish()
-    */
    @Override
-   protected Map<DataBlockId, DataBlockDescription> finish() {
-      return getDescriptionCollector().getAllDescriptions();
+   public String getGlobalId() {
+      return null;
+   }
+
+   @Override
+   public void addChildDescription(DataBlockDescription childDesc) {
+   }
+
+   @Override
+   public ContainerDataFormat getDataFormat() {
+      return dataFormat;
+   }
+
+   @Override
+   public DescriptionCollector getDescriptionCollector() {
+      return collector;
    }
 }

@@ -15,13 +15,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -87,22 +85,7 @@ public class APEv2Extension implements Extension {
    private DataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId apeV2TagId = new DataBlockId(APEv2, "apev2");
-
-      final DataBlockId apeV2GenericItemId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}");
-      final DataBlockId apeV2GenericItemHeaderId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header");
-      final DataBlockId apeV2GenericItemPayloadId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.payload");
-      final DataBlockId apeV2GenericItemValueSizeId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header.size");
-      final DataBlockId apeV2GenericItemFlagsId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header.flags");
-      final DataBlockId apeV2GenericItemKeyId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.header.key");
-      final DataBlockId apeV2GenericItemValueId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.payload.value");
-
-      Map<DataBlockId, DataBlockDescription> descMap = getDescMap(apeV2TagId, apeV2GenericItemId,
-         apeV2GenericItemHeaderId, apeV2GenericItemPayloadId, apeV2GenericItemValueSizeId, apeV2GenericItemFlagsId,
-         apeV2GenericItemKeyId, apeV2GenericItemValueId);
-
-      Set<DataBlockId> topLevelIds = new HashSet<>();
-      topLevelIds.add(apeV2TagId);
+      TopLevelContainerSequenceBuilder builder = getDescMap();
 
       // Byte orders and charsets
       List<ByteOrder> supportedByteOrders = new ArrayList<>();
@@ -111,42 +94,23 @@ public class APEv2Extension implements Extension {
       supportedByteOrders.add(ByteOrder.LITTLE_ENDIAN);
 
       supportedCharsets.add(Charsets.CHARSET_ISO);
+      final DataBlockId apeV2GenericItemId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}");
 
-      final Set<DataBlockId> genericDataBlocks = new HashSet<>();
-
-      genericDataBlocks.add(apeV2GenericItemId);
-      genericDataBlocks.add(apeV2GenericItemFlagsId);
-      genericDataBlocks.add(apeV2GenericItemKeyId);
-      genericDataBlocks.add(apeV2GenericItemValueId);
-      genericDataBlocks.add(apeV2GenericItemValueSizeId);
-      genericDataBlocks.add(apeV2GenericItemHeaderId);
-      genericDataBlocks.add(apeV2GenericItemPayloadId);
-
-      DataFormatSpecification dummyAPEv2Spec = new StandardDataFormatSpecification(APEv2, descMap, topLevelIds,
-         genericDataBlocks, new HashSet<>(), supportedByteOrders, supportedCharsets, apeV2GenericItemId);
-
-      return dummyAPEv2Spec;
+      return new StandardDataFormatSpecification(APEv2, builder.finishContainerSequence(),
+         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), supportedByteOrders, supportedCharsets,
+         apeV2GenericItemId);
    }
 
    /**
-    * @param apeV2TagId
-    * @param apeV2GenericItemId
-    * @param apeV2GenericItemHeaderId
-    * @param apeV2GenericItemPayloadId
-    * @param apeV2GenericItemValueSizeId
-    * @param apeV2GenericItemFlagsId
-    * @param apeV2GenericItemKeyId
-    * @param apeV2GenericItemValueId
     * @return
     */
-   public Map<DataBlockId, DataBlockDescription> getDescMap(final DataBlockId apeV2TagId,
-      final DataBlockId apeV2GenericItemId, final DataBlockId apeV2GenericItemHeaderId,
-      final DataBlockId apeV2GenericItemPayloadId, final DataBlockId apeV2GenericItemValueSizeId,
-      final DataBlockId apeV2GenericItemFlagsId, final DataBlockId apeV2GenericItemKeyId,
-      final DataBlockId apeV2GenericItemValueId) {
+   public TopLevelContainerSequenceBuilder getDescMap() {
       final DataBlockId apeV2HeaderId = new DataBlockId(APEv2Extension.APEv2, "apev2.header");
       final DataBlockId apeV2PayloadId = new DataBlockId(APEv2Extension.APEv2, "apev2.payload");
       final DataBlockId apeV2FooterId = new DataBlockId(APEv2Extension.APEv2, "apev2.footer");
+
+      final DataBlockId apeV2GenericItemId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}");
+      final DataBlockId apeV2GenericItemPayloadId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.payload");
 
       Set<DataBlockId> affectedBlocksHeader = new HashSet<>();
 
@@ -192,8 +156,7 @@ public class APEv2Extension implements Extension {
 
       Flags defaultItemFlags = new Flags(apev2ItemFlagSpec);
 
-      ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>> builder = new TopLevelContainerSequenceBuilder(
-         APEv2Extension.APEv2);
+      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(APEv2Extension.APEv2);
    // @formatter:off
       builder
       .addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
@@ -286,11 +249,11 @@ public class APEv2Extension implements Extension {
                   .finishField()
                .finishFieldBasedPayload()
             .finishContainer()
-         .finishContainerBasedPayload()
+         .finishContainerSequence()
       .finishContainer();
    // @formatter:on
 
-      return builder.finishContainerSequence();
+      return builder;
    }
 
 }
