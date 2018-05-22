@@ -84,16 +84,15 @@ public class MP3Extension implements Extension {
       final DataBlockId mp3FrameId = new DataBlockId(MP3, "mp3");
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = builder.finishContainerSequence();
+      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = builder.getAllDescriptions();
 
       final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
       final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
 
       topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
 
-      return new StandardDataFormatSpecification(MP3, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
-         List.of(Charsets.CHARSET_ISO), null);
+      return new StandardDataFormatSpecification(MP3, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
+         builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN), List.of(Charsets.CHARSET_ISO), null);
    }
 
    /**

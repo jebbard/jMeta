@@ -14,8 +14,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  *
  */
 public interface EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> extends
-   FieldBuilder<ParentBuilder, FieldInterpretedType, EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>>,
-   DataBlockDescriptionModifier<EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>> {
+   FieldBuilder<ParentBuilder, FieldInterpretedType, EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>> {
 
    EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> addEnumeratedValue(byte[] binaryValue,
       FieldInterpretedType interpretedValue);

@@ -10,16 +10,15 @@
 package com.github.jmeta.library.dataformats.impl.builder;
 
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
  * {@link StandardBinaryFieldBuilder}
  *
  */
-public class StandardBinaryFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
-   extends AbstractFieldBuilder<ParentBuilder, BinaryFieldBuilder<ParentBuilder>, byte[]>
-   implements BinaryFieldBuilder<ParentBuilder> {
+public class StandardBinaryFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
+   extends AbstractFieldBuilder<P, BinaryFieldBuilder<P>, byte[]> implements BinaryFieldBuilder<P> {
 
    /**
     * Creates a new {@link StandardBinaryFieldBuilder}.
@@ -28,10 +27,12 @@ public class StandardBinaryFieldBuilder<ParentBuilder extends DataFormatSpecific
     * @param localId
     * @param name
     * @param description
-    * @param isGeneric TODO
+    * @param isGeneric
+    *           TODO
     * @param fieldType
     */
-   public StandardBinaryFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description, boolean isGeneric) {
+   public StandardBinaryFieldBuilder(P parentBuilder, String localId, String name, String description,
+      boolean isGeneric) {
       super(parentBuilder, localId, name, description, FieldType.BINARY, isGeneric);
    }
 }

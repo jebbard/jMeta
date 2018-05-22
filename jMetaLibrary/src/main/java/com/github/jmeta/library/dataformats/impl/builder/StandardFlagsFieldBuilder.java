@@ -11,7 +11,7 @@ package com.github.jmeta.library.dataformats.impl.builder;
 
 import java.nio.ByteOrder;
 
-import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
@@ -21,9 +21,8 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
  * {@link StandardFlagsFieldBuilder}
  *
  */
-public class StandardFlagsFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
-   extends AbstractFieldBuilder<ParentBuilder, FlagsFieldBuilder<ParentBuilder>, Flags>
-   implements FlagsFieldBuilder<ParentBuilder> {
+public class StandardFlagsFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
+   extends AbstractFieldBuilder<P, FlagsFieldBuilder<P>, Flags> implements FlagsFieldBuilder<P> {
 
    /**
     * Creates a new {@link StandardFlagsFieldBuilder}.
@@ -36,7 +35,7 @@ public class StandardFlagsFieldBuilder<ParentBuilder extends DataFormatSpecifica
     *           TODO
     * @param fieldType
     */
-   public StandardFlagsFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description,
+   public StandardFlagsFieldBuilder(P parentBuilder, String localId, String name, String description,
       boolean isGeneric) {
       super(parentBuilder, localId, name, description, FieldType.FLAGS, isGeneric);
    }
@@ -45,7 +44,7 @@ public class StandardFlagsFieldBuilder<ParentBuilder extends DataFormatSpecifica
     * @see com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder#withFlagSpecification(com.github.jmeta.library.dataformats.api.types.FlagSpecification)
     */
    @Override
-   public FlagSpecificationBuilder<ParentBuilder> withFlagSpecification(int byteLength, ByteOrder byteOrder) {
+   public FlagSpecificationBuilder<P> withFlagSpecification(int byteLength, ByteOrder byteOrder) {
       return new StandardFlagSpecificationBuilder<>(this, byteLength, byteOrder);
    }
 

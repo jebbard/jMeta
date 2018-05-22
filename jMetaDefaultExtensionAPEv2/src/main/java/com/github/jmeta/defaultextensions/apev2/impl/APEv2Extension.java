@@ -81,9 +81,9 @@ public class APEv2Extension implements Extension {
       // Data blocks
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      return new StandardDataFormatSpecification(APEv2, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN),
-         List.of(Charsets.CHARSET_ISO), builder.getDefaultNestedContainer());
+      return new StandardDataFormatSpecification(APEv2, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
+         builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO),
+         builder.getDefaultNestedContainer());
    }
 
    /**

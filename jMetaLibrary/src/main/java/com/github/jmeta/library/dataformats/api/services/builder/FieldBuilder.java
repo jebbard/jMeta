@@ -15,24 +15,24 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockId;
  * {@link FieldBuilder}
  *
  */
-public interface FieldBuilder<ParentBuilder, FieldInterpretedType, ConcreteFieldBuilder extends FieldBuilder<ParentBuilder, FieldInterpretedType, ConcreteFieldBuilder>>
-   extends DataFormatSpecificationBuilder {
+public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
+   extends DataBlockDescriptionBuilder<C> {
 
-   ConcreteFieldBuilder withDefaultValue(FieldInterpretedType value);
+   C withDefaultValue(FIT value);
 
-   ConcreteFieldBuilder asMagicKey();
+   C asMagicKey();
 
-   ConcreteFieldBuilder asIdOf(DataBlockId... ids);
+   C asIdOf(DataBlockId... ids);
 
-   ConcreteFieldBuilder indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockId... ids);
+   C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockId... ids);
 
-   ConcreteFieldBuilder asSizeOf(DataBlockId... ids);
+   C asSizeOf(DataBlockId... ids);
 
-   ConcreteFieldBuilder asCountOf(DataBlockId... ids);
+   C asCountOf(DataBlockId... ids);
 
-   ConcreteFieldBuilder asByteOrderOf(DataBlockId... ids);
+   C asByteOrderOf(DataBlockId... ids);
 
-   ConcreteFieldBuilder asCharacterEncodingOf(DataBlockId... ids);
+   C asCharacterEncodingOf(DataBlockId... ids);
 
-   ParentBuilder finishField();
+   P finishField();
 }

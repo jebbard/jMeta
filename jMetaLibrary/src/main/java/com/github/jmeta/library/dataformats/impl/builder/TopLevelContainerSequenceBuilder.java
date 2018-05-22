@@ -114,10 +114,6 @@ public class TopLevelContainerSequenceBuilder implements ContainerSequenceBuilde
       return null;
    }
 
-   public Map<DataBlockId, DataBlockDescription> finishContainerSequence() {
-      return getAllDescriptions();
-   }
-
    public Set<DataBlockId> getGenericDataBlocks() {
       return getGenericDescriptions().keySet();
    }

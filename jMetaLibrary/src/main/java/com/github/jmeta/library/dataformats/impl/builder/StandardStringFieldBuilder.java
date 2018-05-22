@@ -11,7 +11,7 @@ package com.github.jmeta.library.dataformats.impl.builder;
 
 import java.nio.charset.Charset;
 
-import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
@@ -19,9 +19,8 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  * {@link StandardStringFieldBuilder}
  *
  */
-public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
-   extends AbstractFieldBuilder<ParentBuilder, StringFieldBuilder<ParentBuilder>, String>
-   implements StringFieldBuilder<ParentBuilder> {
+public class StandardStringFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
+   extends AbstractFieldBuilder<P, StringFieldBuilder<P>, String> implements StringFieldBuilder<P> {
 
    /**
     * Creates a new {@link StandardStringFieldBuilder}.
@@ -30,10 +29,12 @@ public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecific
     * @param localId
     * @param name
     * @param description
-    * @param isGeneric TODO
+    * @param isGeneric
+    *           TODO
     * @param fieldType
     */
-   public StandardStringFieldBuilder(ParentBuilder parentBuilder, String localId, String name, String description, boolean isGeneric) {
+   public StandardStringFieldBuilder(P parentBuilder, String localId, String name, String description,
+      boolean isGeneric) {
       super(parentBuilder, localId, name, description, FieldType.STRING, isGeneric);
    }
 
@@ -41,7 +42,7 @@ public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecific
     * @see com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder#withTerminationCharacter(java.lang.Character)
     */
    @Override
-   public StringFieldBuilder<ParentBuilder> withTerminationCharacter(Character terminationChar) {
+   public StringFieldBuilder<P> withTerminationCharacter(Character terminationChar) {
       setTerminationCharacter(terminationChar);
       return this;
    }
@@ -50,7 +51,7 @@ public class StandardStringFieldBuilder<ParentBuilder extends DataFormatSpecific
     * @see com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder#withFixedCharset(java.nio.charset.Charset)
     */
    @Override
-   public StringFieldBuilder<ParentBuilder> withFixedCharset(Charset charset) {
+   public StringFieldBuilder<P> withFixedCharset(Charset charset) {
       setFixedCharset(charset);
       return this;
    }

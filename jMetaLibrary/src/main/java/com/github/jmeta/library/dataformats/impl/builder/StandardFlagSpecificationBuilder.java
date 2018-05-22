@@ -13,7 +13,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
@@ -24,21 +24,21 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
  * {@link StandardFlagSpecificationBuilder}
  *
  */
-public class StandardFlagSpecificationBuilder<ParentBuilder extends DataFormatSpecificationBuilder>
-   implements FlagSpecificationBuilder<ParentBuilder> {
+public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuilder<P>>
+   implements FlagSpecificationBuilder<P> {
 
-   private final AbstractFieldBuilder<ParentBuilder, FlagsFieldBuilder<ParentBuilder>, Flags> parentBuilder;
+   private final AbstractFieldBuilder<P, FlagsFieldBuilder<P>, Flags> parentBuilder;
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder#finishFlagSpecification()
     */
    @Override
-   public FlagsFieldBuilder<ParentBuilder> finishFlagSpecification() {
+   public FlagsFieldBuilder<P> finishFlagSpecification() {
       FlagSpecification flagSpecification = new FlagSpecification(flagDescriptions, flagByteLength, flagByteOrder,
          this.defaultFlagBytes);
       parentBuilder.setFlagSpecification(flagSpecification);
       parentBuilder.withDefaultValue(new Flags(flagSpecification));
-      return (FlagsFieldBuilder<ParentBuilder>) parentBuilder;
+      return (FlagsFieldBuilder<P>) parentBuilder;
    }
 
    private final int flagByteLength;
@@ -52,9 +52,8 @@ public class StandardFlagSpecificationBuilder<ParentBuilder extends DataFormatSp
     * @param flagByteLength
     * @param flagByteOrder
     */
-   public StandardFlagSpecificationBuilder(
-      AbstractFieldBuilder<ParentBuilder, FlagsFieldBuilder<ParentBuilder>, Flags> parentBuilder, int flagByteLength,
-      ByteOrder flagByteOrder) {
+   public StandardFlagSpecificationBuilder(AbstractFieldBuilder<P, FlagsFieldBuilder<P>, Flags> parentBuilder,
+      int flagByteLength, ByteOrder flagByteOrder) {
       this.parentBuilder = parentBuilder;
       this.flagByteLength = flagByteLength;
       this.flagByteOrder = flagByteOrder;
@@ -64,7 +63,7 @@ public class StandardFlagSpecificationBuilder<ParentBuilder extends DataFormatSp
     * @see com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder#addFlagDescription(com.github.jmeta.library.dataformats.api.types.FlagDescription)
     */
    @Override
-   public FlagSpecificationBuilder<ParentBuilder> addFlagDescription(FlagDescription flagDesc) {
+   public FlagSpecificationBuilder<P> addFlagDescription(FlagDescription flagDesc) {
       flagDescriptions.add(flagDesc);
       return this;
    }
@@ -73,7 +72,7 @@ public class StandardFlagSpecificationBuilder<ParentBuilder extends DataFormatSp
     * @see com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder#withDefaultFlagBytes()
     */
    @Override
-   public FlagSpecificationBuilder<ParentBuilder> withDefaultFlagBytes(byte[] defaultFlagBytes) {
+   public FlagSpecificationBuilder<P> withDefaultFlagBytes(byte[] defaultFlagBytes) {
       this.defaultFlagBytes = defaultFlagBytes;
       return this;
    }

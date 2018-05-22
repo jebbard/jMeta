@@ -14,6 +14,5 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  *
  */
 public interface BinaryFieldBuilder<ParentBuilder>
-   extends FieldBuilder<ParentBuilder, byte[], BinaryFieldBuilder<ParentBuilder>>,
-   DataBlockDescriptionModifier<BinaryFieldBuilder<ParentBuilder>> {
+   extends FieldBuilder<ParentBuilder, byte[], BinaryFieldBuilder<ParentBuilder>> {
 }

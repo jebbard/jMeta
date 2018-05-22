@@ -13,8 +13,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link FooterBuilder}
  *
  */
-public interface FooterBuilder<PayloadBuilder> extends FieldSequenceBuilder<FooterBuilder<PayloadBuilder>>,
-   DataBlockDescriptionModifier<FooterBuilder<PayloadBuilder>> {
+public interface FooterBuilder<PayloadBuilder> extends FieldSequenceBuilder<FooterBuilder<PayloadBuilder>> {
 
    ContainerBuilder<PayloadBuilder> finishFooter();
 }

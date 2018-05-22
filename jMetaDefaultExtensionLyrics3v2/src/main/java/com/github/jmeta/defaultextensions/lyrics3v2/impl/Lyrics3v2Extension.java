@@ -84,7 +84,7 @@ public class Lyrics3v2Extension implements Extension {
       // Data blocks
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      return new StandardDataFormatSpecification(LYRICS3v2, builder.finishContainerSequence(),
+      return new StandardDataFormatSpecification(LYRICS3v2, builder.getAllDescriptions(),
          builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN),
          List.of(Charsets.CHARSET_ISO), builder.getDefaultNestedContainer());
    }

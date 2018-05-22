@@ -17,21 +17,21 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * {@link StandardFooterBuilder}
  *
  */
-public class StandardFooterBuilder<PayloadBuilder>
-   extends AbstractFieldSequenceBuilder<PayloadBuilder, FooterBuilder<PayloadBuilder>>
-   implements FooterBuilder<PayloadBuilder> {
+public class StandardFooterBuilder<PB>
+   extends AbstractFieldSequenceBuilder<PB, FooterBuilder<PB>>
+   implements FooterBuilder<PB> {
 
    /**
     * Creates a new {@link StandardFooterBuilder}.
     * @param isGeneric TODO
     */
-   public StandardFooterBuilder(ContainerBuilder<PayloadBuilder> parentBuilder, String localId, String name,
+   public StandardFooterBuilder(ContainerBuilder<PB> parentBuilder, String localId, String name,
       String description, boolean isGeneric) {
       super(parentBuilder, localId, name, description, PhysicalDataBlockType.FOOTER, isGeneric);
    }
 
    @Override
-   public ContainerBuilder<PayloadBuilder> finishFooter() {
+   public ContainerBuilder<PB> finishFooter() {
       return super.finish();
    }
 }

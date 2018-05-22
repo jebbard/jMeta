@@ -79,8 +79,8 @@ public class ID3v1Extension implements Extension {
 
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      return new StandardDataFormatSpecification(ID3v1, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
+      return new StandardDataFormatSpecification(ID3v1, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
+         builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
          List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_ASCII, Charsets.CHARSET_UTF8), null);
    }
 

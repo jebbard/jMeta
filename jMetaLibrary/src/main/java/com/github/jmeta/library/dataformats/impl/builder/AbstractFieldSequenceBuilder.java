@@ -11,7 +11,7 @@ package com.github.jmeta.library.dataformats.impl.builder;
 
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.EnumeratedFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
@@ -23,9 +23,8 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * {@link AbstractFieldSequenceBuilder}
  *
  */
-public abstract class AbstractFieldSequenceBuilder<PayloadBuilder, ConcreteFieldSequenceBuilder extends DataFormatSpecificationBuilder>
-   extends AbstractDataFormatSpecificationBuilder<ContainerBuilder<PayloadBuilder>, ConcreteFieldSequenceBuilder>
-   implements FieldSequenceBuilder<ConcreteFieldSequenceBuilder> {
+public abstract class AbstractFieldSequenceBuilder<PB, C extends DataBlockDescriptionBuilder<C>> extends
+   AbstractDataFormatSpecificationBuilder<ContainerBuilder<PB>, C> implements FieldSequenceBuilder<C> {
 
    /**
     * Creates a new {@link AbstractFieldSequenceBuilder}.
@@ -33,43 +32,34 @@ public abstract class AbstractFieldSequenceBuilder<PayloadBuilder, ConcreteField
     * @param isGeneric
     *           TODO
     */
-   public AbstractFieldSequenceBuilder(ContainerBuilder<PayloadBuilder> parentBuilder, String localId, String name,
+   public AbstractFieldSequenceBuilder(ContainerBuilder<PB> parentBuilder, String localId, String name,
       String description, PhysicalDataBlockType type, boolean isGeneric) {
       super(parentBuilder, localId, name, description, type, isGeneric);
    }
 
    @Override
-   public StringFieldBuilder<ConcreteFieldSequenceBuilder> addStringField(String localId, String name,
-      String description) {
-      return new StandardStringFieldBuilder<>((ConcreteFieldSequenceBuilder) this, localId, name, description,
-         isGeneric());
+   public StringFieldBuilder<C> addStringField(String localId, String name, String description) {
+      return new StandardStringFieldBuilder<>((C) this, localId, name, description, isGeneric());
    }
 
    @Override
-   public NumericFieldBuilder<ConcreteFieldSequenceBuilder> addNumericField(String localId, String name,
-      String description) {
-      return new StandardNumericFieldBuilder<>((ConcreteFieldSequenceBuilder) this, localId, name, description,
-         isGeneric());
+   public NumericFieldBuilder<C> addNumericField(String localId, String name, String description) {
+      return new StandardNumericFieldBuilder<>((C) this, localId, name, description, isGeneric());
    }
 
    @Override
-   public BinaryFieldBuilder<ConcreteFieldSequenceBuilder> addBinaryField(String localId, String name,
-      String description) {
-      return new StandardBinaryFieldBuilder<>((ConcreteFieldSequenceBuilder) this, localId, name, description,
-         isGeneric());
+   public BinaryFieldBuilder<C> addBinaryField(String localId, String name, String description) {
+      return new StandardBinaryFieldBuilder<>((C) this, localId, name, description, isGeneric());
    }
 
    @Override
-   public FlagsFieldBuilder<ConcreteFieldSequenceBuilder> addFlagsField(String localId, String name,
-      String description) {
-      return new StandardFlagsFieldBuilder<>((ConcreteFieldSequenceBuilder) this, localId, name, description,
-         isGeneric());
+   public FlagsFieldBuilder<C> addFlagsField(String localId, String name, String description) {
+      return new StandardFlagsFieldBuilder<>((C) this, localId, name, description, isGeneric());
    }
 
    @Override
-   public <FieldInterpretedType> EnumeratedFieldBuilder<ConcreteFieldSequenceBuilder, FieldInterpretedType> addEnumeratedField(
+   public <FieldInterpretedType> EnumeratedFieldBuilder<C, FieldInterpretedType> addEnumeratedField(
       Class<FieldInterpretedType> type, String localId, String name, String description) {
-      return new StandardEnumeratedFieldBuilder<>((ConcreteFieldSequenceBuilder) this, localId, name, description,
-         isGeneric());
+      return new StandardEnumeratedFieldBuilder<>((C) this, localId, name, description, isGeneric());
    }
 }

@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionModifier;
-import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -27,8 +26,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractDataFormatSpecificationBuilder}
  *
  */
-public abstract class AbstractDataFormatSpecificationBuilder<P extends DataFormatSpecificationBuilder, C extends DataFormatSpecificationBuilder>
-   implements DataFormatSpecificationBuilder, DataBlockDescriptionModifier<C> {
+public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlockDescriptionBuilder<P>, C extends DataBlockDescriptionBuilder<C>>
+   implements DataBlockDescriptionBuilder<C> {
 
    private final P parentBuilder;
 
@@ -119,7 +118,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder#getGlobalId()
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#getGlobalId()
     */
    @Override
    public String getGlobalId() {
@@ -127,7 +126,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder#addChildDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#addChildDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
     */
    @Override
    public void addChildDescription(DataBlockDescription childDesc) {

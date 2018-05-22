@@ -125,8 +125,8 @@ public class ID3v23Extension implements Extension {
 
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      return new StandardDataFormatSpecification(ID3v23, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
+      return new StandardDataFormatSpecification(ID3v23, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
+         builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
          List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16), builder.getDefaultNestedContainer());
    }
 

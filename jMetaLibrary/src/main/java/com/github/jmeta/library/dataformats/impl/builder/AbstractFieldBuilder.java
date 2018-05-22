@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
@@ -32,7 +32,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractFieldBuilder}
  *
  */
-public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuilder, C extends FieldBuilder<P, FieldInterpretedType, C>, FieldInterpretedType>
+public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, C extends FieldBuilder<P, FieldInterpretedType, C>, FieldInterpretedType>
    extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FieldInterpretedType, C> {
 
    private Character terminationCharacter;

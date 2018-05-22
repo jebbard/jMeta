@@ -76,9 +76,9 @@ public class OggExtension implements Extension {
       // Data blocks
       TopLevelContainerSequenceBuilder builder = getDescMap();
 
-      return new StandardDataFormatSpecification(OGG, builder.finishContainerSequence(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN),
-         List.of(Charsets.CHARSET_ISO), builder.getDefaultNestedContainer());
+      return new StandardDataFormatSpecification(OGG, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
+         builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO),
+         builder.getDefaultNestedContainer());
    }
 
    /**

@@ -14,7 +14,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  *
  */
 public interface ContainerBuilder<PayloadBuilder>
-   extends DataFormatSpecificationBuilder, DataBlockDescriptionModifier<ContainerBuilder<PayloadBuilder>> {
+   extends DataBlockDescriptionBuilder<ContainerBuilder<PayloadBuilder>> {
 
    PayloadBuilder getPayload();
 
