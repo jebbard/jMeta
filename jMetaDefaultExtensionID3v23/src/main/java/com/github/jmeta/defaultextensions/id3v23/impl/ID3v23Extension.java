@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -24,8 +23,6 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -55,8 +52,6 @@ public class ID3v23Extension implements Extension {
       new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
    public static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
-   private static final DataBlockId GENERIC_FRAME_HEADER_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".header");
    private static final DataBlockId GENERIC_FRAME_ID = new DataBlockId(ID3v23, ID3V23_GENERIC_CONTAINER_ID);
    private static final DataBlockId GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload.data");
@@ -139,64 +134,12 @@ public class ID3v23Extension implements Extension {
     * @return
     */
    public TopLevelContainerSequenceBuilder getDescMap() {
-      Set<DataBlockId> affectedDataBlockIds = new HashSet<>();
-
-      affectedDataBlockIds.add(ID3V23_EXTENDED_HEADER_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsUnsync = new HashSet<>();
-
-      affectedDataBlockIdsUnsync.add(GENERIC_FRAME_HEADER_ID);
-      affectedDataBlockIdsUnsync.add(GENERIC_FRAME_PAYLOAD_ID);
-      affectedDataBlockIdsUnsync.add(ID3V23_EXTENDED_HEADER_ID);
-
-      // 4. tag size
-      Set<DataBlockId> affectedTagSizeBlocks = new HashSet<>();
-
-      affectedTagSizeBlocks.add(ID3V23_PAYLOAD_ID);
-
       TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(ID3v23Extension.ID3v23);
 
-      Set<DataBlockId> affectedDataBlockIdsExtHead = new HashSet<>();
-
-      affectedDataBlockIdsExtHead.add(ID3V23_EXTENDED_HEADER_FIELD_CRC_ID);
-
-      // 1 Frame id
-      Set<DataBlockId> affectedBlocks = new HashSet<>();
-
-      affectedBlocks.add(GENERIC_FRAME_ID);
-
-      // 2 Frame size
-      Set<DataBlockId> affectedFrameSizeBlocks = new HashSet<>();
-
-      affectedFrameSizeBlocks.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsCompression = new HashSet<>();
-
-      affectedDataBlockIdsCompression.add(GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsCompressionTrafo = new HashSet<>();
-
-      affectedDataBlockIdsCompressionTrafo.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsGroup = new HashSet<>();
-
-      affectedDataBlockIdsGroup.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsEncryption = new HashSet<>();
-
-      affectedDataBlockIdsEncryption.add(GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID);
-
-      Set<DataBlockId> affectedDataBlockIdsEncryptionTrafo = new HashSet<>();
-
-      affectedDataBlockIdsEncryptionTrafo.add(GENERIC_FRAME_PAYLOAD_ID);
-
-      Set<DataBlockId> affectedTextEncIds = new HashSet<>();
-
-      affectedTextEncIds.add(GENERIC_INFORMATION_ID);
-      affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TPE1.payload.information"));
-      affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TIT2.payload.information"));
-      affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TRCK.payload.information"));
-      // affectedTextEncIds.add(new DataBlockId(ID3v23, "id3v23.payload.TALB.payload.information"));
+      DataBlockId tpeInformation = new DataBlockId(ID3v23, "id3v23.payload.TPE1.payload.information");
+      DataBlockId titInformation = new DataBlockId(ID3v23, "id3v23.payload.TIT2.payload.information");
+      DataBlockId trckInformation = new DataBlockId(ID3v23, "id3v23.payload.TRCK.payload.information");
+      // DataBlockId talbInformation = new DataBlockId(ID3v23, "id3v23.payload.TALB.payload.information");
 
    // @formatter:off
       builder
@@ -222,11 +165,11 @@ public class ID3v23Extension implements Extension {
                   .addFlagDescription(new FlagDescription(TAG_FLAGS_EXTENDED_HEADER, new BitAddress(0, 1), "", 1, null))
                   .addFlagDescription(new FlagDescription(TAG_FLAGS_EXPERIMENTAL_INDICATOR, new BitAddress(0, 2), "", 1, null))
                .finishFlagSpecification()
-               .withFieldFunction(new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIds, TAG_FLAGS_EXTENDED_HEADER, 1))
+               .indicatesPresenceOf(TAG_FLAGS_EXTENDED_HEADER, 1, ID3V23_EXTENDED_HEADER_ID)
             .finishField()
             .addNumericField("size", "id3v23 tag size", "The id3v23 tag size")
                .withStaticLengthOf(4)
-               .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedTagSizeBlocks, null, null))
+               .asSizeOf(ID3V23_PAYLOAD_ID)
             .finishField()
          .finishHeader()
          .addHeader("extHeader", "id3v23 extended header", "The id3v23 extended header")
@@ -242,8 +185,7 @@ public class ID3v23Extension implements Extension {
                   .withDefaultFlagBytes(new byte[] { 0 })
                   .addFlagDescription(new FlagDescription(EXT_HEADER_FLAG_CRC_DATA_PRESENT, new BitAddress(0, 0), "", 1, null))
                .finishFlagSpecification()
-               .withFieldFunction(
-         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsExtHead, EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1))
+               .indicatesPresenceOf(EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1, ID3V23_EXTENDED_HEADER_FIELD_CRC_ID)
             .finishField()
             .addNumericField("paddingSize", "id3v23 extended header padding size", "The id3v23 extended header padding size")
                .withStaticLengthOf(4)
@@ -263,12 +205,12 @@ public class ID3v23Extension implements Extension {
                   .withLengthOf(10, 10)
                   .addStringField("id", "Generic frame id field", "The generic frame id field")
                      .withStaticLengthOf(FRAME_ID_SIZE)
-                     .withFieldFunction(new FieldFunction(FieldFunctionType.ID_OF, affectedBlocks, null, null))
+                     .asIdOf(GENERIC_FRAME_ID)
                      .withFixedCharset(Charsets.CHARSET_ISO)
                   .finishField()
                   .addNumericField("size", "Generic frame size field", "The generic frame size field")
                      .withStaticLengthOf(4)
-                     .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedFrameSizeBlocks, null, null))
+                     .asSizeOf(GENERIC_FRAME_PAYLOAD_ID)
                   .finishField()
                   .addFlagsField("flags", "Generic frame flags field", "The generic frame flags field")
                      .withStaticLengthOf(2)
@@ -281,12 +223,9 @@ public class ID3v23Extension implements Extension {
                         .addFlagDescription(new FlagDescription(FRAME_FLAGS_ENCRYPTION, new BitAddress(1, 1), "", 1, null))
                         .addFlagDescription(new FlagDescription(FRAME_FLAGS_GROUP_IDENTITY, new BitAddress(1, 2), "", 1, null))
                      .finishFlagSpecification()
-                     .withFieldFunction(
-         new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsCompression, FRAME_FLAGS_COMPRESSION, 1))
-                     .withFieldFunction(
-                        new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsGroup, FRAME_FLAGS_GROUP_IDENTITY, 1))
-                     .withFieldFunction(
-                        new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedDataBlockIdsEncryption, FRAME_FLAGS_ENCRYPTION, 1))
+                     .indicatesPresenceOf(FRAME_FLAGS_COMPRESSION, 1, GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID)
+                     .indicatesPresenceOf(FRAME_FLAGS_GROUP_IDENTITY, 1, GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID)
+                     .indicatesPresenceOf(FRAME_FLAGS_ENCRYPTION, 1, GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID)
                   .finishField()
                .finishHeader()
                .getPayload()
@@ -307,7 +246,7 @@ public class ID3v23Extension implements Extension {
                   .addEnumeratedField(Charset.class, "textEncoding", "Text encoding", "Text encoding")
                      .withStaticLengthOf(1)
                      .withDefaultValue(Charsets.CHARSET_ISO)
-                     .withFieldFunction(new FieldFunction(FieldFunctionType.CHARACTER_ENCODING_OF, affectedTextEncIds, null, null))
+                     .asCharacterEncodingOf(GENERIC_INFORMATION_ID, tpeInformation, titInformation, trckInformation)
                      .addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO)
                      .addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16)
                      .withOverriddenId(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID)
@@ -342,7 +281,7 @@ public class ID3v23Extension implements Extension {
                   .finishField()
                .finishFieldBasedPayload()
             .finishContainer()
-        .finishContainerSequence()
+        .finishContainerBasedPayload()
      .finishContainer();
 
       // @formatter:on

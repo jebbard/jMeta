@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -22,8 +21,6 @@ import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpeci
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -110,19 +107,6 @@ public class Lyrics3v2Extension implements Extension {
          "lyrics3v2.payload.${FIELD_ID}.payload");
       final DataBlockId lyrics3V2HeaderId = new DataBlockId(LYRICS3v2, "lyrics3v2.header");
 
-      Set<DataBlockId> affectedBlocks = new HashSet<>();
-
-      affectedBlocks.add(lyrics3V2HeaderId);
-      affectedBlocks.add(lyrics3V2PayloadId);
-
-      Set<DataBlockId> fieldIdAffectedBlocks = new HashSet<>();
-
-      fieldIdAffectedBlocks.add(lyrics3V2GenericFieldId);
-
-      Set<DataBlockId> fieldSizeAffectedBlocks = new HashSet<>();
-
-      fieldSizeAffectedBlocks.add(lyrics3V2GenericFieldPayloadId);
-
       TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(Lyrics3v2Extension.LYRICS3v2);
 
       // @formatter:off
@@ -142,7 +126,7 @@ public class Lyrics3v2Extension implements Extension {
             .withStaticLengthOf(FOOTER_BYTE_LENGTH)
             .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
                .withStaticLengthOf(FOOTER_SIZE_FIELD_LENGTH)
-               .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocks, null, 0))
+               .asSizeOf(lyrics3V2HeaderId, lyrics3V2PayloadId)
             .finishField()
             .addStringField("id", "Lyrics3v2 footer id", "Lyrics3v2 footer id")
                .withStaticLengthOf(LYRICS3v2_MAGIC_FOOTER_STRING.length())
@@ -160,11 +144,11 @@ public class Lyrics3v2Extension implements Extension {
                   .withStaticLengthOf(LYRICS3v2_FIELD_SIZE_LENGTH + LYRICS3v2_FIELD_ID_SIZE)
                   .addStringField("id", "Lyrics3v2 field id", "Lyrics3v2 field id")
                      .withStaticLengthOf(LYRICS3v2_FIELD_ID_SIZE)
-                     .withFieldFunction(new FieldFunction(FieldFunctionType.ID_OF, fieldIdAffectedBlocks, null, 0))
+                     .asIdOf(lyrics3V2GenericFieldId)
                   .finishField()
                   .addNumericField("size", "Lyrics3v2 item value size", "Lyrics3v2 item value size")
                      .withStaticLengthOf(LYRICS3v2_FIELD_SIZE_LENGTH)
-                     .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, fieldSizeAffectedBlocks, null, 0))
+                     .asSizeOf(lyrics3V2GenericFieldPayloadId)
                   .finishField()
                .finishHeader()
                .getPayload()
@@ -175,7 +159,7 @@ public class Lyrics3v2Extension implements Extension {
                   .finishField()
                .finishFieldBasedPayload()
             .finishContainer()
-         .finishContainerSequence()
+         .finishContainerBasedPayload()
       .finishContainer();
 
       // @formatter:on

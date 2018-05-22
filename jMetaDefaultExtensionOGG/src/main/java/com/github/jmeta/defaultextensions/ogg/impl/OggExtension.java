@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -22,8 +21,6 @@ import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpeci
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -95,14 +92,6 @@ public class OggExtension implements Extension {
       final DataBlockId oggSegmentId = new DataBlockId(OggExtension.OGG,
          "ogg.payload.packetPartContainer.payload.segment");
 
-      Set<DataBlockId> affectedBlocks = new HashSet<>();
-
-      affectedBlocks.add(oggPageHeaderSegmentTableEntryId);
-
-      Set<DataBlockId> affectedBlocks2 = new HashSet<>();
-
-      affectedBlocks2.add(oggSegmentId);
-
       TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(OggExtension.OGG);
 
       // @formatter:off
@@ -138,12 +127,12 @@ public class OggExtension implements Extension {
                 .finishField()
                 .addNumericField("pageSegments", "Ogg page segments", "Ogg page segments")
                    .withStaticLengthOf(1)
-                   .withFieldFunction(new FieldFunction(FieldFunctionType.COUNT_OF, affectedBlocks, null, 0))
+                   .asCountOf(oggPageHeaderSegmentTableEntryId)
                 .finishField()
                 .addNumericField("segmentTableEntry", "Ogg page segment table entry", "Ogg segment table entry")
                    .withStaticLengthOf(1)
                    .withOccurrences(0, 99999)
-                   .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocks2, null, 0))
+                   .asSizeOf(oggSegmentId)
                 .finishField()
              .finishHeader()
              .getPayload()
@@ -161,7 +150,7 @@ public class OggExtension implements Extension {
                       .finishField()
                    .finishFieldBasedPayload()
                 .finishContainer()
-             .finishContainerSequence()
+             .finishContainerBasedPayload()
           .finishContainer();
 
       // @formatter:on

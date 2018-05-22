@@ -54,11 +54,6 @@ public class StandardContainerBasedPayloadBuilder extends
       return new StandardContainerBasedPayloadContainerBuilder(this, "${" + localId + "}", name, description, true);
    }
 
-   @Override
-   public ContainerBuilder<ContainerBasedPayloadBuilder> finishContainerSequence() {
-      return super.finish();
-   }
-
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder#finishContainerBasedPayload()
     */

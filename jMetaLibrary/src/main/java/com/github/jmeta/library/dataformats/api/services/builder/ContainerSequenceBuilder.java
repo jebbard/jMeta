@@ -13,7 +13,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link ContainerSequenceBuilder}
  *
  */
-public interface ContainerSequenceBuilder<Result> extends DataFormatSpecificationBuilder {
+public interface ContainerSequenceBuilder {
 
    ContainerBuilder<FieldBasedPayloadBuilder> addContainerWithFieldBasedPayload(String localId, String name,
       String description);
@@ -26,6 +26,4 @@ public interface ContainerSequenceBuilder<Result> extends DataFormatSpecificatio
 
    ContainerBuilder<ContainerBasedPayloadBuilder> addGenericContainerWithContainerBasedPayload(String localId,
       String name, String description);
-
-   Result finishContainerSequence();
 }

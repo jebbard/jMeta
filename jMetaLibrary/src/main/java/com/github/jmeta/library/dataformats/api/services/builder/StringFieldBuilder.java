@@ -15,8 +15,8 @@ import java.nio.charset.Charset;
  * {@link StringFieldBuilder}
  *
  */
-public interface StringFieldBuilder<ParentBuilder> extends FieldBuilder<ParentBuilder, String>,
-   FieldDescriptionModifier<ParentBuilder, String, StringFieldBuilder<ParentBuilder>>,
+public interface StringFieldBuilder<ParentBuilder>
+   extends FieldBuilder<ParentBuilder, String, StringFieldBuilder<ParentBuilder>>,
    DataBlockDescriptionModifier<StringFieldBuilder<ParentBuilder>> {
 
    StringFieldBuilder<ParentBuilder> withTerminationCharacter(Character terminationChar);

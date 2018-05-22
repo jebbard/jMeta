@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -24,8 +23,6 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
@@ -110,11 +107,7 @@ public class MP3Extension implements Extension {
        * audio version ID C: Layer description D: Protection bit E: Bitrate index F: Sampling rate frequency index G:
        * Padding bit H: Private bit I: Channel mode J: Mode extension K: Copyright L: Original M: Emphasis
        */
-      Set<DataBlockId> affectedBlocks = new HashSet<>();
-
-      affectedBlocks.add(new DataBlockId(MP3Extension.MP3, "mp3.crc"));
-
-      FieldFunction crcFunc = new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedBlocks, "No protection bit", 0);
+      DataBlockId crcId = new DataBlockId(MP3Extension.MP3, "mp3.crc");
 
       TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(MP3Extension.MP3);
 
@@ -143,7 +136,7 @@ public class MP3Extension implements Extension {
                      .addFlagDescription(new FlagDescription("Mode extension bit", new BitAddress(3, 4), "", 2, null))
                      .addFlagDescription(new FlagDescription("Mode bit", new BitAddress(3, 6), "", 2, null))
                   .finishFlagSpecification()
-                  .withFieldFunction(crcFunc)
+                  .indicatesPresenceOf("No protection bit", 0, crcId)
                .finishField()
             .finishHeader()
             .addHeader("crc", "MP3 CRC", "The MP3 CRC")

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -23,8 +22,6 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -100,36 +97,14 @@ public class APEv2Extension implements Extension {
       final DataBlockId apeV2GenericItemId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}");
       final DataBlockId apeV2GenericItemPayloadId = new DataBlockId(APEv2, "apev2.payload.${ITEM_ID}.payload");
 
-      Set<DataBlockId> affectedBlocksHeader = new HashSet<>();
-
-      affectedBlocksHeader.add(apeV2PayloadId);
-      affectedBlocksHeader.add(apeV2FooterId);
-      Set<DataBlockId> affectedBlocksFooter = new HashSet<>();
-
-      affectedBlocksFooter.add(apeV2PayloadId);
-      affectedBlocksFooter.add(apeV2HeaderId);
-
-      Set<DataBlockId> itemCountAffectedBlocks = new HashSet<>();
-
-      itemCountAffectedBlocks.add(apeV2GenericItemId);
-
       FlagDescription readOnlyFlag = new FlagDescription("Read-only", new BitAddress(0, 0), "", 1, null);
       FlagDescription itemTypeFlag = new FlagDescription("Item type", new BitAddress(0, 1), "", 2, null);
-
       FlagDescription thisIsTheHeaderFlag = new FlagDescription("This is the header", new BitAddress(3, 5), "", 1,
          null);
       FlagDescription tagContainsNoFooterFlag = new FlagDescription("Tag contains no footer", new BitAddress(3, 6), "",
          1, null);
       FlagDescription tagContainsHeaderFlag = new FlagDescription("Tag contains header", new BitAddress(3, 7), "", 1,
          null);
-
-      Set<DataBlockId> itemValueSizeAffectedBlocks = new HashSet<>();
-
-      itemValueSizeAffectedBlocks.add(apeV2GenericItemPayloadId);
-
-      Set<DataBlockId> itemKeyAffectedBlocks = new HashSet<>();
-
-      itemKeyAffectedBlocks.add(apeV2GenericItemId);
 
       TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(APEv2Extension.APEv2);
    // @formatter:off
@@ -149,11 +124,11 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 header tag size", "APEv2 header tag size")
                .withStaticLengthOf(4)
-               .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocksHeader, null, 0))
+               .asSizeOf(apeV2PayloadId, apeV2FooterId)
             .finishField()
             .addNumericField("itemCount", "APEv2 header item count", "APEv2 header item count")
                .withStaticLengthOf(4)
-               .withFieldFunction(new FieldFunction(FieldFunctionType.COUNT_OF, itemCountAffectedBlocks, null, 0))
+               .asCountOf(apeV2GenericItemId)
             .finishField()
             .addFlagsField("tagFlags", "APEv2 header tag flags", "APEv2 header tag flags")
                .withStaticLengthOf(4)
@@ -184,11 +159,11 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 footer tag size", "APEv2 footer tag size")
                .withStaticLengthOf(4)
-               .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocksFooter, null, 0))
+               .asSizeOf(apeV2PayloadId, apeV2HeaderId)
             .finishField()
             .addNumericField("itemCount", "APEv2 footer item count", "APEv2 footer item count")
                .withStaticLengthOf(4)
-               .withFieldFunction(new FieldFunction(FieldFunctionType.COUNT_OF, itemCountAffectedBlocks, null, 0))
+               .asCountOf(apeV2GenericItemId)
             .finishField()
             .addFlagsField("tagFlags", "APEv2 footer tag flags", "APEv2 footer tag flags")
                .withStaticLengthOf(4)
@@ -216,7 +191,7 @@ public class APEv2Extension implements Extension {
                   .withLengthOf(APEv2_MIN_ITEM_HEADER_LENGTH, DataBlockDescription.UNLIMITED)
                   .addNumericField("size", "APEv2 item value size", "APEv2 item value size")
                      .withStaticLengthOf(4)
-                     .withFieldFunction(new FieldFunction(FieldFunctionType.SIZE_OF, itemValueSizeAffectedBlocks, null, 0))
+                     .asSizeOf(apeV2GenericItemPayloadId)
                   .finishField()
                   .addFlagsField("flags", "APEv2 item flags", "APEv2 item flags")
                      .withStaticLengthOf(4)
@@ -228,7 +203,7 @@ public class APEv2Extension implements Extension {
                   .finishField()
                   .addStringField("key", "APEv2 item key", "APEv2 item key")
                      .withLengthOf(2, 255)
-                     .withFieldFunction(new FieldFunction(FieldFunctionType.ID_OF, itemKeyAffectedBlocks, null, 0))
+                     .asIdOf(apeV2GenericItemId)
                      .withTerminationCharacter('\u0000')
                   .finishField()
                .finishHeader()
@@ -240,7 +215,7 @@ public class APEv2Extension implements Extension {
                   .finishField()
                .finishFieldBasedPayload()
             .finishContainer()
-         .finishContainerSequence()
+         .finishContainerBasedPayload()
       .finishContainer();
    // @formatter:on
 

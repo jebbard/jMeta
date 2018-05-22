@@ -13,9 +13,8 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link ContainerBasedPayloadBuilder}
  *
  */
-public interface ContainerBasedPayloadBuilder
-   extends ContainerSequenceBuilder<ContainerBuilder<ContainerBasedPayloadBuilder>>,
-   DataBlockDescriptionModifier<ContainerBasedPayloadBuilder> {
+public interface ContainerBasedPayloadBuilder extends ContainerSequenceBuilder,
+   DataBlockDescriptionModifier<ContainerBasedPayloadBuilder>, DataFormatSpecificationBuilder {
 
    ContainerBuilder<ContainerBasedPayloadBuilder> finishContainerBasedPayload();
 }

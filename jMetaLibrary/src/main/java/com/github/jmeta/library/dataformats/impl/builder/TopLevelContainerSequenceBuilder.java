@@ -27,8 +27,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link TopLevelContainerSequenceBuilder}
  *
  */
-public class TopLevelContainerSequenceBuilder
-   implements ContainerSequenceBuilder<Map<DataBlockId, DataBlockDescription>>, DescriptionCollector {
+public class TopLevelContainerSequenceBuilder implements ContainerSequenceBuilder, DescriptionCollector {
 
    private final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
    private final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
@@ -92,15 +91,13 @@ public class TopLevelContainerSequenceBuilder
    @Override
    public ContainerBuilder<FieldBasedPayloadBuilder> addContainerWithFieldBasedPayload(String localId, String name,
       String description) {
-      return new StandardFieldBasedPayloadContainerBuilder(getDescriptionCollector(), getDataFormat(), localId, name,
-         description, false);
+      return new StandardFieldBasedPayloadContainerBuilder(this, dataFormat, localId, name, description, false);
    }
 
    @Override
    public ContainerBuilder<ContainerBasedPayloadBuilder> addContainerWithContainerBasedPayload(String localId,
       String name, String description) {
-      return new StandardContainerBasedPayloadContainerBuilder(getDescriptionCollector(), getDataFormat(), localId,
-         name, description, false);
+      return new StandardContainerBasedPayloadContainerBuilder(this, dataFormat, localId, name, description, false);
    }
 
    @Override
@@ -117,42 +114,19 @@ public class TopLevelContainerSequenceBuilder
       return null;
    }
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#finishContainerSequence()
-    */
-   @Override
    public Map<DataBlockId, DataBlockDescription> finishContainerSequence() {
       return getAllDescriptions();
    }
 
    public Set<DataBlockId> getGenericDataBlocks() {
-      return getDescriptionCollector().getGenericDescriptions().keySet();
+      return getGenericDescriptions().keySet();
    }
 
    public Set<DataBlockId> getTopLevelDataBlocks() {
-      return getDescriptionCollector().getTopLevelDescriptions().keySet();
+      return getTopLevelDescriptions().keySet();
    }
 
    private DataBlockDescription defaultNestedContainerDesc;
-
-   @Override
-   public String getGlobalId() {
-      return null;
-   }
-
-   @Override
-   public void addChildDescription(DataBlockDescription childDesc) {
-   }
-
-   @Override
-   public ContainerDataFormat getDataFormat() {
-      return dataFormat;
-   }
-
-   @Override
-   public DescriptionCollector getDescriptionCollector() {
-      return this;
-   }
 
    public DataBlockId getDefaultNestedContainer() {
       return defaultNestedContainerDesc.getId();

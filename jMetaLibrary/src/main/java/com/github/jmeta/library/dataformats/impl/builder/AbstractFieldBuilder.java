@@ -15,10 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
@@ -29,8 +32,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractFieldBuilder}
  *
  */
-public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuilder, C extends DataFormatSpecificationBuilder, FieldInterpretedType>
-   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FieldInterpretedType> {
+public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuilder, C extends FieldBuilder<P, FieldInterpretedType, C>, FieldInterpretedType>
+   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FieldInterpretedType, C> {
 
    private Character terminationCharacter;
    private FieldInterpretedType defaultValue;
@@ -41,6 +44,79 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
    private ByteOrder fixedByteOrder;
    private final List<FieldFunction> functions = new ArrayList<>();
    private boolean isMagicKey = false;
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asIdOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    */
+   @Override
+   public C asIdOf(DataBlockId... ids) {
+      Set<DataBlockId> affectedBlocks = Set.of(ids);
+
+      functions.add(new FieldFunction(FieldFunctionType.ID_OF, affectedBlocks, null, null));
+
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#indicatesPresenceOf(java.lang.String,
+    *      int, com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    */
+   @Override
+   public C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockId... ids) {
+      Set<DataBlockId> affectedBlocks = Set.of(ids);
+
+      functions.add(new FieldFunction(FieldFunctionType.ID_OF, affectedBlocks, withFlagName, withFlagValue));
+
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    */
+   @Override
+   public C asSizeOf(DataBlockId... ids) {
+      Set<DataBlockId> affectedBlocks = Set.of(ids);
+
+      functions.add(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocks, null, null));
+
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCountOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    */
+   @Override
+   public C asCountOf(DataBlockId... ids) {
+      Set<DataBlockId> affectedBlocks = Set.of(ids);
+
+      functions.add(new FieldFunction(FieldFunctionType.COUNT_OF, affectedBlocks, null, null));
+
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asByteOrderOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    */
+   @Override
+   public C asByteOrderOf(DataBlockId... ids) {
+      Set<DataBlockId> affectedBlocks = Set.of(ids);
+
+      functions.add(new FieldFunction(FieldFunctionType.BYTE_ORDER_OF, affectedBlocks, null, null));
+
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCharacterEncodingOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    */
+   @Override
+   public C asCharacterEncodingOf(DataBlockId... ids) {
+      Set<DataBlockId> affectedBlocks = Set.of(ids);
+
+      functions.add(new FieldFunction(FieldFunctionType.CHARACTER_ENCODING_OF, affectedBlocks, null, null));
+
+      return (C) this;
+   }
 
    /**
     * Creates a new {@link AbstractFieldBuilder}.
@@ -59,11 +135,6 @@ public abstract class AbstractFieldBuilder<P extends DataFormatSpecificationBuil
       Reject.ifNull(fieldType, "fieldType");
 
       this.fieldType = fieldType;
-   }
-
-   public C withFieldFunction(FieldFunction function) {
-      functions.add(function);
-      return (C) this;
    }
 
    /**
