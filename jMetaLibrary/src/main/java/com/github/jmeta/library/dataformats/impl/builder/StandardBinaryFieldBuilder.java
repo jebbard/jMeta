@@ -18,7 +18,7 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  *
  */
 public class StandardBinaryFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
-   extends AbstractFieldBuilder<P, BinaryFieldBuilder<P>, byte[]> implements BinaryFieldBuilder<P> {
+   extends AbstractFieldBuilder<P, byte[], BinaryFieldBuilder<P>> implements BinaryFieldBuilder<P> {
 
    /**
     * Creates a new {@link StandardBinaryFieldBuilder}.

@@ -13,10 +13,10 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link EnumeratedFieldBuilder}
  *
  */
-public interface EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> extends
-   FieldBuilder<ParentBuilder, FieldInterpretedType, EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType>> {
+public interface EnumeratedFieldBuilder<P, FIT> extends
+   FieldBuilder<P, FIT, EnumeratedFieldBuilder<P, FIT>> {
 
-   EnumeratedFieldBuilder<ParentBuilder, FieldInterpretedType> addEnumeratedValue(byte[] binaryValue,
-      FieldInterpretedType interpretedValue);
+   EnumeratedFieldBuilder<P, FIT> addEnumeratedValue(byte[] binaryValue,
+      FIT interpretedValue);
 
 }

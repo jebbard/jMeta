@@ -13,7 +13,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link HeaderBuilder}
  *
  */
-public interface HeaderBuilder<PayloadBuilder> extends FieldSequenceBuilder<HeaderBuilder<PayloadBuilder>> {
+public interface HeaderBuilder<PB> extends FieldSequenceBuilder<HeaderBuilder<PB>> {
 
-   ContainerBuilder<PayloadBuilder> finishHeader();
+   ContainerBuilder<PB> finishHeader();
 }

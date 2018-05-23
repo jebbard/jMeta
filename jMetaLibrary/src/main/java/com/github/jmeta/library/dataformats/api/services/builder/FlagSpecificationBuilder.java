@@ -15,11 +15,11 @@ import com.github.jmeta.library.dataformats.api.types.FlagDescription;
  * {@link FlagSpecificationBuilder}
  *
  */
-public interface FlagSpecificationBuilder<ParentBuilder> {
+public interface FlagSpecificationBuilder<P> {
 
-   FlagSpecificationBuilder<ParentBuilder> addFlagDescription(FlagDescription flagDesc);
+   FlagSpecificationBuilder<P> addFlagDescription(FlagDescription flagDesc);
 
-   FlagSpecificationBuilder<ParentBuilder> withDefaultFlagBytes(byte[] defaultFlagBytes);
+   FlagSpecificationBuilder<P> withDefaultFlagBytes(byte[] defaultFlagBytes);
 
-   FlagsFieldBuilder<ParentBuilder> finishFlagSpecification();
+   FlagsFieldBuilder<P> finishFlagSpecification();
 }

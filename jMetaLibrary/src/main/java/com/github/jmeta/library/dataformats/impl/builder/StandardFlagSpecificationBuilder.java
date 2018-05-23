@@ -27,7 +27,7 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
 public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuilder<P>>
    implements FlagSpecificationBuilder<P> {
 
-   private final AbstractFieldBuilder<P, FlagsFieldBuilder<P>, Flags> parentBuilder;
+   private final AbstractFieldBuilder<P, Flags, FlagsFieldBuilder<P>> parentBuilder;
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder#finishFlagSpecification()
@@ -52,7 +52,7 @@ public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuil
     * @param flagByteLength
     * @param flagByteOrder
     */
-   public StandardFlagSpecificationBuilder(AbstractFieldBuilder<P, FlagsFieldBuilder<P>, Flags> parentBuilder,
+   public StandardFlagSpecificationBuilder(AbstractFieldBuilder<P, Flags, FlagsFieldBuilder<P>> parentBuilder,
       int flagByteLength, ByteOrder flagByteOrder) {
       this.parentBuilder = parentBuilder;
       this.flagByteLength = flagByteLength;

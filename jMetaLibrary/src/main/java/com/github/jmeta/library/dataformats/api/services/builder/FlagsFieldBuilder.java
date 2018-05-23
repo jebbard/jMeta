@@ -17,8 +17,8 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
  * {@link FlagsFieldBuilder}
  *
  */
-public interface FlagsFieldBuilder<ParentBuilder>
-   extends FieldBuilder<ParentBuilder, Flags, FlagsFieldBuilder<ParentBuilder>> {
+public interface FlagsFieldBuilder<P>
+   extends FieldBuilder<P, Flags, FlagsFieldBuilder<P>> {
 
-   FlagSpecificationBuilder<ParentBuilder> withFlagSpecification(int byteLength, ByteOrder byteOrder);
+   FlagSpecificationBuilder<P> withFlagSpecification(int byteLength, ByteOrder byteOrder);
 }

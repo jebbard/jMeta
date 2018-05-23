@@ -20,7 +20,7 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  *
  */
 public class StandardStringFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
-   extends AbstractFieldBuilder<P, StringFieldBuilder<P>, String> implements StringFieldBuilder<P> {
+   extends AbstractFieldBuilder<P, String, StringFieldBuilder<P>> implements StringFieldBuilder<P> {
 
    /**
     * Creates a new {@link StandardStringFieldBuilder}.

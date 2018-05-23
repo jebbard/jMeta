@@ -13,6 +13,6 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link BinaryFieldBuilder}
  *
  */
-public interface BinaryFieldBuilder<ParentBuilder>
-   extends FieldBuilder<ParentBuilder, byte[], BinaryFieldBuilder<ParentBuilder>> {
+public interface BinaryFieldBuilder<P>
+   extends FieldBuilder<P, byte[], BinaryFieldBuilder<P>> {
 }

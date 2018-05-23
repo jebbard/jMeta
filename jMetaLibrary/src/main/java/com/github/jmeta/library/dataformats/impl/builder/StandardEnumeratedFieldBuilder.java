@@ -17,9 +17,9 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
  * {@link StandardEnumeratedFieldBuilder}
  *
  */
-public class StandardEnumeratedFieldBuilder<P extends DataBlockDescriptionBuilder<P>, FieldInterpretedType>
-   extends AbstractFieldBuilder<P, EnumeratedFieldBuilder<P, FieldInterpretedType>, FieldInterpretedType>
-   implements EnumeratedFieldBuilder<P, FieldInterpretedType> {
+public class StandardEnumeratedFieldBuilder<P extends DataBlockDescriptionBuilder<P>, FIT>
+   extends AbstractFieldBuilder<P, FIT, EnumeratedFieldBuilder<P, FIT>>
+   implements EnumeratedFieldBuilder<P, FIT> {
 
    /**
     * Creates a new {@link StandardEnumeratedFieldBuilder}.
@@ -34,7 +34,7 @@ public class StandardEnumeratedFieldBuilder<P extends DataBlockDescriptionBuilde
     */
    public StandardEnumeratedFieldBuilder(P parentBuilder, String localId, String name, String description,
       boolean isGeneric) {
-      super(parentBuilder, localId, name, description, (FieldType<FieldInterpretedType>) FieldType.ENUMERATED,
+      super(parentBuilder, localId, name, description, (FieldType<FIT>) FieldType.ENUMERATED,
          isGeneric);
    }
 
@@ -43,8 +43,8 @@ public class StandardEnumeratedFieldBuilder<P extends DataBlockDescriptionBuilde
     *      java.lang.Object)
     */
    @Override
-   public EnumeratedFieldBuilder<P, FieldInterpretedType> addEnumeratedValue(byte[] binaryValue,
-      FieldInterpretedType interpretedValue) {
+   public EnumeratedFieldBuilder<P, FIT> addEnumeratedValue(byte[] binaryValue,
+      FIT interpretedValue) {
       getEnumeratedValues().put(interpretedValue, binaryValue);
       return this;
    }

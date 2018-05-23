@@ -22,7 +22,7 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
  *
  */
 public class StandardFlagsFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
-   extends AbstractFieldBuilder<P, FlagsFieldBuilder<P>, Flags> implements FlagsFieldBuilder<P> {
+   extends AbstractFieldBuilder<P, Flags, FlagsFieldBuilder<P>> implements FlagsFieldBuilder<P> {
 
    /**
     * Creates a new {@link StandardFlagsFieldBuilder}.

@@ -32,14 +32,14 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractFieldBuilder}
  *
  */
-public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, C extends FieldBuilder<P, FieldInterpretedType, C>, FieldInterpretedType>
-   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FieldInterpretedType, C> {
+public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, FIT, C extends FieldBuilder<P, FIT, C>>
+   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FIT, C> {
 
    private Character terminationCharacter;
-   private FieldInterpretedType defaultValue;
-   private final Map<FieldInterpretedType, byte[]> enumeratedValues = new HashMap<>();
+   private FIT defaultValue;
+   private final Map<FIT, byte[]> enumeratedValues = new HashMap<>();
    private FlagSpecification flagSpecification;
-   private final FieldType<FieldInterpretedType> fieldType;
+   private final FieldType<FIT> fieldType;
    private Charset fixedCharset;
    private ByteOrder fixedByteOrder;
    private final List<FieldFunction> functions = new ArrayList<>();
@@ -130,7 +130,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     * @param type
     */
    public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description,
-      FieldType<FieldInterpretedType> fieldType, boolean isGeneric) {
+      FieldType<FIT> fieldType, boolean isGeneric) {
       super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD, isGeneric);
       Reject.ifNull(fieldType, "fieldType");
 
@@ -140,7 +140,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
     */
-   public C withDefaultValue(FieldInterpretedType value) {
+   public C withDefaultValue(FIT value) {
       this.defaultValue = value;
       return (C) this;
    }
@@ -158,9 +158,8 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @Override
    public P finishField() {
-      FieldProperties<FieldInterpretedType> fieldProperties = new FieldProperties<>(fieldType, defaultValue,
-         enumeratedValues, terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions,
-         isMagicKey);
+      FieldProperties<FIT> fieldProperties = new FieldProperties<>(fieldType, defaultValue, enumeratedValues,
+         terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions, isMagicKey);
 
       setFieldProperties(fieldProperties);
 
@@ -172,7 +171,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     * 
     * @return the attribute {@link #enumeratedValues}
     */
-   protected Map<FieldInterpretedType, byte[]> getEnumeratedValues() {
+   protected Map<FIT, byte[]> getEnumeratedValues() {
       return enumeratedValues;
    }
 
