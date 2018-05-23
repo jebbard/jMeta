@@ -37,7 +37,7 @@ public class DataBlockDescription {
       return getMaximumByteLength() == getMinimumByteLength();
    }
 
-   public final static long UNLIMITED = Long.MAX_VALUE;
+   public static final long UNLIMITED = Long.MAX_VALUE;
 
    /**
     * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
@@ -66,11 +66,11 @@ public class DataBlockDescription {
 
    private final List<MagicKey> m_footerMagicKeys = new ArrayList<>();
 
-   private final DataBlockId m_overriddenId;
-
    private final int minimumOccurrences;
    private final int maximumOccurrences;
    private long fixedByteOffsetInContainer;
+
+   private final boolean isGeneric;
 
    public void setFixedByteOffsetInContainer(long fixedByteOffsetInContainer) {
       this.fixedByteOffsetInContainer = fixedByteOffsetInContainer;
@@ -152,12 +152,13 @@ public class DataBlockDescription {
     *           TODO
     * @param minimumByteLength
     * @param maximumByteLength
-    * @param overriddenId
+    * @param isGeneric
+    *           TODO
     * @param childOrder
     */
    public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
       List<DataBlockId> childIds, FieldProperties<?> fieldProperties, int minimumOccurrences, int maximumOccurrences,
-      long minimumByteLength, long maximumByteLength, DataBlockId overriddenId) {
+      long minimumByteLength, long maximumByteLength, boolean isGeneric) {
       Reject.ifNull(childIds, "childIds");
       Reject.ifNull(physicalType, "physicalType");
       Reject.ifNull(specDescription, "specDescription");
@@ -169,6 +170,7 @@ public class DataBlockDescription {
       Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
       Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
 
+      this.isGeneric = isGeneric;
       this.minimumOccurrences = minimumOccurrences;
       this.maximumOccurrences = maximumOccurrences;
       m_id = id;
@@ -179,7 +181,10 @@ public class DataBlockDescription {
       m_fieldProperties = fieldProperties;
       m_minimumByteLength = minimumByteLength;
       m_maximumByteLength = maximumByteLength;
-      m_overriddenId = overriddenId;
+   }
+
+   public boolean isGeneric() {
+      return isGeneric;
    }
 
    /**
@@ -282,8 +287,8 @@ public class DataBlockDescription {
          + ", m_physicalType=" + m_physicalType + ", m_childIds=" + m_childIds + ", m_fieldProperties="
          + m_fieldProperties + ", m_maximumByteLength=" + m_maximumByteLength + ", m_minimumByteLength="
          + m_minimumByteLength + ", m_headerMagicKeys=" + m_headerMagicKeys + ", m_footerMagicKeys=" + m_footerMagicKeys
-         + ", m_overriddenId=" + m_overriddenId + ", minimumOccurrences=" + minimumOccurrences + ", maximumOccurrences="
-         + maximumOccurrences + ", fixedByteOffsetInContainer=" + fixedByteOffsetInContainer + "]";
+         + ", minimumOccurrences=" + minimumOccurrences + ", maximumOccurrences=" + maximumOccurrences
+         + ", fixedByteOffsetInContainer=" + fixedByteOffsetInContainer + "]";
    }
 
    /**
@@ -318,13 +323,4 @@ public class DataBlockDescription {
          return false;
       return true;
    }
-
-   /**
-    * @return the overridden id
-    */
-   public DataBlockId getOverriddenId() {
-
-      return m_overriddenId;
-   }
-
 }

@@ -43,8 +43,7 @@ public class StandardDataFormatRepository implements DataFormatRepository {
    public StandardDataFormatRepository() {
       extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
-      String validatingExtensions = "Validating registered data format extensions"
-         + LoggingConstants.SUFFIX_TASK;
+      String validatingExtensions = "Validating registered data format extensions" + LoggingConstants.SUFFIX_TASK;
 
       LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
@@ -60,8 +59,8 @@ public class StandardDataFormatRepository implements DataFormatRepository {
 
             if (extensionDataFormat == null) {
                final String message = "The extension " + dataFormatSpec + " must not return null for its data format.";
-               LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR
-                  + validatingExtensions);
+               LOGGER.error(
+                  LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR + validatingExtensions);
                LOGGER.error(message);
                throw new InvalidExtensionException(message, iExtension2);
             }

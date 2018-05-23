@@ -9,30 +9,46 @@
  */
 package com.github.jmeta.library.dataformats.impl.builder;
 
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.impl.StandardDataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link TopLevelContainerSequenceBuilder}
  *
  */
-public class TopLevelContainerSequenceBuilder implements ContainerSequenceBuilder, DescriptionCollector {
+public class TopLevelContainerSequenceBuilder implements DataFormatSpecificationBuilder {
+
+   @Override
+   public DataFormatSpecification createDataFormatSpecification(List<ByteOrder> supportedByteOrders,
+      List<Charset> supportedCharacterEncodings) {
+      Reject.ifNull(supportedCharacterEncodings, "supportedCharacterEncodings");
+      Reject.ifNull(supportedByteOrders, "supportedByteOrders");
+
+      return new StandardDataFormatSpecification(dataFormat, getAllDescriptions(), topLevelDescriptions.keySet(),
+         genericDescriptions.keySet(), supportedByteOrders, supportedCharacterEncodings,
+         defaultNestedContainerDesc == null ? null : defaultNestedContainerDesc.getId());
+   }
 
    private final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
    private final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
    private final Map<DataBlockId, DataBlockDescription> topLevelDescriptions = new HashMap<>();
    private final ContainerDataFormat dataFormat;
+
+   private DataBlockDescription defaultNestedContainerDesc;
 
    /**
     * Creates a new {@link TopLevelContainerSequenceBuilder}.
@@ -45,31 +61,18 @@ public class TopLevelContainerSequenceBuilder implements ContainerSequenceBuilde
    }
 
    @Override
-   public Map<DataBlockId, DataBlockDescription> getGenericDescriptions() {
-      return genericDescriptions;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector#getAllDescriptions()
-    */
-   @Override
    public Map<DataBlockId, DataBlockDescription> getAllDescriptions() {
       return overallDescriptions;
    }
 
    @Override
-   public Map<DataBlockId, DataBlockDescription> getTopLevelDescriptions() {
-      return topLevelDescriptions;
-   }
-
-   @Override
-   public void addDataBlockDescription(DataBlockDescription newDescription, boolean isGeneric, boolean isTopLevel,
+   public void addDataBlockDescription(DataBlockDescription newDescription, boolean isTopLevel,
       boolean isDefaultNestedContainer) {
       Reject.ifNull(newDescription, "newDescription");
 
       overallDescriptions.put(newDescription.getId(), newDescription);
 
-      if (isGeneric) {
+      if (newDescription.isGeneric()) {
          genericDescriptions.put(newDescription.getId(), newDescription);
       }
 
@@ -103,28 +106,12 @@ public class TopLevelContainerSequenceBuilder implements ContainerSequenceBuilde
    @Override
    public ContainerBuilder<FieldBasedPayloadBuilder> addGenericContainerWithFieldBasedPayload(String localId,
       String name, String description) {
-      // TODO implement
-      return null;
+      return new StandardFieldBasedPayloadContainerBuilder(this, dataFormat, localId, name, description, true);
    }
 
    @Override
    public ContainerBuilder<ContainerBasedPayloadBuilder> addGenericContainerWithContainerBasedPayload(String localId,
       String name, String description) {
-      // TODO implement
-      return null;
-   }
-
-   public Set<DataBlockId> getGenericDataBlocks() {
-      return getGenericDescriptions().keySet();
-   }
-
-   public Set<DataBlockId> getTopLevelDataBlocks() {
-      return getTopLevelDescriptions().keySet();
-   }
-
-   private DataBlockDescription defaultNestedContainerDesc;
-
-   public DataBlockId getDefaultNestedContainer() {
-      return defaultNestedContainerDesc.getId();
+      return new StandardContainerBasedPayloadContainerBuilder(this, dataFormat, localId, name, description, true);
    }
 }

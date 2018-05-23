@@ -890,7 +890,9 @@ public class StandardDataBlockReader implements DataBlockReader {
    private DataBlockId determineActualId(MediumOffset reference, DataBlockId id, FieldFunctionStack context,
       long remainingParentByteCount, ByteOrder byteOrder, Charset characterEncoding) {
 
-      if (m_spec.isGeneric(id)) {
+      DataBlockDescription desc = m_spec.getDataBlockDescription(id);
+
+      if (desc.isGeneric()) {
          DataBlockId idFieldId = findFirstIdField(id);
 
          // CONFIG_CHECK For generic data blocks, exactly one child field with ID_OF(genericDataBlockId) must be defined
@@ -1011,7 +1013,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
-         unknownFieldProperties, 1, 1, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, null);
+         unknownFieldProperties, 1, 1, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, false);
    }
 
    private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {

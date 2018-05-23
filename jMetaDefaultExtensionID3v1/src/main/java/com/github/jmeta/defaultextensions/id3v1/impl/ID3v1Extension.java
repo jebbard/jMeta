@@ -17,10 +17,11 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
@@ -32,6 +33,9 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  *
  */
 public class ID3v1Extension implements Extension {
+
+   private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
+      .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    private static final String ID3V1_TAG_ID_STRING = "TAG";
 
@@ -77,62 +81,54 @@ public class ID3v1Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
-      TopLevelContainerSequenceBuilder builder = getDescMap();
-
-      return new StandardDataFormatSpecification(ID3v1, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
-         builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
-         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_ASCII, Charsets.CHARSET_UTF8), null);
-   }
-
-   public TopLevelContainerSequenceBuilder getDescMap() {
-      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(ID3v1Extension.ID3v1);
+      DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(ID3v1Extension.ID3v1);
 
       final char nullCharacter = '\0';
 
       // @formatter:off
-      builder
-          .addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
-             .withStaticLengthOf(id3v1TagLength)
-             .addHeader("header", "ID3v1 tag header", "The ID3v1 tag header")
-                .withStaticLengthOf(3)
-                .addStringField("id", "ID3v1 tag header id", "The ID3v1 tag header id")
-                   .asMagicKey().withDefaultValue(ID3V1_TAG_ID_STRING).withStaticLengthOf(3)
-                .finishField()
-             .finishHeader()
-             .getPayload()
-                .withStaticLengthOf(125)
-                .addStringField("title", "title", "The ID3v1 title")
-                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
-                .finishField()
-                .addStringField("artist", "artist", "The ID3v1 artist")
-                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
-                .finishField()
-                .addStringField("album", "album", "The ID3v1 album")
-                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
-                .finishField()
-                .addStringField("year", "year", "The ID3v1 year")
-                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(4)
-                .finishField()
-                .addStringField("comment", "comment", "The ID3v1 comment")
-                   .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(28)
-                .finishField()
-                .addNumericField("trackIndicator", "track indicator", "The ID3v1 track indicator")
-                   .withDefaultValue(0L).withStaticLengthOf(1)
-                .finishField()
-                .addNumericField("track", "track", "The ID3v1 track")
-                   .withDefaultValue(0L).withStaticLengthOf(1)
-                .finishField()
-                .addEnumeratedField(String.class, "genre", "genre", "The ID3v1 genre")
-                   .withDefaultValue(""+nullCharacter).withStaticLengthOf(1)
-                   .addEnumeratedValue(new byte[]{-1}, "Unknown")
-                   .addEnumeratedValue(new byte[]{99}, "Rock")
-                   .addEnumeratedValue(new byte[]{2}, "Jazz")
-                .finishField()
-             .finishFieldBasedPayload()
-          .finishContainer();
+      builder.addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
+          .withStaticLengthOf(id3v1TagLength)
+          .addHeader("header", "ID3v1 tag header", "The ID3v1 tag header")
+             .withStaticLengthOf(3)
+             .addStringField("id", "ID3v1 tag header id", "The ID3v1 tag header id")
+                .asMagicKey().withDefaultValue(ID3V1_TAG_ID_STRING).withStaticLengthOf(3)
+             .finishField()
+          .finishHeader()
+          .getPayload()
+             .withStaticLengthOf(125)
+             .addStringField("title", "title", "The ID3v1 title")
+                .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
+             .finishField()
+             .addStringField("artist", "artist", "The ID3v1 artist")
+                .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
+             .finishField()
+             .addStringField("album", "album", "The ID3v1 album")
+                .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
+             .finishField()
+             .addStringField("year", "year", "The ID3v1 year")
+                .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(4)
+             .finishField()
+             .addStringField("comment", "comment", "The ID3v1 comment")
+                .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(28)
+             .finishField()
+             .addNumericField("trackIndicator", "track indicator", "The ID3v1 track indicator")
+                .withDefaultValue(0L).withStaticLengthOf(1)
+             .finishField()
+             .addNumericField("track", "track", "The ID3v1 track")
+                .withDefaultValue(0L).withStaticLengthOf(1)
+             .finishField()
+             .addEnumeratedField(String.class, "genre", "genre", "The ID3v1 genre")
+                .withDefaultValue(""+nullCharacter).withStaticLengthOf(1)
+                .addEnumeratedValue(new byte[]{-1}, "Unknown")
+                .addEnumeratedValue(new byte[]{99}, "Rock")
+                .addEnumeratedValue(new byte[]{2}, "Jazz")
+             .finishField()
+          .finishFieldBasedPayload()
+      .finishContainer();
       // @formatter:on
 
-      return builder;
+      return builder.createDataFormatSpecification(List.of(ByteOrder.BIG_ENDIAN),
+         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_ASCII, Charsets.CHARSET_UTF8));
    }
 
 }

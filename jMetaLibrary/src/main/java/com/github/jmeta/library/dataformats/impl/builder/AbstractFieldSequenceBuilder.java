@@ -23,8 +23,8 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * {@link AbstractFieldSequenceBuilder}
  *
  */
-public abstract class AbstractFieldSequenceBuilder<PB, C extends DataBlockDescriptionBuilder<C>> extends
-   AbstractDataFormatSpecificationBuilder<ContainerBuilder<PB>, C> implements FieldSequenceBuilder<C> {
+public abstract class AbstractFieldSequenceBuilder<PB, C extends DataBlockDescriptionBuilder<C>>
+   extends AbstractDataFormatSpecificationBuilder<ContainerBuilder<PB>, C> implements FieldSequenceBuilder<C> {
 
    /**
     * Creates a new {@link AbstractFieldSequenceBuilder}.

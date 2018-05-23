@@ -26,5 +26,4 @@ public interface DataFormatRepository {
     * @return the {@link DataFormatSpecification} for the given {@link ContainerDataFormat}
     */
    public DataFormatSpecification getDataFormatSpecification(ContainerDataFormat dataFormat);
-
 }

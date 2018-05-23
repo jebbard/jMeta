@@ -7,7 +7,7 @@
  * @date 31.12.2010
  */
 
-package com.github.jmeta.library.dataformats.api.services;
+package com.github.jmeta.library.dataformats.impl;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -136,7 +137,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
             genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(),
             genericDescription.getMinimumOccurrences(), genericDescription.getMaximumOccurrences(),
-            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), null);
+            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), false);
       }
 
       return m_dataBlockDescriptions.get(id);
@@ -194,17 +195,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    public Set<DataBlockId> getTopLevelDataBlockIds() {
 
       return Collections.unmodifiableSet(m_topLevelDataBlockIds);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecification#isGeneric(DataBlockId)
-    */
-   @Override
-   public boolean isGeneric(DataBlockId id) {
-
-      Reject.ifFalse(specifiesBlockWithId(id), "specifiesBlockWithId(id)");
-
-      return m_genericDataBlocks.containsKey(id);
    }
 
    /**

@@ -41,7 +41,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
    private String description;
    private final PhysicalDataBlockType type;
    private FieldProperties<?> fieldProperties;
-   private DataBlockId overriddenId;
    private long minimumByteLength = 0;
    private long maximumByteLength = DataBlockDescription.UNLIMITED;
    private int minimumOccurrences = 1;
@@ -92,11 +91,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
       return (C) this;
    }
 
-   public C withOverriddenId(DataBlockId overriddenId) {
-      setOverriddenId(overriddenId);
-      return (C) this;
-   }
-
    public C withDescription(String name, String description) {
       setName(name);
       setDescription(description);
@@ -141,7 +135,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
       if (parentBuilder != null) {
          parentBuilder.addChildDescription(myDescription);
       }
-      getDescriptionCollector().addDataBlockDescription(myDescription, isGeneric(), parentBuilder == null,
+      getDescriptionCollector().addDataBlockDescription(myDescription, parentBuilder == null,
          this.isDefaultNestedContainer);
 
       return parentBuilder;
@@ -185,10 +179,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
       this.maximumOccurrences = maximumOccurrences;
    }
 
-   protected void setOverriddenId(DataBlockId overriddenId) {
-      this.overriddenId = overriddenId;
-   }
-
    protected void setFieldProperties(FieldProperties<?> fieldProperties) {
       this.fieldProperties = fieldProperties;
    }
@@ -199,7 +189,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
 
    protected DataBlockDescription createDescriptionFromProperties() {
       return new DataBlockDescription(new DataBlockId(dataFormat, globalId), name, description, type,
-         childDescriptions.stream().map(desc -> desc.getId()).collect(Collectors.toList()), fieldProperties,
-         minimumOccurrences, maximumOccurrences, minimumByteLength, maximumByteLength, overriddenId);
+         childDescriptions.stream().map(DataBlockDescription::getId).collect(Collectors.toList()), fieldProperties,
+         minimumOccurrences, maximumOccurrences, minimumByteLength, maximumByteLength, isGeneric);
    }
 }

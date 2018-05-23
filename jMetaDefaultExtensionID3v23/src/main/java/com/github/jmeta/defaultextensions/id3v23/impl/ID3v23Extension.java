@@ -18,14 +18,15 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
@@ -34,6 +35,9 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  *
  */
 public class ID3v23Extension implements Extension {
+
+   private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
+      .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    private static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
    public static final String FRAME_FLAGS_COMPRESSION = "Compression";
@@ -53,8 +57,6 @@ public class ID3v23Extension implements Extension {
    public static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
    private static final DataBlockId GENERIC_FRAME_ID = new DataBlockId(ID3v23, ID3V23_GENERIC_CONTAINER_ID);
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".payload.data");
    private static final DataBlockId GENERIC_FRAME_PAYLOAD_DECOMPRESSED_SIZE_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload.decompressedSize");
    private static final DataBlockId GENERIC_FRAME_PAYLOAD_GROUP_ID_FIELD_ID = new DataBlockId(ID3v23,
@@ -123,27 +125,15 @@ public class ID3v23Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
-      TopLevelContainerSequenceBuilder builder = getDescMap();
-
-      return new StandardDataFormatSpecification(ID3v23, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
-         builder.getGenericDataBlocks(), List.of(ByteOrder.BIG_ENDIAN),
-         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16), builder.getDefaultNestedContainer());
-   }
-
-   /**
-    * @return
-    */
-   public TopLevelContainerSequenceBuilder getDescMap() {
-      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(ID3v23Extension.ID3v23);
+      DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(ID3v23Extension.ID3v23);
 
       DataBlockId tpeInformation = new DataBlockId(ID3v23, "id3v23.payload.TPE1.payload.information");
       DataBlockId titInformation = new DataBlockId(ID3v23, "id3v23.payload.TIT2.payload.information");
       DataBlockId trckInformation = new DataBlockId(ID3v23, "id3v23.payload.TRCK.payload.information");
       // DataBlockId talbInformation = new DataBlockId(ID3v23, "id3v23.payload.TALB.payload.information");
 
-   // @formatter:off
-      builder
-      .addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
+      // @formatter:off
+      builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
          .withLengthOf(21, DataBlockDescription.UNLIMITED)
          .addHeader("header", "id3v23 tag header", "The id3v23 tag header")
             .withStaticLengthOf(10)
@@ -249,12 +239,10 @@ public class ID3v23Extension implements Extension {
                      .asCharacterEncodingOf(GENERIC_INFORMATION_ID, tpeInformation, titInformation, trckInformation)
                      .addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO)
                      .addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16)
-                     .withOverriddenId(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID)
                   .finishField()
                   .addStringField("information", "Information", "Information")
                      .withTerminationCharacter('\u0000')
                      .withLengthOf(1, DataBlockDescription.UNLIMITED)
-                     .withOverriddenId(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID)
                   .finishField()
 //                  .addBinaryField("data", "Payload data field", "The payload data field")
 //                     .withLengthOf(1, DataBlockDescription.UNLIMITED)
@@ -283,9 +271,9 @@ public class ID3v23Extension implements Extension {
             .finishContainer()
         .finishContainerBasedPayload()
      .finishContainer();
-
       // @formatter:on
 
-      return builder;
+      return builder.createDataFormatSpecification(List.of(ByteOrder.BIG_ENDIAN),
+         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16));
    }
 }

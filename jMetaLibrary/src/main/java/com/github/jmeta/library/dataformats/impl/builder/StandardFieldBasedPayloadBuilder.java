@@ -23,7 +23,9 @@ public class StandardFieldBasedPayloadBuilder
 
    /**
     * Creates a new {@link StandardFieldBasedPayloadBuilder}.
-    * @param isGeneric TODO
+    * 
+    * @param isGeneric
+    *           TODO
     */
    public StandardFieldBasedPayloadBuilder(ContainerBuilder<FieldBasedPayloadBuilder> parentBuilder, String localId,
       String name, String description, boolean isGeneric) {

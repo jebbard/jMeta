@@ -20,14 +20,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockId;
  */
 public interface DescriptionCollector {
 
-   public void addDataBlockDescription(DataBlockDescription newDescription, boolean isGeneric, boolean isTopLevel,
-      boolean isDefaultNestedContainer);
-
-   public DataBlockId getDefaultNestedContainer();
+   public void addDataBlockDescription(DataBlockDescription newDescription, boolean isTopLevel, boolean isDefaultNestedContainer);
 
    public Map<DataBlockId, DataBlockDescription> getAllDescriptions();
-
-   public Map<DataBlockId, DataBlockDescription> getGenericDescriptions();
-
-   public Map<DataBlockId, DataBlockDescription> getTopLevelDescriptions();
 }

@@ -11,7 +11,6 @@ package com.github.jmeta.library.dataformats.api.services.builder;
 
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 /**
  * {@link DataBlockDescriptionBuilder}
@@ -24,8 +23,6 @@ public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuild
    public C withLengthOf(long minimumByteLength, long maximumByteLength);
 
    public C withOccurrences(int minimumOccurrences, int maximumOccurrences);
-
-   public C withOverriddenId(DataBlockId overriddenId);
 
    public C withDescription(String name, String description);
 

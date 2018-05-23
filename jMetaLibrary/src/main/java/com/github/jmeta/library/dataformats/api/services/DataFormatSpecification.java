@@ -73,12 +73,6 @@ public interface DataFormatSpecification {
 
    /**
     * @param id
-    * @return true if it is a generic block, false otherwise
-    */
-   public boolean isGeneric(DataBlockId id);
-
-   /**
-    * @param id
     * @return true if the given {@link DataBlockId} is contained in the current data format, false otherwise
     */
    public boolean specifiesBlockWithId(DataBlockId id);

@@ -17,14 +17,15 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
@@ -33,6 +34,9 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  *
  */
 public class APEv2Extension implements Extension {
+
+   private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
+      .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    private static final String APE_MAGIC_KEY_STRING = "APETAGEX";
    private static final int APEv2_HEADER_FOOTER_BYTE_LENGTH = 32;
@@ -79,17 +83,6 @@ public class APEv2Extension implements Extension {
    private DataFormatSpecification createSpecification() {
 
       // Data blocks
-      TopLevelContainerSequenceBuilder builder = getDescMap();
-
-      return new StandardDataFormatSpecification(APEv2, builder.getAllDescriptions(), builder.getTopLevelDataBlocks(),
-         builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO),
-         builder.getDefaultNestedContainer());
-   }
-
-   /**
-    * @return
-    */
-   public TopLevelContainerSequenceBuilder getDescMap() {
       final DataBlockId apeV2HeaderId = new DataBlockId(APEv2Extension.APEv2, "apev2.header");
       final DataBlockId apeV2PayloadId = new DataBlockId(APEv2Extension.APEv2, "apev2.payload");
       final DataBlockId apeV2FooterId = new DataBlockId(APEv2Extension.APEv2, "apev2.footer");
@@ -106,10 +99,10 @@ public class APEv2Extension implements Extension {
       FlagDescription tagContainsHeaderFlag = new FlagDescription("Tag contains header", new BitAddress(3, 7), "", 1,
          null);
 
-      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(APEv2Extension.APEv2);
-   // @formatter:off
-      builder
-      .addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
+      DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(APEv2Extension.APEv2);
+
+      // @formatter:off
+      builder.addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
          .withLengthOf(4, DataBlockDescription.UNLIMITED)
          .addHeader("header", "APEv2 header", "The APEv2 header")
             .withStaticLengthOf(APEv2_HEADER_FOOTER_BYTE_LENGTH)
@@ -217,9 +210,9 @@ public class APEv2Extension implements Extension {
             .finishContainer()
          .finishContainerBasedPayload()
       .finishContainer();
-   // @formatter:on
+      // @formatter:on
 
-      return builder;
+      return builder.createDataFormatSpecification(List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO));
    }
 
 }

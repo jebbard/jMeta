@@ -17,12 +17,13 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.services.StandardDataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.impl.builder.TopLevelContainerSequenceBuilder;
 import com.github.jmeta.utility.charset.api.services.Charsets;
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
 
@@ -31,6 +32,9 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  *
  */
 public class Lyrics3v2Extension implements Extension {
+
+   private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
+      .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    private static final String LYRICS3v2_MAGIC_FOOTER_STRING = "LYRICS200";
    private static final String LYRICS3v2_MAGIC_HEADER_STRING = "LYRICSBEGIN";
@@ -82,37 +86,17 @@ public class Lyrics3v2Extension implements Extension {
    private DataFormatSpecification createSpecification() {
 
       // Data blocks
-      TopLevelContainerSequenceBuilder builder = getDescMap();
-
-      return new StandardDataFormatSpecification(LYRICS3v2, builder.getAllDescriptions(),
-         builder.getTopLevelDataBlocks(), builder.getGenericDataBlocks(), List.of(ByteOrder.LITTLE_ENDIAN),
-         List.of(Charsets.CHARSET_ISO), builder.getDefaultNestedContainer());
-   }
-
-   /**
-    * @param lyrics3V2GenericFieldId
-    * @param lyrics3V2GenericFieldHeaderId
-    * @param lyrics3V2GenericFieldPayloadId
-    * @param lyrics3V2GenericFieldHeaderSizeId
-    * @param lyrics3V2GenericFieldHeaderIdId
-    * @param lyrics3V2GenericFieldPayloadDataId
-    * @param lyrics3V2HeaderId
-    * @return
-    */
-   public TopLevelContainerSequenceBuilder getDescMap() {
-
       final DataBlockId lyrics3V2PayloadId = new DataBlockId(Lyrics3v2Extension.LYRICS3v2, "lyrics3v2.payload");
       final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload.${FIELD_ID}");
       final DataBlockId lyrics3V2GenericFieldPayloadId = new DataBlockId(LYRICS3v2,
          "lyrics3v2.payload.${FIELD_ID}.payload");
       final DataBlockId lyrics3V2HeaderId = new DataBlockId(LYRICS3v2, "lyrics3v2.header");
 
-      TopLevelContainerSequenceBuilder builder = new TopLevelContainerSequenceBuilder(Lyrics3v2Extension.LYRICS3v2);
+      DataFormatSpecificationBuilder builder = specFactory
+         .createDataFormatSpecificationBuilder(Lyrics3v2Extension.LYRICS3v2);
 
       // @formatter:off
-
-      builder
-      .addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
+      builder.addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
          .withLengthOf(4, DataBlockDescription.UNLIMITED)
          .addHeader("header", "Lyrics3v2 header", "The Lyrics3v2 header")
             .withStaticLengthOf(HEADER_BYTE_LENGTH)
@@ -161,10 +145,9 @@ public class Lyrics3v2Extension implements Extension {
             .finishContainer()
          .finishContainerBasedPayload()
       .finishContainer();
-
       // @formatter:on
 
-      return builder;
+      return builder.createDataFormatSpecification(List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO));
    }
 
 }
