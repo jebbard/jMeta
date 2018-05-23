@@ -17,8 +17,9 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * {@link StandardFooterBuilder}
  *
  */
-public class StandardFooterBuilder<PB> extends AbstractFieldSequenceBuilder<PB, FooterBuilder<PB>>
-   implements FooterBuilder<PB> {
+public class StandardFooterBuilder<PB>
+   extends AbstractFieldSequenceBuilder<ContainerBuilder<PB>, FooterBuilder<ContainerBuilder<PB>>>
+   implements FooterBuilder<ContainerBuilder<PB>> {
 
    /**
     * Creates a new {@link StandardFooterBuilder}.

@@ -10,7 +10,6 @@
 package com.github.jmeta.library.dataformats.impl.builder;
 
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.EnumeratedFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder;
@@ -23,8 +22,8 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * {@link AbstractFieldSequenceBuilder}
  *
  */
-public abstract class AbstractFieldSequenceBuilder<PB, C extends DataBlockDescriptionBuilder<C>>
-   extends AbstractDataFormatSpecificationBuilder<ContainerBuilder<PB>, C> implements FieldSequenceBuilder<C> {
+public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptionBuilder<P>, C extends DataBlockDescriptionBuilder<C>>
+   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldSequenceBuilder<C> {
 
    /**
     * Creates a new {@link AbstractFieldSequenceBuilder}.
@@ -32,8 +31,8 @@ public abstract class AbstractFieldSequenceBuilder<PB, C extends DataBlockDescri
     * @param isGeneric
     *           TODO
     */
-   public AbstractFieldSequenceBuilder(ContainerBuilder<PB> parentBuilder, String localId, String name,
-      String description, PhysicalDataBlockType type, boolean isGeneric) {
+   public AbstractFieldSequenceBuilder(P parentBuilder, String localId, String name, String description,
+      PhysicalDataBlockType type, boolean isGeneric) {
       super(parentBuilder, localId, name, description, type, isGeneric);
    }
 
@@ -58,8 +57,8 @@ public abstract class AbstractFieldSequenceBuilder<PB, C extends DataBlockDescri
    }
 
    @Override
-   public <FieldInterpretedType> EnumeratedFieldBuilder<C, FieldInterpretedType> addEnumeratedField(
-      Class<FieldInterpretedType> type, String localId, String name, String description) {
+   public <FIT> EnumeratedFieldBuilder<C, FIT> addEnumeratedField(Class<FIT> type, String localId, String name,
+      String description) {
       return new StandardEnumeratedFieldBuilder<>((C) this, localId, name, description, isGeneric());
    }
 }

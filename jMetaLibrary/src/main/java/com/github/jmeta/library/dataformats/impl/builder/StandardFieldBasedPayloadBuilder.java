@@ -18,7 +18,7 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  *
  */
 public class StandardFieldBasedPayloadBuilder
-   extends AbstractFieldSequenceBuilder<FieldBasedPayloadBuilder, FieldBasedPayloadBuilder>
+   extends AbstractFieldSequenceBuilder<ContainerBuilder<FieldBasedPayloadBuilder>, FieldBasedPayloadBuilder>
    implements FieldBasedPayloadBuilder {
 
    /**

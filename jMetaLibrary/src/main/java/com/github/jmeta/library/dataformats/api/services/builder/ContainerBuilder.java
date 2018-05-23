@@ -13,14 +13,13 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link ContainerBuilder}
  *
  */
-public interface ContainerBuilder<PB>
-   extends DataBlockDescriptionBuilder<ContainerBuilder<PB>> {
+public interface ContainerBuilder<PB> extends DataBlockDescriptionBuilder<ContainerBuilder<PB>> {
 
    PB getPayload();
 
-   HeaderBuilder<PB> addHeader(String localId, String name, String description);
+   HeaderBuilder<ContainerBuilder<PB>> addHeader(String localId, String name, String description);
 
-   FooterBuilder<PB> addFooter(String localId, String name, String description);
+   FooterBuilder<ContainerBuilder<PB>> addFooter(String localId, String name, String description);
 
    ContainerBasedPayloadBuilder finishContainer();
 

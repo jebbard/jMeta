@@ -17,8 +17,9 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * {@link StandardHeaderBuilder}
  *
  */
-public class StandardHeaderBuilder<PB> extends AbstractFieldSequenceBuilder<PB, HeaderBuilder<PB>>
-   implements HeaderBuilder<PB> {
+public class StandardHeaderBuilder<PB>
+   extends AbstractFieldSequenceBuilder<ContainerBuilder<PB>, HeaderBuilder<ContainerBuilder<PB>>>
+   implements HeaderBuilder<ContainerBuilder<PB>> {
 
    /**
     * Creates a new {@link StandardHeaderBuilder}.

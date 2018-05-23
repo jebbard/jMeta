@@ -56,12 +56,14 @@ public class StandardContainerBasedPayloadContainerBuilder extends
    }
 
    @Override
-   public HeaderBuilder<ContainerBasedPayloadBuilder> addHeader(String localId, String name, String description) {
+   public HeaderBuilder<ContainerBuilder<ContainerBasedPayloadBuilder>> addHeader(String localId, String name,
+      String description) {
       return new StandardHeaderBuilder<>(this, localId, name, description, isGeneric());
    }
 
    @Override
-   public FooterBuilder<ContainerBasedPayloadBuilder> addFooter(String localId, String name, String description) {
+   public FooterBuilder<ContainerBuilder<ContainerBasedPayloadBuilder>> addFooter(String localId, String name,
+      String description) {
       return new StandardFooterBuilder<>(this, localId, name, description, isGeneric());
    }
 
