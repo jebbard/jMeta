@@ -82,22 +82,6 @@ public class DataBlockDescription {
    public DataBlockDescription(DataBlockId id, String name, String description, PhysicalDataBlockType physicalType,
       List<DataBlockId> childIds, FieldProperties<?> fieldProperties, int minimumOccurrences, int maximumOccurrences,
       long minimumByteLength, long maximumByteLength, boolean isGeneric) {
-      Reject.ifNull(id, "id");
-      Reject.ifNull(name, "name");
-      Reject.ifNull(description, "description");
-      Reject.ifNull(physicalType, "physicalType");
-      Reject.ifNull(childIds, "childIds");
-      Reject.ifNegative(minimumByteLength, "minimumByteLength");
-      Reject.ifNegative(maximumByteLength, "maximumByteLength");
-      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
-      Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
-
-      if (physicalType == PhysicalDataBlockType.FIELD) {
-         Reject.ifNull(fieldProperties, "fieldProperties");
-      } else {
-         Reject.ifNotNull(fieldProperties, "fieldProperties");
-      }
-
       this.id = id;
       this.name = name;
       this.description = description;
@@ -109,6 +93,8 @@ public class DataBlockDescription {
       this.minimumByteLength = minimumByteLength;
       this.maximumByteLength = maximumByteLength;
       this.isGeneric = isGeneric;
+
+      validateDataBlockDescription();
    }
 
    /**
@@ -331,5 +317,99 @@ public class DataBlockDescription {
       } else if (!id.equals(other.id))
          return false;
       return true;
+   }
+
+   private void validateDataBlockDescription() {
+      // Validate that mandatory fields are present
+      Reject.ifNull(id, "id");
+      Reject.ifNull(name, "name");
+      Reject.ifNull(description, "description");
+      Reject.ifNull(physicalType, "physicalType");
+      Reject.ifNull(childIds, "childIds");
+
+      String messagePrefix = "Error validating [" + id + "]: ";
+
+      // Validate lengths
+      Reject.ifNegative(minimumByteLength, "minimumByteLength");
+      Reject.ifNegative(maximumByteLength, "maximumByteLength");
+      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
+
+      // Validate occurrences
+      Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
+
+      // Validate child ids
+      // TODO: Need Descriptions as children here
+
+      // Validate field properties
+      if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
+         throw new IllegalArgumentException(
+            messagePrefix + "Data block is typed as FIELD, but its field properties are null");
+      } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
+         throw new IllegalArgumentException(
+            messagePrefix + "Data block not typed as FIELD, but it has non-null field properties");
+      }
+
+      if (physicalType == PhysicalDataBlockType.FIELD) {
+         validateFieldProperties(messagePrefix, getFieldProperties());
+      }
+   }
+
+   /**
+    * @param messagePrefix
+    */
+   private void validateFieldProperties(String messagePrefix, FieldProperties<?> fieldProperties) {
+      // Validate magic key
+      if (fieldProperties.isMagicKey()) {
+         if (physicalType != PhysicalDataBlockType.FIELD) {
+            throw new IllegalArgumentException(messagePrefix + "Data block is tagged as magic key, but it is no field");
+         }
+
+         if (!hasFixedSize() || maximumByteLength == DataBlockDescription.UNKNOWN_SIZE) {
+            throw new IllegalArgumentException(
+               messagePrefix + "Field is tagged as magic key, but it has a variable size: min length = <"
+                  + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
+         }
+
+         // TODO verify field type (binary, string, numeric, enum)
+         // TODO fixed length == key length
+      }
+
+      // Validate enumerated fields
+      if (fieldProperties.getFieldType() == FieldType.ENUMERATED) {
+         if (fieldProperties.getEnumeratedValues() == null || fieldProperties.getEnumeratedValues().isEmpty()) {
+            throw new IllegalArgumentException(
+               messagePrefix + "Enumerated field does not define any enumerated values");
+         }
+
+         for (Iterator<?> enumValueIterator = fieldProperties.getEnumeratedValues().keySet()
+            .iterator(); enumValueIterator.hasNext();) {
+            Object nextKey = enumValueIterator.next();
+            byte[] nextValue = fieldProperties.getEnumeratedValues().get(nextKey);
+
+            if (hasFixedSize() && nextValue.length > minimumByteLength) {
+               throw new IllegalArgumentException(messagePrefix + "Binary representation of enmuerated value <"
+                  + nextKey + "> with length <" + nextValue.length
+                  + "> is longer than the field's fixed size which is <" + minimumByteLength + ">");
+            }
+         }
+
+         if (fieldProperties.getDefaultValue() != null) {
+            if (!fieldProperties.getEnumeratedValues().containsKey(fieldProperties.getDefaultValue())) {
+               throw new IllegalArgumentException(
+                  messagePrefix + "Default field value <" + fieldProperties.getDefaultValue()
+                     + "> must be contained in list of enumerated values, but it is not");
+            }
+         }
+      }
+
+      // Validate numeric fields
+      // TODO size < 8 bytes
+      // TODO fixed byte order nur bei numeric
+
+      // Validate string fields
+      // TODO fixed charset & termination char nur bei string
+
+      // Validate default value
+      // TODO default value length > fixed length
    }
 }

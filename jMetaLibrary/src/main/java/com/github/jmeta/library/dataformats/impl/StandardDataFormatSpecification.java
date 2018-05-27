@@ -392,13 +392,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                         + ">: " + variableSizeFieldIds);
                }
 
-               if (!fieldDesc.hasFixedSize() || fieldDesc.getMaximumByteLength() == DataBlockDescription.UNKNOWN_SIZE) {
-                  throw new IllegalArgumentException(
-                     "Field that is tagged as magic key must have a fixed size, but min length = <"
-                        + fieldDesc.getMinimumByteLength() + ">, max length = <" + fieldDesc.getMaximumByteLength()
-                        + ">.");
-               }
-
                if (type == PhysicalDataBlockType.FOOTER) {
                   magicKeyOffset -= fieldDesc.getMinimumByteLength();
                }

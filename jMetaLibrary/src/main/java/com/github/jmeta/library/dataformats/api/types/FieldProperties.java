@@ -38,10 +38,9 @@ public class FieldProperties<T> {
     * @param isMagicKey
     *           TODO
     */
-   public FieldProperties(FieldType<?> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
+   public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
       ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey) {
-      // TODO writeConcept001: Is default value a mandatory property for a FieldProperties<> instance?
       // Reject.ifNull(defaultValue, "defaultValue");
 
       m_fieldType = fieldType;
