@@ -20,7 +20,8 @@ import com.github.jmeta.library.dataformats.api.services.builder.DescriptionColl
  * {@link DataFormatSpecificationBuilder}
  *
  */
-public interface DataFormatSpecificationBuilder extends ContainerSequenceBuilder, DescriptionCollector {
+public interface DataFormatSpecificationBuilder
+   extends ContainerSequenceBuilder<DataFormatSpecificationBuilder>, DescriptionCollector {
 
    public DataFormatSpecification createDataFormatSpecification(List<ByteOrder> supportedByteOrders,
       List<Charset> supportedCharacterEncodings);
