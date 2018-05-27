@@ -141,7 +141,9 @@ public class OggExtension implements Extension {
              .finishContainer()
           .finishContainerBasedPayload()
        .finishContainer()
-       .build(List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO));
+       .withByteOrders(ByteOrder.LITTLE_ENDIAN)
+       .withCharsets(Charsets.CHARSET_ISO)
+       .build();
       // @formatter:on
    }
 

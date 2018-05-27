@@ -139,17 +139,6 @@ public class FieldProperties<T> {
    public boolean isMagicKey() {
       return isMagicKey;
    }
-   //
-   // /**
-   // * @see java.lang.Object#toString()
-   // */
-   // @Override
-   // public String toString() {
-   //
-   // return getClass().getName() + "[" + ", termination=" + m_terminationCharacter + ", defaultValue="
-   // + (m_defaultValue instanceof byte[] ? Arrays.toString((byte[]) m_defaultValue) : m_defaultValue)
-   // + ", enumeratedValues=" + enumValuesToString() + ", blockFunction=" + m_functions + "]";
-   // }
 
    @Override
    public String toString() {

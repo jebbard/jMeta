@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
@@ -29,25 +30,60 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractFieldBuilder}
+ * {@link AbstractFieldBuilder} is the base class for all {@link DataBlockDescriptionBuilder}s that build fields. As
+ * such, it holds all attributes necessary for creating {@link FieldProperties}.
  *
+ * @param <P>
+ *           The parent type of this builder
+ * @param <FIT>
+ *           The interpreted type of the concrete field built by this class
+ * @param <C>
+ *           The concrete derived interface of the class implementing this
+ *           {@link AbstractDataFormatSpecificationBuilder}
  */
 public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, FIT, C extends FieldBuilder<P, FIT, C>>
    extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FIT, C> {
 
    private Character terminationCharacter;
    private FIT defaultValue;
-   private final Map<FIT, byte[]> enumeratedValues = new HashMap<>();
    private FlagSpecification flagSpecification;
-   private final FieldType<FIT> fieldType;
    private Charset fixedCharset;
    private ByteOrder fixedByteOrder;
-   private final List<FieldFunction> functions = new ArrayList<>();
    private boolean isMagicKey = false;
+   private final Map<FIT, byte[]> enumeratedValues = new HashMap<>();
+   private final FieldType<FIT> fieldType;
+   private final List<FieldFunction> functions = new ArrayList<>();
+
+   /**
+    * Creates a new {@link AbstractFieldBuilder}.
+    * 
+    * @param parentBuilder
+    *           The parent {@link DataFormatBuilder}. Required for allowing a fluent API, as it is returned by the
+    *           {@link #finish()} method. Must not be null.
+    * @param localId
+    *           The local id of the data block. Must not be null and must not contain the
+    *           {@link DataBlockId#SEGMENT_SEPARATOR}.
+    * @param name
+    *           The human-readable name of the data block in its specification
+    * @param description
+    *           The description of the data block from its specification
+    * @param fieldType
+    *           The {@link FieldType} of the field
+    * @param isGeneric
+    *           true if it is a generic data block, false otherwise
+    */
+   public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description,
+      FieldType<FIT> fieldType, boolean isGeneric) {
+      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD, isGeneric);
+      Reject.ifNull(fieldType, "fieldType");
+
+      this.fieldType = fieldType;
+   }
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asIdOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
     */
+   @SuppressWarnings("unchecked")
    @Override
    public C asIdOf(DataBlockId... ids) {
       Set<DataBlockId> affectedBlocks = Set.of(ids);
@@ -61,6 +97,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#indicatesPresenceOf(java.lang.String,
     *      int, com.github.jmeta.library.dataformats.api.types.DataBlockId[])
     */
+   @SuppressWarnings("unchecked")
    @Override
    public C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockId... ids) {
       Set<DataBlockId> affectedBlocks = Set.of(ids);
@@ -73,6 +110,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
     */
+   @SuppressWarnings("unchecked")
    @Override
    public C asSizeOf(DataBlockId... ids) {
       Set<DataBlockId> affectedBlocks = Set.of(ids);
@@ -85,6 +123,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCountOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
     */
+   @SuppressWarnings("unchecked")
    @Override
    public C asCountOf(DataBlockId... ids) {
       Set<DataBlockId> affectedBlocks = Set.of(ids);
@@ -97,6 +136,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asByteOrderOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
     */
+   @SuppressWarnings("unchecked")
    @Override
    public C asByteOrderOf(DataBlockId... ids) {
       Set<DataBlockId> affectedBlocks = Set.of(ids);
@@ -109,6 +149,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCharacterEncodingOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
     */
+   @SuppressWarnings("unchecked")
    @Override
    public C asCharacterEncodingOf(DataBlockId... ids) {
       Set<DataBlockId> affectedBlocks = Set.of(ids);
@@ -119,27 +160,9 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * Creates a new {@link AbstractFieldBuilder}.
-    * 
-    * @param parentBuilder
-    * @param localId
-    * @param name
-    * @param description
-    * @param isGeneric
-    *           TODO
-    * @param type
-    */
-   public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description,
-      FieldType<FIT> fieldType, boolean isGeneric) {
-      super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD, isGeneric);
-      Reject.ifNull(fieldType, "fieldType");
-
-      this.fieldType = fieldType;
-   }
-
-   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
     */
+   @SuppressWarnings("unchecked")
    public C withDefaultValue(FIT value) {
       this.defaultValue = value;
       return (C) this;
@@ -148,6 +171,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
     */
+   @SuppressWarnings("unchecked")
    public C asMagicKey() {
       this.isMagicKey = true;
       return (C) this;
@@ -166,47 +190,23 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
       return finish();
    }
 
-   /**
-    * Returns the attribute {@link #enumeratedValues}.
-    * 
-    * @return the attribute {@link #enumeratedValues}
-    */
    protected Map<FIT, byte[]> getEnumeratedValues() {
       return enumeratedValues;
    }
 
-   /**
-    * Sets the attribute {@link #flagSpecification}.
-    *
-    * @param new
-    *           vakue for attribute {@link #flagSpecification flagSpecification}.
-    */
    protected void setFlagSpecification(FlagSpecification flagSpecification) {
       this.flagSpecification = flagSpecification;
-   }
-
-   /**
-    * Sets the attribute {@link #fixedCharset}.
-    *
-    * @param new
-    *           vakue for attribute {@link #fixedCharset fixedCharset}.
-    */
-   protected void setFixedCharset(Charset fixedCharset) {
-      this.fixedCharset = fixedCharset;
    }
 
    protected void setTerminationCharacter(Character terminationCharacter) {
       this.terminationCharacter = terminationCharacter;
    }
 
-   /**
-    * Sets the attribute {@link #fixedByteOrder}.
-    *
-    * @param new
-    *           vakue for attribute {@link #fixedByteOrder fixedByteOrder}.
-    */
+   protected void setFixedCharset(Charset fixedCharset) {
+      this.fixedCharset = fixedCharset;
+   }
+
    protected void setFixedByteOrder(ByteOrder fixedByteOrder) {
       this.fixedByteOrder = fixedByteOrder;
    }
-
 }

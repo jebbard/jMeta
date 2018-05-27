@@ -41,6 +41,7 @@ public class FieldFunction {
       Integer requiredFlagValue) {
       Reject.ifNull(affectedBlockIds, "affectedBlockIds");
       Reject.ifNull(fieldFunctionType, "fieldFunctionType");
+      Reject.ifTrue(affectedBlockIds.isEmpty(), "affectedBlockIds.isEmpty()");
 
       m_fieldFunctionType = fieldFunctionType;
       m_flagName = flagName;

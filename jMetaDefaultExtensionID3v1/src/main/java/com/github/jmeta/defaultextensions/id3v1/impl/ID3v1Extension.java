@@ -125,8 +125,9 @@ public class ID3v1Extension implements Extension {
              .finishField()
           .finishFieldBasedPayload()
       .finishContainer()
-      .build(List.of(ByteOrder.BIG_ENDIAN),
-         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_ASCII, Charsets.CHARSET_UTF8));
+      .withByteOrders(ByteOrder.BIG_ENDIAN)
+      .withCharsets(Charsets.CHARSET_ISO, Charsets.CHARSET_ASCII, Charsets.CHARSET_UTF8)
+      .build();
       // @formatter:on
    }
 

@@ -271,8 +271,9 @@ public class ID3v23Extension implements Extension {
             .finishContainer()
         .finishContainerBasedPayload()
      .finishContainer()
-     .build(List.of(ByteOrder.BIG_ENDIAN),
-        List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16));
+     .withByteOrders(ByteOrder.BIG_ENDIAN)
+     .withCharsets(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16)
+     .build();
       // @formatter:on
    }
 }

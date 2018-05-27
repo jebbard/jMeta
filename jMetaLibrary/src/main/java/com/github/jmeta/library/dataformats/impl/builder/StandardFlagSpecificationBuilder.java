@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
@@ -21,25 +22,15 @@ import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 
 /**
- * {@link StandardFlagSpecificationBuilder}
+ * {@link StandardFlagSpecificationBuilder} allows to build flag specifications.
  *
+ * @param <P>
+ *           The parent type of the parent field builder
  */
 public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuilder<P>>
    implements FlagSpecificationBuilder<P> {
 
    private final AbstractFieldBuilder<P, Flags, FlagsFieldBuilder<P>> parentBuilder;
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder#finishFlagSpecification()
-    */
-   @Override
-   public FlagsFieldBuilder<P> finishFlagSpecification() {
-      FlagSpecification flagSpecification = new FlagSpecification(flagDescriptions, flagByteLength, flagByteOrder,
-         this.defaultFlagBytes);
-      parentBuilder.setFlagSpecification(flagSpecification);
-      parentBuilder.withDefaultValue(new Flags(flagSpecification));
-      return (FlagsFieldBuilder<P>) parentBuilder;
-   }
 
    private final int flagByteLength;
    private final ByteOrder flagByteOrder;
@@ -49,8 +40,12 @@ public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuil
    /**
     * Creates a new {@link StandardFlagSpecificationBuilder}.
     * 
+    * @param parentBuilder
+    *           The parent {@link DataFormatBuilder}
     * @param flagByteLength
+    *           The byte length of the flags
     * @param flagByteOrder
+    *           The byte order of the flag bytes
     */
    public StandardFlagSpecificationBuilder(AbstractFieldBuilder<P, Flags, FlagsFieldBuilder<P>> parentBuilder,
       int flagByteLength, ByteOrder flagByteOrder) {
@@ -77,4 +72,16 @@ public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuil
       return this;
    }
 
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder#finishFlagSpecification()
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public FlagsFieldBuilder<P> finishFlagSpecification() {
+      FlagSpecification flagSpecification = new FlagSpecification(flagDescriptions, flagByteLength, flagByteOrder,
+         this.defaultFlagBytes);
+      parentBuilder.setFlagSpecification(flagSpecification);
+      parentBuilder.withDefaultValue(new Flags(flagSpecification));
+      return (FlagsFieldBuilder<P>) parentBuilder;
+   }
 }

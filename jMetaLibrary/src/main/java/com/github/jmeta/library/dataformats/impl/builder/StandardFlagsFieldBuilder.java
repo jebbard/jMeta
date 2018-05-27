@@ -18,22 +18,17 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 
 /**
- * {@link StandardFlagsFieldBuilder}
- *
+ * {@link StandardFlagsFieldBuilder} allows to build flags field descriptions.
+ * 
+ * @param <P>
+ *           The parent type of this builder
  */
 public class StandardFlagsFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
    extends AbstractFieldBuilder<P, Flags, FlagsFieldBuilder<P>> implements FlagsFieldBuilder<P> {
 
    /**
-    * Creates a new {@link StandardFlagsFieldBuilder}.
-    * 
-    * @param parentBuilder
-    * @param localId
-    * @param name
-    * @param description
-    * @param isGeneric
-    *           TODO
-    * @param fieldType
+    * @see AbstractFieldBuilder#AbstractFieldBuilder(DataBlockDescriptionBuilder, String, String, String, FieldType,
+    *      boolean)
     */
    public StandardFlagsFieldBuilder(P parentBuilder, String localId, String name, String description,
       boolean isGeneric) {
@@ -47,5 +42,4 @@ public class StandardFlagsFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
    public FlagSpecificationBuilder<P> withFlagSpecification(int byteLength, ByteOrder byteOrder) {
       return new StandardFlagSpecificationBuilder<>(this, byteLength, byteOrder);
    }
-
 }

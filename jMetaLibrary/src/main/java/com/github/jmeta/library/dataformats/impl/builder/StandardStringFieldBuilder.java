@@ -16,22 +16,17 @@ import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuil
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
- * {@link StandardStringFieldBuilder}
+ * {@link StandardStringFieldBuilder} allows to build string field descriptions.
  *
+ * @param <P>
+ *           The parent type of this builder
  */
 public class StandardStringFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
    extends AbstractFieldBuilder<P, String, StringFieldBuilder<P>> implements StringFieldBuilder<P> {
 
    /**
-    * Creates a new {@link StandardStringFieldBuilder}.
-    * 
-    * @param parentBuilder
-    * @param localId
-    * @param name
-    * @param description
-    * @param isGeneric
-    *           TODO
-    * @param fieldType
+    * @see AbstractFieldBuilder#AbstractFieldBuilder(DataBlockDescriptionBuilder, String, String, String, FieldType,
+    *      boolean)
     */
    public StandardStringFieldBuilder(P parentBuilder, String localId, String name, String description,
       boolean isGeneric) {
@@ -55,5 +50,4 @@ public class StandardStringFieldBuilder<P extends DataBlockDescriptionBuilder<P>
       setFixedCharset(charset);
       return this;
    }
-
 }

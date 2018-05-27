@@ -13,7 +13,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * {@link DataBlockDescriptionBuilder}
  *
  */
-public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuilder<C>> extends UNKNOWN_IFACE {
+public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuilder<C>> extends DataFormatBuilder {
 
    public C withStaticLengthOf(long staticByteLength);
 

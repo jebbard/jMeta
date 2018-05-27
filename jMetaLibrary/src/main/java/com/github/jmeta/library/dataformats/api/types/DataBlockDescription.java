@@ -21,22 +21,6 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class DataBlockDescription {
 
-   public int getMinimumOccurrences() {
-      return minimumOccurrences;
-   }
-
-   public int getMaximumOccurrences() {
-      return maximumOccurrences;
-   }
-
-   public long getFixedByteOffsetInContainer() {
-      return fixedByteOffsetInContainer;
-   }
-
-   public boolean hasFixedSize() {
-      return getMaximumByteLength() == getMinimumByteLength();
-   }
-
    public static final long UNLIMITED = Long.MAX_VALUE;
 
    /**
@@ -44,36 +28,87 @@ public class DataBlockDescription {
     * {@link DataBlock#getTotalSize()}.
     */
    public final static long UNKNOWN_SIZE = -1;
+
    public final static long UNKNOWN_OFFSET = -1;
 
-   private final DataBlockId m_id;
-
-   private final String m_name;
-
-   private final String m_specDescription;
-
-   private final PhysicalDataBlockType m_physicalType;
-
-   private final List<DataBlockId> m_childIds = new ArrayList<>();
-
-   private final FieldProperties<?> m_fieldProperties;
-
-   private final long m_maximumByteLength;
-
-   private final long m_minimumByteLength;
-
-   private final List<MagicKey> m_headerMagicKeys = new ArrayList<>();
-
-   private final List<MagicKey> m_footerMagicKeys = new ArrayList<>();
-
+   private final DataBlockId id;
+   private final String name;
+   private final String description;
+   private final PhysicalDataBlockType physicalType;
+   private final List<DataBlockId> childIds = new ArrayList<>();
+   private final FieldProperties<?> fieldProperties;
+   private final long maximumByteLength;
+   private final long minimumByteLength;
    private final int minimumOccurrences;
    private final int maximumOccurrences;
-   private long fixedByteOffsetInContainer;
-
    private final boolean isGeneric;
 
-   public void setFixedByteOffsetInContainer(long fixedByteOffsetInContainer) {
-      this.fixedByteOffsetInContainer = fixedByteOffsetInContainer;
+   private long fixedByteOffsetInContainer;
+   private final List<MagicKey> headerMagicKeys = new ArrayList<>();
+   private final List<MagicKey> footerMagicKeys = new ArrayList<>();
+
+   /**
+    * Creates a new {@link DataBlockDescription}.
+    * 
+    * @param id
+    *           The {@link DataBlockId} of the data block, must not be null
+    * @param name
+    *           The human-readable name of the data block from its specification, must not be null
+    * @param description
+    *           The specification description of the data block, must not be null
+    * @param physicalType
+    *           The {@link PhysicalDataBlockType} of the data block, must not be null
+    * @param childIds
+    *           The ordered list of child ids (or empty, if no children) as they would appear in this data block, must
+    *           not be null
+    * @param fieldProperties
+    *           The {@link FieldProperties} of the data block, must be non-null if this {@link PhysicalDataBlockType} is
+    *           {@link PhysicalDataBlockType#FIELD}
+    * @param minimumOccurrences
+    *           The minimum number of occurrences of this data block or {@link DataBlockDescription#UNLIMITED}, must be
+    *           smaller than or equal to the maximum number of occurrences
+    * @param maximumOccurrences
+    *           The maximum number of occurrences of this data block or {@link DataBlockDescription#UNLIMITED}, must be
+    *           bigger than or equal to the minimum number of occurrences
+    * @param minimumByteLength
+    *           The minimum length of this data block in bytes or {@link DataBlockDescription#UNKNOWN_SIZE} or
+    *           {@link DataBlockDescription#UNLIMITED}, must be smaller than or equal to the maximum byte length
+    * @param maximumByteLength
+    *           The maximum length of this data block in bytes or {@link DataBlockDescription#UNKNOWN_SIZE} or
+    *           {@link DataBlockDescription#UNLIMITED}, must be bigger than or equal to the minimum byte length
+    * @param isGeneric
+    *           true if instances of this data block generic, false otherwise
+    */
+   public DataBlockDescription(DataBlockId id, String name, String description, PhysicalDataBlockType physicalType,
+      List<DataBlockId> childIds, FieldProperties<?> fieldProperties, int minimumOccurrences, int maximumOccurrences,
+      long minimumByteLength, long maximumByteLength, boolean isGeneric) {
+      Reject.ifNull(id, "id");
+      Reject.ifNull(name, "name");
+      Reject.ifNull(description, "description");
+      Reject.ifNull(physicalType, "physicalType");
+      Reject.ifNull(childIds, "childIds");
+      Reject.ifNegative(minimumByteLength, "minimumByteLength");
+      Reject.ifNegative(maximumByteLength, "maximumByteLength");
+      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
+      Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
+
+      if (physicalType == PhysicalDataBlockType.FIELD) {
+         Reject.ifNull(fieldProperties, "fieldProperties");
+      } else {
+         Reject.ifNotNull(fieldProperties, "fieldProperties");
+      }
+
+      this.id = id;
+      this.name = name;
+      this.description = description;
+      this.physicalType = physicalType;
+      this.childIds.addAll(childIds);
+      this.fieldProperties = fieldProperties;
+      this.minimumOccurrences = minimumOccurrences;
+      this.maximumOccurrences = maximumOccurrences;
+      this.minimumByteLength = minimumByteLength;
+      this.maximumByteLength = maximumByteLength;
+      this.isGeneric = isGeneric;
    }
 
    /**
@@ -138,61 +173,11 @@ public class DataBlockDescription {
    }
 
    /**
-    * Creates a new {@link DataBlockDescription}.
-    * 
-    * @param id
-    * @param name
-    * @param specDescription
-    * @param physicalType
-    * @param childIds
-    * @param fieldProperties
-    * @param minimumOccurrences
-    *           TODO
-    * @param maximumOccurrences
-    *           TODO
-    * @param minimumByteLength
-    * @param maximumByteLength
-    * @param isGeneric
-    *           TODO
-    * @param childOrder
-    */
-   public DataBlockDescription(DataBlockId id, String name, String specDescription, PhysicalDataBlockType physicalType,
-      List<DataBlockId> childIds, FieldProperties<?> fieldProperties, int minimumOccurrences, int maximumOccurrences,
-      long minimumByteLength, long maximumByteLength, boolean isGeneric) {
-      Reject.ifNull(childIds, "childIds");
-      Reject.ifNull(physicalType, "physicalType");
-      Reject.ifNull(specDescription, "specDescription");
-      Reject.ifNull(name, "name");
-      Reject.ifNull(id, "id");
-
-      Reject.ifNegative(minimumByteLength, "minimumByteLength");
-      Reject.ifNegative(maximumByteLength, "maximumByteLength");
-      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
-      Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
-
-      this.isGeneric = isGeneric;
-      this.minimumOccurrences = minimumOccurrences;
-      this.maximumOccurrences = maximumOccurrences;
-      m_id = id;
-      m_name = name;
-      m_specDescription = specDescription;
-      m_physicalType = physicalType;
-      m_childIds.addAll(childIds);
-      m_fieldProperties = fieldProperties;
-      m_minimumByteLength = minimumByteLength;
-      m_maximumByteLength = maximumByteLength;
-   }
-
-   public boolean isGeneric() {
-      return isGeneric;
-   }
-
-   /**
     * @return the {@link DataBlockId}
     */
    public DataBlockId getId() {
 
-      return m_id;
+      return id;
    }
 
    /**
@@ -200,7 +185,7 @@ public class DataBlockDescription {
     */
    public String getName() {
 
-      return m_name;
+      return name;
    }
 
    /**
@@ -208,7 +193,43 @@ public class DataBlockDescription {
     */
    public String getSpecDescription() {
 
-      return m_specDescription;
+      return description;
+   }
+
+   public int getMinimumOccurrences() {
+      return minimumOccurrences;
+   }
+
+   public int getMaximumOccurrences() {
+      return maximumOccurrences;
+   }
+
+   public long getFixedByteOffsetInContainer() {
+      return fixedByteOffsetInContainer;
+   }
+
+   public boolean hasFixedSize() {
+      return getMaximumByteLength() == getMinimumByteLength();
+   }
+
+   public void setFixedByteOffsetInContainer(long fixedByteOffsetInContainer) {
+      this.fixedByteOffsetInContainer = fixedByteOffsetInContainer;
+   }
+
+   public void addHeaderMagicKey(MagicKey magicKey) {
+      Reject.ifNull(magicKey, "magicKey");
+
+      headerMagicKeys.add(magicKey);
+   }
+
+   public void addFooterMagicKey(MagicKey magicKey) {
+      Reject.ifNull(magicKey, "magicKey");
+
+      footerMagicKeys.add(magicKey);
+   }
+
+   public boolean isGeneric() {
+      return isGeneric;
    }
 
    /**
@@ -216,7 +237,7 @@ public class DataBlockDescription {
     */
    public PhysicalDataBlockType getPhysicalType() {
 
-      return m_physicalType;
+      return physicalType;
    }
 
    /**
@@ -224,7 +245,7 @@ public class DataBlockDescription {
     */
    public List<DataBlockId> getOrderedChildIds() {
 
-      return Collections.unmodifiableList(m_childIds);
+      return Collections.unmodifiableList(childIds);
    }
 
    /**
@@ -232,7 +253,7 @@ public class DataBlockDescription {
     */
    public FieldProperties<?> getFieldProperties() {
 
-      return m_fieldProperties;
+      return fieldProperties;
    }
 
    /**
@@ -242,23 +263,11 @@ public class DataBlockDescription {
     */
    public List<MagicKey> getHeaderMagicKeys() {
 
-      return Collections.unmodifiableList(m_headerMagicKeys);
+      return Collections.unmodifiableList(headerMagicKeys);
    }
 
    public List<MagicKey> getFooterMagicKeys() {
-      return m_footerMagicKeys;
-   }
-
-   public void addHeaderMagicKey(MagicKey magicKey) {
-      Reject.ifNull(magicKey, "magicKey");
-
-      m_headerMagicKeys.add(magicKey);
-   }
-
-   public void addFooterMagicKey(MagicKey magicKey) {
-      Reject.ifNull(magicKey, "magicKey");
-
-      m_footerMagicKeys.add(magicKey);
+      return footerMagicKeys;
    }
 
    /**
@@ -268,7 +277,7 @@ public class DataBlockDescription {
     */
    public long getMaximumByteLength() {
 
-      return m_maximumByteLength;
+      return maximumByteLength;
    }
 
    /**
@@ -278,17 +287,17 @@ public class DataBlockDescription {
     */
    public long getMinimumByteLength() {
 
-      return m_minimumByteLength;
+      return minimumByteLength;
    }
 
    @Override
    public String toString() {
-      return "DataBlockDescription [m_id=" + m_id + ", m_name=" + m_name + ", m_specDescription=" + m_specDescription
-         + ", m_physicalType=" + m_physicalType + ", m_childIds=" + m_childIds + ", m_fieldProperties="
-         + m_fieldProperties + ", m_maximumByteLength=" + m_maximumByteLength + ", m_minimumByteLength="
-         + m_minimumByteLength + ", m_headerMagicKeys=" + m_headerMagicKeys + ", m_footerMagicKeys=" + m_footerMagicKeys
-         + ", minimumOccurrences=" + minimumOccurrences + ", maximumOccurrences=" + maximumOccurrences
-         + ", fixedByteOffsetInContainer=" + fixedByteOffsetInContainer + "]";
+      return "DataBlockDescription [m_id=" + id + ", m_name=" + name + ", m_specDescription=" + description
+         + ", m_physicalType=" + physicalType + ", m_childIds=" + childIds + ", m_fieldProperties=" + fieldProperties
+         + ", m_maximumByteLength=" + maximumByteLength + ", m_minimumByteLength=" + minimumByteLength
+         + ", m_headerMagicKeys=" + headerMagicKeys + ", m_footerMagicKeys=" + footerMagicKeys + ", minimumOccurrences="
+         + minimumOccurrences + ", maximumOccurrences=" + maximumOccurrences + ", fixedByteOffsetInContainer="
+         + fixedByteOffsetInContainer + "]";
    }
 
    /**
@@ -299,7 +308,7 @@ public class DataBlockDescription {
 
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((m_id == null) ? 0 : m_id.hashCode());
+      result = prime * result + ((id == null) ? 0 : id.hashCode());
       return result;
    }
 
@@ -316,10 +325,10 @@ public class DataBlockDescription {
       if (getClass() != obj.getClass())
          return false;
       DataBlockDescription other = (DataBlockDescription) obj;
-      if (m_id == null) {
-         if (other.m_id != null)
+      if (id == null) {
+         if (other.id != null)
             return false;
-      } else if (!m_id.equals(other.m_id))
+      } else if (!id.equals(other.id))
          return false;
       return true;
    }

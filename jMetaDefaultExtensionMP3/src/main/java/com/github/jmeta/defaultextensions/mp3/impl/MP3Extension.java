@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -22,7 +21,6 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
@@ -95,6 +93,7 @@ public class MP3Extension implements Extension {
       DataBlockId crcId = new DataBlockId(MP3Extension.MP3, "mp3.crc");
 
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(MP3Extension.MP3);
+      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
 
       // @formatter:off
       builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
@@ -135,17 +134,13 @@ public class MP3Extension implements Extension {
                .withLengthOf(1, 998)
             .finishField()
          .finishFieldBasedPayload()
-      .finishContainer();
+      .finishContainer()
+      .addCustomHeaderMagicKey(mp3FrameId, new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0))
+      .withByteOrders(ByteOrder.BIG_ENDIAN)
+      .withCharsets(Charsets.CHARSET_ISO);
       // @formatter:on
 
-      Map<DataBlockId, DataBlockDescription> topLevelContainerMap = builder.getAllDescriptions();
-
-      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
-      final MagicKey mp3MagicKey = new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0);
-
-      topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
-
-      return builder.build(List.of(ByteOrder.BIG_ENDIAN), List.of(Charsets.CHARSET_ISO));
+      return builder.build();
    }
 
 }

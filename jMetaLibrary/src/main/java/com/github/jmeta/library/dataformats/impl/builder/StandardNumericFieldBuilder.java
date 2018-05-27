@@ -16,22 +16,17 @@ import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBui
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
 /**
- * {@link StandardNumericFieldBuilder}
+ * {@link StandardNumericFieldBuilder} allows to build numeric field descriptions.
  *
+ * @param <P>
+ *           The parent type of this builder
  */
 public class StandardNumericFieldBuilder<P extends DataBlockDescriptionBuilder<P>>
    extends AbstractFieldBuilder<P, Long, NumericFieldBuilder<P>> implements NumericFieldBuilder<P> {
 
    /**
-    * Creates a new {@link StandardNumericFieldBuilder}.
-    * 
-    * @param parentBuilder
-    * @param localId
-    * @param name
-    * @param description
-    * @param isGeneric
-    *           TODO
-    * @param fieldType
+    * @see AbstractFieldBuilder#AbstractFieldBuilder(DataBlockDescriptionBuilder, String, String, String, FieldType,
+    *      boolean)
     */
    public StandardNumericFieldBuilder(P parentBuilder, String localId, String name, String description,
       boolean isGeneric) {
@@ -46,5 +41,4 @@ public class StandardNumericFieldBuilder<P extends DataBlockDescriptionBuilder<P
       setFixedByteOrder(byteOrder);
       return this;
    }
-
 }

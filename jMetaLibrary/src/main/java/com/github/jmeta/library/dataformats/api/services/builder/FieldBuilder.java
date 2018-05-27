@@ -15,8 +15,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockId;
  * {@link FieldBuilder}
  *
  */
-public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
-   extends DataBlockDescriptionBuilder<C> {
+public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends DataBlockDescriptionBuilder<C> {
 
    C withDefaultValue(FIT value);
 

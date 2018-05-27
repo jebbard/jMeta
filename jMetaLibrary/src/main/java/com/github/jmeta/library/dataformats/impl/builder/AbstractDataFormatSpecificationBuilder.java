@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector;
-import com.github.jmeta.library.dataformats.api.services.builder.UNKNOWN_IFACE;
+import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -24,19 +24,26 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractDataFormatSpecificationBuilder}
+ * {@link AbstractDataFormatSpecificationBuilder} is the base class of all {@link DataBlockDescriptionBuilder}s. It
+ * allows to create {@link DataBlockDescription}s and offers a generic {@link #finish()} method. On top of this, it
+ * provides default implementations for all Methods of {@link DataBlockDescriptionBuilder} and
+ * {@link DataFormatBuilder}.
  *
+ * @param <P>
+ *           The parent type of this builder
+ * @param <C>
+ *           The concrete derived interface of the class implementing this
+ *           {@link AbstractDataFormatSpecificationBuilder}
  */
-public abstract class AbstractDataFormatSpecificationBuilder<P extends UNKNOWN_IFACE, C extends DataBlockDescriptionBuilder<C>>
-   implements DataBlockDescriptionBuilder<C> {
+public abstract class AbstractDataFormatSpecificationBuilder<P extends DataFormatBuilder, C extends DataBlockDescriptionBuilder<C>>
+   implements DataBlockDescriptionBuilder<C>, DataFormatBuilder {
 
    private final P parentBuilder;
-
+   private final DataFormatSpecificationBuilder rootBuilder;
    private boolean isDefaultNestedContainer = false;
 
-   private final DescriptionCollector descriptionCollector;
-   private final List<DataBlockDescription> childDescriptions = new ArrayList<>();
    private final ContainerDataFormat dataFormat;
+   private final List<DataBlockDescription> childDescriptions = new ArrayList<>();
    private String globalId;
    private String name;
    private String description;
@@ -48,15 +55,32 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends UNKNOWN_I
    private int maximumOccurrences = 1;
    private final boolean isGeneric;
 
+   /**
+    * Creates a new {@link AbstractDataFormatSpecificationBuilder}.
+    * 
+    * @param parentBuilder
+    *           The parent {@link DataFormatBuilder}. Required for allowing a fluent API, as it is returned by the
+    *           {@link #finish()} method. Must not be null.
+    * @param localId
+    *           The local id of the data block. Must not be null and must not contain the
+    *           {@link DataBlockId#SEGMENT_SEPARATOR}.
+    * @param name
+    *           The human-readable name of the data block in its specification
+    * @param description
+    *           The description of the data block from its specification
+    * @param type
+    *           The {@link PhysicalDataBlockType} of the data block
+    * @param isGeneric
+    *           true if it is a generic data block, false otherwise
+    */
    public AbstractDataFormatSpecificationBuilder(P parentBuilder, String localId, String name, String description,
       PhysicalDataBlockType type, boolean isGeneric) {
-      Reject.ifNull(localId, "localId");
-      Reject.ifNull(type, "type");
       Reject.ifNull(parentBuilder, "parentBuilder");
+      Reject.ifNull(localId, "localId");
+      Reject.ifTrue(localId.contains(DataBlockId.SEGMENT_SEPARATOR), "localId.contains(DataBlockId.SEGMENT_SEPARATOR)");
+      Reject.ifNull(type, "type");
 
-      // TODO check local Id for validity
-
-      this.descriptionCollector = parentBuilder.getDescriptionCollector();
+      this.rootBuilder = parentBuilder.getRootBuilder();
       this.dataFormat = parentBuilder.getDataFormat();
       this.name = name;
       this.description = description;
@@ -67,43 +91,23 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends UNKNOWN_I
       this.parentBuilder = parentBuilder;
 
       if (parentBuilder.getGlobalId() != null) {
-         setGlobalId(parentBuilder.getGlobalId() + "." + localId);
+         this.globalId = parentBuilder.getGlobalId() + DataBlockId.SEGMENT_SEPARATOR + localId;
       } else {
-         setGlobalId(localId);
+         this.globalId = localId;
       }
-
    }
 
-   public C withStaticLengthOf(long staticByteLength) {
-      setStaticLength(staticByteLength);
-      return (C) this;
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getRootBuilder()
+    */
+   @Override
+   public DataFormatSpecificationBuilder getRootBuilder() {
+      return rootBuilder;
    }
 
-   public C withLengthOf(long minimumByteLength, long maximumByteLength) {
-      setLength(minimumByteLength, maximumByteLength);
-      return (C) this;
-   }
-
-   public C withOccurrences(int minimumOccurrences, int maximumOccurrences) {
-      setOccurrences(minimumOccurrences, maximumOccurrences);
-      return (C) this;
-   }
-
-   public C withDescription(String name, String description) {
-      setName(name);
-      setDescription(description);
-      return (C) this;
-   }
-
-   public C asDefaultNestedContainer() {
-      this.isDefaultNestedContainer = true;
-      return (C) this;
-   }
-
-   public DescriptionCollector getDescriptionCollector() {
-      return descriptionCollector;
-   }
-
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getDataFormat()
+    */
    @Override
    public ContainerDataFormat getDataFormat() {
       return dataFormat;
@@ -127,66 +131,96 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends UNKNOWN_I
       childDescriptions.add(childDesc);
    }
 
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withStaticLengthOf(long)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C withStaticLengthOf(long staticByteLength) {
+      this.minimumByteLength = staticByteLength;
+      this.maximumByteLength = staticByteLength;
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withLengthOf(long,
+    *      long)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C withLengthOf(long minimumByteLength, long maximumByteLength) {
+      this.minimumByteLength = minimumByteLength;
+      this.maximumByteLength = maximumByteLength;
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withOccurrences(int,
+    *      int)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C withOccurrences(int minimumOccurrences, int maximumOccurrences) {
+      this.minimumOccurrences = minimumOccurrences;
+      this.maximumOccurrences = maximumOccurrences;
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withDescription(java.lang.String,
+    *      java.lang.String)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C withDescription(String name, String description) {
+      this.name = name;
+      this.description = description;
+      return (C) this;
+   }
+
+   /**
+    * Finishes building of this {@link AbstractDataFormatSpecificationBuilder} by creating its
+    * {@link DataBlockDescription}, and adding it as child description to its parent {@link DataFormatBuilder} as well
+    * as to the root builder.
+    * 
+    * @return The parent {@link DataFormatBuilder}.
+    */
    protected P finish() {
-      DataBlockDescription myDescription = createDescriptionFromProperties();
+      DataBlockDescription myDescription = new DataBlockDescription(new DataBlockId(dataFormat, globalId), name,
+         description, type, childDescriptions.stream().map(DataBlockDescription::getId).collect(Collectors.toList()),
+         fieldProperties, minimumOccurrences, maximumOccurrences, minimumByteLength, maximumByteLength, isGeneric);
 
       parentBuilder.addChildDescription(myDescription);
 
-      getDescriptionCollector().addDataBlockDescription(myDescription, parentBuilder.getGlobalId() == null,
+      getRootBuilder().addDataBlockDescription(myDescription, parentBuilder.getGlobalId() == null,
          this.isDefaultNestedContainer);
 
       return parentBuilder;
    }
 
    /**
-    * Sets the attribute {@link #name}.
-    *
-    * @param new
-    *           vakue for attribute {@link #name name}.
+    * @return whether the data block built is generic or not
     */
-   protected void setName(String name) {
-      this.name = name;
-   }
-
    protected boolean isGeneric() {
       return isGeneric;
    }
 
    /**
-    * Sets the attribute {@link #description}.
-    *
-    * @param new
-    *           vakue for attribute {@link #description description}.
+    * Allows to set or unset the container {@link DataBlockDescription} built by this class as default nested container.
+    * 
+    * @param isDefaultNestedContainer
+    *           true for setting it as default nested container, false otherwise
     */
-   protected void setDescription(String description) {
-      this.description = description;
+   protected void setDefaultNestedContainer(boolean isDefaultNestedContainer) {
+      this.isDefaultNestedContainer = isDefaultNestedContainer;
    }
 
-   protected void setStaticLength(long staticByteLength) {
-      setLength(staticByteLength, staticByteLength);
-   }
-
-   protected void setLength(long minimumByteLength, long maximumByteLength) {
-      this.minimumByteLength = minimumByteLength;
-      this.maximumByteLength = maximumByteLength;
-   }
-
-   protected void setOccurrences(int minimumOccurrences, int maximumOccurrences) {
-      this.minimumOccurrences = minimumOccurrences;
-      this.maximumOccurrences = maximumOccurrences;
-   }
-
+   /**
+    * Allows to set {@link FieldProperties} for the field {@link DataBlockDescription} built by this class.
+    * 
+    * @param fieldProperties
+    */
    protected void setFieldProperties(FieldProperties<?> fieldProperties) {
       this.fieldProperties = fieldProperties;
-   }
-
-   protected void setGlobalId(String globalId) {
-      this.globalId = globalId;
-   }
-
-   protected DataBlockDescription createDescriptionFromProperties() {
-      return new DataBlockDescription(new DataBlockId(dataFormat, globalId), name, description, type,
-         childDescriptions.stream().map(DataBlockDescription::getId).collect(Collectors.toList()), fieldProperties,
-         minimumOccurrences, maximumOccurrences, minimumByteLength, maximumByteLength, isGeneric);
    }
 }

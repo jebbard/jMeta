@@ -1,6 +1,6 @@
 /**
  *
- * {@link UNKNOWN_IFACE}.java
+ * {@link DataFormatBuilder}.java
  *
  * @author Jens Ebert
  *
@@ -9,14 +9,15 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 
 /**
- * {@link UNKNOWN_IFACE}
+ * {@link DataFormatBuilder}
  *
  */
-public interface UNKNOWN_IFACE {
+public interface DataFormatBuilder {
 
    public String getGlobalId();
 
@@ -24,6 +25,6 @@ public interface UNKNOWN_IFACE {
 
    public ContainerDataFormat getDataFormat();
 
-   public DescriptionCollector getDescriptionCollector();
+   public DataFormatSpecificationBuilder getRootBuilder();
 
 }
