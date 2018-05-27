@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DescriptionCollector;
+import com.github.jmeta.library.dataformats.api.services.builder.UNKNOWN_IFACE;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -26,7 +27,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractDataFormatSpecificationBuilder}
  *
  */
-public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlockDescriptionBuilder<P>, C extends DataBlockDescriptionBuilder<C>>
+public abstract class AbstractDataFormatSpecificationBuilder<P extends UNKNOWN_IFACE, C extends DataBlockDescriptionBuilder<C>>
    implements DataBlockDescriptionBuilder<C> {
 
    private final P parentBuilder;
@@ -49,24 +50,14 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
 
    public AbstractDataFormatSpecificationBuilder(P parentBuilder, String localId, String name, String description,
       PhysicalDataBlockType type, boolean isGeneric) {
-      this(parentBuilder, parentBuilder.getDescriptionCollector(), parentBuilder.getDataFormat(), localId, name,
-         description, type, isGeneric);
-
-      setGlobalId(parentBuilder.getGlobalId() + "." + localId);
-   }
-
-   public AbstractDataFormatSpecificationBuilder(P parentBuilder, DescriptionCollector descriptionCollector,
-      ContainerDataFormat dataFormat, String localId, String name, String description, PhysicalDataBlockType type,
-      boolean isGeneric) {
       Reject.ifNull(localId, "localId");
       Reject.ifNull(type, "type");
-      Reject.ifNull(dataFormat, "dataFormat");
-      Reject.ifNull(descriptionCollector, "descriptionCollector");
+      Reject.ifNull(parentBuilder, "parentBuilder");
 
       // TODO check local Id for validity
 
-      this.descriptionCollector = descriptionCollector;
-      this.dataFormat = dataFormat;
+      this.descriptionCollector = parentBuilder.getDescriptionCollector();
+      this.dataFormat = parentBuilder.getDataFormat();
       this.name = name;
       this.description = description;
       this.type = type;
@@ -74,6 +65,13 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
       this.isGeneric = isGeneric;
 
       this.parentBuilder = parentBuilder;
+
+      if (parentBuilder.getGlobalId() != null) {
+         setGlobalId(parentBuilder.getGlobalId() + "." + localId);
+      } else {
+         setGlobalId(localId);
+      }
+
    }
 
    public C withStaticLengthOf(long staticByteLength) {
@@ -132,10 +130,9 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataBlock
    protected P finish() {
       DataBlockDescription myDescription = createDescriptionFromProperties();
 
-      if (parentBuilder != null) {
-         parentBuilder.addChildDescription(myDescription);
-      }
-      getDescriptionCollector().addDataBlockDescription(myDescription, parentBuilder == null,
+      parentBuilder.addChildDescription(myDescription);
+
+      getDescriptionCollector().addDataBlockDescription(myDescription, parentBuilder.getGlobalId() == null,
          this.isDefaultNestedContainer);
 
       return parentBuilder;

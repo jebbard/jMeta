@@ -10,6 +10,7 @@
 package com.github.jmeta.library.dataformats.impl.builder;
 
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
@@ -17,9 +18,9 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * {@link StandardFooterBuilder}
  *
  */
-public class StandardFooterBuilder<PB>
-   extends AbstractFieldSequenceBuilder<ContainerBuilder<PB>, FooterBuilder<ContainerBuilder<PB>>>
-   implements FooterBuilder<ContainerBuilder<PB>> {
+public class StandardFooterBuilder<P extends ContainerSequenceBuilder<P>, PB>
+   extends AbstractFieldSequenceBuilder<ContainerBuilder<P, PB>, FooterBuilder<ContainerBuilder<P, PB>>>
+   implements FooterBuilder<ContainerBuilder<P, PB>> {
 
    /**
     * Creates a new {@link StandardFooterBuilder}.
@@ -27,13 +28,13 @@ public class StandardFooterBuilder<PB>
     * @param isGeneric
     *           TODO
     */
-   public StandardFooterBuilder(ContainerBuilder<PB> parentBuilder, String localId, String name, String description,
+   public StandardFooterBuilder(ContainerBuilder<P, PB> parentBuilder, String localId, String name, String description,
       boolean isGeneric) {
       super(parentBuilder, localId, name, description, PhysicalDataBlockType.FOOTER, isGeneric);
    }
 
    @Override
-   public ContainerBuilder<PB> finishFooter() {
+   public ContainerBuilder<P, PB> finishFooter() {
       return super.finish();
    }
 }

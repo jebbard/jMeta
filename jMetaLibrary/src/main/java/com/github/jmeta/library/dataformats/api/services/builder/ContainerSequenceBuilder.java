@@ -15,15 +15,15 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  */
 public interface ContainerSequenceBuilder<C extends ContainerSequenceBuilder<C>> {
 
-   ContainerBuilder<FieldBasedPayloadBuilder> addContainerWithFieldBasedPayload(String localId, String name,
+   ContainerBuilder<C, FieldBasedPayloadBuilder<C>> addContainerWithFieldBasedPayload(String localId, String name,
       String description);
 
-   ContainerBuilder<ContainerBasedPayloadBuilder> addContainerWithContainerBasedPayload(String localId, String name,
-      String description);
+   ContainerBuilder<C, ContainerBasedPayloadBuilder<C>> addContainerWithContainerBasedPayload(String localId,
+      String name, String description);
 
-   ContainerBuilder<FieldBasedPayloadBuilder> addGenericContainerWithFieldBasedPayload(String localId, String name,
-      String description);
+   ContainerBuilder<C, FieldBasedPayloadBuilder<C>> addGenericContainerWithFieldBasedPayload(String localId,
+      String name, String description);
 
-   ContainerBuilder<ContainerBasedPayloadBuilder> addGenericContainerWithContainerBasedPayload(String localId,
+   ContainerBuilder<C, ContainerBasedPayloadBuilder<C>> addGenericContainerWithContainerBasedPayload(String localId,
       String name, String description);
 }

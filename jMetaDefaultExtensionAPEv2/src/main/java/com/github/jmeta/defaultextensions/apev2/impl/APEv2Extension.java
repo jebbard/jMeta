@@ -102,7 +102,7 @@ public class APEv2Extension implements Extension {
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(APEv2Extension.APEv2);
 
       // @formatter:off
-      builder.addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
+      return builder.addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
          .withLengthOf(4, DataBlockDescription.UNLIMITED)
          .addHeader("header", "APEv2 header", "The APEv2 header")
             .withStaticLengthOf(APEv2_HEADER_FOOTER_BYTE_LENGTH)
@@ -209,10 +209,9 @@ public class APEv2Extension implements Extension {
                .finishFieldBasedPayload()
             .finishContainer()
          .finishContainerBasedPayload()
-      .finishContainer();
+      .finishContainer()
+      .build(List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO));
       // @formatter:on
-
-      return builder.createDataFormatSpecification(List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO));
    }
 
 }

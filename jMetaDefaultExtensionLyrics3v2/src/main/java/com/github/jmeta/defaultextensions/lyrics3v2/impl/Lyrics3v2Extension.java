@@ -96,7 +96,7 @@ public class Lyrics3v2Extension implements Extension {
          .createDataFormatSpecificationBuilder(Lyrics3v2Extension.LYRICS3v2);
 
       // @formatter:off
-      builder.addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
+      return builder.addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
          .withLengthOf(4, DataBlockDescription.UNLIMITED)
          .addHeader("header", "Lyrics3v2 header", "The Lyrics3v2 header")
             .withStaticLengthOf(HEADER_BYTE_LENGTH)
@@ -144,10 +144,9 @@ public class Lyrics3v2Extension implements Extension {
                .finishFieldBasedPayload()
             .finishContainer()
          .finishContainerBasedPayload()
-      .finishContainer();
+      .finishContainer()
+      .build(List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO));
       // @formatter:on
-
-      return builder.createDataFormatSpecification(List.of(ByteOrder.LITTLE_ENDIAN), List.of(Charsets.CHARSET_ISO));
    }
 
 }

@@ -145,7 +145,7 @@ public class MP3Extension implements Extension {
 
       topLevelContainerMap.get(mp3FrameId).addHeaderMagicKey(mp3MagicKey);
 
-      return builder.createDataFormatSpecification(List.of(ByteOrder.BIG_ENDIAN), List.of(Charsets.CHARSET_ISO));
+      return builder.build(List.of(ByteOrder.BIG_ENDIAN), List.of(Charsets.CHARSET_ISO));
    }
 
 }

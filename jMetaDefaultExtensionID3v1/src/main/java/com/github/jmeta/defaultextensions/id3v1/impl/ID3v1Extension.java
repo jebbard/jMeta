@@ -86,7 +86,7 @@ public class ID3v1Extension implements Extension {
       final char nullCharacter = '\0';
 
       // @formatter:off
-      builder.addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
+      return builder.addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
           .withStaticLengthOf(id3v1TagLength)
           .addHeader("header", "ID3v1 tag header", "The ID3v1 tag header")
              .withStaticLengthOf(3)
@@ -124,11 +124,10 @@ public class ID3v1Extension implements Extension {
                 .addEnumeratedValue(new byte[]{2}, "Jazz")
              .finishField()
           .finishFieldBasedPayload()
-      .finishContainer();
-      // @formatter:on
-
-      return builder.createDataFormatSpecification(List.of(ByteOrder.BIG_ENDIAN),
+      .finishContainer()
+      .build(List.of(ByteOrder.BIG_ENDIAN),
          List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_ASCII, Charsets.CHARSET_UTF8));
+      // @formatter:on
    }
 
 }

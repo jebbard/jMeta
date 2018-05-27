@@ -133,7 +133,7 @@ public class ID3v23Extension implements Extension {
       // DataBlockId talbInformation = new DataBlockId(ID3v23, "id3v23.payload.TALB.payload.information");
 
       // @formatter:off
-      builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
+      return builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
          .withLengthOf(21, DataBlockDescription.UNLIMITED)
          .addHeader("header", "id3v23 tag header", "The id3v23 tag header")
             .withStaticLengthOf(10)
@@ -270,10 +270,9 @@ public class ID3v23Extension implements Extension {
                .finishFieldBasedPayload()
             .finishContainer()
         .finishContainerBasedPayload()
-     .finishContainer();
+     .finishContainer()
+     .build(List.of(ByteOrder.BIG_ENDIAN),
+        List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16));
       // @formatter:on
-
-      return builder.createDataFormatSpecification(List.of(ByteOrder.BIG_ENDIAN),
-         List.of(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16));
    }
 }
