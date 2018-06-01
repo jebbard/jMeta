@@ -71,6 +71,18 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder#cloneFrom(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    */
+   @Override
+   public ContainerBuilder<P, ContainerBasedPayloadBuilder<P>> cloneFrom(DataBlockId existingContainerId) {
+
+      ContainerBuilderOverrider.overrideContainerBuilderWithDescription(this, existingContainerId,
+         PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+
+      return this;
+   }
+
+   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder#addFooter(java.lang.String,
     *      java.lang.String, java.lang.String)
     */
@@ -96,4 +108,5 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
    public P finishContainer() {
       return super.finish();
    }
+
 }

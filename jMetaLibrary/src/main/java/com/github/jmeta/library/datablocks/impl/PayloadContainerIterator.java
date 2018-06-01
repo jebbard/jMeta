@@ -46,8 +46,9 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       m_context = context;
       m_remainingParentSize = m_parent.getTotalSize();
 
-      m_containerDescs = DataBlockDescription.getChildDescriptionsOfType(m_reader.getSpecification(), m_parent.getId(),
-         PhysicalDataBlockType.CONTAINER);
+      DataBlockDescription parentDescription = m_reader.getSpecification().getDataBlockDescription(m_parent.getId());
+
+      m_containerDescs = parentDescription.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
    }
 
    /**

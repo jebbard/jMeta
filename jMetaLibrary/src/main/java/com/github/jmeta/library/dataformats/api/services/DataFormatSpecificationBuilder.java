@@ -38,4 +38,8 @@ public interface DataFormatSpecificationBuilder
       ByteOrder... furtherSupportedByteOrders);
 
    public DataFormatSpecificationBuilder withCharsets(Charset defaultCharset, Charset... furtherSupportedCharsets);
+
+   public DataBlockDescription getDataBlockDescription(DataBlockId dataBlockId);
+
+   public void removeDataBlockDescription(DataBlockId dataBlockId);
 }

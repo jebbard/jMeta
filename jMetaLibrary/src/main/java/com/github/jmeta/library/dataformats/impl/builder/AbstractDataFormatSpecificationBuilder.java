@@ -11,7 +11,6 @@ package com.github.jmeta.library.dataformats.impl.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
@@ -187,8 +186,8 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     */
    protected P finish() {
       DataBlockDescription myDescription = new DataBlockDescription(new DataBlockId(dataFormat, globalId), name,
-         description, type, childDescriptions.stream().map(DataBlockDescription::getId).collect(Collectors.toList()),
-         fieldProperties, minimumOccurrences, maximumOccurrences, minimumByteLength, maximumByteLength, isGeneric);
+         description, type, childDescriptions, fieldProperties, minimumOccurrences, maximumOccurrences,
+         minimumByteLength, maximumByteLength, isGeneric);
 
       parentBuilder.addChildDescription(myDescription);
 

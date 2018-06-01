@@ -9,12 +9,13 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+
 /**
  * {@link FieldSequenceBuilder}
  *
  */
-public interface FieldSequenceBuilder<C extends DataBlockDescriptionBuilder<C>>
-   extends DataBlockDescriptionBuilder<C> {
+public interface FieldSequenceBuilder<C extends DataBlockDescriptionBuilder<C>> extends DataBlockDescriptionBuilder<C> {
 
    StringFieldBuilder<C> addStringField(String localId, String name, String description);
 
@@ -24,6 +25,8 @@ public interface FieldSequenceBuilder<C extends DataBlockDescriptionBuilder<C>>
 
    FlagsFieldBuilder<C> addFlagsField(String localId, String name, String description);
 
-   <FIT> EnumeratedFieldBuilder<C, FIT> addEnumeratedField(
-      Class<FIT> type, String localId, String name, String description);
+   <FIT> EnumeratedFieldBuilder<C, FIT> addEnumeratedField(Class<FIT> type, String localId, String name,
+      String description);
+
+   FieldSequenceBuilder<C> removeField(DataBlockId fieldId);
 }

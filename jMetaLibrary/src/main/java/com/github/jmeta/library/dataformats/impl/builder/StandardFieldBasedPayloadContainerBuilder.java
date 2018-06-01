@@ -28,8 +28,7 @@ public class StandardFieldBasedPayloadContainerBuilder<P extends ContainerSequen
    extends AbstractDataFormatSpecificationBuilder<P, ContainerBuilder<P, FieldBasedPayloadBuilder<P>>>
    implements ContainerBuilder<P, FieldBasedPayloadBuilder<P>> {
 
-   private final FieldBasedPayloadBuilder<P> payloadBuilder = new StandardFieldBasedPayloadBuilder<>(this, "payload",
-      "payload", "The payload", isGeneric());
+   private final FieldBasedPayloadBuilder<P> payloadBuilder = createPayloadBuilder();
 
    /**
     * Creates a new {@link StandardFieldBasedPayloadContainerBuilder}.
@@ -95,5 +94,23 @@ public class StandardFieldBasedPayloadContainerBuilder<P extends ContainerSequen
    @Override
    public P finishContainer() {
       return super.finish();
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder#cloneFrom(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    */
+   @Override
+   public ContainerBuilder<P, FieldBasedPayloadBuilder<P>> cloneFrom(DataBlockId existingContainerId) {
+
+      ContainerBuilderOverrider.overrideContainerBuilderWithDescription(this, existingContainerId, PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+      return this;
+   }
+
+   /**
+    * @return
+    */
+   private StandardFieldBasedPayloadBuilder<P> createPayloadBuilder() {
+      return new StandardFieldBasedPayloadBuilder<>(this, "payload", "payload", "The payload", isGeneric());
    }
 }

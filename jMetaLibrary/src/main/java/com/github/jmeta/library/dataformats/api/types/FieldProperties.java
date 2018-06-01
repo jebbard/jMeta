@@ -139,6 +139,82 @@ public class FieldProperties<T> {
       return isMagicKey;
    }
 
+   /**
+    * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (isMagicKey ? 1231 : 1237);
+      result = prime * result + ((m_defaultValue == null) ? 0 : m_defaultValue.hashCode());
+      result = prime * result + ((m_enumeratedValues == null) ? 0 : m_enumeratedValues.hashCode());
+      result = prime * result + ((m_fieldType == null) ? 0 : m_fieldType.hashCode());
+      result = prime * result + ((m_fixedByteOrder == null) ? 0 : m_fixedByteOrder.hashCode());
+      result = prime * result + ((m_fixedCharset == null) ? 0 : m_fixedCharset.hashCode());
+      result = prime * result + ((m_flagSpecification == null) ? 0 : m_flagSpecification.hashCode());
+      result = prime * result + ((m_functions == null) ? 0 : m_functions.hashCode());
+      result = prime * result + ((m_terminationCharacter == null) ? 0 : m_terminationCharacter.hashCode());
+      return result;
+   }
+
+   /**
+    * @see java.lang.Object#equals(java.lang.Object)
+    */
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj)
+         return true;
+      if (obj == null)
+         return false;
+      if (getClass() != obj.getClass())
+         return false;
+      FieldProperties<?> other = (FieldProperties<?>) obj;
+      if (isMagicKey != other.isMagicKey)
+         return false;
+      if (m_defaultValue == null) {
+         if (other.m_defaultValue != null)
+            return false;
+      } else if (!m_defaultValue.equals(other.m_defaultValue))
+         return false;
+      if (m_enumeratedValues == null) {
+         if (other.m_enumeratedValues != null)
+            return false;
+      } else if (!m_enumeratedValues.equals(other.m_enumeratedValues))
+         return false;
+      if (m_fieldType == null) {
+         if (other.m_fieldType != null)
+            return false;
+      } else if (!m_fieldType.equals(other.m_fieldType))
+         return false;
+      if (m_fixedByteOrder == null) {
+         if (other.m_fixedByteOrder != null)
+            return false;
+      } else if (!m_fixedByteOrder.equals(other.m_fixedByteOrder))
+         return false;
+      if (m_fixedCharset == null) {
+         if (other.m_fixedCharset != null)
+            return false;
+      } else if (!m_fixedCharset.equals(other.m_fixedCharset))
+         return false;
+      if (m_flagSpecification == null) {
+         if (other.m_flagSpecification != null)
+            return false;
+      } else if (!m_flagSpecification.equals(other.m_flagSpecification))
+         return false;
+      if (m_functions == null) {
+         if (other.m_functions != null)
+            return false;
+      } else if (!m_functions.equals(other.m_functions))
+         return false;
+      if (m_terminationCharacter == null) {
+         if (other.m_terminationCharacter != null)
+            return false;
+      } else if (!m_terminationCharacter.equals(other.m_terminationCharacter))
+         return false;
+      return true;
+   }
+
    @Override
    public String toString() {
       return "FieldProperties [m_terminationCharacter=" + m_terminationCharacter + ", m_defaultValue="

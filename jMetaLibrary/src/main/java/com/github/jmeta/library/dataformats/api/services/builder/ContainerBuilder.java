@@ -9,6 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+
 /**
  * {@link ContainerBuilder}
  *
@@ -25,4 +27,6 @@ public interface ContainerBuilder<P extends ContainerSequenceBuilder<P>, PB>
    P finishContainer();
 
    ContainerBuilder<P, PB> asDefaultNestedContainer();
+
+   ContainerBuilder<P, PB> cloneFrom(DataBlockId existingContainerId);
 }

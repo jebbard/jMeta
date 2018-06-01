@@ -37,7 +37,7 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
 
    private final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
    private final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
-   private final Map<DataBlockId, DataBlockDescription> topLevelDescriptions = new HashMap<>();
+   private final List<DataBlockDescription> topLevelDescriptions = new ArrayList<>();
    private final ContainerDataFormat dataFormat;
    private DataBlockDescription defaultNestedContainerDesc;
    private final List<ByteOrder> supportedByteOrders = new ArrayList<>();
@@ -71,7 +71,7 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
             "No data blocks defined for this data format - did you remember to call finish*?");
       }
 
-      return new StandardDataFormatSpecification(dataFormat, overallDescriptions, topLevelDescriptions.keySet(),
+      return new StandardDataFormatSpecification(dataFormat, overallDescriptions, topLevelDescriptions,
          genericDescriptions.keySet(), supportedByteOrders, supportedCharacterEncodings,
          defaultNestedContainerDesc == null ? null : defaultNestedContainerDesc.getId());
    }
@@ -92,7 +92,7 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
       }
 
       if (isTopLevel) {
-         topLevelDescriptions.put(newDescription.getId(), newDescription);
+         topLevelDescriptions.add(newDescription);
       }
 
       if (isDefaultNestedContainer) {
@@ -221,5 +221,27 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
    public ContainerBuilder<DataFormatSpecificationBuilder, ContainerBasedPayloadBuilder<DataFormatSpecificationBuilder>> addGenericContainerWithContainerBasedPayload(
       String localId, String name, String description) {
       return new StandardContainerBasedPayloadContainerBuilder<>(this, localId, name, description, true);
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#getDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    */
+   @Override
+   public DataBlockDescription getDataBlockDescription(DataBlockId dataBlockId) {
+      Reject.ifNull(dataBlockId, "dataBlockId");
+
+      if (!overallDescriptions.containsKey(dataBlockId)) {
+         return null;
+      }
+
+      return overallDescriptions.get(dataBlockId);
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#removeDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    */
+   @Override
+   public void removeDataBlockDescription(DataBlockId dataBlockId) {
+      overallDescriptions.remove(dataBlockId);
    }
 }

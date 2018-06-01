@@ -20,7 +20,6 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -113,8 +112,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
       DataBlockReader reader = readerMap.get(dataFormat);
 
-      List<DataBlockDescription> containerDescs = DataBlockDescription
-         .getChildDescriptionsOfType(reader.getSpecification(), null, PhysicalDataBlockType.CONTAINER);
+      List<DataBlockDescription> containerDescs = reader.getSpecification().getTopLevelDataBlockDescriptions();
 
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -35,7 +36,7 @@ public class DataBlockDescription {
    private final String name;
    private final String description;
    private final PhysicalDataBlockType physicalType;
-   private final List<DataBlockId> childIds = new ArrayList<>();
+   private final List<DataBlockDescription> orderedChildren = new ArrayList<>();
    private final FieldProperties<?> fieldProperties;
    private final long maximumByteLength;
    private final long minimumByteLength;
@@ -58,7 +59,7 @@ public class DataBlockDescription {
     *           The specification description of the data block, must not be null
     * @param physicalType
     *           The {@link PhysicalDataBlockType} of the data block, must not be null
-    * @param childIds
+    * @param children
     *           The ordered list of child ids (or empty, if no children) as they would appear in this data block, must
     *           not be null
     * @param fieldProperties
@@ -80,13 +81,13 @@ public class DataBlockDescription {
     *           true if instances of this data block generic, false otherwise
     */
    public DataBlockDescription(DataBlockId id, String name, String description, PhysicalDataBlockType physicalType,
-      List<DataBlockId> childIds, FieldProperties<?> fieldProperties, int minimumOccurrences, int maximumOccurrences,
-      long minimumByteLength, long maximumByteLength, boolean isGeneric) {
+      List<DataBlockDescription> children, FieldProperties<?> fieldProperties, int minimumOccurrences,
+      int maximumOccurrences, long minimumByteLength, long maximumByteLength, boolean isGeneric) {
       this.id = id;
       this.name = name;
       this.description = description;
       this.physicalType = physicalType;
-      this.childIds.addAll(childIds);
+      this.orderedChildren.addAll(children);
       this.fieldProperties = fieldProperties;
       this.minimumOccurrences = minimumOccurrences;
       this.maximumOccurrences = maximumOccurrences;
@@ -109,10 +110,9 @@ public class DataBlockDescription {
 
       long totalMinimumSize = 0;
 
-      for (Iterator<DataBlockId> childIterator = headerDesc.getOrderedChildIds().iterator(); childIterator.hasNext();) {
-         DataBlockId childId = childIterator.next();
-
-         DataBlockDescription childDesc = spec.getDataBlockDescription(childId);
+      for (Iterator<DataBlockDescription> childIterator = headerDesc.getOrderedChildren().iterator(); childIterator
+         .hasNext();) {
+         DataBlockDescription childDesc = childIterator.next();
 
          totalMinimumSize += childDesc.getMinimumByteLength();
       }
@@ -120,42 +120,10 @@ public class DataBlockDescription {
       return totalMinimumSize;
    }
 
-   /**
-    * @param spec
-    * @param parentId
-    * @param type
-    * @return a list of child {@link DataBlockDescription}s
-    */
-   public static List<DataBlockDescription> getChildDescriptionsOfType(DataFormatSpecification spec,
-      DataBlockId parentId, PhysicalDataBlockType type) {
-
-      Reject.ifNull(spec, "spec");
+   public List<DataBlockDescription> getChildDescriptionsOfType(PhysicalDataBlockType type) {
       Reject.ifNull(type, "type");
 
-      List<DataBlockDescription> childDescs = new ArrayList<>();
-
-      Iterator<DataBlockId> childIterator = null;
-
-      // Need to get the top-level children
-      if (parentId == null)
-         childIterator = spec.getTopLevelDataBlockIds().iterator();
-
-      else {
-         DataBlockDescription parentDesc = spec.getDataBlockDescription(parentId);
-
-         childIterator = parentDesc.getOrderedChildIds().iterator();
-      }
-
-      while (childIterator.hasNext()) {
-         DataBlockId childId = childIterator.next();
-
-         DataBlockDescription childDesc = spec.getDataBlockDescription(childId);
-
-         if (childDesc.getPhysicalType().equals(type))
-            childDescs.add(childDesc);
-      }
-
-      return childDescs;
+      return getOrderedChildren().stream().filter(desc -> desc.getPhysicalType() == type).collect(Collectors.toList());
    }
 
    /**
@@ -177,7 +145,7 @@ public class DataBlockDescription {
    /**
     * @return the specification description
     */
-   public String getSpecDescription() {
+   public String getDescription() {
 
       return description;
    }
@@ -229,9 +197,9 @@ public class DataBlockDescription {
    /**
     * @return the child {@link DataBlockId}s
     */
-   public List<DataBlockId> getOrderedChildIds() {
+   public List<DataBlockDescription> getOrderedChildren() {
 
-      return Collections.unmodifiableList(childIds);
+      return Collections.unmodifiableList(orderedChildren);
    }
 
    /**
@@ -276,25 +244,27 @@ public class DataBlockDescription {
       return minimumByteLength;
    }
 
-   @Override
-   public String toString() {
-      return "DataBlockDescription [m_id=" + id + ", m_name=" + name + ", m_specDescription=" + description
-         + ", m_physicalType=" + physicalType + ", m_childIds=" + childIds + ", m_fieldProperties=" + fieldProperties
-         + ", m_maximumByteLength=" + maximumByteLength + ", m_minimumByteLength=" + minimumByteLength
-         + ", m_headerMagicKeys=" + headerMagicKeys + ", m_footerMagicKeys=" + footerMagicKeys + ", minimumOccurrences="
-         + minimumOccurrences + ", maximumOccurrences=" + maximumOccurrences + ", fixedByteOffsetInContainer="
-         + fixedByteOffsetInContainer + "]";
-   }
-
    /**
     * @see java.lang.Object#hashCode()
     */
    @Override
    public int hashCode() {
-
       final int prime = 31;
       int result = 1;
+      result = prime * result + ((description == null) ? 0 : description.hashCode());
+      result = prime * result + ((fieldProperties == null) ? 0 : fieldProperties.hashCode());
+      result = prime * result + (int) (fixedByteOffsetInContainer ^ (fixedByteOffsetInContainer >>> 32));
+      result = prime * result + ((footerMagicKeys == null) ? 0 : footerMagicKeys.hashCode());
+      result = prime * result + ((headerMagicKeys == null) ? 0 : headerMagicKeys.hashCode());
       result = prime * result + ((id == null) ? 0 : id.hashCode());
+      result = prime * result + (isGeneric ? 1231 : 1237);
+      result = prime * result + (int) (maximumByteLength ^ (maximumByteLength >>> 32));
+      result = prime * result + maximumOccurrences;
+      result = prime * result + (int) (minimumByteLength ^ (minimumByteLength >>> 32));
+      result = prime * result + minimumOccurrences;
+      result = prime * result + ((name == null) ? 0 : name.hashCode());
+      result = prime * result + ((orderedChildren == null) ? 0 : orderedChildren.hashCode());
+      result = prime * result + ((physicalType == null) ? 0 : physicalType.hashCode());
       return result;
    }
 
@@ -303,7 +273,6 @@ public class DataBlockDescription {
     */
    @Override
    public boolean equals(Object obj) {
-
       if (this == obj)
          return true;
       if (obj == null)
@@ -311,12 +280,69 @@ public class DataBlockDescription {
       if (getClass() != obj.getClass())
          return false;
       DataBlockDescription other = (DataBlockDescription) obj;
+      if (description == null) {
+         if (other.description != null)
+            return false;
+      } else if (!description.equals(other.description))
+         return false;
+      if (fieldProperties == null) {
+         if (other.fieldProperties != null)
+            return false;
+      } else if (!fieldProperties.equals(other.fieldProperties))
+         return false;
+      if (fixedByteOffsetInContainer != other.fixedByteOffsetInContainer)
+         return false;
+      if (footerMagicKeys == null) {
+         if (other.footerMagicKeys != null)
+            return false;
+      } else if (!footerMagicKeys.equals(other.footerMagicKeys))
+         return false;
+      if (headerMagicKeys == null) {
+         if (other.headerMagicKeys != null)
+            return false;
+      } else if (!headerMagicKeys.equals(other.headerMagicKeys))
+         return false;
       if (id == null) {
          if (other.id != null)
             return false;
       } else if (!id.equals(other.id))
          return false;
+      if (isGeneric != other.isGeneric)
+         return false;
+      if (maximumByteLength != other.maximumByteLength)
+         return false;
+      if (maximumOccurrences != other.maximumOccurrences)
+         return false;
+      if (minimumByteLength != other.minimumByteLength)
+         return false;
+      if (minimumOccurrences != other.minimumOccurrences)
+         return false;
+      if (name == null) {
+         if (other.name != null)
+            return false;
+      } else if (!name.equals(other.name))
+         return false;
+      if (orderedChildren == null) {
+         if (other.orderedChildren != null)
+            return false;
+      } else if (!orderedChildren.equals(other.orderedChildren))
+         return false;
+      if (physicalType != other.physicalType)
+         return false;
       return true;
+   }
+
+   /**
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      return "DataBlockDescription [id=" + id + ", name=" + name + ", description=" + description + ", physicalType="
+         + physicalType + ", orderedChildren=" + orderedChildren + ", fieldProperties=" + fieldProperties
+         + ", maximumByteLength=" + maximumByteLength + ", minimumByteLength=" + minimumByteLength
+         + ", minimumOccurrences=" + minimumOccurrences + ", maximumOccurrences=" + maximumOccurrences + ", isGeneric="
+         + isGeneric + ", fixedByteOffsetInContainer=" + fixedByteOffsetInContainer + ", headerMagicKeys="
+         + headerMagicKeys + ", footerMagicKeys=" + footerMagicKeys + "]";
    }
 
    private void validateDataBlockDescription() {
@@ -325,7 +351,7 @@ public class DataBlockDescription {
       Reject.ifNull(name, "name");
       Reject.ifNull(description, "description");
       Reject.ifNull(physicalType, "physicalType");
-      Reject.ifNull(childIds, "childIds");
+      Reject.ifNull(orderedChildren, "childIds");
 
       String messagePrefix = "Error validating [" + id + "]: ";
 
@@ -337,8 +363,42 @@ public class DataBlockDescription {
       // Validate occurrences
       Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
 
-      // Validate child ids
-      // TODO: Need Descriptions as children here
+      // Validate children
+      switch (physicalType) {
+         case FIELD:
+            if (orderedChildren.size() != 0) {
+               throw new IllegalArgumentException(messagePrefix + "Data block is typed as field, but it has children");
+            }
+         break;
+         case HEADER:
+         case FOOTER:
+         case FIELD_BASED_PAYLOAD:
+            List<DataBlockDescription> fieldChildren = getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
+
+            if (fieldChildren.size() != orderedChildren.size()) {
+               throw new IllegalArgumentException(messagePrefix
+                  + "Data blocks of types HEADER, FOOTER or FIELD_BASED_PAYLOAD must only have fields as children");
+            }
+         break;
+         case CONTAINER:
+            List<DataBlockDescription> payloadChildren = getChildDescriptionsOfType(
+               PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+            payloadChildren.addAll(getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD));
+
+            if (payloadChildren.size() != 1) {
+               throw new IllegalArgumentException(
+                  messagePrefix + "Data blocks of type CONTAINER must have exactly one payload container");
+            }
+         break;
+         case CONTAINER_BASED_PAYLOAD:
+            List<DataBlockDescription> containerChildren = getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
+
+            if (containerChildren.size() != orderedChildren.size()) {
+               throw new IllegalArgumentException(messagePrefix
+                  + "Data blocks of type CONTAINER_BASED_PAYLOAD must have exactly one payload container");
+            }
+         break;
+      }
 
       // Validate field properties
       if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
@@ -370,7 +430,12 @@ public class DataBlockDescription {
                   + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
          }
 
-         // TODO verify field type (binary, string, numeric, enum)
+         if (fieldProperties.getFieldType() == FieldType.FLAGS) {
+            throw new IllegalArgumentException(messagePrefix
+               + "Data block is tagged as magic key, and it must have field type BINARY, STRING, UNSIGNED_WHOLE_NUMER or ENUMERATED, but it was <"
+               + fieldProperties.getFieldType() + ">");
+         }
+
          // TODO fixed length == key length
       }
 
@@ -403,13 +468,33 @@ public class DataBlockDescription {
       }
 
       // Validate numeric fields
-      // TODO size < 8 bytes
-      // TODO fixed byte order nur bei numeric
+      if (fieldProperties.getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
+         if (minimumByteLength > Long.BYTES || maximumByteLength > Long.BYTES) {
+            throw new IllegalArgumentException(
+               messagePrefix + "Field has Numeric type, but its minimum or maximum length is bigger than " + Long.BYTES
+                  + ": min length = <" + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
+         }
+      } else {
+         if (fieldProperties.getFixedByteOrder() != null) {
+            throw new IllegalArgumentException(
+               messagePrefix + "Field has not Numeric type, but a fixed byte order is defined for it");
+         }
+      }
 
       // Validate string fields
-      // TODO fixed charset & termination char nur bei string
+      if (fieldProperties.getFieldType() != FieldType.STRING) {
+         if (fieldProperties.getFixedCharacterEncoding() != null) {
+            throw new IllegalArgumentException(
+               messagePrefix + "Field has not String type, but a fixed character encoding is defined for it");
+         }
+
+         if (fieldProperties.getTerminationCharacter() != null) {
+            throw new IllegalArgumentException(
+               messagePrefix + "Field has not String type, but a termincation character is defined for it");
+         }
+      }
 
       // Validate default value
-      // TODO default value length > fixed length
+      // TODO default value length == fixed length
    }
 }

@@ -250,6 +250,7 @@ public class ID3v23Extension implements Extension {
                .finishFieldBasedPayload()
             .finishContainer()
             .addContainerWithFieldBasedPayload("padding", "Padding", "Padding")
+               .cloneFrom(GENERIC_FRAME_ID)
                .withOccurrences(0, 1)
                .withLengthOf(1, DataBlockDescription.UNLIMITED)
                .addHeader("header", "Padding header", "Padding header")

@@ -20,10 +20,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -351,9 +353,9 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
 
       DataBlockId id = new DataBlockId(dataFormat, idString);
 
-      // if (!spec.specifiesBlockWithId(id))
-      // throw new InvalidTestDataCsvFormatException(
-      // rowPrefix + "Data format <" + dataFormat + "> does not specify a block with id <" + id + ">.", null);
+      if (!spec.specifiesBlockWithId(id))
+         throw new InvalidTestDataCsvFormatException(
+            rowPrefix + "Data format <" + dataFormat + "> does not specify a block with id <" + id + ">.", null);
       return id;
    }
 
@@ -422,7 +424,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
          addInstanceId(instanceId, blockType);
       }
 
-      if (spec.getTopLevelDataBlockIds().contains(id))
+      if (topLevelDataBlocksToMap(spec).containsKey(id))
          expectedTopLevelContainers.add(instanceId);
 
       return instanceId;
@@ -638,7 +640,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
 
       DataFormatSpecification spec = getDataFormatSpecification(instanceId.getId().getDataFormat());
 
-      if (spec.getTopLevelDataBlockIds().contains(instanceId.getId())) {
+      if (topLevelDataBlocksToMap(spec).containsKey(instanceId.getId())) {
          boolean isContainerBackwardReadble = Boolean.parseBoolean(isContainerBackwardReadbleString);
 
          // Each new container must be added AT FRONT of the list because it represents
@@ -647,6 +649,16 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
          if (isContainerBackwardReadble)
             expectedTopLevelContainersReverse.add(0, instanceId);
       }
+   }
+
+   /**
+    * @param spec
+    *           The {@link DataFormatSpecification}
+    * @return A map representation of top-level data blocks
+    */
+   private Map<DataBlockId, DataBlockDescription> topLevelDataBlocksToMap(DataFormatSpecification spec) {
+      return spec.getTopLevelDataBlockDescriptions().stream()
+         .collect(Collectors.toMap(desc -> desc.getId(), desc -> desc));
    }
 
    /**

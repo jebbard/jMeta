@@ -17,6 +17,7 @@ import com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBu
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
@@ -105,5 +106,28 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
    public <FIT> EnumeratedFieldBuilder<C, FIT> addEnumeratedField(Class<FIT> type, String localId, String name,
       String description) {
       return new StandardEnumeratedFieldBuilder<>((C) this, localId, name, description, isGeneric());
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#removeField(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
+    */
+   @Override
+   public FieldSequenceBuilder<C> removeField(DataBlockId fieldId) {
+
+      DataBlockDescription fieldDescription = getRootBuilder().getDataBlockDescription(fieldId);
+
+      if (fieldDescription == null) {
+         throw new IllegalArgumentException("No such field id found: <" + fieldId
+            + "> - ensure that the field you want to remove has already been added to this builder and finished");
+      }
+
+      if (!fieldDescription.getId().getGlobalId().startsWith(getGlobalId())) {
+         throw new IllegalArgumentException(
+            "Field id <" + fieldId + "> - is not a child id of <" + getGlobalId() + ">");
+      }
+
+      getRootBuilder().removeDataBlockDescription(fieldId);
+
+      return this;
    }
 }

@@ -14,7 +14,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * 
     * @param dataFormat
     * @param dataBlockDescriptions
-    * @param topLevelDataBlockIds
+    * @param topLevelDataBlockDescriptions
     * @param genericDataBlocks
     * @param supportedByteOrders
     * @param supportedCharacterEncodings
@@ -55,11 +54,12 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     *           TODO
     */
    public StandardDataFormatSpecification(ContainerDataFormat dataFormat,
-      Map<DataBlockId, DataBlockDescription> dataBlockDescriptions, Set<DataBlockId> topLevelDataBlockIds,
-      Set<DataBlockId> genericDataBlocks, List<ByteOrder> supportedByteOrders,
-      List<Charset> supportedCharacterEncodings, DataBlockId defaultNestedContainerId) {
+      Map<DataBlockId, DataBlockDescription> dataBlockDescriptions,
+      List<DataBlockDescription> topLevelDataBlockDescriptions, Set<DataBlockId> genericDataBlocks,
+      List<ByteOrder> supportedByteOrders, List<Charset> supportedCharacterEncodings,
+      DataBlockId defaultNestedContainerId) {
       Reject.ifNull(dataBlockDescriptions, "dataBlockDescriptions");
-      Reject.ifNull(topLevelDataBlockIds, "topLevelDataBlockIds");
+      Reject.ifNull(topLevelDataBlockDescriptions, "topLevelDataBlockDescriptions");
       Reject.ifNull(dataFormat, "dataFormat");
       Reject.ifNull(supportedCharacterEncodings, "supportedCharacterEncodings");
       Reject.ifNull(supportedByteOrders, "supportedByteOrders");
@@ -70,17 +70,17 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       m_supportedByteOrders.addAll(supportedByteOrders);
       m_supportedCharacterEncodings.addAll(supportedCharacterEncodings);
       m_dataFormat = dataFormat;
-      m_topLevelDataBlockIds.addAll(topLevelDataBlockIds);
+      m_topLevelDataBlocks.addAll(topLevelDataBlockDescriptions);
       m_dataBlockDescriptions.putAll(dataBlockDescriptions);
       this.defaultNestedContainerId = defaultNestedContainerId;
 
       validateDefaultNestedContainerDefined(defaultNestedContainerId);
 
-      autoDetectMagicKeys(m_topLevelDataBlockIds);
+      autoDetectMagicKeys(m_topLevelDataBlocks);
 
       validateTopLevelMagicKeys();
 
-      calculateContainerFieldsFixedByteOffsets(m_topLevelDataBlockIds);
+      calculateContainerFieldsFixedByteOffsets(m_topLevelDataBlocks);
    }
 
    @Override
@@ -104,43 +104,53 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
       // The requested id is an unspecified id that must match a generic id
       if (!m_dataBlockDescriptions.containsKey(id)) {
-         DataBlockId matchingGenericId = getMatchingGenericId(id);
-
-         DataBlockDescription genericDescription = getDataBlockDescription(matchingGenericId);
-
-         Matcher matcher = Pattern.compile(m_genericDataBlocks.get(matchingGenericId)).matcher(id.getGlobalId());
-
-         List<String> matchingStrings = new ArrayList<>();
-
-         if (matcher.find()) {
-            // Ignore group zero (= the whole match) which is also NOT included in Matcher.groupCount()
-            for (int i = 1; i < matcher.groupCount() + 1; i++)
-               matchingStrings.add(matcher.group(i));
-         }
-
-         // Replace child ids
-         List<DataBlockId> realChildIds = new ArrayList<>();
-
-         for (int i = 0; i < genericDescription.getOrderedChildIds().size(); ++i) {
-            DataBlockId childId = genericDescription.getOrderedChildIds().get(i);
-
-            String replacedChildId = childId.getGlobalId();
-
-            for (int j = 0; j < matchingStrings.size(); ++j) {
-               String matchingString = matchingStrings.get(j);
-
-               replacedChildId = replacedChildId.replaceFirst(GENERIC_PLACEHOLDER_PATTERN.pattern(), matchingString);
-            }
-
-            realChildIds.add(new DataBlockId(m_dataFormat, replacedChildId));
-         }
-         return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
-            genericDescription.getPhysicalType(), realChildIds, genericDescription.getFieldProperties(),
-            genericDescription.getMinimumOccurrences(), genericDescription.getMaximumOccurrences(),
-            genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), false);
+         return createConcreteDescription(id);
       }
 
       return m_dataBlockDescriptions.get(id);
+   }
+
+   /**
+    * @param id
+    * @return
+    */
+   private DataBlockDescription createConcreteDescription(DataBlockId id) {
+      DataBlockId matchingGenericId = getMatchingGenericId(id);
+
+      DataBlockDescription genericDescription = getDataBlockDescription(matchingGenericId);
+
+      Matcher matcher = Pattern.compile(m_genericDataBlocks.get(matchingGenericId)).matcher(id.getGlobalId());
+
+      List<String> matchingStrings = new ArrayList<>();
+
+      if (matcher.find()) {
+         // Ignore group zero (= the whole match) which is also NOT included in Matcher.groupCount()
+         for (int i = 1; i < matcher.groupCount() + 1; i++)
+            matchingStrings.add(matcher.group(i));
+      }
+
+      // Replace child ids
+      List<DataBlockDescription> realChildren = new ArrayList<>();
+
+      for (int i = 0; i < genericDescription.getOrderedChildren().size(); ++i) {
+         DataBlockId childId = genericDescription.getOrderedChildren().get(i).getId();
+
+         String replacedChildId = childId.getGlobalId();
+
+         for (int j = 0; j < matchingStrings.size(); ++j) {
+            String matchingString = matchingStrings.get(j);
+
+            replacedChildId = replacedChildId.replaceFirst(GENERIC_PLACEHOLDER_PATTERN.pattern(), matchingString);
+         }
+
+         DataBlockId replacedChildDataBlockId = new DataBlockId(m_dataFormat, replacedChildId);
+
+         realChildren.add(createConcreteDescription(replacedChildDataBlockId));
+      }
+      return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
+         genericDescription.getPhysicalType(), realChildren, genericDescription.getFieldProperties(),
+         genericDescription.getMinimumOccurrences(), genericDescription.getMaximumOccurrences(),
+         genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), false);
    }
 
    /**
@@ -189,12 +199,12 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecification#getTopLevelDataBlockIds()
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecification#getTopLevelDataBlockDescriptions()
     */
    @Override
-   public Set<DataBlockId> getTopLevelDataBlockIds() {
+   public List<DataBlockDescription> getTopLevelDataBlockDescriptions() {
 
-      return Collections.unmodifiableSet(m_topLevelDataBlockIds);
+      return Collections.unmodifiableList(m_topLevelDataBlocks);
    }
 
    /**
@@ -229,21 +239,21 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    }
 
    private void validateTopLevelMagicKeys() {
-      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
-         DataBlockId dataBlockId = iterator.next();
+      for (Iterator<DataBlockDescription> iterator = m_topLevelDataBlocks.iterator(); iterator.hasNext();) {
+         DataBlockDescription dataBlockDesc = iterator.next();
 
-         if (getDataBlockDescription(dataBlockId).getHeaderMagicKeys().isEmpty()) {
+         if (dataBlockDesc.getHeaderMagicKeys().isEmpty()) {
             throw new IllegalArgumentException("Every lop-level container must define at least one magic key");
          }
       }
    }
 
    private void validateDefaultNestedContainerDefined(DataBlockId defaultNestedContainerId) {
-      for (Iterator<DataBlockId> iterator = m_topLevelDataBlockIds.iterator(); iterator.hasNext();) {
-         DataBlockId dataBlockId = iterator.next();
+      for (Iterator<DataBlockDescription> iterator = m_topLevelDataBlocks.iterator(); iterator.hasNext();) {
+         DataBlockDescription dataBlockId = iterator.next();
 
-         List<DataBlockDescription> descs = DataBlockDescription.getChildDescriptionsOfType(this, dataBlockId,
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+         List<DataBlockDescription> descs = dataBlockId
+            .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
          if (descs.size() > 0) {
             if (defaultNestedContainerId == null) {
@@ -280,51 +290,44 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       }
    }
 
-   private void autoDetectMagicKeys(Set<DataBlockId> containerIds) {
-      for (DataBlockId containerId : containerIds) {
-         DataBlockDescription containerDescription = getDataBlockDescription(containerId);
-
+   private void autoDetectMagicKeys(List<DataBlockDescription> containerDescs) {
+      for (DataBlockDescription containerDescription : containerDescs) {
          List<MagicKey> headerMagicKeys = getMagicKeysOfContainer(containerDescription, PhysicalDataBlockType.HEADER);
          headerMagicKeys.forEach(key -> containerDescription.addHeaderMagicKey(key));
          List<MagicKey> footerMagicKeys = getMagicKeysOfContainer(containerDescription, PhysicalDataBlockType.FOOTER);
          footerMagicKeys.forEach(key -> containerDescription.addFooterMagicKey(key));
 
-         List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(this, containerId,
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+         List<DataBlockDescription> payloadDescs = containerDescription
+            .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
          if (payloadDescs.size() == 1) {
-            List<DataBlockDescription> childContainerDescriptions = DataBlockDescription
-               .getChildDescriptionsOfType(this, payloadDescs.get(0).getId(), PhysicalDataBlockType.CONTAINER);
+            List<DataBlockDescription> childContainerDescriptions = payloadDescs.get(0)
+               .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
 
-            autoDetectMagicKeys(childContainerDescriptions.stream().map(cd -> cd.getId()).collect(Collectors.toSet()));
+            autoDetectMagicKeys(childContainerDescriptions);
          }
       }
    }
 
-   private void calculateContainerFieldsFixedByteOffsets(Set<DataBlockId> containerIds) {
-      for (DataBlockId containerId : containerIds) {
-         DataBlockDescription containerDescription = getDataBlockDescription(containerId);
-
+   private void calculateContainerFieldsFixedByteOffsets(List<DataBlockDescription> containerDescs) {
+      for (DataBlockDescription containerDescription : containerDescs) {
          List<DataBlockDescription> parentsWithFields = new ArrayList<>();
 
-         parentsWithFields.addAll(DataBlockDescription.getChildDescriptionsOfType(this, containerDescription.getId(),
-            PhysicalDataBlockType.HEADER));
-         parentsWithFields.addAll(DataBlockDescription.getChildDescriptionsOfType(this, containerDescription.getId(),
-            PhysicalDataBlockType.FOOTER));
-         parentsWithFields.addAll(DataBlockDescription.getChildDescriptionsOfType(this, containerDescription.getId(),
-            PhysicalDataBlockType.FIELD_BASED_PAYLOAD));
+         parentsWithFields.addAll(containerDescription.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER));
+         parentsWithFields.addAll(containerDescription.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER));
+         parentsWithFields
+            .addAll(containerDescription.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD));
 
          setFieldsFixedByteOffsets(parentsWithFields);
 
-         List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(this, containerId,
-            PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+         List<DataBlockDescription> payloadDescs = containerDescription
+            .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
          if (payloadDescs.size() == 1) {
-            List<DataBlockDescription> childContainerDescriptions = DataBlockDescription
-               .getChildDescriptionsOfType(this, payloadDescs.get(0).getId(), PhysicalDataBlockType.CONTAINER);
+            List<DataBlockDescription> childContainerDescriptions = payloadDescs.get(0)
+               .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
 
-            calculateContainerFieldsFixedByteOffsets(
-               childContainerDescriptions.stream().map(cd -> cd.getId()).collect(Collectors.toSet()));
+            calculateContainerFieldsFixedByteOffsets(childContainerDescriptions);
          }
       }
    }
@@ -336,8 +339,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       long currentOffset = 0;
 
       for (DataBlockDescription parentDesc : parentsWithFields) {
-         List<DataBlockDescription> fieldDescs = DataBlockDescription.getChildDescriptionsOfType(this,
-            parentDesc.getId(), PhysicalDataBlockType.FIELD);
+         List<DataBlockDescription> fieldDescs = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
 
          for (DataBlockDescription fieldDesc : fieldDescs) {
             fieldDesc.setFixedByteOffsetInContainer(currentOffset);
@@ -360,8 +362,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       PhysicalDataBlockType type) {
       List<MagicKey> magicKeys = new ArrayList<>();
 
-      List<DataBlockDescription> headerOrFooterDescs = DataBlockDescription.getChildDescriptionsOfType(this,
-         containerDescription.getId(), type);
+      List<DataBlockDescription> headerOrFooterDescs = containerDescription.getChildDescriptionsOfType(type);
 
       List<DataBlockId> variableSizeFieldIds = new ArrayList<>();
 
@@ -372,8 +373,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       }
 
       for (DataBlockDescription headerOrFooterDesc : headerOrFooterDescs) {
-         List<DataBlockDescription> fieldDescs = DataBlockDescription.getChildDescriptionsOfType(this,
-            headerOrFooterDesc.getId(), PhysicalDataBlockType.FIELD);
+         List<DataBlockDescription> fieldDescs = headerOrFooterDesc
+            .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
 
          if (type == PhysicalDataBlockType.FOOTER) {
             Collections.reverse(fieldDescs);
@@ -440,7 +441,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
    private final ContainerDataFormat m_dataFormat;
 
-   private final Set<DataBlockId> m_topLevelDataBlockIds = new HashSet<>();
+   private final List<DataBlockDescription> m_topLevelDataBlocks = new ArrayList<>();
 
    private final Map<DataBlockId, DataBlockDescription> m_dataBlockDescriptions = new HashMap<>();
 }

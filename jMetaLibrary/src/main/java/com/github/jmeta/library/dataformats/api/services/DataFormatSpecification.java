@@ -10,7 +10,6 @@ package com.github.jmeta.library.dataformats.api.services;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -41,7 +40,7 @@ public interface DataFormatSpecification {
    /**
     * @return the top-level data blocks
     */
-   public Set<DataBlockId> getTopLevelDataBlockIds();
+   public List<DataBlockDescription> getTopLevelDataBlockDescriptions();
 
    /**
     * @param id

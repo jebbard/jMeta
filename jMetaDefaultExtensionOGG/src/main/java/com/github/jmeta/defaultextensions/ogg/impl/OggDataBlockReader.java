@@ -35,14 +35,19 @@ public class OggDataBlockReader extends StandardDataBlockReader {
    protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
 
       if (containerId.getGlobalId().equals("ogg")) {
-         final DataBlockId packetPayloadId = DataBlockDescription.getChildDescriptionsOfType(getSpecification(),
-            PACKET_CONTAINER_ID, PhysicalDataBlockType.FIELD_BASED_PAYLOAD).get(0).getId();
-         final DataBlockId oggPagePayloadId = DataBlockDescription
-            .getChildDescriptionsOfType(getSpecification(), containerId, PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)
+
+         DataBlockDescription containerDesc = getSpecification().getDataBlockDescription(containerId);
+         DataBlockDescription packetContainerDesc = getSpecification().getDataBlockDescription(PACKET_CONTAINER_ID);
+
+         final DataBlockId packetPayloadId = packetContainerDesc
+            .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD).get(0).getId();
+         final DataBlockId oggPagePayloadId = containerDesc
+            .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD).get(0).getId();
+
+         DataBlockDescription packetPayloadDesc = getSpecification().getDataBlockDescription(packetPayloadId);
+
+         final DataBlockId segmentFieldId = packetPayloadDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD)
             .get(0).getId();
-         final DataBlockId segmentFieldId = DataBlockDescription
-            .getChildDescriptionsOfType(getSpecification(), packetPayloadId, PhysicalDataBlockType.FIELD).get(0)
-            .getId();
 
          Header header = headers.get(0);
 

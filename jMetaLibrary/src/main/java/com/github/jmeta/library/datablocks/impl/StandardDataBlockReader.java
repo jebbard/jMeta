@@ -184,8 +184,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       List<Header> headers = new ArrayList<>();
 
-      List<DataBlockDescription> headerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.HEADER);
+      DataBlockDescription actualDesc = m_spec.getDataBlockDescription(actualId);
+
+      List<DataBlockDescription> headerDescs = actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
 
       long overallHeaderSize = 0;
 
@@ -215,11 +216,10 @@ public class StandardDataBlockReader implements DataBlockReader {
       afterHeaderReading(actualId, theContext, headers);
 
       // Read payload
-      List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+      List<DataBlockDescription> payloadDescs = actualDesc
+         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
-      payloadDescs.addAll(DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
+      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
 
       // CONFIG_CHECK: Any container must specify a single PAYLOAD block
       if (payloadDescs.size() != 1)
@@ -240,8 +240,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       nextReference = nextReference.advance(payload.getTotalSize());
 
       List<Header> footers = new ArrayList<>();
-      List<DataBlockDescription> footerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.FOOTER);
+      List<DataBlockDescription> footerDescs = actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
 
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
@@ -296,8 +295,10 @@ public class StandardDataBlockReader implements DataBlockReader {
       MediumOffset nextReference = reference;
 
       List<Header> footers = new ArrayList<>();
-      List<DataBlockDescription> footerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.FOOTER);
+
+      DataBlockDescription actualDesc = m_spec.getDataBlockDescription(actualId);
+
+      List<DataBlockDescription> footerDescs = actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
 
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
@@ -329,11 +330,10 @@ public class StandardDataBlockReader implements DataBlockReader {
       afterFooterReading(actualId, theContext, footers);
 
       // Read payload
-      List<DataBlockDescription> payloadDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+      List<DataBlockDescription> payloadDescs = actualDesc
+         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
-      payloadDescs.addAll(DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
+      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
 
       // CONFIG_CHECK: Any container must specify a single PAYLOAD block
       if (payloadDescs.size() != 1)
@@ -349,8 +349,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       List<Header> headers = new ArrayList<>();
 
-      List<DataBlockDescription> headerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, actualId,
-         PhysicalDataBlockType.HEADER);
+      List<DataBlockDescription> headerDescs = actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
 
       for (int i = 0; i < headerDescs.size(); ++i) {
          DataBlockDescription headerDesc = headerDescs.get(i);
@@ -484,8 +483,9 @@ public class StandardDataBlockReader implements DataBlockReader {
    public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, FieldFunctionStack context,
       long remainingDirectParentByteCount) {
 
-      List<DataBlockDescription> fieldChildren = DataBlockDescription.getChildDescriptionsOfType(m_spec, parentId,
-         PhysicalDataBlockType.FIELD);
+      DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
+
+      List<DataBlockDescription> fieldChildren = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
 
       List<Field<?>> fields = new ArrayList<>();
 
@@ -570,8 +570,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    @Override
    public boolean identifiesDataFormat(MediumOffset reference, boolean forwardRead) {
 
-      List<DataBlockDescription> topLevelContainerDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec, null,
-         PhysicalDataBlockType.CONTAINER);
+      List<DataBlockDescription> topLevelContainerDescs = m_spec.getTopLevelDataBlockDescriptions();
 
       for (int i = 0; i < topLevelContainerDescs.size(); ++i) {
          DataBlockDescription desc = topLevelContainerDescs.get(i);
@@ -649,10 +648,11 @@ public class StandardDataBlockReader implements DataBlockReader {
          || blockDesc.getPhysicalType().equals(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)) {
          long totalSizeToSubtract = 0;
 
-         List<DataBlockDescription> headerAndFooterDescs = DataBlockDescription.getChildDescriptionsOfType(m_spec,
-            parentId, PhysicalDataBlockType.HEADER);
-         headerAndFooterDescs
-            .addAll(DataBlockDescription.getChildDescriptionsOfType(m_spec, parentId, PhysicalDataBlockType.FOOTER));
+         DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
+
+         List<DataBlockDescription> headerAndFooterDescs = parentDesc
+            .getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
+         headerAndFooterDescs.addAll(parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER));
 
          for (int i = 0; i < headerAndFooterDescs.size(); ++i) {
             DataBlockDescription headerOrFooterDesc = headerAndFooterDescs.get(i);
@@ -944,8 +944,8 @@ public class StandardDataBlockReader implements DataBlockReader {
          }
       }
 
-      for (int i = 0; i < parentDesc.getOrderedChildIds().size(); ++i) {
-         final DataBlockId id = findFirstIdField(parentDesc.getOrderedChildIds().get(i));
+      for (int i = 0; i < parentDesc.getOrderedChildren().size(); ++i) {
+         final DataBlockId id = findFirstIdField(parentDesc.getOrderedChildren().get(i).getId());
          if (id != null)
             return id;
       }
@@ -1012,7 +1012,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          null, null, null, null, null, false);
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
-         DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<DataBlockId>(),
+         DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<>(),
          unknownFieldProperties, 1, 1, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, false);
    }
 
