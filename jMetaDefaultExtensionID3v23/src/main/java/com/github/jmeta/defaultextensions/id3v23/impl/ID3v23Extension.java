@@ -48,6 +48,7 @@ public class ID3v23Extension implements Extension {
    private static final String FRAME_FLAGS_TAG_ALTER_PRESERVATION = "Tag Alter Preservation";
    private static final int FRAME_ID_SIZE = 4;
    private static final String ID3V23_GENERIC_CONTAINER_ID = "id3v23.payload.${FRAME_ID}";
+   private static final String ID3V23_GENERIC_TEXT_FRAME_ID = "id3v23.payload.${TEXT_FRAME_ID}";
    private static final byte[] ID3V23_TAG_VERSION_BYTES = new byte[] { 3, 0 };
    /**
     *
@@ -63,8 +64,13 @@ public class ID3v23Extension implements Extension {
       ID3V23_GENERIC_CONTAINER_ID + ".payload.groupId");
    private static final DataBlockId GENERIC_FRAME_PAYLOAD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".payload");
+
+   private static final DataBlockId GENERIC_TEXT_FRAME_ID = new DataBlockId(ID3v23, ID3V23_GENERIC_TEXT_FRAME_ID);
+
    private static final DataBlockId GENERIC_INFORMATION_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".payload.information");
+      ID3V23_GENERIC_TEXT_FRAME_ID + ".payload.information");
+   private static final DataBlockId GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID = new DataBlockId(ID3v23,
+      ID3V23_GENERIC_CONTAINER_ID + ".payload.data");
    private static final DataBlockId ID3V23_EXTENDED_HEADER_FIELD_CRC_ID = new DataBlockId(ID3v23,
       "id3v23.extHeader.crc");
    private static final DataBlockId ID3V23_EXTENDED_HEADER_ID = new DataBlockId(ID3v23, "id3v23.extHeader");
@@ -127,9 +133,9 @@ public class ID3v23Extension implements Extension {
 
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(ID3v23Extension.ID3v23);
 
-      DataBlockId tpeInformation = new DataBlockId(ID3v23, "id3v23.payload.TPE1.payload.information");
-      DataBlockId titInformation = new DataBlockId(ID3v23, "id3v23.payload.TIT2.payload.information");
-      DataBlockId trckInformation = new DataBlockId(ID3v23, "id3v23.payload.TRCK.payload.information");
+      // DataBlockId tpeInformation = new DataBlockId(ID3v23, "id3v23.payload.TPE1.payload.information");
+      // DataBlockId titInformation = new DataBlockId(ID3v23, "id3v23.payload.TIT2.payload.information");
+      // DataBlockId trckInformation = new DataBlockId(ID3v23, "id3v23.payload.TRCK.payload.information");
       // DataBlockId talbInformation = new DataBlockId(ID3v23, "id3v23.payload.TALB.payload.information");
 
       // @formatter:off
@@ -233,10 +239,19 @@ public class ID3v23Extension implements Extension {
                      .withStaticLengthOf(1)
                      .withOccurrences(0, 1)
                   .finishField()
+                  .addBinaryField("data", "Payload data field", "The payload data field")
+                     .withLengthOf(1, DataBlockDescription.UNLIMITED)
+                  .finishField()
+               .finishFieldBasedPayload()
+            .finishContainer()
+            .addGenericContainerWithFieldBasedPayload("TEXT_FRAME_ID", "GENERIC_ID3v23_TEXT_FRAME", "The id3v23 GENERIC_TEXT_FRAME")
+               .cloneFrom(GENERIC_FRAME_ID)
+               .getPayload()
+                  .removeField(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID.getLocalId())
                   .addEnumeratedField(Charset.class, "textEncoding", "Text encoding", "Text encoding")
                      .withStaticLengthOf(1)
                      .withDefaultValue(Charsets.CHARSET_ISO)
-                     .asCharacterEncodingOf(GENERIC_INFORMATION_ID, tpeInformation, titInformation, trckInformation)
+                     .asCharacterEncodingOf(GENERIC_INFORMATION_ID)
                      .addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO)
                      .addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16)
                   .finishField()
@@ -244,13 +259,18 @@ public class ID3v23Extension implements Extension {
                      .withTerminationCharacter('\u0000')
                      .withLengthOf(1, DataBlockDescription.UNLIMITED)
                   .finishField()
-//                  .addBinaryField("data", "Payload data field", "The payload data field")
-//                     .withLengthOf(1, DataBlockDescription.UNLIMITED)
-//                  .finishField()
                .finishFieldBasedPayload()
             .finishContainer()
+            .addContainerWithFieldBasedPayload("TPE1", "Lead performer/soloist", "The ID3v23 Lead performer/soloist")
+               .cloneFrom(GENERIC_TEXT_FRAME_ID)
+            .finishContainer()
+            .addContainerWithFieldBasedPayload("TRCK", "Track number/Position in set", "The ID3v23 Track number/Position in set")
+               .cloneFrom(GENERIC_TEXT_FRAME_ID)
+            .finishContainer()
+            .addContainerWithFieldBasedPayload("TIT2", "Title/songname/content description", "The ID3v23 Title/songname/content description")
+               .cloneFrom(GENERIC_TEXT_FRAME_ID)
+            .finishContainer()
             .addContainerWithFieldBasedPayload("padding", "Padding", "Padding")
-               .cloneFrom(GENERIC_FRAME_ID)
                .withOccurrences(0, 1)
                .withLengthOf(1, DataBlockDescription.UNLIMITED)
                .addHeader("header", "Padding header", "Padding header")

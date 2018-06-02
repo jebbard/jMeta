@@ -10,7 +10,8 @@
 package com.github.jmeta.library.dataformats.impl.builder;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
@@ -42,7 +43,9 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    private boolean isDefaultNestedContainer = false;
 
    private final ContainerDataFormat dataFormat;
-   private final List<DataBlockDescription> childDescriptions = new ArrayList<>();
+   // We use a map here to ensure we cannot add children with the same id multiple times; this is especially important
+   // for the cloning to work
+   private final Map<DataBlockId, DataBlockDescription> childDescriptions = new LinkedHashMap<>();
    private String globalId;
    private String name;
    private String description;
@@ -127,7 +130,13 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    public void addChildDescription(DataBlockDescription childDesc) {
       Reject.ifNull(childDesc, "childDesc");
 
-      childDescriptions.add(childDesc);
+      childDescriptions.put(childDesc.getId(), childDesc);
+   }
+
+   public void removeChildDescription(DataBlockId childId) {
+      Reject.ifNull(childId, "childId");
+
+      childDescriptions.remove(childId);
    }
 
    /**
@@ -186,8 +195,8 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     */
    protected P finish() {
       DataBlockDescription myDescription = new DataBlockDescription(new DataBlockId(dataFormat, globalId), name,
-         description, type, childDescriptions, fieldProperties, minimumOccurrences, maximumOccurrences,
-         minimumByteLength, maximumByteLength, isGeneric);
+         description, type, new ArrayList<>(childDescriptions.values()), fieldProperties, minimumOccurrences,
+         maximumOccurrences, minimumByteLength, maximumByteLength, isGeneric);
 
       parentBuilder.addChildDescription(myDescription);
 

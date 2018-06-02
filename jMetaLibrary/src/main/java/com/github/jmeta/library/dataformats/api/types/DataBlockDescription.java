@@ -268,6 +268,17 @@ public class DataBlockDescription {
       return result;
    }
 
+   public boolean hasChildWithLocalId(String localId) {
+
+      for (DataBlockDescription dataBlockDescription : orderedChildren) {
+         if (dataBlockDescription.getId().getLocalId().equals(localId)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    /**
     * @see java.lang.Object#equals(java.lang.Object)
     */
@@ -387,15 +398,15 @@ public class DataBlockDescription {
 
             if (payloadChildren.size() != 1) {
                throw new IllegalArgumentException(
-                  messagePrefix + "Data blocks of type CONTAINER must have exactly one payload container");
+                  messagePrefix + "Data blocks of type CONTAINER must have exactly one payload");
             }
          break;
          case CONTAINER_BASED_PAYLOAD:
             List<DataBlockDescription> containerChildren = getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
 
             if (containerChildren.size() != orderedChildren.size()) {
-               throw new IllegalArgumentException(messagePrefix
-                  + "Data blocks of type CONTAINER_BASED_PAYLOAD must have exactly one payload container");
+               throw new IllegalArgumentException(
+                  messagePrefix + "Data blocks of type CONTAINER_BASED_PAYLOAD must only have CONTAINERs as children");
             }
          break;
       }

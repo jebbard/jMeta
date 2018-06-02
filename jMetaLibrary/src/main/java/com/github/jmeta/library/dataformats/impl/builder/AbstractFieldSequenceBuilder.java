@@ -109,24 +109,24 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#removeField(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#removeField(java.lang.String)
     */
    @Override
-   public FieldSequenceBuilder<C> removeField(DataBlockId fieldId) {
+   public FieldSequenceBuilder<C> removeField(String localId) {
 
-      DataBlockDescription fieldDescription = getRootBuilder().getDataBlockDescription(fieldId);
+      DataBlockId fieldSequenceId = new DataBlockId(getDataFormat(), getGlobalId());
+      DataBlockDescription fieldSequenceDescription = getRootBuilder().getDataBlockDescription(fieldSequenceId);
 
-      if (fieldDescription == null) {
-         throw new IllegalArgumentException("No such field id found: <" + fieldId
-            + "> - ensure that the field you want to remove has already been added to this builder and finished");
-      }
-
-      if (!fieldDescription.getId().getGlobalId().startsWith(getGlobalId())) {
+      if (!fieldSequenceDescription.hasChildWithLocalId(localId)) {
          throw new IllegalArgumentException(
-            "Field id <" + fieldId + "> - is not a child id of <" + getGlobalId() + ">");
+            "Field local id <" + localId + "> - not found as a a child id of <" + getGlobalId() + ">");
       }
 
-      getRootBuilder().removeDataBlockDescription(fieldId);
+      DataBlockId existingChildId = new DataBlockId(getDataFormat(), fieldSequenceId, localId);
+
+      getRootBuilder().removeDataBlockDescription(existingChildId);
+
+      removeChildDescription(existingChildId);
 
       return this;
    }

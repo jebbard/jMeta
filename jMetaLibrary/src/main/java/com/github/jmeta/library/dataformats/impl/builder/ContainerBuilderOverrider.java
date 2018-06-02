@@ -9,23 +9,34 @@
  */
 package com.github.jmeta.library.dataformats.impl.builder;
 
+import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.EnumeratedFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPayloadBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.FlagSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.HeaderBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.FlagDescription;
+import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
 /**
@@ -36,6 +47,8 @@ public class ContainerBuilderOverrider {
 
    public static void overrideContainerBuilderWithDescription(ContainerBuilder<?, ?> containerBuilder,
       DataBlockId existingContainerId, PhysicalDataBlockType payloadType) {
+
+      DataBlockId clonedContainerId = new DataBlockId(containerBuilder.getDataFormat(), containerBuilder.getGlobalId());
 
       DataBlockDescription containerDescription = containerBuilder.getRootBuilder()
          .getDataBlockDescription(existingContainerId);
@@ -80,7 +93,9 @@ public class ContainerBuilderOverrider {
 
          setLengthAndOccurrences(hb, headerDescription);
 
-         cloneFields(hb, headerDescription, messagePrefix);
+         cloneFields(hb, headerDescription, messagePrefix, existingContainerId, clonedContainerId);
+
+         hb.finishHeader();
       }
 
       for (DataBlockDescription footerDescription : footerDescriptions) {
@@ -89,7 +104,9 @@ public class ContainerBuilderOverrider {
 
          setLengthAndOccurrences(fb, footerDescription);
 
-         cloneFields(fb, footerDescription, messagePrefix);
+         cloneFields(fb, footerDescription, messagePrefix, existingContainerId, clonedContainerId);
+
+         fb.finishFooter();
       }
 
       if (payloadType == PhysicalDataBlockType.FIELD_BASED_PAYLOAD) {
@@ -98,7 +115,10 @@ public class ContainerBuilderOverrider {
 
          setLengthAndOccurrences(fieldBasedPayloadBuilder, payloadDescription);
 
-         cloneFields(fieldBasedPayloadBuilder, payloadDescription, messagePrefix);
+         cloneFields(fieldBasedPayloadBuilder, payloadDescription, messagePrefix, existingContainerId,
+            clonedContainerId);
+
+         fieldBasedPayloadBuilder.finishFieldBasedPayload();
       } else if (payloadType == PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
          ContainerBasedPayloadBuilder<?> containerBasedPayloadBuilder = (ContainerBasedPayloadBuilder<?>) containerBuilder
             .getPayload();
@@ -128,6 +148,8 @@ public class ContainerBuilderOverrider {
 
                overrideContainerBuilderWithDescription(childContainerBuilder, childContainerDescription.getId(),
                   PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+               childContainerBuilder.finishContainer();
             } else {
                ContainerBuilder<?, ?> childContainerBuilder = childContainerDescription.isGeneric()
                   ? containerBasedPayloadBuilder.addGenericContainerWithContainerBasedPayload(
@@ -141,8 +163,12 @@ public class ContainerBuilderOverrider {
 
                overrideContainerBuilderWithDescription(childContainerBuilder, childContainerDescription.getId(),
                   PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+
+               childContainerBuilder.finishContainer();
             }
          }
+
+         containerBasedPayloadBuilder.finishContainerBasedPayload();
       }
    }
 
@@ -150,9 +176,13 @@ public class ContainerBuilderOverrider {
     * @param fsb
     * @param fieldSequenceDescription
     * @param messagePrefix
+    * @param existingContainerId
+    *           TODO
+    * @param clonedContainerId
+    *           TODO
     */
    private static void cloneFields(FieldSequenceBuilder<?> fsb, DataBlockDescription fieldSequenceDescription,
-      String messagePrefix) {
+      String messagePrefix, DataBlockId existingContainerId, DataBlockId clonedContainerId) {
       List<DataBlockDescription> fieldDescriptions = fieldSequenceDescription
          .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
 
@@ -168,35 +198,110 @@ public class ContainerBuilderOverrider {
             BinaryFieldBuilder<?> bfb = fsb.addBinaryField(fieldDescription.getId().getLocalId(),
                fieldDescription.getName(), fieldDescription.getDescription());
 
-            setLengthAndOccurrences(bfb, fieldDescription);
+            setCommonFieldProperties(fieldDescription, (FieldProperties<byte[]>) fieldProperties, bfb,
+               existingContainerId, clonedContainerId);
+            bfb.finishField();
+         } else if (fieldProperties.getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
+            NumericFieldBuilder<?> nfb = fsb.addNumericField(fieldDescription.getId().getLocalId(),
+               fieldDescription.getName(), fieldDescription.getDescription());
+            nfb.withFixedByteOrder(fieldProperties.getFixedByteOrder());
 
-            bfb.withDefaultValue((byte[]) fieldProperties.getDefaultValue());
+            setCommonFieldProperties(fieldDescription, (FieldProperties<Long>) fieldProperties, nfb,
+               existingContainerId, clonedContainerId);
+            nfb.finishField();
+         } else if (fieldProperties.getFieldType() == FieldType.STRING) {
+            StringFieldBuilder<?> sfb = fsb.addStringField(fieldDescription.getId().getLocalId(),
+               fieldDescription.getName(), fieldDescription.getDescription());
 
-            if (fieldProperties.isMagicKey()) {
-               bfb.asMagicKey();
+            sfb.withFixedCharset(fieldProperties.getFixedCharacterEncoding());
+            sfb.withTerminationCharacter(fieldProperties.getTerminationCharacter());
+
+            setCommonFieldProperties(fieldDescription, (FieldProperties<String>) fieldProperties, sfb,
+               existingContainerId, clonedContainerId);
+            sfb.finishField();
+         } else if (fieldProperties.getFieldType() == FieldType.FLAGS) {
+            FlagsFieldBuilder<?> ffb = fsb.addFlagsField(fieldDescription.getId().getLocalId(),
+               fieldDescription.getName(), fieldDescription.getDescription());
+
+            setCommonFieldProperties(fieldDescription, (FieldProperties<Flags>) fieldProperties, ffb,
+               existingContainerId, clonedContainerId);
+
+            FlagSpecificationBuilder<?> flagSpecBuilder = ffb.withFlagSpecification(
+               fieldProperties.getFlagSpecification().getByteLength(),
+               fieldProperties.getFlagSpecification().getByteOrdering());
+
+            flagSpecBuilder.withDefaultFlagBytes(fieldProperties.getFlagSpecification().getDefaultFlagBytes());
+
+            Map<String, FlagDescription> flagDescriptions = fieldProperties.getFlagSpecification()
+               .getFlagDescriptions();
+
+            for (Iterator<String> iterator = flagDescriptions.keySet().iterator(); iterator.hasNext();) {
+               String nextFlagName = iterator.next();
+
+               flagSpecBuilder.addFlagDescription(flagDescriptions.get(nextFlagName));
             }
 
-            List<FieldFunction> fieldFunctions = fieldProperties.getFieldFunctions();
+            flagSpecBuilder.finishFlagSpecification();
+            ffb.finishField();
+         } else if (fieldProperties.getFieldType() == FieldType.ENUMERATED) {
+            // TODO ENsure it is working for any type!!!
+            EnumeratedFieldBuilder<?, Charset> bfb = fsb.addEnumeratedField(Charset.class,
+               fieldDescription.getId().getLocalId(), fieldDescription.getName(), fieldDescription.getDescription());
 
-            for (FieldFunction fieldFunction : fieldFunctions) {
-               FieldFunctionType<?> ffType = fieldFunction.getFieldFunctionType();
-               Set<DataBlockId> affectedFields = fieldFunction.getAffectedBlockIds();
+            setCommonFieldProperties(fieldDescription, (FieldProperties<Charset>) fieldProperties, bfb,
+               existingContainerId, clonedContainerId);
 
-               if (ffType == FieldFunctionType.BYTE_ORDER_OF) {
-                  bfb.asByteOrderOf((DataBlockId[]) affectedFields.toArray());
-               } else if (ffType == FieldFunctionType.CHARACTER_ENCODING_OF) {
-                  bfb.asCharacterEncodingOf((DataBlockId[]) affectedFields.toArray());
-               } else if (ffType == FieldFunctionType.COUNT_OF) {
-                  bfb.asCountOf((DataBlockId[]) affectedFields.toArray());
-               } else if (ffType == FieldFunctionType.ID_OF) {
-                  bfb.asIdOf((DataBlockId[]) affectedFields.toArray());
-               } else if (ffType == FieldFunctionType.PRESENCE_OF) {
-                  bfb.indicatesPresenceOf(fieldFunction.getFlagName(), fieldFunction.getFlagValue(),
-                     (DataBlockId[]) affectedFields.toArray());
-               } else if (ffType == FieldFunctionType.SIZE_OF) {
-                  bfb.asSizeOf((DataBlockId[]) affectedFields.toArray());
-               }
+            for (Iterator<?> iterator = fieldProperties.getEnumeratedValues().keySet().iterator(); iterator
+               .hasNext();) {
+               Object nextKey = iterator.next();
+               byte[] nextValue = fieldProperties.getEnumeratedValues().get(nextKey);
+
+               bfb.addEnumeratedValue(nextValue, (Charset) nextKey);
             }
+            bfb.finishField();
+         }
+      }
+   }
+
+   private static <P, FIT, C extends FieldBuilder<P, FIT, C>> void setCommonFieldProperties(
+      DataBlockDescription fieldDescription, FieldProperties<FIT> fieldProperties, FieldBuilder<P, FIT, C> fb,
+      DataBlockId existingContainerId, DataBlockId clonedContainerId) {
+      setLengthAndOccurrences(fb, fieldDescription);
+
+      fb.withDefaultValue(fieldProperties.getDefaultValue());
+
+      if (fieldProperties.isMagicKey()) {
+         fb.asMagicKey();
+      }
+
+      List<FieldFunction> fieldFunctions = fieldProperties.getFieldFunctions();
+
+      for (FieldFunction fieldFunction : fieldFunctions) {
+         FieldFunctionType<?> ffType = fieldFunction.getFieldFunctionType();
+         Set<DataBlockId> affectedIds = fieldFunction.getAffectedBlockIds();
+
+         DataBlockId[] replacedAffectedIds = new DataBlockId[affectedIds.size()];
+
+         // Replace affected ids with actual id
+         int i = 0;
+         for (DataBlockId dataBlockId : affectedIds) {
+            String replacedGlobalId = dataBlockId.getGlobalId().replace(existingContainerId.getGlobalId(),
+               clonedContainerId.getGlobalId());
+            replacedAffectedIds[i++] = new DataBlockId(dataBlockId.getDataFormat(), replacedGlobalId);
+         }
+
+         if (ffType == FieldFunctionType.BYTE_ORDER_OF) {
+            fb.asByteOrderOf(replacedAffectedIds);
+         } else if (ffType == FieldFunctionType.CHARACTER_ENCODING_OF) {
+            fb.asCharacterEncodingOf(replacedAffectedIds);
+         } else if (ffType == FieldFunctionType.COUNT_OF) {
+            fb.asCountOf(replacedAffectedIds);
+         } else if (ffType == FieldFunctionType.ID_OF) {
+            fb.asIdOf(replacedAffectedIds);
+         } else if (ffType == FieldFunctionType.PRESENCE_OF) {
+            fb.indicatesPresenceOf(fieldFunction.getFlagName(), fieldFunction.getFlagValue(), replacedAffectedIds);
+         } else if (ffType == FieldFunctionType.SIZE_OF) {
+            fb.asSizeOf(replacedAffectedIds);
          }
       }
    }
