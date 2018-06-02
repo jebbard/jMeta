@@ -15,25 +15,24 @@ import java.nio.charset.Charset;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
 
 /**
  * {@link UnsignedNumericFieldConverter}
  *
  */
-public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
+public class UnsignedNumericFieldConverter extends AbstractBaseFieldConverter<Long> {
 
    private static final int MAX_LONG_BYTE_SIZE = Long.SIZE / Byte.SIZE;
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
+    *      java.nio.charset.Charset)
+    */
    @Override
-   public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+   protected Long convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws BinaryValueConversionException {
-
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(binaryValue, "binaryValue");
 
       long fieldByteCount = binaryValue.remaining();
 
@@ -69,14 +68,14 @@ public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
       return null;
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
+    *      java.nio.charset.Charset)
+    */
    @Override
-   public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws InterpretedValueConversionException {
-
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(interpretedValue, "interpretedValue");
+   protected ByteBuffer convertInterpretedToBinary(Long interpretedValue, DataBlockDescription desc,
+      ByteOrder byteOrder, Charset characterEncoding) throws InterpretedValueConversionException {
 
       long fieldByteCount = desc.getMaximumByteLength();
 
@@ -103,5 +102,4 @@ public class UnsignedNumericFieldConverter implements FieldConverter<Long> {
 
       return buffer;
    }
-
 }

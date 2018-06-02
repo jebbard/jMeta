@@ -117,7 +117,7 @@ public class ID3v1Extension implements Extension {
              .addNumericField("track", "track", "The ID3v1 track")
                 .withDefaultValue(0L).withStaticLengthOf(1)
              .finishField()
-             .addEnumeratedField(String.class, "genre", "genre", "The ID3v1 genre")
+             .addStringField("genre", "genre", "The ID3v1 genre")
                 .withDefaultValue(""+nullCharacter).withStaticLengthOf(1)
                 .addEnumeratedValue(new byte[]{99}, "Rock")
                 .addEnumeratedValue(new byte[]{2}, "Jazz")

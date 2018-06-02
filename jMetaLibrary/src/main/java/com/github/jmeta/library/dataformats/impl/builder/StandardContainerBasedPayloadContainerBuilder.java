@@ -76,7 +76,7 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
    @Override
    public ContainerBuilder<P, ContainerBasedPayloadBuilder<P>> cloneFrom(DataBlockId existingContainerId) {
 
-      ContainerBuilderOverrider.overrideContainerBuilderWithDescription(this, existingContainerId,
+      ContainerBuilderCloner.cloneContainerIntoBuilder(this, existingContainerId,
          PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
       return this;

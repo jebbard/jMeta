@@ -23,8 +23,5 @@ public interface FieldSequenceBuilder<C extends DataBlockDescriptionBuilder<C>> 
 
    FlagsFieldBuilder<C> addFlagsField(String localId, String name, String description);
 
-   <FIT> EnumeratedFieldBuilder<C, FIT> addEnumeratedField(Class<FIT> type, String localId, String name,
-      String description);
-
    FieldSequenceBuilder<C> removeField(String localId);
 }

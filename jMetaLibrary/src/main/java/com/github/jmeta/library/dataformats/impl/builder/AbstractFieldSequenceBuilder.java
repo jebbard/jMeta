@@ -12,7 +12,6 @@ package com.github.jmeta.library.dataformats.impl.builder;
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.EnumeratedFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
@@ -95,17 +94,6 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
    @Override
    public FlagsFieldBuilder<C> addFlagsField(String localId, String name, String description) {
       return new StandardFlagsFieldBuilder<>((C) this, localId, name, description, isGeneric());
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#addEnumeratedField(java.lang.Class,
-    *      java.lang.String, java.lang.String, java.lang.String)
-    */
-   @SuppressWarnings("unchecked")
-   @Override
-   public <FIT> EnumeratedFieldBuilder<C, FIT> addEnumeratedField(Class<FIT> type, String localId, String name,
-      String description) {
-      return new StandardEnumeratedFieldBuilder<>((C) this, localId, name, description, isGeneric());
    }
 
    /**

@@ -40,6 +40,7 @@ import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
+import com.github.jmeta.utility.byteutils.api.services.ByteOrders;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -501,12 +502,15 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataBlockDescription fieldDesc = fieldChildren.get(i);
 
          // Update current character encoding via CHARACTER_ENCODING_OF
-         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF))
-            currentCharset = context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF);
+         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF)) {
+            String charsetName = context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF);
+            currentCharset = Charset.forName(charsetName);
+         }
 
          // Update current byte order via BYTE_ORDER_OF
          if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF))
-            currentByteOrder = context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF);
+            currentByteOrder = ByteOrders
+               .fromString(context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF));
 
          // Fixed charset and byte order override currently set charset or byte order
          actualByteOrder = currentByteOrder;
@@ -1008,8 +1012,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       DataBlockId unknownBlockId = new DataBlockId(m_spec.getDataFormat(), parentId,
          DataFormatSpecification.UNKNOWN_FIELD_ID);
 
-      FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
-         null, null, null, null, null, false);
+      FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 },
+         null, null, null, null, null, null, false);
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<>(),

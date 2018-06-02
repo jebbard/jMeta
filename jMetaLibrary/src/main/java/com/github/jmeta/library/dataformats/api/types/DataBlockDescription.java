@@ -375,6 +375,25 @@ public class DataBlockDescription {
       Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
 
       // Validate children
+      validateChildren();
+
+      // Validate field properties
+      if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
+         throw new IllegalArgumentException(
+            messagePrefix + "Data block is typed as FIELD, but its field properties are null");
+      } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
+         throw new IllegalArgumentException(
+            messagePrefix + "Data block not typed as FIELD, but it has non-null field properties");
+      }
+
+      if (physicalType == PhysicalDataBlockType.FIELD) {
+         validateFieldProperties(messagePrefix, getFieldProperties());
+      }
+   }
+
+   public void validateChildren() {
+      String messagePrefix = "Error validating [" + id + "]: ";
+
       switch (physicalType) {
          case FIELD:
             if (orderedChildren.size() != 0) {
@@ -410,19 +429,6 @@ public class DataBlockDescription {
             }
          break;
       }
-
-      // Validate field properties
-      if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
-         throw new IllegalArgumentException(
-            messagePrefix + "Data block is typed as FIELD, but its field properties are null");
-      } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
-         throw new IllegalArgumentException(
-            messagePrefix + "Data block not typed as FIELD, but it has non-null field properties");
-      }
-
-      if (physicalType == PhysicalDataBlockType.FIELD) {
-         validateFieldProperties(messagePrefix, getFieldProperties());
-      }
    }
 
    /**
@@ -451,30 +457,22 @@ public class DataBlockDescription {
       }
 
       // Validate enumerated fields
-      if (fieldProperties.getFieldType() == FieldType.ENUMERATED) {
-         if (fieldProperties.getEnumeratedValues() == null || fieldProperties.getEnumeratedValues().isEmpty()) {
+      for (Iterator<?> enumValueIterator = fieldProperties.getEnumeratedValues().keySet().iterator(); enumValueIterator
+         .hasNext();) {
+         Object nextKey = enumValueIterator.next();
+         byte[] nextValue = fieldProperties.getEnumeratedValues().get(nextKey);
+
+         if (hasFixedSize() && nextValue.length > minimumByteLength) {
             throw new IllegalArgumentException(
-               messagePrefix + "Enumerated field does not define any enumerated values");
+               messagePrefix + "Binary representation of enmuerated value <" + nextKey + "> with length <"
+                  + nextValue.length + "> is longer than the field's fixed size which is <" + minimumByteLength + ">");
          }
+      }
 
-         for (Iterator<?> enumValueIterator = fieldProperties.getEnumeratedValues().keySet()
-            .iterator(); enumValueIterator.hasNext();) {
-            Object nextKey = enumValueIterator.next();
-            byte[] nextValue = fieldProperties.getEnumeratedValues().get(nextKey);
-
-            if (hasFixedSize() && nextValue.length > minimumByteLength) {
-               throw new IllegalArgumentException(messagePrefix + "Binary representation of enmuerated value <"
-                  + nextKey + "> with length <" + nextValue.length
-                  + "> is longer than the field's fixed size which is <" + minimumByteLength + ">");
-            }
-         }
-
-         if (fieldProperties.getDefaultValue() != null) {
-            if (!fieldProperties.getEnumeratedValues().containsKey(fieldProperties.getDefaultValue())) {
-               throw new IllegalArgumentException(
-                  messagePrefix + "Default field value <" + fieldProperties.getDefaultValue()
-                     + "> must be contained in list of enumerated values, but it is not");
-            }
+      if (!fieldProperties.getEnumeratedValues().isEmpty() && fieldProperties.getDefaultValue() != null) {
+         if (!fieldProperties.getEnumeratedValues().containsKey(fieldProperties.getDefaultValue())) {
+            throw new IllegalArgumentException(messagePrefix + "Default field value <"
+               + fieldProperties.getDefaultValue() + "> must be contained in list of enumerated values, but it is not");
          }
       }
 

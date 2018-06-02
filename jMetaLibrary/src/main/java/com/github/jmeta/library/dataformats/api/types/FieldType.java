@@ -38,11 +38,6 @@ public class FieldType<T> {
     */
    public static final FieldType<Flags> FLAGS = new FieldType<>("FLAGS");
 
-   /**
-    *
-    */
-   public static final FieldType<?> ENUMERATED = new FieldType<>("ENUMERATED");
-
    public String getId() {
       return id;
    }

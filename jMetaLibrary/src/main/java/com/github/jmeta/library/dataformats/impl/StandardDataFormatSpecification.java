@@ -115,6 +115,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * @return
     */
    private DataBlockDescription createConcreteDescription(DataBlockId id) {
+      System.out.println("ID:" + id);
+
       DataBlockId matchingGenericId = getMatchingGenericId(id);
 
       DataBlockDescription genericDescription = getDataBlockDescription(matchingGenericId);
@@ -403,10 +405,11 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                } else if (fieldDesc.getFieldProperties().getFieldType() == FieldType.BINARY) {
                   magicKeys.add(new MagicKey((byte[]) fieldDesc.getFieldProperties().getDefaultValue(),
                      fieldDesc.getId(), magicKeyOffset));
-               } else if (fieldDesc.getFieldProperties().getFieldType() == FieldType.ENUMERATED) {
-                  for (Object enumeratedValue : fieldDesc.getFieldProperties().getEnumeratedValues().keySet()) {
-                     magicKeys.add(new MagicKey((String) enumeratedValue, fieldDesc.getId(), magicKeyOffset));
-                  }
+                  // TODO Add magic keys if enumerated and not fixed!
+                  // } else if (fieldDesc.getFieldProperties().getFieldType() == FieldType.ENUMERATED) {
+                  // for (Object enumeratedValue : fieldDesc.getFieldProperties().getEnumeratedValues().keySet()) {
+                  // magicKeys.add(new MagicKey((String) enumeratedValue, fieldDesc.getId(), magicKeyOffset));
+                  // }
                }
             } else {
                if (type == PhysicalDataBlockType.HEADER) {

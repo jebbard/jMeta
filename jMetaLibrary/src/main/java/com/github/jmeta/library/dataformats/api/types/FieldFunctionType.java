@@ -7,9 +7,6 @@
 
 package com.github.jmeta.library.dataformats.api.types;
 
-import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 // TODO: SIZE_OF is problematic - See Vorbis user comment "length" - current implementation won't work
@@ -39,12 +36,12 @@ public class FieldFunctionType<T> {
    /**
     *
     */
-   public static final FieldFunctionType<ByteOrder> BYTE_ORDER_OF = new FieldFunctionType<>("BYTE_ORDER_OF");
+   public static final FieldFunctionType<String> BYTE_ORDER_OF = new FieldFunctionType<>("BYTE_ORDER_OF");
 
    /**
     *
     */
-   public static final FieldFunctionType<Charset> CHARACTER_ENCODING_OF = new FieldFunctionType<>(
+   public static final FieldFunctionType<String> CHARACTER_ENCODING_OF = new FieldFunctionType<>(
       "CHARACTER_ENCODING_OF");
 
    /**

@@ -102,7 +102,7 @@ public class StandardFieldBasedPayloadContainerBuilder<P extends ContainerSequen
    @Override
    public ContainerBuilder<P, FieldBasedPayloadBuilder<P>> cloneFrom(DataBlockId existingContainerId) {
 
-      ContainerBuilderOverrider.overrideContainerBuilderWithDescription(this, existingContainerId, PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+      ContainerBuilderCloner.cloneContainerIntoBuilder(this, existingContainerId, PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
       return this;
    }

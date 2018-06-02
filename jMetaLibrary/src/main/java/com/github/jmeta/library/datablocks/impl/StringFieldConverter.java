@@ -17,22 +17,21 @@ import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionE
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
-import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link StringFieldConverter}
  *
  */
-public class StringFieldConverter implements FieldConverter<String> {
+public class StringFieldConverter extends AbstractBaseFieldConverter<String> {
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
+    *      java.nio.charset.Charset)
+    */
    @Override
-   public String toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+   protected String convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws BinaryValueConversionException {
-
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "spec");
-      Reject.ifNull(binaryValue, "byteValue");
 
       if (binaryValue.remaining() > Integer.MAX_VALUE)
          throw new BinaryValueConversionException(
@@ -63,14 +62,14 @@ public class StringFieldConverter implements FieldConverter<String> {
       }
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
+    *      java.nio.charset.Charset)
+    */
    @Override
-   public ByteBuffer toBinary(String interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws InterpretedValueConversionException {
-
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(interpretedValue, "interpretedValue");
+   protected ByteBuffer convertInterpretedToBinary(String interpretedValue, DataBlockDescription desc,
+      ByteOrder byteOrder, Charset characterEncoding) throws InterpretedValueConversionException {
 
       // CONFIG_CHECK: Check for supported Encodings
       try {
@@ -81,5 +80,4 @@ public class StringFieldConverter implements FieldConverter<String> {
             interpretedValue, byteOrder, characterEncoding);
       }
    }
-
 }

@@ -178,6 +178,17 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#addEnumeratedValue(byte[],
+    *      java.lang.Object)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C addEnumeratedValue(byte[] binaryValue, FIT interpretedValue) {
+      enumeratedValues.put(interpretedValue, binaryValue);
+      return (C) this;
+   }
+
+   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#finishField()
     */
    @Override
@@ -188,10 +199,6 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
       setFieldProperties(fieldProperties);
 
       return finish();
-   }
-
-   protected Map<FIT, byte[]> getEnumeratedValues() {
-      return enumeratedValues;
    }
 
    protected void setFlagSpecification(FlagSpecification flagSpecification) {

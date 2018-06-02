@@ -18,22 +18,21 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
-import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link FlagsFieldConverter}
  *
  */
-public class FlagsFieldConverter implements FieldConverter<Flags> {
+public class FlagsFieldConverter extends AbstractBaseFieldConverter<Flags> {
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
+    *      java.nio.charset.Charset)
+    */
    @Override
-   public Flags toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+   protected Flags convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
       Charset characterEncoding) throws BinaryValueConversionException {
-
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "spec");
-      Reject.ifNull(binaryValue, "byteValue");
 
       int staticFlagLength = desc.getFieldProperties().getFlagSpecification().getByteLength();
       if (binaryValue.remaining() > staticFlagLength)
@@ -51,16 +50,15 @@ public class FlagsFieldConverter implements FieldConverter<Flags> {
       return flags;
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
+    *      java.nio.charset.Charset)
+    */
    @Override
-   public ByteBuffer toBinary(Flags interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws InterpretedValueConversionException {
-
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(interpretedValue, "interpretedValue");
+   protected ByteBuffer convertInterpretedToBinary(Flags interpretedValue, DataBlockDescription desc,
+      ByteOrder byteOrder, Charset characterEncoding) throws InterpretedValueConversionException {
 
       return ByteBuffer.wrap(interpretedValue.asArray());
    }
-
 }

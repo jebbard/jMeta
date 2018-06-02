@@ -42,7 +42,6 @@ public class FieldProperties<T> {
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
       ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey) {
       // Reject.ifNull(defaultValue, "defaultValue");
-
       m_fieldType = fieldType;
       m_defaultValue = defaultValue;
       m_terminationCharacter = terminationCharacter;
@@ -73,7 +72,7 @@ public class FieldProperties<T> {
     *
     * @return fieldType
     */
-   public FieldType<?> getFieldType() {
+   public FieldType<T> getFieldType() {
 
       return m_fieldType;
    }
@@ -244,7 +243,7 @@ public class FieldProperties<T> {
 
    private final FlagSpecification m_flagSpecification;
 
-   private final FieldType<?> m_fieldType;
+   private final FieldType<T> m_fieldType;
 
    private final Charset m_fixedCharset;
 

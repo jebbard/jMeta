@@ -10,7 +10,6 @@
 package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -248,12 +247,12 @@ public class ID3v23Extension implements Extension {
                .cloneFrom(GENERIC_FRAME_ID)
                .getPayload()
                   .removeField(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID.getLocalId())
-                  .addEnumeratedField(Charset.class, "textEncoding", "Text encoding", "Text encoding")
+                  .addStringField("textEncoding", "Text encoding", "Text encoding")
                      .withStaticLengthOf(1)
-                     .withDefaultValue(Charsets.CHARSET_ISO)
+                     .withDefaultValue(Charsets.CHARSET_ISO.name())
                      .asCharacterEncodingOf(GENERIC_INFORMATION_ID)
-                     .addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO)
-                     .addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16)
+                     .addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO.name())
+                     .addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16.name())
                   .finishField()
                   .addStringField("information", "Information", "Information")
                      .withTerminationCharacter('\u0000')

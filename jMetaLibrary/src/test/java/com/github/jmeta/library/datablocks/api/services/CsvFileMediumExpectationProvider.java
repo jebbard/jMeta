@@ -27,8 +27,6 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
@@ -523,53 +521,6 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
                throw new InvalidArrayStringFormatException(rowPrefix + e.getMessage());
             }
             expectedFieldInterpretedValues.put(instanceId, parsedBytes);
-         }
-
-         // Enumerated fields are either charsets, byte orders or arbitrary typed
-         else if (fieldProps.getFieldType().equals(FieldType.ENUMERATED)) {
-            List<FieldFunction> fieldFunctions = fieldProps.getFieldFunctions();
-
-            boolean expectedValueDetermined = false;
-
-            // TODO stage2_007: Finding field functions is tedious
-            for (int i = 0; i < fieldFunctions.size(); ++i) {
-               FieldFunction function = fieldFunctions.get(i);
-
-               if (function.getFieldFunctionType().equals(FieldFunctionType.BYTE_ORDER_OF)) {
-                  expectedValueDetermined = true;
-
-                  if (expInterpretedFieldValueString.equals(ByteOrder.BIG_ENDIAN.toString()))
-                     expectedFieldInterpretedValues.put(instanceId, ByteOrder.BIG_ENDIAN);
-
-                  else if (expInterpretedFieldValueString.equals(ByteOrder.LITTLE_ENDIAN.toString()))
-                     expectedFieldInterpretedValues.put(instanceId, ByteOrder.LITTLE_ENDIAN);
-
-                  else
-                     throw new InvalidTestDataCsvFormatException(
-                        rowPrefix + "Field type requires a byte order as value. Byte Order with name <"
-                           + expInterpretedFieldValueString
-                           + "> is unknown. Only BIG_ENDIAN and LITTLE_ENDIAN are allowed",
-                        null);
-               }
-
-               else if (function.getFieldFunctionType().equals(FieldFunctionType.CHARACTER_ENCODING_OF)) {
-                  expectedValueDetermined = true;
-
-                  expectedFieldInterpretedValues.put(instanceId, Charset.forName(expInterpretedFieldValueString));
-               }
-            }
-
-            // It is expected to be a string interpreted value
-            if (!expectedValueDetermined) {
-               // If no custom parser for the expected field value is registered,
-               // take the read string as expected value
-               if (!customFieldValueParsers.containsKey(id))
-                  expectedFieldInterpretedValues.put(instanceId, expInterpretedFieldValueString);
-
-               else
-                  expectedFieldInterpretedValues.put(instanceId,
-                     customFieldValueParsers.get(id).parse(expInterpretedFieldValueString));
-            }
          }
       }
    }

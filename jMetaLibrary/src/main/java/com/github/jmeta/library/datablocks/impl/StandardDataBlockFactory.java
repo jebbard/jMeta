@@ -174,7 +174,7 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    static {
       FIELD_CONVERTERS.put(FieldType.BINARY, new BinaryFieldConverter());
-      FIELD_CONVERTERS.put(FieldType.ENUMERATED, new EnumeratedFieldConverter());
+      // FIELD_CONVERTERS.put(FieldType.ENUMERATED, new EnumeratedFieldConverter());
       FIELD_CONVERTERS.put(FieldType.FLAGS, new FlagsFieldConverter());
       FIELD_CONVERTERS.put(FieldType.UNSIGNED_WHOLE_NUMBER, new UnsignedNumericFieldConverter());
       FIELD_CONVERTERS.put(FieldType.STRING, new StringFieldConverter());

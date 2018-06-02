@@ -33,5 +33,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends
 
    C asCharacterEncodingOf(DataBlockId... ids);
 
+   C addEnumeratedValue(byte[] binaryValue, FIT interpretedValue);
+
    P finishField();
 }
