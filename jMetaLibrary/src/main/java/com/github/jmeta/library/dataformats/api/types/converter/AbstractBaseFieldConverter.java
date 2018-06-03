@@ -7,7 +7,7 @@
  * @date 02.06.2018
  *
  */
-package com.github.jmeta.library.datablocks.impl;
+package com.github.jmeta.library.dataformats.api.types.converter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -67,7 +67,7 @@ public abstract class AbstractBaseFieldConverter<T> implements FieldConverter<T>
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.impl.FieldConverter#toInterpreted(java.nio.ByteBuffer,
+    * @see com.github.jmeta.library.dataformats.api.types.converter.FieldConverter#toInterpreted(java.nio.ByteBuffer,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
     *      java.nio.charset.Charset)
     */
@@ -89,7 +89,7 @@ public abstract class AbstractBaseFieldConverter<T> implements FieldConverter<T>
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.impl.FieldConverter#toBinary(java.lang.Object,
+    * @see com.github.jmeta.library.dataformats.api.types.converter.FieldConverter#toBinary(java.lang.Object,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
     *      java.nio.charset.Charset)
     */

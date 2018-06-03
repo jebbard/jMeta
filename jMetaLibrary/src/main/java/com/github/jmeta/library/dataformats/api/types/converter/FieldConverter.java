@@ -6,7 +6,7 @@
  *
  * @date 19.06.2011
  */
-package com.github.jmeta.library.datablocks.impl;
+package com.github.jmeta.library.dataformats.api.types.converter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

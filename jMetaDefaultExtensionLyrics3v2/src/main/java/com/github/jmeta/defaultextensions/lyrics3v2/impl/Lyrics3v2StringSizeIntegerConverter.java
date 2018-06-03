@@ -14,8 +14,8 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.datablocks.impl.SignedNumericFieldConverter;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.converter.SignedNumericFieldConverter;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**

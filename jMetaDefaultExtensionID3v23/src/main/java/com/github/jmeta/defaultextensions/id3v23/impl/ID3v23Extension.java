@@ -38,6 +38,8 @@ public class ID3v23Extension implements Extension {
    private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
+   private static final SyncSafeIntegerConverter SYNC_SAFE_INTEGER_CONVERTER = new SyncSafeIntegerConverter();
+
    private static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
    public static final String FRAME_FLAGS_COMPRESSION = "Compression";
    private static final String FRAME_FLAGS_ENCRYPTION = "Encryption";
@@ -160,6 +162,7 @@ public class ID3v23Extension implements Extension {
             .addNumericField("size", "id3v23 tag size", "The id3v23 tag size")
                .withStaticLengthOf(4)
                .asSizeOf(ID3V23_PAYLOAD_ID)
+               .withCustomConverter(SYNC_SAFE_INTEGER_CONVERTER)
             .finishField()
          .finishHeader()
          .addHeader("extHeader", "id3v23 extended header", "The id3v23 extended header")
@@ -201,6 +204,7 @@ public class ID3v23Extension implements Extension {
                   .addNumericField("size", "Generic frame size field", "The generic frame size field")
                      .withStaticLengthOf(4)
                      .asSizeOf(GENERIC_FRAME_PAYLOAD_ID)
+                     .withCustomConverter(SYNC_SAFE_INTEGER_CONVERTER)
                   .finishField()
                   .addFlagsField("flags", "Generic frame flags field", "The generic frame flags field")
                      .withStaticLengthOf(2)

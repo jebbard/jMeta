@@ -6,7 +6,7 @@
  *
  * @date 19.06.2011
  */
-package com.github.jmeta.library.datablocks.impl;
+package com.github.jmeta.library.dataformats.api.types.converter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -26,7 +26,7 @@ import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
 public class FlagsFieldConverter extends AbstractBaseFieldConverter<Flags> {
 
    /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
+    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
     *      java.nio.charset.Charset)
     */
@@ -51,7 +51,7 @@ public class FlagsFieldConverter extends AbstractBaseFieldConverter<Flags> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
+    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
     *      java.nio.charset.Charset)
     */

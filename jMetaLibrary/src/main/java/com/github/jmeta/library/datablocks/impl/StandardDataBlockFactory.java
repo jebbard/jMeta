@@ -10,9 +10,7 @@ package com.github.jmeta.library.datablocks.impl;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
@@ -25,7 +23,6 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -34,7 +31,6 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
-@SuppressWarnings("rawtypes")
 public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    /**
@@ -68,9 +64,7 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
-      @SuppressWarnings("unchecked")
-      StandardField<T> field = new StandardField<>(desc, fieldBytes, reference,
-         (FieldConverter<T>) getFieldConverter(id));
+      StandardField<T> field = new StandardField<>(desc, fieldBytes, reference);
 
       field.initByteOrder(byteOrder);
       field.initCharacterEncoding(characterEncoding);
@@ -145,38 +139,11 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
       DataBlockDescription desc = m_dataBlockReader.getSpecification().getDataBlockDescription(fieldId);
 
-      return new StandardField<>(desc, value, null, this.<T> getFieldConverter(fieldId));
-   }
-
-   /**
-    * @param fieldId
-    * @return the {@link FieldConverter}
-    */
-   @SuppressWarnings("unchecked")
-   protected <T> FieldConverter<T> getFieldConverter(DataBlockId fieldId) {
-
-      DataFormatSpecification spec = m_dataBlockReader.getSpecification();
-
-      DataBlockDescription desc = spec.getDataBlockDescription(fieldId);
-
-      return (FieldConverter<T>) FIELD_CONVERTERS.get(desc.getFieldProperties().getFieldType());
+      return new StandardField<>(desc, value, null);
    }
 
    @SuppressWarnings("unused")
    private MediaAPI m_mediumFactory;
 
    private DataBlockReader m_dataBlockReader;
-
-   /**
-    *
-    */
-   protected final static Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
-
-   static {
-      FIELD_CONVERTERS.put(FieldType.BINARY, new BinaryFieldConverter());
-      // FIELD_CONVERTERS.put(FieldType.ENUMERATED, new EnumeratedFieldConverter());
-      FIELD_CONVERTERS.put(FieldType.FLAGS, new FlagsFieldConverter());
-      FIELD_CONVERTERS.put(FieldType.UNSIGNED_WHOLE_NUMBER, new UnsignedNumericFieldConverter());
-      FIELD_CONVERTERS.put(FieldType.STRING, new StringFieldConverter());
-   }
 }

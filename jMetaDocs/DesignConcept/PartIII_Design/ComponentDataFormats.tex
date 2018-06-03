@@ -962,9 +962,55 @@ Maybe less flexibility for future demands and less support for actual object ori
 }
 %%%% <-- DD %%%%
 
-Finally, some fields - no matter what type - have always the same static value. We join this requirement with the notion of a default value, i.e. a value to be preferred when it is not known which would be the right value of a field.
+As we have these default field types, we can also define default field conversion mechanisms:
 %%%% DD --> %%%%
 \DD{dd:536}
+{% Title
+Default field converters for every field type
+}
+{% Short description
+\COMPdataFormatManagement{} provides default field converters used to convert the binary value of a field into an interpreted value. It first looks if there are enumerated values and maps values accordingly. If there is no matching enumerated value, the converter provides a default appropriate conversion based on provided character encoding and byte order. There are two conversion methods:
+\begin{itemize}
+\item \texttt{toInterpreted:} Converts a binary value to an interpreted value, taking current character encoding and byte order as parameters
+\item \texttt{toBinary:} Converts an interpreted value to a binary value, taking current character encoding and byte order as parameters
+\end{itemize}
+
+So we can implement the following default conversion mechanisms:
+\begin{itemize}
+\item String: Convert the string into bytes and vice versa according to the provided character encoding
+\item Binary: Identical conversion
+\item Numeric: Convert the number into bytes according to the provided byte order, assuming unsigned integer
+\item Flags: Put the binary value into a Flags instance and vice versa
+\end{itemize}
+}
+{% Rationale
+Conversion is quite standardized according to the standardizes field types, this might cover at least 80 percent of the conversion cases. Conversions are relatively simple such that it is fine to keep them in \COMPdataFormatManagement{}.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+But standard converters are not enough. What happens if you need signed integers instead of unsigned? This is where a custom converter comes in:
+%%%% DD --> %%%%
+\DD{dd:537}
+{% Title
+\COMPdataFormatManagement{} allows to add custom converters for each field
+}
+{% Short description
+Users may add custom converters to a field upon \texttt{DataFormatSpecification} creation. A custom converter is a property of the field.
+}
+{% Rationale
+E.g. necessary for ID3v23 (sync-safe integers), Lyrics3v2 (numbers represented as characters) and Matroska (VINTs).
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Finally, some fields - no matter what type - have always the same static value. We join this requirement with the notion of a default value, i.e. a value to be preferred when it is not known which would be the right value of a field.
+%%%% DD --> %%%%
+\DD{dd:538}
 {% Title
 Each field has an optional default (interpreted) value
 }
@@ -978,6 +1024,7 @@ The default values are needed for fields with fixed values, and might be used to
 No disadvantages known
 }
 %%%% <-- DD %%%%
+
 
 % =======================================================================================================
 \subsection{Field Functions}%

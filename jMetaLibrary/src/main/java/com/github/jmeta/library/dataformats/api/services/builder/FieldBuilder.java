@@ -12,6 +12,7 @@ package com.github.jmeta.library.dataformats.api.services.builder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
+import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 
 /**
  * {@link FieldBuilder} allows to set properties of a field data block.
@@ -24,15 +25,6 @@ import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
  *           The concrete {@link FieldBuilder} interface derived from this interface
  */
 public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends DataBlockDescriptionBuilder<C> {
-
-   /**
-    * Sets the default value of the built field, which is initially null
-    * 
-    * @param value
-    *           The default value to set, may be null
-    * @return This builder
-    */
-   C withDefaultValue(FIT value);
 
    /**
     * Tags this field as representing a magic key. The field must be of type {@link FieldType#STRING},
@@ -128,6 +120,25 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends
     * @return This builder
     */
    C addEnumeratedValue(byte[] binaryValue, FIT interpretedValue);
+
+   /**
+    * Sets the default value of the built field, which is initially null
+    * 
+    * @param value
+    *           The default value to set, may be null
+    * @return This builder
+    */
+   C withDefaultValue(FIT value);
+
+   /**
+    * Sets a custom {@link FieldConverter} to be used when converting binary values into interpreted values and vice
+    * versa.
+    * 
+    * @param customConverter
+    *           The custom converter, must not be null
+    * @return This builder
+    */
+   C withCustomConverter(FieldConverter<FIT> customConverter);
 
    /**
     * Finishes building the field

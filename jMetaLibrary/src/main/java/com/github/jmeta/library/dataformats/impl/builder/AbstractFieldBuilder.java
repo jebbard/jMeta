@@ -27,6 +27,7 @@ import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -54,6 +55,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    private final FieldType<FIT> fieldType;
    private final List<FieldFunction> functions = new ArrayList<>();
    private Integer magicKeyBitLength = null;
+   private FieldConverter<FIT> customConverter;
 
    /**
     * Creates a new {@link AbstractFieldBuilder}.
@@ -79,6 +81,24 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
       Reject.ifNull(fieldType, "fieldType");
 
       this.fieldType = fieldType;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
+    */
+   @SuppressWarnings("unchecked")
+   public C asMagicKey() {
+      this.isMagicKey = true;
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asMagicKeyWithOddBitLength(byte)
+    */
+   @Override
+   public C asMagicKeyWithOddBitLength(int bitLength) {
+      this.magicKeyBitLength = bitLength;
+      return asMagicKey();
    }
 
    /**
@@ -161,33 +181,6 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
-    */
-   @SuppressWarnings("unchecked")
-   public C withDefaultValue(FIT value) {
-      this.defaultValue = value;
-      return (C) this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
-    */
-   @SuppressWarnings("unchecked")
-   public C asMagicKey() {
-      this.isMagicKey = true;
-      return (C) this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asMagicKeyWithOddBitLength(byte)
-    */
-   @Override
-   public C asMagicKeyWithOddBitLength(int bitLength) {
-      this.magicKeyBitLength = bitLength;
-      return asMagicKey();
-   }
-
-   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#addEnumeratedValue(byte[],
     *      java.lang.Object)
     */
@@ -199,13 +192,33 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
+    */
+   @SuppressWarnings("unchecked")
+   public C withDefaultValue(FIT value) {
+      this.defaultValue = value;
+      return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#withCustomConverter(com.github.jmeta.library.dataformats.api.types.converter.FieldConverter)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C withCustomConverter(FieldConverter<FIT> customConverter) {
+      Reject.ifNull(customConverter, "customConverter");
+      this.customConverter = customConverter;
+      return (C) this;
+   }
+
+   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#finishField()
     */
    @Override
    public P finishField() {
       FieldProperties<FIT> fieldProperties = new FieldProperties<>(fieldType, defaultValue, enumeratedValues,
          terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions, isMagicKey,
-         magicKeyBitLength);
+         magicKeyBitLength, customConverter);
 
       setFieldProperties(fieldProperties);
 

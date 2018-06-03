@@ -36,6 +36,8 @@ public class Lyrics3v2Extension implements Extension {
    private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
+   private static final Lyrics3v2StringSizeIntegerConverter STRING_SIZE_INTEGER_CONVERTER = new Lyrics3v2StringSizeIntegerConverter();
+
    private static final String LYRICS3v2_MAGIC_FOOTER_STRING = "LYRICS200";
    private static final String LYRICS3v2_MAGIC_HEADER_STRING = "LYRICSBEGIN";
    public static final int FOOTER_SIZE_FIELD_LENGTH = 6;
@@ -109,6 +111,7 @@ public class Lyrics3v2Extension implements Extension {
          .addFooter("footer", "Lyrics3v2 footer", "The Lyrics3v2 footer")
             .withStaticLengthOf(FOOTER_BYTE_LENGTH)
             .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
+               .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
                .withStaticLengthOf(FOOTER_SIZE_FIELD_LENGTH)
                .asSizeOf(lyrics3V2HeaderId, lyrics3V2PayloadId)
             .finishField()
@@ -131,6 +134,7 @@ public class Lyrics3v2Extension implements Extension {
                      .asIdOf(lyrics3V2GenericFieldId)
                   .finishField()
                   .addNumericField("size", "Lyrics3v2 item value size", "Lyrics3v2 item value size")
+                     .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
                      .withStaticLengthOf(LYRICS3v2_FIELD_SIZE_LENGTH)
                      .asSizeOf(lyrics3V2GenericFieldPayloadId)
                   .finishField()

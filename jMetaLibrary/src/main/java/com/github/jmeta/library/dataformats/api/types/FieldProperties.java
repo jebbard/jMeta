@@ -17,6 +17,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.github.jmeta.library.dataformats.api.types.converter.BinaryFieldConverter;
+import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
+import com.github.jmeta.library.dataformats.api.types.converter.FlagsFieldConverter;
+import com.github.jmeta.library.dataformats.api.types.converter.StringFieldConverter;
+import com.github.jmeta.library.dataformats.api.types.converter.UnsignedNumericFieldConverter;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -30,6 +35,8 @@ public class FieldProperties<T> {
 
    private final T defaultValue;
 
+   private final FieldConverter<T> converter;
+
    private final Map<T, byte[]> enumeratedValues = new HashMap<>();
 
    private final List<FieldFunction> functions = new ArrayList<>();
@@ -40,11 +47,19 @@ public class FieldProperties<T> {
 
    private final Character terminationCharacter;
 
-   private final Charset fixedCharset;
+   private final Charset fixedCharacterEncoding;
 
    private final FlagSpecification flagSpecification;
 
    private final ByteOrder fixedByteOrder;
+
+   private final static Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
+   static {
+      FIELD_CONVERTERS.put(FieldType.BINARY, new BinaryFieldConverter());
+      FIELD_CONVERTERS.put(FieldType.FLAGS, new FlagsFieldConverter());
+      FIELD_CONVERTERS.put(FieldType.UNSIGNED_WHOLE_NUMBER, new UnsignedNumericFieldConverter());
+      FIELD_CONVERTERS.put(FieldType.STRING, new StringFieldConverter());
+   }
 
    /**
     * Creates a new {@link FieldProperties}.
@@ -61,24 +76,33 @@ public class FieldProperties<T> {
     *           TODO
     * @param magicKeyBitLength
     *           TODO
+    * @param customConverter
+    *           TODO
     */
    public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
-      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey, Integer magicKeyBitLength) {
+      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey, Integer magicKeyBitLength,
+      FieldConverter<T> customConverter) {
       Reject.ifNull(fieldType, "fieldType");
       Reject.ifNull(enumeratedValues, "enumeratedValues");
       Reject.ifNull(functions, "functions");
 
       this.fieldType = fieldType;
       this.defaultValue = defaultValue;
-      this.terminationCharacter = terminationCharacter;
-      this.flagSpecification = flagSpecification;
-      this.fixedCharset = fixedCharset;
-      this.fixedByteOrder = fixedByteOrder;
+      this.converter = customConverter == null ? getDefaultFieldConverter(fieldType) : customConverter;
+      this.enumeratedValues.putAll(enumeratedValues);
+      this.functions.addAll(functions);
       this.isMagicKey = isMagicKey;
       this.magicKeyBitLength = magicKeyBitLength;
-      this.functions.addAll(functions);
-      this.enumeratedValues.putAll(enumeratedValues);
+      this.terminationCharacter = terminationCharacter;
+      this.fixedCharacterEncoding = fixedCharset;
+      this.flagSpecification = flagSpecification;
+      this.fixedByteOrder = fixedByteOrder;
+   }
+
+   @SuppressWarnings("unchecked")
+   private static <F> FieldConverter<F> getDefaultFieldConverter(FieldType<F> fieldType) {
+      return (FieldConverter<F>) FIELD_CONVERTERS.get(fieldType);
    }
 
    /**
@@ -97,6 +121,15 @@ public class FieldProperties<T> {
    public T getDefaultValue() {
 
       return defaultValue;
+   }
+
+   /**
+    * Returns the attribute {@link #converter}.
+    * 
+    * @return the attribute {@link #converter}
+    */
+   public FieldConverter<T> getConverter() {
+      return converter;
    }
 
    /**
@@ -145,7 +178,7 @@ public class FieldProperties<T> {
     */
    public Charset getFixedCharacterEncoding() {
 
-      return fixedCharset;
+      return fixedCharacterEncoding;
    }
 
    /**
@@ -173,11 +206,12 @@ public class FieldProperties<T> {
    public int hashCode() {
       final int prime = 31;
       int result = 1;
+      result = prime * result + ((converter == null) ? 0 : converter.hashCode());
       result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
       result = prime * result + ((enumeratedValues == null) ? 0 : enumeratedValues.hashCode());
       result = prime * result + ((fieldType == null) ? 0 : fieldType.hashCode());
       result = prime * result + ((fixedByteOrder == null) ? 0 : fixedByteOrder.hashCode());
-      result = prime * result + ((fixedCharset == null) ? 0 : fixedCharset.hashCode());
+      result = prime * result + ((fixedCharacterEncoding == null) ? 0 : fixedCharacterEncoding.hashCode());
       result = prime * result + ((flagSpecification == null) ? 0 : flagSpecification.hashCode());
       result = prime * result + ((functions == null) ? 0 : functions.hashCode());
       result = prime * result + (isMagicKey ? 1231 : 1237);
@@ -198,6 +232,11 @@ public class FieldProperties<T> {
       if (getClass() != obj.getClass())
          return false;
       FieldProperties<?> other = (FieldProperties<?>) obj;
+      if (converter == null) {
+         if (other.converter != null)
+            return false;
+      } else if (!converter.equals(other.converter))
+         return false;
       if (defaultValue == null) {
          if (other.defaultValue != null)
             return false;
@@ -218,10 +257,10 @@ public class FieldProperties<T> {
             return false;
       } else if (!fixedByteOrder.equals(other.fixedByteOrder))
          return false;
-      if (fixedCharset == null) {
-         if (other.fixedCharset != null)
+      if (fixedCharacterEncoding == null) {
+         if (other.fixedCharacterEncoding != null)
             return false;
-      } else if (!fixedCharset.equals(other.fixedCharset))
+      } else if (!fixedCharacterEncoding.equals(other.fixedCharacterEncoding))
          return false;
       if (flagSpecification == null) {
          if (other.flagSpecification != null)
@@ -254,15 +293,12 @@ public class FieldProperties<T> {
    @Override
    public String toString() {
       return "FieldProperties [fieldType=" + fieldType + ", defaultValue=" + interpretedValueToString(defaultValue)
-         + ", enumeratedValues=" + enumValuesToString() + ", functions=" + functions + ", isMagicKey=" + isMagicKey
-         + ", magicKeyBitLength=" + magicKeyBitLength + ", terminationCharacter=" + terminationCharacter
-         + ", fixedCharset=" + fixedCharset + ", flagSpecification=" + flagSpecification + ", fixedByteOrder="
-         + fixedByteOrder + "]";
+         + ", converter=" + converter + ", enumeratedValues=" + enumValuesToString() + ", functions=" + functions
+         + ", isMagicKey=" + isMagicKey + ", magicKeyBitLength=" + magicKeyBitLength + ", terminationCharacter="
+         + terminationCharacter + ", fixedCharacterEncoding=" + fixedCharacterEncoding + ", flagSpecification="
+         + flagSpecification + ", fixedByteOrder=" + fixedByteOrder + "]";
    }
 
-   /**
-    * @param messagePrefix
-    */
    void validateFieldProperties(String messagePrefix, long minimumByteLength, long maximumByteLength) {
       boolean hasFixedSize = minimumByteLength == maximumByteLength;
 

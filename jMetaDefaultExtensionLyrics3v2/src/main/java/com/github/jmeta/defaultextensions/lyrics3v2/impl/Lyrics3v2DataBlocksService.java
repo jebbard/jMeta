@@ -10,7 +10,6 @@ package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 
 /**
@@ -29,11 +28,5 @@ public class Lyrics3v2DataBlocksService extends AbstractDataBlockService {
    @Override
    public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
       return new Lyrics3v2DataBlockReader(spec, lazyFieldSize);
-   }
-
-   @Override
-   public ExtendedDataBlockFactory getDataBlockFactory() {
-
-      return new Lyrics3v2DataBlockFactory();
    }
 }

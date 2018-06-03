@@ -17,6 +17,7 @@ import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -52,13 +53,12 @@ public class StandardField<T> implements Field<T> {
       // TODO: How to implement free for fields?
    }
 
-   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, FieldConverter<T> fieldConverter) {
+   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference) {
       Reject.ifNull(fieldDesc, "fieldDesc");
-      Reject.ifNull(fieldConverter, "fieldConverter");
 
       m_desc = fieldDesc;
       m_mediumReference = reference;
-      m_fieldConverter = fieldConverter;
+      m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
    }
 
    /**
@@ -89,11 +89,9 @@ public class StandardField<T> implements Field<T> {
     * @param fieldDesc
     * @param interpretedValue
     * @param reference
-    * @param fieldConverter
     */
-   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference,
-      FieldConverter<T> fieldConverter) {
-      this(fieldDesc, reference, fieldConverter);
+   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference) {
+      this(fieldDesc, reference);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
 
@@ -107,11 +105,9 @@ public class StandardField<T> implements Field<T> {
     * @param fieldDesc
     * @param byteValue
     * @param reference
-    * @param fieldConverter
     */
-   public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
-      FieldConverter<T> fieldConverter) {
-      this(fieldDesc, reference, fieldConverter);
+   public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference) {
+      this(fieldDesc, reference);
 
       Reject.ifNull(byteValue, "byteValue");
 
