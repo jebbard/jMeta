@@ -46,6 +46,8 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  * their names to ensure the API end-user does not unintentionally pick them during auto-completion.</li>
  * <li>In contrast to this, any methods named like "with*" allow to modify a property of the current data block, i.e.
  * they will not return the child builder but the current builder only.</li>
+ * <li>Any methods named like "as*" allow to tag the current data block with a special function, e.g. that it is a magic
+ * key.</li>
  * <li>In the end, if the last top-level container has been finished, you must call the {@link #build()} method to
  * finally create a {@link DataFormatSpecification} from the built content.</li>
  * </ol>

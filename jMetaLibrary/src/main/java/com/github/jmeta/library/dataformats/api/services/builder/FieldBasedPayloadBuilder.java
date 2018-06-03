@@ -10,13 +10,18 @@
 package com.github.jmeta.library.dataformats.api.services.builder;
 
 /**
- * {@link FieldBasedPayloadBuilder}
+ * {@link FieldBasedPayloadBuilder} allows to add fields to a field-bayed payload data block.
  *
+ * @param <P>
+ *           The concrete parent builder interface
  */
 public interface FieldBasedPayloadBuilder<P extends ContainerSequenceBuilder<P>>
    extends FieldSequenceBuilder<FieldBasedPayloadBuilder<P>> {
 
-   FieldBasedPayloadBuilder<P> withDescription(String name, String description);
-
+   /**
+    * Finishes building the field-based payload
+    * 
+    * @return The parent builder
+    */
    ContainerBuilder<P, FieldBasedPayloadBuilder<P>> finishFieldBasedPayload();
 }

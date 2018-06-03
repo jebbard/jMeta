@@ -322,15 +322,15 @@ public final class ContainerBuilderCloner {
          }
 
          if (ffType == FieldFunctionType.BYTE_ORDER_OF) {
-            fb.asByteOrderOf(replacedAffectedIds);
+            fb.asByteOrderOf(replacedAffectedIds[0]);
          } else if (ffType == FieldFunctionType.CHARACTER_ENCODING_OF) {
-            fb.asCharacterEncodingOf(replacedAffectedIds);
+            fb.asCharacterEncodingOf(replacedAffectedIds[0]);
          } else if (ffType == FieldFunctionType.COUNT_OF) {
-            fb.asCountOf(replacedAffectedIds);
+            fb.asCountOf(replacedAffectedIds[0]);
          } else if (ffType == FieldFunctionType.ID_OF) {
-            fb.asIdOf(replacedAffectedIds);
+            fb.asIdOf(replacedAffectedIds[0]);
          } else if (ffType == FieldFunctionType.PRESENCE_OF) {
-            fb.indicatesPresenceOf(fieldFunction.getFlagName(), fieldFunction.getFlagValue(), replacedAffectedIds);
+            fb.indicatesPresenceOf(fieldFunction.getFlagName(), fieldFunction.getFlagValue(), replacedAffectedIds[0]);
          } else if (ffType == FieldFunctionType.SIZE_OF) {
             fb.asSizeOf(replacedAffectedIds);
          }

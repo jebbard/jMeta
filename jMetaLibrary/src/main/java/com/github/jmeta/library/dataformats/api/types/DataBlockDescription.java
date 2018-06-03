@@ -83,6 +83,13 @@ public class DataBlockDescription {
    public DataBlockDescription(DataBlockId id, String name, String description, PhysicalDataBlockType physicalType,
       List<DataBlockDescription> children, FieldProperties<?> fieldProperties, int minimumOccurrences,
       int maximumOccurrences, long minimumByteLength, long maximumByteLength, boolean isGeneric) {
+
+      Reject.ifNull(id, "id");
+      Reject.ifNull(name, "name");
+      Reject.ifNull(description, "description");
+      Reject.ifNull(physicalType, "physicalType");
+      Reject.ifNull(children, "children");
+
       this.id = id;
       this.name = name;
       this.description = description;
@@ -94,7 +101,6 @@ public class DataBlockDescription {
       this.minimumByteLength = minimumByteLength;
       this.maximumByteLength = maximumByteLength;
       this.isGeneric = isGeneric;
-
       validateDataBlockDescription();
    }
 
@@ -164,6 +170,17 @@ public class DataBlockDescription {
 
    public boolean hasFixedSize() {
       return getMaximumByteLength() == getMinimumByteLength();
+   }
+
+   public boolean hasChildWithLocalId(String localId) {
+   
+      for (DataBlockDescription dataBlockDescription : orderedChildren) {
+         if (dataBlockDescription.getId().getLocalId().equals(localId)) {
+            return true;
+         }
+      }
+   
+      return false;
    }
 
    public void setFixedByteOffsetInContainer(long fixedByteOffsetInContainer) {
@@ -266,17 +283,6 @@ public class DataBlockDescription {
       result = prime * result + ((orderedChildren == null) ? 0 : orderedChildren.hashCode());
       result = prime * result + ((physicalType == null) ? 0 : physicalType.hashCode());
       return result;
-   }
-
-   public boolean hasChildWithLocalId(String localId) {
-
-      for (DataBlockDescription dataBlockDescription : orderedChildren) {
-         if (dataBlockDescription.getId().getLocalId().equals(localId)) {
-            return true;
-         }
-      }
-
-      return false;
    }
 
    /**
@@ -397,13 +403,6 @@ public class DataBlockDescription {
    }
 
    private void validateDataBlockDescription() {
-      // Validate that mandatory fields are present
-      Reject.ifNull(id, "id");
-      Reject.ifNull(name, "name");
-      Reject.ifNull(description, "description");
-      Reject.ifNull(physicalType, "physicalType");
-      Reject.ifNull(orderedChildren, "childIds");
-
       String messagePrefix = "Error validating [" + id + "]: ";
 
       // Validate lengths
@@ -427,87 +426,7 @@ public class DataBlockDescription {
       }
 
       if (physicalType == PhysicalDataBlockType.FIELD) {
-         validateFieldProperties(messagePrefix, getFieldProperties());
+         getFieldProperties().validateFieldProperties(messagePrefix, minimumByteLength, maximumByteLength);
       }
-   }
-
-   /**
-    * @param messagePrefix
-    */
-   private void validateFieldProperties(String messagePrefix, FieldProperties<?> fieldProperties) {
-      // Validate magic key
-      if (fieldProperties.isMagicKey()) {
-         if (physicalType != PhysicalDataBlockType.FIELD) {
-            throw new IllegalArgumentException(messagePrefix + "Data block is tagged as magic key, but it is no field");
-         }
-
-         if (!hasFixedSize() || maximumByteLength == DataBlockDescription.UNKNOWN_SIZE) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field is tagged as magic key, but it has a variable size: min length = <"
-                  + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
-         }
-
-         if (fieldProperties.getEnumeratedValues().isEmpty() && fieldProperties.getDefaultValue() == null) {
-            throw new IllegalArgumentException(messagePrefix
-               + "Data block is tagged as magic key, but it has neither enumerated values nor a default value set");
-         }
-
-         if (fieldProperties.getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
-            throw new IllegalArgumentException(messagePrefix
-               + "Data block is tagged as magic key, but it has type NUMERIC. Magic key fields must have one of the types STRING, BINARY or FLAGS");
-         }
-
-         // TODO fixed length == key length
-      }
-
-      // Validate enumerated fields
-      for (Iterator<?> enumValueIterator = fieldProperties.getEnumeratedValues().keySet().iterator(); enumValueIterator
-         .hasNext();) {
-         Object nextKey = enumValueIterator.next();
-         byte[] nextValue = fieldProperties.getEnumeratedValues().get(nextKey);
-
-         if (hasFixedSize() && nextValue.length > minimumByteLength) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Binary representation of enmuerated value <" + nextKey + "> with length <"
-                  + nextValue.length + "> is longer than the field's fixed size which is <" + minimumByteLength + ">");
-         }
-      }
-
-      if (!fieldProperties.getEnumeratedValues().isEmpty() && fieldProperties.getDefaultValue() != null) {
-         if (!fieldProperties.getEnumeratedValues().containsKey(fieldProperties.getDefaultValue())) {
-            throw new IllegalArgumentException(messagePrefix + "Default field value <"
-               + fieldProperties.getDefaultValue() + "> must be contained in list of enumerated values, but it is not");
-         }
-      }
-
-      // Validate numeric fields
-      if (fieldProperties.getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
-         if (minimumByteLength > Long.BYTES || maximumByteLength > Long.BYTES) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has Numeric type, but its minimum or maximum length is bigger than " + Long.BYTES
-                  + ": min length = <" + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
-         }
-      } else {
-         if (fieldProperties.getFixedByteOrder() != null) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has not Numeric type, but a fixed byte order is defined for it");
-         }
-      }
-
-      // Validate string fields
-      if (fieldProperties.getFieldType() != FieldType.STRING) {
-         if (fieldProperties.getFixedCharacterEncoding() != null) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has not String type, but a fixed character encoding is defined for it");
-         }
-
-         if (fieldProperties.getTerminationCharacter() != null) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has not String type, but a termincation character is defined for it");
-         }
-      }
-
-      // Validate default value
-      // TODO default value length == fixed length
    }
 }

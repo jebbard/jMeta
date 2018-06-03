@@ -14,6 +14,9 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 /**
  * {@link DataBlockDescriptionBuilder} is the base interface for all data block builders. It offers a chained builder
  * API.
+ *
+ * @param <C>
+ *           The concrete {@link DataBlockDescriptionBuilder} interface derived from this interface
  */
 public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuilder<C>> extends DataFormatBuilder {
 

@@ -30,7 +30,7 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
  *           The concrete derived interface of the class implementing this
  *           {@link AbstractDataFormatSpecificationBuilder}
  */
-public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptionBuilder<P>, C extends DataBlockDescriptionBuilder<C>>
+public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptionBuilder<P>, C extends FieldSequenceBuilder<C>>
    extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldSequenceBuilder<C> {
 
    /**
@@ -97,10 +97,10 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#removeField(java.lang.String)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#withoutField(java.lang.String)
     */
    @Override
-   public FieldSequenceBuilder<C> removeField(String localId) {
+   public FieldSequenceBuilder<C> withoutField(String localId) {
 
       DataBlockId fieldSequenceId = new DataBlockId(getDataFormat(), getGlobalId());
       DataBlockDescription fieldSequenceDescription = getRootBuilder().getDataBlockDescription(fieldSequenceId);

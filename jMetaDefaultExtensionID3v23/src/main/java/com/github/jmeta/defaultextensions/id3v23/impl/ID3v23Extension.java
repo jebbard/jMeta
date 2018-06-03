@@ -241,7 +241,7 @@ public class ID3v23Extension implements Extension {
             .addContainerWithFieldBasedPayload("TEXT_FRAME_ID", "GENERIC_ID3v23_TEXT_FRAME", "The id3v23 GENERIC_TEXT_FRAME")
                .cloneFrom(GENERIC_FRAME_ID)
                .getPayload()
-                  .removeField(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID.getLocalId())
+                  .withoutField(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID.getLocalId())
                   .addStringField("textEncoding", "Text encoding", "Text encoding")
                      .withStaticLengthOf(1)
                      .withDefaultValue(Charsets.CHARSET_ISO.name())

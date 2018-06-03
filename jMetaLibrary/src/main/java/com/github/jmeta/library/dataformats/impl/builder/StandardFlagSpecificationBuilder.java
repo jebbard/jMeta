@@ -20,6 +20,7 @@ import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuild
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.Flags;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link StandardFlagSpecificationBuilder} allows to build flag specifications.
@@ -49,6 +50,8 @@ public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuil
     */
    public StandardFlagSpecificationBuilder(AbstractFieldBuilder<P, Flags, FlagsFieldBuilder<P>> parentBuilder,
       int flagByteLength, ByteOrder flagByteOrder) {
+      Reject.ifNull(parentBuilder, "parentBuilder");
+
       this.parentBuilder = parentBuilder;
       this.flagByteLength = flagByteLength;
       this.flagByteOrder = flagByteOrder;
@@ -59,6 +62,7 @@ public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuil
     */
    @Override
    public FlagSpecificationBuilder<P> addFlagDescription(FlagDescription flagDesc) {
+      Reject.ifNull(flagDesc, "flagDesc");
       flagDescriptions.add(flagDesc);
       return this;
    }
