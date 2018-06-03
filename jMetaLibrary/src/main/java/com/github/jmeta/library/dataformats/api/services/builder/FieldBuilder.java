@@ -21,6 +21,8 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends
 
    C asMagicKey();
 
+   C asMagicKeyWithOddBitLength(int bitLength);
+
    C asIdOf(DataBlockId... ids);
 
    C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockId... ids);

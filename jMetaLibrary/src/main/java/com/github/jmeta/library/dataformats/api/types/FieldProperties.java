@@ -37,10 +37,12 @@ public class FieldProperties<T> {
     * @param functions
     * @param isMagicKey
     *           TODO
+    * @param magicKeyBitLength
+    *           TODO
     */
    public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
-      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey) {
+      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey, Integer magicKeyBitLength) {
       // Reject.ifNull(defaultValue, "defaultValue");
       m_fieldType = fieldType;
       m_defaultValue = defaultValue;
@@ -49,6 +51,7 @@ public class FieldProperties<T> {
       m_fixedCharset = fixedCharset;
       m_fixedByteOrder = fixedByteOrder;
       this.isMagicKey = isMagicKey;
+      this.magicKeyBitLength = magicKeyBitLength;
 
       if (functions != null)
          m_functions.addAll(functions);
@@ -251,5 +254,10 @@ public class FieldProperties<T> {
 
    private final List<FieldFunction> m_functions = new ArrayList<>();
 
+   public Integer getMagicKeyBitLength() {
+      return magicKeyBitLength;
+   }
+
    private final boolean isMagicKey;
+   private final Integer magicKeyBitLength;
 }

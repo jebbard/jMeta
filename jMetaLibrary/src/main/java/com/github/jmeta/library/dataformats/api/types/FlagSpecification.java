@@ -156,7 +156,7 @@ public class FlagSpecification {
     * @return the default flag bytes used when initializing new flag bytes.
     */
    public byte[] getDefaultFlagBytes() {
-      return defaultFlagBytes;
+      return defaultFlagBytes.clone();
    }
 
    /**

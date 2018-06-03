@@ -23,6 +23,11 @@ public class FieldType<T> {
     */
    public static final FieldType<byte[]> BINARY = new FieldType<>("BINARY");
 
+   @Override
+   public String toString() {
+      return "FieldType [id=" + id + "]";
+   }
+
    /**
     *
     */

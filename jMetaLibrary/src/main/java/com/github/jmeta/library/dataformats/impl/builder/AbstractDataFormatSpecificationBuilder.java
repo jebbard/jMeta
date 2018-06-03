@@ -87,7 +87,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
       this.name = name;
       this.description = description;
       this.type = type;
-      this.globalId = localId;
       this.isGeneric = isGeneric;
 
       this.parentBuilder = parentBuilder;
@@ -127,27 +126,18 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#addChildDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
     */
    @Override
-   public void addChildDescription(DataBlockDescription childDesc) {
-      Reject.ifNull(childDesc, "childDesc");
+   public void addChildDescription(DataBlockDescription childDescription) {
+      Reject.ifNull(childDescription, "childDescription");
 
-      childDescriptions.put(childDesc.getId(), childDesc);
-   }
-
-   public void removeChildDescription(DataBlockId childId) {
-      Reject.ifNull(childId, "childId");
-
-      childDescriptions.remove(childId);
+      childDescriptions.put(childDescription.getId(), childDescription);
    }
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withStaticLengthOf(long)
     */
-   @SuppressWarnings("unchecked")
    @Override
    public C withStaticLengthOf(long staticByteLength) {
-      this.minimumByteLength = staticByteLength;
-      this.maximumByteLength = staticByteLength;
-      return (C) this;
+      return withLengthOf(staticByteLength, staticByteLength);
    }
 
    /**
@@ -187,6 +177,18 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    }
 
    /**
+    * Allows derived builders to remove a child {@link DataBlockDescription} with a given id
+    * 
+    * @param childId
+    *           The {@link DataBlockId} of the child to remove, must not be null
+    */
+   protected void removeChildDescription(DataBlockId childId) {
+      Reject.ifNull(childId, "childId");
+   
+      childDescriptions.remove(childId);
+   }
+
+   /**
     * Finishes building of this {@link AbstractDataFormatSpecificationBuilder} by creating its
     * {@link DataBlockDescription}, and adding it as child description to its parent {@link DataFormatBuilder} as well
     * as to the root builder.
@@ -200,7 +202,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 
       parentBuilder.addChildDescription(myDescription);
 
-      getRootBuilder().addDataBlockDescription(myDescription, parentBuilder.getGlobalId() == null,
+      getRootBuilder().putDataBlockDescription(myDescription, parentBuilder.getGlobalId() == null,
          this.isDefaultNestedContainer);
 
       return parentBuilder;

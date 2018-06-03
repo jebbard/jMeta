@@ -43,7 +43,14 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * existing {@link ContainerBuilder}, i.e. adding all children and properties from an existing container's
  * {@link DataBlockDescription}.
  */
-public class ContainerBuilderCloner {
+public final class ContainerBuilderCloner {
+
+   /**
+    * Creates a new {@link ContainerBuilderCloner}.
+    */
+   private ContainerBuilderCloner() {
+      // Private to ensure nobody can instantiate it
+   }
 
    /**
     * Clones the {@link DataBlockDescription} of an existing container into the given {@link ContainerBuilder}.
@@ -79,10 +86,8 @@ public class ContainerBuilderCloner {
             + " this id is unknown; you can only clone containers who's id exists and that are already finished");
       }
 
-      if (containerDescription.getPhysicalType() != PhysicalDataBlockType.CONTAINER
-         || !containerDescription.isGeneric()) {
-         throw new IllegalArgumentException(
-            messagePrefix + "it does not refer to a generic CONTAINER data block description");
+      if (containerDescription.getPhysicalType() != PhysicalDataBlockType.CONTAINER) {
+         throw new IllegalArgumentException(messagePrefix + "it does not refer to a CONTAINER data block description");
       }
 
       containerDescription.validateChildren();
@@ -119,70 +124,50 @@ public class ContainerBuilderCloner {
 
          setLengthAndOccurrences(containerBasedPayloadBuilder, payloadDescription);
 
-         List<DataBlockDescription> containerDescriptions = payloadDescription
-            .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
-
-         for (DataBlockDescription childContainerDescription : containerDescriptions) {
-            if (childContainerDescription.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD)
-               .size() == 1) {
-               ContainerBuilder<?, ?> childContainerBuilder = childContainerDescription.isGeneric()
-                  ? containerBasedPayloadBuilder.addGenericContainerWithFieldBasedPayload(
-                     childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
-                     childContainerDescription.getDescription())
-                  : containerBasedPayloadBuilder.addContainerWithFieldBasedPayload(
-                     childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
-                     childContainerDescription.getDescription());
-
-               setLengthAndOccurrences(childContainerBuilder, childContainerDescription);
-
-               cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
-                  PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
-
-               childContainerBuilder.finishContainer();
-            } else {
-               ContainerBuilder<?, ?> childContainerBuilder = childContainerDescription.isGeneric()
-                  ? containerBasedPayloadBuilder.addGenericContainerWithContainerBasedPayload(
-                     childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
-                     childContainerDescription.getDescription())
-                  : containerBasedPayloadBuilder.addContainerWithContainerBasedPayload(
-                     childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
-                     childContainerDescription.getDescription());
-
-               setLengthAndOccurrences(childContainerBuilder, childContainerDescription);
-
-               cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
-                  PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
-
-               childContainerBuilder.finishContainer();
-            }
-         }
+         cloneContainerChildren(payloadDescription, containerBasedPayloadBuilder);
 
          containerBasedPayloadBuilder.finishContainerBasedPayload();
       }
    }
 
-   /**
-    * @param containerBuilder
-    * @param containerDescription
-    * @param existingContainerId
-    * @param clonedContainerId
-    */
-   private static void cloneFooters(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription containerDescription,
-      DataBlockId existingContainerId, DataBlockId clonedContainerId) {
-      List<DataBlockDescription> footerDescriptions = containerDescription
-         .getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
+   private static void cloneContainerChildren(DataBlockDescription payloadDescription,
+      ContainerBasedPayloadBuilder<?> containerBasedPayloadBuilder) {
+      List<DataBlockDescription> containerDescriptions = payloadDescription
+         .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
 
-      for (DataBlockDescription footerDescription : footerDescriptions) {
-         FooterBuilder<?> fb = containerBuilder.addFooter(footerDescription.getId().getLocalId(),
-            footerDescription.getName(), footerDescription.getDescription());
+      for (DataBlockDescription childContainerDescription : containerDescriptions) {
+         if (childContainerDescription.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD)
+            .size() == 1) {
+            ContainerBuilder<?, ?> childContainerBuilder = childContainerDescription.isGeneric()
+               ? containerBasedPayloadBuilder.addGenericContainerWithFieldBasedPayload(
+                  childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
+                  childContainerDescription.getDescription())
+               : containerBasedPayloadBuilder.addContainerWithFieldBasedPayload(
+                  childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
+                  childContainerDescription.getDescription());
 
-         footerDescription.validateChildren();
+            setLengthAndOccurrences(childContainerBuilder, childContainerDescription);
 
-         setLengthAndOccurrences(fb, footerDescription);
+            cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
+               PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
-         cloneFields(fb, footerDescription, existingContainerId, clonedContainerId);
+            childContainerBuilder.finishContainer();
+         } else {
+            ContainerBuilder<?, ?> childContainerBuilder = childContainerDescription.isGeneric()
+               ? containerBasedPayloadBuilder.addGenericContainerWithContainerBasedPayload(
+                  childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
+                  childContainerDescription.getDescription())
+               : containerBasedPayloadBuilder.addContainerWithContainerBasedPayload(
+                  childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
+                  childContainerDescription.getDescription());
 
-         fb.finishFooter();
+            setLengthAndOccurrences(childContainerBuilder, childContainerDescription);
+
+            cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
+               PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
+
+            childContainerBuilder.finishContainer();
+         }
       }
    }
 
@@ -208,6 +193,31 @@ public class ContainerBuilderCloner {
          cloneFields(hb, headerDescription, existingContainerId, clonedContainerId);
 
          hb.finishHeader();
+      }
+   }
+
+   /**
+    * @param containerBuilder
+    * @param containerDescription
+    * @param existingContainerId
+    * @param clonedContainerId
+    */
+   private static void cloneFooters(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription containerDescription,
+      DataBlockId existingContainerId, DataBlockId clonedContainerId) {
+      List<DataBlockDescription> footerDescriptions = containerDescription
+         .getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
+
+      for (DataBlockDescription footerDescription : footerDescriptions) {
+         FooterBuilder<?> fb = containerBuilder.addFooter(footerDescription.getId().getLocalId(),
+            footerDescription.getName(), footerDescription.getDescription());
+
+         footerDescription.validateChildren();
+
+         setLengthAndOccurrences(fb, footerDescription);
+
+         cloneFields(fb, footerDescription, existingContainerId, clonedContainerId);
+
+         fb.finishFooter();
       }
    }
 
@@ -274,16 +284,16 @@ public class ContainerBuilderCloner {
       }
    }
 
-   private static <P, FIT, C extends FieldBuilder<P, FIT, C>> void setCommonFieldProperties(
-      DataBlockDescription fieldDescription, FieldProperties<FIT> fieldProperties, FieldBuilder<P, FIT, C> fb,
+   private static <P, F, C extends FieldBuilder<P, F, C>> void setCommonFieldProperties(
+      DataBlockDescription fieldDescription, FieldProperties<F> fieldProperties, FieldBuilder<P, F, C> fb,
       DataBlockId existingContainerId, DataBlockId clonedContainerId) {
 
       setLengthAndOccurrences(fb, fieldDescription);
 
       fb.withDefaultValue(fieldProperties.getDefaultValue());
 
-      for (Iterator<FIT> iterator = fieldProperties.getEnumeratedValues().keySet().iterator(); iterator.hasNext();) {
-         FIT nextKey = iterator.next();
+      for (Iterator<F> iterator = fieldProperties.getEnumeratedValues().keySet().iterator(); iterator.hasNext();) {
+         F nextKey = iterator.next();
          byte[] nextValue = fieldProperties.getEnumeratedValues().get(nextKey);
 
          fb.addEnumeratedValue(nextValue, nextKey);

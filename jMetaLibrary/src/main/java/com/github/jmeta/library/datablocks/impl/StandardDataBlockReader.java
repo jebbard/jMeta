@@ -1012,8 +1012,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       DataBlockId unknownBlockId = new DataBlockId(m_spec.getDataFormat(), parentId,
          DataFormatSpecification.UNKNOWN_FIELD_ID);
 
-      FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 },
-         null, null, null, null, null, null, false);
+      FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
+         null, null, null, null, null, false, null);
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<>(),

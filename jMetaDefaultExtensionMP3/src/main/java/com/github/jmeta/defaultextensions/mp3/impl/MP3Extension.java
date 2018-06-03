@@ -23,7 +23,6 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -39,7 +38,7 @@ public class MP3Extension implements Extension {
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    private static final int FRAME_SYNC_BIT_COUNT = 11;
-   private static final byte[] MP3_FRAME_SYNC = new byte[] { -1, -32 }; // 11 one bits
+   private static final byte[] MP3_FRAME_SYNC = new byte[] { -1, -32, 0, 0 }; // 11 one bits
    private static final int MP3_HEADER_BYTE_LENGTH = 4;
 
    /**
@@ -83,7 +82,6 @@ public class MP3Extension implements Extension {
    private DataFormatSpecification createSpecification() {
 
       // Data blocks
-      final DataBlockId mp3FrameId = new DataBlockId(MP3, "mp3");
       /*
        * Bit layout of the MPEG-1 Audio header Byte: -- 00 -- -- 01 -- -- 02 -- -- 03 -- Bit index in byte: 76543210
        * 76543210 76543210 76543210 Bit contents: AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM Description: A: Frame sync B: MPEG
@@ -93,7 +91,6 @@ public class MP3Extension implements Extension {
       DataBlockId crcId = new DataBlockId(MP3Extension.MP3, "mp3.crc");
 
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(MP3Extension.MP3);
-      final DataBlockId mp3HeaderContentId = new DataBlockId(MP3, "mp3.header.content");
 
       // @formatter:off
       builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
@@ -103,7 +100,7 @@ public class MP3Extension implements Extension {
                .withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
                .withFlagSpecification(MP3_HEADER_BYTE_LENGTH,
                   ByteOrder.BIG_ENDIAN)
-                  .withDefaultFlagBytes(new byte[MP3_HEADER_BYTE_LENGTH])
+                  .withDefaultFlagBytes(MP3_FRAME_SYNC)
                   .addFlagDescription(new FlagDescription("Frame sync", new BitAddress(0, 0), "", FRAME_SYNC_BIT_COUNT, null))
                   .addFlagDescription(new FlagDescription("No protection bit", new BitAddress(1, 0), "", 1, null))
                   .addFlagDescription(new FlagDescription("Layer", new BitAddress(1, 1), "", 2, List.of("reserved", "Layer III", "Layer II", "Layer I")))
@@ -119,6 +116,7 @@ public class MP3Extension implements Extension {
                   .addFlagDescription(new FlagDescription("Mode bit", new BitAddress(3, 6), "", 2, null))
                .finishFlagSpecification()
                .indicatesPresenceOf("No protection bit", 0, crcId)
+               .asMagicKeyWithOddBitLength(11)
             .finishField()
          .finishHeader()
          .addHeader("crc", "MP3 CRC", "The MP3 CRC")
@@ -135,7 +133,6 @@ public class MP3Extension implements Extension {
             .finishField()
          .finishFieldBasedPayload()
       .finishContainer()
-      .addCustomHeaderMagicKey(mp3FrameId, new MagicKey(MP3_FRAME_SYNC, FRAME_SYNC_BIT_COUNT, mp3HeaderContentId, 0))
       .withByteOrders(ByteOrder.BIG_ENDIAN)
       .withCharsets(Charsets.CHARSET_ISO);
       // @formatter:on

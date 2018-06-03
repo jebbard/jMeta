@@ -844,39 +844,41 @@ We already covered sizes of data blocks (including fields) and we already define
 %%%% DD --> %%%%
 \DD{dd:530}
 {% Title
-Fields have one of the types binary, string, numeric, enumerated or flags
+Fields have one of the types binary, string, numeric, string list or flags
 }
 {% Short description
 Every field has a field type, and thus not only a \textbf{binary value}, but also an \textbf{interpreted value}. The field types are:
 \begin{itemize}
 \item \textbf{String:} The field's value is representing a string in a specific encoding.
 \item \textbf{Binary:} The field's value is not further interpreted, i.e. the interpreted value is identical to the binary value of the field. I.e. this could be used to represent raw encoded bytes of a codec.
+\item \textbf{String List:} The field's value corresponds to a list of strings.
 \item \textbf{Numeric:} The field's value is representing a numeric value with a specific byte order.
-\item \textbf{Enumerated:} The field's value must be one out of a fixed set of values; the interpreted value is allowed to have an arbitrary type, but the field's specification must provide a static map of all allowed byte values (keys) mapped to their interpreted values.
 \item \textbf{Flags:} The field's value is representing flags, i.e. a set of bit toggles, e.g. vital for parsing. 
 \end{itemize}
 }
 {% Rationale
 Parsers can directly read the interpreted values of the fields they need for parsing (e.g. sizes, flags or others) without needing to implement conversion to an interpreted value themselves. Interpretation should be kept inside the format specific code - in this case in the data format specification.
 
-All of the field types of our reference data formats can be covered by these types. 
+All of the field types of our reference data formats can be covered by these types.
+
+The string list type is unfortunately necessary just for the sake of ID3v2.4. 
 }
 {% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
 
-First, we will care about the string fields:
+First, we will care about the string and string list fields:
 %%%% DD --> %%%%
 \DD{dd:531}
 {% Title
-String fields support termination characters and fixed character encoding as specific properties
+String fields and string list fields support termination characters and fixed character encoding as specific properties
 }
 {% Short description
-A non-fixed-size string field can be terminated by a single termination character given in the field's character encoding known at parsing time. Second, a string field might have a fixed character encoding to be used. Both are optional properties.  
+A non-fixed-size string field or string list field can be terminated by a single termination character given in the field's character encoding known at parsing time. Second, a string field might have a fixed character encoding to be used. Both are optional properties.  
 }
 {% Rationale
-String fields can be terminated by termination characters, this is needed e.g. in ID3v1 and ID3v23 data formats, where the actual number of termination bytes depends on the current character encoding. Thus, it is best to define a termination character and then decide at parsing time, which bytes according to the current character encoding are expected as termination bytes. See also \DesLink{dd:532}.
+String fields can be terminated by termination characters, this is needed e.g. in ID3v1 and ID3v23 data formats, where the actual number of termination bytes depends on the current character encoding. Thus, it is best to define a termination character and then decide at parsing time, which bytes according to the current character encoding are expected as termination bytes. For string lists, the termination character also acts as separator between different list entries. See also \DesLink{dd:532}.
 
 Some specifications define fixed character encodings for specific string fields that might deviate from the data format's default character encoding.
 }
@@ -919,26 +921,9 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-For enumerate fields, we define the following:
-%%%% DD --> %%%%
-\DD{dd:534}
-{% Title
-Enumerated fields require a static mapping of allowed enumerated values
-}
-{% Short description
-Every enumerated field must define a static map of all enumerated values that are allowed for the field. The mapping contains an interpreted value as key and maps it to its byte representation. Not only the keys must be (of course) unique, but also the values.
-}
-{% Rationale
-This is the nature of enumerations.
-}
-{% Disadvantes
-No disadvantages known
-}
-%%%% <-- DD %%%%
-
 For flags, it would be convenient to describe them in particular, e.g. which flags are there, where are they and what is their meaning. Thus we introduce a new class:
 %%%% DD --> %%%%
-\DD{dd:535}
+\DD{dd:534}
 {% Title
 Flag fields require an instance of \texttt{FlagSpecification} that describes all flags in a flags field
 }
@@ -957,6 +942,23 @@ It is more convenient to access the flags, in contrast to doing bitwise OR and A
 }
 {% Disadvantes
 No disadvantages known
+}
+%%%% <-- DD %%%%
+
+One question that could arise now is: Why do we not have ``enumerated fields''? Actually, we had them in a previous version. They could allow for an \emph{arbitrary} interpreted type, allowing the end user to map arbitrary objects to their byte representation for a field. Although this might seem very flexible and extensible, we explicitly decided to remove it:
+%%%% DD --> %%%%
+\DD{dd:535}
+{% Title
+No ``enumerated'' field type, but an enumeration property
+}
+{% Short description
+There is no such field type called ``enumerated'', but only the already mentioned field types. Instead, every field has an additional property, basically a mapping that enumerates all possible interpreted values mapped to their unique binary interpretation. This way, it is still possible to provide a fixed value set for e.g. validation or specific conversions.
+}
+{% Rationale
+The main problem with an explicit enumerated field type is its \emph{arbitrary} interpreted type. The runtime cannot know which type it is and requires very adventurous casting to get it done, or you need to write special code essentially duplicating the same logic for enums vs. concrete types. As we can still enumerate, this is fine. The only place where it hurts a bit are fields that are representing a Charset or a ByteOrder. Here it would be nice to have an enumerated field type as Charset or ByteOrder. However, it is simply possible to map bytes to string representations of Charsets and ByteOrders, i.e. having a String field instead.
+}
+{% Disadvantes
+Maybe less flexibility for future demands and less support for actual object orientation
 }
 %%%% <-- DD %%%%
 
@@ -998,6 +1000,35 @@ No disadvantages known
 % =======================================================================================================
 \subsection{Payload Properties}%
 \label{sec:PayloadProperties}%
+
+% =======================================================================================================
+\subsection{Builder API}%
+\label{sec:BuilderAPI}%
+
+From all that has been said previously, it might already be clear that a \texttt{DataFormatSpecification} is a complex thing: We have data blocks of very different types, each type with its individual properties and corresponding validity aspects, organized hierarchically. If we want user to create this, this can get very nasty. Actually, in a first version, there was just a plain old java interface for creating a \texttt{DataFormatSpecification}: A lot of boiler-plate code, creating and populating collections, wiring parents and children, filling attributes that have no meaning for a type with their default values, filling up values such as lenghts for parents and children redundantly etc.
+
+So this is not only a pain to write, but also a pain to read and maintain. Thus we introduced a builder API as a quantum leap in contrast to the original API:
+%%%% DD --> %%%%
+\DD{dd:550}
+{% Title
+Builder API for creating valid \texttt{DataFormatSpecification}s and \texttt{DataBlockDescription}s
+}
+{% Short description
+\COMPdataFormatManagement{} provides a comfortable builder API for building a \texttt{DataFormatSpecification} from its individual \texttt{DataBlockDescription}s. It uses method names for providing data block type and if it is generic or not, method parameters for adding the local id, name and description, and nested methods for setting other properties and adding children to a data block. It removes a lot of boiler-plate code, ensures the user only sees the properties that are really valid for the given type, and wires parents and children as well as their ids correctly.
+}
+{% Rationale
+The user can add a new \texttt{DataFormatSpecification} much more conveniently. Furthermore, the code remains short and readable (thus maintainable), still communicating only what happens without any noise.
+
+In addition, we noticed the following interesting benefits of the builder API:
+\begin{itemize}
+\item The user is not required to directly depend on the implementation of \texttt{DataFormatSpecification}
+\item Cloning of data blocks can be implemented and provided in an easier way
+\end{itemize}
+}
+{% Disadvantes
+The builder API of course needs to be built and maintained, it is a complex structure of interdepentend classes and interfaces with a lot of generics magic. 
+}
+%%%% <-- DD %%%%
 
 
 %###############################################################################################

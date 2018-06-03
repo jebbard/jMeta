@@ -356,41 +356,6 @@ public class DataBlockDescription {
          + headerMagicKeys + ", footerMagicKeys=" + footerMagicKeys + "]";
    }
 
-   private void validateDataBlockDescription() {
-      // Validate that mandatory fields are present
-      Reject.ifNull(id, "id");
-      Reject.ifNull(name, "name");
-      Reject.ifNull(description, "description");
-      Reject.ifNull(physicalType, "physicalType");
-      Reject.ifNull(orderedChildren, "childIds");
-
-      String messagePrefix = "Error validating [" + id + "]: ";
-
-      // Validate lengths
-      Reject.ifNegative(minimumByteLength, "minimumByteLength");
-      Reject.ifNegative(maximumByteLength, "maximumByteLength");
-      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
-
-      // Validate occurrences
-      Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
-
-      // Validate children
-      validateChildren();
-
-      // Validate field properties
-      if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
-         throw new IllegalArgumentException(
-            messagePrefix + "Data block is typed as FIELD, but its field properties are null");
-      } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
-         throw new IllegalArgumentException(
-            messagePrefix + "Data block not typed as FIELD, but it has non-null field properties");
-      }
-
-      if (physicalType == PhysicalDataBlockType.FIELD) {
-         validateFieldProperties(messagePrefix, getFieldProperties());
-      }
-   }
-
    public void validateChildren() {
       String messagePrefix = "Error validating [" + id + "]: ";
 
@@ -431,6 +396,41 @@ public class DataBlockDescription {
       }
    }
 
+   private void validateDataBlockDescription() {
+      // Validate that mandatory fields are present
+      Reject.ifNull(id, "id");
+      Reject.ifNull(name, "name");
+      Reject.ifNull(description, "description");
+      Reject.ifNull(physicalType, "physicalType");
+      Reject.ifNull(orderedChildren, "childIds");
+
+      String messagePrefix = "Error validating [" + id + "]: ";
+
+      // Validate lengths
+      Reject.ifNegative(minimumByteLength, "minimumByteLength");
+      Reject.ifNegativeOrZero(maximumByteLength, "maximumByteLength");
+      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
+
+      // Validate occurrences
+      Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
+
+      // Validate children
+      validateChildren();
+
+      // Validate field properties
+      if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
+         throw new IllegalArgumentException(
+            messagePrefix + "Data block is typed as FIELD, but its field properties are null");
+      } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
+         throw new IllegalArgumentException(
+            messagePrefix + "Data block not typed as FIELD, but it has non-null field properties");
+      }
+
+      if (physicalType == PhysicalDataBlockType.FIELD) {
+         validateFieldProperties(messagePrefix, getFieldProperties());
+      }
+   }
+
    /**
     * @param messagePrefix
     */
@@ -447,10 +447,14 @@ public class DataBlockDescription {
                   + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
          }
 
-         if (fieldProperties.getFieldType() == FieldType.FLAGS) {
+         if (fieldProperties.getEnumeratedValues().isEmpty() && fieldProperties.getDefaultValue() == null) {
             throw new IllegalArgumentException(messagePrefix
-               + "Data block is tagged as magic key, and it must have field type BINARY, STRING, UNSIGNED_WHOLE_NUMER or ENUMERATED, but it was <"
-               + fieldProperties.getFieldType() + ">");
+               + "Data block is tagged as magic key, but it has neither enumerated values nor a default value set");
+         }
+
+         if (fieldProperties.getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
+            throw new IllegalArgumentException(messagePrefix
+               + "Data block is tagged as magic key, but it has type NUMERIC. Magic key fields must have one of the types STRING, BINARY or FLAGS");
          }
 
          // TODO fixed length == key length

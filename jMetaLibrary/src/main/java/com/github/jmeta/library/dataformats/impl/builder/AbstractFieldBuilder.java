@@ -53,6 +53,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    private final Map<FIT, byte[]> enumeratedValues = new HashMap<>();
    private final FieldType<FIT> fieldType;
    private final List<FieldFunction> functions = new ArrayList<>();
+   private Integer magicKeyBitLength = null;
 
    /**
     * Creates a new {@link AbstractFieldBuilder}.
@@ -178,6 +179,15 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asMagicKeyWithOddBitLength(byte)
+    */
+   @Override
+   public C asMagicKeyWithOddBitLength(int bitLength) {
+      this.magicKeyBitLength = bitLength;
+      return asMagicKey();
+   }
+
+   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#addEnumeratedValue(byte[],
     *      java.lang.Object)
     */
@@ -194,7 +204,8 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    @Override
    public P finishField() {
       FieldProperties<FIT> fieldProperties = new FieldProperties<>(fieldType, defaultValue, enumeratedValues,
-         terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions, isMagicKey);
+         terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions, isMagicKey,
+         magicKeyBitLength);
 
       setFieldProperties(fieldProperties);
 

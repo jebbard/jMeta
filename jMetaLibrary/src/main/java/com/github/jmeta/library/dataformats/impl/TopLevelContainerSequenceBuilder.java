@@ -25,7 +25,6 @@ import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPaylo
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.impl.builder.StandardContainerBasedPayloadContainerBuilder;
 import com.github.jmeta.library.dataformats.impl.builder.StandardFieldBasedPayloadContainerBuilder;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -77,12 +76,12 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#addDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#putDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
     *      boolean, boolean)
     */
    @Override
-   public DataFormatSpecificationBuilder addDataBlockDescription(DataBlockDescription newDescription,
-      boolean isTopLevel, boolean isDefaultNestedContainer) {
+   public void putDataBlockDescription(DataBlockDescription newDescription, boolean isTopLevel,
+      boolean isDefaultNestedContainer) {
       Reject.ifNull(newDescription, "newDescription");
 
       overallDescriptions.put(newDescription.getId(), newDescription);
@@ -104,28 +103,6 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
 
          this.defaultNestedContainerDesc = newDescription;
       }
-
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#addCustomHeaderMagicKey(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.dataformats.api.types.MagicKey)
-    */
-   @Override
-   public DataFormatSpecificationBuilder addCustomHeaderMagicKey(DataBlockId containerId, MagicKey magicKey) {
-      overallDescriptions.get(containerId).addHeaderMagicKey(magicKey);
-      return this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#addCustomFooterMagicKey(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.dataformats.api.types.MagicKey)
-    */
-   @Override
-   public DataFormatSpecificationBuilder addCustomFooterMagicKey(DataBlockId containerId, MagicKey magicKey) {
-      overallDescriptions.get(containerId).addFooterMagicKey(magicKey);
-      return this;
    }
 
    /**

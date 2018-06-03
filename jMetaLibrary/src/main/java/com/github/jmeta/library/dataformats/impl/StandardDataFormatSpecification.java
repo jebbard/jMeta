@@ -26,9 +26,11 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -115,8 +117,6 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     * @return
     */
    private DataBlockDescription createConcreteDescription(DataBlockId id) {
-      System.out.println("ID:" + id);
-
       DataBlockId matchingGenericId = getMatchingGenericId(id);
 
       DataBlockDescription genericDescription = getDataBlockDescription(matchingGenericId);
@@ -399,18 +399,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                   magicKeyOffset -= fieldDesc.getMinimumByteLength();
                }
 
-               if (fieldDesc.getFieldProperties().getFieldType() == FieldType.STRING) {
-                  magicKeys.add(new MagicKey((String) fieldDesc.getFieldProperties().getDefaultValue(),
-                     fieldDesc.getId(), magicKeyOffset));
-               } else if (fieldDesc.getFieldProperties().getFieldType() == FieldType.BINARY) {
-                  magicKeys.add(new MagicKey((byte[]) fieldDesc.getFieldProperties().getDefaultValue(),
-                     fieldDesc.getId(), magicKeyOffset));
-                  // TODO Add magic keys if enumerated and not fixed!
-                  // } else if (fieldDesc.getFieldProperties().getFieldType() == FieldType.ENUMERATED) {
-                  // for (Object enumeratedValue : fieldDesc.getFieldProperties().getEnumeratedValues().keySet()) {
-                  // magicKeys.add(new MagicKey((String) enumeratedValue, fieldDesc.getId(), magicKeyOffset));
-                  // }
-               }
+               magicKeys.addAll(determineFieldMagicKeys(magicKeyOffset, fieldDesc));
             } else {
                if (type == PhysicalDataBlockType.HEADER) {
                   magicKeyOffset += fieldDesc.getMinimumByteLength();
@@ -432,6 +421,59 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       }
 
       return magicKeys;
+   }
+
+   private List<MagicKey> determineFieldMagicKeys(long magicKeyOffset, DataBlockDescription fieldDesc) {
+      List<MagicKey> fieldMagicKeys = new ArrayList<>();
+
+      FieldProperties<?> fieldProperties = fieldDesc.getFieldProperties();
+
+      if (!fieldProperties.getEnumeratedValues().isEmpty()) {
+         // TODO implement
+      } else if (fieldProperties.getDefaultValue() != null) {
+         byte[] magicKeyBytes = null;
+
+         if (fieldProperties.getFieldType() == FieldType.STRING) {
+            magicKeyBytes = ((String) fieldProperties.getDefaultValue()).getBytes(Charsets.CHARSET_ASCII);
+         } else if (fieldProperties.getFieldType() == FieldType.BINARY) {
+            magicKeyBytes = (byte[]) fieldProperties.getDefaultValue();
+         } else if (fieldProperties.getFieldType() == FieldType.FLAGS) {
+            magicKeyBytes = fieldProperties.getFlagSpecification().getDefaultFlagBytes();
+         } else {
+            // Note that validation is already done in DataBlockDescription so this should never be thrown
+            throw new IllegalStateException("Invalid magic key field type");
+         }
+
+         if (fieldProperties.getMagicKeyBitLength() != null) {
+            if (fieldProperties.getMagicKeyBitLength() > magicKeyBytes.length * Byte.SIZE) {
+               throw new IllegalArgumentException("Magic key bit length <" + fieldProperties.getMagicKeyBitLength()
+                  + "> specified for magic key field <" + fieldDesc.getId() + "> exceeds its binary value length of <"
+                  + (magicKeyBytes.length * Byte.SIZE) + "> bits");
+            }
+
+            int actualMagicKeyByteLength = fieldProperties.getMagicKeyBitLength() / Byte.SIZE
+               + (fieldProperties.getMagicKeyBitLength() % Byte.SIZE > 0 ? 1 : 0);
+
+            byte[] adaptedMagicKeyBytes = magicKeyBytes;
+
+            if (actualMagicKeyByteLength < magicKeyBytes.length) {
+               adaptedMagicKeyBytes = new byte[actualMagicKeyByteLength];
+
+               System.arraycopy(magicKeyBytes, 0, adaptedMagicKeyBytes, 0, actualMagicKeyByteLength);
+            }
+
+            fieldMagicKeys.add(new MagicKey(adaptedMagicKeyBytes, fieldProperties.getMagicKeyBitLength(),
+               fieldDesc.getId(), magicKeyOffset));
+         } else {
+            fieldMagicKeys.add(new MagicKey(magicKeyBytes, fieldDesc.getId(), magicKeyOffset));
+         }
+
+      } else {
+         // Note that validation is already done in DataBlockDescription so this should never be thrown
+         throw new IllegalStateException("Invalid magic key field");
+      }
+
+      return fieldMagicKeys;
    }
 
    private final DataBlockId defaultNestedContainerId;

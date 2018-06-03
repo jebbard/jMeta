@@ -105,6 +105,12 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
       DataBlockId fieldSequenceId = new DataBlockId(getDataFormat(), getGlobalId());
       DataBlockDescription fieldSequenceDescription = getRootBuilder().getDataBlockDescription(fieldSequenceId);
 
+      if (fieldSequenceDescription == null) {
+         throw new IllegalArgumentException("Field sequence with id <" + fieldSequenceId
+            + "> not yet present in the root builder - You must call remove field only on cloned field "
+            + "sequences which were already finished when cloning");
+      }
+
       if (!fieldSequenceDescription.hasChildWithLocalId(localId)) {
          throw new IllegalArgumentException(
             "Field local id <" + localId + "> - not found as a a child id of <" + getGlobalId() + ">");

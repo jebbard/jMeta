@@ -17,5 +17,6 @@
     "sec:FieldFunctions"
     "sec:HeaderProperties"
     "sec:ContainerProperties"
-    "sec:PayloadProperties")))
+    "sec:PayloadProperties"
+    "sec:BuilderAPI")))
 
