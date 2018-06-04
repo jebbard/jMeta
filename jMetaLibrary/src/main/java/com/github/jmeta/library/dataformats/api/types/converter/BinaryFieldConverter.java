@@ -18,7 +18,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
  * {@link BinaryFieldConverter}
  *
  */
-public class BinaryFieldConverter extends AbstractBaseFieldConverter<ByteBuffer> {
+public class BinaryFieldConverter extends AbstractBaseFieldConverter<byte[]> {
 
    /**
     * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
@@ -26,9 +26,18 @@ public class BinaryFieldConverter extends AbstractBaseFieldConverter<ByteBuffer>
     *      java.nio.charset.Charset)
     */
    @Override
-   protected ByteBuffer convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding) {
-      return binaryValue;
+   protected byte[] convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+      Charset characterEncoding) {
+
+      binaryValue.mark();
+
+      byte[] bytes = new byte[binaryValue.remaining()];
+
+      binaryValue.get(bytes);
+
+      binaryValue.reset();
+
+      return bytes;
    }
 
    /**
@@ -37,8 +46,8 @@ public class BinaryFieldConverter extends AbstractBaseFieldConverter<ByteBuffer>
     *      java.nio.charset.Charset)
     */
    @Override
-   protected ByteBuffer convertInterpretedToBinary(ByteBuffer interpretedValue, DataBlockDescription desc,
+   protected ByteBuffer convertInterpretedToBinary(byte[] interpretedValue, DataBlockDescription desc,
       ByteOrder byteOrder, Charset characterEncoding) {
-      return interpretedValue;
+      return ByteBuffer.wrap(interpretedValue);
    }
 }

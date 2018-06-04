@@ -42,7 +42,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     * @param offset
     *           The start {@link MediumOffset} of the payload
     * @param totalSize
-    *           The total payload size, if already known, or {@link DataBlockDescription#UNKNOWN_SIZE} if not yet known
+    *           The total payload size, if already known, or {@link DataBlockDescription#UNDEFINED} if not yet known
     * @param dataBlockReader
     *           The {@link DataBlockReader} to be used parsing the content of the payload
     * @param context
@@ -58,7 +58,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
 
       // The size of the payload is still unknown - There is no other way than to read
       // its children and sum up their sizes
-      if (totalSize == DataBlockDescription.UNKNOWN_SIZE) {
+      if (totalSize == DataBlockDescription.UNDEFINED) {
          long summedUpTotalSize = 0;
          List<Field<?>> fields = getFields();
 

@@ -7,6 +7,9 @@
 
 package com.github.jmeta.library.dataformats.api.types;
 
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.*;
+
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -17,11 +20,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.types.converter.BinaryFieldConverter;
 import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 import com.github.jmeta.library.dataformats.api.types.converter.FlagsFieldConverter;
 import com.github.jmeta.library.dataformats.api.types.converter.StringFieldConverter;
 import com.github.jmeta.library.dataformats.api.types.converter.UnsignedNumericFieldConverter;
+import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -43,7 +49,7 @@ public class FieldProperties<T> {
 
    private final boolean isMagicKey;
 
-   private final Integer magicKeyBitLength;
+   private final long magicKeyBitLength;
 
    private final Character terminationCharacter;
 
@@ -61,27 +67,9 @@ public class FieldProperties<T> {
       FIELD_CONVERTERS.put(FieldType.STRING, new StringFieldConverter());
    }
 
-   /**
-    * Creates a new {@link FieldProperties}.
-    * 
-    * @param fieldType
-    * @param defaultValue
-    * @param enumeratedValues
-    * @param terminationCharacter
-    * @param flagSpecification
-    * @param fixedCharset
-    * @param fixedByteOrder
-    * @param functions
-    * @param isMagicKey
-    *           TODO
-    * @param magicKeyBitLength
-    *           TODO
-    * @param customConverter
-    *           TODO
-    */
    public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
-      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey, Integer magicKeyBitLength,
+      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey, long magicKeyBitLength,
       FieldConverter<T> customConverter) {
       Reject.ifNull(fieldType, "fieldType");
       Reject.ifNull(enumeratedValues, "enumeratedValues");
@@ -157,7 +145,7 @@ public class FieldProperties<T> {
       return isMagicKey;
    }
 
-   public Integer getMagicKeyBitLength() {
+   public long getMagicKeyBitLength() {
       return magicKeyBitLength;
    }
 
@@ -215,7 +203,7 @@ public class FieldProperties<T> {
       result = prime * result + ((flagSpecification == null) ? 0 : flagSpecification.hashCode());
       result = prime * result + ((functions == null) ? 0 : functions.hashCode());
       result = prime * result + (isMagicKey ? 1231 : 1237);
-      result = prime * result + ((magicKeyBitLength == null) ? 0 : magicKeyBitLength.hashCode());
+      result = prime * result + (int) (magicKeyBitLength ^ (magicKeyBitLength >>> 32));
       result = prime * result + ((terminationCharacter == null) ? 0 : terminationCharacter.hashCode());
       return result;
    }
@@ -274,10 +262,7 @@ public class FieldProperties<T> {
          return false;
       if (isMagicKey != other.isMagicKey)
          return false;
-      if (magicKeyBitLength == null) {
-         if (other.magicKeyBitLength != null)
-            return false;
-      } else if (!magicKeyBitLength.equals(other.magicKeyBitLength))
+      if (magicKeyBitLength != other.magicKeyBitLength)
          return false;
       if (terminationCharacter == null) {
          if (other.terminationCharacter != null)
@@ -299,34 +284,39 @@ public class FieldProperties<T> {
          + flagSpecification + ", fixedByteOrder=" + fixedByteOrder + "]";
    }
 
-   void validateFieldProperties(String messagePrefix, long minimumByteLength, long maximumByteLength) {
+   void validateFieldProperties(DataBlockDescription desc) {
+      long minimumByteLength = desc.getMinimumByteLength();
+      long maximumByteLength = desc.getMaximumByteLength();
+
       boolean hasFixedSize = minimumByteLength == maximumByteLength;
+
+      String messagePrefix = "Error validating field properties for <" + desc.getId() + ">: ";
 
       // Validate magic key
       if (isMagicKey()) {
-         if (!hasFixedSize || maximumByteLength == DataBlockDescription.UNKNOWN_SIZE) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field is tagged as magic key, but it has a variable size: min length = <"
-                  + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
+         if (!hasFixedSize || maximumByteLength == DataBlockDescription.UNDEFINED) {
+            throw new InvalidSpecificationException(
+               VLD_MAGIC_KEY_INVALID_FIELD_LENGTH, desc, 
+                  minimumByteLength, maximumByteLength);
          }
 
          if (getEnumeratedValues().isEmpty() && getDefaultValue() == null) {
-            throw new IllegalArgumentException(messagePrefix
-               + "Data block is tagged as magic key, but it has neither enumerated values nor a default value set");
+            throw new InvalidSpecificationException(VLD_MAGIC_KEY_INVALID_FIELD_VALUE, desc);
          }
 
          if (getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
-            throw new IllegalArgumentException(messagePrefix
-               + "Data block is tagged as magic key, but it has type NUMERIC. Magic key fields must have one of the types STRING, BINARY or FLAGS");
+            throw new InvalidSpecificationException(VLD_MAGIC_KEY_INVALID_FIELD_TYPE, desc);
          }
 
-         if (getMagicKeyBitLength() != null && getMagicKeyBitLength() <= 0) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Data block is tagged as magic key but its bit length set is zero or negative: "
-                  + getMagicKeyBitLength());
+         if (getMagicKeyBitLength() != DataBlockDescription.UNDEFINED && getMagicKeyBitLength() <= 0) {
+            throw new InvalidSpecificationException(VLD_MAGIC_KEY_BIT_LENGTH_TOO_SMALL, desc, getMagicKeyBitLength());
          }
 
-         // TODO fixed length == key length
+         if (getMagicKeyBitLength() != DataBlockDescription.UNDEFINED
+            && getMagicKeyBitLength() > maximumByteLength * Byte.SIZE) {
+            throw new InvalidSpecificationException(VLD_MAGIC_KEY_BIT_LENGTH_BIGGER_THAN_FIXED_SIZE, desc,
+                  maximumByteLength * Byte.SIZE, getMagicKeyBitLength());
+         }
       }
 
       // Validate enumerated fields
@@ -337,53 +327,45 @@ public class FieldProperties<T> {
          byte[] nextValue = getEnumeratedValues().get(nextKey);
 
          if (binaryValues.containsKey(nextValue)) {
-            throw new IllegalArgumentException(messagePrefix + "Binary representation <" + Arrays.toString(nextValue)
-               + "> of enumerated interpreted value <" + nextKey
-               + "> is not unique, it is already used for interpreted value <" + binaryValues.get(nextValue) + ">.");
+            throw new InvalidSpecificationException(VLD_BINARY_ENUMERATED_VALUE_NOT_UNIQUE, desc, 
+               Arrays.toString(nextValue), nextKey, binaryValues.get(nextValue));
          }
 
          if (hasFixedSize && nextValue.length > minimumByteLength) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Binary representation of enmuerated value <" + nextKey + "> with length <"
-                  + nextValue.length + "> is longer than the field's fixed size which is <" + minimumByteLength + ">");
+            throw new InvalidSpecificationException(VLD_BINARY_ENUMERATED_VALUE_TOO_LONG, desc, 
+               nextKey, nextValue.length, minimumByteLength);
          }
       }
 
       if (!getEnumeratedValues().isEmpty() && getDefaultValue() != null) {
          if (!getEnumeratedValues().containsKey(getDefaultValue())) {
-            throw new IllegalArgumentException(messagePrefix + "Default field value <" + getDefaultValue()
-               + "> must be contained in list of enumerated values, but it is not");
+            throw new InvalidSpecificationException(VLD_DEFAULT_VALUE_NOT_ENUMERATED, desc, getDefaultValue());
          }
       }
 
       // Validate numeric fields
       if (getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
          if (minimumByteLength > Long.BYTES || maximumByteLength > Long.BYTES) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has Numeric type, but its minimum or maximum length is bigger than " + Long.BYTES
-                  + ": min length = <" + minimumByteLength + ">, max length = <" + maximumByteLength + ">");
+            throw new InvalidSpecificationException(VLD_NUMERIC_FIELD_TOO_LONG, desc, Long.BYTES, minimumByteLength, maximumByteLength);
          }
       } else {
          if (getFixedByteOrder() != null) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has not Numeric type, but a fixed byte order is defined for it");
+            throw new InvalidSpecificationException(VLD_FIXED_BYTE_ORDER_NON_NUMERIC, desc);
          }
       }
 
       // Validate string fields
       if (getFieldType() != FieldType.STRING) {
          if (getFixedCharacterEncoding() != null) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has not String type, but a fixed character encoding is defined for it");
+            throw new InvalidSpecificationException(VLD_FIXED_CHARSET_NON_STRING, desc);
          }
 
          if (getTerminationCharacter() != null) {
-            throw new IllegalArgumentException(
-               messagePrefix + "Field has not String type, but a termincation character is defined for it");
+            throw new InvalidSpecificationException(VLD_TERMINATION_CHAR_NON_STRING, desc);
          }
       }
 
-      // Validate field functions standalone
+      // Validate field functions stand-alone
       List<FieldFunction> fieldFunctions = getFieldFunctions();
 
       for (FieldFunction fieldFunction : fieldFunctions) {
@@ -391,25 +373,91 @@ public class FieldProperties<T> {
          if (ffType == FieldFunctionType.ID_OF || ffType == FieldFunctionType.CHARACTER_ENCODING_OF
             || ffType == FieldFunctionType.BYTE_ORDER_OF) {
             if (getFieldType() != FieldType.STRING) {
-               throw new IllegalArgumentException(messagePrefix
-                  + "Field is the id of, character encoding of or byte order of another field, but it is not of type String");
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_STRING, desc);
             }
          } else if (ffType == FieldFunctionType.SIZE_OF || ffType == FieldFunctionType.COUNT_OF) {
             if (getFieldType() != FieldType.UNSIGNED_WHOLE_NUMBER) {
-               throw new IllegalArgumentException(messagePrefix
-                  + "Field is the id of, character encoding of or byte order of another field, but it is not of type Numeric");
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_NUMERIC, desc);
             }
          } else if (ffType == FieldFunctionType.PRESENCE_OF) {
             if (getFieldType() != FieldType.FLAGS) {
-               throw new IllegalArgumentException(messagePrefix
-                  + "Field is the id of, character encoding of or byte order of another field, but it is not of type Flags");
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_FLAGS, desc);
             }
          }
-
       }
 
-      // Validate default value
-      // TODO default value length == fixed length
+      validateDefaultValue(messagePrefix, desc);
+   }
+
+   List<MagicKey> determineFieldMagicKeys(DataBlockDescription fieldDesc, long magicKeyOffset) {
+      List<MagicKey> fieldMagicKeys = new ArrayList<>();
+
+      if (!getEnumeratedValues().isEmpty()) {
+         // TODO implement
+      } else if (getDefaultValue() != null) {
+         byte[] magicKeyBytes = null;
+
+         if (getFieldType() == FieldType.STRING) {
+            magicKeyBytes = ((String) getDefaultValue()).getBytes(Charsets.CHARSET_ASCII);
+         } else if (getFieldType() == FieldType.BINARY) {
+            magicKeyBytes = (byte[]) getDefaultValue();
+         } else if (getFieldType() == FieldType.FLAGS) {
+            magicKeyBytes = getFlagSpecification().getDefaultFlagBytes();
+         } // Note that the else case cannot happen due to validation already done
+
+         if (getMagicKeyBitLength() != DataBlockDescription.UNDEFINED) {
+            int maxMagicKeyBitLength = magicKeyBytes.length * Byte.SIZE;
+
+            // TODO move to validation instead!
+            if (getMagicKeyBitLength() > maxMagicKeyBitLength) {
+               throw new InvalidSpecificationException(VLD_MAGIC_KEY_BIT_LENGTH_TOO_BIG, fieldDesc,
+                  getMagicKeyBitLength(), maxMagicKeyBitLength);
+            }
+
+            int actualMagicKeyByteLength = (int) getMagicKeyBitLength() / Byte.SIZE
+               + (getMagicKeyBitLength() % Byte.SIZE > 0 ? 1 : 0);
+
+            byte[] adaptedMagicKeyBytes = magicKeyBytes;
+
+            if (actualMagicKeyByteLength < magicKeyBytes.length) {
+               adaptedMagicKeyBytes = new byte[actualMagicKeyByteLength];
+
+               System.arraycopy(magicKeyBytes, 0, adaptedMagicKeyBytes, 0, actualMagicKeyByteLength);
+            }
+
+            fieldMagicKeys.add(
+               new MagicKey(adaptedMagicKeyBytes, (int) getMagicKeyBitLength(), fieldDesc.getId(), magicKeyOffset));
+         } else {
+            fieldMagicKeys.add(new MagicKey(magicKeyBytes, fieldDesc.getId(), magicKeyOffset));
+         }
+
+      } // Note that the else case cannot happen due to validation already done
+
+      return fieldMagicKeys;
+   }
+
+   private void validateDefaultValue(String messagePrefix, DataBlockDescription fieldDesc) {
+      long maximumByteLength = fieldDesc.getMaximumByteLength();
+
+      if (getDefaultValue() != null) {
+         ByteOrder byteOrderToUse = getFixedByteOrder() != null ? getFixedByteOrder() : ByteOrder.LITTLE_ENDIAN;
+         Charset charsetToUse = getFixedCharacterEncoding() != null ? getFixedCharacterEncoding()
+            : Charsets.CHARSET_ASCII;
+
+         ByteBuffer defaultBinaryValue = null;
+         try {
+            defaultBinaryValue = getConverter().toBinary(getDefaultValue(), fieldDesc, byteOrderToUse, charsetToUse);
+         } catch (InterpretedValueConversionException e) {
+            throw new InvalidSpecificationException(VLD_DEFAULT_VALUE_CONVERSION_FAILED, fieldDesc, e,
+               getDefaultValue());
+         }
+
+         if (maximumByteLength != DataBlockDescription.UNDEFINED
+            && defaultBinaryValue.remaining() > maximumByteLength) {
+            throw new InvalidSpecificationException(VLD_DEFAULT_VALUE_EXCEEDS_LENGTH, fieldDesc,
+               Arrays.toString(defaultBinaryValue.array()), maximumByteLength);
+         }
+      }
    }
 
    private String enumValuesToString() {

@@ -51,10 +51,10 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    private String description;
    private final PhysicalDataBlockType type;
    private FieldProperties<?> fieldProperties;
-   private long minimumByteLength = 0;
-   private long maximumByteLength = DataBlockDescription.UNLIMITED;
-   private int minimumOccurrences = 1;
-   private int maximumOccurrences = 1;
+   private long minimumByteLength = DataBlockDescription.UNDEFINED;
+   private long maximumByteLength = DataBlockDescription.UNDEFINED;
+   private long minimumOccurrences = 1;
+   private long maximumOccurrences = 1;
    private final boolean isGeneric;
 
    /**
@@ -158,7 +158,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     */
    @SuppressWarnings("unchecked")
    @Override
-   public C withOccurrences(int minimumOccurrences, int maximumOccurrences) {
+   public C withOccurrences(long minimumOccurrences, long maximumOccurrences) {
       this.minimumOccurrences = minimumOccurrences;
       this.maximumOccurrences = maximumOccurrences;
       return (C) this;
@@ -184,7 +184,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     */
    protected void removeChildDescription(DataBlockId childId) {
       Reject.ifNull(childId, "childId");
-   
+
       childDescriptions.remove(childId);
    }
 

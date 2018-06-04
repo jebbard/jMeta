@@ -72,7 +72,7 @@ public class StandardHeader extends AbstractDataBlock implements Header {
    public long getTotalSize() {
 
       if (m_fields.size() == 0)
-         return DataBlockDescription.UNKNOWN_SIZE;
+         return DataBlockDescription.UNDEFINED;
 
       long returnedSize = 0;
 
@@ -81,8 +81,8 @@ public class StandardHeader extends AbstractDataBlock implements Header {
          Field<?> field = fieldIterator.next();
 
          // As soon as one child has unknown size, the whole header has unknown size
-         if (field.getTotalSize() == DataBlockDescription.UNKNOWN_SIZE)
-            return DataBlockDescription.UNKNOWN_SIZE;
+         if (field.getTotalSize() == DataBlockDescription.UNDEFINED)
+            return DataBlockDescription.UNDEFINED;
 
          returnedSize += field.getTotalSize();
       }

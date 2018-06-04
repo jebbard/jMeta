@@ -654,11 +654,8 @@ public abstract class AbstractDataBlockAccessorTest {
          try {
             Object actualFieldValue = field.getInterpretedValue();
 
-            if (actualFieldValue instanceof ByteBuffer) {
-               ByteBuffer actualAsBB = (ByteBuffer) actualFieldValue;
-               byte[] actualFieldValueAsByteArray = ByteBufferUtils.asByteArrayCopy(actualAsBB);
-
-               actualFieldValue = actualFieldValueAsByteArray;
+            if (actualFieldValue instanceof byte[]) {
+               byte[] actualFieldValueAsByteArray = (byte[]) actualFieldValue;
 
                Assert.assertArrayEquals((byte[]) expectedFieldValue, actualFieldValueAsByteArray);
             } else {

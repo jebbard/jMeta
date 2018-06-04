@@ -75,7 +75,7 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
          @SuppressWarnings("unchecked")
          Field<Flags> flagsHeaderField = (Field<Flags>) header.getFields().get(0);
 
-         long totalPayloadSize = DataBlockDescription.UNKNOWN_SIZE;
+         long totalPayloadSize = DataBlockDescription.UNDEFINED;
          try {
             Flags flags = flagsHeaderField.getInterpretedValue();
 

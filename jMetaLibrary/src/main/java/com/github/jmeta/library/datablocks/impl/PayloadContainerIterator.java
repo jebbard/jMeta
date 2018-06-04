@@ -59,9 +59,9 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
 
       // If the parent size is known: The already read containers reach to the end of the
       // payload => no further children available
-      long remainingParentByteCount = DataBlockDescription.UNKNOWN_SIZE;
+      long remainingParentByteCount = DataBlockDescription.UNDEFINED;
 
-      if (m_parent.getTotalSize() != DataBlockDescription.UNKNOWN_SIZE) {
+      if (m_parent.getTotalSize() != DataBlockDescription.UNDEFINED) {
          remainingParentByteCount = m_parent.getTotalSize() - (m_nextContainerReference.getAbsoluteMediumOffset()
             - m_parent.getMediumReference().getAbsoluteMediumOffset());
 
@@ -144,7 +144,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
    private void updateProgress(Container container) {
       m_nextContainerReference = m_nextContainerReference.advance(container.getTotalSize());
 
-      if (m_remainingParentSize != DataBlockDescription.UNKNOWN_SIZE)
+      if (m_remainingParentSize != DataBlockDescription.UNDEFINED)
          m_remainingParentSize -= container.getTotalSize();
    }
 

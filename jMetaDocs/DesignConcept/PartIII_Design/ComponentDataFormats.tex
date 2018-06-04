@@ -816,10 +816,28 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+How to deal with uncertainty? It is not always the case that lengths or counts are known. We want a constant here that clearly communicates
+%%%% DD --> %%%%
+\DD{dd:529c}
+{% Title
+Constant for undefined or unknown length and occurrences
+}
+{% Short description
+We define a constant in \texttt{DataBlockDescription} which has the meaning of an undefined or (yet) unknown length, offset or count.
+}
+{% Rationale
+This is e.g. necessary for fields with dynamic length or occurrences, or for relative offsets that cannot be computed due to dynamic lenghts or occurrences. Having only one constant for all reduces confusion and still clearly communicates intent. Using \texttt{null} for undefined is not clearly communicating intent and is less readable. The reason for choosing the smallest negative long is: While offsets might get negative in some cases, lengths and counts never do. It is reasonable to assume that the negative relative offets we need in \COMPdataFormatManagement{} never reach the smallest long.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+
 We just cover one additional special case here: In \DesLink{dd:521} and the follow-up discussion, we already noted that Lyrics3v2 is somewhat special in terms of how to determine its payload size: It cannot be done before parsing it. Instead, it is only known to end when the footer's magic key is found. Thus it is kind of ``terminated''. In a first design, this was handled by some kind of special magic keys, so-called ``exclusion keys'' that where defined to state ``if you find this key, a container of the current type IS NOT present''. However, we decided to redesign this to be less odd:
 
 %%%% DD --> %%%%
-\DD{dd:550}
+\DD{dd:529d}
 {% Title
 Lyrics3v2 payload size is determined in custom implementation
 }

@@ -20,6 +20,7 @@ import java.util.Set;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
@@ -54,7 +55,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    private final Map<FIT, byte[]> enumeratedValues = new HashMap<>();
    private final FieldType<FIT> fieldType;
    private final List<FieldFunction> functions = new ArrayList<>();
-   private Integer magicKeyBitLength = null;
+   private long magicKeyBitLength = DataBlockDescription.UNDEFINED;
    private FieldConverter<FIT> customConverter;
 
    /**
@@ -96,7 +97,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asMagicKeyWithOddBitLength(byte)
     */
    @Override
-   public C asMagicKeyWithOddBitLength(int bitLength) {
+   public C asMagicKeyWithOddBitLength(long bitLength) {
       this.magicKeyBitLength = bitLength;
       return asMagicKey();
    }

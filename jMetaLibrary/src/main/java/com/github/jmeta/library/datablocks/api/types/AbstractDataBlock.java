@@ -60,7 +60,7 @@ public abstract class AbstractDataBlock implements DataBlock {
       Reject.ifNegative(size, "size");
       Reject.ifNull(getMediumReference(), "getMediumReference()");
 
-      if (getTotalSize() != DataBlockDescription.UNKNOWN_SIZE)
+      if (getTotalSize() != DataBlockDescription.UNDEFINED)
          Reject.ifFalse(offset + size <= getTotalSize(), "offset + size <= getTotalSize()");
 
       return getDataBlockReader().readBytes(m_mediumReference.advance(offset), size);

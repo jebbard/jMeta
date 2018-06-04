@@ -7,13 +7,24 @@
 
 package com.github.jmeta.library.dataformats.api.types;
 
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_CONTAINER;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_CONTAINER_BASED_PAYLOAD;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_FIELD;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_FIELD_SEQUENCE;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_TOO_MANY;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_UNKNOWN_OFFSET;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MISSING_FIELD_PROPERTIES;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_UNNECESSARY_FIELD_PROPERTIES;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -22,15 +33,11 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class DataBlockDescription {
 
-   public static final long UNLIMITED = Long.MAX_VALUE;
-
    /**
     * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
     * {@link DataBlock#getTotalSize()}.
     */
-   public final static long UNKNOWN_SIZE = -1;
-
-   public final static long UNKNOWN_OFFSET = -1;
+   public final static long UNDEFINED = Long.MIN_VALUE;
 
    private final DataBlockId id;
    private final String name;
@@ -40,11 +47,13 @@ public class DataBlockDescription {
    private final FieldProperties<?> fieldProperties;
    private final long maximumByteLength;
    private final long minimumByteLength;
-   private final int minimumOccurrences;
-   private final int maximumOccurrences;
+   private final long minimumOccurrences;
+   private final long maximumOccurrences;
    private final boolean isGeneric;
 
-   private long fixedByteOffsetInContainer;
+   private long byteOffsetFromStartOfContainer = UNDEFINED;
+   private long byteOffsetFromEndOfContainer = UNDEFINED;
+
    private final List<MagicKey> headerMagicKeys = new ArrayList<>();
    private final List<MagicKey> footerMagicKeys = new ArrayList<>();
 
@@ -66,23 +75,23 @@ public class DataBlockDescription {
     *           The {@link FieldProperties} of the data block, must be non-null if this {@link PhysicalDataBlockType} is
     *           {@link PhysicalDataBlockType#FIELD}
     * @param minimumOccurrences
-    *           The minimum number of occurrences of this data block or {@link DataBlockDescription#UNLIMITED}, must be
+    *           The minimum number of occurrences of this data block or {@link DataBlockDescription#UNDEFINED}, must be
     *           smaller than or equal to the maximum number of occurrences
     * @param maximumOccurrences
-    *           The maximum number of occurrences of this data block or {@link DataBlockDescription#UNLIMITED}, must be
+    *           The maximum number of occurrences of this data block or {@link DataBlockDescription#UNDEFINED}, must be
     *           bigger than or equal to the minimum number of occurrences
     * @param minimumByteLength
-    *           The minimum length of this data block in bytes or {@link DataBlockDescription#UNKNOWN_SIZE} or
-    *           {@link DataBlockDescription#UNLIMITED}, must be smaller than or equal to the maximum byte length
+    *           The minimum length of this data block in bytes or {@link DataBlockDescription#UNDEFINED}, must be
+    *           smaller than or equal to the maximum byte length
     * @param maximumByteLength
-    *           The maximum length of this data block in bytes or {@link DataBlockDescription#UNKNOWN_SIZE} or
-    *           {@link DataBlockDescription#UNLIMITED}, must be bigger than or equal to the minimum byte length
+    *           The maximum length of this data block in bytes or {@link DataBlockDescription#UNDEFINED}, must be bigger
+    *           than or equal to the minimum byte length
     * @param isGeneric
     *           true if instances of this data block generic, false otherwise
     */
    public DataBlockDescription(DataBlockId id, String name, String description, PhysicalDataBlockType physicalType,
-      List<DataBlockDescription> children, FieldProperties<?> fieldProperties, int minimumOccurrences,
-      int maximumOccurrences, long minimumByteLength, long maximumByteLength, boolean isGeneric) {
+      List<DataBlockDescription> children, FieldProperties<?> fieldProperties, long minimumOccurrences,
+      long maximumOccurrences, long minimumByteLength, long maximumByteLength, boolean isGeneric) {
 
       Reject.ifNull(id, "id");
       Reject.ifNull(name, "name");
@@ -101,7 +110,25 @@ public class DataBlockDescription {
       this.minimumByteLength = minimumByteLength;
       this.maximumByteLength = maximumByteLength;
       this.isGeneric = isGeneric;
+
+      // (A) Stand-alone validation of all fields
       validateDataBlockDescription();
+
+      // (B) Derive properties
+      if (physicalType == PhysicalDataBlockType.CONTAINER) {
+         determineFixedByteOffsetsFromStartOfContainerForAllFields();
+         determineFixedByteOffsetsFromEndOfContainerForAllFields();
+         autoDetectMagicKeys();
+      }
+   }
+
+   /**
+    * Returns the attribute {@link #byteOffsetFromEndOfContainer}.
+    * 
+    * @return the attribute {@link #byteOffsetFromEndOfContainer}
+    */
+   public long getByteOffsetFromEndOfContainer() {
+      return byteOffsetFromEndOfContainer;
    }
 
    /**
@@ -156,16 +183,16 @@ public class DataBlockDescription {
       return description;
    }
 
-   public int getMinimumOccurrences() {
+   public long getMinimumOccurrences() {
       return minimumOccurrences;
    }
 
-   public int getMaximumOccurrences() {
+   public long getMaximumOccurrences() {
       return maximumOccurrences;
    }
 
-   public long getFixedByteOffsetInContainer() {
-      return fixedByteOffsetInContainer;
+   public long getByteOffsetFromStartOfContainer() {
+      return byteOffsetFromStartOfContainer;
    }
 
    public boolean hasFixedSize() {
@@ -173,30 +200,14 @@ public class DataBlockDescription {
    }
 
    public boolean hasChildWithLocalId(String localId) {
-   
+
       for (DataBlockDescription dataBlockDescription : orderedChildren) {
          if (dataBlockDescription.getId().getLocalId().equals(localId)) {
             return true;
          }
       }
-   
+
       return false;
-   }
-
-   public void setFixedByteOffsetInContainer(long fixedByteOffsetInContainer) {
-      this.fixedByteOffsetInContainer = fixedByteOffsetInContainer;
-   }
-
-   public void addHeaderMagicKey(MagicKey magicKey) {
-      Reject.ifNull(magicKey, "magicKey");
-
-      headerMagicKeys.add(magicKey);
-   }
-
-   public void addFooterMagicKey(MagicKey magicKey) {
-      Reject.ifNull(magicKey, "magicKey");
-
-      footerMagicKeys.add(magicKey);
    }
 
    public boolean isGeneric() {
@@ -268,17 +279,18 @@ public class DataBlockDescription {
    public int hashCode() {
       final int prime = 31;
       int result = 1;
+      result = prime * result + (int) (byteOffsetFromEndOfContainer ^ (byteOffsetFromEndOfContainer >>> 32));
+      result = prime * result + (int) (byteOffsetFromStartOfContainer ^ (byteOffsetFromStartOfContainer >>> 32));
       result = prime * result + ((description == null) ? 0 : description.hashCode());
       result = prime * result + ((fieldProperties == null) ? 0 : fieldProperties.hashCode());
-      result = prime * result + (int) (fixedByteOffsetInContainer ^ (fixedByteOffsetInContainer >>> 32));
       result = prime * result + ((footerMagicKeys == null) ? 0 : footerMagicKeys.hashCode());
       result = prime * result + ((headerMagicKeys == null) ? 0 : headerMagicKeys.hashCode());
       result = prime * result + ((id == null) ? 0 : id.hashCode());
       result = prime * result + (isGeneric ? 1231 : 1237);
       result = prime * result + (int) (maximumByteLength ^ (maximumByteLength >>> 32));
-      result = prime * result + maximumOccurrences;
+      result = prime * result + (int) (maximumOccurrences ^ (maximumOccurrences >>> 32));
       result = prime * result + (int) (minimumByteLength ^ (minimumByteLength >>> 32));
-      result = prime * result + minimumOccurrences;
+      result = prime * result + (int) (minimumOccurrences ^ (minimumOccurrences >>> 32));
       result = prime * result + ((name == null) ? 0 : name.hashCode());
       result = prime * result + ((orderedChildren == null) ? 0 : orderedChildren.hashCode());
       result = prime * result + ((physicalType == null) ? 0 : physicalType.hashCode());
@@ -297,6 +309,10 @@ public class DataBlockDescription {
       if (getClass() != obj.getClass())
          return false;
       DataBlockDescription other = (DataBlockDescription) obj;
+      if (byteOffsetFromEndOfContainer != other.byteOffsetFromEndOfContainer)
+         return false;
+      if (byteOffsetFromStartOfContainer != other.byteOffsetFromStartOfContainer)
+         return false;
       if (description == null) {
          if (other.description != null)
             return false;
@@ -306,8 +322,6 @@ public class DataBlockDescription {
          if (other.fieldProperties != null)
             return false;
       } else if (!fieldProperties.equals(other.fieldProperties))
-         return false;
-      if (fixedByteOffsetInContainer != other.fixedByteOffsetInContainer)
          return false;
       if (footerMagicKeys == null) {
          if (other.footerMagicKeys != null)
@@ -358,17 +372,15 @@ public class DataBlockDescription {
          + physicalType + ", orderedChildren=" + orderedChildren + ", fieldProperties=" + fieldProperties
          + ", maximumByteLength=" + maximumByteLength + ", minimumByteLength=" + minimumByteLength
          + ", minimumOccurrences=" + minimumOccurrences + ", maximumOccurrences=" + maximumOccurrences + ", isGeneric="
-         + isGeneric + ", fixedByteOffsetInContainer=" + fixedByteOffsetInContainer + ", headerMagicKeys="
+         + isGeneric + ", fixedByteOffsetInContainer=" + byteOffsetFromStartOfContainer + ", headerMagicKeys="
          + headerMagicKeys + ", footerMagicKeys=" + footerMagicKeys + "]";
    }
 
    public void validateChildren() {
-      String messagePrefix = "Error validating [" + id + "]: ";
-
       switch (physicalType) {
          case FIELD:
             if (orderedChildren.size() != 0) {
-               throw new IllegalArgumentException(messagePrefix + "Data block is typed as field, but it has children");
+               throw new InvalidSpecificationException(VLD_INVALID_CHILDREN_FIELD, this);
             }
          break;
          case HEADER:
@@ -377,8 +389,7 @@ public class DataBlockDescription {
             List<DataBlockDescription> fieldChildren = getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
 
             if (fieldChildren.size() != orderedChildren.size()) {
-               throw new IllegalArgumentException(messagePrefix
-                  + "Data blocks of types HEADER, FOOTER or FIELD_BASED_PAYLOAD must only have fields as children");
+               throw new InvalidSpecificationException(VLD_INVALID_CHILDREN_FIELD_SEQUENCE, this);
             }
          break;
          case CONTAINER:
@@ -387,28 +398,32 @@ public class DataBlockDescription {
             payloadChildren.addAll(getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD));
 
             if (payloadChildren.size() != 1) {
-               throw new IllegalArgumentException(
-                  messagePrefix + "Data blocks of type CONTAINER must have exactly one payload");
+               throw new InvalidSpecificationException(VLD_INVALID_CHILDREN_CONTAINER, this);
             }
          break;
          case CONTAINER_BASED_PAYLOAD:
             List<DataBlockDescription> containerChildren = getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
 
             if (containerChildren.size() != orderedChildren.size()) {
-               throw new IllegalArgumentException(
-                  messagePrefix + "Data blocks of type CONTAINER_BASED_PAYLOAD must only have CONTAINERs as children");
+               throw new InvalidSpecificationException(VLD_INVALID_CHILDREN_CONTAINER_BASED_PAYLOAD, this);
             }
          break;
       }
    }
 
    private void validateDataBlockDescription() {
-      String messagePrefix = "Error validating [" + id + "]: ";
-
       // Validate lengths
-      Reject.ifNegative(minimumByteLength, "minimumByteLength");
-      Reject.ifNegativeOrZero(maximumByteLength, "maximumByteLength");
-      Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
+      if (minimumByteLength != UNDEFINED) {
+         Reject.ifNegative(minimumByteLength, "minimumByteLength");
+      }
+
+      if (maximumByteLength != UNDEFINED) {
+         Reject.ifNegativeOrZero(maximumByteLength, "maximumByteLength");
+      }
+
+      if (minimumByteLength != UNDEFINED && maximumByteLength != UNDEFINED) {
+         Reject.ifFalse(minimumByteLength <= maximumByteLength, "minimumByteLength <= maximumByteLength");
+      }
 
       // Validate occurrences
       Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
@@ -418,15 +433,137 @@ public class DataBlockDescription {
 
       // Validate field properties
       if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
-         throw new IllegalArgumentException(
-            messagePrefix + "Data block is typed as FIELD, but its field properties are null");
+         throw new InvalidSpecificationException(VLD_MISSING_FIELD_PROPERTIES, this);
       } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
-         throw new IllegalArgumentException(
-            messagePrefix + "Data block not typed as FIELD, but it has non-null field properties");
+         throw new InvalidSpecificationException(VLD_UNNECESSARY_FIELD_PROPERTIES, this);
       }
 
       if (physicalType == PhysicalDataBlockType.FIELD) {
-         getFieldProperties().validateFieldProperties(messagePrefix, minimumByteLength, maximumByteLength);
+         getFieldProperties().validateFieldProperties(this);
       }
+   }
+
+   private void determineFixedByteOffsetsFromStartOfContainerForAllFields() {
+      boolean hasContainerBasedPayload = getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)
+         .size() == 1;
+
+      long currentOffset = setFixedByteOffsetsFromStartOfContainer(
+         getChildDescriptionsOfType(PhysicalDataBlockType.HEADER), 0L);
+
+      if (hasContainerBasedPayload) {
+         currentOffset = UNDEFINED;
+      } else {
+         currentOffset = setFixedByteOffsetsFromStartOfContainer(
+            getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD), currentOffset);
+      }
+
+      setFixedByteOffsetsFromStartOfContainer(getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER), currentOffset);
+   }
+
+   private long setFixedByteOffsetsFromStartOfContainer(List<DataBlockDescription> parentsWithFields, long baseOffset) {
+      for (DataBlockDescription parentDesc : parentsWithFields) {
+         List<DataBlockDescription> fieldDescs = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
+
+         for (DataBlockDescription fieldDesc : fieldDescs) {
+            fieldDesc.byteOffsetFromStartOfContainer = baseOffset;
+
+            if (baseOffset != UNDEFINED && fieldDesc.hasFixedSize()) {
+               baseOffset += fieldDesc.getMaximumByteLength();
+            } else {
+               baseOffset = UNDEFINED;
+            }
+         }
+      }
+      return baseOffset;
+   }
+
+   private void determineFixedByteOffsetsFromEndOfContainerForAllFields() {
+      boolean hasContainerBasedPayload = getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)
+         .size() == 1;
+
+      long currentOffset = setFixedByteOffsetsFromEndOfContainer(
+         getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER), 0L);
+
+      if (hasContainerBasedPayload) {
+         currentOffset = UNDEFINED;
+      } else {
+         currentOffset = setFixedByteOffsetsFromEndOfContainer(
+            getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD), currentOffset);
+      }
+
+      setFixedByteOffsetsFromEndOfContainer(getChildDescriptionsOfType(PhysicalDataBlockType.HEADER), currentOffset);
+   }
+
+   private long setFixedByteOffsetsFromEndOfContainer(List<DataBlockDescription> parentsWithFields, long baseOffset) {
+
+      List<DataBlockDescription> parentsWithFieldsReversed = new ArrayList<>(parentsWithFields);
+
+      Collections.reverse(parentsWithFieldsReversed);
+
+      for (DataBlockDescription parentDesc : parentsWithFieldsReversed) {
+         List<DataBlockDescription> fieldDescs = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
+
+         List<DataBlockDescription> fieldDescsReversed = new ArrayList<>(fieldDescs);
+
+         Collections.reverse(fieldDescsReversed);
+
+         for (DataBlockDescription fieldDesc : fieldDescsReversed) {
+            if (baseOffset != UNDEFINED && fieldDesc.hasFixedSize()) {
+               baseOffset -= fieldDesc.getMaximumByteLength();
+            } else {
+               baseOffset = UNDEFINED;
+            }
+
+            fieldDesc.byteOffsetFromEndOfContainer = baseOffset;
+         }
+      }
+      return baseOffset;
+   }
+
+   private void autoDetectMagicKeys() {
+      List<MagicKey> detectedHeaderMagicKeys = detectMagicKeys(PhysicalDataBlockType.HEADER);
+      detectedHeaderMagicKeys.forEach(key -> headerMagicKeys.add(key));
+      List<MagicKey> detectedFooterMagicKeys = detectMagicKeys(PhysicalDataBlockType.FOOTER);
+      detectedFooterMagicKeys.forEach(key -> footerMagicKeys.add(key));
+   }
+
+   private List<MagicKey> detectMagicKeys(PhysicalDataBlockType type) {
+      List<MagicKey> magicKeys = new ArrayList<>();
+
+      List<DataBlockDescription> headerOrFooterDescs = getChildDescriptionsOfType(type);
+
+      for (DataBlockDescription headerOrFooterDesc : headerOrFooterDescs) {
+         List<DataBlockDescription> fieldDescs = headerOrFooterDesc
+            .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
+
+         for (DataBlockDescription fieldDesc : fieldDescs) {
+
+            long magicKeyOffset = UNDEFINED;
+
+            if (fieldDesc.getFieldProperties().isMagicKey()) {
+               if (type == PhysicalDataBlockType.HEADER) {
+                  magicKeyOffset = fieldDesc.getByteOffsetFromStartOfContainer();
+               } else {
+                  magicKeyOffset = fieldDesc.getByteOffsetFromEndOfContainer();
+               }
+
+               if (magicKeyOffset == UNDEFINED) {
+                  throw new InvalidSpecificationException(VLD_MAGIC_KEY_UNKNOWN_OFFSET, fieldDesc);
+               }
+
+               magicKeys.addAll(fieldDesc.getFieldProperties().determineFieldMagicKeys(fieldDesc, magicKeyOffset));
+            }
+         }
+      }
+
+      Set<Long> distinctMagicKeyOffsets = magicKeys.stream().map(key -> key.getDeltaOffset())
+         .collect(Collectors.toSet());
+
+      if (distinctMagicKeyOffsets.size() > 1) {
+         throw new InvalidSpecificationException(VLD_MAGIC_KEY_TOO_MANY, this, type,
+            magicKeys.stream().map(key -> key.getFieldId()).collect(Collectors.toList()));
+      }
+
+      return magicKeys;
    }
 }

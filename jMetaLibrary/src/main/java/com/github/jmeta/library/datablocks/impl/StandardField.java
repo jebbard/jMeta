@@ -96,7 +96,7 @@ public class StandardField<T> implements Field<T> {
       Reject.ifNull(interpretedValue, "interpretedValue");
 
       m_interpretedValue = interpretedValue;
-      m_totalSize = DataBlockDescription.UNKNOWN_SIZE;
+      m_totalSize = DataBlockDescription.UNDEFINED;
    }
 
    /**

@@ -42,7 +42,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
  * 2^63-1 bytes.
  *
  * An {@link DataBlock} may have an unknown size which is reflected by a return value of
- * {@link DataBlockDescription#UNKNOWN_SIZE} by the method {@link #getTotalSize()}.
+ * {@link DataBlockDescription#UNDEFINED} by the method {@link #getTotalSize()}.
  */
 public interface DataBlock {
 
@@ -58,7 +58,7 @@ public interface DataBlock {
    /**
     * Returns the total size of the {@link DataBlock} in bytes.
     *
-    * @return the total size of the {@link DataBlock} in bytes or {@link DataBlockDescription#UNKNOWN_SIZE} if the size
+    * @return the total size of the {@link DataBlock} in bytes or {@link DataBlockDescription#UNDEFINED} if the size
     *         of this {@link DataBlock} is unknown.
     */
    public long getTotalSize();

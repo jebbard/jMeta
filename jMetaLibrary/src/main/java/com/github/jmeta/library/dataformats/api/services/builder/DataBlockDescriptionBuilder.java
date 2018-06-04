@@ -22,8 +22,8 @@ public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuild
 
    /**
     * Assigns a static length (min length = max length) to the data block. If this method is not called, the default
-    * lengths are {@link DataBlockDescription#getMinimumByteLength()} = 0 and
-    * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNLIMITED}.
+    * lengths are {@link DataBlockDescription#getMinimumByteLength()} = {@link DataBlockDescription#UNDEFINED} and
+    * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNDEFINED}.
     * 
     * @param staticByteLength
     *           The static length of the data block, must not be negative
@@ -33,8 +33,8 @@ public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuild
 
    /**
     * Assigns a dynamic length (min length not equal to max length) to the data block. If this method is not called, the
-    * default lengths are {@link DataBlockDescription#getMinimumByteLength()} = 0 and
-    * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNLIMITED}.
+    * default lengths are {@link DataBlockDescription#getMinimumByteLength()} = {@link DataBlockDescription#UNDEFINED}
+    * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNDEFINED}.
     * 
     * @param minimumByteLength
     *           The minimum byte length of the data block, must not be negative and must be smaller than or equal to the
@@ -59,7 +59,7 @@ public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuild
     *           number of occurrences
     * @return The concrete builder instance
     */
-   public C withOccurrences(int minimumOccurrences, int maximumOccurrences);
+   public C withOccurrences(long minimumOccurrences, long maximumOccurrences);
 
    /**
     * Allows to change the specification name and description of a data block.

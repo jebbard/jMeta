@@ -135,7 +135,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          // This container cannot be stored in the parent, as there are not enough bytes in
          // left the parent for its magic key.
          if (forwardRead) {
-            if (remainingDirectParentByteCount != DataBlockDescription.UNKNOWN_SIZE
+            if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED
                && magicKeySizeInBytes > remainingDirectParentByteCount)
                return false;
          } else {
@@ -228,9 +228,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       DataBlockDescription payloadDesc = payloadDescs.get(0);
 
-      long remainingPayloadByteCount = DataBlockDescription.UNKNOWN_SIZE;
+      long remainingPayloadByteCount = DataBlockDescription.UNDEFINED;
 
-      if (remainingDirectParentByteCount != DataBlockDescription.UNKNOWN_SIZE) {
+      if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED) {
          remainingPayloadByteCount = remainingDirectParentByteCount - overallHeaderSize;
       }
 
@@ -305,7 +305,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
          long staticLength = footerDesc.hasFixedSize() ? footerDesc.getMaximumByteLength()
-            : DataBlockDescription.UNKNOWN_SIZE;
+            : DataBlockDescription.UNDEFINED;
 
          nextReference = nextReference.advance(-staticLength);
 
@@ -403,7 +403,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       long totalPayloadSize = determineActualPayloadSize(payloadDesc, parentId, context, footers, null,
          remainingDirectParentByteCount);
 
-      if (totalPayloadSize == DataBlockDescription.UNKNOWN_SIZE)
+      if (totalPayloadSize == DataBlockDescription.UNDEFINED)
          throw new IllegalStateException("Payload size could not be determined");
 
       final Payload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(),
@@ -428,9 +428,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       // Get the actual occurrences of this headerId based on the fields of the previous
       // headers
-      int actualOccurrences = determineActualOccurrences(parentId, desc, context);
+      long actualOccurrences = determineActualOccurrences(parentId, desc, context);
 
-      long staticLength = desc.hasFixedSize() ? desc.getMaximumByteLength() : DataBlockDescription.UNKNOWN_SIZE;
+      long staticLength = desc.hasFixedSize() ? desc.getMaximumByteLength() : DataBlockDescription.UNDEFINED;
 
       // Read all header occurrences
       for (int i = 0; i < actualOccurrences; i++) {
@@ -526,9 +526,9 @@ public class StandardDataBlockReader implements DataBlockReader {
          if (fixedCharset != null)
             actualCharacterEncoding = fixedCharset;
 
-         int actualOccurrences = determineActualOccurrences(parentId, fieldDesc, context);
+         long actualOccurrences = determineActualOccurrences(parentId, fieldDesc, context);
 
-         for (int j = 0; j < actualOccurrences; j++) {
+         for (long j = 0; j < actualOccurrences; j++) {
             long fieldSize = determineActualFieldSize(fieldDesc, parentId, context, currentlyRemainingParentByteCount,
                currentFieldReference, actualByteOrder, actualCharacterEncoding);
 
@@ -539,7 +539,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
             fields.add(newField);
 
-            if (currentlyRemainingParentByteCount != DataBlockDescription.UNKNOWN_SIZE)
+            if (currentlyRemainingParentByteCount != DataBlockDescription.UNDEFINED)
                currentlyRemainingParentByteCount -= fieldSize;
 
             currentFieldReference = currentFieldReference.advance(fieldSize);
@@ -580,7 +580,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataBlockDescription desc = topLevelContainerDescs.get(i);
 
          // TODO stage2_010: What value should remaining parent byte count really have here?
-         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNKNOWN_SIZE, forwardRead))
+         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNDEFINED, forwardRead))
             return true;
       }
 
@@ -616,7 +616,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          else {
             if (m_cache.getCachedByteCountAt(reference) < fieldSize)
-               if (remainingDirectParentByteCount == DataBlockDescription.UNKNOWN_SIZE)
+               if (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED)
                   cache(reference, fieldSize);
 
                else
@@ -640,7 +640,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    private long getSizeFromFieldFunction(FieldFunctionStack context, DataBlockId sizeBlockId, DataBlockId parentId) {
 
-      long sizeFromFieldFunction = DataBlockDescription.UNKNOWN_SIZE;
+      long sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
 
       final Long size = context.popFieldFunction(sizeBlockId, FieldFunctionType.SIZE_OF);
 
@@ -663,9 +663,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
             if (context.hasFieldFunction(headerOrFooterDesc.getId(), FieldFunctionType.SIZE_OF)) {
                if (!headerOrFooterDesc.hasFixedSize())
-                  return DataBlockDescription.UNKNOWN_SIZE;
+                  return DataBlockDescription.UNDEFINED;
 
-               int actualOccurrences = determineActualOccurrences(parentId, headerOrFooterDesc, context);
+               long actualOccurrences = determineActualOccurrences(parentId, headerOrFooterDesc, context);
 
                totalSizeToSubtract += actualOccurrences * headerOrFooterDesc.getMinimumByteLength();
             }
@@ -674,7 +674,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          sizeFromFieldFunction = size - totalSizeToSubtract;
 
          if (sizeFromFieldFunction < 0)
-            sizeFromFieldFunction = DataBlockDescription.UNKNOWN_SIZE;
+            sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
       }
 
       else
@@ -717,7 +717,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    private long determineActualPayloadSize(DataBlockDescription payloadDesc, DataBlockId parentId,
       FieldFunctionStack context, List<Header> headers, List<Header> footers, long remainingDirectParentByteCount) {
 
-      long actualBlockSize = DataBlockDescription.UNKNOWN_SIZE;
+      long actualBlockSize = DataBlockDescription.UNDEFINED;
 
       // Payload has a dynamic size which is determined by further context information
       if (!payloadDesc.hasFixedSize()) {
@@ -739,7 +739,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       else
          actualBlockSize = payloadDesc.getMinimumByteLength();
 
-      if (actualBlockSize == DataBlockDescription.UNKNOWN_SIZE)
+      if (actualBlockSize == DataBlockDescription.UNDEFINED)
          actualBlockSize = remainingDirectParentByteCount;
 
       return actualBlockSize;
@@ -749,7 +749,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       FieldFunctionStack context, long remainingDirectParentByteCount, MediumOffset reference, ByteOrder byteOrder,
       Charset characterEncoding) {
 
-      long actualBlockSize = DataBlockDescription.UNKNOWN_SIZE;
+      long actualBlockSize = DataBlockDescription.UNDEFINED;
 
       // Field has a dynamic size which is determined by further context information
       if (!fieldDesc.hasFixedSize()) {
@@ -766,7 +766,7 @@ public class StandardDataBlockReader implements DataBlockReader {
                actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
          }
 
-         if (actualBlockSize == DataBlockDescription.UNKNOWN_SIZE) {
+         if (actualBlockSize == DataBlockDescription.UNDEFINED) {
             final Character terminationCharacter = fieldDesc.getFieldProperties().getTerminationCharacter();
 
             // Determine termination bytes from termination character
@@ -784,7 +784,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       else
          actualBlockSize = fieldDesc.getMinimumByteLength();
 
-      if (actualBlockSize == DataBlockDescription.UNKNOWN_SIZE)
+      if (actualBlockSize == DataBlockDescription.UNDEFINED)
          actualBlockSize = remainingDirectParentByteCount;
 
       return actualBlockSize;
@@ -857,14 +857,14 @@ public class StandardDataBlockReader implements DataBlockReader {
          // is known, the algorithm terminates already if this number is exceeded, instead
          // of reading further up to the end of medium and potentially spotting wrong
          // termination bytes already belonging to a subsequent field.
-         if (remainingDirectParentByteCount != DataBlockDescription.UNKNOWN_SIZE)
+         if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED)
             if (sizeUpToTerminationBytes >= remainingDirectParentByteCount)
                return remainingDirectParentByteCount;
 
          currentReference = currentReference.advance(bytesToRead);
       }
 
-      return DataBlockDescription.UNKNOWN_SIZE;
+      return DataBlockDescription.UNDEFINED;
    }
 
    private int findTerminationBytes(ByteBuffer fieldBytes, final byte[] terminationBytes) {
@@ -906,9 +906,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          final DataBlockDescription idFieldDesc = m_spec.getDataBlockDescription(idFieldId);
 
-         long byteOffset = idFieldDesc.getFixedByteOffsetInContainer();
+         long byteOffset = idFieldDesc.getByteOffsetFromStartOfContainer();
 
-         if (byteOffset == DataBlockDescription.UNKNOWN_SIZE)
+         if (byteOffset == DataBlockDescription.UNDEFINED)
             throw new IllegalStateException("For generic data block " + id
                + ", a LocationProperties object with the exact offset for its container parent " + id
                + " must be specified.");
@@ -918,7 +918,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          long actualFieldSize = determineActualFieldSize(idFieldDesc, id, context,
             remainingParentByteCount - byteOffset, idFieldReference, byteOrder, characterEncoding);
 
-         if (actualFieldSize == DataBlockDescription.UNKNOWN_SIZE)
+         if (actualFieldSize == DataBlockDescription.UNDEFINED)
             throw new IllegalStateException(
                "Could not determine size of field " + idFieldId + " which stores the id of a generic data block");
 
@@ -957,11 +957,12 @@ public class StandardDataBlockReader implements DataBlockReader {
       return null;
    }
 
-   private int determineActualOccurrences(DataBlockId parentId, DataBlockDescription desc, FieldFunctionStack context) {
+   private long determineActualOccurrences(DataBlockId parentId, DataBlockDescription desc,
+      FieldFunctionStack context) {
 
-      int minOccurrences = 0;
-      int maxOccurrences = 0;
-      int actualOccurrences = 0;
+      long minOccurrences = 0;
+      long maxOccurrences = 0;
+      long actualOccurrences = 0;
 
       maxOccurrences = desc.getMaximumOccurrences();
       minOccurrences = desc.getMinimumOccurrences();
@@ -1013,11 +1014,11 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataFormatSpecification.UNKNOWN_FIELD_ID);
 
       FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
-         null, null, null, null, null, false, null, null);
+         null, null, null, null, null, false, DataBlockDescription.UNDEFINED, null);
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<>(),
-         unknownFieldProperties, 1, 1, DataBlockDescription.UNKNOWN_SIZE, DataBlockDescription.UNKNOWN_SIZE, false);
+         unknownFieldProperties, 1, 1, DataBlockDescription.UNDEFINED, DataBlockDescription.UNDEFINED, false);
    }
 
    private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {

@@ -43,7 +43,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends
     *           The bit length to set, must be strictly positive
     * @return This builder
     */
-   C asMagicKeyWithOddBitLength(int bitLength);
+   C asMagicKeyWithOddBitLength(long bitLength);
 
    /**
     * Tags this field as representing the id of a target generic container data block. The field must be of
