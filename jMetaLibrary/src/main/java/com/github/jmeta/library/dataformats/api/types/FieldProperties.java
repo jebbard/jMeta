@@ -7,7 +7,27 @@
 
 package com.github.jmeta.library.dataformats.api.types;
 
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.*;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_BINARY_ENUMERATED_VALUE_NOT_UNIQUE;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_BINARY_ENUMERATED_VALUE_TOO_LONG;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_CONVERSION_FAILED;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_EXCEEDS_LENGTH;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_NOT_ENUMERATED;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_FLAG_PROPERTIES_UNNECESSARY;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_FLAGS;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_NUMERIC;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_STRING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_PRESENCE_OF_MISSING_FIELDS;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIXED_BYTE_ORDER_NON_NUMERIC;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIXED_CHARSET_NON_STRING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_BIT_LENGTH_BIGGER_THAN_FIXED_SIZE;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_BIT_LENGTH_TOO_BIG;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_BIT_LENGTH_TOO_SMALL;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_INVALID_FIELD_LENGTH;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_INVALID_FIELD_TYPE;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_INVALID_FIELD_VALUE;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_NUMERIC_FIELD_TOO_LONG;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_TERMINATION_CHAR_NON_STRING;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -295,9 +315,8 @@ public class FieldProperties<T> {
       // Validate magic key
       if (isMagicKey()) {
          if (!hasFixedSize || maximumByteLength == DataBlockDescription.UNDEFINED) {
-            throw new InvalidSpecificationException(
-               VLD_MAGIC_KEY_INVALID_FIELD_LENGTH, desc, 
-                  minimumByteLength, maximumByteLength);
+            throw new InvalidSpecificationException(VLD_MAGIC_KEY_INVALID_FIELD_LENGTH, desc, minimumByteLength,
+               maximumByteLength);
          }
 
          if (getEnumeratedValues().isEmpty() && getDefaultValue() == null) {
@@ -315,7 +334,7 @@ public class FieldProperties<T> {
          if (getMagicKeyBitLength() != DataBlockDescription.UNDEFINED
             && getMagicKeyBitLength() > maximumByteLength * Byte.SIZE) {
             throw new InvalidSpecificationException(VLD_MAGIC_KEY_BIT_LENGTH_BIGGER_THAN_FIXED_SIZE, desc,
-                  maximumByteLength * Byte.SIZE, getMagicKeyBitLength());
+               maximumByteLength * Byte.SIZE, getMagicKeyBitLength());
          }
       }
 
@@ -327,13 +346,13 @@ public class FieldProperties<T> {
          byte[] nextValue = getEnumeratedValues().get(nextKey);
 
          if (binaryValues.containsKey(nextValue)) {
-            throw new InvalidSpecificationException(VLD_BINARY_ENUMERATED_VALUE_NOT_UNIQUE, desc, 
+            throw new InvalidSpecificationException(VLD_BINARY_ENUMERATED_VALUE_NOT_UNIQUE, desc,
                Arrays.toString(nextValue), nextKey, binaryValues.get(nextValue));
          }
 
          if (hasFixedSize && nextValue.length > minimumByteLength) {
-            throw new InvalidSpecificationException(VLD_BINARY_ENUMERATED_VALUE_TOO_LONG, desc, 
-               nextKey, nextValue.length, minimumByteLength);
+            throw new InvalidSpecificationException(VLD_BINARY_ENUMERATED_VALUE_TOO_LONG, desc, nextKey,
+               nextValue.length, minimumByteLength);
          }
       }
 
@@ -346,7 +365,8 @@ public class FieldProperties<T> {
       // Validate numeric fields
       if (getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
          if (minimumByteLength > Long.BYTES || maximumByteLength > Long.BYTES) {
-            throw new InvalidSpecificationException(VLD_NUMERIC_FIELD_TOO_LONG, desc, Long.BYTES, minimumByteLength, maximumByteLength);
+            throw new InvalidSpecificationException(VLD_NUMERIC_FIELD_TOO_LONG, desc, Long.BYTES, minimumByteLength,
+               maximumByteLength);
          }
       } else {
          if (getFixedByteOrder() != null) {
@@ -383,6 +403,23 @@ public class FieldProperties<T> {
             if (getFieldType() != FieldType.FLAGS) {
                throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_FLAGS, desc);
             }
+
+            if (fieldFunction.getFlagName() == null || fieldFunction.getFlagValue() == null) {
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_PRESENCE_OF_MISSING_FIELDS, desc,
+                  fieldFunction.getFlagName(), fieldFunction.getFlagValue());
+            }
+
+            if (!getFlagSpecification().hasFlag(fieldFunction.getFlagName())) {
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME, desc,
+                  fieldFunction.getFlagName());
+            }
+         }
+
+         if (ffType != FieldFunctionType.PRESENCE_OF) {
+            if (fieldFunction.getFlagName() != null || fieldFunction.getFlagValue() != null) {
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_FLAG_PROPERTIES_UNNECESSARY, desc,
+                  fieldFunction.getFlagName(), fieldFunction.getFlagValue());
+            }
          }
       }
 
@@ -393,7 +430,10 @@ public class FieldProperties<T> {
       List<MagicKey> fieldMagicKeys = new ArrayList<>();
 
       if (!getEnumeratedValues().isEmpty()) {
-         // TODO implement
+
+         getEnumeratedValues().forEach((Object interpretedValue, byte[] binaryValue) -> {
+            fieldMagicKeys.addAll(getFieldMagicKeys(fieldDesc, magicKeyOffset, binaryValue));
+         });
       } else if (getDefaultValue() != null) {
          byte[] magicKeyBytes = null;
 
@@ -405,33 +445,45 @@ public class FieldProperties<T> {
             magicKeyBytes = getFlagSpecification().getDefaultFlagBytes();
          } // Note that the else case cannot happen due to validation already done
 
-         if (getMagicKeyBitLength() != DataBlockDescription.UNDEFINED) {
-            int maxMagicKeyBitLength = magicKeyBytes.length * Byte.SIZE;
+         fieldMagicKeys.addAll(getFieldMagicKeys(fieldDesc, magicKeyOffset, magicKeyBytes));
+      } // Note that the else case cannot happen due to validation already done
 
-            // TODO move to validation instead!
-            if (getMagicKeyBitLength() > maxMagicKeyBitLength) {
-               throw new InvalidSpecificationException(VLD_MAGIC_KEY_BIT_LENGTH_TOO_BIG, fieldDesc,
-                  getMagicKeyBitLength(), maxMagicKeyBitLength);
-            }
+      return fieldMagicKeys;
+   }
 
-            int actualMagicKeyByteLength = (int) getMagicKeyBitLength() / Byte.SIZE
-               + (getMagicKeyBitLength() % Byte.SIZE > 0 ? 1 : 0);
+   /**
+    * @param fieldDesc
+    * @param magicKeyOffset
+    * @param fieldMagicKeys
+    * @param magicKeyBytes
+    */
+   private List<MagicKey> getFieldMagicKeys(DataBlockDescription fieldDesc, long magicKeyOffset, byte[] magicKeyBytes) {
+      List<MagicKey> fieldMagicKeys = new ArrayList<>();
 
-            byte[] adaptedMagicKeyBytes = magicKeyBytes;
+      if (getMagicKeyBitLength() != DataBlockDescription.UNDEFINED) {
+         int maxMagicKeyBitLength = magicKeyBytes.length * Byte.SIZE;
 
-            if (actualMagicKeyByteLength < magicKeyBytes.length) {
-               adaptedMagicKeyBytes = new byte[actualMagicKeyByteLength];
-
-               System.arraycopy(magicKeyBytes, 0, adaptedMagicKeyBytes, 0, actualMagicKeyByteLength);
-            }
-
-            fieldMagicKeys.add(
-               new MagicKey(adaptedMagicKeyBytes, (int) getMagicKeyBitLength(), fieldDesc.getId(), magicKeyOffset));
-         } else {
-            fieldMagicKeys.add(new MagicKey(magicKeyBytes, fieldDesc.getId(), magicKeyOffset));
+         if (getMagicKeyBitLength() > maxMagicKeyBitLength) {
+            throw new InvalidSpecificationException(VLD_MAGIC_KEY_BIT_LENGTH_TOO_BIG, fieldDesc, getMagicKeyBitLength(),
+               maxMagicKeyBitLength);
          }
 
-      } // Note that the else case cannot happen due to validation already done
+         int actualMagicKeyByteLength = (int) getMagicKeyBitLength() / Byte.SIZE
+            + (getMagicKeyBitLength() % Byte.SIZE > 0 ? 1 : 0);
+
+         byte[] adaptedMagicKeyBytes = magicKeyBytes;
+
+         if (actualMagicKeyByteLength < magicKeyBytes.length) {
+            adaptedMagicKeyBytes = new byte[actualMagicKeyByteLength];
+
+            System.arraycopy(magicKeyBytes, 0, adaptedMagicKeyBytes, 0, actualMagicKeyByteLength);
+         }
+
+         fieldMagicKeys
+            .add(new MagicKey(adaptedMagicKeyBytes, (int) getMagicKeyBitLength(), fieldDesc.getId(), magicKeyOffset));
+      } else {
+         fieldMagicKeys.add(new MagicKey(magicKeyBytes, fieldDesc.getId(), magicKeyOffset));
+      }
 
       return fieldMagicKeys;
    }

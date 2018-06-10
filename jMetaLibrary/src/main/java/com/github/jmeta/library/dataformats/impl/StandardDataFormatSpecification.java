@@ -9,9 +9,16 @@
 
 package com.github.jmeta.library.dataformats.impl;
 
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_NESTED_CONTAINER_MISSING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_BYTE_ORDER;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHARACTER_ENCODING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_MISSING;
+
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,16 +28,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
+import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.*;
 
 /**
  * {@link StandardDataFormatSpecification}
@@ -85,6 +93,60 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       validateDefaultNestedContainerDefined();
       validateTopLevelMagicKeys();
       validateCharacterEncodingsAndByteOrders();
+      validateFieldFunctions();
+   }
+
+   /**
+    * 
+    */
+   private void validateFieldFunctions() {
+
+      Stream<DataBlockDescription> descriptionStream = m_dataBlockDescriptions.values().stream();
+
+      List<FieldFunction> fieldFunctions = descriptionStream
+         .filter(desc -> desc.getPhysicalType() == PhysicalDataBlockType.FIELD)
+         .map(desc -> desc.getFieldProperties().getFieldFunctions()).flatMap(Collection::stream)
+         .collect(Collectors.toList());
+
+      for (FieldFunction fieldFunction : fieldFunctions) {
+         FieldFunctionType<?> type = fieldFunction.getFieldFunctionType();
+         Set<DataBlockId> affectedIds = fieldFunction.getAffectedBlockIds();
+
+         if (type == FieldFunctionType.ID_OF) {
+            affectedIds.forEach(id -> {
+               Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.CONTAINER);
+
+               checkFieldFunctionTargetType(type, id, allowedTypes);
+            });
+         } else if (type == FieldFunctionType.SIZE_OF) {
+            // TODO prüfen, ob alle referenzierten Blöcke zusammenhängen?
+            affectedIds.forEach(id -> {
+
+            });
+         } else if (type == FieldFunctionType.COUNT_OF) {
+            affectedIds.forEach(id -> {
+               Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.FIELD,
+                  PhysicalDataBlockType.HEADER, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.CONTAINER);
+
+               checkFieldFunctionTargetType(type, id, allowedTypes);
+            });
+         }
+      }
+   }
+
+   /**
+    * @param fieldFunctionType
+    * @param targetId
+    * @param allowedTargetTypes
+    */
+   private void checkFieldFunctionTargetType(FieldFunctionType<?> fieldFunctionType, DataBlockId targetId,
+      Set<PhysicalDataBlockType> allowedTargetTypes) {
+      PhysicalDataBlockType affectedIdType = getDataBlockDescription(targetId).getPhysicalType();
+
+      if (!allowedTargetTypes.contains(affectedIdType)) {
+         throw new InvalidSpecificationException(VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE,
+            getDefaultNestedContainerDescription(), fieldFunctionType, allowedTargetTypes, targetId, affectedIdType);
+      }
    }
 
    /**
@@ -106,8 +168,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          ByteOrder fixedByteOrder = fieldDesc.getFieldProperties().getFixedByteOrder();
          if (fixedByteOrder != null) {
             if (!getSupportedByteOrders().contains(fixedByteOrder)) {
-               throw new InvalidSpecificationException(VLD_INVALID_BYTE_ORDER, fieldDesc,
-                  fixedByteOrder, getSupportedByteOrders());
+               throw new InvalidSpecificationException(VLD_INVALID_BYTE_ORDER, fieldDesc, fixedByteOrder,
+                  getSupportedByteOrders());
             }
          }
       }
@@ -273,7 +335,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          DataBlockDescription dataBlockDesc = iterator.next();
 
          if (dataBlockDesc.getHeaderMagicKeys().isEmpty()) {
-            throw new InvalidSpecificationException(VLD_MISSING_MAGIC_KEY, dataBlockDesc);
+            throw new InvalidSpecificationException(VLD_MAGIC_KEY_MISSING, dataBlockDesc);
          }
       }
    }
@@ -287,7 +349,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
          if (descs.size() > 0) {
             if (defaultNestedContainerId == null) {
-               throw new InvalidSpecificationException(VLD_MISSING_DEFAULT_NESTED_CONTAINER, topLevelDesc);
+               throw new InvalidSpecificationException(VLD_DEFAULT_NESTED_CONTAINER_MISSING, topLevelDesc);
             }
          }
       }

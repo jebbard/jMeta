@@ -13,8 +13,8 @@ import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecifi
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_FIELD_SEQUENCE;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_TOO_MANY;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_UNKNOWN_OFFSET;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MISSING_FIELD_PROPERTIES;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_UNNECESSARY_FIELD_PROPERTIES;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_MISSING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_UNNECESSARY;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -433,9 +433,9 @@ public class DataBlockDescription {
 
       // Validate field properties
       if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {
-         throw new InvalidSpecificationException(VLD_MISSING_FIELD_PROPERTIES, this);
+         throw new InvalidSpecificationException(VLD_FIELD_PROPERTIES_MISSING, this);
       } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
-         throw new InvalidSpecificationException(VLD_UNNECESSARY_FIELD_PROPERTIES, this);
+         throw new InvalidSpecificationException(VLD_FIELD_PROPERTIES_UNNECESSARY, this);
       }
 
       if (physicalType == PhysicalDataBlockType.FIELD) {
