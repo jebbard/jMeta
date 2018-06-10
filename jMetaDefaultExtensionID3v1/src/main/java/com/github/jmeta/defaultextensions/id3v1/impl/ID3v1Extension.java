@@ -87,15 +87,12 @@ public class ID3v1Extension implements Extension {
 
       // @formatter:off
       return builder.addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
-          .withStaticLengthOf(id3v1TagLength)
           .addHeader("header", "ID3v1 tag header", "The ID3v1 tag header")
-             .withStaticLengthOf(3)
              .addStringField("id", "ID3v1 tag header id", "The ID3v1 tag header id")
                 .asMagicKey().withDefaultValue(ID3V1_TAG_ID_STRING).withStaticLengthOf(3)
              .finishField()
           .finishHeader()
           .getPayload()
-             .withStaticLengthOf(125)
              .addStringField("title", "title", "The ID3v1 title")
                 .withTerminationCharacter(nullCharacter).withDefaultValue(""+nullCharacter).withStaticLengthOf(30)
              .finishField()

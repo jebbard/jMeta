@@ -27,7 +27,7 @@ public interface DataFormatBuilder {
     * @return a string representation of the built data block's global id or null if the built data block is a top-level
     *         data block.
     */
-   public String getGlobalId();
+   String getGlobalId();
 
    /**
     * Allows child builders as well as end users to add a new {@link DataBlockDescription} as child description.
@@ -35,14 +35,14 @@ public interface DataFormatBuilder {
     * @param childDescription
     *           The child {@link DataBlockDescription} to add, must not be null
     */
-   public void addChildDescription(DataBlockDescription childDescription);
+   void addChildDescription(DataBlockDescription childDescription);
 
    /**
     * Returns the {@link ContainerDataFormat} this builder belongs to.
     * 
     * @return The {@link ContainerDataFormat} this builder belongs to
     */
-   public ContainerDataFormat getDataFormat();
+   ContainerDataFormat getDataFormat();
 
    /**
     * Returns the root {@link DataFormatSpecificationBuilder} of this builder hierarchy. This is necessary to add
@@ -50,6 +50,5 @@ public interface DataFormatBuilder {
     * 
     * @return The root {@link DataFormatSpecificationBuilder} of this builder hierarchy
     */
-   public DataFormatSpecificationBuilder getRootBuilder();
-
+   DataFormatSpecificationBuilder getRootBuilder();
 }

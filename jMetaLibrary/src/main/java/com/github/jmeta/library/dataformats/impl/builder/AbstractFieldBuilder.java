@@ -193,6 +193,17 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#withCustomConverter(com.github.jmeta.library.dataformats.api.types.converter.FieldConverter)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C withCustomConverter(FieldConverter<FIT> customConverter) {
+      Reject.ifNull(customConverter, "customConverter");
+      this.customConverter = customConverter;
+      return (C) this;
+   }
+
+   /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
     */
    @SuppressWarnings("unchecked")
@@ -202,14 +213,22 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#withCustomConverter(com.github.jmeta.library.dataformats.api.types.converter.FieldConverter)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withLengthOf(long,
+    *      long)
     */
    @SuppressWarnings("unchecked")
    @Override
-   public C withCustomConverter(FieldConverter<FIT> customConverter) {
-      Reject.ifNull(customConverter, "customConverter");
-      this.customConverter = customConverter;
+   public C withLengthOf(long minimumByteLength, long maximumByteLength) {
+      setLengths(minimumByteLength, maximumByteLength);
       return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withStaticLengthOf(long)
+    */
+   @Override
+   public C withStaticLengthOf(long staticByteLength) {
+      return withLengthOf(staticByteLength, staticByteLength);
    }
 
    /**

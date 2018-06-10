@@ -15,7 +15,8 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * @param <P>
  *           The concrete parent builder interface
  */
-public interface FooterBuilder<P> extends FieldSequenceBuilder<FooterBuilder<P>> {
+public interface FooterBuilder<P>
+   extends FieldSequenceBuilder<FooterBuilder<P>>, DynamicOccurrenceBuilder<FooterBuilder<P>> {
 
    /**
     * Finishes the builder

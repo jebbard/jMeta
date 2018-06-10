@@ -7,14 +7,14 @@
 
 package com.github.jmeta.library.dataformats.api.types;
 
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_MISSING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_UNNECESSARY;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_CONTAINER;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_CONTAINER_BASED_PAYLOAD;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_FIELD;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_FIELD_SEQUENCE;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_TOO_MANY;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_UNKNOWN_OFFSET;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_MISSING;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_UNNECESSARY;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class DataBlockDescription {
     * States that the total size of an {@link DataBlock} is unknown. This is a possible return value of the method
     * {@link DataBlock#getTotalSize()}.
     */
-   public final static long UNDEFINED = Long.MIN_VALUE;
+   public static final long UNDEFINED = Long.MIN_VALUE;
 
    private final DataBlockId id;
    private final String name;
@@ -45,8 +45,8 @@ public class DataBlockDescription {
    private final PhysicalDataBlockType physicalType;
    private final List<DataBlockDescription> orderedChildren = new ArrayList<>();
    private final FieldProperties<?> fieldProperties;
-   private final long maximumByteLength;
-   private final long minimumByteLength;
+   private long maximumByteLength;
+   private long minimumByteLength;
    private final long minimumOccurrences;
    private final long maximumOccurrences;
    private final boolean isGeneric;
@@ -115,6 +115,14 @@ public class DataBlockDescription {
       validateDataBlockDescription();
 
       // (B) Derive properties
+      if (physicalType != PhysicalDataBlockType.FIELD
+         && physicalType != PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
+         // Note that fields do not have children, while a container-based payload by definition allows the occurrence
+         // or absence of any of its child containers, thus calculating its size from its defined children would be
+         // wrong
+         determineAndValidateLengthsFromChildren();
+      }
+
       if (physicalType == PhysicalDataBlockType.CONTAINER) {
          determineFixedByteOffsetsFromStartOfContainerForAllFields();
          determineFixedByteOffsetsFromEndOfContainerForAllFields();
@@ -196,7 +204,7 @@ public class DataBlockDescription {
    }
 
    public boolean hasFixedSize() {
-      return getMaximumByteLength() == getMinimumByteLength();
+      return getMaximumByteLength() != UNDEFINED && getMaximumByteLength() == getMinimumByteLength();
    }
 
    public boolean hasChildWithLocalId(String localId) {
@@ -426,6 +434,8 @@ public class DataBlockDescription {
       }
 
       // Validate occurrences
+      Reject.ifNegative(minimumOccurrences, "minimumOccurrences");
+      Reject.ifNegative(maximumOccurrences, "maximumOccurrences");
       Reject.ifFalse(minimumOccurrences <= maximumOccurrences, "minimumOccurrences <= maximumOccurrences");
 
       // Validate children
@@ -441,6 +451,33 @@ public class DataBlockDescription {
       if (physicalType == PhysicalDataBlockType.FIELD) {
          getFieldProperties().validateFieldProperties(this);
       }
+   }
+
+   /**
+    * 
+    */
+   private void determineAndValidateLengthsFromChildren() {
+      long determinedMinLength = 0;
+
+      for (DataBlockDescription childDescription : orderedChildren) {
+         if (childDescription.getMinimumByteLength() != UNDEFINED) {
+            determinedMinLength += childDescription.getMinimumByteLength() * childDescription.getMinimumOccurrences();
+         }
+      }
+
+      minimumByteLength = determinedMinLength;
+
+      long determinedMaxLength = 0;
+
+      for (DataBlockDescription childDescription : orderedChildren) {
+         if (childDescription.getMaximumByteLength() != UNDEFINED && determinedMaxLength != UNDEFINED) {
+            determinedMaxLength += childDescription.getMaximumByteLength() * childDescription.getMaximumOccurrences();
+         } else {
+            determinedMaxLength = UNDEFINED;
+         }
+      }
+
+      maximumByteLength = determinedMaxLength;
    }
 
    private void determineFixedByteOffsetsFromStartOfContainerForAllFields() {

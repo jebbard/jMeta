@@ -9,6 +9,7 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
@@ -24,7 +25,8 @@ import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
  * @param <C>
  *           The concrete {@link FieldBuilder} interface derived from this interface
  */
-public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends DataBlockDescriptionBuilder<C> {
+public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
+   extends DataBlockDescriptionBuilder<C>, DynamicOccurrenceBuilder<C> {
 
    /**
     * Tags this field as representing a magic key. The field must be of type {@link FieldType#STRING},
@@ -122,6 +124,16 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends
    C addEnumeratedValue(byte[] binaryValue, FIT interpretedValue);
 
    /**
+    * Sets a custom {@link FieldConverter} to be used when converting binary values into interpreted values and vice
+    * versa.
+    * 
+    * @param customConverter
+    *           The custom converter, must not be null
+    * @return This builder
+    */
+   C withCustomConverter(FieldConverter<FIT> customConverter);
+
+   /**
     * Sets the default value of the built field, which is initially null
     * 
     * @param value
@@ -131,14 +143,30 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>> extends
    C withDefaultValue(FIT value);
 
    /**
-    * Sets a custom {@link FieldConverter} to be used when converting binary values into interpreted values and vice
-    * versa.
+    * Assigns a dynamic length (min length not equal to max length) to the data block. If this method is not called, the
+    * default lengths are {@link DataBlockDescription#getMinimumByteLength()} = {@link DataBlockDescription#UNDEFINED}
+    * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNDEFINED}.
     * 
-    * @param customConverter
-    *           The custom converter, must not be null
-    * @return This builder
+    * @param minimumByteLength
+    *           The minimum byte length of the data block, must not be negative and must be smaller than or equal to the
+    *           maximum byte length
+    * @param maximumByteLength
+    *           The maximum byte length of the data block, must not be negative and must be bigger than or equal to the
+    *           minimum byte length
+    * @return The concrete builder instance
     */
-   C withCustomConverter(FieldConverter<FIT> customConverter);
+   C withLengthOf(long minimumByteLength, long maximumByteLength);
+
+   /**
+    * Assigns a static length (min length = max length) to the data block. If this method is not called, the default
+    * lengths are {@link DataBlockDescription#getMinimumByteLength()} = {@link DataBlockDescription#UNDEFINED} and
+    * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNDEFINED}.
+    * 
+    * @param staticByteLength
+    *           The static length of the data block, must not be negative
+    * @return The concrete builder instance
+    */
+   C withStaticLengthOf(long staticByteLength);
 
    /**
     * Finishes building the field

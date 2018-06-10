@@ -39,8 +39,6 @@ public class APEv2Extension implements Extension {
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    private static final String APE_MAGIC_KEY_STRING = "APETAGEX";
-   private static final int APEv2_HEADER_FOOTER_BYTE_LENGTH = 32;
-   private static final int APEv2_MIN_ITEM_HEADER_LENGTH = 9;
    private static final int PREAMPLE_BYTE_LENGTH = 8;
    /**
     *
@@ -82,6 +80,8 @@ public class APEv2Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
+      // TODO: APEv2 tag header and footer must be declared optional but it does not work!
+
       // Data blocks
       final DataBlockId apeV2HeaderId = new DataBlockId(APEv2Extension.APEv2, "apev2.header");
       final DataBlockId apeV2PayloadId = new DataBlockId(APEv2Extension.APEv2, "apev2.payload");
@@ -103,9 +103,8 @@ public class APEv2Extension implements Extension {
 
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
-         .withLengthOf(4, DataBlockDescription.UNDEFINED)
          .addHeader("header", "APEv2 header", "The APEv2 header")
-            .withStaticLengthOf(APEv2_HEADER_FOOTER_BYTE_LENGTH)
+//            .asOptional()
             .addStringField("preample", "APEv2 header preample", "APEv2 header preample")
                .withStaticLengthOf(PREAMPLE_BYTE_LENGTH)
                .withDefaultValue(APE_MAGIC_KEY_STRING)
@@ -133,6 +132,7 @@ public class APEv2Extension implements Extension {
                   .addFlagDescription(tagContainsNoFooterFlag)
                   .addFlagDescription(tagContainsHeaderFlag)
                .finishFlagSpecification()
+               .indicatesPresenceOf(tagContainsNoFooterFlag.getFlagName(), 0, apeV2FooterId)
             .finishField()
             .addBinaryField("reserved", "APEv2 header reserved", "APEv2 header reserved")
                .withStaticLengthOf(8)
@@ -140,7 +140,7 @@ public class APEv2Extension implements Extension {
             .finishField()
          .finishHeader()
          .addFooter("footer", "APEv2 footer", "The APEv2 footer")
-            .withStaticLengthOf(APEv2_HEADER_FOOTER_BYTE_LENGTH)
+//            .asOptional()
             .addStringField("preample", "APEv2 footer preample", "APEv2 footer preample")
                .withStaticLengthOf(PREAMPLE_BYTE_LENGTH)
                .withDefaultValue(APE_MAGIC_KEY_STRING)
@@ -168,6 +168,7 @@ public class APEv2Extension implements Extension {
                   .addFlagDescription(tagContainsNoFooterFlag)
                   .addFlagDescription(tagContainsHeaderFlag)
                .finishFlagSpecification()
+               .indicatesPresenceOf(tagContainsHeaderFlag.getFlagName(), 1, apeV2HeaderId)
             .finishField()
             .addBinaryField("reserved", "APEv2 footer reserved", "APEv2 footer reserved")
                .withStaticLengthOf(8)
@@ -176,12 +177,9 @@ public class APEv2Extension implements Extension {
          .finishFooter()
          .getPayload()
             .withDescription("APEv2 payload", "The APEv2 payload")
-            .withLengthOf(0, DataBlockDescription.UNDEFINED)
             .addGenericContainerWithFieldBasedPayload("ITEM_ID", "APEv2 item", "The APEv2 item")
-               .withLengthOf(1, DataBlockDescription.UNDEFINED)
                .asDefaultNestedContainer()
                .addHeader("header", "APEv2 item header", "The APEv2 item header")
-                  .withLengthOf(APEv2_MIN_ITEM_HEADER_LENGTH, DataBlockDescription.UNDEFINED)
                   .addNumericField("size", "APEv2 item value size", "APEv2 item value size")
                      .withStaticLengthOf(4)
                      .asSizeOf(apeV2GenericItemPayloadId)
@@ -202,7 +200,6 @@ public class APEv2Extension implements Extension {
                .finishHeader()
                .getPayload()
                   .withDescription("APEv2 item payload", "The APEv2 item payload")
-                  .withLengthOf(0, DataBlockDescription.UNDEFINED)
                   .addStringField("value", "APEv2 item value", "APEv2 item value")
                      .withLengthOf(0, DataBlockDescription.UNDEFINED)
                   .finishField()

@@ -10,6 +10,8 @@
 package com.github.jmeta.library.dataformats.impl;
 
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_NESTED_CONTAINER_MISSING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_BYTE_ORDER;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHARACTER_ENCODING;
@@ -28,7 +30,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -101,9 +102,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     */
    private void validateFieldFunctions() {
 
-      Stream<DataBlockDescription> descriptionStream = m_dataBlockDescriptions.values().stream();
-
-      List<FieldFunction> fieldFunctions = descriptionStream
+      List<FieldFunction> fieldFunctions = m_dataBlockDescriptions.values().stream()
          .filter(desc -> desc.getPhysicalType() == PhysicalDataBlockType.FIELD)
          .map(desc -> desc.getFieldProperties().getFieldFunctions()).flatMap(Collection::stream)
          .collect(Collectors.toList());
@@ -132,6 +131,52 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
             });
          }
       }
+
+      Map<DataBlockId, List<FieldFunction>> fieldFunctionsByTargetId = new HashMap<>();
+
+      for (FieldFunction fieldFunction : fieldFunctions) {
+         for (DataBlockId affectedBlock : fieldFunction.getAffectedBlockIds()) {
+
+            if (!fieldFunctionsByTargetId.containsKey(affectedBlock)) {
+               fieldFunctionsByTargetId.put(affectedBlock, new ArrayList<>());
+            }
+
+            fieldFunctionsByTargetId.get(affectedBlock).add(fieldFunction);
+         }
+      }
+
+      List<DataBlockDescription> dataBlocksWithDynamicOccurrences = m_dataBlockDescriptions.values().stream()
+         .filter(desc -> desc.getMaximumOccurrences() != desc.getMinimumOccurrences()).collect(Collectors.toList());
+
+      for (DataBlockDescription dataBlockWithDynamicOccurrences : dataBlocksWithDynamicOccurrences) {
+         DataBlockId id = dataBlockWithDynamicOccurrences.getId();
+
+         boolean hasFieldFunctionForId = fieldFunctionsByTargetId.containsKey(id);
+
+         if (dataBlockWithDynamicOccurrences.getMinimumOccurrences() == 0
+            && dataBlockWithDynamicOccurrences.getMaximumOccurrences() == 1) {
+
+            if (!hasFieldFunctionForId
+               || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), FieldFunctionType.PRESENCE_OF)) {
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING,
+                  dataBlockWithDynamicOccurrences);
+            }
+         } else {
+            if (!hasFieldFunctionForId
+               || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), FieldFunctionType.COUNT_OF)) {
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING,
+                  dataBlockWithDynamicOccurrences);
+            }
+         }
+
+      }
+
+      // TODO verify SIZE_OF exists
+   }
+
+   private boolean hasFieldFunctionOfType(List<FieldFunction> functions, FieldFunctionType<?> type) {
+      return functions.stream().filter(function -> function.getFieldFunctionType().equals(type)).findFirst()
+         .isPresent();
    }
 
    /**

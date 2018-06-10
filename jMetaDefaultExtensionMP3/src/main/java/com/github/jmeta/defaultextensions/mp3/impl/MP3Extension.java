@@ -94,8 +94,7 @@ public class MP3Extension implements Extension {
 
       // @formatter:off
       builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
-         .withLengthOf(33, 1024)
-         .addHeader("header", "MP3 header", "The MP3 header").withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
+         .addHeader("header", "MP3 header", "The MP3 header")
             .addFlagsField("content", "MP3 header contents", "The MP3 header contents")
                .withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
                .withFlagSpecification(MP3_HEADER_BYTE_LENGTH,
@@ -120,14 +119,12 @@ public class MP3Extension implements Extension {
             .finishField()
          .finishHeader()
          .addHeader("crc", "MP3 CRC", "The MP3 CRC")
-            .withStaticLengthOf(2)
             .withOccurrences(0, 1)
             .addBinaryField("data", "MP3 CRC data", "The MP3 CRC data")
                .withStaticLengthOf(2)
             .finishField()
          .finishHeader()
          .getPayload()
-            .withLengthOf(1, 998)
             .addBinaryField("data", "payloadData", "The MP3 payload data")
                .withLengthOf(1, 998)
             .finishField()

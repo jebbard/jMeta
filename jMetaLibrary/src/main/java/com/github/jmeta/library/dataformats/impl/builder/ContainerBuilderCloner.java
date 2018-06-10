@@ -17,7 +17,7 @@ import java.util.Set;
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DynamicOccurrenceBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder;
@@ -44,13 +44,6 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link DataBlockDescription}.
  */
 public final class ContainerBuilderCloner {
-
-   /**
-    * Creates a new {@link ContainerBuilderCloner}.
-    */
-   private ContainerBuilderCloner() {
-      // Private to ensure nobody can instantiate it
-   }
 
    /**
     * Clones the {@link DataBlockDescription} of an existing container into the given {@link ContainerBuilder}.
@@ -92,13 +85,18 @@ public final class ContainerBuilderCloner {
 
       containerDescription.validateChildren();
 
-      setLengthAndOccurrences(containerBuilder, containerDescription);
-
       cloneHeaders(containerBuilder, containerDescription, existingContainerId, clonedContainerId);
 
       cloneFooters(containerBuilder, containerDescription, existingContainerId, clonedContainerId);
 
       clonePayload(containerBuilder, containerDescription, existingContainerId, clonedContainerId, payloadType);
+   }
+
+   /**
+    * Creates a new {@link ContainerBuilderCloner}.
+    */
+   private ContainerBuilderCloner() {
+      // Private to ensure nobody can instantiate it
    }
 
    private static void clonePayload(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription containerDescription,
@@ -113,16 +111,12 @@ public final class ContainerBuilderCloner {
          FieldBasedPayloadBuilder<?> fieldBasedPayloadBuilder = (FieldBasedPayloadBuilder<?>) containerBuilder
             .getPayload();
 
-         setLengthAndOccurrences(fieldBasedPayloadBuilder, payloadDescription);
-
          cloneFields(fieldBasedPayloadBuilder, payloadDescription, existingContainerId, clonedContainerId);
 
          fieldBasedPayloadBuilder.finishFieldBasedPayload();
       } else if (payloadType == PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
          ContainerBasedPayloadBuilder<?> containerBasedPayloadBuilder = (ContainerBasedPayloadBuilder<?>) containerBuilder
             .getPayload();
-
-         setLengthAndOccurrences(containerBasedPayloadBuilder, payloadDescription);
 
          cloneContainerChildren(payloadDescription, containerBasedPayloadBuilder);
 
@@ -146,8 +140,6 @@ public final class ContainerBuilderCloner {
                   childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
                   childContainerDescription.getDescription());
 
-            setLengthAndOccurrences(childContainerBuilder, childContainerDescription);
-
             cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
                PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
@@ -161,8 +153,6 @@ public final class ContainerBuilderCloner {
                   childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
                   childContainerDescription.getDescription());
 
-            setLengthAndOccurrences(childContainerBuilder, childContainerDescription);
-
             cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
                PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
@@ -171,12 +161,6 @@ public final class ContainerBuilderCloner {
       }
    }
 
-   /**
-    * @param containerBuilder
-    * @param containerDescription
-    * @param existingContainerId
-    * @param clonedContainerId
-    */
    private static void cloneHeaders(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription containerDescription,
       DataBlockId existingContainerId, DataBlockId clonedContainerId) {
       List<DataBlockDescription> headerDescriptions = containerDescription
@@ -188,7 +172,7 @@ public final class ContainerBuilderCloner {
 
          headerDescription.validateChildren();
 
-         setLengthAndOccurrences(hb, headerDescription);
+         setOccurrences(hb, headerDescription);
 
          cloneFields(hb, headerDescription, existingContainerId, clonedContainerId);
 
@@ -196,12 +180,6 @@ public final class ContainerBuilderCloner {
       }
    }
 
-   /**
-    * @param containerBuilder
-    * @param containerDescription
-    * @param existingContainerId
-    * @param clonedContainerId
-    */
    private static void cloneFooters(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription containerDescription,
       DataBlockId existingContainerId, DataBlockId clonedContainerId) {
       List<DataBlockDescription> footerDescriptions = containerDescription
@@ -213,7 +191,7 @@ public final class ContainerBuilderCloner {
 
          footerDescription.validateChildren();
 
-         setLengthAndOccurrences(fb, footerDescription);
+         setOccurrences(fb, footerDescription);
 
          cloneFields(fb, footerDescription, existingContainerId, clonedContainerId);
 
@@ -288,7 +266,9 @@ public final class ContainerBuilderCloner {
       DataBlockDescription fieldDescription, FieldProperties<F> fieldProperties, FieldBuilder<P, F, C> fb,
       DataBlockId existingContainerId, DataBlockId clonedContainerId) {
 
-      setLengthAndOccurrences(fb, fieldDescription);
+      fb.withLengthOf(fieldDescription.getMinimumByteLength(), fieldDescription.getMaximumByteLength());
+
+      setOccurrences(fb, fieldDescription);
 
       fb.withDefaultValue(fieldProperties.getDefaultValue());
 
@@ -337,9 +317,8 @@ public final class ContainerBuilderCloner {
       }
    }
 
-   private static void setLengthAndOccurrences(DataBlockDescriptionBuilder<?> builder,
-      DataBlockDescription description) {
-      builder.withLengthOf(description.getMinimumByteLength(), description.getMaximumByteLength());
+   private static void setOccurrences(DynamicOccurrenceBuilder<?> builder, DataBlockDescription description) {
+
       builder.withOccurrences(description.getMinimumOccurrences(), description.getMaximumOccurrences());
    }
 

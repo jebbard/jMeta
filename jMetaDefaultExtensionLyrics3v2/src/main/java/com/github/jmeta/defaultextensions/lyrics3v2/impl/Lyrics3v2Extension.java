@@ -41,8 +41,6 @@ public class Lyrics3v2Extension implements Extension {
    private static final String LYRICS3v2_MAGIC_FOOTER_STRING = "LYRICS200";
    private static final String LYRICS3v2_MAGIC_HEADER_STRING = "LYRICSBEGIN";
    public static final int FOOTER_SIZE_FIELD_LENGTH = 6;
-   private static final int FOOTER_BYTE_LENGTH = LYRICS3v2_MAGIC_FOOTER_STRING.length() + FOOTER_SIZE_FIELD_LENGTH;
-   private static final int HEADER_BYTE_LENGTH = LYRICS3v2_MAGIC_HEADER_STRING.length();
    private static final int LYRICS3v2_FIELD_ID_SIZE = 3;
    private static final int LYRICS3v2_FIELD_SIZE_LENGTH = 5;
 
@@ -99,17 +97,14 @@ public class Lyrics3v2Extension implements Extension {
 
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
-         .withLengthOf(4, DataBlockDescription.UNDEFINED)
          .addHeader("header", "Lyrics3v2 header", "The Lyrics3v2 header")
-            .withStaticLengthOf(HEADER_BYTE_LENGTH)
             .addStringField("id", "Lyrics3v2 header id", "Lyrics3v2 header id")
-               .withStaticLengthOf(HEADER_BYTE_LENGTH)
+               .withStaticLengthOf(LYRICS3v2_MAGIC_HEADER_STRING.length())
                .withDefaultValue(LYRICS3v2_MAGIC_HEADER_STRING)
                .asMagicKey()
             .finishField()
          .finishHeader()
          .addFooter("footer", "Lyrics3v2 footer", "The Lyrics3v2 footer")
-            .withStaticLengthOf(FOOTER_BYTE_LENGTH)
             .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
                .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
                .withStaticLengthOf(FOOTER_SIZE_FIELD_LENGTH)
@@ -123,12 +118,9 @@ public class Lyrics3v2Extension implements Extension {
          .finishFooter()
          .getPayload()
             .withDescription("Lyrics3v2 payload", "The Lyrics3v2 payload")
-            .withLengthOf(0, DataBlockDescription.UNDEFINED)
             .addGenericContainerWithFieldBasedPayload("FIELD_ID", "Lyrics3v2 field", "The Lyrics3v2 field")
-               .withLengthOf(1, DataBlockDescription.UNDEFINED)
                .asDefaultNestedContainer()
                .addHeader("header", "Lyrics3v2 field header", "The Lyrics3v2 field header")
-                  .withStaticLengthOf(LYRICS3v2_FIELD_SIZE_LENGTH + LYRICS3v2_FIELD_ID_SIZE)
                   .addStringField("id", "Lyrics3v2 field id", "Lyrics3v2 field id")
                      .withStaticLengthOf(LYRICS3v2_FIELD_ID_SIZE)
                      .asIdOf(lyrics3V2GenericFieldId)
@@ -141,7 +133,6 @@ public class Lyrics3v2Extension implements Extension {
                .finishHeader()
                .getPayload()
                   .withDescription("Lyrics3v2 field payload", "The Lyrics3v2 field payload")
-                  .withLengthOf(0, DataBlockDescription.UNDEFINED)
                   .addStringField("value", "Lyrics3v2 field data", "Lyrics3v2 field data")
                      .withLengthOf(0, DataBlockDescription.UNDEFINED)
                   .finishField()

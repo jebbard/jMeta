@@ -16,6 +16,7 @@ import java.util.Map;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DynamicOccurrenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -133,31 +134,20 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withStaticLengthOf(long)
+    * Note that this method implements {@link DynamicOccurrenceBuilder#asOptional()} without claiming to override it (as
+    * it comes deeper down into the interface hierarchy). This way, it is possible to provide the occurrence methods
+    * just for a selected group of builders only.
     */
-   @Override
-   public C withStaticLengthOf(long staticByteLength) {
-      return withLengthOf(staticByteLength, staticByteLength);
+   public C asOptional() {
+      return withOccurrences(0, 1);
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withLengthOf(long,
-    *      long)
+    * Note that this method implements {@link DynamicOccurrenceBuilder#withOccurrences(long, long)} without claiming to
+    * override it (as it comes deeper down into the interface hierarchy). This way, it is possible to provide the
+    * occurrence methods just for a selected group of builders only.
     */
    @SuppressWarnings("unchecked")
-   @Override
-   public C withLengthOf(long minimumByteLength, long maximumByteLength) {
-      this.minimumByteLength = minimumByteLength;
-      this.maximumByteLength = maximumByteLength;
-      return (C) this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withOccurrences(int,
-    *      int)
-    */
-   @SuppressWarnings("unchecked")
-   @Override
    public C withOccurrences(long minimumOccurrences, long maximumOccurrences) {
       this.minimumOccurrences = minimumOccurrences;
       this.maximumOccurrences = maximumOccurrences;
@@ -213,6 +203,19 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     */
    protected boolean isGeneric() {
       return isGeneric;
+   }
+
+   /**
+    * Allows to modify the lengths of the data block build by this class
+    * 
+    * @param minimumByteLength
+    *           The minimum byte length
+    * @param maximumByteLength
+    *           The maximum byte length
+    */
+   protected void setLengths(long minimumByteLength, long maximumByteLength) {
+      this.minimumByteLength = minimumByteLength;
+      this.maximumByteLength = maximumByteLength;
    }
 
    /**

@@ -15,7 +15,8 @@ package com.github.jmeta.library.dataformats.api.services.builder;
  * @param <P>
  *           The concrete parent builder interface
  */
-public interface HeaderBuilder<P> extends FieldSequenceBuilder<HeaderBuilder<P>> {
+public interface HeaderBuilder<P>
+   extends FieldSequenceBuilder<HeaderBuilder<P>>, DynamicOccurrenceBuilder<HeaderBuilder<P>> {
 
    /**
     * Finishes the builder
