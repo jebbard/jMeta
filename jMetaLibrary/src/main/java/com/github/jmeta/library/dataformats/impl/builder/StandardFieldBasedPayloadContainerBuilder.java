@@ -28,7 +28,8 @@ public class StandardFieldBasedPayloadContainerBuilder<P extends ContainerSequen
    extends AbstractDataFormatSpecificationBuilder<P, ContainerBuilder<P, FieldBasedPayloadBuilder<P>>>
    implements ContainerBuilder<P, FieldBasedPayloadBuilder<P>> {
 
-   private final FieldBasedPayloadBuilder<P> payloadBuilder = createPayloadBuilder();
+   private final FieldBasedPayloadBuilder<P> payloadBuilder = new StandardFieldBasedPayloadBuilder<>(this,
+      DataBlockId.DEFAULT_PAYLOAD_ID, "payload", "The payload", isGeneric());
 
    /**
     * Creates a new {@link StandardFieldBasedPayloadContainerBuilder}.
@@ -102,15 +103,9 @@ public class StandardFieldBasedPayloadContainerBuilder<P extends ContainerSequen
    @Override
    public ContainerBuilder<P, FieldBasedPayloadBuilder<P>> cloneFrom(DataBlockId existingContainerId) {
 
-      ContainerBuilderCloner.cloneContainerIntoBuilder(this, existingContainerId, PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+      ContainerBuilderCloner.cloneContainerIntoBuilder(this, existingContainerId,
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
       return this;
-   }
-
-   /**
-    * @return
-    */
-   private StandardFieldBasedPayloadBuilder<P> createPayloadBuilder() {
-      return new StandardFieldBasedPayloadBuilder<>(this, "payload", "payload", "The payload", isGeneric());
    }
 }

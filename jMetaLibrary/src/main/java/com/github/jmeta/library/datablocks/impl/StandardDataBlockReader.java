@@ -619,7 +619,7 @@ public class StandardDataBlockReader implements DataBlockReader {
                if (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED)
                   cache(reference, fieldSize);
 
-               else if (remainingDirectParentByteCount > 0)
+               else
                   cache(reference, remainingDirectParentByteCount);
          }
       } catch (EndOfMediumException e) {

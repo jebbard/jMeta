@@ -630,7 +630,7 @@ public abstract class AbstractDataBlockAccessorTest {
       List<DataBlockInstanceId> expectedFieldIds = expectationProvider.getExpectedChildBlocksOfType(parentInstanceId,
          PhysicalDataBlockType.FIELD);
 
-      Assert.assertEquals(expectedFieldIds.size(), fieldList.size());
+      Assert.assertEquals(parentInstanceId.toString(), expectedFieldIds.size(), fieldList.size());
 
       for (int i = 0; i < expectedFieldIds.size(); ++i) {
          DataBlockInstanceId expectedFieldId = expectedFieldIds.get(i);

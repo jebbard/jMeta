@@ -51,32 +51,23 @@ import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link FieldProperties}
+ * {@link FieldProperties} represent all properties of a field.
  *
  * @param <T>
+ *           The interpreted type of the field
  */
 public class FieldProperties<T> {
 
    private final FieldType<T> fieldType;
-
    private final T defaultValue;
-
    private final FieldConverter<T> converter;
-
    private final Map<T, byte[]> enumeratedValues = new HashMap<>();
-
    private final List<FieldFunction> functions = new ArrayList<>();
-
    private final boolean isMagicKey;
-
    private final long magicKeyBitLength;
-
    private final Character terminationCharacter;
-
    private final Charset fixedCharacterEncoding;
-
    private final FlagSpecification flagSpecification;
-
    private final ByteOrder fixedByteOrder;
 
    private final static Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
@@ -87,6 +78,32 @@ public class FieldProperties<T> {
       FIELD_CONVERTERS.put(FieldType.STRING, new StringFieldConverter());
    }
 
+   /**
+    * Creates a new {@link FieldProperties}.
+    * 
+    * @param fieldType
+    *           The {@link FieldType}
+    * @param defaultValue
+    *           The default value of the field, might be null
+    * @param enumeratedValues
+    *           The enumerated values that might occur for the field, might be empty
+    * @param terminationCharacter
+    *           The termination character for string fields or null
+    * @param flagSpecification
+    *           The {@link FlagSpecification} for flags fields or null
+    * @param fixedCharset
+    *           The fixed {@link Charset} for string fields or null
+    * @param fixedByteOrder
+    *           The fixed {@link ByteOrder} for numeric fields or null
+    * @param functions
+    *           The {@link FieldFunction}s of the field
+    * @param isMagicKey
+    *           true if the field acts as a magic key, false otherwise
+    * @param magicKeyBitLength
+    *           The magic key's bit length
+    * @param customConverter
+    *           A custom {@link FieldConverter} to use, pass null to use a default {@link FieldConverter}
+    */
    public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
       ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey, long magicKeyBitLength,
@@ -108,59 +125,30 @@ public class FieldProperties<T> {
       this.fixedByteOrder = fixedByteOrder;
    }
 
-   @SuppressWarnings("unchecked")
-   private static <F> FieldConverter<F> getDefaultFieldConverter(FieldType<F> fieldType) {
-      return (FieldConverter<F>) FIELD_CONVERTERS.get(fieldType);
-   }
-
-   /**
-    * Returns fieldType
-    *
-    * @return fieldType
-    */
    public FieldType<T> getFieldType() {
 
       return fieldType;
    }
 
-   /**
-    * @return the default value
-    */
    public T getDefaultValue() {
 
       return defaultValue;
    }
 
-   /**
-    * Returns the attribute {@link #converter}.
-    * 
-    * @return the attribute {@link #converter}
-    */
    public FieldConverter<T> getConverter() {
       return converter;
    }
 
-   /**
-    * @return the enumerated values
-    */
    public Map<T, byte[]> getEnumeratedValues() {
 
       return Collections.unmodifiableMap(enumeratedValues);
    }
 
-   /**
-    * @return the {@link FieldFunction}
-    */
    public List<FieldFunction> getFieldFunctions() {
 
       return Collections.unmodifiableList(functions);
    }
 
-   /**
-    * Returns the attribute {@link #isMagicKey}.
-    * 
-    * @return the attribute {@link #isMagicKey}
-    */
    public boolean isMagicKey() {
       return isMagicKey;
    }
@@ -169,39 +157,21 @@ public class FieldProperties<T> {
       return magicKeyBitLength;
    }
 
-   /**
-    * Returns terminationCharacter
-    *
-    * @return terminationCharacter
-    */
    public Character getTerminationCharacter() {
 
       return terminationCharacter;
    }
 
-   /**
-    * Returns fixedCharset
-    *
-    * @return fixedCharset
-    */
    public Charset getFixedCharacterEncoding() {
 
       return fixedCharacterEncoding;
    }
 
-   /**
-    * @return the {@link FlagSpecification}
-    */
    public FlagSpecification getFlagSpecification() {
 
       return flagSpecification;
    }
 
-   /**
-    * Returns fixedByteOrder
-    *
-    * @return fixedByteOrder
-    */
    public ByteOrder getFixedByteOrder() {
 
       return fixedByteOrder;
@@ -451,12 +421,11 @@ public class FieldProperties<T> {
       return fieldMagicKeys;
    }
 
-   /**
-    * @param fieldDesc
-    * @param magicKeyOffset
-    * @param fieldMagicKeys
-    * @param magicKeyBytes
-    */
+   @SuppressWarnings("unchecked")
+   private static <F> FieldConverter<F> getDefaultFieldConverter(FieldType<F> fieldType) {
+      return (FieldConverter<F>) FIELD_CONVERTERS.get(fieldType);
+   }
+
    private List<MagicKey> getFieldMagicKeys(DataBlockDescription fieldDesc, long magicKeyOffset, byte[] magicKeyBytes) {
       List<MagicKey> fieldMagicKeys = new ArrayList<>();
 

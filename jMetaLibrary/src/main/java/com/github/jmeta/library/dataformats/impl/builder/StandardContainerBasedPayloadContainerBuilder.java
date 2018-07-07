@@ -29,7 +29,7 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
    implements ContainerBuilder<P, ContainerBasedPayloadBuilder<P>> {
 
    private final ContainerBasedPayloadBuilder<P> payloadBuilder = new StandardContainerBasedPayloadBuilder<>(this,
-      "payload", "payload", "The payload");
+      DataBlockId.DEFAULT_PAYLOAD_ID, "payload", "The payload");
 
    /**
     * Creates a new {@link StandardContainerBasedPayloadContainerBuilder}.

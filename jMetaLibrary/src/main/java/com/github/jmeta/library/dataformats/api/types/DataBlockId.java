@@ -20,6 +20,37 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public class DataBlockId {
 
    /**
+    * A default local id for a {@link PhysicalDataBlockType#HEADER} data block.
+    */
+   public static final String DEFAULT_HEADER_ID = "header";
+
+   /**
+    * A default local id for a {@link PhysicalDataBlockType#FOOTER} data block.
+    */
+   public static final String DEFAULT_FOOTER_ID = "footer";
+
+   /**
+    * A default local id for a {@link PhysicalDataBlockType#FIELD_BASED_PAYLOAD} or
+    * {@link PhysicalDataBlockType#CONTAINER_BASED_PAYLOAD} data block.
+    */
+   public static final String DEFAULT_PAYLOAD_ID = "payload";
+
+   /**
+    * A default local id for an id {@link PhysicalDataBlockType#FIELD} data block.
+    */
+   public static final String DEFAULT_FIELD_ID_ID = "id";
+
+   /**
+    * A default local id for a size {@link PhysicalDataBlockType#FIELD} data block.
+    */
+   public static final String DEFAULT_FIELD_SIZE_ID = "size";
+
+   /**
+    * A default local id for a flags {@link PhysicalDataBlockType#FIELD} data block.
+    */
+   public static final String DEFAULT_FIELD_FLAGS_ID = "flags";
+
+   /**
     *
     */
    public static final String SEGMENT_SEPARATOR = ".";
@@ -31,8 +62,7 @@ public class DataBlockId {
     * @param parent
     * @param localId
     */
-   public DataBlockId(ContainerDataFormat dataFormat, DataBlockId parent,
-      String localId) {
+   public DataBlockId(ContainerDataFormat dataFormat, DataBlockId parent, String localId) {
       Reject.ifNull(localId, "localId");
       Reject.ifNull(parent, "parent");
 
@@ -51,8 +81,7 @@ public class DataBlockId {
     */
    public DataBlockId(ContainerDataFormat dataFormat, List<String> segments) {
       Reject.ifNull(segments, "segments");
-      Reject.ifTrue(segments.isEmpty(),
-         "segments.isEmpty()");
+      Reject.ifTrue(segments.isEmpty(), "segments.isEmpty()");
 
       m_idSegments.addAll(segments);
       m_globalId = computeGlobalId(m_idSegments);
@@ -69,8 +98,7 @@ public class DataBlockId {
       Reject.ifNull(globalId, "globalId");
 
       m_globalId = globalId;
-      m_idSegments
-         .addAll(Arrays.asList(m_globalId.split("\\" + SEGMENT_SEPARATOR)));
+      m_idSegments.addAll(Arrays.asList(m_globalId.split("\\" + SEGMENT_SEPARATOR)));
       m_dataFormat = dataFormat;
    }
 
@@ -154,10 +182,8 @@ public class DataBlockId {
 
       final int prime = 31;
       int result = 1;
-      result = prime * result
-         + ((m_dataFormat == null) ? 0 : m_dataFormat.hashCode());
-      result = prime * result
-         + ((m_globalId == null) ? 0 : m_globalId.hashCode());
+      result = prime * result + ((m_dataFormat == null) ? 0 : m_dataFormat.hashCode());
+      result = prime * result + ((m_globalId == null) ? 0 : m_globalId.hashCode());
       return result;
    }
 

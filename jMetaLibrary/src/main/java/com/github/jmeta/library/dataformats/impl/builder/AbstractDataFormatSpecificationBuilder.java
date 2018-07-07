@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DynamicOccurrenceBuilder;
@@ -167,6 +168,16 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    }
 
    /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#referencedAs(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public C referencedAs(DataBlockCrossReference reference) {
+      getRootBuilder().addReference(reference, createId());
+      return (C) this;
+   }
+
+   /**
     * Allows derived builders to remove a child {@link DataBlockDescription} with a given id
     * 
     * @param childId
@@ -186,9 +197,9 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     * @return The parent {@link DataFormatBuilder}.
     */
    protected P finish() {
-      DataBlockDescription myDescription = new DataBlockDescription(new DataBlockId(dataFormat, globalId), name,
-         description, type, new ArrayList<>(childDescriptions.values()), fieldProperties, minimumOccurrences,
-         maximumOccurrences, minimumByteLength, maximumByteLength, isGeneric);
+      DataBlockDescription myDescription = new DataBlockDescription(createId(), name, description, type,
+         new ArrayList<>(childDescriptions.values()), fieldProperties, minimumOccurrences, maximumOccurrences,
+         minimumByteLength, maximumByteLength, isGeneric);
 
       parentBuilder.addChildDescription(myDescription);
 
@@ -235,5 +246,9 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     */
    protected void setFieldProperties(FieldProperties<?> fieldProperties) {
       this.fieldProperties = fieldProperties;
+   }
+
+   private DataBlockId createId() {
+      return new DataBlockId(getDataFormat(), getGlobalId());
    }
 }

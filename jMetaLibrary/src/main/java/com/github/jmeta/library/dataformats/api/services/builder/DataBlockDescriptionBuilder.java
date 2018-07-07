@@ -28,4 +28,6 @@ public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuild
     * @return The concrete builder instance
     */
    C withDescription(String name, String description);
+
+   C referencedAs(DataBlockCrossReference reference);
 }

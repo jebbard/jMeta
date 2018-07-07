@@ -10,7 +10,6 @@
 package com.github.jmeta.library.dataformats.impl;
 
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_NESTED_CONTAINER_MISSING;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_BYTE_ORDER;
@@ -162,11 +161,12 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                   dataBlockWithDynamicOccurrences);
             }
          } else {
-            if (!hasFieldFunctionForId
-               || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), FieldFunctionType.COUNT_OF)) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING,
-                  dataBlockWithDynamicOccurrences);
-            }
+            // TODO This does not work for the Ogg special case...
+            // if (!hasFieldFunctionForId
+            // || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), FieldFunctionType.COUNT_OF)) {
+            // throw new InvalidSpecificationException(VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING,
+            // dataBlockWithDynamicOccurrences);
+            // }
          }
 
       }
