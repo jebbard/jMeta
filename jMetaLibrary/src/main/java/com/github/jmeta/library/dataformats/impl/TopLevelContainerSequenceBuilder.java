@@ -225,12 +225,27 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
       Reject.ifNull(reference, "reference");
       Reject.ifNull(referencedId, "referencedId");
 
-      if (crossReferences.containsKey(reference)) {
-         throw new IllegalArgumentException("The cross reference <" + reference
-            + "> has already been used by data block id <" + crossReferences.get(reference) + ">");
-      }
+      // if (crossReferences.containsKey(reference)) {
+      // throw new IllegalArgumentException("The cross reference <" + reference + "> to be used to refer to <"
+      // + referencedId + "> has already been used by data block id <" + crossReferences.get(reference) + ">");
+      // }
 
       crossReferences.put(reference, referencedId);
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#getReferencedId(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    */
+   @Override
+   public DataBlockId getReferencedId(DataBlockCrossReference reference) {
+      Reject.ifNull(reference, "reference");
+
+      // if (!crossReferences.containsKey(reference)) {
+      // throw new IllegalArgumentException(
+      // "The cross reference <" + reference + "> is unknown, i.e. was never defined");
+      // }
+
+      return crossReferences.get(reference);
    }
 
    /**

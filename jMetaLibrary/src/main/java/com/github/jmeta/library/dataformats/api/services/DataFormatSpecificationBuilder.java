@@ -134,4 +134,13 @@ public interface DataFormatSpecificationBuilder
     *           The referenced {@link DataBlockId}, must not be null
     */
    public void addReference(DataBlockCrossReference reference, DataBlockId referencedId);
+
+   /**
+    * Returns the {@link DataBlockId} referenced by the passed {@link DataBlockCrossReference}. If not existing, a
+    * corresponding runtime exception is thrown.
+    * 
+    * @param reference
+    *           The {@link DataBlockCrossReference} to look up, must not be null
+    */
+   public DataBlockId getReferencedId(DataBlockCrossReference reference);
 }

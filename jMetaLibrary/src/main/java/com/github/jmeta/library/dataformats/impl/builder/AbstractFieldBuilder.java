@@ -12,11 +12,14 @@ package com.github.jmeta.library.dataformats.impl.builder;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
@@ -103,82 +106,52 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asIdOf(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asIdOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
     */
-   @SuppressWarnings("unchecked")
    @Override
-   public C asIdOf(DataBlockId targetId) {
-      Set<DataBlockId> affectedBlocks = Set.of(targetId);
-
-      functions.add(new FieldFunction(FieldFunctionType.ID_OF, affectedBlocks, null, null));
-
-      return (C) this;
+   public C asIdOf(DataBlockCrossReference referencedBlock) {
+      return addFieldFunction(FieldFunctionType.ID_OF, null, null, referencedBlock);
    }
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#indicatesPresenceOf(java.lang.String,
-    *      int, com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    *      int, com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
     */
-   @SuppressWarnings("unchecked")
    @Override
-   public C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockId targetId) {
-      Set<DataBlockId> affectedBlocks = Set.of(targetId);
-
-      functions.add(new FieldFunction(FieldFunctionType.PRESENCE_OF, affectedBlocks, withFlagName, withFlagValue));
-
-      return (C) this;
+   public C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockCrossReference referencedBlock) {
+      return addFieldFunction(FieldFunctionType.PRESENCE_OF, withFlagName, withFlagValue, referencedBlock);
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference[])
     */
-   @SuppressWarnings("unchecked")
    @Override
-   public C asSizeOf(DataBlockId... ids) {
-      Set<DataBlockId> affectedBlocks = Set.of(ids);
-
-      functions.add(new FieldFunction(FieldFunctionType.SIZE_OF, affectedBlocks, null, null));
-
-      return (C) this;
+   public C asSizeOf(DataBlockCrossReference... referencedBlocks) {
+      return addFieldFunction(FieldFunctionType.SIZE_OF, null, null, referencedBlocks);
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCountOf(com.github.jmeta.library.dataformats.api.types.DataBlockId[])
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCountOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
     */
-   @SuppressWarnings("unchecked")
    @Override
-   public C asCountOf(DataBlockId targetId) {
-      Set<DataBlockId> affectedBlocks = Set.of(targetId);
-
-      functions.add(new FieldFunction(FieldFunctionType.COUNT_OF, affectedBlocks, null, null));
-
-      return (C) this;
+   public C asCountOf(DataBlockCrossReference referencedBlock) {
+      return addFieldFunction(FieldFunctionType.COUNT_OF, null, null, referencedBlock);
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asByteOrderOf(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asByteOrderOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
     */
-   @SuppressWarnings("unchecked")
    @Override
-   public C asByteOrderOf(DataBlockId targetId) {
-      Set<DataBlockId> affectedBlocks = Set.of(targetId);
-
-      functions.add(new FieldFunction(FieldFunctionType.BYTE_ORDER_OF, affectedBlocks, null, null));
-
-      return (C) this;
+   public C asByteOrderOf(DataBlockCrossReference referencedBlock) {
+      return addFieldFunction(FieldFunctionType.BYTE_ORDER_OF, null, null, referencedBlock);
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCharacterEncodingOf(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCharacterEncodingOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
     */
-   @SuppressWarnings("unchecked")
    @Override
-   public C asCharacterEncodingOf(DataBlockId targetId) {
-      Set<DataBlockId> affectedBlocks = Set.of(targetId);
-
-      functions.add(new FieldFunction(FieldFunctionType.CHARACTER_ENCODING_OF, affectedBlocks, null, null));
-
-      return (C) this;
+   public C asCharacterEncodingOf(DataBlockCrossReference referencedBlock) {
+      return addFieldFunction(FieldFunctionType.CHARACTER_ENCODING_OF, null, null, referencedBlock);
    }
 
    /**
@@ -259,5 +232,18 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
 
    protected void setFixedByteOrder(ByteOrder fixedByteOrder) {
       this.fixedByteOrder = fixedByteOrder;
+   }
+
+   @SuppressWarnings("unchecked")
+   private C addFieldFunction(FieldFunctionType<?> type, String withFlagName, Integer withFlagValue,
+      DataBlockCrossReference... referencedBlocks) {
+      Reject.ifNull(referencedBlocks, "referencedBlock");
+
+      Set<DataBlockId> fakeBlocks = Arrays.asList(referencedBlocks).stream()
+         .map(reference -> new DataBlockId(getDataFormat(), reference.getRefId())).collect(Collectors.toSet());
+
+      functions.add(new FieldFunction(type, fakeBlocks, withFlagName, withFlagValue));
+
+      return (C) this;
    }
 }

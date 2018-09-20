@@ -9,13 +9,20 @@
  */
 package com.github.jmeta.library.dataformats.impl.builder;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.HeaderBuilder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
 /**
@@ -94,7 +101,30 @@ public class StandardFieldBasedPayloadContainerBuilder<P extends ContainerSequen
     */
    @Override
    public P finishContainer() {
-      return super.finish();
+      P parentBuilder = super.finish();
+
+      List<DataBlockDescription> overallDescriptions = getRootBuilder().getDataBlockDescription(createId())
+         .getTransitiveChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
+      overallDescriptions.forEach(desc -> {
+         for (FieldFunction fieldFunction : desc.getFieldProperties().getFieldFunctions()) {
+            Set<DataBlockId> resolvedAffectedBlocks = fieldFunction.getAffectedBlockIds().stream().map(id -> {
+               DataBlockId referencedId = getRootBuilder()
+                  .getReferencedId(new DataBlockCrossReference(id.getGlobalId()));
+
+               if (referencedId == null) {
+                  return id;
+               }
+
+               return referencedId;
+            }).collect(Collectors.toSet());
+
+            fieldFunction.setAffectedBlockIds(resolvedAffectedBlocks);
+         }
+
+         desc.getFieldProperties().validateFieldProperties(desc);
+      });
+
+      return parentBuilder;
    }
 
    /**

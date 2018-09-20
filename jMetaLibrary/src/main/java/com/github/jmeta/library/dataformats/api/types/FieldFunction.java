@@ -21,7 +21,13 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class FieldFunction {
 
-   private final Set<DataBlockId> m_affectedBlockIds = new HashSet<>();
+   private Set<DataBlockId> m_affectedBlockIds = new HashSet<>();
+
+   public void setAffectedBlockIds(Set<DataBlockId> m_affectedBlockIds) {
+      Reject.ifNull(m_affectedBlockIds, "m_affectedBlockIds");
+
+      this.m_affectedBlockIds = m_affectedBlockIds;
+   }
 
    private final FieldFunctionType<?> m_fieldFunctionType;
 

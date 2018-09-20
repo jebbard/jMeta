@@ -141,6 +141,18 @@ public class DataBlockDescription {
       return getOrderedChildren().stream().filter(desc -> desc.getPhysicalType() == type).collect(Collectors.toList());
    }
 
+   public List<DataBlockDescription> getTransitiveChildDescriptionsOfType(PhysicalDataBlockType type) {
+      Reject.ifNull(type, "type");
+
+      final List<DataBlockDescription> childDescriptionsOfType = getOrderedChildren().stream()
+         .filter(desc -> desc.getPhysicalType() == type).collect(Collectors.toList());
+
+      getOrderedChildren()
+         .forEach(desc -> childDescriptionsOfType.addAll(desc.getTransitiveChildDescriptionsOfType(type)));
+
+      return childDescriptionsOfType;
+   }
+
    public DataBlockId getId() {
 
       return id;
@@ -403,10 +415,6 @@ public class DataBlockDescription {
          throw new InvalidSpecificationException(VLD_FIELD_PROPERTIES_MISSING, this);
       } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
          throw new InvalidSpecificationException(VLD_FIELD_PROPERTIES_UNNECESSARY, this);
-      }
-
-      if (physicalType == PhysicalDataBlockType.FIELD) {
-         getFieldProperties().validateFieldProperties(this);
       }
    }
 

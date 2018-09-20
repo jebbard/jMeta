@@ -30,4 +30,9 @@ public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuild
    C withDescription(String name, String description);
 
    C referencedAs(DataBlockCrossReference reference);
+
+   /**
+    * @return the {@link DataBlockCrossReference} for the data block built by this container, or null if there is none
+    */
+   DataBlockCrossReference getReference();
 }

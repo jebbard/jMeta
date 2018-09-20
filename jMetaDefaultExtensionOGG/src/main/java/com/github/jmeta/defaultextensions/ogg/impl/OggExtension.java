@@ -19,9 +19,9 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -77,13 +77,10 @@ public class OggExtension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
-      // Data blocks
-      final DataBlockId oggPageHeaderSegmentTableEntryId = new DataBlockId(OggExtension.OGG,
-         "ogg.header.segmentTableEntry");
-      final DataBlockId oggSegmentId = new DataBlockId(OggExtension.OGG,
-         "ogg.payload.packetPartContainer.payload.segment");
-
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(OggExtension.OGG);
+
+      DataBlockCrossReference segmentTableEntryReference = new DataBlockCrossReference("Segment table entry");
+      DataBlockCrossReference segmentReference = new DataBlockCrossReference("Segment");
 
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("ogg", "Ogg page", "The ogg page")
@@ -114,13 +111,13 @@ public class OggExtension implements Extension {
              .finishField()
              .addNumericField("pageSegments", "Ogg page segments", "Ogg page segments")
                 .withStaticLengthOf(1)
-                .asCountOf(oggPageHeaderSegmentTableEntryId)
-//                .asCountOf(oggSegmentId)
+                .asCountOf(segmentTableEntryReference)
              .finishField()
              .addNumericField("segmentTableEntry", "Ogg page segment table entry", "Ogg segment table entry")
+                .referencedAs(segmentTableEntryReference)
                 .withStaticLengthOf(1)
                 .withOccurrences(0, 99999)
-                .asSizeOf(oggSegmentId)
+                .asSizeOf(segmentReference)
              .finishField()
           .finishHeader()
           .getPayload()
@@ -129,6 +126,7 @@ public class OggExtension implements Extension {
                 .getPayload()
                    .withDescription("Ogg packet", "Ogg packet")
                    .addBinaryField("segment", "Ogg segment", "Ogg segment")
+                      .referencedAs(segmentReference)
                       .withLengthOf(0, DataBlockDescription.UNDEFINED)
                       .withOccurrences(1, 999999)
                    .finishField()

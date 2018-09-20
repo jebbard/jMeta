@@ -59,6 +59,8 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    private long maximumOccurrences = 1;
    private final boolean isGeneric;
 
+   private DataBlockCrossReference myCrossReference;
+
    /**
     * Creates a new {@link AbstractDataFormatSpecificationBuilder}.
     * 
@@ -173,8 +175,20 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    @SuppressWarnings("unchecked")
    @Override
    public C referencedAs(DataBlockCrossReference reference) {
+      Reject.ifNull(reference, "reference");
+
+      myCrossReference = reference;
+
       getRootBuilder().addReference(reference, createId());
       return (C) this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#getReference()
+    */
+   @Override
+   public DataBlockCrossReference getReference() {
+      return myCrossReference;
    }
 
    /**
@@ -248,7 +262,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
       this.fieldProperties = fieldProperties;
    }
 
-   private DataBlockId createId() {
+   protected DataBlockId createId() {
       return new DataBlockId(getDataFormat(), getGlobalId());
    }
 }

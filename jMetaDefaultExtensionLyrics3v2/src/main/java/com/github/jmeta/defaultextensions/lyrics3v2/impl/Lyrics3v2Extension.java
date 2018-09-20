@@ -19,6 +19,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -85,19 +86,18 @@ public class Lyrics3v2Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
-      // Data blocks
-      final DataBlockId lyrics3V2PayloadId = new DataBlockId(Lyrics3v2Extension.LYRICS3v2, "lyrics3v2.payload");
-      final DataBlockId lyrics3V2GenericFieldId = new DataBlockId(LYRICS3v2, "lyrics3v2.payload.${FIELD_ID}");
-      final DataBlockId lyrics3V2GenericFieldPayloadId = new DataBlockId(LYRICS3v2,
-         "lyrics3v2.payload.${FIELD_ID}.payload");
-      final DataBlockId lyrics3V2HeaderId = new DataBlockId(LYRICS3v2, "lyrics3v2.header");
-
       DataFormatSpecificationBuilder builder = specFactory
          .createDataFormatSpecificationBuilder(Lyrics3v2Extension.LYRICS3v2);
 
       // @formatter:off
+      DataBlockCrossReference fieldReference = new DataBlockCrossReference("Field");
+      DataBlockCrossReference headerReference = new DataBlockCrossReference("Header");
+      DataBlockCrossReference payloadReference = new DataBlockCrossReference("Payload");
+      DataBlockCrossReference fieldPayloadReference = new DataBlockCrossReference("Field Payload");
+      
       return builder.addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
          .addHeader("header", "Lyrics3v2 header", "The Lyrics3v2 header")
+            .referencedAs(headerReference)
             .addStringField("id", "Lyrics3v2 header id", "Lyrics3v2 header id")
                .withStaticLengthOf(LYRICS3v2_MAGIC_HEADER_STRING.length())
                .withDefaultValue(LYRICS3v2_MAGIC_HEADER_STRING)
@@ -108,7 +108,7 @@ public class Lyrics3v2Extension implements Extension {
             .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
                .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
                .withStaticLengthOf(FOOTER_SIZE_FIELD_LENGTH)
-               .asSizeOf(lyrics3V2HeaderId, lyrics3V2PayloadId)
+               .asSizeOf(headerReference, payloadReference)
             .finishField()
             .addStringField("id", "Lyrics3v2 footer id", "Lyrics3v2 footer id")
                .withStaticLengthOf(LYRICS3v2_MAGIC_FOOTER_STRING.length())
@@ -117,21 +117,24 @@ public class Lyrics3v2Extension implements Extension {
             .finishField()
          .finishFooter()
          .getPayload()
+            .referencedAs(payloadReference)
             .withDescription("Lyrics3v2 payload", "The Lyrics3v2 payload")
             .addGenericContainerWithFieldBasedPayload("FIELD_ID", "Lyrics3v2 field", "The Lyrics3v2 field")
+               .referencedAs(fieldReference)
                .asDefaultNestedContainer()
                .addHeader("header", "Lyrics3v2 field header", "The Lyrics3v2 field header")
                   .addStringField("id", "Lyrics3v2 field id", "Lyrics3v2 field id")
                      .withStaticLengthOf(LYRICS3v2_FIELD_ID_SIZE)
-                     .asIdOf(lyrics3V2GenericFieldId)
+                     .asIdOf(fieldReference)
                   .finishField()
                   .addNumericField("size", "Lyrics3v2 item value size", "Lyrics3v2 item value size")
                      .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
                      .withStaticLengthOf(LYRICS3v2_FIELD_SIZE_LENGTH)
-                     .asSizeOf(lyrics3V2GenericFieldPayloadId)
+                     .asSizeOf(fieldPayloadReference)
                   .finishField()
                .finishHeader()
                .getPayload()
+                  .referencedAs(fieldPayloadReference)
                   .withDescription("Lyrics3v2 field payload", "The Lyrics3v2 field payload")
                   .addStringField("value", "Lyrics3v2 field data", "Lyrics3v2 field data")
                      .withLengthOf(0, DataBlockDescription.UNDEFINED)

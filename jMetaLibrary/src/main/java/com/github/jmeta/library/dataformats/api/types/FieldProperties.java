@@ -274,7 +274,7 @@ public class FieldProperties<T> {
          + flagSpecification + ", fixedByteOrder=" + fixedByteOrder + "]";
    }
 
-   void validateFieldProperties(DataBlockDescription desc) {
+   public void validateFieldProperties(DataBlockDescription desc) {
       long minimumByteLength = desc.getMinimumByteLength();
       long maximumByteLength = desc.getMaximumByteLength();
 

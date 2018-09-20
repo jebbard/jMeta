@@ -10,7 +10,6 @@
 package com.github.jmeta.library.dataformats.api.services.builder;
 
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
@@ -51,11 +50,11 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     * Tags this field as representing the id of a target generic container data block. The field must be of
     * {@link FieldType#STRING}.
     * 
-    * @param targetId
-    *           The target id, must not be null and refer to a generic container data block
+    * @param referencedBlock
+    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
     */
-   C asIdOf(DataBlockId targetId);
+   C asIdOf(DataBlockCrossReference referencedBlock);
 
    /**
     * Tags this field as indicating the presence of a target data block. The field must be of {@link FieldType#FLAGS}.
@@ -65,52 +64,51 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     *           existing flag name of the underlying {@link FlagSpecification}
     * @param withFlagValue
     *           The value of the flag the indicates presence, any other value found during parsing indicates absence
-    * @param targetId
-    *           The target id, must not be null and refer to a target data block being optional, i.e. having minimum
-    *           occurrences equal to 0 and maximum occurrences equal to 1
+    * @param referencedBlock
+    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
     */
-   C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockId targetId);
+   C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockCrossReference referencedBlock);
 
    /**
     * Tags this field as representing the size of a target data block. The field must be of
     * {@link FieldType#UNSIGNED_WHOLE_NUMBER}.
     * 
-    * @param ids
-    *           The target ids, must not be null and refer to sibling target data blocks having a dynamic size together
+    * @param referencedBlock
+    *           The target data blocks identified by their {@link DataBlockCrossReference}s, must not be null
     * @return This builder
     */
-   C asSizeOf(DataBlockId... ids);
+   C asSizeOf(DataBlockCrossReference... referencedBlocks);
 
    /**
     * Tags this field as representing the number of occurrences of a target data block. The field must be of
     * {@link FieldType#UNSIGNED_WHOLE_NUMBER}.
     * 
-    * @param targetId
-    *           The target id, must not be null and refer to a target data block having a dynamic number of occurrences
+    * @param referencedBlock
+    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
     */
-   C asCountOf(DataBlockId targetId);
+   C asCountOf(DataBlockCrossReference referencedBlock);
 
    /**
     * Tags this field as representing the id of a target generic container data block. The field must be of
     * {@link FieldType#STRING}.
     * 
-    * @param targetId
-    *           The target id, must not be null
+    * @param referencedBlock
+    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
     */
-   C asByteOrderOf(DataBlockId targetId);
+   C asByteOrderOf(DataBlockCrossReference referencedBlock);
 
    /**
     * Tags this field as representing the id of a target generic container data block. The field must be of
     * {@link FieldType#STRING}.
     * 
-    * @param targetId
-    *           The target id, must not be null
+    * @param referencedBlock
+    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
     */
-   C asCharacterEncodingOf(DataBlockId targetId);
+   C asCharacterEncodingOf(DataBlockCrossReference referencedBlock);
 
    /**
     * Adds an enumerated value to this field's data block description.

@@ -19,6 +19,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
+import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -93,6 +94,7 @@ public class MP3Extension implements Extension {
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(MP3Extension.MP3);
 
       // @formatter:off
+      DataBlockCrossReference crcReference = new DataBlockCrossReference("CRC");
       builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
          .addHeader("header", "MP3 header", "The MP3 header")
             .addFlagsField("content", "MP3 header contents", "The MP3 header contents")
@@ -114,11 +116,12 @@ public class MP3Extension implements Extension {
                   .addFlagDescription(new FlagDescription("Mode extension bit", new BitAddress(3, 4), "", 2, null))
                   .addFlagDescription(new FlagDescription("Mode bit", new BitAddress(3, 6), "", 2, null))
                .finishFlagSpecification()
-               .indicatesPresenceOf("No protection bit", 0, crcId)
+               .indicatesPresenceOf("No protection bit", 0, crcReference)
                .asMagicKeyWithOddBitLength(11)
             .finishField()
          .finishHeader()
          .addHeader("crc", "MP3 CRC", "The MP3 CRC")
+            .referencedAs(crcReference)
             .withOccurrences(0, 1)
             .addBinaryField("data", "MP3 CRC data", "The MP3 CRC data")
                .withStaticLengthOf(2)
