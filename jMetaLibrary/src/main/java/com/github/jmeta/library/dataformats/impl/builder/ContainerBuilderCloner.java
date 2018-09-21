@@ -18,7 +18,6 @@ import java.util.UUID;
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DynamicOccurrenceBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
@@ -29,6 +28,7 @@ import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.HeaderBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
@@ -52,17 +52,17 @@ public final class ContainerBuilderCloner {
     * 
     * @param containerBuilder
     *           The {@link ContainerBuilder} to clone into
-    * @param existingContainerId
-    *           The id of the existing container
+    * @param existingContainerRef
+    *           The reference to the existing container
     * @param payloadType
     *           The payload type of the container, either {@link PhysicalDataBlockType#FIELD_BASED_PAYLOAD} or
     *           {@link PhysicalDataBlockType#CONTAINER_BASED_PAYLOAD}.
     */
    public static void cloneContainerIntoBuilder(ContainerBuilder<?, ?> containerBuilder,
-      DataBlockId existingContainerId, PhysicalDataBlockType payloadType) {
+      DataBlockCrossReference existingContainerRef, PhysicalDataBlockType payloadType) {
 
       Reject.ifNull(payloadType, "payloadType");
-      Reject.ifNull(existingContainerId, "existingContainerId");
+      Reject.ifNull(existingContainerRef, "existingContainerId");
       Reject.ifNull(containerBuilder, "containerBuilder");
       Reject.ifTrue(
          payloadType != PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD
@@ -72,9 +72,9 @@ public final class ContainerBuilderCloner {
       DataBlockId clonedContainerId = new DataBlockId(containerBuilder.getDataFormat(), containerBuilder.getGlobalId());
 
       DataBlockDescription existingContainerDescription = containerBuilder.getRootBuilder()
-         .getDataBlockDescription(existingContainerId);
+         .getDataBlockDescription(existingContainerRef.getReferencedId());
 
-      String messagePrefix = "Cloning container with id <" + existingContainerId + "> is not possible: ";
+      String messagePrefix = "Cloning container with id <" + existingContainerRef + "> is not possible: ";
 
       if (existingContainerDescription == null) {
          throw new IllegalArgumentException(messagePrefix
@@ -87,22 +87,12 @@ public final class ContainerBuilderCloner {
 
       existingContainerDescription.validateChildren();
 
-      DataBlockCrossReference existingContainerReference = containerBuilder.getReference();
-      DataBlockCrossReference clonedContainerReference = null;
+      cloneHeaders(containerBuilder, existingContainerDescription, existingContainerRef, clonedContainerId);
 
-      if (existingContainerReference != null) {
-         clonedContainerReference = new DataBlockCrossReference(
-            existingContainerReference.getRefId() + "_" + clonedContainerId + "_" + UUID.randomUUID());
-      }
+      cloneFooters(containerBuilder, existingContainerDescription, existingContainerRef, clonedContainerId);
 
-      cloneHeaders(containerBuilder, existingContainerDescription, existingContainerId, clonedContainerId,
-         clonedContainerReference);
-
-      cloneFooters(containerBuilder, existingContainerDescription, existingContainerId, clonedContainerId,
-         clonedContainerReference);
-
-      clonePayload(containerBuilder, existingContainerDescription, existingContainerId, clonedContainerId, payloadType,
-         clonedContainerReference);
+      clonePayload(containerBuilder, existingContainerDescription, existingContainerRef, clonedContainerId,
+         payloadType);
    }
 
    /**
@@ -112,10 +102,11 @@ public final class ContainerBuilderCloner {
       // Private to ensure nobody can instantiate it
    }
 
-   private static void clonePayload(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription existingContainerDescription,
-      DataBlockId existingContainerId, DataBlockId clonedContainerId, PhysicalDataBlockType payloadType,
-      DataBlockCrossReference clonedContainerReference) {
-      List<DataBlockDescription> payloadDescriptions = existingContainerDescription.getChildDescriptionsOfType(payloadType);
+   private static void clonePayload(ContainerBuilder<?, ?> containerBuilder,
+      DataBlockDescription existingContainerDescription, DataBlockCrossReference existingContainerRef,
+      DataBlockId clonedContainerId, PhysicalDataBlockType payloadType) {
+      List<DataBlockDescription> payloadDescriptions = existingContainerDescription
+         .getChildDescriptionsOfType(payloadType);
 
       DataBlockDescription payloadDescription = payloadDescriptions.get(0);
 
@@ -125,8 +116,7 @@ public final class ContainerBuilderCloner {
          FieldBasedPayloadBuilder<?> fieldBasedPayloadBuilder = (FieldBasedPayloadBuilder<?>) containerBuilder
             .getPayload();
 
-         cloneFields(fieldBasedPayloadBuilder, payloadDescription, existingContainerId, clonedContainerId,
-            clonedContainerReference);
+         cloneFields(fieldBasedPayloadBuilder, payloadDescription, existingContainerRef, clonedContainerId);
 
          fieldBasedPayloadBuilder.finishFieldBasedPayload();
       } else if (payloadType == PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
@@ -155,7 +145,8 @@ public final class ContainerBuilderCloner {
                   childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
                   childContainerDescription.getDescription());
 
-            cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
+            cloneContainerIntoBuilder(childContainerBuilder,
+               new DataBlockCrossReference(childContainerDescription.getId().getGlobalId()),
                PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
 
             childContainerBuilder.finishContainer();
@@ -168,7 +159,8 @@ public final class ContainerBuilderCloner {
                   childContainerDescription.getId().getLocalId(), childContainerDescription.getName(),
                   childContainerDescription.getDescription());
 
-            cloneContainerIntoBuilder(childContainerBuilder, childContainerDescription.getId(),
+            cloneContainerIntoBuilder(childContainerBuilder,
+               new DataBlockCrossReference(childContainerDescription.getId().getGlobalId()),
                PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
             childContainerBuilder.finishContainer();
@@ -176,9 +168,9 @@ public final class ContainerBuilderCloner {
       }
    }
 
-   private static void cloneHeaders(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription existingContainerDescription,
-      DataBlockId existingContainerId, DataBlockId clonedContainerId,
-      DataBlockCrossReference clonedContainerReference) {
+   private static void cloneHeaders(ContainerBuilder<?, ?> containerBuilder,
+      DataBlockDescription existingContainerDescription, DataBlockCrossReference existingContainerRef,
+      DataBlockId clonedContainerId) {
       List<DataBlockDescription> headerDescriptions = existingContainerDescription
          .getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
 
@@ -190,15 +182,15 @@ public final class ContainerBuilderCloner {
 
          setOccurrences(hb, headerDescription);
 
-         cloneFields(hb, headerDescription, existingContainerId, clonedContainerId, clonedContainerReference);
+         cloneFields(hb, headerDescription, existingContainerRef, clonedContainerId);
 
          hb.finishHeader();
       }
    }
 
-   private static void cloneFooters(ContainerBuilder<?, ?> containerBuilder, DataBlockDescription existingContainerDescription,
-      DataBlockId existingContainerId, DataBlockId clonedContainerId,
-      DataBlockCrossReference clonedContainerReference) {
+   private static void cloneFooters(ContainerBuilder<?, ?> containerBuilder,
+      DataBlockDescription existingContainerDescription, DataBlockCrossReference existingContainerRef,
+      DataBlockId clonedContainerId) {
       List<DataBlockDescription> footerDescriptions = existingContainerDescription
          .getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
 
@@ -210,7 +202,7 @@ public final class ContainerBuilderCloner {
 
          setOccurrences(fb, footerDescription);
 
-         cloneFields(fb, footerDescription, existingContainerId, clonedContainerId, clonedContainerReference);
+         cloneFields(fb, footerDescription, existingContainerRef, clonedContainerId);
 
          fb.finishFooter();
       }
@@ -218,8 +210,9 @@ public final class ContainerBuilderCloner {
 
    @SuppressWarnings("unchecked")
    private static void cloneFields(FieldSequenceBuilder<?> fsb, DataBlockDescription existingFieldSequenceDescription,
-      DataBlockId existingContainerId, DataBlockId clonedContainerId,
-      DataBlockCrossReference clonedContainerReference) {
+      DataBlockCrossReference existingContainerRef, DataBlockId clonedContainerId) {
+
+      DataBlockId existingContainerId = existingContainerRef.getReferencedId();
 
       List<DataBlockDescription> fieldDescriptions = existingFieldSequenceDescription
          .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
@@ -232,7 +225,7 @@ public final class ContainerBuilderCloner {
                fieldDescription.getName(), fieldDescription.getDescription());
 
             setCommonFieldProperties(fieldDescription, (FieldProperties<byte[]>) fieldProperties, bfb,
-               existingContainerId, clonedContainerId, clonedContainerReference);
+               existingContainerId, clonedContainerId);
             bfb.finishField();
          } else if (fieldProperties.getFieldType() == FieldType.UNSIGNED_WHOLE_NUMBER) {
             NumericFieldBuilder<?> nfb = fsb.addNumericField(fieldDescription.getId().getLocalId(),
@@ -240,7 +233,7 @@ public final class ContainerBuilderCloner {
             nfb.withFixedByteOrder(fieldProperties.getFixedByteOrder());
 
             setCommonFieldProperties(fieldDescription, (FieldProperties<Long>) fieldProperties, nfb,
-               existingContainerId, clonedContainerId, clonedContainerReference);
+               existingContainerId, clonedContainerId);
             nfb.finishField();
          } else if (fieldProperties.getFieldType() == FieldType.STRING) {
             StringFieldBuilder<?> sfb = fsb.addStringField(fieldDescription.getId().getLocalId(),
@@ -250,14 +243,14 @@ public final class ContainerBuilderCloner {
             sfb.withTerminationCharacter(fieldProperties.getTerminationCharacter());
 
             setCommonFieldProperties(fieldDescription, (FieldProperties<String>) fieldProperties, sfb,
-               existingContainerId, clonedContainerId, clonedContainerReference);
+               existingContainerId, clonedContainerId);
             sfb.finishField();
          } else if (fieldProperties.getFieldType() == FieldType.FLAGS) {
             FlagsFieldBuilder<?> ffb = fsb.addFlagsField(fieldDescription.getId().getLocalId(),
                fieldDescription.getName(), fieldDescription.getDescription());
 
             setCommonFieldProperties(fieldDescription, (FieldProperties<Flags>) fieldProperties, ffb,
-               existingContainerId, clonedContainerId, clonedContainerReference);
+               existingContainerId, clonedContainerId);
 
             FlagSpecificationBuilder<?> flagSpecBuilder = ffb.withFlagSpecification(
                fieldProperties.getFlagSpecification().getByteLength(),
@@ -282,8 +275,7 @@ public final class ContainerBuilderCloner {
 
    private static <P, F, C extends FieldBuilder<P, F, C>> void setCommonFieldProperties(
       DataBlockDescription fieldDescription, FieldProperties<F> existingFieldProperties, FieldBuilder<P, F, C> fb,
-      DataBlockId existingContainerId, DataBlockId clonedContainerId,
-      DataBlockCrossReference clonedContainerReference) {
+      DataBlockId existingContainerId, DataBlockId clonedContainerId) {
 
       fb.withLengthOf(fieldDescription.getMinimumByteLength(), fieldDescription.getMaximumByteLength());
 
@@ -291,7 +283,8 @@ public final class ContainerBuilderCloner {
 
       fb.withDefaultValue(existingFieldProperties.getDefaultValue());
 
-      for (Iterator<F> iterator = existingFieldProperties.getEnumeratedValues().keySet().iterator(); iterator.hasNext();) {
+      for (Iterator<F> iterator = existingFieldProperties.getEnumeratedValues().keySet().iterator(); iterator
+         .hasNext();) {
          F nextKey = iterator.next();
          byte[] nextValue = existingFieldProperties.getEnumeratedValues().get(nextKey);
 
@@ -308,7 +301,6 @@ public final class ContainerBuilderCloner {
          FieldFunctionType<?> ffType = fieldFunction.getFieldFunctionType();
          Set<DataBlockId> affectedIds = fieldFunction.getAffectedBlockIds();
 
-         DataBlockId[] replacedAffectedIds = new DataBlockId[affectedIds.size()];
          DataBlockCrossReference[] references = new DataBlockCrossReference[affectedIds.size()];
 
          // Replace affected ids (which are still referring to the original container) with the
@@ -318,9 +310,9 @@ public final class ContainerBuilderCloner {
          for (DataBlockId dataBlockId : affectedIds) {
             String replacedGlobalId = dataBlockId.getGlobalId().replace(existingContainerId.getGlobalId(),
                clonedContainerId.getGlobalId());
-            replacedAffectedIds[i] = new DataBlockId(dataBlockId.getDataFormat(), replacedGlobalId);
-            references[i] = new DataBlockCrossReference(replacedAffectedIds[i].getGlobalId());
-            fb.getRootBuilder().addReference(references[i], replacedAffectedIds[i]);
+            DataBlockId replacedAffectedId = new DataBlockId(dataBlockId.getDataFormat(), replacedGlobalId);
+            references[i] = new DataBlockCrossReference(replacedAffectedId.getGlobalId() + "_" + UUID.randomUUID());
+            references[i].resolve(replacedAffectedId);
 
             i++;
          }

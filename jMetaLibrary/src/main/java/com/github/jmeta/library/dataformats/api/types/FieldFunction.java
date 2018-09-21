@@ -1,6 +1,6 @@
 /**
  *
- * {@link FieldFunction}.java
+ * {@link UnresolvedFieldFunction}.java
  *
  * @author Jens Ebert
  *
@@ -12,6 +12,7 @@ package com.github.jmeta.library.dataformats.api.types;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -21,38 +22,36 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class FieldFunction {
 
-   private Set<DataBlockId> m_affectedBlockIds = new HashSet<>();
+   private final Set<DataBlockCrossReference> referencedBlocks = new HashSet<>();
 
-   public void setAffectedBlockIds(Set<DataBlockId> m_affectedBlockIds) {
-      Reject.ifNull(m_affectedBlockIds, "m_affectedBlockIds");
+   private final FieldFunctionType<?> fieldFunctionType;
 
-      this.m_affectedBlockIds = m_affectedBlockIds;
+   private final String flagName;
+
+   private final Integer flagValue;
+
+   public Set<DataBlockCrossReference> getReferencedBlocks() {
+      return Collections.unmodifiableSet(referencedBlocks);
    }
-
-   private final FieldFunctionType<?> m_fieldFunctionType;
-
-   private final String m_flagName;
-
-   private final Integer m_flagValue;
 
    /**
     * Creates a new {@link FieldFunction}.
     * 
     * @param fieldFunctionType
-    * @param affectedBlockIds
+    * @param referencedBlocks
     * @param flagName
     * @param requiredFlagValue
     */
-   public FieldFunction(FieldFunctionType<?> fieldFunctionType, Set<DataBlockId> affectedBlockIds, String flagName,
-      Integer requiredFlagValue) {
-      Reject.ifNull(affectedBlockIds, "affectedBlockIds");
+   public FieldFunction(FieldFunctionType<?> fieldFunctionType, Set<DataBlockCrossReference> referencedBlocks,
+      String flagName, Integer requiredFlagValue) {
+      Reject.ifNull(referencedBlocks, "affectedBlockIds");
       Reject.ifNull(fieldFunctionType, "fieldFunctionType");
-      Reject.ifTrue(affectedBlockIds.isEmpty(), "affectedBlockIds.isEmpty()");
+      Reject.ifTrue(referencedBlocks.isEmpty(), "affectedBlockIds.isEmpty()");
 
-      m_fieldFunctionType = fieldFunctionType;
-      m_flagName = flagName;
-      m_flagValue = requiredFlagValue;
-      m_affectedBlockIds.addAll(affectedBlockIds);
+      this.fieldFunctionType = fieldFunctionType;
+      this.flagName = flagName;
+      this.flagValue = requiredFlagValue;
+      this.referencedBlocks.addAll(referencedBlocks);
    }
 
    /**
@@ -61,8 +60,8 @@ public class FieldFunction {
     * @return affectedBlockIds
     */
    public Set<DataBlockId> getAffectedBlockIds() {
-
-      return Collections.unmodifiableSet(m_affectedBlockIds);
+      return Collections
+         .unmodifiableSet(referencedBlocks.stream().map(ref -> ref.getReferencedId()).collect(Collectors.toSet()));
    }
 
    /**
@@ -72,7 +71,7 @@ public class FieldFunction {
     */
    public FieldFunctionType<?> getFieldFunctionType() {
 
-      return m_fieldFunctionType;
+      return fieldFunctionType;
    }
 
    /**
@@ -82,7 +81,7 @@ public class FieldFunction {
     */
    public String getFlagName() {
 
-      return m_flagName;
+      return flagName;
    }
 
    /**
@@ -90,12 +89,12 @@ public class FieldFunction {
     */
    public Integer getFlagValue() {
 
-      return m_flagValue;
+      return flagValue;
    }
 
    @Override
    public String toString() {
-      return m_fieldFunctionType + ", " + getAffectedBlockIds();
+      return fieldFunctionType + ", " + getAffectedBlockIds();
    }
 
 }

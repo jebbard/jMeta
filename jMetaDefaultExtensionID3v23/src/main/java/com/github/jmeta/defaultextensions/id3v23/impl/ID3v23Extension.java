@@ -19,9 +19,9 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
@@ -50,7 +50,6 @@ public class ID3v23Extension implements Extension {
    private static final String FRAME_FLAGS_TAG_ALTER_PRESERVATION = "Tag Alter Preservation";
    private static final int FRAME_ID_SIZE = 4;
    private static final String ID3V23_GENERIC_CONTAINER_ID = "id3v23.payload.${FRAME_ID}";
-   private static final String ID3V23_TEXT_FRAME_ID = "id3v23.payload.TEXT_FRAME_ID";
    private static final byte[] ID3V23_TAG_VERSION_BYTES = new byte[] { 3, 0 };
    /**
     *
@@ -59,12 +58,7 @@ public class ID3v23Extension implements Extension {
       new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
    public static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
-   private static final DataBlockId GENERIC_FRAME_ID = new DataBlockId(ID3v23, ID3V23_GENERIC_CONTAINER_ID);
 
-   private static final DataBlockId GENERIC_TEXT_FRAME_ID = new DataBlockId(ID3v23, ID3V23_TEXT_FRAME_ID);
-
-   private static final DataBlockId GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".payload.data");
    private static final int ID3V23_FRAME_FLAG_SIZE = 2;
    public static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.flags");
    private static final int ID3V23_TAG_FLAG_SIZE = 1;
@@ -123,8 +117,8 @@ public class ID3v23Extension implements Extension {
 
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(ID3v23Extension.ID3v23);
 
-      // @formatter:off
       DataBlockCrossReference frameReference = new DataBlockCrossReference("Frame");
+      DataBlockCrossReference textFrameReference = new DataBlockCrossReference("Text Frame");
       DataBlockCrossReference extendedHeaderReference = new DataBlockCrossReference("Extended header");
       DataBlockCrossReference crcReference = new DataBlockCrossReference("CRC");
       DataBlockCrossReference decompressedSizeReference = new DataBlockCrossReference("Decompressed size");
@@ -132,7 +126,10 @@ public class ID3v23Extension implements Extension {
       DataBlockCrossReference encryptionMethodReference = new DataBlockCrossReference("Encryption method");
       DataBlockCrossReference informationReference = new DataBlockCrossReference("Information");
       DataBlockCrossReference payloadReference = new DataBlockCrossReference("Tag Payload");
-      DataBlockCrossReference framePayloadReference = new DataBlockCrossReference("Frame payload reference");
+      DataBlockCrossReference framePayloadReference = new DataBlockCrossReference("Frame payload");
+      DataBlockCrossReference dataFieldReference = new DataBlockCrossReference("Data");
+
+      // @formatter:off
       return builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
          .addHeader("header", "id3v23 tag header", "The id3v23 tag header")
             .addStringField("id", "id3v23 tag header id", "The id3v23 tag header id")
@@ -194,7 +191,6 @@ public class ID3v23Extension implements Extension {
                   .addStringField("id", "Generic frame id field", "The generic frame id field")
                      .withStaticLengthOf(FRAME_ID_SIZE)
                      .asIdOf(frameReference)
-//                     .asIdOf(GENERIC_FRAME_ID)
                      .withFixedCharset(Charsets.CHARSET_ISO)
                   .finishField()
                   .addNumericField("size", "Generic frame size field", "The generic frame size field")
@@ -237,14 +233,16 @@ public class ID3v23Extension implements Extension {
                      .asOptional()
                   .finishField()
                   .addBinaryField("data", "Payload data field", "The payload data field")
+                     .referencedAs(dataFieldReference)
                      .withLengthOf(1, DataBlockDescription.UNDEFINED)
                   .finishField()
                .finishFieldBasedPayload()
             .finishContainer()
             .addContainerWithFieldBasedPayload("TEXT_FRAME_ID", "GENERIC_ID3v23_TEXT_FRAME", "The id3v23 GENERIC_TEXT_FRAME")
-               .cloneFrom(GENERIC_FRAME_ID)
+               .cloneFrom(frameReference)
+               .referencedAs(textFrameReference)
                .getPayload()
-                  .withoutField(GENERIC_FRAME_PAYLOAD_DATA_FIELD_ID.getLocalId())
+                  .withoutField(dataFieldReference)
                   .addStringField("textEncoding", "Text encoding", "Text encoding")
                      .withStaticLengthOf(1)
                      .withDefaultValue(Charsets.CHARSET_ISO.name())
@@ -260,16 +258,15 @@ public class ID3v23Extension implements Extension {
                .finishFieldBasedPayload()
             .finishContainer()
             .addContainerWithFieldBasedPayload("TPE1", "Lead performer/soloist", "The ID3v23 Lead performer/soloist")
-               .cloneFrom(GENERIC_TEXT_FRAME_ID)
+               .cloneFrom(textFrameReference)
             .finishContainer()
             .addContainerWithFieldBasedPayload("TRCK", "Track number/Position in set", "The ID3v23 Track number/Position in set")
-               .cloneFrom(GENERIC_TEXT_FRAME_ID)
+               .cloneFrom(textFrameReference)
             .finishContainer()
             .addContainerWithFieldBasedPayload("TIT2", "Title/songname/content description", "The ID3v23 Title/songname/content description")
-               .cloneFrom(GENERIC_TEXT_FRAME_ID)
+               .cloneFrom(textFrameReference)
             .finishContainer()
             .addContainerWithFieldBasedPayload("padding", "Padding", "Padding")
-//               .asOptional()
                .addHeader("header", "Padding header", "Padding header")
                   .addBinaryField("key", "id3v23 padding header key", "The id3v23 padding header key")
                      .withDefaultValue(new byte[] { 0 })

@@ -12,6 +12,7 @@ package com.github.jmeta.library.dataformats.impl;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_NESTED_CONTAINER_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_UNRESOLVED;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_BYTE_ORDER;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHARACTER_ENCODING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_MISSING;
@@ -19,12 +20,12 @@ import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecifi
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
@@ -49,6 +51,20 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    private static final String GENERIC_ID_REPLACE_PATTERN = "([^\\.]+)";
 
    private static final Pattern GENERIC_PLACEHOLDER_PATTERN = Pattern.compile("(\\$\\{.+?\\})");
+
+   private final Map<DataBlockId, String> m_genericDataBlocks = new HashMap<>();
+
+   private final List<ByteOrder> m_supportedByteOrders = new ArrayList<>();
+
+   private final List<Charset> m_supportedCharacterEncodings = new ArrayList<>();
+
+   private final ContainerDataFormat m_dataFormat;
+
+   private final List<DataBlockDescription> m_topLevelDataBlocks = new ArrayList<>();
+
+   private final Map<DataBlockId, DataBlockDescription> m_dataBlockDescriptions = new HashMap<>();
+
+   private final DataBlockId defaultNestedContainerId;
 
    /**
     * Creates a new {@link StandardDataFormatSpecification}.
@@ -101,48 +117,56 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     */
    private void validateFieldFunctions() {
 
-      List<FieldFunction> fieldFunctions = m_dataBlockDescriptions.values().stream()
+      Map<DataBlockId, List<FieldFunction>> fieldFunctions = m_dataBlockDescriptions.values().stream()
          .filter(desc -> desc.getPhysicalType() == PhysicalDataBlockType.FIELD)
-         .map(desc -> desc.getFieldProperties().getFieldFunctions()).flatMap(Collection::stream)
-         .collect(Collectors.toList());
-
-      for (FieldFunction fieldFunction : fieldFunctions) {
-         FieldFunctionType<?> type = fieldFunction.getFieldFunctionType();
-         Set<DataBlockId> affectedIds = fieldFunction.getAffectedBlockIds();
-
-         if (type == FieldFunctionType.ID_OF) {
-            affectedIds.forEach(id -> {
-               Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.CONTAINER);
-
-               checkFieldFunctionTargetType(type, id, allowedTypes);
-            });
-         } else if (type == FieldFunctionType.SIZE_OF) {
-            // TODO prüfen, ob alle referenzierten Blöcke zusammenhängen?
-            affectedIds.forEach(id -> {
-
-            });
-         } else if (type == FieldFunctionType.COUNT_OF) {
-            affectedIds.forEach(id -> {
-               Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.FIELD,
-                  PhysicalDataBlockType.HEADER, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.CONTAINER);
-
-               checkFieldFunctionTargetType(type, id, allowedTypes);
-            });
-         }
-      }
+         .collect(Collectors.toMap(DataBlockDescription::getId, desc -> desc.getFieldProperties().getFieldFunctions()));
 
       Map<DataBlockId, List<FieldFunction>> fieldFunctionsByTargetId = new HashMap<>();
 
-      for (FieldFunction fieldFunction : fieldFunctions) {
-         for (DataBlockId affectedBlock : fieldFunction.getAffectedBlockIds()) {
+      fieldFunctions.forEach((fieldIdWithFunctions, functionsForField) -> {
+         for (FieldFunction fieldFunction : functionsForField) {
+            FieldFunctionType<?> type = fieldFunction.getFieldFunctionType();
+            Set<DataBlockId> affectedIds = fieldFunction.getAffectedBlockIds();
 
-            if (!fieldFunctionsByTargetId.containsKey(affectedBlock)) {
-               fieldFunctionsByTargetId.put(affectedBlock, new ArrayList<>());
+            // Check for unresolved field functions
+            Optional<DataBlockCrossReference> firstUnresolvedFF = fieldFunction.getReferencedBlocks().stream()
+               .filter(ref -> !ref.isResolved()).findFirst();
+
+            if (firstUnresolvedFF.isPresent()) {
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_UNRESOLVED,
+                  getDataBlockDescription(fieldIdWithFunctions), firstUnresolvedFF);
             }
 
-            fieldFunctionsByTargetId.get(affectedBlock).add(fieldFunction);
+            if (type == FieldFunctionType.ID_OF) {
+               affectedIds.forEach(id -> {
+                  Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.CONTAINER);
+
+                  checkFieldFunctionTargetType(type, id, allowedTypes);
+               });
+            } else if (type == FieldFunctionType.SIZE_OF) {
+               // TODO prüfen, ob alle referenzierten Blöcke zusammenhängen?
+               affectedIds.forEach(id -> {
+
+               });
+            } else if (type == FieldFunctionType.COUNT_OF) {
+               affectedIds.forEach(id -> {
+                  Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.FIELD,
+                     PhysicalDataBlockType.HEADER, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.CONTAINER);
+
+                  checkFieldFunctionTargetType(type, id, allowedTypes);
+               });
+            }
+
+            for (DataBlockId affectedBlock : fieldFunction.getAffectedBlockIds()) {
+
+               if (!fieldFunctionsByTargetId.containsKey(affectedBlock)) {
+                  fieldFunctionsByTargetId.put(affectedBlock, new ArrayList<>());
+               }
+
+               fieldFunctionsByTargetId.get(affectedBlock).add(fieldFunction);
+            }
          }
-      }
+      });
 
       List<DataBlockDescription> dataBlocksWithDynamicOccurrences = m_dataBlockDescriptions.values().stream()
          .filter(desc -> desc.getMaximumOccurrences() != desc.getMinimumOccurrences()).collect(Collectors.toList());
@@ -175,8 +199,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    }
 
    private boolean hasFieldFunctionOfType(List<FieldFunction> functions, FieldFunctionType<?> type) {
-      return functions.stream().filter(function -> function.getFieldFunctionType().equals(type)).findFirst()
-         .isPresent();
+      return functions.stream().anyMatch(function -> function.getFieldFunctionType().equals(type));
    }
 
    /**
@@ -203,19 +226,15 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
       for (DataBlockDescription fieldDesc : allFields) {
          Charset fixedCharacterEncoding = fieldDesc.getFieldProperties().getFixedCharacterEncoding();
-         if (fixedCharacterEncoding != null) {
-            if (!getSupportedCharacterEncodings().contains(fixedCharacterEncoding)) {
-               throw new InvalidSpecificationException(VLD_INVALID_CHARACTER_ENCODING, fieldDesc,
-                  fixedCharacterEncoding, getSupportedCharacterEncodings());
-            }
+         if (fixedCharacterEncoding != null && !getSupportedCharacterEncodings().contains(fixedCharacterEncoding)) {
+            throw new InvalidSpecificationException(VLD_INVALID_CHARACTER_ENCODING, fieldDesc, fixedCharacterEncoding,
+               getSupportedCharacterEncodings());
          }
 
          ByteOrder fixedByteOrder = fieldDesc.getFieldProperties().getFixedByteOrder();
-         if (fixedByteOrder != null) {
-            if (!getSupportedByteOrders().contains(fixedByteOrder)) {
-               throw new InvalidSpecificationException(VLD_INVALID_BYTE_ORDER, fieldDesc, fixedByteOrder,
-                  getSupportedByteOrders());
-            }
+         if (fixedByteOrder != null && !getSupportedByteOrders().contains(fixedByteOrder)) {
+            throw new InvalidSpecificationException(VLD_INVALID_BYTE_ORDER, fieldDesc, fixedByteOrder,
+               getSupportedByteOrders());
          }
       }
    }
@@ -392,10 +411,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          List<DataBlockDescription> descs = topLevelDesc
             .getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
-         if (descs.size() > 0) {
-            if (defaultNestedContainerId == null) {
-               throw new InvalidSpecificationException(VLD_DEFAULT_NESTED_CONTAINER_MISSING, topLevelDesc);
-            }
+         if (!descs.isEmpty() && defaultNestedContainerId == null) {
+            throw new InvalidSpecificationException(VLD_DEFAULT_NESTED_CONTAINER_MISSING, topLevelDesc);
          }
       }
    }
@@ -408,7 +425,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          final String idString = genericBlockId.getGlobalId();
          Matcher matcher = GENERIC_PLACEHOLDER_PATTERN.matcher(idString);
 
-         StringBuffer idPattern = new StringBuffer();
+         StringBuilder idPattern = new StringBuilder();
 
          int matchEndIndex = 0;
 
@@ -425,18 +442,4 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          m_genericDataBlocks.put(genericBlockId, idPattern.toString());
       }
    }
-
-   private final DataBlockId defaultNestedContainerId;
-
-   private final Map<DataBlockId, String> m_genericDataBlocks = new HashMap<>();
-
-   private final List<ByteOrder> m_supportedByteOrders = new ArrayList<>();
-
-   private final List<Charset> m_supportedCharacterEncodings = new ArrayList<>();
-
-   private final ContainerDataFormat m_dataFormat;
-
-   private final List<DataBlockDescription> m_topLevelDataBlocks = new ArrayList<>();
-
-   private final Map<DataBlockId, DataBlockDescription> m_dataBlockDescriptions = new HashMap<>();
 }

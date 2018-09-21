@@ -9,6 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
+
 /**
  * {@link DataBlockDescriptionBuilder} is the base interface for all data block builders. It offers a chained builder
  * API.
@@ -29,10 +31,13 @@ public interface DataBlockDescriptionBuilder<C extends DataBlockDescriptionBuild
     */
    C withDescription(String name, String description);
 
-   C referencedAs(DataBlockCrossReference reference);
-
    /**
-    * @return the {@link DataBlockCrossReference} for the data block built by this container, or null if there is none
+    * Assigns a {@link DataBlockCrossReference} as a symbolic reference to the currently built data block. This can be
+    * used to reference it from other data blocks, e.g. from a field function.
+    * 
+    * @param reference
+    *           The {@link DataBlockCrossReference} to use, must not be null
+    * @return The concrete builder instance
     */
-   DataBlockCrossReference getReference();
+   C referencedAs(DataBlockCrossReference reference);
 }

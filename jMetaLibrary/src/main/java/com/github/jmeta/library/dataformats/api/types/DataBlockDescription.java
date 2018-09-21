@@ -241,7 +241,7 @@ public class DataBlockDescription {
    public void validateChildren() {
       switch (physicalType) {
          case FIELD:
-            if (orderedChildren.size() != 0) {
+            if (!orderedChildren.isEmpty()) {
                throw new InvalidSpecificationException(VLD_INVALID_CHILDREN_FIELD, this);
             }
          break;
@@ -415,6 +415,10 @@ public class DataBlockDescription {
          throw new InvalidSpecificationException(VLD_FIELD_PROPERTIES_MISSING, this);
       } else if (physicalType != PhysicalDataBlockType.FIELD && fieldProperties != null) {
          throw new InvalidSpecificationException(VLD_FIELD_PROPERTIES_UNNECESSARY, this);
+      }
+
+      if (physicalType == PhysicalDataBlockType.FIELD) {
+         fieldProperties.validateFieldProperties(this);
       }
    }
 

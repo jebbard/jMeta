@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -61,6 +60,9 @@ import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 public interface DataFormatSpecificationBuilder
    extends ContainerSequenceBuilder<DataFormatSpecificationBuilder>, DataFormatBuilder {
 
+   /**
+    * @return The built {@link DataFormatSpecification}
+    */
    public DataFormatSpecification build();
 
    /**
@@ -123,24 +125,4 @@ public interface DataFormatSpecificationBuilder
     *         id
     */
    public DataBlockDescription getDataBlockDescription(DataBlockId dataBlockId);
-
-   /**
-    * Adds a new {@link DataBlockCrossReference} to the hierarchy. It must not have been used before, otherwise a
-    * runtime exception is thrown.
-    * 
-    * @param reference
-    *           The {@link DataBlockCrossReference} to add, must not be null
-    * @param referencedId
-    *           The referenced {@link DataBlockId}, must not be null
-    */
-   public void addReference(DataBlockCrossReference reference, DataBlockId referencedId);
-
-   /**
-    * Returns the {@link DataBlockId} referenced by the passed {@link DataBlockCrossReference}. If not existing, a
-    * corresponding runtime exception is thrown.
-    * 
-    * @param reference
-    *           The {@link DataBlockCrossReference} to look up, must not be null
-    */
-   public DataBlockId getReferencedId(DataBlockCrossReference reference);
 }

@@ -70,7 +70,7 @@ public class FieldProperties<T> {
    private final FlagSpecification flagSpecification;
    private final ByteOrder fixedByteOrder;
 
-   private final static Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
+   private static final Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
    static {
       FIELD_CONVERTERS.put(FieldType.BINARY, new BinaryFieldConverter());
       FIELD_CONVERTERS.put(FieldType.FLAGS, new FlagsFieldConverter());
@@ -145,7 +145,6 @@ public class FieldProperties<T> {
    }
 
    public List<FieldFunction> getFieldFunctions() {
-
       return Collections.unmodifiableList(functions);
    }
 
@@ -274,13 +273,11 @@ public class FieldProperties<T> {
          + flagSpecification + ", fixedByteOrder=" + fixedByteOrder + "]";
    }
 
-   public void validateFieldProperties(DataBlockDescription desc) {
+   void validateFieldProperties(DataBlockDescription desc) {
       long minimumByteLength = desc.getMinimumByteLength();
       long maximumByteLength = desc.getMaximumByteLength();
 
       boolean hasFixedSize = minimumByteLength == maximumByteLength;
-
-      String messagePrefix = "Error validating field properties for <" + desc.getId() + ">: ";
 
       // Validate magic key
       if (isMagicKey()) {
@@ -326,10 +323,9 @@ public class FieldProperties<T> {
          }
       }
 
-      if (!getEnumeratedValues().isEmpty() && getDefaultValue() != null) {
-         if (!getEnumeratedValues().containsKey(getDefaultValue())) {
-            throw new InvalidSpecificationException(VLD_DEFAULT_VALUE_NOT_ENUMERATED, desc, getDefaultValue());
-         }
+      if (!getEnumeratedValues().isEmpty() && getDefaultValue() != null
+         && !getEnumeratedValues().containsKey(getDefaultValue())) {
+         throw new InvalidSpecificationException(VLD_DEFAULT_VALUE_NOT_ENUMERATED, desc, getDefaultValue());
       }
 
       // Validate numeric fields
@@ -393,7 +389,7 @@ public class FieldProperties<T> {
          }
       }
 
-      validateDefaultValue(messagePrefix, desc);
+      validateDefaultValue(desc);
    }
 
    List<MagicKey> determineFieldMagicKeys(DataBlockDescription fieldDesc, long magicKeyOffset) {
@@ -401,9 +397,8 @@ public class FieldProperties<T> {
 
       if (!getEnumeratedValues().isEmpty()) {
 
-         getEnumeratedValues().forEach((Object interpretedValue, byte[] binaryValue) -> {
-            fieldMagicKeys.addAll(getFieldMagicKeys(fieldDesc, magicKeyOffset, binaryValue));
-         });
+         getEnumeratedValues().forEach((Object interpretedValue, byte[] binaryValue) -> fieldMagicKeys
+            .addAll(getFieldMagicKeys(fieldDesc, magicKeyOffset, binaryValue)));
       } else if (getDefaultValue() != null) {
          byte[] magicKeyBytes = null;
 
@@ -457,7 +452,7 @@ public class FieldProperties<T> {
       return fieldMagicKeys;
    }
 
-   private void validateDefaultValue(String messagePrefix, DataBlockDescription fieldDesc) {
+   private void validateDefaultValue(DataBlockDescription fieldDesc) {
       long maximumByteLength = fieldDesc.getMaximumByteLength();
 
       if (getDefaultValue() != null) {

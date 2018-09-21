@@ -19,10 +19,9 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
@@ -89,8 +88,6 @@ public class MP3Extension implements Extension {
        * audio version ID C: Layer description D: Protection bit E: Bitrate index F: Sampling rate frequency index G:
        * Padding bit H: Private bit I: Channel mode J: Mode extension K: Copyright L: Original M: Emphasis
        */
-      DataBlockId crcId = new DataBlockId(MP3Extension.MP3, "mp3.crc");
-
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(MP3Extension.MP3);
 
       // @formatter:off

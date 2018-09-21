@@ -16,9 +16,11 @@ import com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBu
 import com.github.jmeta.library.dataformats.api.services.builder.FlagsFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link AbstractFieldSequenceBuilder} is the base class of all builders that allow to create sequences of child
@@ -97,10 +99,12 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#withoutField(java.lang.String)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldSequenceBuilder#withoutField(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
-   public FieldSequenceBuilder<C> withoutField(String localId) {
+   public FieldSequenceBuilder<C> withoutField(DataBlockCrossReference fieldReference) {
+      Reject.ifNull(fieldReference, "fieldReference");
+      Reject.ifTrue(!fieldReference.isResolved(), "!fieldReference.isResolved()");
 
       DataBlockId fieldSequenceId = new DataBlockId(getDataFormat(), getGlobalId());
       DataBlockDescription fieldSequenceDescription = getRootBuilder().getDataBlockDescription(fieldSequenceId);
@@ -110,6 +114,8 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
             + "> not yet present in the root builder - You must call remove field only on cloned field "
             + "sequences which were already finished when cloning");
       }
+
+      String localId = fieldReference.getReferencedId().getLocalId();
 
       if (!fieldSequenceDescription.hasChildWithLocalId(localId)) {
          throw new IllegalArgumentException(

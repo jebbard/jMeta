@@ -115,7 +115,9 @@ public class InvalidSpecificationException extends RuntimeException {
    public static final String VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING = 
       "For this data block with dynamic occurrences, there is no other field defined with a " + 
       FieldFunctionType.COUNT_OF + " field function";
-   
+   public static final String VLD_FIELD_FUNC_UNRESOLVED = 
+      "For this field, the field function of type <%1$s> has an unresolved cross references: <%2$s>";
+
    public static final String VLD_CONTAINER_HAS_OCCURRENCES = "Data block type as " + PhysicalDataBlockType.CONTAINER + 
       " must not have defined occurrences, as it by design may have arbitrary occurrences, but min occurrences = " + 
       "<%1$s> and max occurrences = <%2$s>";

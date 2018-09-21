@@ -14,15 +14,15 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldFunction;
@@ -40,26 +40,26 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  * @param <P>
  *           The parent type of this builder
- * @param <FIT>
+ * @param <I>
  *           The interpreted type of the concrete field built by this class
  * @param <C>
  *           The concrete derived interface of the class implementing this
  *           {@link AbstractDataFormatSpecificationBuilder}
  */
-public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, FIT, C extends FieldBuilder<P, FIT, C>>
-   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, FIT, C> {
+public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, I, C extends FieldBuilder<P, I, C>>
+   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, I, C> {
 
    private Character terminationCharacter;
-   private FIT defaultValue;
+   private I defaultValue;
    private FlagSpecification flagSpecification;
    private Charset fixedCharset;
    private ByteOrder fixedByteOrder;
    private boolean isMagicKey = false;
-   private final Map<FIT, byte[]> enumeratedValues = new HashMap<>();
-   private final FieldType<FIT> fieldType;
+   private final Map<I, byte[]> enumeratedValues = new HashMap<>();
+   private final FieldType<I> fieldType;
    private final List<FieldFunction> functions = new ArrayList<>();
    private long magicKeyBitLength = DataBlockDescription.UNDEFINED;
-   private FieldConverter<FIT> customConverter;
+   private FieldConverter<I> customConverter;
 
    /**
     * Creates a new {@link AbstractFieldBuilder}.
@@ -79,8 +79,8 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     * @param isGeneric
     *           true if it is a generic data block, false otherwise
     */
-   public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description,
-      FieldType<FIT> fieldType, boolean isGeneric) {
+   public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description, FieldType<I> fieldType,
+      boolean isGeneric) {
       super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD, isGeneric);
       Reject.ifNull(fieldType, "fieldType");
 
@@ -106,7 +106,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asIdOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asIdOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
    public C asIdOf(DataBlockCrossReference referencedBlock) {
@@ -115,7 +115,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
 
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#indicatesPresenceOf(java.lang.String,
-    *      int, com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    *      int, com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
    public C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockCrossReference referencedBlock) {
@@ -123,7 +123,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference[])
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference[])
     */
    @Override
    public C asSizeOf(DataBlockCrossReference... referencedBlocks) {
@@ -131,7 +131,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCountOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCountOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
    public C asCountOf(DataBlockCrossReference referencedBlock) {
@@ -139,7 +139,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asByteOrderOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asByteOrderOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
    public C asByteOrderOf(DataBlockCrossReference referencedBlock) {
@@ -147,7 +147,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCharacterEncodingOf(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCharacterEncodingOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
    public C asCharacterEncodingOf(DataBlockCrossReference referencedBlock) {
@@ -160,7 +160,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @SuppressWarnings("unchecked")
    @Override
-   public C addEnumeratedValue(byte[] binaryValue, FIT interpretedValue) {
+   public C addEnumeratedValue(byte[] binaryValue, I interpretedValue) {
       enumeratedValues.put(interpretedValue, binaryValue);
       return (C) this;
    }
@@ -170,7 +170,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @SuppressWarnings("unchecked")
    @Override
-   public C withCustomConverter(FieldConverter<FIT> customConverter) {
+   public C withCustomConverter(FieldConverter<I> customConverter) {
       Reject.ifNull(customConverter, "customConverter");
       this.customConverter = customConverter;
       return (C) this;
@@ -180,7 +180,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
     */
    @SuppressWarnings("unchecked")
-   public C withDefaultValue(FIT value) {
+   public C withDefaultValue(I value) {
       this.defaultValue = value;
       return (C) this;
    }
@@ -209,7 +209,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @Override
    public P finishField() {
-      FieldProperties<FIT> fieldProperties = new FieldProperties<>(fieldType, defaultValue, enumeratedValues,
+      FieldProperties<I> fieldProperties = new FieldProperties<>(fieldType, defaultValue, enumeratedValues,
          terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions, isMagicKey,
          magicKeyBitLength, customConverter);
 
@@ -239,8 +239,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
       DataBlockCrossReference... referencedBlocks) {
       Reject.ifNull(referencedBlocks, "referencedBlock");
 
-      Set<DataBlockId> fakeBlocks = Arrays.asList(referencedBlocks).stream()
-         .map(reference -> new DataBlockId(getDataFormat(), reference.getRefId())).collect(Collectors.toSet());
+      Set<DataBlockCrossReference> fakeBlocks = new HashSet<>(Arrays.asList(referencedBlocks));
 
       functions.add(new FieldFunction(type, fakeBlocks, withFlagName, withFlagValue));
 

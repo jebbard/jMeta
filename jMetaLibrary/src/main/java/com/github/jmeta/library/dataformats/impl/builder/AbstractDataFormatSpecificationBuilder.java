@@ -14,11 +14,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DynamicOccurrenceBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -58,8 +58,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    private long minimumOccurrences = 1;
    private long maximumOccurrences = 1;
    private final boolean isGeneric;
-
-   private DataBlockCrossReference myCrossReference;
 
    /**
     * Creates a new {@link AbstractDataFormatSpecificationBuilder}.
@@ -170,25 +168,16 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#referencedAs(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#referencedAs(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @SuppressWarnings("unchecked")
    @Override
    public C referencedAs(DataBlockCrossReference reference) {
       Reject.ifNull(reference, "reference");
 
-      myCrossReference = reference;
+      reference.resolve(createId());
 
-      getRootBuilder().addReference(reference, createId());
       return (C) this;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#getReference()
-    */
-   @Override
-   public DataBlockCrossReference getReference() {
-      return myCrossReference;
    }
 
    /**

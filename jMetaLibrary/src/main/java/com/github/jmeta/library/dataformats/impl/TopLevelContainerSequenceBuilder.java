@@ -21,7 +21,6 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -42,7 +41,6 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
    private DataBlockDescription defaultNestedContainerDesc;
    private final List<ByteOrder> supportedByteOrders = new ArrayList<>();
    private final List<Charset> supportedCharacterEncodings = new ArrayList<>();
-   private final Map<DataBlockCrossReference, DataBlockId> crossReferences = new HashMap<>();
 
    /**
     * Creates a new {@link TopLevelContainerSequenceBuilder}.
@@ -214,38 +212,6 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
       }
 
       return overallDescriptions.get(dataBlockId);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#addReference(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference,
-    *      DataBlockId)
-    */
-   @Override
-   public void addReference(DataBlockCrossReference reference, DataBlockId referencedId) {
-      Reject.ifNull(reference, "reference");
-      Reject.ifNull(referencedId, "referencedId");
-
-      // if (crossReferences.containsKey(reference)) {
-      // throw new IllegalArgumentException("The cross reference <" + reference + "> to be used to refer to <"
-      // + referencedId + "> has already been used by data block id <" + crossReferences.get(reference) + ">");
-      // }
-
-      crossReferences.put(reference, referencedId);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#getReferencedId(com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference)
-    */
-   @Override
-   public DataBlockId getReferencedId(DataBlockCrossReference reference) {
-      Reject.ifNull(reference, "reference");
-
-      // if (!crossReferences.containsKey(reference)) {
-      // throw new IllegalArgumentException(
-      // "The cross reference <" + reference + "> is unknown, i.e. was never defined");
-      // }
-
-      return crossReferences.get(reference);
    }
 
    /**

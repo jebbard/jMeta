@@ -9,6 +9,7 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 /**
@@ -79,11 +80,11 @@ public interface ContainerBuilder<P extends ContainerSequenceBuilder<P>, PB>
     * given container exists and has the same type, and that all of its children are valid. If this is not the case,
     * this method directly throws an {@link IllegalArgumentException}.
     * 
-    * @param existingContainerId
-    *           The existing container {@link DataBlockId}, must indeed refer to a container of the same type
-    *           (field-based or container-based payload) and must exist in the root builder already, i.e. it must have
-    *           been already finished prior to calling this method
+    * @param existingContainerRef
+    *           The existing container {@link DataBlockCrossReference}, must indeed refer to a container of the same
+    *           type (field-based or container-based payload) and must exist in the root builder already, i.e. it must
+    *           have been already finished prior to calling this method
     * @return the current builder
     */
-   ContainerBuilder<P, PB> cloneFrom(DataBlockId existingContainerId);
+   ContainerBuilder<P, PB> cloneFrom(DataBlockCrossReference existingContainerRef);
 }

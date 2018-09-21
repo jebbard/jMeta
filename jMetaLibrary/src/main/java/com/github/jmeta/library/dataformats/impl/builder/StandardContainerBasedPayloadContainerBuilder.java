@@ -9,20 +9,14 @@
  */
 package com.github.jmeta.library.dataformats.impl.builder;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBasedPayloadBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder;
-import com.github.jmeta.library.dataformats.api.services.builder.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.HeaderBuilder;
-import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 
 /**
@@ -78,12 +72,12 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder#cloneFrom(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder#cloneFrom(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
-   public ContainerBuilder<P, ContainerBasedPayloadBuilder<P>> cloneFrom(DataBlockId existingContainerId) {
+   public ContainerBuilder<P, ContainerBasedPayloadBuilder<P>> cloneFrom(DataBlockCrossReference existingContainerRef) {
 
-      ContainerBuilderCloner.cloneContainerIntoBuilder(this, existingContainerId,
+      ContainerBuilderCloner.cloneContainerIntoBuilder(this, existingContainerRef,
          PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD);
 
       return this;
@@ -113,30 +107,7 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
     */
    @Override
    public P finishContainer() {
-      P parentBuilder = super.finish();
-
-      List<DataBlockDescription> overallDescriptions = getRootBuilder().getDataBlockDescription(createId())
-         .getTransitiveChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
-      overallDescriptions.forEach(desc -> {
-         for (FieldFunction fieldFunction : desc.getFieldProperties().getFieldFunctions()) {
-            Set<DataBlockId> resolvedAffectedBlocks = fieldFunction.getAffectedBlockIds().stream().map(id -> {
-               DataBlockId referencedId = getRootBuilder()
-                  .getReferencedId(new DataBlockCrossReference(id.getGlobalId()));
-
-               if (referencedId == null) {
-                  return id;
-               }
-
-               return referencedId;
-            }).collect(Collectors.toSet());
-
-            fieldFunction.setAffectedBlockIds(resolvedAffectedBlocks);
-         }
-
-         desc.getFieldProperties().validateFieldProperties(desc);
-      });
-
-      return parentBuilder;
+      return super.finish();
    }
 
 }

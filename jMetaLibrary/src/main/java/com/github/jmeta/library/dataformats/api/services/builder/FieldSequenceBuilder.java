@@ -9,6 +9,7 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 
@@ -79,10 +80,10 @@ public interface FieldSequenceBuilder<C extends FieldSequenceBuilder<C>> extends
    /**
     * Allows to remove a field already added to another field sequence which has been cloned before.
     * 
-    * @param localId
-    *           The local id of the field to remove, must not be null and must indeed refer to a child field previously
-    *           added
+    * @param fieldReference
+    *           The field reference pointing to the field to remove, must not be null and must indeed refer to a child
+    *           field previously added
     * @return The current builder
     */
-   FieldSequenceBuilder<C> withoutField(String localId);
+   FieldSequenceBuilder<C> withoutField(DataBlockCrossReference fieldReference);
 }
