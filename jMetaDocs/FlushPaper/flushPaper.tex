@@ -63,8 +63,12 @@ Jens Ebert, 2018
 
 This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0 International License: \url{http://creativecommons.org/licenses/by-nd/4.0/}.
 
+\textcolor{white}{blind text} \linebreak
+
+Contact the author: jensebert@gmx.net
+
 \begin{abstract}
-This paper describes a simple, algorithm with quadratic complexity for modifying a finite sequence of bytes by a series of modifications, namely insertions, removes and replaces. The order of changes is not relevant except the case of multiple insertions at the same offset. The paper defines rules for valid modification series. For a valid modification series, the algorithm calculates the disjoint subsets of the byte sequence that need to be moved to another offset, as indicated by the modifications. The algorithm ensures that modifications are executed at the correct offsets and that existing bytes of the sequence not covered by a modification are never overwritten. The paper specifically covers an aspect relevant for practical implementation: Block-wise reading and writing of existing and new bytes.
+This paper describes a simple algorithm with quadratic complexity for modifying a finite sequence of bytes by a series of modifications, namely insertions, removes and replaces. The order of changes is not relevant except the case of multiple insertions at the same offset. The paper defines rules for valid modification series. For a valid modification series, the algorithm calculates the disjoint subsets of the byte sequence that need to be moved to another offset, as indicated by the modifications. The algorithm ensures that modifications are executed at the correct offsets and that existing bytes of the sequence not covered by a modification are never overwritten. The paper specifically covers an aspect relevant for practical implementation: Block-wise reading and writing of existing and new bytes.
 \end{abstract}
 
 
@@ -76,15 +80,15 @@ This paper describes a simple, algorithm with quadratic complexity for modifying
 
 The most common use case of byte sequences are files on any platform. A \emph{file} is basically a finite, ordered sequence of bytes with a clearly defined start and end. It is irrelevant for us that operating system implementations might fragment the bytes on hard disk, we always consider it as a fully consecutive chunk, as it transparently appears to all programming APIs. Another example of a byte sequence is a chunk of in-memory bytes, in some programming languages called \emph{byte array}.
 
-Both examples of byte sequences have one thing in common: They are inherently static. Inserting a new byte in the middle of the sequence means to first shift the bytes behind by the according distance towards higher offsets, then add the new insertion bytes starting at the insertion offset. It is quite similar with removes inside a byte sequence. All primitive file I/O APIs as well as byte arrays in most programming languages are working like that. To make this easier, an API on top is required.
+Both examples of byte sequences have one thing in common: They are inherently static. Inserting a new byte in the middle of the sequence means to first shift the bytes behind by the according distance towards higher offsets, then adding the new insertion bytes starting at the insertion offset. It is quite similar with removes inside a byte sequence. All primitive file I/O APIs as well as byte arrays in most programming languages are working like that. To make this easier, an API on top is required.
 
 Common use cases are modifications of files to write changed data, e.g. when changing the metadata of an audio or video file, which typically requires insertions, removes or overwrites. The problem with all this is of course: Performance. When inserting new bytes at the beginning of a large file, all bytes behind it must be read and rewritten at the correct higher offset. Of course, reading large byte sequences requires corresponding amounts of memory, so a chunk-wise reading and writing might be necessary. Some of these issues have been adressed by different approaches:
 \begin{itemize}
 \item Some descriptive metadata formats such as ID3v1 and ID3v2 store their metadata at the end or near the end of files; thus reading bytes behind when modifying them is unnecessary
-\item Some data formats, e.g. metadata tag formats, use so-called \emph{padding} bytes; these bytes have no meaning, but are just junk fillers that work like a crush zone: If new bytes are inserted before, the corresponding bytes from the padding must be removed, and if bytes before the padding are removed, the corresponding number of bytes must be added to the padding bytes. This way, the overall size of a tag remains stable and reading and writing of any bytes behind the tag is not necessary. For this to work, of course the number of padding bytes must be suitable for the corresponding insertions.
+\item Some data formats, e.g. metadata tag formats, use so-called \emph{padding} bytes; these bytes have no meaning, but are just junk fillers that work like a crush zone: If new bytes are inserted before, the corresponding bytes from the padding must be removed, and if bytes before the padding are removed, the corresponding number of bytes must be added to the padding bytes. This way, the overall size of a tag remains stable and reading and writing of any bytes behind the tag is not necessary. For this to work, of course the number of padding bytes must be suitable for the corresponding insertions or removals.
 \end{itemize}
 
-The contents of a byte sequence is in no way just consisting of unstructured individual bytes that line up linearly. They have a structure and consist of disjoint objects with a meaning, as shown in figure \ref{fig:Objects}. In the figure we see a typical use case: A header with a so-called magic key starts at a given offset and has a fixed size. It is followed by a series of so-called frames of varying sizes, and finally a footer with a fixed size. Frames can be inserted or removed from the payload, or existing frames are changed, thereby shrinking or growing.
+The contents of a byte sequence is in no way just consisting of unstructured individual bytes that line up linearly. They have a structure and consist of disjoint ``objects'' with a meaning, as shown in figure \ref{fig:Objects}. In the figure we see a typical use case: A header with a so-called magic key starts at a given offset and has a fixed size. It is followed by a series of so-called frames of varying sizes, and finally a footer with a fixed size. Frames can be inserted or removed from the payload, or existing frames can be changed, thereby shrinking or growing.
 
 \begin{figure}[htbp]
 \centering
@@ -93,13 +97,13 @@ The contents of a byte sequence is in no way just consisting of unstructured ind
 \label{fig:Objects}
 \end{figure}
 
-The idea of the algorithm presented in this paper is to encapsulate all reads and writes necessary to implement byte sequence changes such that bytes are correctly written without data loss\footnote{Data loss might occur because in practical implementations, modifications are not written to a copy of the original byte sequence, but the original byte sequence is usually modified in-place.}. This is only one part of it. The second aspect is that it allows to schedule multiple (non-contradicting) modifications for a given byte sequence, executing these modifications in the correct order.
+The idea of the algorithm presented in this paper is to encapsulate all reads and writes necessary to implement byte sequence changes such that bytes are correctly written without data loss. Data loss might occur because in practical implementations, modifications are not written to a copy of the original byte sequence, but the original byte sequence is usually modified in-place. This is only one part of it. The second aspect of the algorithm is that it allows to schedule multiple (non-contradicting) modifications for a given byte sequence, executing these modifications in the correct order.
 
 Figure \ref{fig:Changes} shows an example: Here we not only have an insertion of 10 bytes, but also a remove of 40 bytes at a later offset. What needs to be done to implement this?
 \begin{enumerate}
-\item First, the bytes between the insert offset and the remove offset are read and moved forward by 30 bytes - this essentially overwrites the first 10 bytes of the range to be removed, thus not leading to data loss
-\item Second, the insertion bytes are written at the insertion offset
-\item Third, the bytes behind the end of the removed range are read and moved backward by 10 bytes
+\item First, the bytes $B$ between the insert offset and the remove offset are read and moved forward by 30 bytes - this essentially overwrites the first 10 bytes of the range $C$ to be removed, thus not leading to data loss
+\item Second, the insertion bytes $I1$ are written at the insertion offset
+\item Third, the bytes $D$ behind the end of the removed range $C$ are read and moved backward by 10 bytes
 \end{enumerate}
 
 These steps can also be done in another order: Step 3 can be done first, then step 1 and then step 2, or first step 1, then step 3, finally step 2. The only limitation is that step 2 must be done after step 1 to prevent overwriting the bytes between the insert and remove offset.
@@ -127,10 +131,10 @@ This paper presents an algorithm to find a correct execution plan for an arbitra
 
 In this paper, a \textbf{byte} is the smallest adressable unit to read and write. A byte has a \textbf{value}. It does not matter for this paper which values a byte can take. Two bytes are the same if they have the same value.
 
-A \textbf{byte sequence} is a finite sequence of bytes of \textbf{length} $\text{len}(S)\in\mathbb{N}_{0}$, defining a linear chain of bytes. It assigns a zero-based index to each byte. We write byte sequences with upper-case letters:
+A \textbf{byte sequence} is a finite sequence of bytes of \textbf{length} $\text{len}(S)\in\mathbb{N}_{0}$, defining a linear chain of bytes. It assigns a zero-based index to each byte, so bytes are denoted as $b_{i}$, $i\in\mathbb{N}_{0}$. We write byte sequences with upper-case letters:
 \[S=(b_{0}, b_{1}, \ldots, b_{\text{len}(S)-1}).\]
 
-The zero-based index of a byte in a sequence is called the \textbf{offset} of the byte. Offsets of value $\text{len}(S)$ are allowed and can be considered as pointing to the end of the sequence.
+The zero-based index of a byte in a sequence is called the \textbf{offset} of the byte. Offsets of value $i=\text{len}(S)$ are allowed and can be considered as pointing to the end of the sequence.
 
 The \textbf{empty byte sequence} has a length of 0 and is written as $E:=()$.
 
@@ -139,11 +143,11 @@ Two byte sequences are said to be equal if they contain the same bytes in the sa
 A sequence $T$ is called a \textbf{byte sub-sequence} of $S$, if $T\subseteq S$ and $T$ is defined as:
 \[T:=(b_{i}, b_{i+1}, \ldots, b_{k})\text{ for }i\leq k,\]
 
-i.e. it contains a sequence of bytes from $S$, preserving their order and values. If the start and end offsets of a sub-sequence of $S$ are important, the paper uses the following notation:
+i.e. it contains a sequence of bytes from $S$ without gaps, preserving their order and values. If the start and end offsets of a sub-sequence of $S$ are important, the paper uses the following notation:
 
-\[S[a, b):=(b_{a}, b_{a+1}, \ldots, b_{b-1}),a\leq b,\]
+\[S[i, k):=(b_{i}, b_{i+1}, \ldots, b_{k-1}),i\leq k,\]
 
-where $S[a, a):=E.$
+where $S[i, i):=E.$
 
 The set of all possible finite byte sequences is written as $\mathcal{S}$ in this paper.
 
@@ -159,19 +163,19 @@ i.e. it joins two byte-sequences in order.
 \subsection{Modification Series}%
 \label{sec:ModificationSeries}%
 
-A \textbf{modification} $m_{k}$ is a potential change of a byte sequence, where the index $k\in\mathbb{N}_{0}$ is the order of applying the modification to the byte sequence, which is detailed in \ref{sec:SchedulingPhase}.
+A \textbf{modification} $m_{k}$ is a potential change of a byte sequence, where the index $k\in\mathbb{N}_{0}$ is the order of applying the modification to the byte sequence, which is detailed in section \ref{sec:SchedulingPhase}.
 
 A modification has the following properties - all of them also indexed by $k$:
 \begin{itemize}
 \item The start and end offsets $s_{k}$ and $e_{k}$ of the modification in the byte sequence $S$, $0\leq s_{k}\leq e_{k}\leq \text{len}(S)$.
-\item A byte sequence of insertion bytes $I_{k}^{l_{k}}:=(i_{0},\ldots,i_{l-1})$ of length $l_{k}$, for which also the empty sequence is allowed.
+\item A byte sequence of insertion bytes $I_{k}^{l_{k}}:=(i_{0},\ldots,i_{l_{k}-1})$ of length $l_{k}$, for which also the empty sequence is allowed.
 \end{itemize}
 
 We write $m_{k}[s_{k}, e_{k}, I_{k}^{l_{k}}]$ if the properties of the modification $m_{k}$ are relevant in a given context.
 
 Based on the properties, a classification of modifications is possible:
 \begin{itemize}
-\item \texttt{INSERT} $\text{ins}_{k}[s_{k},I_{k}^{l}]:=m_{k}[s_{k},s_{k},I_{k}^{l_{k}}]$ with $l_{k}>0$: Insert a non-empty byte sequence $I_{k}^{l_{k}}$ at offset $s_{k}$ into the byte sequence $S$.
+\item \texttt{INSERT} $\text{ins}_{k}[s_{k},I_{k}^{l_{k}}]:=m_{k}[s_{k},s_{k},I_{k}^{l_{k}}]$ with $l_{k}>0$: Insert a non-empty byte sequence $I_{k}^{l_{k}}$ at offset $s_{k}$ into the byte sequence $S$.
 \item \texttt{REMOVE} $\text{rem}_{k}[s_{k},e_{k}]:=m_{k}[s_{k},e_{k},()]$ with $e_{k}>s_{k}$: Remove a non-empty byte sub-sequence $S[s_{k},e_{k})$ at offset $s_{k}$ from the byte sequence $S$, without inserting any additional bytes.
 \item \texttt{REPLACE} $\text{rep}_{k}[s_{k},e_{k},I_{k}^{l_{k}}]:=m_{k}[s_{k},e_{k},I_{k}^{l_{k}}]$ with $e_{k}>s_{k}$ and $l_{k}>0$: Replace a non-empty byte sub-sequence $S[s_{k},e_{k})$ at offset $s_{k}$ from the byte sequence $S$ with the non-empty insertion bytes $I_{k}^{l_{k}}$.
 \end{itemize}
@@ -248,12 +252,12 @@ Note that validity rule (2) prevents overlapping \texttt{REMOVE}s or \texttt{REP
 
 The algorithm terminates if the modification series $mod^{n}$ is invalid.
 
-Otherwise, the second part of the scheduling phase starts, whose purpose is to prepare the modification series for the follow-up phases. We assume here that changes are scheduled in no specific order (the scheduling order), which is reflected in $mod^{n}$. The task of part two of the scheduling phase is to sort $mod^{n}$ in a clearly defined way. It also answers the question for the meaning of \texttt{INSERT}s at the same offset $s_{k}=s_{j}$. In this paper, we define that an \texttt{INSERT} scheduled before an \texttt{INSERT} with the same offset is executed first\footnote{Of course, with the same right, it could also have the meaning of prepending inserts instead. The meaning should be defined as appropriate for the use case.}. This essentially means the insertion bytes of the \texttt{INSERT} that has first been scheduled are inserted first into the resulting byte sequence $T$, followed by the insertion bytes of the second scheduled \texttt{INSERT} at this offset and so on.
+Otherwise, the second part of the scheduling phase starts, whose purpose is to prepare the modification series for the follow-up phases. We assume here that changes in $mod^{n}$ are scheduled in no specific order. The task of part two of the scheduling phase is to sort $mod^{n}$ in a clearly defined way. It also answers the question for the meaning of \texttt{INSERT}s at the same offset $s_{k}=s_{j}$. In this paper, we define that an \texttt{INSERT} scheduled before an \texttt{INSERT} with the same offset is executed first (Of course, with the same right, it could also have the meaning of prepending inserts instead - The meaning should be defined as appropriate for the use case). This definition essentially means that the insertion bytes of the \texttt{INSERT} that has first been scheduled are inserted first into the resulting byte sequence $T$, followed (i.e. appended) by the insertion bytes of the second scheduled \texttt{INSERT} at this offset and so on.
 
 The concrete sorting criteria are as follows: Given $m_{k}[s_{k},e_{k},I_{k}^{l_{k}}]\in mod^{n}, 0\leq k< n$, the second part of the scheduling phase sorts these modifications as follows:
 \begin{enumerate}
-\item If $s_{k}>s_{j}$ for $j\neq k$, $m_{k}$ is executed before $m_{j}$
-\item If $s_{k}=s_{j}$ for $j\neq k$, $m_{k}$ is executed before $m_{j}$ if $k<j$
+\item If $s_{k}>s_{j}$ for $j\neq k$, $m_{j}$ is executed before $m_{k}$
+\item If $s_{k}=s_{j}$ for $j\neq k$, $m_{j}$ is executed before $m_{k}$ if $j<k$
 \end{enumerate}
 
 This defines a total ordering on $mod^{n}$ and an output modification series $\overline{mod^{n}}$, containing the same modifications in ``offset-ascending order''. Note that due to the validation part of this phase, sort criterion (2) can only apply to \texttt{INSERT}s at the same offset as another \texttt{INSERT}, \texttt{REMOVE} or \texttt{REPLACE}.
@@ -293,7 +297,7 @@ Having determined $\delta_{k+1}$, we now need to define the order of moving the 
 
 where $T_{k}=I_{k}^{l_{k}}+S_{k}$.
 
-The second key idea of the algorithm addresses the execution order issue. The idea is to sort modifications such that a modification $m_{k}$ whose target region overlaps the source region of another modifcation $m_{j}$ is executed after $m_{j}$. If $m_{k}$ would be executed first, it would overwrite the bytes in the source region of $m_{j}$, thus leading to data loss. Put formatlly: $m_{j}$ is executed before $m_{k}$ for $k\neq j$ in the following cases:
+The second key idea of the algorithm addresses the execution order issue. The idea is to sort modifications such that a modification $m_{k}$ whose target region overlaps the source region of another modifcation $m_{j}$ is executed after $m_{j}$. Note that this sorting is different from the initial sorting action described in section \ref{sec:SchedulingPhase}, i.e. it is done additionally. If $m_{k}$ would be executed first, it would overwrite the bytes in the source region of $m_{j}$, thus leading to data loss. Put formally: $m_{j}$ is executed before $m_{k}$ for $k\neq j$ in the following cases:
 \begin{enumerate}
 \item If $S_{j}\cap T_{k}\neq ()$, $m_{j}$ is considered smaller than $m_{k}$.
 \item Otherwise if $S_{j}\cap T_{k}=()$, $m_{j}$ is considered smaller than $m_{k}$ if $j<k$.
@@ -337,8 +341,8 @@ Likewise, the number of chunks to write for the insertion bytes $I_{k}^{l_{k}}$ 
 
 The result of the plan creation phase is a sequence $\mathcal{E}(r)$ of \texttt{READ} and \texttt{WRITE} operations with the following structure:
 \begin{itemize}
-\item It starts with $w_{0}$ \texttt{WRITE} operations at the corresponding chunk start offsets $s_{k}+\delta_{k}+x_{i}$, where $x_{i}$ is the start offset of the $i$-th chunk, $0\leq i\leq w_{0}-1$.
-\item Then $n_{k}$ pairs of \texttt{READ} and \texttt{WRITE} operations follow at read offset $e_{k}+y_{i}$ and write offset $e_{k}+\delta_{k+1}+y_{i}$, where $y_{i}$ is the start offset of the $i$-th chunk, $0\leq i\leq n_{0}-1$.
+\item It starts with $w_{0}$ \texttt{WRITE} operations at the corresponding chunk start offsets $s_{0}+\delta_{0}+x_{i}$, where $x_{i}$ is the start offset of the $i$-th chunk, $0\leq i\leq w_{0}-1$.
+\item Then $n_{0}$ pairs of \texttt{READ} and \texttt{WRITE} operations follow at read offset $e_{0}+y_{i}$ and write offset $e_{0}+\delta_{1}+y_{i}$, where $y_{i}$ is the start offset of the $i$-th chunk, $0\leq i\leq n_{0}-1$.
 \item After this, the same for the second until the $n$-th modification in $\underline{mod^{n}}$ follows
 \end{itemize}
 
@@ -348,7 +352,7 @@ $\mathcal{E}(r)$ is called the \textbf{execution plan} of $\underline{mod^{n}}$ 
 \subsection{Execution Phase}%
 \label{sec:ExecutionPhase}%
 
-The execution phase simply iterates the execution plan in order and executes the operations in an application dependent way. E.g., for files, corresponding operating system APIs offer primitive \emph{read} and \emph{write} calls. In addition, for files, a sindle \emph{truncate} operation to shorten the file might be necessary.
+The execution phase simply iterates the execution plan in order and executes the operations in an application-dependent way. E.g., for files, corresponding operating system APIs offer primitive \emph{read} and \emph{write} calls. In addition, for files, a sindle \emph{truncate} operation to shorten the file might be necessary.
 
 % =======================================================================================================
 \subsection{Algorithm Summary}%
@@ -374,8 +378,8 @@ After detailed phase explanations, we want to give a concise summary of the algo
 \item [\textbf{1b.}] If one of the conditions is not met for at least one $m_{k}$, set $T:=S$ and terminate the algorithm.
 \item [\textbf{1c.}] Otherwise sort $mod^{n}$, following the criteria:
 \begin{enumerate}
-\item[(i.)] If $s_{k}>s_{j}$ for $j\neq k$, $m_{k}$ is executed before $m_{j}$
-\item[(ii.)] If $s_{k}=s_{j}$ for $j\neq k$, $m_{k}$ is executed before $m_{j}$ if $k<j$
+\item[(i.)] If $s_{k}>s_{j}$ for $j\neq k$, $m_{j}$ is executed before $m_{k}$
+\item[(ii.)] If $s_{k}=s_{j}$ for $j\neq k$, $m_{j}$ is executed before $m_{k}$ if $j<k$
 \end{enumerate}
 \item [\textbf{1d.}] The regular output of phase 1 is a validated modification series $\overline{mod^{n}}$ sorted by offset ascending.
 \end{enumerate}
@@ -454,9 +458,7 @@ the algorithm creates a target byte sequence $T$ such that
 \begin{proof}
 If $S=()$, only \texttt{INSERT} operations are permitted according to criterion (i.) in step 1a. Assuming $n$ \texttt{INSERT}s of the sub-sequences $I_{k}^{l_{k}}$ at offset $s_{k}=0$, we can see that $T$ has the correct structure.
 
-Let $S\neq()$. To avoid confusion, in the following sections, we use the notation $\delta'_{k+1}$ to indicate the $\delta$ value associated with the $k$-th modification in the sorted modification series $\underline{mod^{n}}$, i.e. the modification series already sorted by step 2c. In general, this is a different value than the $\delta_{k+1}$ in step 2b, because the order of modifications might have changed due to step 2c.
-
-$T$ always starts with $S[0,s_{0})$, because:
+Let $S\neq()$. $T$ always starts with $S[0,s_{0})$, because:
 \begin{itemize}
 \item If $m_{0}$ contains non-empty insertion bytes, the \texttt{WRITE} operation with smallest offset according to step 2f is done at offset $s_{0}$, thus not changing any bytes in $S[0,s_{0})$.
 \item If $m_{0}$ does not contain insertion bytes, the \texttt{WRITE} operation with smallest offset according to step 2f is done at offset $e_{0}+\delta'_{1}=e_{0}+s_{0}-e_{0}=s_{0}$, thus not changing any bytes in $S[0,s_{0})$.
