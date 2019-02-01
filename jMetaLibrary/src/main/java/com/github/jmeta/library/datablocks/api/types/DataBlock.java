@@ -58,8 +58,8 @@ public interface DataBlock {
    /**
     * Returns the total size of the {@link DataBlock} in bytes.
     *
-    * @return the total size of the {@link DataBlock} in bytes or {@link DataBlockDescription#UNDEFINED} if the size
-    *         of this {@link DataBlock} is unknown.
+    * @return the total size of the {@link DataBlock} in bytes or {@link DataBlockDescription#UNDEFINED} if the size of
+    *         this {@link DataBlock} is unknown.
     */
    public long getTotalSize();
 
@@ -103,12 +103,4 @@ public interface DataBlock {
     * @param bytes
     */
    public void setBytes(byte[][] bytes);
-
-   /**
-    * Frees any internal data associated with this {@link DataBlock}. Should be called when you use large portions of
-    * data or a lot of data blocks over a longer period of time to avoid out-of-memory conditions. Whenever an
-    * {@link DataBlock} is not used anymore, call this method. However, after calling this method, the {@link DataBlock}
-    * instance may still be used.
-    */
-   public void free();
 }

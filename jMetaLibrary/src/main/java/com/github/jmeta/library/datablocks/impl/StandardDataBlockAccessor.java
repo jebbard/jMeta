@@ -8,7 +8,6 @@
 package com.github.jmeta.library.datablocks.impl;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
-import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
-import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -39,26 +36,10 @@ import com.github.jmeta.utility.logging.api.services.LoggingConstants;
  *
  */
 public class StandardDataBlockAccessor implements DataBlockAccessor {
-   // TODO stage2_013: Provide means to set timeouts (read block timeout + identify timeout)
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
 
    private static final int DEFAULT_LAZY_FIELD_SIZE = 8192;
-
-   private final Map<Medium<?>, MediumStore> mediumStores = new HashMap<>();
-
-   @Override
-   public void setLazyFieldSize(int lazyFieldSize) {
-
-      m_lazyFieldSize = lazyFieldSize;
-
-      for (Iterator<ContainerDataFormat> iterator = m_readers.keySet().iterator(); iterator.hasNext();) {
-         ContainerDataFormat nextKey = iterator.next();
-         DataBlockReader nextValue = m_readers.get(nextKey);
-
-         nextValue.setMaxFieldBlockSize(lazyFieldSize);
-      }
-   }
 
    /**
     * Creates a new {@link StandardDataBlockAccessor}.
@@ -91,7 +72,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
                throw new InvalidExtensionException(message, iExtension2);
             }
 
-            if (m_factories.containsKey(extensionDataFormat) || m_readers.containsKey(extensionDataFormat)) {
+            if (m_readers.containsKey(extensionDataFormat)) {
                LOGGER.warn(
                   "The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
                   iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
@@ -119,22 +100,11 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       DataBlockReader dataBlockReader = dataBlocksExtensions.getDataBlockReader(spec, m_lazyFieldSize);
 
-      ExtendedDataBlockFactory dataBlockFactory = dataBlocksExtensions.getDataBlockFactory();
-
-      // Set default data block factory
-      if (dataBlockFactory == null)
-         dataBlockFactory = new StandardDataBlockFactory();
-
-      dataBlockFactory.setMediumFactory(m_mediumFactory);
-
-      m_factories.put(format, dataBlockFactory);
-
       // Set default data block reader
       if (dataBlockReader == null) {
          dataBlockReader = new StandardDataBlockReader(spec, m_lazyFieldSize);
       }
 
-      dataBlockReader.initDataBlockFactory(dataBlockFactory);
       m_readers.put(format, dataBlockReader);
    }
 
@@ -142,25 +112,19 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
     * @see DataBlockAccessor#getContainerIterator
     */
    @Override
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium,
-      List<ContainerDataFormat> dataFormatHints, boolean forceMediumReadOnly) {
+   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
 
-      Reject.ifNull(dataFormatHints, "dataFormatHints");
       Reject.ifNull(medium, "medium");
 
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      mediumStores.put(medium, mediumStore);
-
-      return new TopLevelContainerIterator(medium, dataFormatHints, m_readers, mediumStore, true);
+      return new TopLevelContainerIterator(medium, m_readers, mediumStore, true);
    }
 
    @Override
    public AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium,
-      List<ContainerDataFormat> dataFormatHints, boolean forceMediumReadOnly) {
-
-      Reject.ifNull(dataFormatHints, "dataFormatHints");
+      boolean forceMediumReadOnly) {
       Reject.ifNull(medium, "medium");
 
       if (!medium.isRandomAccess())
@@ -169,18 +133,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      mediumStores.put(medium, mediumStore);
-
-      return new TopLevelContainerIterator(medium, dataFormatHints, m_readers, mediumStore, false);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getDataBlockFactory(ContainerDataFormat)
-    */
-   @Override
-   public DataBlockFactory getDataBlockFactory(ContainerDataFormat dataFormat) {
-
-      return m_factories.get(dataFormat);
+      return new TopLevelContainerIterator(medium, m_readers, mediumStore, false);
    }
 
    private int m_lazyFieldSize = DEFAULT_LAZY_FIELD_SIZE;
@@ -188,21 +141,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
    private final DataFormatRepository m_repository;
 
    private final MediaAPI m_mediumFactory;
-
    private final Map<ContainerDataFormat, DataBlockReader> m_readers = new HashMap<>();
 
-   private final Map<ContainerDataFormat, ExtendedDataBlockFactory> m_factories = new HashMap<>();
-
    private final ExtensionManager extManager;
-
-   /**
-    * @see DataBlockAccessor#closeMedium
-    */
-   @Override
-   public void closeMedium(Medium<?> medium) {
-
-      Reject.ifNull(medium, "medium");
-
-      mediumStores.get(medium).close();
-   }
 }

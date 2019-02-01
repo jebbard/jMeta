@@ -4,7 +4,6 @@ package com.github.jmeta.tools.smoketest;
 import java.io.File;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -78,7 +77,7 @@ public class DataFormatsSmoke_ReverseReading {
          System.out.println("All data blocks in the AbstractMedium: " + medium);
          System.out.println("***********************************************************************");
 
-         printContainers(accessor.getReverseContainerIterator(medium, new ArrayList<ContainerDataFormat>(), false),
+         printContainers(accessor.getReverseContainerIterator(medium, false),
             Integer.valueOf(1));
       }
    }

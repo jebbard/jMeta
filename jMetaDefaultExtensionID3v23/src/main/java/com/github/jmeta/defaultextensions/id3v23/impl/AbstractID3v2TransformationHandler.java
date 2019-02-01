@@ -4,6 +4,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -46,7 +47,7 @@ public abstract class AbstractID3v2TransformationHandler {
 
    public abstract boolean requiresUntransform(Container container);
 
-   public Container transform(Container container) {
+   public Container transform(Container container, DataBlockReader reader) {
       Reject.ifNull(container, "container");
       Reject.ifFalse(requiresTransform(container), "requiresTransform(container)");
 
@@ -65,10 +66,10 @@ public abstract class AbstractID3v2TransformationHandler {
       payload.setBytes(transformedPayloadBytes);
 
       return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
-         container.getMediumReference(), container.getHeaders(), payload, container.getFooters());
+         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader);
    }
 
-   public Container untransform(Container container) {
+   public Container untransform(Container container, DataBlockReader reader) {
 
       Reject.ifNull(container, "container");
       Reject.ifFalse(requiresUntransform(container), "requiresUntransform(container)");
@@ -88,7 +89,7 @@ public abstract class AbstractID3v2TransformationHandler {
       payload.setBytes(untransformedPayloadBytes);
 
       return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
-         container.getMediumReference(), container.getHeaders(), payload, container.getFooters());
+         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader);
    }
 
    protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);

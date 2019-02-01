@@ -24,11 +24,6 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 public interface DataBlockReader {
 
    /**
-    * @param dataBlockFactory
-    */
-   public void initDataBlockFactory(ExtendedDataBlockFactory dataBlockFactory);
-
-   /**
     * @param reference
     * @param id
     * @param parent
@@ -108,42 +103,6 @@ public interface DataBlockReader {
    public List<Header> readHeadersOrFootersWithId(MediumOffset reference, DataBlockId headerOrFooterId,
       DataBlockId parentId, List<Header> previousHeadersOrFooters, FieldFunctionStack context, boolean isFooter);
 
-   // /**
-   // * Returns the next {@link Header} with the given {@link DataBlockId} assumed to be stored starting at the given
-   // * {@link MediumOffset} or null. If the {@link Header}s presence is optional, its actual presence is determined
-   // using
-   // * the given previous {@link Header}s. The method returns null if no {@link Header} with the {@link DataBlockId} is
-   // * present at the given {@link MediumOffset}.
-   // *
-   // * @param reference
-   // * The {@link MediumOffset} pointing to the location of the assumed {@link Header} in the
-   // * {@link AbstractMedium}.
-   // * @param headerId
-   // * The {@link DataBlockId} of the assumed {@link Header}.
-   // * @param parentId
-   // * @param previousHeaders
-   // * The {@link List} of previous {@link Header}s belonging to the same {@link Container}. Have been already
-   // * read beforehand. These {@link Header}s can be used to determine the presence of the currently requested
-   // * {@link Header}. If there are no {@link Header}s that have been read beforehand, this {@link List} must
-   // * be empty.
-   // * @param context
-   // * @return The {@link Header} with the given {@link DataBlockId} with its {@link Field}s read from the given
-   // * {@link MediumOffset}.
-   // */
-   // public List<Header> readHeadersWithId(MediumOffset reference, DataBlockId headerId, DataBlockId parentId,
-   // List<Header> previousHeaders, FieldFunctionStack context);
-   //
-   // /**
-   // * @param reference
-   // * @param footerId
-   // * @param parentId
-   // * @param previousFooters
-   // * @param context
-   // * @return the list of {@link Header}s
-   // */
-   // public List<Header> readFootersWithId(MediumOffset reference, DataBlockId footerId, DataBlockId parentId,
-   // List<Header> previousFooters, FieldFunctionStack context);
-
    /**
     * @param reference
     * @param id
@@ -197,10 +156,4 @@ public interface DataBlockReader {
     * @return the {@link ByteBuffer}
     */
    public ByteBuffer readBytes(MediumOffset reference, int size);
-
-   /**
-    * @param startReference
-    * @param size
-    */
-   public void free(MediumOffset startReference, long size);
 }

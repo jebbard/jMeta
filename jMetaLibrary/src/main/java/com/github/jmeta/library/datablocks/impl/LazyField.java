@@ -14,8 +14,8 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
@@ -49,8 +49,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
     * @param characterEncoding
     */
    public LazyField(DataBlockDescription fieldDesc, MediumOffset reference, DataBlock parent, long totalSize,
-      ExtendedDataBlockFactory factory, DataBlockReader dataBlockReader, ByteOrder byteOrder,
-      Charset characterEncoding) {
+      DataBlockFactory factory, DataBlockReader dataBlockReader, ByteOrder byteOrder, Charset characterEncoding) {
       super(fieldDesc.getId(), parent, reference, dataBlockReader);
 
       Reject.ifNull(factory, "factory");
@@ -120,7 +119,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
 
    private final long m_totalSize;
 
-   private final ExtendedDataBlockFactory m_dbFactory;
+   private final DataBlockFactory m_dbFactory;
 
    private final ByteOrder m_byteOrder;
 

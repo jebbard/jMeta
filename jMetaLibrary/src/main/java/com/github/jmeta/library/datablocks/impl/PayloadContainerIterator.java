@@ -7,6 +7,7 @@
 
 package com.github.jmeta.library.datablocks.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,14 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public class PayloadContainerIterator extends AbstractDataBlockIterator<Container> {
+
+   /**
+    * @see java.io.Closeable#close()
+    */
+   @Override
+   public void close() throws IOException {
+      // Closing a PayloadContainerIterator has no effect
+   }
 
    /**
     * Creates a new instance of {@link PayloadContainerIterator}.

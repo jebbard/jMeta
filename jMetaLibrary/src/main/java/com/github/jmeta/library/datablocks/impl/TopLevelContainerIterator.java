@@ -7,6 +7,7 @@
 
 package com.github.jmeta.library.datablocks.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,15 +43,11 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
    private final Map<ContainerDataFormat, DataBlockReader> readerMap = new LinkedHashMap<>();
 
-   // TODO: Really use data format hints as documented
-
    /**
     * Creates a new {@link TopLevelContainerIterator}.
     * 
     * @param medium
     *           The {@link Medium} to iterate
-    * @param dataFormatHints
-    *           A list of {@link ContainerDataFormat} preferably checked to be present in that order
     * @param readers
     *           All {@link DataBlockReader}s per supported {@link ContainerDataFormat}
     * @param mediumStore
@@ -58,9 +55,8 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
     * @param forwardRead
     *           true for forward reading, false for backward reading
     */
-   public TopLevelContainerIterator(Medium<?> medium, List<ContainerDataFormat> dataFormatHints,
-      Map<ContainerDataFormat, DataBlockReader> readers, MediumStore mediumStore, boolean forwardRead) {
-      Reject.ifNull(dataFormatHints, "dataFormatHints");
+   public TopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
+      MediumStore mediumStore, boolean forwardRead) {
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
       Reject.ifNull(mediumStore, "mediumFactory");
@@ -75,7 +71,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
          currentOffset = mediumStore.createMediumOffset(medium.getCurrentLength());
       }
 
-      setDataFormatHints(dataFormatHints);
+      precedenceList.addAll(new ArrayList<>(readerMap.keySet()));
       setMedium(medium);
    }
 
@@ -85,10 +81,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    @Override
    public boolean hasNext() {
       if (forwardRead) {
-         // TODO stage2_004: Heavy problem with stream based media: When caching, the
-         // end of medium is reached SOONER, which is NOT an indication that no more
-         // containers are left, but that the whole data of the stream has been cached, before
-         // being really accessed...
          return !mediumStore.isAtEndOfMedium(currentOffset);
       } else {
          return currentOffset.getAbsoluteMediumOffset() != 0;
@@ -127,6 +119,14 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       }
 
       return null;
+   }
+
+   /**
+    * @see java.io.Closeable#close()
+    */
+   @Override
+   public void close() throws IOException {
+      mediumStore.close();
    }
 
    /**
@@ -172,11 +172,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       } else {
          return -container.getTotalSize();
       }
-   }
-
-   private void setDataFormatHints(List<ContainerDataFormat> dataFormatHints) {
-      precedenceList.clear();
-      precedenceList.addAll(new ArrayList<>(readerMap.keySet()));
    }
 
    private void setMedium(Medium<?> medium) {

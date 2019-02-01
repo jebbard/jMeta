@@ -15,11 +15,6 @@ public interface DataBlockService {
    public ContainerDataFormat getDataFormat();
 
    /**
-    * @return null to indicate usage of the default {@link ExtendedDataBlockFactory}
-    */
-   public ExtendedDataBlockFactory getDataBlockFactory();
-
-   /**
     * @param spec
     * @param lazyFieldSize
     * @return null to indicate usage of the default {@link DataBlockReader}

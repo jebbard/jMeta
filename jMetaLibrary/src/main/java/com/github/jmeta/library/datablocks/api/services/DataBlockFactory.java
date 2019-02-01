@@ -15,6 +15,7 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -38,14 +39,15 @@ public interface DataBlockFactory {
     *           the {@link AbstractMedium} of the {@link Container}.
     * @param headers
     *           the headers building this {@link Container}.
-    * @param footers
-    *           the footers building this {@link Container}.
     * @param payload
     *           the {@link Payload} building this {@link Container}.
+    * @param footers
+    *           the footers building this {@link Container}.
+    * @param reader TODO
     * @return the created {@link Container}.
     */
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers);
+      Payload payload, List<Header> footers, DataBlockReader reader);
 
    /**
     * @param id
@@ -60,19 +62,23 @@ public interface DataBlockFactory {
       ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding);
 
    /**
-    * @param fieldId
-    * @param value
-    * @return the {@link Field}
-    */
-   public <T> Field<T> createFieldForWriting(DataBlockId fieldId, T value);
-
-   /**
     * @param id
     * @param reference
     * @param fields
     * @param isFooter
+    * @param reader TODO
     * @return the {@link Header}
     */
-   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter);
+   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader);
 
+   /**
+    * @param id
+    * @param reference
+    * @param totalSize
+    * @param reader
+    * @param context
+    * @return the {@link Payload}
+    */
+   public Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader,
+      FieldFunctionStack context);
 }

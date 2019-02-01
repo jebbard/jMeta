@@ -2,6 +2,7 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +26,6 @@ import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.services.MediaAPI;
@@ -416,39 +416,47 @@ public abstract class AbstractDataBlockAccessorTest {
    }
 
    /**
-    * Checks {@link DataBlockAccessor#getContainerIterator(Medium, List, boolean)} for a given medium.
+    * Checks {@link DataBlockAccessor#getContainerIterator(Medium, boolean)} for a given medium.
     * 
     * @param medium
     *           The medium to check
     */
    private void assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
       AbstractDataBlockIterator<Container> topLevelContainerIterator = getTestling().getContainerIterator(medium,
-         new ArrayList<ContainerDataFormat>(), false);
+         false);
 
       Assert.assertNotNull(topLevelContainerIterator);
 
       // Check the whole data block hierarchy returned for correctness
       checkContainers(topLevelContainerIterator, null, false);
 
-      getTestling().closeMedium(medium);
+      try {
+         topLevelContainerIterator.close();
+      } catch (IOException e) {
+         Assert.fail("Unexpected exception during close" + e);
+      }
    }
 
    /**
-    * Checks {@link DataBlockAccessor#getReverseContainerIterator(Medium, List, boolean)} for a given medium.
+    * Checks {@link DataBlockAccessor#getReverseContainerIterator(Medium, boolean)} for a given medium.
     * 
     * @param medium
     *           The medium to check
     */
    private void assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
       AbstractDataBlockIterator<Container> topLevelReverseContainerIterator = getTestling()
-         .getReverseContainerIterator(medium, new ArrayList<ContainerDataFormat>(), false);
+         .getReverseContainerIterator(medium, false);
 
       Assert.assertNotNull(topLevelReverseContainerIterator);
 
       // Check the whole data block hierarchy returned for correctness
       checkContainers(topLevelReverseContainerIterator, null, true);
 
-      getTestling().closeMedium(medium);
+      try {
+         topLevelReverseContainerIterator.close();
+      } catch (IOException e) {
+         Assert.fail("Unexpected exception during close" + e);
+      }
    }
 
    /**

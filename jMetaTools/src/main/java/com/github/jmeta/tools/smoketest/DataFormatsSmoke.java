@@ -4,7 +4,6 @@ package com.github.jmeta.tools.smoketest;
 import java.io.File;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -102,7 +101,7 @@ public class DataFormatsSmoke {
          PRIVATE_LOGGER.info("All data blocks in the AbstractMedium: " + medium);
          PRIVATE_LOGGER.info("***********************************************************************");
 
-         printContainers(accessor.getContainerIterator(medium, new ArrayList<ContainerDataFormat>(), false), Integer.valueOf(1));
+         printContainers(accessor.getContainerIterator(medium, false), Integer.valueOf(1));
       }
    }
 

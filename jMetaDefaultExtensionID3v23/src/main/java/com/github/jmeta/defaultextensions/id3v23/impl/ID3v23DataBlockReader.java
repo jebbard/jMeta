@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -42,11 +42,6 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     */
    public ID3v23DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
       super(spec, maxFieldBlockSize);
-   }
-
-   @Override
-   public void initDataBlockFactory(ExtendedDataBlockFactory dataBlockFactory) {
-      super.initDataBlockFactory(dataBlockFactory);
 
       transformationsReadOrder.put(ID3v2TransformationType.UNSYNCHRONIZATION,
          new UnsynchronisationHandler(getDataBlockFactory()));
@@ -64,7 +59,7 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
       FieldFunctionStack context, long remainingDirectParentByteCount) {
       Container container = super.readContainerWithId(reference, id, parent, context, remainingDirectParentByteCount);
 
-      return applyTransformationsAfterRead(container);
+      return applyTransformationsAfterRead(container, this);
    }
 
    /**
@@ -77,7 +72,7 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
       FieldFunctionStack context, long remainingDirectParentByteCount) {
       return applyTransformationsAfterRead(
-         super.readContainerWithIdBackwards(reference, id, parent, context, remainingDirectParentByteCount));
+         super.readContainerWithIdBackwards(reference, id, parent, context, remainingDirectParentByteCount), this);
    }
 
    /**
@@ -98,7 +93,7 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
       transformationsReadOrder.put(ID3v2TransformationType.ENCRYPTION, handler);
    }
 
-   private Container applyTransformationsAfterRead(Container container) {
+   private Container applyTransformationsAfterRead(Container container, DataBlockReader reader) {
       Container transformedContainer = container;
 
       Iterator<AbstractID3v2TransformationHandler> handlerIterator = transformationsReadOrder.values().iterator();
@@ -115,7 +110,7 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
                   throw new IllegalStateException("Unexpected end of medium", e);
                }
 
-            transformedContainer = transformationHandler.untransform(transformedContainer);
+            transformedContainer = transformationHandler.untransform(transformedContainer, reader);
          }
       }
 

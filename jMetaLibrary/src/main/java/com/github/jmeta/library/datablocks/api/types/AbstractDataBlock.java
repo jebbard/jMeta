@@ -43,13 +43,6 @@ public abstract class AbstractDataBlock implements DataBlock {
          initParent(parent);
    }
 
-   // TODO use free in test cases
-   @Override
-   public void free() {
-
-      m_dataBlockReader.free(getMediumReference(), getTotalSize());
-   }
-
    /**
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(long, int)
     */

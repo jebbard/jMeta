@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
@@ -44,15 +44,6 @@ import com.github.jmeta.utility.byteutils.api.services.ByteOrders;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
-// TODO document002: Determine payload size by reading children
-// TODO document003: ID_OF facility
-// TODO document004: Reverse reading: Rules, preconditions, implementation, testing
-// TODO document005: Test approach for data blocks component
-// TODO document006: Detailed description how field functions work
-
-// TODO stage2_000: Better strategy for reading large data (everything block-wise, not
-// only large payload and fields) => document possible cases of data size to block types
-
 /**
  * {@link StandardDataBlockReader}
  *
@@ -62,19 +53,13 @@ public class StandardDataBlockReader implements DataBlockReader {
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockReader.class);
 
    /**
-    * @return the {@link ExtendedDataBlockFactory}
+    * @return the {@link DataBlockFactory}
     */
-   protected ExtendedDataBlockFactory getDataBlockFactory() {
+   protected DataBlockFactory getDataBlockFactory() {
 
       return m_dataBlockFactory;
    }
 
-   @Override
-   public void free(MediumOffset startReference, long size) {
-   }
-
-   // TODO stage2_005: It is a validation / parsing error if a field for which a fixed value is
-   // defined does have another value during reading.
    private static final String LOGGING_BINARY_TO_INTERPRETED_FAILED = "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.";
 
    /**
@@ -90,17 +75,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       m_spec = spec;
       m_maxFieldBlockSize = maxFieldBlockSize;
-   }
-
-   @Override
-   public void initDataBlockFactory(ExtendedDataBlockFactory dataBlockFactory) {
-
-      Reject.ifNull(dataBlockFactory, "dataBlockFactory");
-      Reject.ifFalse(m_dataBlockFactory == null, "m_dataBlockFactory");
-
-      m_dataBlockFactory = dataBlockFactory;
-
-      m_dataBlockFactory.setDataBlockReader(this);
+      m_dataBlockFactory = new StandardDataBlockFactory();
    }
 
    /**
@@ -268,7 +243,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       // Create container
       final Container container = m_dataBlockFactory.createContainer(actualId, parent, reference, headers, payload,
-         footers);
+         footers, this);
 
       return container;
    }
@@ -383,7 +358,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       // IMPORTANT: The containers StandardMediumReference MUST NOT be set to the original passed
       // StandardMediumReference because that one points to the containers back!
       final Container container = m_dataBlockFactory.createContainer(actualId, parent, nextReference, headers, payload,
-         footers);
+         footers, this);
 
       return container;
    }
@@ -437,7 +412,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          List<Field<?>> headerFields = readFields(reference, headerOrFooterId, context, staticLength);
 
          nextHeadersOrFooters
-            .add(m_dataBlockFactory.createHeaderOrFooter(headerOrFooterId, reference, headerFields, isFooter));
+            .add(m_dataBlockFactory.createHeaderOrFooter(headerOrFooterId, reference, headerFields, isFooter, this));
       }
 
       return nextHeadersOrFooters;
@@ -1028,7 +1003,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          + " were read before EOF.";
    }
 
-   private ExtendedDataBlockFactory m_dataBlockFactory;
+   private DataBlockFactory m_dataBlockFactory;
 
    private final DataFormatSpecification m_spec;
 

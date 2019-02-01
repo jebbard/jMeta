@@ -12,8 +12,8 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
-import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
@@ -24,30 +24,29 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.services.MediaAPI;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  *
  */
-public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
+public class StandardDataBlockFactory implements DataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      com.github.jmeta.library.datablocks.api.types.DataBlock, MediumOffset, java.util.List,
-    *      com.github.jmeta.library.datablocks.api.types.Payload, java.util.List)
+    *      com.github.jmeta.library.datablocks.api.types.Payload, java.util.List, DataBlockReader)
     */
    @Override
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers) {
+      Payload payload, List<Header> footers, DataBlockReader reader) {
 
       Reject.ifNull(id, "id");
       Reject.ifNull(reference, "reference");
       Reject.ifNull(footers, "footers");
       Reject.ifNull(payload, "payload");
       Reject.ifNull(headers, "headers");
-      return new StandardContainer(id, parent, reference, headers, payload, footers, m_dataBlockReader);
+      return new StandardContainer(id, parent, reference, headers, payload, footers, reader);
    }
 
    /**
@@ -97,53 +96,16 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeaderOrFooter(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      MediumOffset, java.util.List, boolean)
+    *      MediumOffset, java.util.List, boolean, DataBlockReader)
     */
    @Override
-   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter) {
+   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
+      DataBlockReader reader) {
 
       Reject.ifNull(id, "headerRef");
       Reject.ifNull(reference, "parent");
       Reject.ifNull(fields, "fields");
 
-      return new StandardHeader(id, reference, fields, isFooter, m_dataBlockReader);
+      return new StandardHeader(id, reference, fields, isFooter, reader);
    }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#setDataBlockReader(com.github.jmeta.library.datablocks.api.services.DataBlockReader)
-    */
-   @Override
-   public void setDataBlockReader(DataBlockReader dataBlockReader) {
-
-      Reject.ifNull(dataBlockReader, "dataBlockReader");
-
-      m_dataBlockReader = dataBlockReader;
-   }
-
-   /**
-    * @see ExtendedDataBlockFactory#setMediumFactory
-    */
-   @Override
-   public void setMediumFactory(MediaAPI mediumFactory) {
-
-      Reject.ifNull(mediumFactory, "mediumFactory");
-
-      m_mediumFactory = mediumFactory;
-   }
-
-   @Override
-   public <T> Field<T> createFieldForWriting(DataBlockId fieldId, T value) {
-
-      Reject.ifNull(fieldId, "fieldId");
-      Reject.ifNull(value, "value");
-
-      DataBlockDescription desc = m_dataBlockReader.getSpecification().getDataBlockDescription(fieldId);
-
-      return new StandardField<>(desc, value, null);
-   }
-
-   @SuppressWarnings("unused")
-   private MediaAPI m_mediumFactory;
-
-   private DataBlockReader m_dataBlockReader;
 }

@@ -7,6 +7,7 @@
 
 package com.github.jmeta.library.datablocks.api.services;
 
+import java.io.Closeable;
 import java.util.Iterator;
 
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
@@ -20,8 +21,7 @@ import com.github.jmeta.library.datablocks.api.types.DataBlock;
  *
  * @param <T>
  */
-public abstract class AbstractDataBlockIterator<T extends DataBlock>
-   implements Iterator<T> {
+public abstract class AbstractDataBlockIterator<T extends DataBlock> implements Iterator<T>, Closeable, AutoCloseable {
 
    /**
     * @see java.util.Iterator#remove()
@@ -29,7 +29,6 @@ public abstract class AbstractDataBlockIterator<T extends DataBlock>
    @Override
    public void remove() {
 
-      throw new UnsupportedOperationException(
-         "remove operation is unsupported");
+      throw new UnsupportedOperationException("remove operation is unsupported");
    }
 }

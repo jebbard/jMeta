@@ -47,12 +47,6 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class StandardField<T> implements Field<T> {
 
-   @Override
-   public void free() {
-
-      // TODO: How to implement free for fields?
-   }
-
    private StandardField(DataBlockDescription fieldDesc, MediumOffset reference) {
       Reject.ifNull(fieldDesc, "fieldDesc");
 

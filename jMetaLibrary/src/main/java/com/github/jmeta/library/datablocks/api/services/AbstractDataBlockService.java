@@ -27,16 +27,6 @@ public abstract class AbstractDataBlockService implements DataBlockService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockFactory()
-    */
-   @Override
-   public ExtendedDataBlockFactory getDataBlockFactory() {
-
-      // Choose to use default IExtendedDataBlockFactory
-      return null;
-   }
-
-   /**
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockReader(DataFormatSpecification,
     *      int)
     */
