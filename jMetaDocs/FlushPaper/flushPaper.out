@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Definitions}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Byte Sequences}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Modification Series}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Execution Plan and Transformation Function}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Algorithm Description}{}% 6
+\BOOKMARK [2][-]{subsection.3.1}{Algorithm Overview}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.2}{Scheduling Phase}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.3}{Plan Creation Phase}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.4}{Execution Phase}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.5}{Algorithm Summary}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.6}{Properties of the Algorithm}{section.3}% 12
+\BOOKMARK [3][-]{subsubsection.3.6.1}{Termination}{subsection.3.6}% 13
+\BOOKMARK [3][-]{subsubsection.3.6.2}{Correctness}{subsection.3.6}% 14
+\BOOKMARK [3][-]{subsubsection.3.6.3}{Complexity}{subsection.3.6}% 15
+\BOOKMARK [1][-]{section.4}{Implementation Hints}{}% 16
