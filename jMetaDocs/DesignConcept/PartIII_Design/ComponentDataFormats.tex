@@ -120,7 +120,7 @@ Now towards headers and footers: Are they inherently different or basically the 
 Headers and footers as sequences of fields are structurally identical
 }
 {% Short description
-Headers and footers are sequences of fields, i.e. they must not nest a container. They are either variable or fixed-size. For both header and footer, the same model class called FieldSequence is used.
+Headers and footers are sequences of fields, i.e. they must not nest a container. They are either variable or fixed-size. For both header and footer, the same model class called \texttt{Header} is used.
 }
 {% Rationale
 No data format specifies a header or footer nesting a container-like data structure, they all consist of plain fields. Despite the location (before or behind the payload), there is nothing really distinguishing headers or footers from a structural perspective. Thus the same model class can be used for both. However, there is no english term for that class that seems to clearly be a grouping term for headers and footers.

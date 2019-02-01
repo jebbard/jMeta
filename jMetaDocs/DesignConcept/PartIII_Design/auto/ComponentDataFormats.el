@@ -18,5 +18,6 @@
     "sec:HeaderProperties"
     "sec:ContainerProperties"
     "sec:PayloadProperties"
-    "sec:BuilderAPI")))
+    "sec:BuilderAPI"))
+ :latex)
 
