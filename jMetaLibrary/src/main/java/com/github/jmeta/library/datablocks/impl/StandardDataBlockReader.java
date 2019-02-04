@@ -192,16 +192,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       afterHeaderReading(actualId, theContext, headers);
 
       // Read payload
-      List<DataBlockDescription> payloadDescs = actualDesc
-         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
-
-      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
-
-      // CONFIG_CHECK: Any container must specify a single PAYLOAD block
-      if (payloadDescs.size() != 1)
-         throw new IllegalStateException("For container parents, there must be a single data block of type PAYLOAD");
-
-      DataBlockDescription payloadDesc = payloadDescs.get(0);
+      DataBlockDescription payloadDesc = getPayloadDescription(actualDesc);
 
       long remainingPayloadByteCount = DataBlockDescription.UNDEFINED;
 
@@ -241,11 +232,24 @@ public class StandardDataBlockReader implements DataBlockReader {
       // information to the context.
       afterFooterReading(actualId, theContext, footers);
 
-      // Create container
-      final Container container = m_dataBlockFactory.createContainer(actualId, parent, reference, headers, payload,
-         footers, this);
+      return m_dataBlockFactory.createContainer(actualId, parent, reference, headers, payload, footers, this);
+   }
 
-      return container;
+   /**
+    * @param actualDesc
+    * @return
+    */
+   private DataBlockDescription getPayloadDescription(DataBlockDescription actualDesc) {
+      List<DataBlockDescription> payloadDescs = actualDesc
+         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
+
+      if (payloadDescs.size() != 1) {
+         throw new IllegalStateException("For container parents, there must be a single data block of type PAYLOAD");
+      }
+
+      return payloadDescs.get(0);
    }
 
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
@@ -445,10 +449,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          }
       }
 
-      final Payload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(), reference,
-         totalPayloadSize, this, context);
-
-      return createPayloadAfterRead;
+      return m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(), reference, totalPayloadSize, this, context);
    }
 
    /**

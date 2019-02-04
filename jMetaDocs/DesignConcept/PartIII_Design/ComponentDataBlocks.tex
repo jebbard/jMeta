@@ -161,18 +161,22 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-As streams are non-random-access media, the question arises what we do with the bytes of a stream. It is no good idea to skip the payload byte here - what if the user wants to closely look at them? There is no other choice than to still cache them:
+As streams are non-random-access media, the question arises what we do with the bytes of a stream. It is no good idea to skip the payload byte here - what if the user wants to closely look at them? There is no other choice than to still cache them. The same is true for rather ``exotic'' formats such as Lyrics3v2 where the payload size is not contained in a header, but only in the footer.
 
 %%%% DD --> %%%%
 \DD{dd:608}
 {% Title
-Fully cache payload for stream-based media
+Fully cache payload for stream-based media and formats without size field
 }
 {% Short description
-For stream-based media, the whole payload data must be fully read to at least have a chance that the user can look at it later. It might happen that the maximum cache size is exceeded in which case the first bytes of the payload might fall out of the cache.
+  For stream-based media, the whole payload data must be fully read to at least have a chance that the user can look at it later. It might happen that the maximum cache size is exceeded in which case the first bytes of the payload might fall out of the cache.
+
+For formats not having a static payload size and not having a size indicator in its header, the payload must be fully read in entirety to know its size. This also leads to potentially filling up the cache. 
 }
 {% Rationale
-There is no other way for streams than grabbing the bytes when looking at them - streams are just one time read.
+  There is no other way for streams than grabbing the bytes when looking at them - streams are just one time read.
+
+  For the special case of formats not having a payload size in their header, see \DesLink{dd:529d}.
 }
 {% Disadvantes
 No disadvantages known

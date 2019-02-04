@@ -839,13 +839,13 @@ We just cover one additional special case here: In \DesLink{dd:521} and the foll
 %%%% DD --> %%%%
 \DD{dd:529d}
 {% Title
-Lyrics3v2 payload size is determined in custom implementation
+Lyrics3v2 payload size is determined by reading all children
 }
 {% Short description
-Lyrics3v2 special case is treated in a custom implementation by overriding the process of determining the payload length in the Lyrics3v2 parser implementation.
+Lyrics3v2 special case (no size indicator in header) is treated by reading all children until its footer. This is done for any data format where no payload size could be determined after reading the headers.
 }
 {% Rationale
-This case is only known for Lyrics3v2, thus we do not want to handle it in the generic parsing code. The Lyrics3v2 implementation is the right place to handle it.
+This case is currently only known for Lyrics3v2, but the generic handling is not too complicated but rather simple, thus not requiring a custom implementation for Lyrics3v2 only.
 }
 {% Disadvantes
 No disadvantages known
