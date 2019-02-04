@@ -10,23 +10,174 @@ In this section, the design of the component \COMPdataPartManagement{} is descri
 \subsection{Basic Concept for Reading}%
 \label{sec:BasicConceptforReading}%
 
-% DD1: Specification-driven approach
+In section \SectionLink{sec:RepresentingaDataFormat}, we discussed the approach that a data format is described in terms of a \emph{data format specification}, which basically is a description of how data is represented as a chunk of bytes in the data format. It breaks up such a chunk into different types of so-called data blocks that form a well-defined hierarchy (see \SectionLink{sec:TheContainerMetamodel}). Given such a specification and data block hierarchy, we define the following design decisions:
 
-% DD2: Datablock Hierarchy represented in Datablocks component
+%%%% DD --> %%%%
+\DD{dd:601}
+{% Title
+Data block instance classes defined in \COMPdataPartManagement{}
+}
+{% Short description
+The instances for the different data block types are represented as Java classes in the \COMPdataPartManagement{} component which use the same names as in figure \ref{fig:II_GeneralModel}.
+}
+{% Rationale
+As chunks of bytes are structured according to the metamodel and the data format specification describes them as such, it is quite clear the have to be instance of corresponding classes during parsing. These instances are also returned to the user and provide a clear, better-to-understand view on the data. Btw., having a metamodel but not transforming it into a class model seems to be quite nonsense.
+}
+{% Disadvantages
+No disadvantages known.
+}
+%%%% <-- DD %%%%
 
-% DD3: Container Iterator approach
+%%%% DD --> %%%%
+\DD{dd:602}
+{% Title
+Specification-driven Read Approach
+}
+{% Short description
+Reading is heavily based on the description of the data format in its data format specification. The descriptions of lengths and types are used as basic assumption for parsing, especially magic keys for first identification.
+}
+{% Rationale
+It is quite clear that otherwise, the data format specification would be quite useless and we would implement some data-format-specific and thus non-generic code again.
+}
+{% Disadvantages
+Is it flexible enough? If we stick to a stiff specification, how to ensure that it is flexible enough for different data formats?
+}
+%%%% <-- DD %%%%
+
+%%%% DD --> %%%%
+\DD{dd:603}
+{% Title
+Reading and writing with \COMPmedia{}
+}
+{% Short description
+Reading and writing is done using \COMPmedia{}, including use of its caching features.
+}
+{% Rationale
+Again this is very clear.
+}
+{% Disadvantages
+No disadvantages known.
+}
+%%%% <-- DD %%%%
+
+Given these basic design decisions, we are ready to sketch a rough draft of how reading basically works. We first summarize the very fundamentals that we know this far:
+\begin{itemize}
+\item Data is represented as linear chunks of bytes whose structure is defined by the data format specification
+\item The top-level data blocks for reading are containers
+\item It is not clear which data format we have in front of us
+\item A data block might get large, as we use long as data type (see \DesLink{dd:417})
+\end{itemize}
+
+Given the first two observations, we define the following:
+
+%%%% DD --> %%%%
+\DD{dd:604}
+{% Title
+Iterator approach for reading
+}
+{% Short description
+  \LibName{} provides an iterator pattern for iterating top-level containers.
+}
+{% Rationale
+As the basic structure of a chunk of data format bytes consists of linear disjoint containers and we need to do forward-reading, an iterator is a quite natural choice. Lists or other collection data types would be insufficient, because they would suggest that there is a finite number of containers. Iterators are a good fit for streaming, allowing virtually ``unlimited'' streams of containers.
+}
+{% Disadvantages
+No disadvantages known.
+}
+%%%% <-- DD %%%%
+
+Now we can define the basis approach of forward reading, i.e. what is done if we read a top-level container? Of course, first it is not clear which data format we have - identification is necessary, already introduced in \SectionLink{sec:MagicKeys}. Second, it might happen anytime that we hit end of medium, either expectedly or unexpectedly. The basic flow is defined in the following design decision and shown in figure \ref{fig:III_ForwardReading}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1.0\linewidth]{figures/III_ForwardReading.pdf}
+  \caption{Steps for reading data forward}
+  \label{fig:III_ForwardReading}
+\end{figure}
+
+%%%% DD --> %%%%
+\DD{dd:605}
+{% Title
+Steps of forward reading of top-level containers
+}
+{% Short description
+  Forward reading of a single top-level container works as follows - whenever \texttt{next()} on the iterator is called to read the first or next container:
+  \begin{enumerate}
+  \item First, we do data format identification, i.e. finding out whether the data chunk ahead belongs to a data format the library supports - see \SectionLink{sec:MagicKeys} for details. If we cannot identify the data format, the process stops here with an exception.
+  \item After identifying the data format, we need to identify which concrete container we have, i.e. determining its actual id at runtime; this is necessary for data formats supporting generic containers which is most of the container data formats out there. 
+  \item Then, as we forward-read, the headers of the container are parsed, which means understanding their content. This includes determining if there are other headers or footers, and also the length of the container's payload.
+  \item After heaving determined the payload length, the payload object itself is created. 
+  \item Then, if there are any footers, they are at least created and ready to be parsed.
+  \item Finally, the container is created which consists of the previously created headers, footers and payload
+  \end{enumerate}
+  It might happen that during this process, an expected or unexpected end of medium occurs. Expected it can only be during data format identification, in all other cases there seems to be a corruption in the data or parallel changes, as the parsing metadata indicates a size which is not matching reality.
+
+  During steps 2, 3 and 5, fields need to be parsed which is a special discipline discussed later.
+}
+{% Rationale
+The process is aligned at the structure of a container and typical for forward reading.
+}
+{% Disadvantages
+No disadvantages known.
+}
+%%%% <-- DD %%%%
 
 % =======================================================================================================
-\subsection{Reading Steps}%
+\subsection{Buffering, Caching and Lazy Reading}%
 \label{sec:ReadingSteps}%
 
-% DD x: Reading Steps overview
+\COMPdataPartManagement{} uses the features of \COMPmedia{} for caching as described in \SectionLink{sec:PerfMedia}. These features are also used for buffering, i.e.
+%%%% DD --> %%%%
+\DD{dd:606}
+{% Title
+Headers are buffered during forward reading
+}
+{% Short description
+For static headers, they are buffered as a whole by first caching all bytes the header is made of; for dynamic-length headers, headers are buffered according to their known minimum length. Any upcoming fields are read using \COMPmedia{}'s \texttt{getData} and thus either use the buffered data or fetch it from the medium.
+}
+{% Rationale
+Reading byte by byte or field by field would be nonsense from performance point of view
+}
+{% Disadvantages
+No disadvantages known.
+}
+%%%% <-- DD %%%%
 
-% DD x+1: Data Format Identification
+A very basic mechanism of container data formats is that they allow seeking and skipping based on containers, that means the decoders might just need to check a container header to find out if they are interested in the data it contains, and if not simply go on reading with the follow-up container. For this, most if not all data formats specify the size of the container in its header or footer. To fully support this, we define some kind of lazyness as follows:
 
-% DD x+2: Lazy Payload
+%%%% DD --> %%%%
+\DD{dd:607}
+{% Title
+Lazy payload
+}
+{% Short description
+Any field-based or container-based payload is lazy by default, i.e. its bytes are first read only when explicitly requested by the user. A sole exception is in place for stream-based media (see upcoming design decision). 
+}
+{% Rationale
+This way, we do not read unnecessary data the user might never look at, especially allowing to skip over large containers without risking out of memory and long read times, just perfectly meeting requirement \SectionLink{sec:REQ009LesenSchreibenGrosse}.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
-% DD x+3: Caching
+As streams are non-random-access media, the question arises what we do with the bytes of a stream. It is no good idea to skip the payload byte here - what if the user wants to closely look at them? There is no other choice than to still cache them:
+
+%%%% DD --> %%%%
+\DD{dd:608}
+{% Title
+Fully cache payload for stream-based media
+}
+{% Short description
+For stream-based media, the whole payload data must be fully read to at least have a chance that the user can look at it later. It might happen that the maximum cache size is exceeded in which case the first bytes of the payload might fall out of the cache.
+}
+{% Rationale
+There is no other way for streams than grabbing the bytes when looking at them - streams are just one time read.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 % =======================================================================================================
 \subsection{Field Parsing}%
