@@ -209,15 +209,14 @@ public abstract class AbstractDataBlockAccessorTest {
    // detected); reason: Current position of the stream medium is advanced way more than the current read offset, thus
    // isAtEOM detects medium end - too much cache calls in between that advance the streams current position -
    // Reading style must be adapted
-   // /**
-   // * Tests {@link DataBlockAccessor#getContainerIterator}.
-   // */
-   // @Test
-   // public void
-   // getContainerIterator_forInputStreamMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
-   // assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(createStreamMedium(getFileForMediaContents(),
-   // Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
-   // }
+   /**
+    * Tests {@link DataBlockAccessor#getContainerIterator}.
+    */
+   @Test
+   public void getContainerIterator_forInputStreamMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+      assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(createStreamMedium(getFileForMediaContents(),
+         Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
+   }
 
    // TODO: Currently fails for most of the formats: Redesign of reading process necessary
    // /**

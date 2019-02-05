@@ -151,13 +151,14 @@ public interface MediumStore {
     * {@link Medium#getMaxReadWriteBlockSizeInBytes()} as size. So it might perform multiple accesses to the external
     * medium, if the given number of bytes exceeds the maximum configured read-write block size for the medium.
     * 
-    * For non-random-access media, this method has a specialized behavior: If passing the already described initial
-    * checks (data is not yet in the cache and caching is enabled), it compares the given offset with the last position
-    * read from the stream. If the given offset is smaller then the highest previous read position, it throws an
-    * {@link InvalidMediumOffsetException}, indicating that you cannot cache bytes from earlier stream positions,
-    * because streams cannot look back. If it is equal, it simply reads the given number of bytes. If it is bigger, it
-    * reads all bytes until the given offset and possibly caches them (if caching is enabled), and then it tries to read
-    * the indicated number of bytes. Of course, during these reads, also an {@link EndOfMediumException} might occur.
+    * For non-random-access media, this method has a specialized behavior: It compares the given offset with the last
+    * position read from the stream. If the given offset is smaller then the highest previous read position, all the
+    * data requested to cache must be already cached, otherwise this method throws an
+    * {@link InvalidMediumOffsetException}, indicating that you cannot re-cache bytes from earlier stream positions,
+    * because streams cannot look back. If it is equal to the last position read from the stream, it simply reads the
+    * given number of bytes. If it is bigger, it reads all bytes until the given offset and caches them, and then it
+    * tries to read the indicated number of bytes. Of course, during these reads, also an {@link EndOfMediumException}
+    * might occur.
     * 
     * This method offers users the possibility to buffer data as soon as its required size is known, thus minimizing
     * explicit read calls to the external medium. The buffered data can then later be fetched using
@@ -226,7 +227,7 @@ public interface MediumStore {
     * 
     * As already indicated, one model of working with this API is to call {@link #cache(MediumOffset, int)} as soon as
     * you know the number of bytes you need to work with ahead, then call {@link #getData(MediumOffset, int)}
-    * portion-wise for the same range at places where you need the actually work with the data. Another option is to not
+    * portion-wise for the same range at places where you need to actually work with the data. Another option is to not
     * use {@link #cache(MediumOffset, int)} and directly call {@link #getData(MediumOffset, int)} if your code structure
     * allows to directly work with the data. If an {@link EndOfMediumException} occurs in this case, you do not
     * necessarily have to again call this method with fewer bytes, but you can also obtain all bytes until end of medium

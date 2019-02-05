@@ -607,14 +607,14 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          MediumOffset currentPosition = mediumAccessor.getCurrentPosition();
 
          if (offset.before(currentPosition)) {
-            logDebugMessage(() -> "Reading data from the current position " + currentPosition.getAbsoluteMediumOffset()
-               + " until " + offset.getAbsoluteMediumOffset() + " for non-random-access medium");
+            logDebugMessage(() -> "Checking cache data from offset " + currentPosition.getAbsoluteMediumOffset()
+               + " until the current position" + offset.getAbsoluteMediumOffset() + " for non-random-access medium");
 
             long cachedByteCountAtOffset = cache.getCachedByteCountAt(offset);
 
             if (cachedByteCountAtOffset < currentPosition.distanceTo(offset)) {
                throw new InvalidMediumOffsetException(offset,
-                  "Cannot re-read data of  non-random-access media for already passed ranges that are not fully cached");
+                  "Cannot re-read data of non-random-access media for already passed ranges that are not fully cached");
             }
          }
 

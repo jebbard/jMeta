@@ -121,10 +121,17 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          MediumOffset magicKeyReference = reference.advance(magicKey.getDeltaOffset());
 
-         final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
+         try {
+            cache(magicKeyReference, magicKeySizeInBytes);
 
-         if (magicKey.isPresentIn(readBytes)) {
-            return true;
+            final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
+
+            if (magicKey.isPresentIn(readBytes)) {
+               return true;
+            }
+         } catch (EndOfMediumException e) {
+            // If this happens, the magic key is definitely not present here...
+            LOGGER.warn("End of medium encountered during data format identification", e);
          }
       }
 
@@ -441,7 +448,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          remainingDirectParentByteCount);
 
       // If the medium is a stream-based medium, all the payload bytes must be cached first
-      if (!m_cache.getMedium().isRandomAccess() && totalPayloadSize != Medium.UNKNOWN_LENGTH) {
+      if (!m_cache.getMedium().isRandomAccess() && totalPayloadSize != DataBlockDescription.UNDEFINED) {
          try {
             cache(reference, totalPayloadSize);
          } catch (EndOfMediumException e) {
