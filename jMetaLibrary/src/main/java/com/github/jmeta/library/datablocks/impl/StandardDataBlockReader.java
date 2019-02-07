@@ -52,19 +52,19 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockReader.class);
 
-   /**
-    * @return the {@link DataBlockFactory}
-    */
-   protected DataBlockFactory getDataBlockFactory() {
-
-      return m_dataBlockFactory;
-   }
-
    private static final String LOGGING_BINARY_TO_INTERPRETED_FAILED = "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.";
+
+   protected MediumStore m_cache;
+
+   private DataBlockFactory m_dataBlockFactory;
+
+   private int m_maxFieldBlockSize;
+
+   private final DataFormatSpecification m_spec;
 
    /**
     * Creates a new {@link StandardDataBlockReader}.
-    * 
+    *
     * @param spec
     * @param transformationHandlers
     * @param maxFieldBlockSize
@@ -76,6 +76,509 @@ public class StandardDataBlockReader implements DataBlockReader {
       m_spec = spec;
       m_maxFieldBlockSize = maxFieldBlockSize;
       m_dataBlockFactory = new StandardDataBlockFactory();
+   }
+
+   /**
+    * @param containerId
+    * @param context
+    * @param footers
+    */
+   protected void afterFooterReading(DataBlockId containerId, FieldFunctionStack context, List<Header> footers) {
+
+      // Default behavior: Do nothing. This method is intended to be overridden by a
+      // data format specific implementation.
+   }
+
+   /**
+    * @param containerId
+    * @param context
+    * @param headers
+    */
+   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
+
+      // Default behavior: Do nothing. This method is intended to be overridden by a
+      // data format specific implementation.
+   }
+
+   private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {
+
+      return "Unexpected EOF occurred during read from medium " + reference.getMedium() + " [offset="
+         + reference.getAbsoluteMediumOffset() + ", byteCount=" + byteCount + "]. Only " + bytesRead
+         + " were read before EOF.";
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#cache(com.github.jmeta.library.media.api.types.MediumOffset,
+    *      long)
+    */
+   @Override
+   public void cache(MediumOffset reference, long size) throws EndOfMediumException {
+
+      m_cache.cache(reference, (int) size);
+   }
+
+   private DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, Field<?> headerField) {
+
+      String concreteLocalId = "";
+      try {
+         concreteLocalId = headerField.getInterpretedValue().toString();
+      } catch (BinaryValueConversionException e) {
+         // Silently ignore: The local id remains by its previous value
+         LOGGER.warn(LOGGING_BINARY_TO_INTERPRETED_FAILED, headerField.getId());
+         LOGGER.error("concreteBlockIdFromGenericId", e);
+      }
+
+      String concreteGlobalId = genericBlockId.getGlobalId().replace(genericBlockId.getLocalId(), concreteLocalId);
+
+      return new DataBlockId(genericBlockId.getDataFormat(), concreteGlobalId);
+   }
+
+   private DataBlockDescription createUnknownFieldDescription(DataBlockId parentId) {
+
+      DataBlockId unknownBlockId = new DataBlockId(m_spec.getDataFormat(), parentId,
+         DataFormatSpecification.UNKNOWN_FIELD_ID);
+
+      FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
+         null, null, null, null, null, false, DataBlockDescription.UNDEFINED, null);
+
+      return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
+         DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<>(),
+         unknownFieldProperties, 1, 1, DataBlockDescription.UNDEFINED, DataBlockDescription.UNDEFINED, false);
+   }
+
+   private long determineActualFieldSize(DataBlockDescription fieldDesc, DataBlockId parentId,
+      FieldFunctionStack context, long remainingDirectParentByteCount, MediumOffset reference, ByteOrder byteOrder,
+      Charset characterEncoding) {
+
+      long actualBlockSize = DataBlockDescription.UNDEFINED;
+
+      // Field has a dynamic size which is determined by further context information
+      if (!fieldDesc.hasFixedSize()) {
+         // Search for a SIZE_OF function, i.e. the size of the current field is
+         // determined by the value of a field already read before
+         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.SIZE_OF)) {
+            actualBlockSize = getSizeFromFieldFunction(context, fieldDesc.getId(), parentId);
+         } else {
+            DataBlockId matchingGenericId = m_spec.getMatchingGenericId(fieldDesc.getId());
+
+            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, FieldFunctionType.SIZE_OF)) {
+               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
+            }
+         }
+
+         if (actualBlockSize == DataBlockDescription.UNDEFINED) {
+            final Character terminationCharacter = fieldDesc.getFieldProperties().getTerminationCharacter();
+
+            // Determine termination bytes from termination character
+            if (terminationCharacter != null) {
+               byte[] terminationBytes = Charsets.getBytesWithoutBOM(new String("" + terminationCharacter),
+                  characterEncoding);
+
+               actualBlockSize = getSizeUpToTerminationBytes(reference, byteOrder, terminationBytes,
+                  remainingDirectParentByteCount);
+            }
+         }
+      } else {
+         actualBlockSize = fieldDesc.getMinimumByteLength();
+      }
+
+      if (actualBlockSize == DataBlockDescription.UNDEFINED) {
+         actualBlockSize = remainingDirectParentByteCount;
+      }
+
+      return actualBlockSize;
+   }
+
+   private DataBlockId determineActualId(MediumOffset reference, DataBlockId id, FieldFunctionStack context,
+      long remainingParentByteCount, ByteOrder byteOrder, Charset characterEncoding) {
+
+      DataBlockDescription desc = m_spec.getDataBlockDescription(id);
+
+      if (desc.isGeneric()) {
+         DataBlockId idFieldId = findFirstIdField(id);
+
+         // CONFIG_CHECK For generic data blocks, exactly one child field with ID_OF(genericDataBlockId) must be defined
+         if (idFieldId == null) {
+            throw new IllegalStateException(
+               "For generic data block " + id + ", no child field with ID_OF function is defined.");
+         }
+
+         final DataBlockDescription idFieldDesc = m_spec.getDataBlockDescription(idFieldId);
+
+         long byteOffset = idFieldDesc.getByteOffsetFromStartOfContainer();
+
+         if (byteOffset == DataBlockDescription.UNDEFINED) {
+            throw new IllegalStateException("For generic data block " + id
+               + ", a LocationProperties object with the exact offset for its container parent " + id
+               + " must be specified.");
+         }
+
+         MediumOffset idFieldReference = reference.advance(byteOffset);
+
+         long actualFieldSize = determineActualFieldSize(idFieldDesc, id, context,
+            remainingParentByteCount - byteOffset, idFieldReference, byteOrder, characterEncoding);
+
+         if (actualFieldSize == DataBlockDescription.UNDEFINED) {
+            throw new IllegalStateException(
+               "Could not determine size of field " + idFieldId + " which stores the id of a generic data block");
+         }
+
+         // Read the field that defines the actual id for the container
+         ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
+         Charset currentCharacterEncoding = m_spec.getDefaultCharacterEncoding();
+
+         Field<?> idField = readField(idFieldReference, currentByteOrder, currentCharacterEncoding, idFieldDesc,
+            actualFieldSize, actualFieldSize);
+
+         return concreteBlockIdFromGenericId(id, idField);
+      }
+
+      return id;
+   }
+
+   private long determineActualOccurrences(DataBlockId parentId, DataBlockDescription desc,
+      FieldFunctionStack context) {
+
+      long minOccurrences = 0;
+      long maxOccurrences = 0;
+      long actualOccurrences = 0;
+
+      maxOccurrences = desc.getMaximumOccurrences();
+      minOccurrences = desc.getMinimumOccurrences();
+
+      // Data block has fixed amount of mandatory occurrences
+      if (minOccurrences == maxOccurrences) {
+         actualOccurrences = minOccurrences;
+      } else if (minOccurrences == 0 && maxOccurrences == 1) {
+         if (context.hasFieldFunction(desc.getId(), FieldFunctionType.PRESENCE_OF)) {
+            boolean present = context.popFieldFunction(desc.getId(), FieldFunctionType.PRESENCE_OF);
+
+            if (present) {
+               actualOccurrences = 1;
+            }
+         }
+      }
+
+      // Data block has a variable number of occurrences
+      else if (minOccurrences != maxOccurrences) {
+         if (context.hasFieldFunction(desc.getId(), FieldFunctionType.COUNT_OF)) {
+            final Long count = context.popFieldFunction(desc.getId(), FieldFunctionType.COUNT_OF);
+
+            actualOccurrences = (int) count.longValue();
+         }
+      }
+      return actualOccurrences;
+   }
+
+   /**
+    * @param payloadDesc
+    * @param parentId
+    * @param context
+    * @param headers
+    * @param footers
+    * @param remainingDirectParentByteCount
+    * @return the actual payload size
+    */
+   private long determineActualPayloadSize(DataBlockDescription payloadDesc, DataBlockId parentId,
+      FieldFunctionStack context, List<Header> headers, List<Header> footers, long remainingDirectParentByteCount) {
+
+      long actualBlockSize = DataBlockDescription.UNDEFINED;
+
+      // Payload has a dynamic size which is determined by further context information
+      if (!payloadDesc.hasFixedSize()) {
+         // Search for a SIZE_OF function, i.e. the size of the current payload is
+         // determined by the value of a field already read before
+         if (context.hasFieldFunction(payloadDesc.getId(), FieldFunctionType.SIZE_OF)) {
+            actualBlockSize = getSizeFromFieldFunction(context, payloadDesc.getId(), parentId);
+         } else {
+            DataBlockId matchingGenericId = m_spec.getMatchingGenericId(payloadDesc.getId());
+
+            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, FieldFunctionType.SIZE_OF)) {
+               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
+            }
+         }
+      } else {
+         actualBlockSize = payloadDesc.getMinimumByteLength();
+      }
+
+      if (actualBlockSize == DataBlockDescription.UNDEFINED) {
+         actualBlockSize = remainingDirectParentByteCount;
+      }
+
+      return actualBlockSize;
+   }
+
+   private DataBlockId findFirstIdField(DataBlockId parentId) {
+
+      DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
+
+      if (parentDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD)) {
+         for (int i = 0; i < parentDesc.getFieldProperties().getFieldFunctions().size(); ++i) {
+            FieldFunction function = parentDesc.getFieldProperties().getFieldFunctions().get(i);
+
+            if (function.getFieldFunctionType().equals(FieldFunctionType.ID_OF)) {
+               return parentId;
+            }
+         }
+      }
+
+      for (int i = 0; i < parentDesc.getOrderedChildren().size(); ++i) {
+         final DataBlockId id = findFirstIdField(parentDesc.getOrderedChildren().get(i).getId());
+         if (id != null) {
+            return id;
+         }
+      }
+
+      return null;
+   }
+
+   private int findTerminationBytes(ByteBuffer fieldBytes, final byte[] terminationBytes) {
+
+      int terminationStartIndex = 0;
+
+      byte[] terminationByteBuffer = new byte[terminationBytes.length];
+
+      // Find termination bytes - Only at offsets that are multiples of the termination byte length!
+      // Because this is interpreted as the size of one "character", especially for strings
+      // (e.g. UTF-16 null character consisting of two null bytes)
+      while (fieldBytes.hasRemaining()) {
+         int filledCount = terminationStartIndex % terminationBytes.length;
+
+         terminationByteBuffer[filledCount] = fieldBytes.get();
+
+         if (filledCount == terminationBytes.length - 1) {
+            if (Arrays.equals(terminationByteBuffer, terminationBytes)) {
+               return terminationStartIndex - terminationBytes.length + 1;
+            }
+         }
+
+         terminationStartIndex++;
+      }
+
+      return -1;
+   }
+
+   /**
+    * @return the {@link DataBlockFactory}
+    */
+   protected DataBlockFactory getDataBlockFactory() {
+
+      return m_dataBlockFactory;
+   }
+
+   /**
+    * @param actualDesc
+    * @return
+    */
+   private DataBlockDescription getPayloadDescription(DataBlockDescription actualDesc) {
+      List<DataBlockDescription> payloadDescs = actualDesc
+         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
+
+      if (payloadDescs.size() != 1) {
+         throw new IllegalStateException("For container parents, there must be a single data block of type PAYLOAD");
+      }
+
+      return payloadDescs.get(0);
+   }
+
+   private long getSizeFromFieldFunction(FieldFunctionStack context, DataBlockId sizeBlockId, DataBlockId parentId) {
+
+      long sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
+
+      final Long size = context.popFieldFunction(sizeBlockId, FieldFunctionType.SIZE_OF);
+
+      DataBlockDescription blockDesc = m_spec.getDataBlockDescription(sizeBlockId);
+
+      // The given SIZE_OF may be a total size of payload plus headers and /or footers
+      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
+      if (blockDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD_BASED_PAYLOAD)
+         || blockDesc.getPhysicalType().equals(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)) {
+         long totalSizeToSubtract = 0;
+
+         DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
+
+         List<DataBlockDescription> headerAndFooterDescs = parentDesc
+            .getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
+         headerAndFooterDescs.addAll(parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER));
+
+         for (int i = 0; i < headerAndFooterDescs.size(); ++i) {
+            DataBlockDescription headerOrFooterDesc = headerAndFooterDescs.get(i);
+
+            if (context.hasFieldFunction(headerOrFooterDesc.getId(), FieldFunctionType.SIZE_OF)) {
+               if (!headerOrFooterDesc.hasFixedSize()) {
+                  return DataBlockDescription.UNDEFINED;
+               }
+
+               long actualOccurrences = determineActualOccurrences(parentId, headerOrFooterDesc, context);
+
+               totalSizeToSubtract += actualOccurrences * headerOrFooterDesc.getMinimumByteLength();
+            }
+         }
+
+         sizeFromFieldFunction = size - totalSizeToSubtract;
+
+         if (sizeFromFieldFunction < 0) {
+            sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
+         }
+      } else {
+         sizeFromFieldFunction = size;
+      }
+
+      return sizeFromFieldFunction;
+   }
+
+   private long getSizeUpToTerminationBytes(MediumOffset reference, ByteOrder byteOrder, byte[] terminationBytes,
+      long remainingDirectParentByteCount) {
+
+      long sizeUpToEndOfTerminationBytes = 0;
+
+      Medium<?> medium = reference.getMedium();
+      MediumOffset currentReference = reference;
+
+      long currentlyRemainingDirectParentByteCount = remainingDirectParentByteCount;
+
+      if (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED) {
+         if (medium.getCurrentLength() != Medium.UNKNOWN_LENGTH) {
+            currentlyRemainingDirectParentByteCount = medium.getCurrentLength() - reference.getAbsoluteMediumOffset();
+         } else {
+
+         }
+      }
+
+      boolean terminationBytesFound = false;
+
+      while (!terminationBytesFound) {
+
+         int bytesToRead = (int) Math.min(currentlyRemainingDirectParentByteCount,
+            medium.getMaxReadWriteBlockSizeInBytes());
+         // This special case needs to be handled, otherwise we have an infinite wile loop...
+         bytesToRead = Math.max(bytesToRead, terminationBytes.length);
+
+         try {
+            m_cache.cache(currentReference, bytesToRead);
+         } catch (EndOfMediumException e) {
+            throw new RuntimeException("Unexpected end of medium", e);
+         }
+
+         // Special handling for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception,
+         // thus bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
+         if (bytesToRead == 0 || currentReference.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
+            && bytesToRead > currentReference.getMedium().getCurrentLength()
+               - currentReference.getAbsoluteMediumOffset()) {
+            bytesToRead = (int) (currentReference.getMedium().getCurrentLength()
+               - currentReference.getAbsoluteMediumOffset());
+         }
+
+         ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
+         bufferedBytes.order(byteOrder);
+
+         int findStartIndex = findTerminationBytes(bufferedBytes, terminationBytes);
+
+         terminationBytesFound = findStartIndex != -1;
+
+         if (terminationBytesFound) {
+            sizeUpToEndOfTerminationBytes += findStartIndex + terminationBytes.length;
+         } else {
+            // Using this bytes to advance count, we ensure to detect also termination bytes overlapping read blocks
+            int bytesToAdvance = bytesToRead - terminationBytes.length + 1;
+            sizeUpToEndOfTerminationBytes += bytesToAdvance;
+            currentlyRemainingDirectParentByteCount -= bytesToAdvance;
+
+            currentReference = currentReference.advance(bytesToAdvance);
+
+            // We have to cancel if we did not find termination bytes up to the end of the direct parent
+            if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED
+               && sizeUpToEndOfTerminationBytes >= remainingDirectParentByteCount) {
+               sizeUpToEndOfTerminationBytes = remainingDirectParentByteCount;
+               terminationBytesFound = true;
+            }
+         }
+      }
+
+      return sizeUpToEndOfTerminationBytes;
+
+      // boolean endOfMediumReached = false;
+      //
+      // // The block size read is adapted to be a multiple of the termination bytes' length,
+      // // to be sure the termination bytes are not split up between to subsequent read
+      // // blocks, but found in a single block read.
+      // int fittingBlockSize = m_maxFieldBlockSize + terminationBytes.length
+      // - m_maxFieldBlockSize % terminationBytes.length;
+      //
+      // while (!endOfMediumReached) {
+      // int bytesToRead = fittingBlockSize;
+      //
+      // long cachedByteCountAt = m_cache.getCachedByteCountAt(currentReference);
+      // // As long as no termination bytes are found: Cache from medium, if not already
+      // // done.
+      // try {
+      // // TODO: Problem using cache here - For potentially large terminated (lazy)
+      // // fields, the whole field would - at the end - be cached in memory. This
+      // // will cause an OutOfMemory condition soon. Instead, use a "checkedRead"
+      // // approach that won't memorize read bytes...
+      // if (cachedByteCountAt < bytesToRead) {
+      // m_cache.cache(currentReference, bytesToRead);
+      // }
+      // } catch (EndOfMediumException e) {
+      // bytesToRead = e.getByteCountActuallyRead();
+      //
+      // if (bytesToRead < cachedByteCountAt) {
+      // bytesToRead = (int) cachedByteCountAt;
+      // }
+      //
+      // // End condition for the loop
+      // endOfMediumReached = true;
+      // }
+      //
+      // // Workaround for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception, thus
+      // // bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
+      // if (bytesToRead == 0 || currentReference.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
+      // && bytesToRead > currentReference.getMedium().getCurrentLength()
+      // - currentReference.getAbsoluteMediumOffset()) {
+      // bytesToRead = (int) (currentReference.getMedium().getCurrentLength()
+      // - currentReference.getAbsoluteMediumOffset());
+      // }
+      //
+      // ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
+      // bufferedBytes.order(byteOrder);
+      //
+      // int findStartIndex = findTerminationBytes(bufferedBytes, terminationBytes);
+      //
+      // // Termination bytes have been found!
+      // if (findStartIndex != -1) {
+      // sizeUpToEndOfTerminationBytes += findStartIndex + terminationBytes.length;
+      //
+      // return sizeUpToEndOfTerminationBytes;
+      // }
+      //
+      // // Otherwise try to locate them in the next block read
+      // sizeUpToEndOfTerminationBytes += bytesToRead;
+      //
+      // // In case that the number of remaining bytes in the current field's parent
+      // // is known, the algorithm terminates already if this number is exceeded, instead
+      // // of reading further up to the end of medium and potentially spotting wrong
+      // // termination bytes already belonging to a subsequent field.
+      // if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED) {
+      // if (sizeUpToEndOfTerminationBytes >= remainingDirectParentByteCount) {
+      // return remainingDirectParentByteCount;
+      // }
+      // }
+      //
+      // currentReference = currentReference.advance(bytesToRead);
+      // }
+      //
+      // return DataBlockDescription.UNDEFINED;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#getSpecification()
+    */
+   @Override
+   public DataFormatSpecification getSpecification() {
+
+      return m_spec;
    }
 
    /**
@@ -111,8 +614,9 @@ public class StandardDataBlockReader implements DataBlockReader {
          // left the parent for its magic key.
          if (forwardRead) {
             if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED
-               && magicKeySizeInBytes > remainingDirectParentByteCount)
+               && magicKeySizeInBytes > remainingDirectParentByteCount) {
                return false;
+            }
          } else {
             if (reference.getAbsoluteMediumOffset() + magicKey.getDeltaOffset() < 0) {
                return false;
@@ -139,9 +643,45 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumOffset, boolean)
+    */
+   @Override
+   public boolean identifiesDataFormat(MediumOffset reference, boolean forwardRead) {
+
+      List<DataBlockDescription> topLevelContainerDescs = m_spec.getTopLevelDataBlockDescriptions();
+
+      for (int i = 0; i < topLevelContainerDescs.size(); ++i) {
+         DataBlockDescription desc = topLevelContainerDescs.get(i);
+
+         // TODO stage2_010: What value should remaining parent byte count really have here?
+         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNDEFINED, forwardRead)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumOffset,
+    *      int)
+    */
+   @Override
+   public ByteBuffer readBytes(MediumOffset reference, int size) {
+
+      Reject.ifNull(reference, "reference");
+
+      try {
+         return m_cache.getData(reference, size);
+      } catch (EndOfMediumException e) {
+         throw new RuntimeException("Unexpected end of medium", e);
+      }
+   }
+
+   /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
     * {@link MediumOffset} or null. If the {@link Container}s presence is optional, its actual presence is determined
-    * 
+    *
     * @param parent
     */
    @Override
@@ -159,8 +699,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       FieldFunctionStack theContext = context;
 
-      if (theContext == null)
+      if (theContext == null) {
          theContext = new FieldFunctionStack();
+      }
 
       // Read headers
       MediumOffset nextReference = reference;
@@ -242,23 +783,6 @@ public class StandardDataBlockReader implements DataBlockReader {
       return m_dataBlockFactory.createContainer(actualId, parent, reference, headers, payload, footers, this);
    }
 
-   /**
-    * @param actualDesc
-    * @return
-    */
-   private DataBlockDescription getPayloadDescription(DataBlockDescription actualDesc) {
-      List<DataBlockDescription> payloadDescs = actualDesc
-         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
-
-      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
-
-      if (payloadDescs.size() != 1) {
-         throw new IllegalStateException("For container parents, there must be a single data block of type PAYLOAD");
-      }
-
-      return payloadDescs.get(0);
-   }
-
    // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
    // readPayloadBackwards
    @Override
@@ -275,8 +799,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       FieldFunctionStack theContext = context;
 
-      if (theContext == null)
+      if (theContext == null) {
          theContext = new FieldFunctionStack();
+      }
 
       // Read footers
       MediumOffset nextReference = reference;
@@ -323,8 +848,9 @@ public class StandardDataBlockReader implements DataBlockReader {
       payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
 
       // CONFIG_CHECK: Any container must specify a single PAYLOAD block
-      if (payloadDescs.size() != 1)
+      if (payloadDescs.size() != 1) {
          throw new IllegalStateException("For container parents, there must be a single data block of type PAYLOAD");
+      }
 
       DataBlockDescription payloadDesc = payloadDescs.get(0);
 
@@ -374,29 +900,133 @@ public class StandardDataBlockReader implements DataBlockReader {
       return container;
    }
 
-   // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
-   // readPayloadBackwards
+   private Field<?> readField(final MediumOffset reference, ByteOrder currentByteOrder, Charset currentCharset,
+      DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount) {
+
+      ByteBuffer fieldBuffer = null;
+
+      try {
+         if (remainingDirectParentByteCount > fieldSize) {
+            if (fieldSize <= m_maxFieldBlockSize) {
+               if (m_cache.getCachedByteCountAt(reference) >= 1) {
+                  if (m_cache.getCachedByteCountAt(reference) < fieldSize) {
+                     cache(reference, fieldSize);
+                  }
+               } else {
+                  cache(reference, Math.min(remainingDirectParentByteCount, m_maxFieldBlockSize));
+               }
+            }
+         }
+
+         else {
+            if (m_cache.getCachedByteCountAt(reference) < fieldSize) {
+               if (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED) {
+                  cache(reference, fieldSize);
+               } else {
+                  cache(reference, remainingDirectParentByteCount);
+               }
+            }
+         }
+      } catch (EndOfMediumException e) {
+         throw new IllegalStateException(
+            buildEOFExceptionMessage(reference, e.getByteCountTriedToRead(), e.getByteCountActuallyRead()));
+      }
+
+      // A lazy field is created if the field size exceeds a maximum size
+      if (fieldSize > m_maxFieldBlockSize) {
+         return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, currentByteOrder,
+            currentCharset);
+      }
+
+      fieldBuffer = readBytes(reference, (int) fieldSize);
+
+      return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer,
+         currentByteOrder, currentCharset);
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumOffset,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, FieldFunctionStack, long)
+    */
    @Override
-   public Payload readPayloadBackwards(MediumOffset reference, DataBlockId id, DataBlockId parentId,
-      List<Header> footers, FieldFunctionStack context, long remainingDirectParentByteCount) {
+   public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, FieldFunctionStack context,
+      long remainingDirectParentByteCount) {
 
-      Reject.ifNull(footers, "footers");
-      Reject.ifNull(id, "id");
-      Reject.ifNull(reference, "reference");
+      DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
 
-      DataBlockDescription payloadDesc = m_spec.getDataBlockDescription(id);
+      List<DataBlockDescription> fieldChildren = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
 
-      long totalPayloadSize = determineActualPayloadSize(payloadDesc, parentId, context, footers, null,
-         remainingDirectParentByteCount);
+      List<Field<?>> fields = new ArrayList<>();
 
-      if (totalPayloadSize == DataBlockDescription.UNDEFINED)
-         throw new IllegalStateException("Payload size could not be determined");
+      MediumOffset currentFieldReference = reference;
+      ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
+      Charset currentCharset = m_spec.getDefaultCharacterEncoding();
+      ByteOrder actualByteOrder = currentByteOrder;
+      Charset actualCharacterEncoding = currentCharset;
 
-      final Payload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(),
-         m_cache.createMediumOffset(reference.getAbsoluteMediumOffset() - totalPayloadSize), totalPayloadSize, this,
-         context);
+      long currentlyRemainingParentByteCount = remainingDirectParentByteCount;
 
-      return createPayloadAfterRead;
+      for (int i = 0; i < fieldChildren.size(); ++i) {
+         DataBlockDescription fieldDesc = fieldChildren.get(i);
+
+         // Update current character encoding via CHARACTER_ENCODING_OF
+         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF)) {
+            String charsetName = context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF);
+            currentCharset = Charset.forName(charsetName);
+         }
+
+         // Update current byte order via BYTE_ORDER_OF
+         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF)) {
+            currentByteOrder = ByteOrders
+               .fromString(context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF));
+         }
+
+         // Fixed charset and byte order override currently set charset or byte order
+         actualByteOrder = currentByteOrder;
+         actualCharacterEncoding = currentCharset;
+
+         final ByteOrder fixedByteOrder = fieldDesc.getFieldProperties().getFixedByteOrder();
+
+         if (fixedByteOrder != null) {
+            actualByteOrder = fixedByteOrder;
+         }
+
+         final Charset fixedCharset = fieldDesc.getFieldProperties().getFixedCharacterEncoding();
+
+         if (fixedCharset != null) {
+            actualCharacterEncoding = fixedCharset;
+         }
+
+         long actualOccurrences = determineActualOccurrences(parentId, fieldDesc, context);
+
+         for (long j = 0; j < actualOccurrences; j++) {
+            long fieldSize = determineActualFieldSize(fieldDesc, parentId, context, currentlyRemainingParentByteCount,
+               currentFieldReference, actualByteOrder, actualCharacterEncoding);
+
+            Field<?> newField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding, fieldDesc,
+               fieldSize, currentlyRemainingParentByteCount);
+
+            context.pushFieldFunctions(fieldDesc, newField);
+
+            fields.add(newField);
+
+            if (currentlyRemainingParentByteCount != DataBlockDescription.UNDEFINED) {
+               currentlyRemainingParentByteCount -= fieldSize;
+            }
+
+            currentFieldReference = currentFieldReference.advance(fieldSize);
+         }
+      }
+
+      if (currentlyRemainingParentByteCount > 0) {
+         Field<?> unknownField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding,
+            createUnknownFieldDescription(parentId), currentlyRemainingParentByteCount,
+            currentlyRemainingParentByteCount);
+
+         fields.add(unknownField);
+      }
+
+      return fields;
    }
 
    @Override
@@ -460,85 +1090,38 @@ public class StandardDataBlockReader implements DataBlockReader {
       return m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(), reference, totalPayloadSize, this, context);
    }
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, FieldFunctionStack, long)
-    */
+   // TODO primeRefactor002: Refactor and check readContainerWithIdBackwards as well as
+   // readPayloadBackwards
    @Override
-   public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, FieldFunctionStack context,
-      long remainingDirectParentByteCount) {
+   public Payload readPayloadBackwards(MediumOffset reference, DataBlockId id, DataBlockId parentId,
+      List<Header> footers, FieldFunctionStack context, long remainingDirectParentByteCount) {
 
-      DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
+      Reject.ifNull(footers, "footers");
+      Reject.ifNull(id, "id");
+      Reject.ifNull(reference, "reference");
 
-      List<DataBlockDescription> fieldChildren = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
+      DataBlockDescription payloadDesc = m_spec.getDataBlockDescription(id);
 
-      List<Field<?>> fields = new ArrayList<>();
+      long totalPayloadSize = determineActualPayloadSize(payloadDesc, parentId, context, footers, null,
+         remainingDirectParentByteCount);
 
-      MediumOffset currentFieldReference = reference;
-      ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
-      Charset currentCharset = m_spec.getDefaultCharacterEncoding();
-      ByteOrder actualByteOrder = currentByteOrder;
-      Charset actualCharacterEncoding = currentCharset;
-
-      long currentlyRemainingParentByteCount = remainingDirectParentByteCount;
-
-      for (int i = 0; i < fieldChildren.size(); ++i) {
-         DataBlockDescription fieldDesc = fieldChildren.get(i);
-
-         // Update current character encoding via CHARACTER_ENCODING_OF
-         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF)) {
-            String charsetName = context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF);
-            currentCharset = Charset.forName(charsetName);
-         }
-
-         // Update current byte order via BYTE_ORDER_OF
-         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF))
-            currentByteOrder = ByteOrders
-               .fromString(context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF));
-
-         // Fixed charset and byte order override currently set charset or byte order
-         actualByteOrder = currentByteOrder;
-         actualCharacterEncoding = currentCharset;
-
-         final ByteOrder fixedByteOrder = fieldDesc.getFieldProperties().getFixedByteOrder();
-
-         if (fixedByteOrder != null)
-            actualByteOrder = fixedByteOrder;
-
-         final Charset fixedCharset = fieldDesc.getFieldProperties().getFixedCharacterEncoding();
-
-         if (fixedCharset != null)
-            actualCharacterEncoding = fixedCharset;
-
-         long actualOccurrences = determineActualOccurrences(parentId, fieldDesc, context);
-
-         for (long j = 0; j < actualOccurrences; j++) {
-            long fieldSize = determineActualFieldSize(fieldDesc, parentId, context, currentlyRemainingParentByteCount,
-               currentFieldReference, actualByteOrder, actualCharacterEncoding);
-
-            Field<?> newField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding, fieldDesc,
-               fieldSize, currentlyRemainingParentByteCount);
-
-            context.pushFieldFunctions(fieldDesc, newField);
-
-            fields.add(newField);
-
-            if (currentlyRemainingParentByteCount != DataBlockDescription.UNDEFINED)
-               currentlyRemainingParentByteCount -= fieldSize;
-
-            currentFieldReference = currentFieldReference.advance(fieldSize);
-         }
+      if (totalPayloadSize == DataBlockDescription.UNDEFINED) {
+         throw new IllegalStateException("Payload size could not be determined");
       }
 
-      if (currentlyRemainingParentByteCount > 0) {
-         Field<?> unknownField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding,
-            createUnknownFieldDescription(parentId), currentlyRemainingParentByteCount,
-            currentlyRemainingParentByteCount);
+      final Payload createPayloadAfterRead = m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(),
+         m_cache.createMediumOffset(reference.getAbsoluteMediumOffset() - totalPayloadSize), totalPayloadSize, this,
+         context);
 
-         fields.add(unknownField);
-      }
+      return createPayloadAfterRead;
+   }
 
-      return fields;
+   @Override
+   public void setMaxFieldBlockSize(int maxFieldBlockSize) {
+
+      Reject.ifNull(maxFieldBlockSize, "maxFieldBlockSize");
+
+      m_maxFieldBlockSize = maxFieldBlockSize;
    }
 
    /**
@@ -550,507 +1133,5 @@ public class StandardDataBlockReader implements DataBlockReader {
       Reject.ifNull(cache, "cache");
 
       m_cache = cache;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumOffset, boolean)
-    */
-   @Override
-   public boolean identifiesDataFormat(MediumOffset reference, boolean forwardRead) {
-
-      List<DataBlockDescription> topLevelContainerDescs = m_spec.getTopLevelDataBlockDescriptions();
-
-      for (int i = 0; i < topLevelContainerDescs.size(); ++i) {
-         DataBlockDescription desc = topLevelContainerDescs.get(i);
-
-         // TODO stage2_010: What value should remaining parent byte count really have here?
-         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNDEFINED, forwardRead))
-            return true;
-      }
-
-      return false;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#getSpecification()
-    */
-   @Override
-   public DataFormatSpecification getSpecification() {
-
-      return m_spec;
-   }
-
-   private Field<?> readField(final MediumOffset reference, ByteOrder currentByteOrder, Charset currentCharset,
-      DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount) {
-
-      ByteBuffer fieldBuffer = null;
-
-      try {
-         if (remainingDirectParentByteCount > fieldSize) {
-            if (fieldSize <= m_maxFieldBlockSize) {
-               if (m_cache.getCachedByteCountAt(reference) >= 1) {
-                  if (m_cache.getCachedByteCountAt(reference) < fieldSize)
-                     cache(reference, fieldSize);
-               }
-
-               else
-                  cache(reference, Math.min(remainingDirectParentByteCount, m_maxFieldBlockSize));
-            }
-         }
-
-         else {
-            if (m_cache.getCachedByteCountAt(reference) < fieldSize)
-               if (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED)
-                  cache(reference, fieldSize);
-
-               else
-                  cache(reference, remainingDirectParentByteCount);
-         }
-      } catch (EndOfMediumException e) {
-         throw new IllegalStateException(
-            buildEOFExceptionMessage(reference, e.getByteCountTriedToRead(), e.getByteCountActuallyRead()));
-      }
-
-      // A lazy field is created if the field size exceeds a maximum size
-      if (fieldSize > m_maxFieldBlockSize)
-         return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, currentByteOrder,
-            currentCharset);
-
-      fieldBuffer = readBytes(reference, (int) fieldSize);
-
-      return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer,
-         currentByteOrder, currentCharset);
-   }
-
-   private long getSizeFromFieldFunction(FieldFunctionStack context, DataBlockId sizeBlockId, DataBlockId parentId) {
-
-      long sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
-
-      final Long size = context.popFieldFunction(sizeBlockId, FieldFunctionType.SIZE_OF);
-
-      DataBlockDescription blockDesc = m_spec.getDataBlockDescription(sizeBlockId);
-
-      // The given SIZE_OF may be a total size of payload plus headers and /or footers
-      // FIXME: FIELD_BASED and CONTAINER_BASED_PAYLOAD
-      if (blockDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD_BASED_PAYLOAD)
-         || blockDesc.getPhysicalType().equals(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD)) {
-         long totalSizeToSubtract = 0;
-
-         DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
-
-         List<DataBlockDescription> headerAndFooterDescs = parentDesc
-            .getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
-         headerAndFooterDescs.addAll(parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER));
-
-         for (int i = 0; i < headerAndFooterDescs.size(); ++i) {
-            DataBlockDescription headerOrFooterDesc = headerAndFooterDescs.get(i);
-
-            if (context.hasFieldFunction(headerOrFooterDesc.getId(), FieldFunctionType.SIZE_OF)) {
-               if (!headerOrFooterDesc.hasFixedSize())
-                  return DataBlockDescription.UNDEFINED;
-
-               long actualOccurrences = determineActualOccurrences(parentId, headerOrFooterDesc, context);
-
-               totalSizeToSubtract += actualOccurrences * headerOrFooterDesc.getMinimumByteLength();
-            }
-         }
-
-         sizeFromFieldFunction = size - totalSizeToSubtract;
-
-         if (sizeFromFieldFunction < 0)
-            sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
-      }
-
-      else
-         sizeFromFieldFunction = size;
-
-      return sizeFromFieldFunction;
-   }
-
-   /**
-    * @param containerId
-    * @param context
-    * @param footers
-    */
-   protected void afterFooterReading(DataBlockId containerId, FieldFunctionStack context, List<Header> footers) {
-
-      // Default behavior: Do nothing. This method is intended to be overridden by a
-      // data format specific implementation.
-   }
-
-   /**
-    * @param containerId
-    * @param context
-    * @param headers
-    */
-   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
-
-      // Default behavior: Do nothing. This method is intended to be overridden by a
-      // data format specific implementation.
-   }
-
-   /**
-    * @param payloadDesc
-    * @param parentId
-    * @param context
-    * @param headers
-    * @param footers
-    * @param remainingDirectParentByteCount
-    * @return the actual payload size
-    */
-   private long determineActualPayloadSize(DataBlockDescription payloadDesc, DataBlockId parentId,
-      FieldFunctionStack context, List<Header> headers, List<Header> footers, long remainingDirectParentByteCount) {
-
-      long actualBlockSize = DataBlockDescription.UNDEFINED;
-
-      // Payload has a dynamic size which is determined by further context information
-      if (!payloadDesc.hasFixedSize()) {
-         // Search for a SIZE_OF function, i.e. the size of the current payload is
-         // determined by the value of a field already read before
-         if (context.hasFieldFunction(payloadDesc.getId(), FieldFunctionType.SIZE_OF))
-            actualBlockSize = getSizeFromFieldFunction(context, payloadDesc.getId(), parentId);
-
-         // If a size could not be determined this way, try the generic id
-         else {
-            DataBlockId matchingGenericId = m_spec.getMatchingGenericId(payloadDesc.getId());
-
-            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, FieldFunctionType.SIZE_OF))
-               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
-         }
-      }
-
-      // Static length: Payload has always the same length
-      else
-         actualBlockSize = payloadDesc.getMinimumByteLength();
-
-      if (actualBlockSize == DataBlockDescription.UNDEFINED)
-         actualBlockSize = remainingDirectParentByteCount;
-
-      return actualBlockSize;
-   }
-
-   private long determineActualFieldSize(DataBlockDescription fieldDesc, DataBlockId parentId,
-      FieldFunctionStack context, long remainingDirectParentByteCount, MediumOffset reference, ByteOrder byteOrder,
-      Charset characterEncoding) {
-
-      long actualBlockSize = DataBlockDescription.UNDEFINED;
-
-      // Field has a dynamic size which is determined by further context information
-      if (!fieldDesc.hasFixedSize()) {
-         // Search for a SIZE_OF function, i.e. the size of the current field is
-         // determined by the value of a field already read before
-         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.SIZE_OF))
-            actualBlockSize = getSizeFromFieldFunction(context, fieldDesc.getId(), parentId);
-
-         // If a size could not be determined this way, try the generic id
-         else {
-            DataBlockId matchingGenericId = m_spec.getMatchingGenericId(fieldDesc.getId());
-
-            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, FieldFunctionType.SIZE_OF))
-               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
-         }
-
-         if (actualBlockSize == DataBlockDescription.UNDEFINED) {
-            final Character terminationCharacter = fieldDesc.getFieldProperties().getTerminationCharacter();
-
-            // Determine termination bytes from termination character
-            if (terminationCharacter != null) {
-               byte[] terminationBytes = Charsets.getBytesWithoutBOM(new String("" + terminationCharacter),
-                  characterEncoding);
-
-               actualBlockSize = getSizeUpToTerminationBytes(reference, byteOrder, terminationBytes,
-                  remainingDirectParentByteCount);
-            }
-         }
-      }
-
-      // Static length: Field has always the same length
-      else
-         actualBlockSize = fieldDesc.getMinimumByteLength();
-
-      if (actualBlockSize == DataBlockDescription.UNDEFINED)
-         actualBlockSize = remainingDirectParentByteCount;
-
-      return actualBlockSize;
-   }
-
-   private long getSizeUpToTerminationBytes(MediumOffset reference, ByteOrder byteOrder, byte[] terminationBytes,
-      long remainingDirectParentByteCount) {
-
-      long sizeUpToTerminationBytes = 0;
-
-      MediumOffset currentReference = reference;
-
-      boolean endOfMediumReached = false;
-
-      // The block size read is adapted to be a multiple of the termination bytes' length,
-      // to be sure the termination bytes are not split up between to subsequent read
-      // blocks, but found in a single block read.
-      int fittingBlockSize = m_maxFieldBlockSize + terminationBytes.length
-         - m_maxFieldBlockSize % terminationBytes.length;
-
-      while (!endOfMediumReached) {
-         int bytesToRead = fittingBlockSize;
-
-         long cachedByteCountAt = m_cache.getCachedByteCountAt(currentReference);
-         // As long as no termination bytes are found: Cache from medium, if not already
-         // done.
-         try {
-            // TODO: Problem using cache here - For potentially large terminated (lazy)
-            // fields, the whole field would - at the end - be cached in memory. This
-            // will cause an OutOfMemory condition soon. Instead, use a "checkedRead"
-            // approach that won't memorize read bytes...
-            if (cachedByteCountAt < bytesToRead)
-               m_cache.cache(currentReference, bytesToRead);
-         } catch (EndOfMediumException e) {
-            bytesToRead = (int) e.getByteCountActuallyRead();
-
-            if (bytesToRead < cachedByteCountAt) {
-               bytesToRead = (int) cachedByteCountAt;
-            }
-
-            // End condition for the loop
-            endOfMediumReached = true;
-         }
-
-         // Workaround for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception, thus
-         // bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
-         if (bytesToRead == 0 || (currentReference.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
-            && bytesToRead > currentReference.getMedium().getCurrentLength()
-               - currentReference.getAbsoluteMediumOffset())) {
-            bytesToRead = (int) (currentReference.getMedium().getCurrentLength()
-               - currentReference.getAbsoluteMediumOffset());
-         }
-
-         ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
-         bufferedBytes.order(byteOrder);
-
-         int findStartIndex = findTerminationBytes(bufferedBytes, terminationBytes);
-
-         // Termination bytes have been found!
-         if (findStartIndex != -1) {
-            sizeUpToTerminationBytes += findStartIndex + terminationBytes.length;
-
-            return sizeUpToTerminationBytes;
-         }
-
-         // Otherwise try to locate them in the next block read
-         sizeUpToTerminationBytes += bytesToRead;
-
-         // In case that the number of remaining bytes in the current field's parent
-         // is known, the algorithm terminates already if this number is exceeded, instead
-         // of reading further up to the end of medium and potentially spotting wrong
-         // termination bytes already belonging to a subsequent field.
-         if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED)
-            if (sizeUpToTerminationBytes >= remainingDirectParentByteCount)
-               return remainingDirectParentByteCount;
-
-         currentReference = currentReference.advance(bytesToRead);
-      }
-
-      return DataBlockDescription.UNDEFINED;
-   }
-
-   private int findTerminationBytes(ByteBuffer fieldBytes, final byte[] terminationBytes) {
-
-      int terminationStartIndex = 0;
-
-      byte[] terminationByteBuffer = new byte[terminationBytes.length];
-
-      // Find termination bytes - Only at offsets that are multiples of the termination byte length!
-      // Because this is interpreted as the size of one "character", especially for strings
-      // (e.g. UTF-16 null character consisting of two null bytes)
-      while (fieldBytes.hasRemaining()) {
-         int filledCount = terminationStartIndex % terminationBytes.length;
-
-         terminationByteBuffer[filledCount] = fieldBytes.get();
-
-         if (filledCount == terminationBytes.length - 1)
-            if (Arrays.equals(terminationByteBuffer, terminationBytes))
-               return terminationStartIndex - terminationBytes.length + 1;
-
-         terminationStartIndex++;
-      }
-
-      return -1;
-   }
-
-   private DataBlockId determineActualId(MediumOffset reference, DataBlockId id, FieldFunctionStack context,
-      long remainingParentByteCount, ByteOrder byteOrder, Charset characterEncoding) {
-
-      DataBlockDescription desc = m_spec.getDataBlockDescription(id);
-
-      if (desc.isGeneric()) {
-         DataBlockId idFieldId = findFirstIdField(id);
-
-         // CONFIG_CHECK For generic data blocks, exactly one child field with ID_OF(genericDataBlockId) must be defined
-         if (idFieldId == null)
-            throw new IllegalStateException(
-               "For generic data block " + id + ", no child field with ID_OF function is defined.");
-
-         final DataBlockDescription idFieldDesc = m_spec.getDataBlockDescription(idFieldId);
-
-         long byteOffset = idFieldDesc.getByteOffsetFromStartOfContainer();
-
-         if (byteOffset == DataBlockDescription.UNDEFINED)
-            throw new IllegalStateException("For generic data block " + id
-               + ", a LocationProperties object with the exact offset for its container parent " + id
-               + " must be specified.");
-
-         MediumOffset idFieldReference = reference.advance(byteOffset);
-
-         long actualFieldSize = determineActualFieldSize(idFieldDesc, id, context,
-            remainingParentByteCount - byteOffset, idFieldReference, byteOrder, characterEncoding);
-
-         if (actualFieldSize == DataBlockDescription.UNDEFINED)
-            throw new IllegalStateException(
-               "Could not determine size of field " + idFieldId + " which stores the id of a generic data block");
-
-         // Read the field that defines the actual id for the container
-         ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
-         Charset currentCharacterEncoding = m_spec.getDefaultCharacterEncoding();
-
-         Field<?> idField = readField(idFieldReference, currentByteOrder, currentCharacterEncoding, idFieldDesc,
-            actualFieldSize, actualFieldSize);
-
-         return concreteBlockIdFromGenericId(id, idField);
-      }
-
-      return id;
-   }
-
-   private DataBlockId findFirstIdField(DataBlockId parentId) {
-
-      DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
-
-      if (parentDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD)) {
-         for (int i = 0; i < parentDesc.getFieldProperties().getFieldFunctions().size(); ++i) {
-            FieldFunction function = parentDesc.getFieldProperties().getFieldFunctions().get(i);
-
-            if (function.getFieldFunctionType().equals(FieldFunctionType.ID_OF))
-               return parentId;
-         }
-      }
-
-      for (int i = 0; i < parentDesc.getOrderedChildren().size(); ++i) {
-         final DataBlockId id = findFirstIdField(parentDesc.getOrderedChildren().get(i).getId());
-         if (id != null)
-            return id;
-      }
-
-      return null;
-   }
-
-   private long determineActualOccurrences(DataBlockId parentId, DataBlockDescription desc,
-      FieldFunctionStack context) {
-
-      long minOccurrences = 0;
-      long maxOccurrences = 0;
-      long actualOccurrences = 0;
-
-      maxOccurrences = desc.getMaximumOccurrences();
-      minOccurrences = desc.getMinimumOccurrences();
-
-      // Data block has fixed amount of mandatory occurrences
-      if (minOccurrences == maxOccurrences)
-         actualOccurrences = minOccurrences;
-
-      // Data block is optional
-      else if (minOccurrences == 0 && maxOccurrences == 1) {
-         if (context.hasFieldFunction(desc.getId(), FieldFunctionType.PRESENCE_OF)) {
-            boolean present = context.popFieldFunction(desc.getId(), FieldFunctionType.PRESENCE_OF);
-
-            if (present)
-               actualOccurrences = 1;
-         }
-      }
-
-      // Data block has a variable number of occurrences
-      else if (minOccurrences != maxOccurrences) {
-         if (context.hasFieldFunction(desc.getId(), FieldFunctionType.COUNT_OF)) {
-            final Long count = context.popFieldFunction(desc.getId(), FieldFunctionType.COUNT_OF);
-
-            actualOccurrences = (int) count.longValue();
-         }
-      }
-      return actualOccurrences;
-   }
-
-   private DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, Field<?> headerField) {
-
-      String concreteLocalId = "";
-      try {
-         concreteLocalId = headerField.getInterpretedValue().toString();
-      } catch (BinaryValueConversionException e) {
-         // Silently ignore: The local id remains by its previous value
-         LOGGER.warn(LOGGING_BINARY_TO_INTERPRETED_FAILED, headerField.getId());
-         LOGGER.error("concreteBlockIdFromGenericId", e);
-      }
-
-      String concreteGlobalId = genericBlockId.getGlobalId().replace(genericBlockId.getLocalId(), concreteLocalId);
-
-      return new DataBlockId(genericBlockId.getDataFormat(), concreteGlobalId);
-   }
-
-   private DataBlockDescription createUnknownFieldDescription(DataBlockId parentId) {
-
-      DataBlockId unknownBlockId = new DataBlockId(m_spec.getDataFormat(), parentId,
-         DataFormatSpecification.UNKNOWN_FIELD_ID);
-
-      FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
-         null, null, null, null, null, false, DataBlockDescription.UNDEFINED, null);
-
-      return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
-         DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<>(),
-         unknownFieldProperties, 1, 1, DataBlockDescription.UNDEFINED, DataBlockDescription.UNDEFINED, false);
-   }
-
-   private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {
-
-      return "Unexpected EOF occurred during read from medium " + reference.getMedium() + " [offset="
-         + reference.getAbsoluteMediumOffset() + ", byteCount=" + byteCount + "]. Only " + bytesRead
-         + " were read before EOF.";
-   }
-
-   private DataBlockFactory m_dataBlockFactory;
-
-   private final DataFormatSpecification m_spec;
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      int)
-    */
-   @Override
-   public ByteBuffer readBytes(MediumOffset reference, int size) {
-
-      Reject.ifNull(reference, "reference");
-
-      try {
-         return m_cache.getData(reference, size);
-      } catch (EndOfMediumException e) {
-         throw new RuntimeException("Unexpected end of medium", e);
-      }
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#cache(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      long)
-    */
-   @Override
-   public void cache(MediumOffset reference, long size) throws EndOfMediumException {
-
-      m_cache.cache(reference, (int) size);
-   }
-
-   protected MediumStore m_cache;
-
-   private int m_maxFieldBlockSize;
-
-   @Override
-   public void setMaxFieldBlockSize(int maxFieldBlockSize) {
-
-      Reject.ifNull(maxFieldBlockSize, "maxFieldBlockSize");
-
-      m_maxFieldBlockSize = maxFieldBlockSize;
    }
 }
