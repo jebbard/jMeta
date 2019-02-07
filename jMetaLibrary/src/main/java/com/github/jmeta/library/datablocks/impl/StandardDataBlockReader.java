@@ -448,7 +448,8 @@ public class StandardDataBlockReader implements DataBlockReader {
          remainingDirectParentByteCount);
 
       // If the medium is a stream-based medium, all the payload bytes must be cached first
-      if (!m_cache.getMedium().isRandomAccess() && totalPayloadSize != DataBlockDescription.UNDEFINED) {
+      if (!m_cache.getMedium().isRandomAccess() && totalPayloadSize != DataBlockDescription.UNDEFINED
+         && totalPayloadSize != 0) {
          try {
             cache(reference, totalPayloadSize);
          } catch (EndOfMediumException e) {
