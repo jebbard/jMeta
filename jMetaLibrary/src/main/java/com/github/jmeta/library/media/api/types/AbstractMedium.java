@@ -14,17 +14,11 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link AbstractMedium} represents a physical medium where binary data can be stored.
- * 
+ *
  * @param <T>
  *           The concrete type of wrapped medium object.
  */
 public abstract class AbstractMedium<T> implements Medium<T> {
-
-   private T medium;
-
-   private final String name;
-
-   private final boolean requiresCaching;
 
    private final boolean isRandomAccess;
 
@@ -34,10 +28,16 @@ public abstract class AbstractMedium<T> implements Medium<T> {
 
    private final int maxReadWriteBlockSizeInBytes;
 
+   private T medium;
+
+   private final String name;
+
+   private final boolean requiresCaching;
+
    /**
     * Creates a new {@link AbstractMedium} with default values used for all configuration values, see
     * {@link #getMaxCacheSizeInBytes()} and {@link #getMaxReadWriteBlockSizeInBytes()}.
-    * 
+    *
     * @param medium
     *           see {@link #AbstractMedium(Object, String, boolean, boolean, boolean, long, int)}
     * @param name
@@ -56,7 +56,7 @@ public abstract class AbstractMedium<T> implements Medium<T> {
 
    /**
     * Creates a new {@link AbstractMedium}, using explicit values for all properties.
-    * 
+    *
     * @param medium
     *           The underlying raw medium object
     * @param name
@@ -89,18 +89,6 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    }
 
    /**
-    * @see java.lang.Object#hashCode()
-    */
-   @Override
-   public int hashCode() {
-
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((medium == null) ? 0 : medium.hashCode());
-      return result;
-   }
-
-   /**
     * @see java.lang.Object#equals(java.lang.Object)
     */
    @Override
@@ -127,14 +115,19 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    }
 
    /**
-    * @see java.lang.Object#toString()
+    * @see com.github.jmeta.library.media.api.types.Medium#getMaxCacheSizeInBytes()
     */
    @Override
-   public String toString() {
-      return "AbstractMedium [medium=" + medium + ", name=" + name + ", isRandomAccess=" + isRandomAccess
-         + ", isReadOnly=" + isReadOnly + ", maxCacheSizeInBytes=" + maxCacheSizeInBytes
-         + ", maxReadWriteBlockSizeInBytes=" + maxReadWriteBlockSizeInBytes + ", requiresCaching=" + requiresCaching
-         + "]";
+   public long getMaxCacheSizeInBytes() {
+      return maxCacheSizeInBytes;
+   }
+
+   /**
+    * @see com.github.jmeta.library.media.api.types.Medium#getMaxReadWriteBlockSizeInBytes()
+    */
+   @Override
+   public int getMaxReadWriteBlockSizeInBytes() {
+      return maxReadWriteBlockSizeInBytes;
    }
 
    /**
@@ -153,6 +146,18 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    public T getWrappedMedium() {
 
       return medium;
+   }
+
+   /**
+    * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
+
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (medium == null ? 0 : medium.hashCode());
+      return result;
    }
 
    /**
@@ -182,24 +187,8 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.Medium#getMaxCacheSizeInBytes()
-    */
-   @Override
-   public long getMaxCacheSizeInBytes() {
-      return maxCacheSizeInBytes;
-   }
-
-   /**
-    * @see com.github.jmeta.library.media.api.types.Medium#getMaxReadWriteBlockSizeInBytes()
-    */
-   @Override
-   public int getMaxReadWriteBlockSizeInBytes() {
-      return maxReadWriteBlockSizeInBytes;
-   }
-
-   /**
     * Provides the possibility to overwrite the wrapped medium.
-    * 
+    *
     * @param newMedium
     *           The new medium content.
     */
@@ -207,5 +196,16 @@ public abstract class AbstractMedium<T> implements Medium<T> {
       Reject.ifNull(newMedium, "medium");
 
       this.medium = newMedium;
+   }
+
+   /**
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      return "AbstractMedium [medium=" + medium + ", name=" + name + ", isRandomAccess=" + isRandomAccess
+         + ", isReadOnly=" + isReadOnly + ", maxCacheSizeInBytes=" + maxCacheSizeInBytes
+         + ", maxReadWriteBlockSizeInBytes=" + maxReadWriteBlockSizeInBytes + ", requiresCaching=" + requiresCaching
+         + "]";
    }
 }

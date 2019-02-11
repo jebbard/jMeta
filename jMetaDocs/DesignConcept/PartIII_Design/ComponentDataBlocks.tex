@@ -143,6 +143,23 @@ No disadvantages known.
 }
 %%%% <-- DD %%%%
 
+During data format identification, the library might need to ``try'' multiple different magic keys to see what data format is ahead. This process is optimized as follows:
+%%%% DD --> %%%%
+\DD{dd:606a}
+{% Title
+Use longest header size for initial buffering
+}
+{% Short description
+The buffering in \DesLink{dd:606} first calculates a minimum suitable size to read by obtaining the minimum sizes of all headers of all supported data format's top-level containers. It chooses the longest such size for its purpose. Thus, clearly, end of medium might be reached if a long header is read first while the actual data format has a short header and the medium ands early. Such an end of medium condition is not an error but simply rules out some candidate data formats.
+}
+{% Rationale
+Otherwise we would probably do some very inefficient piece-wise reading during data format identification
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 A very basic mechanism of container data formats is that they allow seeking and skipping based on containers, that means the decoders might just need to check a container header to find out if they are interested in the data it contains, and if not simply go on reading with the follow-up container. For this, most if not all data formats specify the size of the container in its header or footer. To fully support this, we define some kind of lazyness as follows:
 
 %%%% DD --> %%%%
@@ -186,6 +203,15 @@ No disadvantages known
 % =======================================================================================================
 \subsection{Field Parsing}%
 \label{sec:FieldParsing}%
+
+Field parsing is the most complex part of reading data format bytes. It requires answers to following questions:
+\begin{itemize}
+\item How to determine the size of the field?
+\item How to determine the number of occurrences of a field, especially the case of optional fields?
+\item Which byte order (for numeric fields) and character encoding (for string or enumerated fields) needs to be used when?
+\item How to convert the binary field value to an interpreted one?
+\item How to use caching during field parsing?
+\end{itemize}
 
 
 % =======================================================================================================

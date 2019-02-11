@@ -9,10 +9,12 @@ package com.github.jmeta.library.datablocks.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
@@ -21,6 +23,8 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -45,7 +49,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
    /**
     * Creates a new {@link TopLevelContainerIterator}.
-    * 
+    *
     * @param medium
     *           The {@link Medium} to iterate
     * @param readers
@@ -61,7 +65,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       Reject.ifNull(readers, "readers");
       Reject.ifNull(mediumStore, "mediumFactory");
 
-      this.readerMap.putAll(readers);
+      readerMap.putAll(readers);
       this.mediumStore = mediumStore;
       this.forwardRead = forwardRead;
 
@@ -76,6 +80,34 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    }
 
    /**
+    * @see java.io.Closeable#close()
+    */
+   @Override
+   public void close() throws IOException {
+      mediumStore.close();
+   }
+
+   private long determineMinimumHeaderSize() {
+      List<DataBlockDescription> topLevelDescriptions = readerMap.values().stream()
+         .flatMap(dr -> dr.getSpecification().getTopLevelDataBlockDescriptions().stream()).collect(Collectors.toList());
+
+      List<DataBlockDescription> topLevelHeaders = topLevelDescriptions.stream()
+         .flatMap(tld -> tld.getOrderedChildren().stream())
+         .filter(ch -> ch.getPhysicalType() == PhysicalDataBlockType.HEADER).collect(Collectors.toList());
+
+      return topLevelHeaders.stream().max(Comparator.comparing(DataBlockDescription::getMinimumByteLength)).get()
+         .getMinimumByteLength();
+   }
+
+   private long getBytesToAdvance(Container container) {
+      if (forwardRead) {
+         return container.getTotalSize();
+      } else {
+         return -container.getTotalSize();
+      }
+   }
+
+   /**
     * @see java.util.Iterator#hasNext()
     */
    @Override
@@ -85,6 +117,40 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       } else {
          return currentOffset.getAbsoluteMediumOffset() != 0;
       }
+   }
+
+   /**
+    * Identifies the {@link ContainerDataFormat} present at the given {@link MediumOffset}
+    *
+    * @param reference
+    *           The {@link MediumOffset} to start scanning. For forward reading, it is the start offset of an assumed
+    *           container, for backward reading, it is the end offset of an assumed container.
+    * @return The {@link ContainerDataFormat} identified or null if none could be identified
+    */
+   private ContainerDataFormat identifyDataFormat(MediumOffset reference) {
+
+      if (precedenceList.isEmpty()) {
+         return null;
+      }
+
+      long minHeaderSize = determineMinimumHeaderSize();
+
+      try {
+         mediumStore.cache(reference, (int) minHeaderSize);
+      } catch (EndOfMediumException e) {
+         // Silently ignore as this might well happen if a data format min header size is too big for the medium
+      }
+
+      for (Iterator<ContainerDataFormat> iterator = precedenceList.iterator(); iterator.hasNext();) {
+         ContainerDataFormat dataFormat = iterator.next();
+         DataBlockReader reader = readerMap.get(dataFormat);
+
+         if (reader.identifiesDataFormat(reference, forwardRead)) {
+            return dataFormat;
+         }
+      }
+
+      return null;
    }
 
    /**
@@ -121,40 +187,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       return null;
    }
 
-   /**
-    * @see java.io.Closeable#close()
-    */
-   @Override
-   public void close() throws IOException {
-      mediumStore.close();
-   }
-
-   /**
-    * Identifies the {@link ContainerDataFormat} present at the given {@link MediumOffset}
-    * 
-    * @param reference
-    *           The {@link MediumOffset} to start scanning. For forward reading, it is the start offset of an assumed
-    *           container, for backward reading, it is the end offset of an assumed container.
-    * @return The {@link ContainerDataFormat} identified or null if none could be identified
-    */
-   private ContainerDataFormat identifyDataFormat(MediumOffset reference) {
-
-      if (precedenceList.isEmpty()) {
-         return null;
-      }
-
-      for (Iterator<ContainerDataFormat> iterator = precedenceList.iterator(); iterator.hasNext();) {
-         ContainerDataFormat dataFormat = iterator.next();
-         DataBlockReader reader = readerMap.get(dataFormat);
-
-         if (reader.identifiesDataFormat(reference, forwardRead)) {
-            return dataFormat;
-         }
-      }
-
-      return null;
-   }
-
    private Container readContainerWithId(DataBlockReader reader, MediumOffset currentMediumOffset,
       DataBlockId containerId) {
       if (forwardRead) {
@@ -163,14 +195,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       } else {
          return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null, null,
             DataBlockDescription.UNDEFINED);
-      }
-   }
-
-   private long getBytesToAdvance(Container container) {
-      if (forwardRead) {
-         return container.getTotalSize();
-      } else {
-         return -container.getTotalSize();
       }
    }
 

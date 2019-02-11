@@ -21,27 +21,16 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  * <li>Has a wrapped underlying {@link Medium} object</li>
  * <li>Requires to be backed by a cache or not</li>
  * </ul>
- * 
+ *
  * In addition, there are several configuration values that can be used to configure the {@link Medium} for later access
  * by an {@link MediumStore}. These need to be set in the corresponding implementation classes. This interface only
  * offers methods for reading them: See {@link #getMaxReadWriteBlockSizeInBytes()} and
  * {@link #getMaxCacheSizeInBytes()}.
- * 
+ *
  * @param <T>
  *           The concrete type of wrapped medium object.
  */
 public interface Medium<T> {
-
-   /**
-    * Refers to an unknown length of this {@link Medium}.
-    */
-   public static final long UNKNOWN_LENGTH = -1;
-
-   /**
-    * The default maximum read-write block size in bytes, if no values are explicitly set. See
-    * {@link #getMaxReadWriteBlockSizeInBytes()} for more details.
-    */
-   public static int DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES = 16384;
 
    /**
     * The default maximum cache size in bytes, if no values are explicitly set. See {@link #getMaxCacheSizeInBytes()}
@@ -50,18 +39,30 @@ public interface Medium<T> {
    public static long DEFAULT_MAX_CACHE_SIZE_IN_BYTES = 1_048_576L;
 
    /**
-    * Returns whether this {@link Medium} supports random-access or not.
-    * 
-    * @return whether this {@link Medium} supports random-access or not.
+    * The default maximum read-write block size in bytes, if no values are explicitly set. See
+    * {@link #getMaxReadWriteBlockSizeInBytes()} for more details.
     */
-   public boolean isRandomAccess();
+   public static int DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES = 16384;
 
    /**
-    * Returns whether this {@link Medium} supports only read-access or not.
-    * 
-    * @return whether this {@link Medium} supports only read-access or not.
+    * The minimum value for the maximum read-write block size in bytes. See {@link #getMaxReadWriteBlockSizeInBytes()}
+    * for more details.
     */
-   public boolean isReadOnly();
+   public static int MINIMUM_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES = 1024;
+
+   /**
+    * Refers to an unknown length of this {@link Medium}.
+    */
+   public static final long UNKNOWN_LENGTH = -1;
+
+   /**
+    * @see java.lang.Object#equals(java.lang.Object)
+    *
+    *      Two {@link Medium} implementations are equal if and only if they refer to the same (i.e. an equal) wrapped
+    *      medium object.
+    */
+   @Override
+   public boolean equals(Object obj);
 
    /**
     * @return the current length of this {@link Medium}, if it is a random-access medium, or {@link #UNKNOWN_LENGTH} if
@@ -71,18 +72,18 @@ public interface Medium<T> {
    public long getCurrentLength();
 
    /**
-    * Returns the name of the {@link Medium}, if any, or null.
-    * 
-    * @return the name of the {@link Medium}, if any, or null.
+    * Returns the currently configured maximum cache size in bytes. The cache must not exceed this size, if it does,
+    * cached data is automatically freed. In detail, the cached data read the longest time ago is freed first to ensure
+    * the new cache size is again below the maximum configured size. This size must be bigger than 0 and bigger than the
+    * currently configured maximum cache region size in bytes. If this medium does not require caching, i.e.
+    * {@link #requiresCaching()} returns false, this configuration parameter has no meaning and is ignored.
+    *
+    * The default value, if caching is enabled and if it is not explicitly set is
+    * {@link #DEFAULT_MAX_CACHE_SIZE_IN_BYTES}.
+    *
+    * @return the currently configured maximum cache size in bytes
     */
-   public String getName();
-
-   /**
-    * Returns the wrapped medium object.
-    * 
-    * @return the wrapped medium object.
-    */
-   public T getWrappedMedium();
+   public long getMaxCacheSizeInBytes();
 
    /**
     * Returns the currently configured maximum read-write block size. This essentially influences the behavior of medium
@@ -92,7 +93,7 @@ public interface Medium<T> {
     * "garbage" reads that occur e.g. during flushing. Second, you want this size to be bigger than the usual header
     * sizes. Headers play a very important role when processing data formats. You do not want to read multiple times to
     * get headers into memory. So choose a size that is bigger than the headers you need.
-    * 
+    *
     * The read-write block size is used at several places:
     * <ol>
     * <li>When reading bytes during {@link MediumStore#getData(MediumOffset, int)} or
@@ -104,50 +105,56 @@ public interface Medium<T> {
     * <li>When the need arises to read and write bytes before a written change in the medium during
     * {@link MediumStore#flush()}</li>
     * </ol>
-    * 
+    *
     * This configuration must only be changed before accessing the {@link Medium} using an {@link MediumStore} the first
     * time. Changes to it after opening an {@link MediumStore} are ignored.
-    * 
+    *
     * The default value if it is not explicitly set is {@link #DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES}.
-    * 
+    *
     * @return the currently configured maximum read-write block size
     */
    public int getMaxReadWriteBlockSizeInBytes();
 
    /**
-    * Returns the currently configured maximum cache size in bytes. The cache must not exceed this size, if it does,
-    * cached data is automatically freed. In detail, the cached data read the longest time ago is freed first to ensure
-    * the new cache size is again below the maximum configured size. This size must be bigger than 0 and bigger than the
-    * currently configured maximum cache region size in bytes. If this medium does not require caching, i.e.
-    * {@link #requiresCaching()} returns false, this configuration parameter has no meaning and is ignored.
-    * 
-    * The default value, if caching is enabled and if it is not explicitly set is
-    * {@link #DEFAULT_MAX_CACHE_SIZE_IN_BYTES}.
-    * 
-    * @return the currently configured maximum cache size in bytes
+    * Returns the name of the {@link Medium}, if any, or null.
+    *
+    * @return the name of the {@link Medium}, if any, or null.
     */
-   public long getMaxCacheSizeInBytes();
+   public String getName();
 
    /**
-    * Tells whether this {@link Medium} requires to be backed by a cache or not
-    * 
-    * @return the {@link Medium} needs to be backed by a cache (true) or not (false)
+    * Returns the wrapped medium object.
+    *
+    * @return the wrapped medium object.
     */
-   public boolean requiresCaching();
-
-   /**
-    * @see java.lang.Object#equals(java.lang.Object)
-    * 
-    *      Two {@link Medium} implementations are equal if and only if they refer to the same (i.e. an equal) wrapped
-    *      medium object.
-    */
-   public boolean equals(Object obj);
+   public T getWrappedMedium();
 
    /**
     * @see java.lang.Object#hashCode()
     */
    @Override
    public int hashCode();
+
+   /**
+    * Returns whether this {@link Medium} supports random-access or not.
+    *
+    * @return whether this {@link Medium} supports random-access or not.
+    */
+   public boolean isRandomAccess();
+
+   /**
+    * Returns whether this {@link Medium} supports only read-access or not.
+    *
+    * @return whether this {@link Medium} supports only read-access or not.
+    */
+   public boolean isReadOnly();
+
+   /**
+    * Tells whether this {@link Medium} requires to be backed by a cache or not
+    *
+    * @return the {@link Medium} needs to be backed by a cache (true) or not (false)
+    */
+   public boolean requiresCaching();
 
    /**
     * @see java.lang.Object#toString()

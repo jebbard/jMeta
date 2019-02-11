@@ -358,6 +358,72 @@ public class StandardDataBlockReader implements DataBlockReader {
       return -1;
    }
 
+   // private long getByteSizeUpToTerminationCharacter(MediumOffset reference, Character terminationCharacter,
+   // long remainingDirectParentByteCount, int maxCharacterByteLength) {
+   //
+   // long sizeUpToEndOfTerminationBytes = 0;
+   //
+   // Medium<?> medium = reference.getMedium();
+   //
+   // long remainingMediumBytes = Medium.UNKNOWN_LENGTH;
+   //
+   // boolean mediumHasUnknownLength = reference.getMedium().getCurrentLength() == Medium.UNKNOWN_LENGTH;
+   //
+   // if (!mediumHasUnknownLength) {
+   // remainingMediumBytes = reference.getMedium().getCurrentLength() - reference.getAbsoluteMediumOffset();
+   // }
+   //
+   // MediumOffset currentReference = reference;
+   //
+   // boolean terminationBytesFound = false;
+   //
+   // while (!terminationBytesFound) {
+   //
+   // int bytesToRead = medium.getMaxReadWriteBlockSizeInBytes();
+   //
+   // // This special case needs to be handled, otherwise we have an infinite while loop...
+   // bytesToRead = Math.max(bytesToRead, maxCharacterByteLength);
+   //
+   // try {
+   // m_cache.cache(currentReference, bytesToRead);
+   // } catch (EndOfMediumException e) {
+   // bytesToRead = e.getByteCountActuallyRead();
+   // }
+   //
+   // // Special handling for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception,
+   // // thus bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
+   // if (bytesToRead == 0 || !mediumHasUnknownLength && bytesToRead > remainingMediumBytes) {
+   // bytesToRead = (int) remainingMediumBytes;
+   // }
+   //
+   // ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
+   // bufferedBytes.order(byteOrder);
+   //
+   // int findStartIndex = findTerminationBytes(bufferedBytes, terminationBytes);
+   //
+   // terminationBytesFound = findStartIndex != -1;
+   //
+   // if (terminationBytesFound) {
+   // sizeUpToEndOfTerminationBytes += findStartIndex + terminationBytes.length;
+   // } else {
+   // // Using this bytes to advance count, we ensure to detect also termination bytes overlapping read blocks
+   // int bytesToAdvance = bytesToRead - terminationBytes.length + 1;
+   // sizeUpToEndOfTerminationBytes += bytesToAdvance;
+   //
+   // currentReference = currentReference.advance(bytesToAdvance);
+   //
+   // // We have to cancel if we did not find termination bytes up to the end of the direct parent
+   // if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED
+   // && sizeUpToEndOfTerminationBytes >= remainingDirectParentByteCount) {
+   // sizeUpToEndOfTerminationBytes = remainingDirectParentByteCount;
+   // terminationBytesFound = true;
+   // }
+   // }
+   // }
+   //
+   // return sizeUpToEndOfTerminationBytes;
+   // }
+
    /**
     * @return the {@link DataBlockFactory}
     */
@@ -435,40 +501,36 @@ public class StandardDataBlockReader implements DataBlockReader {
       long sizeUpToEndOfTerminationBytes = 0;
 
       Medium<?> medium = reference.getMedium();
-      MediumOffset currentReference = reference;
 
-      long currentlyRemainingDirectParentByteCount = remainingDirectParentByteCount;
+      long remainingMediumBytes = Medium.UNKNOWN_LENGTH;
 
-      if (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED) {
-         if (medium.getCurrentLength() != Medium.UNKNOWN_LENGTH) {
-            currentlyRemainingDirectParentByteCount = medium.getCurrentLength() - reference.getAbsoluteMediumOffset();
-         } else {
+      boolean mediumHasUnknownLength = reference.getMedium().getCurrentLength() == Medium.UNKNOWN_LENGTH;
 
-         }
+      if (!mediumHasUnknownLength) {
+         remainingMediumBytes = reference.getMedium().getCurrentLength() - reference.getAbsoluteMediumOffset();
       }
+
+      MediumOffset currentReference = reference;
 
       boolean terminationBytesFound = false;
 
       while (!terminationBytesFound) {
 
-         int bytesToRead = (int) Math.min(currentlyRemainingDirectParentByteCount,
-            medium.getMaxReadWriteBlockSizeInBytes());
-         // This special case needs to be handled, otherwise we have an infinite wile loop...
+         int bytesToRead = medium.getMaxReadWriteBlockSizeInBytes();
+
+         // This special case needs to be handled, otherwise we have an infinite while loop...
          bytesToRead = Math.max(bytesToRead, terminationBytes.length);
 
          try {
             m_cache.cache(currentReference, bytesToRead);
          } catch (EndOfMediumException e) {
-            throw new RuntimeException("Unexpected end of medium", e);
+            bytesToRead = e.getByteCountActuallyRead();
          }
 
          // Special handling for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception,
          // thus bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
-         if (bytesToRead == 0 || currentReference.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
-            && bytesToRead > currentReference.getMedium().getCurrentLength()
-               - currentReference.getAbsoluteMediumOffset()) {
-            bytesToRead = (int) (currentReference.getMedium().getCurrentLength()
-               - currentReference.getAbsoluteMediumOffset());
+         if (bytesToRead == 0 || !mediumHasUnknownLength && bytesToRead > remainingMediumBytes) {
+            bytesToRead = (int) remainingMediumBytes;
          }
 
          ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
@@ -484,7 +546,6 @@ public class StandardDataBlockReader implements DataBlockReader {
             // Using this bytes to advance count, we ensure to detect also termination bytes overlapping read blocks
             int bytesToAdvance = bytesToRead - terminationBytes.length + 1;
             sizeUpToEndOfTerminationBytes += bytesToAdvance;
-            currentlyRemainingDirectParentByteCount -= bytesToAdvance;
 
             currentReference = currentReference.advance(bytesToAdvance);
 
