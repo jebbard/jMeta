@@ -7,6 +7,7 @@
     "fig:III_ForwardReading"
     "sec:ReadingSteps"
     "sec:FieldParsing"
+    "sec:TerminatedFields"
     "sec:BackwardReading"
     "sec:APIDesign"))
  :latex)

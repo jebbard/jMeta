@@ -213,6 +213,93 @@ Field parsing is the most complex part of reading data format bytes. It requires
 \item How to use caching during field parsing?
 \end{itemize}
 
+% -------------------------------------------------------------------------------------------------------
+\subsubsection{Terminated Fields}%
+\label{sec:TerminatedFields}%
+
+Terminated fields are those fields with a dynamic length that is not given by the value of another field, but these fields are delimited by a sequence of termination bytes or characters. 
+
+Terminated fields are worst-case for parsing: First of all you never know when it ends, and second you have to deal with strings which brings different encodings into play.
+
+Let's deal with the first problem, the unknown length. Of course, in the ``usual'' case a terminated field is still a field and thus relatively small. We will only rarely encounter terminated fields longer than several KB. In order to be fully generic, one needs to deal with the worst case of fields having up to \texttt{Long.MAX\_VALUE-1} as size. Having said this, also block-wise reading is required as we do not want to risk out-of-memory conditions by soaking too much bytes into memory. One could come up with the idea of using some upper bounds for reading data, i.e.:
+\begin{itemize}
+\item \textbf{Case 1:} The current total medium size as well as the exact size of a parent of the field is known - E.g. for ID3v23 text frames, the frame size and thus payload size is known, but there is a terminated text payload field; for file and byte array media, the medium length is also known.
+\item \textbf{Case 2:} The current total medium size is unknown, yet the exact size of a parent of the field is known - Take an ID3v23 text frame on an input stream medium as an example.
+\item \textbf{Case 3:} The current total medium size is known, but the exact size of a parent of the field is unknown - Take an APEv2 item header on a file or byte array medium as an example. Here, the item key is terminated, and the size of the parent header is unknown as it is only determined by the sum of the field sizes and not - in addition - by any size indicators.
+\item \textbf{Case 4:} Neither current total medium size nor the exact size of a parent of the field is known - So APEv2 item header on an input stream medium is an example.
+\end{itemize}
+
+%%%% DD --> %%%%
+\DD{dd:650a}
+{% Title
+Block-wise reading for finding field termination
+}
+{% Short description
+Block-wise reading is necessary in order to find field termination. According to \DesLink{dd:438}, we do not read more than the configured maximum read-write block size in bytes from the medium at once. Actually, we \emph{always} read the configured maximum read-write block size and do not take into consideration any additionally known upper bounds such as the remaining parent byte count or remaining medium length (if available). If an end of medium is encountered during reading a block of data, we scan for the termination within the actually read bytes. Otherwise the next block is read for scanning for termination bytes and so on. However, we can at least take into account any available bounds for finding out if we need to search further or we can skip the process: If the already read byte count is bigger than the remaining parent byte count, we should skip as a data corruption might be present.
+}
+{% Rationale
+Block-wise reading avoids out-of-memory conditions and is a compromise between reading too much and reading too few bytes at once. Of course this compromise comes with the cost of added complexity. We mitigate this complexity by not coming up with further ``optimizations'' such as only reading up to a known upper bound like the medium end or parent end. In the end, both might not be known, especially in case 4, thus anyway we have to do a ``blind'' reading in this case.
+}
+{% Disadvantes
+Added complexity, but in conformance with \DesLink{dd:438}. The complexity is adressed as specified in the rationale.
+}
+%%%% <-- DD %%%%
+
+Regarding strings and their encoding: First of all, we remember that only string and string list fields can be terminated and thus it is fine to talk about \emph{termination characters} instead of termination bytes (see \DesLink{dd:531} and \DesLink{dd:532}). How should we parse terminated fields to detect the termination character? We could do it either:
+\begin{enumerate}
+\item by converting the character to a byte sequence and then searching the termination
+\item by converting the bytes to a string and then trying to find the termination character or
+\end{enumerate}
+
+Both approaches have their serious drawbacks. \textbf{Approach (1)} requires us to know where a character starts and ends such that we can correctly match termination bytes only at character borders. For instance UTF-16 encodes all characters always as two bytes. It would be wrong to try to detect termination bytes at odd offsets. Instead we have to ensure to search for them only at even offsets.
+
+\textbf{Approach (2)} suffers from a similar problem that there is no nice way to handle block-wise split strings: If we read block-wise, it might be that a single character spanning multiple bytes is just torn apart at a block border. E.g. UTF-8 is a variable length encoding where - depending on the first byte - the total number of bytes of a character is given. If a converter from byte to string encounters a torn apart character at the end of the byte sequence, it might fail with some kind of decoding runtime error, so we have to handle this separately. However, Java's \texttt{CharsetDecoder} seems just about right for this task. ID3v2.4 supports UTF-16LE, UTF-16BE, ISO-8859-1 as well as UTF-8 so we have to handle such cases.
+
+We define:
+%%%% DD --> %%%%
+\DD{dd:650}
+{% Title
+Character-based termination detection
+}
+{% Short description
+We use character-based termination detection (approach 2) for finding termination characters and do not use termination-byte-based detection (approach 1)
+}
+{% Rationale
+This is possible due to the fact that only string and string list fields can be terminated (see \DesLink{dd:531} and \DesLink{dd:532}). Approach 1 seems even harder as we need to re-implement parsing of strange encodings while approach 2 at least provides an out-of-the box solution in the form of  \texttt{CharsetDecoder}.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+No we can summarize the process of finding termination of a field:
+%%%% DD --> %%%%
+\DD{dd:651}
+{% Title
+Determining the end of a terminated field
+}
+{% Short description
+  As input for the algorithm, we get the current medium offset, the character encoding of the bytes as well as the termination character to find and the maximum read-write block size. The steps are as follows:
+  \begin{enumerate}
+  \item Read $N:=$ read-write block size bytes from the medium at the current offset
+  \item If end of medium occurs, take the actually read bytes and mark the algorithm for termination as no further input is available
+  \item Search the input buffer for the termination character by actually decoding bytes according to the character encoding using \texttt{CharsetDecoder}
+  \item If there should be a character overlapping a block border, use the facilities of \texttt{CharsetDecoder} to overcome the situation
+  \item If a termination character is found, mark the algorithm for termination
+  \item Otherwise:
+    \begin{enumerate}
+    \item If the remaining parent byte count is known and the already read byte count is bigger than this value, mark the algorithm for termination 
+    \item Otherwise increment the current medium offset by the maximum read-write block size and goto step 1
+    \end{enumerate}
+  \end{enumerate}
+}
+{% Rationale
+This process is efficient in terms of avoiding unknown steps and using only sparse memory. It is as simple as it can get without risking incorrectness.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 % =======================================================================================================
 \subsection{Backward Reading}%
