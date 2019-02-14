@@ -11,7 +11,9 @@ package com.github.jmeta.library.datablocks.impl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -174,7 +176,7 @@ public class StandardDataBlockReader implements DataBlockReader {
                byte[] terminationBytes = Charsets.getBytesWithoutBOM(new String("" + terminationCharacter),
                   characterEncoding);
 
-               actualBlockSize = getSizeUpToTerminationBytes(reference, byteOrder, terminationBytes,
+               actualBlockSize = getSizeUpToTerminationBytes(reference, characterEncoding, terminationCharacter,
                   remainingDirectParentByteCount);
             }
          }
@@ -495,66 +497,62 @@ public class StandardDataBlockReader implements DataBlockReader {
       return sizeFromFieldFunction;
    }
 
-   private long getSizeUpToTerminationBytes(MediumOffset reference, ByteOrder byteOrder, byte[] terminationBytes,
-      long remainingDirectParentByteCount) {
+   private long getSizeUpToTerminationBytes(MediumOffset reference, Charset characterEncoding,
+      Character terminationCharacter, long remainingDirectParentByteCount) {
 
       long sizeUpToEndOfTerminationBytes = 0;
 
       Medium<?> medium = reference.getMedium();
 
-      long remainingMediumBytes = Medium.UNKNOWN_LENGTH;
-
-      boolean mediumHasUnknownLength = reference.getMedium().getCurrentLength() == Medium.UNKNOWN_LENGTH;
-
-      if (!mediumHasUnknownLength) {
-         remainingMediumBytes = reference.getMedium().getCurrentLength() - reference.getAbsoluteMediumOffset();
-      }
-
       MediumOffset currentReference = reference;
 
       boolean terminationBytesFound = false;
+
+      ByteBuffer readBytes = null;
+      ByteBuffer encodedBytes = ByteBuffer.allocate(medium.getMaxReadWriteBlockSizeInBytes());
 
       while (!terminationBytesFound) {
 
          int bytesToRead = medium.getMaxReadWriteBlockSizeInBytes();
 
-         // This special case needs to be handled, otherwise we have an infinite while loop...
-         bytesToRead = Math.max(bytesToRead, terminationBytes.length);
-
          try {
             m_cache.cache(currentReference, bytesToRead);
          } catch (EndOfMediumException e) {
-            bytesToRead = e.getByteCountActuallyRead();
+            return e.getByteCountActuallyRead();
          }
 
-         // Special handling for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception,
-         // thus bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
-         if (bytesToRead == 0 || !mediumHasUnknownLength && bytesToRead > remainingMediumBytes) {
-            bytesToRead = (int) remainingMediumBytes;
-         }
+         // // Special handling for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception,
+         // // thus bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
+         // if (bytesToRead == 0 || !mediumHasUnknownLength && bytesToRead > remainingMediumBytes) {
+         // bytesToRead = (int) remainingMediumBytes;
+         // }
 
-         ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
-         bufferedBytes.order(byteOrder);
+         readBytes = readBytes(currentReference, bytesToRead);
 
-         int findStartIndex = findTerminationBytes(bufferedBytes, terminationBytes);
+         encodedBytes.put(readBytes);
 
-         terminationBytesFound = findStartIndex != -1;
+         CharsetDecoder decoder = characterEncoding.newDecoder();
 
-         if (terminationBytesFound) {
-            sizeUpToEndOfTerminationBytes += findStartIndex + terminationBytes.length;
-         } else {
-            // Using this bytes to advance count, we ensure to detect also termination bytes overlapping read blocks
-            int bytesToAdvance = bytesToRead - terminationBytes.length + 1;
-            sizeUpToEndOfTerminationBytes += bytesToAdvance;
+         CharBuffer outputBuffer = CharBuffer.allocate(bytesToRead);
 
-            currentReference = currentReference.advance(bytesToAdvance);
+         decoder.decode(encodedBytes, outputBuffer, false);
 
-            // We have to cancel if we did not find termination bytes up to the end of the direct parent
-            if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED
-               && sizeUpToEndOfTerminationBytes >= remainingDirectParentByteCount) {
-               sizeUpToEndOfTerminationBytes = remainingDirectParentByteCount;
+         for (int i = 0; i < outputBuffer.remaining(); i++) {
+            char c = outputBuffer.get();
+
+            sizeUpToEndOfTerminationBytes += Charsets.getBytesWithoutBOM("" + c, characterEncoding).length;
+
+            if (terminationCharacter.equals(c)) {
                terminationBytesFound = true;
+               break;
             }
+         }
+
+         if (!terminationBytesFound) {
+            readBytes = ByteBuffer.allocate(medium.getMaxReadWriteBlockSizeInBytes() + encodedBytes.remaining());
+            readBytes.put(encodedBytes);
+            encodedBytes = readBytes;
+            currentReference = currentReference.advance(bytesToRead);
          }
       }
 
