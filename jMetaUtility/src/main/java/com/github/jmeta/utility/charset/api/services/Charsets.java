@@ -28,7 +28,7 @@ public final class Charsets {
 
    /**
     * Returns true if the given charset is a BOMMED charset, false otherwise.
-    * 
+    *
     * @param cs
     *           The {@link Charset} to check
     * @return true if the given charset is a BOMMED charset, false otherwise.
@@ -70,11 +70,12 @@ public final class Charsets {
          byte[] bomBytes = BOMMED_CHARSETS.get(cs);
 
          for (int i = 0; i < bomBytes.length; i++) {
-            if (returnedBytes.length <= i || returnedBytes[i] != bomBytes[i])
+            if (returnedBytes.length <= i || returnedBytes[i] != bomBytes[i]) {
                throw new JMetaIllegalStateException(
                   "Byte representation: <" + Arrays.toString(returnedBytes) + "> of String: <" + string
                      + "> with charset: <" + cs + "> does not start with BOM bytes: <" + bomBytes + ">",
                   null);
+            }
          }
 
          byte[] tempBytes = new byte[returnedBytes.length - bomBytes.length];
@@ -96,7 +97,7 @@ public final class Charsets {
     */
    public static Charset CHARSET_ISO = Charset.forName("ISO-8859-1");
    /**
-    * Sixteen-bit UCS Transformation Format, byte order identified by an optional byte- order mark
+    * Sixteen-bit UCS Transformation Format, byte order identified by an optional byte order mark
     */
    public static Charset CHARSET_UTF16 = Charset.forName("UTF-16");
    /**

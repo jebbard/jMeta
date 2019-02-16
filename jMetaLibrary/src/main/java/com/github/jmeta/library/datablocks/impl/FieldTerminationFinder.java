@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 
 import com.github.jmeta.utility.charset.api.services.Charsets;
 
@@ -53,25 +54,64 @@ public class FieldTerminationFinder {
          // }
 
          encodedBytes.put(readBytes);
+         encodedBytes.flip();
+
+         if (!encodedBytes.hasRemaining()) {
+            return sizeUpToEndOfTerminationBytes;
+         }
+
+         int byteCountBeforeDecode = encodedBytes.remaining();
 
          CharsetDecoder decoder = charset.newDecoder();
 
-         CharBuffer outputBuffer = CharBuffer.allocate(bytesToRead);
+         CharBuffer outputBuffer = CharBuffer.allocate(byteCountBeforeDecode);
+         CoderResult result = decoder.decode(encodedBytes, outputBuffer, false);
 
-         decoder.decode(encodedBytes, outputBuffer, false);
+         outputBuffer.flip();
 
-         for (int i = 0; i < outputBuffer.remaining(); i++) {
-            char c = outputBuffer.get();
+         if (limit != NO_LIMIT && sizeUpToEndOfTerminationBytes + outputBuffer.remaining() > limit) {
+            return limit;
+         }
 
-            sizeUpToEndOfTerminationBytes += Charsets.getBytesWithoutBOM("" + c, charset).length;
+         String bufferString = outputBuffer.toString();
 
-            if (terminationCharacter.equals(c)) {
-               terminationBytesFound = true;
-               break;
-            }
+         int lenUpToTermination = bufferString.indexOf(terminationCharacter);
+
+         int endIndex = outputBuffer.remaining();
+
+         if (lenUpToTermination != -1) {
+            endIndex = lenUpToTermination + 1;
+            terminationBytesFound = true;
+         }
+
+         boolean isFollowUpBlock = sizeUpToEndOfTerminationBytes > 0;
+
+         if (true/* charset.equals(Charsets.CHARSET_UTF16) && lenUpToTermination != -1 */) {
+            sizeUpToEndOfTerminationBytes += bufferString.substring(0, endIndex).getBytes(charset).length;
+            // } else {
+            //
+            // for (int i = 0; i < remaining; i++) {
+            // char c = outputBuffer.get();
+            //
+            // sizeUpToEndOfTerminationBytes += Charsets.getBytesWithoutBOM("" + c, charset).length;
+            //
+            // if (terminationCharacter.equals(c)) {
+            // terminationBytesFound = true;
+            // break;
+            // }
+            // }
+         }
+
+         if (isFollowUpBlock && Charsets.hasBOM(charset)) {
+            sizeUpToEndOfTerminationBytes -= 2;
          }
 
          if (!terminationBytesFound) {
+
+            if (limit != NO_LIMIT && sizeUpToEndOfTerminationBytes >= limit) {
+               return limit;
+            }
+
             readBytes = ByteBuffer.allocate(readBlockSize + encodedBytes.remaining());
             readBytes.put(encodedBytes);
             encodedBytes = readBytes;
