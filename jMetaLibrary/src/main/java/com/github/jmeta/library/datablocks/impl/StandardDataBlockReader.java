@@ -27,7 +27,7 @@ import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
-import com.github.jmeta.library.datablocks.impl.FieldTerminationFinder.DataProvider;
+import com.github.jmeta.library.datablocks.impl.FieldTerminationFinder.FieldDataProvider;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -165,7 +165,7 @@ public class StandardDataBlockReader implements DataBlockReader {
                byte[] terminationBytes = Charsets.getBytesWithoutBOM(new String("" + terminationCharacter),
                   characterEncoding);
 
-               actualBlockSize = getSizeUpToTerminationBytes(reference, byteOrder, terminationBytes,
+               actualBlockSize = getSizeUpToTerminationBytes(reference, characterEncoding, terminationCharacter,
                   remainingDirectParentByteCount);
             }
          }
@@ -486,13 +486,13 @@ public class StandardDataBlockReader implements DataBlockReader {
       return sizeFromFieldFunction;
    }
 
-   private static class DefDataProvider implements DataProvider {
+   private static class DefDataProvider implements FieldDataProvider {
 
       private MediumOffset currentOffset;
       private MediumStore store;
 
       /**
-       * @see com.github.jmeta.library.datablocks.impl.FieldTerminationFinder.DataProvider#nextData(int)
+       * @see com.github.jmeta.library.datablocks.impl.FieldTerminationFinder.FieldDataProvider#nextData(int)
        */
       @Override
       public ByteBuffer nextData(int byteCount) {
@@ -501,10 +501,23 @@ public class StandardDataBlockReader implements DataBlockReader {
             return ByteBuffer.allocate(0);
          }
 
-         try {
-            store.cache(currentOffset, byteCount);
-         } catch (EndOfMediumException e) {
-            byteCount = e.getByteCountActuallyRead();
+         long cachedAt = store.getCachedByteCountAt(currentOffset);
+
+         if (cachedAt < byteCount && cachedAt > 0) {
+            byteCount = (int) cachedAt;
+         } else {
+            try {
+               store.cache(currentOffset, byteCount);
+            } catch (EndOfMediumException e) {
+               byteCount = e.getByteCountActuallyRead();
+            }
+         }
+
+         // Workaround for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception, thus
+         // bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
+         if (byteCount == 0 || currentOffset.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
+            && byteCount > currentOffset.getMedium().getCurrentLength() - currentOffset.getAbsoluteMediumOffset()) {
+            byteCount = (int) (currentOffset.getMedium().getCurrentLength() - currentOffset.getAbsoluteMediumOffset());
          }
 
          ByteBuffer readData;
@@ -532,84 +545,14 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    }
 
-   private long getSizeUpToTerminationBytes(MediumOffset reference, ByteOrder byteOrder, byte[] terminationBytes,
+   private long getSizeUpToTerminationBytes(MediumOffset reference, Charset charset, Character terminationCharacter,
       long remainingDirectParentByteCount) {
+      FieldTerminationFinder finder = new FieldTerminationFinder();
 
-      long sizeUpToTerminationBytes = 0;
-
-      MediumOffset currentReference = reference;
-
-      boolean endOfMediumReached = false;
-
-      // The block size read is adapted to be a multiple of the termination bytes' length,
-      // to be sure the termination bytes are not split up between to subsequent read
-      // blocks, but found in a single block read.
-      int fittingBlockSize = m_maxFieldBlockSize + terminationBytes.length
-         - m_maxFieldBlockSize % terminationBytes.length;
-
-      while (!endOfMediumReached) {
-         int bytesToRead = fittingBlockSize;
-
-         long cachedByteCountAt = m_cache.getCachedByteCountAt(currentReference);
-         // As long as no termination bytes are found: Cache from medium, if not already
-         // done.
-         try {
-            // TODO: Problem using cache here - For potentially large terminated (lazy)
-            // fields, the whole field would - at the end - be cached in memory. This
-            // will cause an OutOfMemory condition soon. Instead, use a "checkedRead"
-            // approach that won't memorize read bytes...
-            if (cachedByteCountAt < bytesToRead) {
-               m_cache.cache(currentReference, bytesToRead);
-            }
-         } catch (EndOfMediumException e) {
-            bytesToRead = e.getByteCountActuallyRead();
-
-            if (bytesToRead < cachedByteCountAt) {
-               bytesToRead = (int) cachedByteCountAt;
-            }
-
-            // End condition for the loop
-            endOfMediumReached = true;
-         }
-
-         // Workaround for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception, thus
-         // bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
-         if (bytesToRead == 0 || currentReference.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
-            && bytesToRead > currentReference.getMedium().getCurrentLength()
-               - currentReference.getAbsoluteMediumOffset()) {
-            bytesToRead = (int) (currentReference.getMedium().getCurrentLength()
-               - currentReference.getAbsoluteMediumOffset());
-         }
-
-         ByteBuffer bufferedBytes = readBytes(currentReference, bytesToRead);
-         bufferedBytes.order(byteOrder);
-
-         int findStartIndex = findTerminationBytes(bufferedBytes, terminationBytes);
-
-         // Termination bytes have been found!
-         if (findStartIndex != -1) {
-            sizeUpToTerminationBytes += findStartIndex + terminationBytes.length;
-
-            return sizeUpToTerminationBytes;
-         }
-
-         // Otherwise try to locate them in the next block read
-         sizeUpToTerminationBytes += bytesToRead;
-
-         // In case that the number of remaining bytes in the current field's parent
-         // is known, the algorithm terminates already if this number is exceeded, instead
-         // of reading further up to the end of medium and potentially spotting wrong
-         // termination bytes already belonging to a subsequent field.
-         if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED) {
-            if (sizeUpToTerminationBytes >= remainingDirectParentByteCount) {
-               return remainingDirectParentByteCount;
-            }
-         }
-
-         currentReference = currentReference.advance(bytesToRead);
-      }
-
-      return DataBlockDescription.UNDEFINED;
+      return finder.getSizeUntilTermination(charset, terminationCharacter, new DefDataProvider(reference, m_cache),
+         remainingDirectParentByteCount == DataBlockDescription.UNDEFINED ? FieldTerminationFinder.NO_LIMIT
+            : remainingDirectParentByteCount,
+         reference.getMedium().getMaxReadWriteBlockSizeInBytes());
    }
 
    /**

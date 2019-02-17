@@ -20,7 +20,7 @@ public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
    /**
     * Creates a new {@link InMemoryMedium} with default values for all properties that influence reading and writing.
     * Note that caching is always disable for an {@link InMemoryMedium}.
-    * 
+    *
     * @param medium
     *           See {@link #InMemoryMedium(byte[], String, boolean, int)}
     * @param name
@@ -35,7 +35,7 @@ public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
    /**
     * Creates a new {@link InMemoryMedium} and allows to explicitly set all configuration properties that influence
     * reading and writing. Note that caching is always disable for an {@link InMemoryMedium}.
-    * 
+    *
     * @param medium
     *           The underlying byte array, must not be null
     * @param name
@@ -43,7 +43,7 @@ public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
     * @param isReadOnly
     *           true to make this {@link InMemoryMedium} read-only, false enables read and write
     * @param maxReadWriteBlockSizeInBytes
-    *           see #getMaxReadWriteBlockSizeInBytes()
+    *           see {@link Medium#getMaxReadWriteBlockSizeInBytes()}
     */
    public InMemoryMedium(byte[] medium, String name, boolean isReadOnly, int maxReadWriteBlockSizeInBytes) {
       super(ByteBuffer.wrap(medium), name, true, isReadOnly, false, 0, maxReadWriteBlockSizeInBytes);
@@ -60,7 +60,7 @@ public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
 
    /**
     * Provides the possibility to reset the current medium bytes.
-    * 
+    *
     * @param mediumBytes
     *           The bytes to set
     */

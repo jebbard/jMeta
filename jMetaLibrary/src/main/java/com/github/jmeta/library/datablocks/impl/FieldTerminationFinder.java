@@ -24,14 +24,14 @@ import com.github.jmeta.utility.charset.api.services.Charsets;
 public class FieldTerminationFinder {
 
    @FunctionalInterface
-   interface DataProvider {
+   interface FieldDataProvider {
 
       ByteBuffer nextData(int byteCount);
    }
 
    public final static long NO_LIMIT = -1;
 
-   public long getSizeUntilTermination(Charset charset, Character terminationCharacter, DataProvider dataProvider,
+   public long getSizeUntilTermination(Charset charset, Character terminationCharacter, FieldDataProvider dataProvider,
       long limit, int readBlockSize) {
 
       long sizeUpToEndOfTerminationBytes = 0;
@@ -69,10 +69,6 @@ public class FieldTerminationFinder {
 
          outputBuffer.flip();
 
-         if (limit != NO_LIMIT && sizeUpToEndOfTerminationBytes + outputBuffer.remaining() > limit) {
-            return limit;
-         }
-
          String bufferString = outputBuffer.toString();
 
          int lenUpToTermination = bufferString.indexOf(terminationCharacter);
@@ -83,6 +79,11 @@ public class FieldTerminationFinder {
             endIndex = lenUpToTermination + 1;
             terminationBytesFound = true;
          }
+
+         // if (!terminationBytesFound && limit != NO_LIMIT
+         // && sizeUpToEndOfTerminationBytes + outputBuffer.remaining() > limit) {
+         // return limit;
+         // }
 
          boolean isFollowUpBlock = sizeUpToEndOfTerminationBytes > 0;
 
@@ -106,11 +107,11 @@ public class FieldTerminationFinder {
             sizeUpToEndOfTerminationBytes -= 2;
          }
 
-         if (!terminationBytesFound) {
+         if (limit != NO_LIMIT && sizeUpToEndOfTerminationBytes >= limit) {
+            return limit;
+         }
 
-            if (limit != NO_LIMIT && sizeUpToEndOfTerminationBytes >= limit) {
-               return limit;
-            }
+         if (!terminationBytesFound) {
 
             readBytes = ByteBuffer.allocate(readBlockSize + encodedBytes.remaining());
             readBytes.put(encodedBytes);
