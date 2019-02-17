@@ -136,7 +136,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       long minHeaderSize = determineMinimumHeaderSize();
 
       try {
-         mediumStore.cache(reference, (int) minHeaderSize);
+         mediumStore.cache(reference, reference.getMedium().getMaxReadWriteBlockSizeInBytes());
       } catch (EndOfMediumException e) {
          // Silently ignore as this might well happen if a data format min header size is too big for the medium
       }
