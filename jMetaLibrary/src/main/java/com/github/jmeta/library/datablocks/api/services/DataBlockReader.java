@@ -12,7 +12,6 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.StandardField;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -38,7 +37,7 @@ public interface DataBlockReader {
    /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
     * {@link MediumOffset} or null. If the {@link Container}s presence is optional, its actual presence is determined
-    * 
+    *
     * @param reference
     * @param id
     * @param parent
@@ -142,13 +141,6 @@ public interface DataBlockReader {
     * @return the {@link DataFormatSpecification}
     */
    public DataFormatSpecification getSpecification();
-
-   /**
-    * @param reference
-    * @param size
-    * @throws EndOfMediumException
-    */
-   public void cache(MediumOffset reference, long size) throws EndOfMediumException;
 
    /**
     * @param reference

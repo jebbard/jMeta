@@ -108,16 +108,6 @@ public class StandardDataBlockReader implements DataBlockReader {
          + " were read before EOF.";
    }
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#cache(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      long)
-    */
-   @Override
-   public void cache(MediumOffset reference, long size) throws EndOfMediumException {
-
-      m_cache.cache(reference, (int) size);
-   }
-
    private DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, Field<?> headerField) {
 
       String concreteLocalId = "";
@@ -643,6 +633,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
 
+      bufferBeforeRead(reference, remainingDirectParentByteCount);
+
       DataBlockDescription defaultNestedContainerDescription = getSpecification()
          .getDefaultNestedContainerDescription();
 
@@ -675,17 +667,10 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          MediumOffset magicKeyReference = reference.advance(magicKey.getDeltaOffset());
 
-         try {
-            cache(magicKeyReference, magicKeySizeInBytes);
+         final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
 
-            final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
-
-            if (magicKey.isPresentIn(readBytes)) {
-               return true;
-            }
-         } catch (EndOfMediumException e) {
-            // If this happens, the magic key is definitely not present here...
-            LOGGER.warn("End of medium encountered during data format identification", e);
+         if (magicKey.isPresentIn(readBytes)) {
+            return true;
          }
       }
 
@@ -740,8 +725,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
-      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, true),
-         "hasContainerWithId(reference, id, parent, remainingDirectParentByteCount)");
+
+      bufferBeforeRead(reference, remainingDirectParentByteCount);
 
       // TODO the actual current charset and byte order must be known here!
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
@@ -841,8 +826,6 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
-      Reject.ifFalse(hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, false),
-         "hasContainerWithId(reference, id, parent, remainingDirectParentByteCount)");
 
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
          m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding());
@@ -953,42 +936,13 @@ public class StandardDataBlockReader implements DataBlockReader {
    private Field<?> readField(final MediumOffset reference, ByteOrder currentByteOrder, Charset currentCharset,
       DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount) {
 
-      ByteBuffer fieldBuffer = null;
-
-      try {
-         if (remainingDirectParentByteCount > fieldSize) {
-            if (fieldSize <= m_maxFieldBlockSize) {
-               if (m_cache.getCachedByteCountAt(reference) >= 1) {
-                  if (m_cache.getCachedByteCountAt(reference) < fieldSize) {
-                     cache(reference, fieldSize);
-                  }
-               } else {
-                  cache(reference, Math.min(remainingDirectParentByteCount, m_maxFieldBlockSize));
-               }
-            }
-         }
-
-         else {
-            if (m_cache.getCachedByteCountAt(reference) < fieldSize) {
-               if (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED) {
-                  cache(reference, fieldSize);
-               } else {
-                  cache(reference, remainingDirectParentByteCount);
-               }
-            }
-         }
-      } catch (EndOfMediumException e) {
-         throw new IllegalStateException(
-            buildEOFExceptionMessage(reference, e.getByteCountTriedToRead(), e.getByteCountActuallyRead()));
-      }
-
       // A lazy field is created if the field size exceeds a maximum size
       if (fieldSize > m_maxFieldBlockSize) {
          return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, currentByteOrder,
             currentCharset);
       }
 
-      fieldBuffer = readBytes(reference, (int) fieldSize);
+      ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
       return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer,
          currentByteOrder, currentCharset);
@@ -1001,6 +955,8 @@ public class StandardDataBlockReader implements DataBlockReader {
    @Override
    public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, FieldFunctionStack context,
       long remainingDirectParentByteCount) {
+
+      bufferBeforeRead(reference, remainingDirectParentByteCount);
 
       DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
 
@@ -1130,11 +1086,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       // If the medium is a stream-based medium, all the payload bytes must be cached first
       if (!m_cache.getMedium().isRandomAccess() && totalPayloadSize != DataBlockDescription.UNDEFINED
          && totalPayloadSize != 0) {
-         try {
-            cache(reference, totalPayloadSize);
-         } catch (EndOfMediumException e) {
-            throw new RuntimeException("Unexpected end of file " + e);
-         }
+         bufferBeforeRead(reference, totalPayloadSize);
       }
 
       return m_dataBlockFactory.createPayloadAfterRead(payloadDesc.getId(), reference, totalPayloadSize, this, context);
@@ -1213,9 +1165,11 @@ public class StandardDataBlockReader implements DataBlockReader {
       MediumOffset cacheOffset = null;
       int cacheSize = startOffset.getMedium().getMaxReadWriteBlockSizeInBytes();
 
-      if (size != DataBlockDescription.UNDEFINED && m_cache.getCachedByteCountAt(cacheOffset) < size) {
-         cacheOffset = startOffset.advance(size - m_cache.getCachedByteCountAt(cacheOffset));
-      } else if (size == DataBlockDescription.UNDEFINED && m_cache.getCachedByteCountAt(cacheOffset) == 0) {
+      long cachedByteCountAt = m_cache.getCachedByteCountAt(startOffset);
+
+      if (size != DataBlockDescription.UNDEFINED && cachedByteCountAt < size) {
+         cacheOffset = startOffset.advance(cachedByteCountAt);
+      } else if (size == DataBlockDescription.UNDEFINED && cachedByteCountAt == 0) {
          cacheOffset = startOffset;
       }
 

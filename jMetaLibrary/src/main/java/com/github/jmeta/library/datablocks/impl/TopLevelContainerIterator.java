@@ -9,12 +9,10 @@ package com.github.jmeta.library.datablocks.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
@@ -23,8 +21,6 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -87,18 +83,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       mediumStore.close();
    }
 
-   private long determineMinimumHeaderSize() {
-      List<DataBlockDescription> topLevelDescriptions = readerMap.values().stream()
-         .flatMap(dr -> dr.getSpecification().getTopLevelDataBlockDescriptions().stream()).collect(Collectors.toList());
-
-      List<DataBlockDescription> topLevelHeaders = topLevelDescriptions.stream()
-         .flatMap(tld -> tld.getOrderedChildren().stream())
-         .filter(ch -> ch.getPhysicalType() == PhysicalDataBlockType.HEADER).collect(Collectors.toList());
-
-      return topLevelHeaders.stream().max(Comparator.comparing(DataBlockDescription::getMinimumByteLength)).get()
-         .getMinimumByteLength();
-   }
-
    private long getBytesToAdvance(Container container) {
       if (forwardRead) {
          return container.getTotalSize();
@@ -131,14 +115,6 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
 
       if (precedenceList.isEmpty()) {
          return null;
-      }
-
-      long minHeaderSize = determineMinimumHeaderSize();
-
-      try {
-         mediumStore.cache(reference, reference.getMedium().getMaxReadWriteBlockSizeInBytes());
-      } catch (EndOfMediumException e) {
-         // Silently ignore as this might well happen if a data format min header size is too big for the medium
       }
 
       for (Iterator<ContainerDataFormat> iterator = precedenceList.iterator(); iterator.hasNext();) {
