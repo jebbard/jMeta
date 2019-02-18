@@ -45,7 +45,7 @@ public class StandardMediaAPITest {
 
       /**
        * Creates a new {@link FakeMediumClass}.
-       * 
+       *
        * @param medium
        *           The fake medium
        */
@@ -77,7 +77,8 @@ public class StandardMediaAPITest {
    public void createMediumStore_forInMemoryMedium_returnsProperStoreInstance() {
       MediaAPI mediaAPI = new StandardMediaAPI();
 
-      InMemoryMedium mediumDefinition = new InMemoryMedium(new byte[] { 100 }, "My Medium", false, 500);
+      InMemoryMedium mediumDefinition = new InMemoryMedium(new byte[] { 100 }, "My Medium", false,
+         MediumStore.MIN_CACHE_SIZE_IN_BYTES, 500);
 
       MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 

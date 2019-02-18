@@ -15,7 +15,7 @@ import java.util.List;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 
 /**
- * {@link ReadOnlyMemoryMediumAccessorTest} tests a {@link MemoryMediumAccessor} working on a read-only medium.
+ * {@link ReadOnlyMemoryMediumAccessorTest} tests a {@link InMemoryMediumAccessor} working on a read-only medium.
  */
 public class ReadOnlyMemoryMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 
@@ -58,7 +58,7 @@ public class ReadOnlyMemoryMediumAccessorTest extends AbstractReadOnlyMediumAcce
     */
    @Override
    protected MediumAccessor<?> createImplementationToTest() {
-      return new MemoryMediumAccessor(getExpectedMedium());
+      return new InMemoryMediumAccessor(getExpectedMedium());
    }
 
    /**

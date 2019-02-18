@@ -13,7 +13,7 @@ import java.util.List;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 
 /**
- * Tests the class {@link MemoryMediumAccessor} for a writable medium.
+ * Tests the class {@link InMemoryMediumAccessor} for a writable medium.
  */
 public class WritableMemoryMediumAccessorTest extends AbstractWritableRandomAccessMediumAccessorTest {
 
@@ -57,7 +57,7 @@ public class WritableMemoryMediumAccessorTest extends AbstractWritableRandomAcce
     */
    @Override
    protected MediumAccessor<?> createImplementationToTest() {
-      return new MemoryMediumAccessor(getExpectedMedium());
+      return new InMemoryMediumAccessor(getExpectedMedium());
    }
 
    /**

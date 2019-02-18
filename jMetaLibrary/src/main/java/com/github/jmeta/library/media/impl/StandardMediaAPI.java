@@ -23,7 +23,7 @@ import com.github.jmeta.library.media.impl.changeManager.MediumChangeManager;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.InputStreamMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
-import com.github.jmeta.library.media.impl.mediumAccessor.MemoryMediumAccessor;
+import com.github.jmeta.library.media.impl.mediumAccessor.InMemoryMediumAccessor;
 import com.github.jmeta.library.media.impl.offset.MediumOffsetFactory;
 import com.github.jmeta.library.media.impl.store.StandardMediumStore;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -69,7 +69,7 @@ public class StandardMediaAPI implements MediaAPI {
       if (medium.getClass() == FileMedium.class) {
          mediumAccessor = new FileMediumAccessor((FileMedium) medium);
       } else if (medium.getClass() == InMemoryMedium.class) {
-         mediumAccessor = new MemoryMediumAccessor((InMemoryMedium) medium);
+         mediumAccessor = new InMemoryMediumAccessor((InMemoryMedium) medium);
       } else if (medium.getClass() == InputStreamMedium.class) {
          mediumAccessor = new InputStreamMediumAccessor((InputStreamMedium) medium);
       }

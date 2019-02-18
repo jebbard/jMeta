@@ -22,14 +22,14 @@ public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
     * Note that caching is always disable for an {@link InMemoryMedium}.
     *
     * @param medium
-    *           See {@link #InMemoryMedium(byte[], String, boolean, int)}
+    *           See {@link #InMemoryMedium(byte[], String, boolean, long, int)}
     * @param name
-    *           See {@link #InMemoryMedium(byte[], String, boolean, int)}
+    *           See {@link #InMemoryMedium(byte[], String, boolean, long, int)}
     * @param readOnly
-    *           See {@link #InMemoryMedium(byte[], String, boolean, int)}
+    *           See {@link #InMemoryMedium(byte[], String, boolean, long, int)}
     */
    public InMemoryMedium(byte[] medium, String name, boolean readOnly) {
-      this(medium, name, readOnly, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      this(medium, name, readOnly, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
    }
 
    /**
@@ -42,11 +42,14 @@ public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
     *           A name of the {@link InputStream} to be able to identify it. Optional, i.e. null may be passed
     * @param isReadOnly
     *           true to make this {@link InMemoryMedium} read-only, false enables read and write
+    * @param maxCacheSizeInBytes
+    *           see {@link Medium#getMaxCacheSizeInBytes()}, must be bigger than 0
     * @param maxReadWriteBlockSizeInBytes
     *           see {@link Medium#getMaxReadWriteBlockSizeInBytes()}
     */
-   public InMemoryMedium(byte[] medium, String name, boolean isReadOnly, int maxReadWriteBlockSizeInBytes) {
-      super(ByteBuffer.wrap(medium), name, true, isReadOnly, false, 0, maxReadWriteBlockSizeInBytes);
+   public InMemoryMedium(byte[] medium, String name, boolean isReadOnly, long maxCacheSizeInBytes,
+      int maxReadWriteBlockSizeInBytes) {
+      super(ByteBuffer.wrap(medium), name, true, isReadOnly, true, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
    }
 
    /**

@@ -513,13 +513,6 @@ public class StandardDataBlockReader implements DataBlockReader {
             }
          }
 
-         // Workaround for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception, thus
-         // bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
-         if (byteCount == 0 || currentOffset.getMedium().getCurrentLength() != Medium.UNKNOWN_LENGTH
-            && byteCount > currentOffset.getMedium().getCurrentLength() - currentOffset.getAbsoluteMediumOffset()) {
-            byteCount = (int) (currentOffset.getMedium().getCurrentLength() - currentOffset.getAbsoluteMediumOffset());
-         }
-
          ByteBuffer readData;
          try {
             readData = store.getData(currentOffset, byteCount);

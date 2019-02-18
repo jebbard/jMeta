@@ -15,7 +15,7 @@ import com.github.jmeta.library.media.api.services.AbstractReadOnlyMediumStoreTe
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
-import com.github.jmeta.library.media.impl.mediumAccessor.MemoryMediumAccessor;
+import com.github.jmeta.library.media.impl.mediumAccessor.InMemoryMediumAccessor;
 
 /**
  * {@link ReadOnlyInMemoryMediumStoreTest} tests a {@link MediumStore} backed by {@link InMemoryMedium} instances.
@@ -35,6 +35,6 @@ public class ReadOnlyInMemoryMediumStoreTest extends AbstractReadOnlyMediumStore
     */
    @Override
    protected MediumAccessor<InMemoryMedium> createMediumAccessor(InMemoryMedium mediumToUse) {
-      return new MemoryMediumAccessor(mediumToUse);
+      return new InMemoryMediumAccessor(mediumToUse);
    }
 }

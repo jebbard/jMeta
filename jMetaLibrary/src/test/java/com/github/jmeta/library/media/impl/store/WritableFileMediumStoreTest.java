@@ -13,17 +13,18 @@ import static com.github.jmeta.library.media.api.helper.TestMedia.at;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmeta.library.media.api.exceptions.InvalidOverlappingWriteException;
-import com.github.jmeta.library.media.api.exceptions.MediumStoreClosedException;
 import com.github.jmeta.library.media.api.helper.MediaTestUtility;
 import com.github.jmeta.library.media.api.helper.TestMedia;
-import com.github.jmeta.library.media.api.services.AbstractCachedMediumStoreTest;
+import com.github.jmeta.library.media.api.services.AbstractWritableRandomAccessMediumStoreTest;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.MediumAction;
@@ -31,31 +32,12 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.library.media.impl.mediumAccessor.FileMediumAccessor;
 import com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor;
 import com.github.jmeta.utility.charset.api.services.Charsets;
+import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link CachedWritableFileMediumStoreTest} tests a {@link MediumStore} backed by {@link FileMedium} instances.
+ * {@link WritableFileMediumStoreTest} tests a {@link MediumStore} backed by {@link FileMedium} instances.
  */
-public class CachedWritableFileMediumStoreTest extends AbstractCachedMediumStoreTest<FileMedium> {
-
-   /**
-    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and {@link MediumStore#cache(MediumOffset, int)}.
-    */
-   @Test
-   public void getCachedByteCountAt_forFilledRandomAccessMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      mediumStoreUnderTest.open();
-
-      int byteCountToCache = 10;
-
-      MediumOffset cacheOffset = at(currentMedium, 20);
-
-      cacheNoEOMExpected(cacheOffset, byteCountToCache);
-
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(-5)));
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(byteCountToCache)));
-      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(byteCountToCache + 10)));
-   }
+public class WritableFileMediumStoreTest extends AbstractWritableRandomAccessMediumStoreTest<FileMedium> {
 
    /**
     * Tests {@link MediumStore#cache(MediumOffset, int)}.
@@ -175,22 +157,196 @@ public class CachedWritableFileMediumStoreTest extends AbstractCachedMediumStore
    }
 
    /**
-    * Tests {@link MediumStore#cache(MediumOffset, int)}.
+    * Tests {@link MediumStore#flush()} in terms of caching
     */
    @Test
-   public void cache_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
+   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_nothingCachedBefore_cachesCorrectData() {
       mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
 
       String currentMediumContent = getMediumContentAsString(currentMedium);
 
+      int startOffsetOfChanges = 4;
+
       mediumStoreUnderTest.open();
 
-      MediumOffset cacheOffset = at(currentMedium, currentMediumContent.length() + 15);
-      int cacheSize = 10;
+      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
 
-      testCache_throwsEndOfMediumException(cacheOffset, cacheSize, currentMediumContent);
+      assertRangeIsNotCached(at(currentMedium, 0), startOffsetOfChanges);
 
-      assertCacheIsEmpty();
+      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
+         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
+
+      mediumStoreUnderTest.close();
+
+      String expectedMediumContent = new String(
+         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
+         Charsets.CHARSET_UTF8);
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+
+      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
+
+      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
+         mediumContentAfterFlush.length());
+
+      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
+
+      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} in terms of caching
+    */
+   @Test
+   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_partlyCachedBefore_cachesCorrectData() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      int startOffsetOfChanges = 4;
+
+      mediumStoreUnderTest.open();
+
+      // Caching in some later removed and replaced regions, as well as some later "re-read" regions
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(5), 200);
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(255), 114);
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(600), 344);
+
+      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
+
+      assertRangeIsNotCached(at(currentMedium, 0), startOffsetOfChanges);
+
+      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
+         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
+
+      mediumStoreUnderTest.close();
+
+      String expectedMediumContent = new String(
+         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
+         Charsets.CHARSET_UTF8);
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+
+      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
+
+      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
+         mediumContentAfterFlush.length());
+
+      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
+
+      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} in terms of caching
+    */
+   @Test
+   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_allCachedBefore_cachesCorrectData() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      int startOffsetOfChanges = 4;
+
+      mediumStoreUnderTest.open();
+
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(0), currentMediumContent.length());
+
+      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
+
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), startOffsetOfChanges, currentMediumContent);
+
+      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
+         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
+
+      mediumStoreUnderTest.close();
+
+      String expectedMediumContent = new String(
+         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
+         Charsets.CHARSET_UTF8);
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+
+      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
+
+      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
+         mediumContentAfterFlush.length());
+
+      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
+
+      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
+   }
+
+   /**
+    * Tests {@link MediumStore#flush()} in terms of caching
+    */
+   @Test
+   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_onlyGapsWithNoChangesCachedBefore_cachesCorrectData() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      String currentMediumContent = getMediumContentAsString(currentMedium);
+
+      int startOffsetOfChanges = 4;
+
+      mediumStoreUnderTest.open();
+
+      // Caching in some later removed and replaced regions, as well as some later "re-read" regions
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(0), 2);
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(400), 80);
+      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(1000), 186);
+
+      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
+
+      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), 2, currentMediumContent);
+      assertRangeIsNotCached(at(currentMedium, 2), startOffsetOfChanges - 2);
+
+      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
+         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
+
+      mediumStoreUnderTest.close();
+
+      String expectedMediumContent = new String(
+         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
+         Charsets.CHARSET_UTF8);
+
+      String actualMediumContent = getMediumContentAsString(currentMedium);
+
+      Assert.assertEquals(expectedMediumContent, actualMediumContent);
+
+      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
+
+      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
+         mediumContentAfterFlush.length());
+
+      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
+
+      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
+   }
+
+   /**
+    * Tests {@link MediumStore#getCachedByteCountAt(MediumOffset)} and {@link MediumStore#cache(MediumOffset, int)}.
+    */
+   @Test
+   public void getCachedByteCountAt_forFilledRandomAccessMediumWithBigCache_priorCacheAndOffsetOutsideCachedRegion_returnsZero() {
+      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
+
+      mediumStoreUnderTest.open();
+
+      int byteCountToCache = 10;
+
+      MediumOffset cacheOffset = at(currentMedium, 20);
+
+      cacheNoEOMExpected(cacheOffset, byteCountToCache);
+
+      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(-5)));
+      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(byteCountToCache)));
+      Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset.advance(byteCountToCache + 10)));
    }
 
    /**
@@ -325,225 +481,6 @@ public class CachedWritableFileMediumStoreTest extends AbstractCachedMediumStore
    }
 
    /**
-    * Tests {@link MediumStore#getData(MediumOffset, int)}.
-    */
-   @Test
-   public void getData_forFilledRandomAccessMediumWithBigCache_forOffsetBeyondEOM_throwsEOMException() {
-      mediumStoreUnderTest = createFilledMediumStoreWithBigCache();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      mediumStoreUnderTest.open();
-
-      MediumOffset getDataOffset = at(currentMedium, (long) (currentMediumContent.length() + 15));
-      int getDataSize = 10;
-
-      testGetData_throwsEndOfMediumException(getDataOffset, getDataSize, currentMediumContent.length(),
-         currentMediumContent);
-
-      assertCacheIsEmpty();
-   }
-
-   /**
-    * Tests {@link MediumStore#flush()} in terms of caching
-    */
-   @Test
-   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_nothingCachedBefore_cachesCorrectData() {
-      mediumStoreUnderTest = createDefaultFilledMediumStore();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      int startOffsetOfChanges = 4;
-
-      mediumStoreUnderTest.open();
-
-      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
-
-      assertRangeIsNotCached(at(currentMedium, 0), startOffsetOfChanges);
-
-      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
-         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
-
-      mediumStoreUnderTest.close();
-
-      String expectedMediumContent = new String(
-         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
-         Charsets.CHARSET_UTF8);
-
-      String actualMediumContent = getMediumContentAsString(currentMedium);
-
-      Assert.assertEquals(expectedMediumContent, actualMediumContent);
-
-      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
-
-      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
-         mediumContentAfterFlush.length());
-
-      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
-
-      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
-   }
-
-   /**
-    * Tests {@link MediumStore#flush()} in terms of caching
-    */
-   @Test
-   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_partlyCachedBefore_cachesCorrectData() {
-      mediumStoreUnderTest = createDefaultFilledMediumStore();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      int startOffsetOfChanges = 4;
-
-      mediumStoreUnderTest.open();
-
-      // Caching in some later removed and replaced regions, as well as some later "re-read" regions
-      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(5), 200);
-      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(255), 114);
-      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(600), 344);
-
-      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
-
-      assertRangeIsNotCached(at(currentMedium, 0), startOffsetOfChanges);
-
-      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
-         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
-
-      mediumStoreUnderTest.close();
-
-      String expectedMediumContent = new String(
-         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
-         Charsets.CHARSET_UTF8);
-
-      String actualMediumContent = getMediumContentAsString(currentMedium);
-
-      Assert.assertEquals(expectedMediumContent, actualMediumContent);
-
-      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
-
-      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
-         mediumContentAfterFlush.length());
-
-      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
-
-      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
-   }
-
-   /**
-    * Tests {@link MediumStore#flush()} in terms of caching
-    */
-   @Test
-   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_allCachedBefore_cachesCorrectData() {
-      mediumStoreUnderTest = createDefaultFilledMediumStore();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      int startOffsetOfChanges = 4;
-
-      mediumStoreUnderTest.open();
-
-      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(0), currentMediumContent.length());
-
-      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
-
-      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), startOffsetOfChanges, currentMediumContent);
-
-      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
-         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
-
-      mediumStoreUnderTest.close();
-
-      String expectedMediumContent = new String(
-         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
-         Charsets.CHARSET_UTF8);
-
-      String actualMediumContent = getMediumContentAsString(currentMedium);
-
-      Assert.assertEquals(expectedMediumContent, actualMediumContent);
-
-      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
-
-      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
-         mediumContentAfterFlush.length());
-
-      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
-
-      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
-   }
-
-   /**
-    * Tests {@link MediumStore#flush()} in terms of caching
-    */
-   @Test
-   public void flush_forFilledRandomAccessMediumWithBigCache_variousChanges_onlyGapsWithNoChangesCachedBefore_cachesCorrectData() {
-      mediumStoreUnderTest = createDefaultFilledMediumStore();
-
-      String currentMediumContent = getMediumContentAsString(currentMedium);
-
-      int startOffsetOfChanges = 4;
-
-      mediumStoreUnderTest.open();
-
-      // Caching in some later removed and replaced regions, as well as some later "re-read" regions
-      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(0), 2);
-      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(400), 80);
-      cacheNoEOMExpected(mediumStoreUnderTest.createMediumOffset(1000), 186);
-
-      int mediumSizeDelta = performAndCheckFlushForCachingTests(startOffsetOfChanges);
-
-      assertRangeIsCachedFromExternalMedium(at(currentMedium, 0), 2, currentMediumContent);
-      assertRangeIsNotCached(at(currentMedium, 2), startOffsetOfChanges - 2);
-
-      String cacheContentAfterFlush = getCacheContentInRangeAsString(at(currentMedium, startOffsetOfChanges),
-         currentMediumContent.length() - startOffsetOfChanges + mediumSizeDelta);
-
-      mediumStoreUnderTest.close();
-
-      String expectedMediumContent = new String(
-         MediaTestUtility.readFileContent(createFlushExpectationPath("expectation_flush_caching.txt")),
-         Charsets.CHARSET_UTF8);
-
-      String actualMediumContent = getMediumContentAsString(currentMedium);
-
-      Assert.assertEquals(expectedMediumContent, actualMediumContent);
-
-      String mediumContentAfterFlush = getMediumContentAsString(currentMedium);
-
-      String expectedCacheContent = mediumContentAfterFlush.substring(startOffsetOfChanges,
-         mediumContentAfterFlush.length());
-
-      Assert.assertEquals(expectedCacheContent, cacheContentAfterFlush);
-
-      assertRangeIsNotCached(at(currentMedium, mediumContentAfterFlush.length()), 2000);
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
-    */
-   @Test(expected = InvalidOverlappingWriteException.class)
-   public void replaceData_overlappingWithPriorReplace_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
-      mediumStoreUnderTest.replaceData(at(currentMedium, 11), 21, ByteBuffer.allocate(8));
-   }
-
-   /**
-    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
-    */
-   @Test(expected = InvalidOverlappingWriteException.class)
-   public void replaceData_overlappingWithPriorRemove_throwsException() {
-      mediumStoreUnderTest = createEmptyMediumStore();
-
-      mediumStoreUnderTest.open();
-
-      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
-      mediumStoreUnderTest.removeData(at(currentMedium, 11), 22);
-   }
-
-   /**
     * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
    @Test(expected = InvalidOverlappingWriteException.class)
@@ -570,13 +507,29 @@ public class CachedWritableFileMediumStoreTest extends AbstractCachedMediumStore
    }
 
    /**
-    * Tests {@link MediumStore#removeData(MediumOffset, int)}.
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
     */
-   @Test(expected = MediumStoreClosedException.class)
-   public void removeData_forClosedMedium_throwsException() {
+   @Test(expected = InvalidOverlappingWriteException.class)
+   public void replaceData_overlappingWithPriorReplace_throwsException() {
       mediumStoreUnderTest = createEmptyMediumStore();
 
-      mediumStoreUnderTest.removeData(at(currentMedium, 10), 20);
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
+      mediumStoreUnderTest.replaceData(at(currentMedium, 11), 21, ByteBuffer.allocate(8));
+   }
+
+   /**
+    * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
+    */
+   @Test(expected = InvalidOverlappingWriteException.class)
+   public void replaceData_overlappingWithPriorRemove_throwsException() {
+      mediumStoreUnderTest = createEmptyMediumStore();
+
+      mediumStoreUnderTest.open();
+
+      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
+      mediumStoreUnderTest.removeData(at(currentMedium, 11), 22);
    }
 
    /**
@@ -619,9 +572,36 @@ public class CachedWritableFileMediumStoreTest extends AbstractCachedMediumStore
    }
 
    /**
+    * Creates a copy of the indicated file in a temporary folder with the given name parts.
+    *
+    * @param pathToFile
+    *           The path to the file to copy
+    * @param mediumType
+    *           The type of medium as string, concatenated to the target file name
+    * @param testMethodName
+    *           The name of the test method currently executed, concatenated to the target file name
+    * @return a Path to a copied file
+    * @throws IOException
+    *            if anything bad happens during I/O
+    */
+   private Path getCopiedFile(Path pathToFile, String mediumType, String testMethodName) throws IOException {
+      Reject.ifNull(testMethodName, "testMethodName");
+      Reject.ifNull(mediumType, "mediumType");
+      Reject.ifNull(pathToFile, "pathToFile");
+
+      Reject.ifFalse(Files.isRegularFile(pathToFile), "Files.isRegularFile(pathToFile)");
+
+      Path copiedFile = Files.copy(pathToFile,
+         TestMedia.TEST_FILE_TEMP_OUTPUT_DIRECTORY_PATH
+            .resolve(getClass().getSimpleName() + "_" + mediumType + testMethodName + ".txt"),
+         StandardCopyOption.REPLACE_EXISTING);
+      return copiedFile;
+   }
+
+   /**
     * Schedules some hard-coded {@link MediumAction}s, flushes them and compares with the expectation. This is done as
     * preparation for any caching tests in connection to flush.
-    * 
+    *
     * @param startOffsetOfChanges
     *           The offset to perform the first action
     * @return The change of the size of the medium after the flush

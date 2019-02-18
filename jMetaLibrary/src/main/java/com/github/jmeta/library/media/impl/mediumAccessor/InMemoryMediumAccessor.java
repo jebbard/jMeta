@@ -1,5 +1,5 @@
 /**
- * {@link MemoryMediumAccessor}.java
+ * {@link InMemoryMediumAccessor}.java
  *
  * @author Jens Ebert
  * @date 09.12.10 21:18:22 (December 9, 2010)
@@ -19,17 +19,17 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * Represents an in-memory, random-access {@link MediumAccessor}.
  */
-public class MemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium> {
+public class InMemoryMediumAccessor extends AbstractMediumAccessor<InMemoryMedium> {
 
    private ByteBuffer memory;
 
    /**
-    * Creates a new {@link MemoryMediumAccessor}.
+    * Creates a new {@link InMemoryMediumAccessor}.
     * 
     * @param medium
     *           The {@link AbstractMedium} this class works on
     */
-   public MemoryMediumAccessor(InMemoryMedium medium) {
+   public InMemoryMediumAccessor(InMemoryMedium medium) {
       super(medium);
    }
 
