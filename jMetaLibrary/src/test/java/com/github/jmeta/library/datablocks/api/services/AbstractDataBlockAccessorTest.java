@@ -182,7 +182,7 @@ public abstract class AbstractDataBlockAccessorTest {
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
-   public void getContainerIterator_forReadOnlyUncachedInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+   public void getContainerIterator_forReadOnlyInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
          createInMemoryMedium(getFileForMediaContents(), true, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
             Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
@@ -192,7 +192,7 @@ public abstract class AbstractDataBlockAccessorTest {
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
-   public void getContainerIterator_forWritableUncachedInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
+   public void getContainerIterator_forWritableInMemoryMediumWithDefaultCacheAndRWBSize_returnsExpectedContainersAndFields() {
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
          createInMemoryMedium(getFileForMediaContents(), false, Medium.DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
             Medium.DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES));
@@ -202,8 +202,8 @@ public abstract class AbstractDataBlockAccessorTest {
     * Tests {@link DataBlockAccessor#getContainerIterator}.
     */
    @Test
-   public void getContainerIterator_forWritableUncachedInMemoryMediumWithSmallCacheAndRWBSize_returnsExpectedContainersAndFields() {
-      int maxCacheSizeToUse = 1;
+   public void getContainerIterator_forWritableInMemoryMediumWithSmallCacheAndRWBSize_returnsExpectedContainersAndFields() {
+      int maxCacheSizeToUse = 101;
       resetMaxCacheSize(maxCacheSizeToUse);
 
       assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(
@@ -310,7 +310,7 @@ public abstract class AbstractDataBlockAccessorTest {
     */
    @Test
    public void getReverseContainerIterator_forWritableInMemoryMediumWithSmallCacheAndRWBSize_returnsExpectedContainersAndFields() {
-      int maxCacheSizeToUse = 1;
+      int maxCacheSizeToUse = 101;
       resetMaxCacheSize(maxCacheSizeToUse);
 
       assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(

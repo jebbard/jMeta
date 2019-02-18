@@ -55,7 +55,7 @@ public class InputStreamMedium extends AbstractMedium<InputStream> {
     */
    public InputStreamMedium(InputStream medium, String name, long maxCacheSizeInBytes,
       int maxReadWriteBlockSizeInBytes) {
-      super(medium, name, false, true, true, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
+      super(medium, name, false, true, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
    }
 
    /**

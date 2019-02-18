@@ -46,8 +46,7 @@ public class FileMedium extends AbstractMedium<Path> {
     *           see {@link Medium#getMaxReadWriteBlockSizeInBytes()}
     */
    public FileMedium(Path medium, boolean isReadOnly, long maxCacheSizeInBytes, int maxReadWriteBlockSizeInBytes) {
-      super(medium, medium.toAbsolutePath().toString(), true, isReadOnly, true, maxCacheSizeInBytes,
-         maxReadWriteBlockSizeInBytes);
+      super(medium, medium.toAbsolutePath().toString(), true, isReadOnly, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
 
       Reject.ifFalse(Files.isRegularFile(medium), "Files.isRegularFile(medium)");
    }

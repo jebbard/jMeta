@@ -50,7 +50,7 @@ public class StandardMediaAPITest {
        *           The fake medium
        */
       public FakeMediumClass(Object medium) {
-         super(medium, "Fake test medium", false, false, false, 0, 0);
+         super(medium, "Fake test medium", false, false, 0, 0);
       }
    }
 

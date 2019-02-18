@@ -32,5 +32,6 @@
     "sec:flushingPlan"
     "tab:createFlushPlan"
     "sec:Konfigurationsparameter"
-    "tab:ConfigMedia")))
+    "tab:ConfigMedia"))
+ :latex)
 

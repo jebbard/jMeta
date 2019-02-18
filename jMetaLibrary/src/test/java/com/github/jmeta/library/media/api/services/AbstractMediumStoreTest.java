@@ -1193,15 +1193,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
       mediumAccessorSpy = Mockito.spy(createMediumAccessor(mediumToUse));
 
-      int maxCacheRegionSize = 0;
-      long maxCacheSize = 0;
-
-      if (mediumToUse.requiresCaching()) {
-         maxCacheSize = mediumToUse.getMaxCacheSizeInBytes();
-         maxCacheRegionSize = mediumToUse.getMaxReadWriteBlockSizeInBytes();
-      }
-
-      mediumCacheSpy = Mockito.spy(new MediumCache(mediumToUse, maxCacheSize, maxCacheRegionSize));
+      mediumCacheSpy = Mockito.spy(new MediumCache(mediumToUse, mediumToUse.getMaxCacheSizeInBytes(),
+         mediumToUse.getMaxReadWriteBlockSizeInBytes()));
       mediumReferenceFactorySpy = Mockito.spy(new MediumOffsetFactory(mediumToUse));
       mediumChangeManagerSpy = Mockito.spy(new MediumChangeManager(mediumReferenceFactorySpy));
 

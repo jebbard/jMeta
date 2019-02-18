@@ -32,26 +32,21 @@ public abstract class AbstractMedium<T> implements Medium<T> {
 
    private final String name;
 
-   private final boolean requiresCaching;
-
    /**
     * Creates a new {@link AbstractMedium} with default values used for all configuration values, see
     * {@link #getMaxCacheSizeInBytes()} and {@link #getMaxReadWriteBlockSizeInBytes()}.
     *
     * @param medium
-    *           see {@link #AbstractMedium(Object, String, boolean, boolean, boolean, long, int)}
+    *           see {@link #AbstractMedium(Object, String, boolean, boolean, long, int)}
     * @param name
-    *           see {@link #AbstractMedium(Object, String, boolean, boolean, boolean, long, int)}
+    *           see {@link #AbstractMedium(Object, String, boolean, boolean, long, int)}
     * @param isRandomAccess
-    *           see {@link #AbstractMedium(Object, String, boolean, boolean, boolean, long, int)}
+    *           see {@link #AbstractMedium(Object, String, boolean, boolean, long, int)}
     * @param isReadOnly
-    *           see {@link #AbstractMedium(Object, String, boolean, boolean, boolean, long, int)}
-    * @param requiresCaching
-    *           see {@link #AbstractMedium(Object, String, boolean, boolean, boolean, long, int)}
+    *           see {@link #AbstractMedium(Object, String, boolean, boolean, long, int)}
     */
-   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, boolean requiresCaching) {
-      this(medium, name, isRandomAccess, isReadOnly, true, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
-         DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly) {
+      this(medium, name, isRandomAccess, isReadOnly, DEFAULT_MAX_CACHE_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
    }
 
    /**
@@ -66,15 +61,13 @@ public abstract class AbstractMedium<T> implements Medium<T> {
     *           true if the medium is random-access, false otherwise
     * @param isReadOnly
     *           true to make this a read-only {@link Medium}, false otherwise.
-    * @param requiresCaching
-    *           see {@link #requiresCaching()}
     * @param maxCacheSizeInBytes
     *           see {@link #getMaxCacheSizeInBytes()}
     * @param maxReadWriteBlockSizeInBytes
     *           see {@link #getMaxReadWriteBlockSizeInBytes()}
     */
-   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, boolean requiresCaching,
-      long maxCacheSizeInBytes, int maxReadWriteBlockSizeInBytes) {
+   public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, long maxCacheSizeInBytes,
+      int maxReadWriteBlockSizeInBytes) {
       Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
       Reject.ifNegative(maxCacheSizeInBytes, "maxCacheSizeInBytes");
       Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
@@ -85,7 +78,6 @@ public abstract class AbstractMedium<T> implements Medium<T> {
       this.isReadOnly = isReadOnly;
       this.maxCacheSizeInBytes = maxCacheSizeInBytes;
       this.maxReadWriteBlockSizeInBytes = maxReadWriteBlockSizeInBytes;
-      this.requiresCaching = requiresCaching;
    }
 
    /**
@@ -179,14 +171,6 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.media.api.types.Medium#requiresCaching()
-    */
-   @Override
-   public boolean requiresCaching() {
-      return requiresCaching;
-   }
-
-   /**
     * Provides the possibility to overwrite the wrapped medium.
     *
     * @param newMedium
@@ -205,7 +189,6 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    public String toString() {
       return "AbstractMedium [medium=" + medium + ", name=" + name + ", isRandomAccess=" + isRandomAccess
          + ", isReadOnly=" + isReadOnly + ", maxCacheSizeInBytes=" + maxCacheSizeInBytes
-         + ", maxReadWriteBlockSizeInBytes=" + maxReadWriteBlockSizeInBytes + ", requiresCaching=" + requiresCaching
-         + "]";
+         + ", maxReadWriteBlockSizeInBytes=" + maxReadWriteBlockSizeInBytes + "]";
    }
 }

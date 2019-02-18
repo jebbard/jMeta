@@ -75,8 +75,7 @@ public interface Medium<T> {
     * Returns the currently configured maximum cache size in bytes. The cache must not exceed this size, if it does,
     * cached data is automatically freed. In detail, the cached data read the longest time ago is freed first to ensure
     * the new cache size is again below the maximum configured size. This size must be bigger than 0 and bigger than the
-    * currently configured maximum cache region size in bytes. If this medium does not require caching, i.e.
-    * {@link #requiresCaching()} returns false, this configuration parameter has no meaning and is ignored.
+    * currently configured maximum cache region size in bytes.
     *
     * The default value, if caching is enabled and if it is not explicitly set is
     * {@link #DEFAULT_MAX_CACHE_SIZE_IN_BYTES}.
@@ -148,13 +147,6 @@ public interface Medium<T> {
     * @return whether this {@link Medium} supports only read-access or not.
     */
    public boolean isReadOnly();
-
-   /**
-    * Tells whether this {@link Medium} requires to be backed by a cache or not
-    *
-    * @return the {@link Medium} needs to be backed by a cache (true) or not (false)
-    */
-   public boolean requiresCaching();
 
    /**
     * @see java.lang.Object#toString()

@@ -56,7 +56,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    /**
     * Creates a new {@link StandardMediumStore}.
-    * 
+    *
     * @param mediumAccessor
     *           The {@link MediumAccessor} instance to use, also contains the {@link Medium} this {@link MediumStore}
     *           works on
@@ -166,51 +166,47 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          }
       }
 
-      if (getMedium().requiresCaching()) {
-         if (getMedium().isRandomAccess()) {
-            logDebugMessage(() -> "Caching is enabled, working on random access medium");
+      if (getMedium().isRandomAccess()) {
+         logDebugMessage(() -> "Working on random access medium");
 
-            long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
+         long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
 
-            logDebugMessage(() -> "Current cache size is: " + initialCacheSize);
-            logDebugMessage(() -> "Getting all cached regions in range "
-               + new MediumRegion(offset, numberOfBytes).toIntervalString());
+         logDebugMessage(() -> "Current cache size is: " + initialCacheSize);
+         logDebugMessage(
+            () -> "Getting all cached regions in range " + new MediumRegion(offset, numberOfBytes).toIntervalString());
 
-            List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
+         List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
 
-            for (MediumRegion cacheRegion : cacheRegionsInRange) {
-               logDebugMessage(() -> "Next cache region in range: " + cacheRegion);
+         for (MediumRegion cacheRegion : cacheRegionsInRange) {
+            logDebugMessage(() -> "Next cache region in range: " + cacheRegion);
 
-               MediumRegion clippedCacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
+            MediumRegion clippedCacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
 
-               if (!clippedCacheRegion.isCached()) {
-                  MediumRegion regionWithBytes = readRegion(clippedCacheRegion.getStartOffset(),
-                     clippedCacheRegion.getSize());
-                  cache.addRegion(regionWithBytes);
-               } else if (isPreviouslyCachedRegionNowUncached(clippedCacheRegion, initialCacheSize, numberOfBytes)) {
-                  cache.addRegion(clippedCacheRegion);
-               }
+            if (!clippedCacheRegion.isCached()) {
+               MediumRegion regionWithBytes = readRegion(clippedCacheRegion.getStartOffset(),
+                  clippedCacheRegion.getSize());
+               cache.addRegion(regionWithBytes);
+            } else if (isPreviouslyCachedRegionNowUncached(clippedCacheRegion, initialCacheSize, numberOfBytes)) {
+               cache.addRegion(clippedCacheRegion);
             }
-         } else {
-            logDebugMessage(() -> "Caching is enabled, working on non-random access medium");
-            logDebugMessage(() -> "Reading any bytes until cache start offset, if necessary");
-
-            List<MediumRegion> regionsToAdd = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
-
-            MediumOffset offsetToUse = mediumAccessor.getCurrentPosition();
-            int numberOfBytesToUse = numberOfBytes - (int) offsetToUse.distanceTo(offset);
-
-            logDebugMessage(() -> "Current position on medium: " + offsetToUse);
-            logDebugMessage(() -> "Number of bytes to actually cache (only if positive): " + numberOfBytesToUse);
-
-            if (numberOfBytesToUse > 0) {
-               regionsToAdd.addAll(readRegionWise(offsetToUse, numberOfBytesToUse));
-            }
-
-            regionsToAdd.forEach(cache::addRegion);
          }
       } else {
-         logDebugMessage(() -> "Caching is disabled, not doing anything");
+         logDebugMessage(() -> "Working on non-random access medium");
+         logDebugMessage(() -> "Reading any bytes until cache start offset, if necessary");
+
+         List<MediumRegion> regionsToAdd = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
+
+         MediumOffset offsetToUse = mediumAccessor.getCurrentPosition();
+         int numberOfBytesToUse = numberOfBytes - (int) offsetToUse.distanceTo(offset);
+
+         logDebugMessage(() -> "Current position on medium: " + offsetToUse);
+         logDebugMessage(() -> "Number of bytes to actually cache (only if positive): " + numberOfBytesToUse);
+
+         if (numberOfBytesToUse > 0) {
+            regionsToAdd.addAll(readRegionWise(offsetToUse, numberOfBytesToUse));
+         }
+
+         regionsToAdd.forEach(cache::addRegion);
       }
 
       logDebugMessage(() -> "DONE Cache <" + numberOfBytes + "> bytes at <" + offset + ">");
@@ -250,77 +246,61 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
          }
       }
 
-      if (getMedium().requiresCaching()) {
-         long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
+      long initialCacheSize = cache.calculateCurrentCacheSizeInBytes();
 
-         logDebugMessage(() -> "Caching is enabled, current cache size: " + initialCacheSize);
+      logDebugMessage(() -> "Current cache size: " + initialCacheSize);
 
-         List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
+      List<MediumRegion> cacheRegionsInRange = cache.getRegionsInRange(offset, numberOfBytes);
 
-         logDebugMessage(
-            () -> "Getting all cached regions in range " + new MediumRegion(offset, numberOfBytes).toIntervalString());
+      logDebugMessage(
+         () -> "Getting all cached regions in range " + new MediumRegion(offset, numberOfBytes).toIntervalString());
 
-         MediumRegion firstRegion = cacheRegionsInRange.get(0);
+      MediumRegion firstRegion = cacheRegionsInRange.get(0);
 
-         // This "if" is just an optimization for the 80% case in which we just take the original ByteBuffer as view,
-         // tailored to the requested range. This safes us new memory allocation and copying of bytes.
-         if (cacheRegionsInRange.size() == 1 && firstRegion.isCached()
-            && firstRegion.getOverlappingByteCount(new MediumRegion(offset, numberOfBytes)) == numberOfBytes) {
+      // This "if" is just an optimization for the 80% case in which we just take the original ByteBuffer as view,
+      // tailored to the requested range. This safes us new memory allocation and copying of bytes.
+      if (cacheRegionsInRange.size() == 1 && firstRegion.isCached()
+         && firstRegion.getOverlappingByteCount(new MediumRegion(offset, numberOfBytes)) == numberOfBytes) {
 
-            logDebugMessage(() -> "Full region cache hit");
+         logDebugMessage(() -> "Full region cache hit");
 
-            ByteBuffer firstRegionCachedBytes = firstRegion.getBytes();
-            firstRegionCachedBytes
-               .position(firstRegionCachedBytes.position() + (int) offset.distanceTo(firstRegion.getStartOffset()));
-            firstRegionCachedBytes.limit(firstRegionCachedBytes.position() + numberOfBytes);
+         ByteBuffer firstRegionCachedBytes = firstRegion.getBytes();
+         firstRegionCachedBytes
+            .position(firstRegionCachedBytes.position() + (int) offset.distanceTo(firstRegion.getStartOffset()));
+         firstRegionCachedBytes.limit(firstRegionCachedBytes.position() + numberOfBytes);
 
-            returnedBytes = firstRegionCachedBytes;
-         } else {
-            ByteBuffer cachedBytes = ByteBuffer.allocate(numberOfBytes);
-
-            logDebugMessage(() -> "Need to gather data from several cache regions");
-
-            for (MediumRegion cacheRegion : cacheRegionsInRange) {
-               logDebugMessage(() -> "Next cache region in range: " + cacheRegion);
-
-               MediumRegion clippedCacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
-
-               if (clippedCacheRegion.isCached()
-                  && !isPreviouslyCachedRegionNowUncached(clippedCacheRegion, initialCacheSize, numberOfBytes)) {
-                  cachedBytes.put(clippedCacheRegion.getBytes());
-               } else {
-                  List<MediumRegion> regionsRead = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(
-                     clippedCacheRegion.getStartOffset());
-
-                  MediumRegion regionToAddWithBytes = readRegion(clippedCacheRegion.getStartOffset(),
-                     clippedCacheRegion.getSize());
-
-                  cachedBytes.put(regionToAddWithBytes.getBytes());
-
-                  regionsRead.add(regionToAddWithBytes);
-
-                  regionsRead.forEach((region) -> cache.addRegion(region));
-               }
-            }
-
-            cachedBytes.rewind();
-
-            returnedBytes = cachedBytes;
-         }
+         returnedBytes = firstRegionCachedBytes;
       } else {
-         logDebugMessage(() -> "Caching is not enabled");
+         ByteBuffer cachedBytes = ByteBuffer.allocate(numberOfBytes);
 
-         readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(offset);
+         logDebugMessage(() -> "Need to gather data from several cache regions");
 
-         ByteBuffer readBytes = ByteBuffer.allocate(numberOfBytes);
+         for (MediumRegion cacheRegion : cacheRegionsInRange) {
+            logDebugMessage(() -> "Next cache region in range: " + cacheRegion);
 
-         List<MediumRegion> regionsRead = readRegionWise(offset, numberOfBytes);
+            MediumRegion clippedCacheRegion = clipRegionAgainstRange(cacheRegion, offset, numberOfBytes);
 
-         regionsRead.forEach((region) -> readBytes.put(region.getBytes()));
+            if (clippedCacheRegion.isCached()
+               && !isPreviouslyCachedRegionNowUncached(clippedCacheRegion, initialCacheSize, numberOfBytes)) {
+               cachedBytes.put(clippedCacheRegion.getBytes());
+            } else {
+               List<MediumRegion> regionsRead = readDataFromCurrentPositionUntilOffsetForNonRandomAccessMedia(
+                  clippedCacheRegion.getStartOffset());
 
-         readBytes.rewind();
+               MediumRegion regionToAddWithBytes = readRegion(clippedCacheRegion.getStartOffset(),
+                  clippedCacheRegion.getSize());
 
-         returnedBytes = readBytes;
+               cachedBytes.put(regionToAddWithBytes.getBytes());
+
+               regionsRead.add(regionToAddWithBytes);
+
+               regionsRead.forEach((region) -> cache.addRegion(region));
+            }
+         }
+
+         cachedBytes.rewind();
+
+         returnedBytes = cachedBytes;
       }
 
       logDebugMessage(() -> "DONE getData of <" + numberOfBytes + "> bytes at <" + offset + ">");
@@ -490,46 +470,36 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
                // If there is an existing cached region containing the insert offset, we must split it there,
                // to ensure the part of the region behind the insert offset is shifted correspondingly to leave room
                // for the inserts
-               if (getMedium().requiresCaching()) {
-                  MediumRegion existingRegionContainingInsertOffset = cache
-                     .getRegionsInRange(scheduledAction.getRegion().getStartOffset(), 1).get(0);
+               MediumRegion existingRegionContainingInsertOffset = cache
+                  .getRegionsInRange(scheduledAction.getRegion().getStartOffset(), 1).get(0);
 
-                  if (existingRegionContainingInsertOffset.isCached() && existingRegionContainingInsertOffset
-                     .getStartOffset().before(scheduledAction.getRegion().getStartOffset())) {
-                     MediumRegion existingRegionSplitAtInsertOffset = existingRegionContainingInsertOffset
-                        .split(scheduledAction.getRegion().getStartOffset())[0];
+               if (existingRegionContainingInsertOffset.isCached() && existingRegionContainingInsertOffset
+                  .getStartOffset().before(scheduledAction.getRegion().getStartOffset())) {
+                  MediumRegion existingRegionSplitAtInsertOffset = existingRegionContainingInsertOffset
+                     .split(scheduledAction.getRegion().getStartOffset())[0];
 
-                     cache.addRegion(existingRegionSplitAtInsertOffset);
-                  }
+                  cache.addRegion(existingRegionSplitAtInsertOffset);
                }
 
                offsetFactory.updateOffsets(scheduledAction);
 
-               if (getMedium().requiresCaching()) {
-                  // Please note the comment in ShiftedMediumBlock.initStartReference()
-                  cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
-               }
+               // Please note the comment in ShiftedMediumBlock.initStartReference()
+               cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
             break;
 
             case REMOVE:
-               if (getMedium().requiresCaching()) {
-                  cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
-                     scheduledAction.getRegion().getSize());
-               }
+               cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
+                  scheduledAction.getRegion().getSize());
                changeManager.undo(scheduledAction);
                offsetFactory.updateOffsets(scheduledAction);
             break;
 
             case REPLACE:
                changeManager.undo(scheduledAction);
-               if (getMedium().requiresCaching()) {
-                  cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
-                     scheduledAction.getRegion().getSize());
-               }
+               cache.removeRegionsInRange(scheduledAction.getRegion().getStartOffset(),
+                  scheduledAction.getRegion().getSize());
                offsetFactory.updateOffsets(scheduledAction);
-               if (getMedium().requiresCaching()) {
-                  cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
-               }
+               cache.addRegion(new MediumRegion(scheduledAction.getRegion().getStartOffset(), actionBytes));
             break;
 
             default:
@@ -546,7 +516,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * In case of {@link MediumRegion}s overlapping just front or back of a given range, they need to be clipped, which
     * is done by this method. It returns a clipped region that is guaranteed to start at or behind the range start
     * offset and end at or before the range end offset.
-    * 
+    *
     * @param region
     *           The {@link MediumRegion} to clip
     * @param rangeOffset
@@ -567,17 +537,17 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * {@link MediumCache#getRegionsInRange(MediumOffset, int)} was meanwhile has become uncached as new regions have
     * been added after this initial call which forced the cache to remove previously cached {@link MediumRegion}s to
     * keep its size below the maximum allowed cache size.
-    * 
+    *
     * If the region is now uncached, it can nevertheless be used for caching again or retrieving data. This way we also
     * avoid unneeded medium accesses even in this corner case.
-    * 
+    *
     * @param cachedRegion
     *           The cached {@link MediumRegion} to check
     * @param initialCacheSizeInBytes
     *           The cache size at point in time when {@link MediumCache#getRegionsInRange(MediumOffset, int)} was called
     * @param maxNumberOfBytesToAdd
     *           The maximum number of bytes that might get added to the cache in total
-    * 
+    *
     * @return true if the given {@link MediumRegion} has now become uncached, false otherwise
     */
    private boolean isPreviouslyCachedRegionNowUncached(MediumRegion cachedRegion, long initialCacheSizeInBytes,
@@ -591,7 +561,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
     * bytes between these offsets chunk-wise and returns the corresponding {@link MediumRegion}s. If the medium's
     * current position is bigger than the given offset, it throws an {@link InvalidMediumOffsetException}. If the
     * offsets are equal, it returns an empty list. For random-access media it also returns an empty list.
-    * 
+    *
     * @param offset
     *           The target offset
     * @return The {@link MediumRegion}s of maximum size {@link Medium#getMaxReadWriteBlockSizeInBytes()} between the
@@ -628,7 +598,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
    /**
     * Determines chunked {@link MediumRegion}s filled with data read from the medium in the given range based on the
     * maximum read-write block size configured for the medium.
-    * 
+    *
     * @param rangeOffset
     *           The range start offset
     * @param rangeSize
@@ -647,7 +617,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    /**
     * Reads a region of bytes from the external medium.
-    * 
+    *
     * @param regionOffset
     *           The offset of the region
     * @param regionSize
@@ -663,10 +633,8 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
          return new MediumRegion(regionOffset, dataRead);
       } catch (EndOfMediumException e) {
-         if (getMedium().requiresCaching()) {
-            if (e.getByteCountActuallyRead() > 0) {
-               cache.addRegion(new MediumRegion(e.getReadStartReference(), e.getBytesReadSoFar()));
-            }
+         if (e.getByteCountActuallyRead() > 0) {
+            cache.addRegion(new MediumRegion(e.getReadStartReference(), e.getBytesReadSoFar()));
          }
 
          throw e;
@@ -693,7 +661,7 @@ public class StandardMediumStore<T extends Medium<?>> implements MediumStore {
 
    /**
     * Logs a debug message, if debug logging is enabled
-    * 
+    *
     * @param message
     *           The message to log
     */

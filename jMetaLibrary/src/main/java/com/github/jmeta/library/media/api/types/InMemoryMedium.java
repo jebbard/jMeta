@@ -49,7 +49,7 @@ public class InMemoryMedium extends AbstractMedium<ByteBuffer> {
     */
    public InMemoryMedium(byte[] medium, String name, boolean isReadOnly, long maxCacheSizeInBytes,
       int maxReadWriteBlockSizeInBytes) {
-      super(ByteBuffer.wrap(medium), name, true, isReadOnly, true, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
+      super(ByteBuffer.wrap(medium), name, true, isReadOnly, maxCacheSizeInBytes, maxReadWriteBlockSizeInBytes);
    }
 
    /**
