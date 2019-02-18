@@ -16,6 +16,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 
@@ -121,7 +122,7 @@ public class FieldTerminationFinder {
          sizeUpToEndOfTerminationBytes += getSizeToAddOfCurrentBlock(charset, lenUpToTermination, bufferString,
             isFollowUpBlock);
 
-         if (limit != Medium.UNKNOWN_LENGTH && sizeUpToEndOfTerminationBytes >= limit) {
+         if (limit != DataBlockDescription.UNDEFINED && sizeUpToEndOfTerminationBytes >= limit) {
             return limit;
          }
       } while (lenUpToTermination == -1);

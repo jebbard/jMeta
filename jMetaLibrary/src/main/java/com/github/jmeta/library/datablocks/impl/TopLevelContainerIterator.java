@@ -97,6 +97,16 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    @Override
    public boolean hasNext() {
       if (forwardRead) {
+         // NOTE: For streaming media, the offset parameter for MediumStore.isAtEndOfMedium is actually ignored, but
+         // the test is always done at the current stream position.
+         // Thus, if pre-buffering occurs for a streaming medium, the actual stream position might be already at EOM,
+         // but at this.currentOffset, there are still some cached bytes available waiting to be fetched.
+         boolean cachedBytesExist = mediumStore.getCachedByteCountAt(currentOffset) > 0;
+
+         if (cachedBytesExist) {
+            return true;
+         }
+
          return !mediumStore.isAtEndOfMedium(currentOffset);
       } else {
          return currentOffset.getAbsoluteMediumOffset() != 0;

@@ -22,7 +22,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.jmeta.library.datablocks.impl.FieldTerminationFinder.FieldDataProvider;
-import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 
 /**
@@ -173,7 +173,7 @@ public class FieldTerminationFinderTest {
    public void getSizeUpToTermination_withoutTerminationWithoutLimit_returnsTotalSize() {
       String inputString = inputStringProviderFunc.apply(null);
 
-      assertExpectedSizeIsReturned(inputString, Medium.UNKNOWN_LENGTH, inputString.getBytes(charset).length,
+      assertExpectedSizeIsReturned(inputString, DataBlockDescription.UNDEFINED, inputString.getBytes(charset).length,
          TERMINATION_CHARACTER_1);
    }
 
@@ -204,10 +204,10 @@ public class FieldTerminationFinderTest {
     */
    @Test
    public void getSizeUpToTermination_withTerminationWithoutLimit_returnsByteSizeUpToTermination() {
-      assertExpectedSizeIsReturned(inputStringProviderFunc.apply(TERMINATION_CHARACTER_1), Medium.UNKNOWN_LENGTH,
-         expectedByteCountUpToTermination, TERMINATION_CHARACTER_1);
-      assertExpectedSizeIsReturned(inputStringProviderFunc.apply(TERMINATION_CHARACTER_2), Medium.UNKNOWN_LENGTH,
-         expectedByteCountUpToTermination, TERMINATION_CHARACTER_2);
+      assertExpectedSizeIsReturned(inputStringProviderFunc.apply(TERMINATION_CHARACTER_1),
+         DataBlockDescription.UNDEFINED, expectedByteCountUpToTermination, TERMINATION_CHARACTER_1);
+      assertExpectedSizeIsReturned(inputStringProviderFunc.apply(TERMINATION_CHARACTER_2),
+         DataBlockDescription.UNDEFINED, expectedByteCountUpToTermination, TERMINATION_CHARACTER_2);
    }
 
    private void assertExpectedSizeIsReturned(String inputString, long limit, long expectedSize,

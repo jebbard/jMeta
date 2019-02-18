@@ -550,9 +550,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       FieldTerminationFinder finder = new FieldTerminationFinder();
 
       return finder.getSizeUntilTermination(charset, terminationCharacter, new DefDataProvider(reference, m_cache),
-         remainingDirectParentByteCount == DataBlockDescription.UNDEFINED ? Medium.UNKNOWN_LENGTH
-            : remainingDirectParentByteCount,
-         reference.getMedium().getMaxReadWriteBlockSizeInBytes());
+         remainingDirectParentByteCount, reference.getMedium().getMaxReadWriteBlockSizeInBytes());
    }
 
    /**
