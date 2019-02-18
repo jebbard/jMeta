@@ -104,13 +104,14 @@ public class FieldTerminationFinderTest {
          /*
           * String containing also NON-US-ASCII characters, UTF-8 encoding, varying block sizes
           */
-         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 100, Charsets.CHARSET_UTF8, 98 },
-         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 12, Charsets.CHARSET_UTF8, 98 },
-         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 33, Charsets.CHARSET_UTF8, 98 },
-         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 210, Charsets.CHARSET_UTF8, 98 },
-         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 303, Charsets.CHARSET_UTF8, 98 },
-         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 999, Charsets.CHARSET_UTF8,
-            98 }, });
+         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 100, Charsets.CHARSET_UTF8, 72 },
+         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 12, Charsets.CHARSET_UTF8, 72 },
+         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 33, Charsets.CHARSET_UTF8, 72 },
+         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 210, Charsets.CHARSET_UTF8, 72 },
+         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 303, Charsets.CHARSET_UTF8, 72 },
+         { (Function<Character, String>) FieldTerminationFinderTest::nonAsciiString, 999, Charsets.CHARSET_UTF8, 72 },
+
+      });
    }
 
    private final static Character TERMINATION_CHARACTER_1 = '\u0000';
@@ -124,11 +125,18 @@ public class FieldTerminationFinderTest {
    /**
     * Creates a new {@link FieldTerminationFinderTest}.
     *
-    * @param stringWithTermination
-    * @param stringWithoutTermination
+    * @param inputStringProviderFunc
+    *           A function providing an input test string with the given termination character; passing to it null means
+    *           it returns a string without termination character; it returns either a pure US-ASCII string or a string
+    *           with some non-US-ASCII characters
     * @param readBlockSize
+    *           The block size used for reading
     * @param charset
+    *           The {@link Charset} to use
     * @param expectedByteCountUpToTermination
+    *           The expected length returned by
+    *           {@link FieldTerminationFinder#getSizeUntilTermination(Charset, Character, FieldDataProvider, long, int)},
+    *           if terminated including the termination bytes
     */
    public FieldTerminationFinderTest(Function<Character, String> inputStringProviderFunc, int readBlockSize,
       Charset charset, int expectedByteCountUpToTermination) {

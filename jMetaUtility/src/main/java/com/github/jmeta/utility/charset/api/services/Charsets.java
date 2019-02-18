@@ -27,16 +27,16 @@ import com.github.jmeta.utility.errors.api.services.JMetaRuntimeException;
 public final class Charsets {
 
    /**
-    * Returns true if the given charset is a BOMMED charset, false otherwise.
+    * Returns a byte order mark (a sequence of bytes) if the given charset is a BOMMED charset, null otherwise.
     *
     * @param cs
     *           The {@link Charset} to check
-    * @return true if the given charset is a BOMMED charset, false otherwise.
+    * @return the byte order mark bytes for the given charset if it is a BOMMED charset, null otherwise
     */
-   public static boolean hasBOM(Charset cs) {
+   public static byte[] getBOM(Charset cs) {
       Reject.ifNull(cs, "cs");
 
-      return BOMMED_CHARSETS.containsKey(cs);
+      return BOMMED_CHARSETS.get(cs);
    }
 
    /**
@@ -66,7 +66,7 @@ public final class Charsets {
          throw new JMetaRuntimeException("Unsupported encoding", e);
       }
 
-      if (hasBOM(cs)) {
+      if (getBOM(cs) != null) {
          byte[] bomBytes = BOMMED_CHARSETS.get(cs);
 
          for (int i = 0; i < bomBytes.length; i++) {

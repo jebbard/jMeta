@@ -14,6 +14,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.CodingErrorAction;
 
 import com.github.jmeta.utility.charset.api.services.Charsets;
 
@@ -36,89 +37,80 @@ public class FieldTerminationFinder {
 
       long sizeUpToEndOfTerminationBytes = 0;
 
-      boolean terminationBytesFound = false;
+      // If -1, this variable indicates no termination bytes have been found yet, if > 0 it is their current loop's
+      // index
+      int lenUpToTermination = -1;
 
-      ByteBuffer readBytes = null;
-      ByteBuffer encodedBytes = ByteBuffer.allocate(readBlockSize);
+      ByteBuffer encodedBytes = ByteBuffer.allocate(0);
 
-      while (!terminationBytesFound) {
+      CharsetDecoder decoder = charset.newDecoder();
+      decoder.onMalformedInput(CodingErrorAction.REPLACE);
+      decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
 
-         int bytesToRead = readBlockSize;
-
-         readBytes = dataProvider.nextData(bytesToRead);
-
-         // // Special handling for InMemoryMedia: They cannot be used for caching, and then there is no EOM Exception,
-         // // thus bytesToRead will still be too big, we have to change it, otherwise Unexpected EOM during readBytes
-         // if (bytesToRead == 0 || !mediumHasUnknownLength && bytesToRead > remainingMediumBytes) {
-         // bytesToRead = (int) remainingMediumBytes;
-         // }
-
-         encodedBytes.put(readBytes);
-         encodedBytes.flip();
+      do {
+         encodedBytes = getNextEncodedBytes(encodedBytes, dataProvider, readBlockSize);
 
          if (!encodedBytes.hasRemaining()) {
             return sizeUpToEndOfTerminationBytes;
          }
 
-         int byteCountBeforeDecode = encodedBytes.remaining();
-
-         CharsetDecoder decoder = charset.newDecoder();
-
-         CharBuffer outputBuffer = CharBuffer.allocate(byteCountBeforeDecode);
+         CharBuffer outputBuffer = CharBuffer.allocate(encodedBytes.remaining());
          CoderResult result = decoder.decode(encodedBytes, outputBuffer, false);
+
+         // This should never happen as allocate as much characters as there are bytes
+         if (result.isOverflow()) {
+            throw new IllegalStateException(
+               "Output buffer overflow when decoding a byte sequence to charset " + charset);
+         }
 
          outputBuffer.flip();
 
          String bufferString = outputBuffer.toString();
 
-         int lenUpToTermination = bufferString.indexOf(terminationCharacter);
-
-         int endIndex = outputBuffer.remaining();
-
-         if (lenUpToTermination != -1) {
-            endIndex = lenUpToTermination + 1;
-            terminationBytesFound = true;
-         }
-
-         // if (!terminationBytesFound && limit != NO_LIMIT
-         // && sizeUpToEndOfTerminationBytes + outputBuffer.remaining() > limit) {
-         // return limit;
-         // }
+         lenUpToTermination = bufferString.indexOf(terminationCharacter);
 
          boolean isFollowUpBlock = sizeUpToEndOfTerminationBytes > 0;
 
-         if (true/* charset.equals(Charsets.CHARSET_UTF16) && lenUpToTermination != -1 */) {
-            sizeUpToEndOfTerminationBytes += bufferString.substring(0, endIndex).getBytes(charset).length;
-            // } else {
-            //
-            // for (int i = 0; i < remaining; i++) {
-            // char c = outputBuffer.get();
-            //
-            // sizeUpToEndOfTerminationBytes += Charsets.getBytesWithoutBOM("" + c, charset).length;
-            //
-            // if (terminationCharacter.equals(c)) {
-            // terminationBytesFound = true;
-            // break;
-            // }
-            // }
-         }
-
-         if (isFollowUpBlock && Charsets.hasBOM(charset)) {
-            sizeUpToEndOfTerminationBytes -= 2;
-         }
+         sizeUpToEndOfTerminationBytes += getDeltaSizeUpToEndOfTerminationBytes(charset, lenUpToTermination,
+            bufferString, isFollowUpBlock);
 
          if (limit != NO_LIMIT && sizeUpToEndOfTerminationBytes >= limit) {
             return limit;
          }
-
-         if (!terminationBytesFound) {
-
-            readBytes = ByteBuffer.allocate(readBlockSize + encodedBytes.remaining());
-            readBytes.put(encodedBytes);
-            encodedBytes = readBytes;
-         }
-      }
+      } while (lenUpToTermination == -1);
 
       return sizeUpToEndOfTerminationBytes;
+   }
+
+   private ByteBuffer getNextEncodedBytes(ByteBuffer previousEncodedBytes, FieldDataProvider dataProvider,
+      int readBlockSize) {
+      ByteBuffer tempBuffer = ByteBuffer.allocate(readBlockSize + previousEncodedBytes.remaining());
+      tempBuffer.put(previousEncodedBytes);
+      ByteBuffer nextEncodedBytes = tempBuffer;
+
+      tempBuffer = dataProvider.nextData(readBlockSize);
+
+      nextEncodedBytes.put(tempBuffer);
+      nextEncodedBytes.flip();
+      return nextEncodedBytes;
+   }
+
+   private long getDeltaSizeUpToEndOfTerminationBytes(Charset charset, int lenUpToTermination, String bufferString,
+      boolean isFollowUpBlock) {
+      long deltaSize = 0;
+
+      int endIndex = bufferString.length();
+
+      if (lenUpToTermination != -1) {
+         endIndex = lenUpToTermination + 1;
+      }
+
+      deltaSize += bufferString.substring(0, endIndex).getBytes(charset).length;
+
+      byte[] bom = Charsets.getBOM(charset);
+      if (isFollowUpBlock && bom != null) {
+         deltaSize -= bom.length;
+      }
+      return deltaSize;
    }
 }
