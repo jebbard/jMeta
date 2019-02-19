@@ -18,11 +18,11 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.exceptions.EndOfMediumException;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -36,7 +36,7 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
 
    /**
     * Creates a new {@link ID3v23DataBlockReader}.
-    * 
+    *
     * @param spec
     * @param maxFieldBlockSize
     */
@@ -97,19 +97,14 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
       Container transformedContainer = container;
 
       Iterator<AbstractID3v2TransformationHandler> handlerIterator = transformationsReadOrder.values().iterator();
+      MediumDataProvider mediumDataProvider = getMediumDataProvider();
 
       while (handlerIterator.hasNext()) {
          AbstractID3v2TransformationHandler transformationHandler = handlerIterator.next();
 
          if (transformationHandler.requiresUntransform(transformedContainer)) {
-            if (m_cache.getCachedByteCountAt(transformedContainer.getMediumReference()) < transformedContainer
-               .getTotalSize())
-               try {
-                  m_cache.cache(transformedContainer.getMediumReference(), (int) transformedContainer.getTotalSize());
-               } catch (EndOfMediumException e) {
-                  throw new IllegalStateException("Unexpected end of medium", e);
-               }
-
+            mediumDataProvider.bufferBeforeRead(transformedContainer.getMediumReference(),
+               transformedContainer.getTotalSize());
             transformedContainer = transformationHandler.untransform(transformedContainer, reader);
          }
       }
