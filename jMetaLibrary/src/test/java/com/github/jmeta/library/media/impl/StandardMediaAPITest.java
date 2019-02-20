@@ -50,7 +50,8 @@ public class StandardMediaAPITest {
        *           The fake medium
        */
       public FakeMediumClass(Object medium) {
-         super(medium, "Fake test medium", false, false, 0, 0);
+         super(medium, "Fake test medium", false, false, MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES,
+            MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
       }
    }
 
@@ -62,7 +63,7 @@ public class StandardMediaAPITest {
       MediaAPI mediaAPI = new StandardMediaAPI();
 
       FileMedium mediumDefinition = new FileMedium(TestMedia.EMPTY_TEST_FILE_PATH, false,
-         MediumStore.MIN_CACHE_SIZE_IN_BYTES, 500);
+         MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
 
       MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 
@@ -78,7 +79,7 @@ public class StandardMediaAPITest {
       MediaAPI mediaAPI = new StandardMediaAPI();
 
       InMemoryMedium mediumDefinition = new InMemoryMedium(new byte[] { 100 }, "My Medium", false,
-         MediumStore.MIN_CACHE_SIZE_IN_BYTES, 500);
+         MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
 
       MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 
@@ -96,7 +97,7 @@ public class StandardMediaAPITest {
       InputStreamMedium mediumDefinition;
       try {
          mediumDefinition = new InputStreamMedium(new FileInputStream(TestMedia.EMPTY_TEST_FILE_PATH.toFile()),
-            "My Medium", MediumStore.MIN_CACHE_SIZE_IN_BYTES, 500);
+            "My Medium", MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
       } catch (FileNotFoundException e) {
          throw new RuntimeException("Unexpected exception", e);
       }

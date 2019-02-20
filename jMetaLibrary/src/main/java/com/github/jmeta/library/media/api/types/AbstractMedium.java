@@ -70,12 +70,7 @@ public abstract class AbstractMedium<T> implements Medium<T> {
    public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly, long maxCacheSizeInBytes,
       int maxReadWriteBlockSizeInBytes) {
       Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
-      Reject.ifNegative(maxCacheSizeInBytes, "maxCacheSizeInBytes");
-      Reject.ifTrue(maxCacheSizeInBytes < 2 * maxReadWriteBlockSizeInBytes,
-         "The maximum cache size must at least be twice the maximum read-write block size");
-      // TODO enforce this and fix failing tests
-      // Reject.ifTrue(maxReadWriteBlockSizeInBytes < MINIMUM_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES,
-      // "The maximum read-write block size must be at least " + MINIMUM_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      Reject.ifNegativeOrZero(maxCacheSizeInBytes, "maxCacheSizeInBytes");
 
       this.medium = medium;
       this.name = name;

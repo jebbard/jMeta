@@ -33,25 +33,37 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class StandardMediaAPI implements MediaAPI {
 
-   private static final Set<Class<? extends Medium<?>>> SUPORTED_MEDIA_CLASSES = new HashSet<>();
+   private static final Set<Class<? extends Medium<?>>> SUPPORTED_MEDIA_CLASSES = new HashSet<>();
 
    static {
-      SUPORTED_MEDIA_CLASSES.add(FileMedium.class);
-      SUPORTED_MEDIA_CLASSES.add(InMemoryMedium.class);
-      SUPORTED_MEDIA_CLASSES.add(InputStreamMedium.class);
+      SUPPORTED_MEDIA_CLASSES.add(FileMedium.class);
+      SUPPORTED_MEDIA_CLASSES.add(InMemoryMedium.class);
+      SUPPORTED_MEDIA_CLASSES.add(InputStreamMedium.class);
    }
 
-   private long minimumCacheSize = MediumStore.MIN_CACHE_SIZE_IN_BYTES;
+   private long minimumCacheSize = MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES;
+   private long minimumReadWriteBlockSize = MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES;
 
    /**
     * Allows test cases to manipulate the minimum cache size to even smaller values than
-    * {@link MediumStore#MIN_CACHE_SIZE_IN_BYTES} (the default).
+    * {@link MediumStore#MINIMUM_CACHE_SIZE_IN_BYTES} (the default).
     *
-    * @param minumumCacheSize
+    * @param minimumCacheSize
     *           The new minimum cache size to set.
     */
-   public void setMinimumCacheSize(long minumumCacheSize) {
-      minimumCacheSize = minumumCacheSize;
+   public void setMinimumCacheSize(long minimumCacheSize) {
+      this.minimumCacheSize = minimumCacheSize;
+   }
+
+   /**
+    * Allows test cases to manipulate the minimum cache size to even smaller values than
+    * {@link MediumStore#MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES} (the default).
+    *
+    * @param minimumCacheSize
+    *           The new minimum cache size to set.
+    */
+   public void setMinimumReadWriteBlockSize(long minimumReadWriteBlockSize) {
+      this.minimumReadWriteBlockSize = minimumReadWriteBlockSize;
    }
 
    /**
@@ -61,8 +73,15 @@ public class StandardMediaAPI implements MediaAPI {
    public MediumStore createMediumStore(Medium<?> medium) {
       Reject.ifNull(medium, "medium");
 
-      Reject.ifFalse(SUPORTED_MEDIA_CLASSES.contains(medium.getClass()),
+      Reject.ifFalse(SUPPORTED_MEDIA_CLASSES.contains(medium.getClass()),
          "SUPORTED_MEDIA_CLASSES.contains(medium.getClass())");
+
+      Reject.ifTrue(medium.getMaxReadWriteBlockSizeInBytes() < minimumReadWriteBlockSize,
+         "The maximum read-write block size must be at least " + minimumReadWriteBlockSize);
+      Reject.ifTrue(medium.getMaxCacheSizeInBytes() < minimumCacheSize,
+         "The maximum cache size must be at least " + minimumCacheSize);
+      Reject.ifTrue(medium.getMaxCacheSizeInBytes() < 2 * medium.getMaxReadWriteBlockSizeInBytes(),
+         "The maximum cache size must at least be twice the maximum read-write block size");
 
       MediumAccessor<?> mediumAccessor = null;
 
