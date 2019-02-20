@@ -108,12 +108,25 @@ Design-by-contract distinguishes:
 \item \emph{Invariants}, i.e. state conditions for the interface that must be fulfilled before and after a method is called, but nut during a method call.
 \end{itemize}
 
-\paragraph{\LibName{} and Design-by-Contract}
+\paragraph{\LibName{} and Design-by-Contract}:
 \label{sec:LibNameDesignByContract}
 
-The use of design-by-contract is basically described in the design decision \SectionLink{sec:DesignDecisionDbC}.
-
+We define: 
+%%%% DD --> %%%%
+\DD{dd:205}
+{% Title
+Checking preconditions
+}
+{% Short description
 In the Java implementation of \LibName{}, an invalid parameter range leads to an \texttt{IllegalArgumentException}, while a precondition that can only be checked by calling a method before-hand causes a \texttt{PreconditionUnfulfilledException} if not established. Every violation of a precondition contains a british English message that describes the error using detailed argument values.
+}
+{% Rationale
+Fail fast is good and easy to implement
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 \paragraph{Design-by-Contract vs. Multithreading}
 \label{sec:DbcMultithreading}

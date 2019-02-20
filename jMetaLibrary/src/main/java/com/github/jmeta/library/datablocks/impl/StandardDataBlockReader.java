@@ -741,8 +741,6 @@ public class StandardDataBlockReader implements DataBlockReader {
    public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, FieldFunctionStack context,
       long remainingDirectParentByteCount) {
 
-      mediumDataProvider.bufferBeforeRead(reference, remainingDirectParentByteCount);
-
       DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
 
       List<DataBlockDescription> fieldChildren = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
@@ -758,6 +756,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       long currentlyRemainingParentByteCount = remainingDirectParentByteCount;
 
       for (int i = 0; i < fieldChildren.size(); ++i) {
+         mediumDataProvider.bufferBeforeRead(currentFieldReference, currentlyRemainingParentByteCount);
+
          DataBlockDescription fieldDesc = fieldChildren.get(i);
 
          // Update current character encoding via CHARACTER_ENCODING_OF

@@ -46,7 +46,8 @@ public abstract class AbstractMedium<T> implements Medium<T> {
     *           see {@link #AbstractMedium(Object, String, boolean, boolean, long, int)}
     */
    public AbstractMedium(T medium, String name, boolean isRandomAccess, boolean isReadOnly) {
-      this(medium, name, isRandomAccess, isReadOnly, DEFAULT_MAX_CACHE_SIZE_IN_BYTES, DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      this(medium, name, isRandomAccess, isReadOnly, DEFAULT_MAX_CACHE_SIZE_IN_BYTES,
+         DEFAULT_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
    }
 
    /**
@@ -70,7 +71,11 @@ public abstract class AbstractMedium<T> implements Medium<T> {
       int maxReadWriteBlockSizeInBytes) {
       Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
       Reject.ifNegative(maxCacheSizeInBytes, "maxCacheSizeInBytes");
-      Reject.ifNegativeOrZero(maxReadWriteBlockSizeInBytes, "maxReadWriteBlockSizeInBytes");
+      Reject.ifTrue(maxCacheSizeInBytes < 2 * maxReadWriteBlockSizeInBytes,
+         "The maximum cache size must at least be twice the maximum read-write block size");
+      // TODO enforce this and fix failing tests
+      // Reject.ifTrue(maxReadWriteBlockSizeInBytes < MINIMUM_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES,
+      // "The maximum read-write block size must be at least " + MINIMUM_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES);
 
       this.medium = medium;
       this.name = name;

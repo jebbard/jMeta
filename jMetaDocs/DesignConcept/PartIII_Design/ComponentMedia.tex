@@ -481,6 +481,57 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
+In addition, we require a lower limit of the cache size:
+%%%% DD --> %%%%
+\DD{dd:411ea}
+{% Title
+Minimum cache size
+}
+{% Short description
+Every cache has a minimum size with a sensible value, any smaller values are rejected
+}
+{% Rationale
+Allowing caches to have sizes of e.g. 1 Byte would lead to very stupid special cases to handle or subtle bugs, and these bugs would be created by users who indeed think the cache size is given in KB instead of bytes. To avoid this, a minimum size is enforced. This allows guarantees a better average performance.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+What about the sizes of the individual parts kept in a cache, the \emph{cache regions}? They should also have some size restrictions. Actually it turned out that a single configuration parameter can be used for various important things in the library, so we introduce it already here:
+%%%% DD --> %%%%
+\DD{dd:438}
+{% Title
+Configurable \textbf{maximum read-write block size} to limit data written or read at once as well as cache region size
+}
+{% Short description
+A parameter called \textbf{maximum read-write block size} must be configurable for the user - It is the maximum number of bytes read or written at once by e.g. flush operations or caching operations. In addition, it is also the maximum size of a single cache region.
+}
+{% Rationale
+Necessary due to the block-wise reading and writing operations behind affected regions caused by inserts and removes. By making it configurable, the user can himself decide how much bytes should be processed in a single pass. In general, it enables a more efficient buffered reading approach. Making the cache regions exactly this maximum size is straight forward as otherwise we would need to deal with more fragmentation in average case.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+In \DesLink{dd:411ea} it was said that there is a minimum cache size. With the same idea, it goes that there should be a minimum for the read-write block size as well as a coupling of the two size indicators:
+%%%% DD --> %%%%
+\DD{dd:438a}
+{% Title
+Lower bound of read-write block size, maximum cache size must be bigger than the maximum read-write block size
+}
+{% Short description
+Read-write block size must have a minimum value which is enforced by the API. The initially set maximum cache size set must be bigger than twice the maximum read-write block size which is also enforced.
+}
+{% Rationale
+1 Byte read-write block sizes would lead to awful performance and subtle special cases to handle and errors to fix. Using a sensible default and minimum scores a good average performance for every user. The other part of the design decision comes from the following observation: Buffered reading is a good idea, and a natural fit for the buffer size is the maximum read-write block size. But what if some object that needs to be part overlaps two consecutive blocks? In that case it would be possible that once you buffer the next block, the maximum cache size is exceeded and thus the previous block freed. So you end up having just the second part of the object buffered, the first one thrown out of the cache. In worst-case for streaming media this means runtime exceptions.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 %%%% DD --> %%%%
 \DD{dd:411f}
 {% Title
@@ -1979,23 +2030,6 @@ We can add that the writing operations have some additional oddities:
 \item For \texttt{replaceData()} we have to distinguish corresponding cases, it could either behave like \texttt{insert} or \texttt{remove}, or a simple overwrite (if number of bytes to replace equals number of replacement bytes).
 \end{itemize}
 \end{itemize}
-
-We can first confirm that the configuration of a maximum read write block size for writing is necessary:
-%%%% DD --> %%%%
-\DD{dd:438}
-{% Title
-A maximum read-write block size must be configurable for the user
-}
-{% Short description
-It must be between 1 and N (any integer) bytes
-}
-{% Rationale
-Necessary due to the block-wise reading and writing operations behind affected regions caused by inserts and removes. By making it configurable, the user can himself decide how much bytes should be processed in a single pass.
-}
-{% Disadvantages
-No disadvantages known
-}
-%%%% <-- DD %%%%
 
 Finding out wich operations must be executed during a flush is a complex task. We need to perform this complex task within a method:
 %%%% DD --> %%%%

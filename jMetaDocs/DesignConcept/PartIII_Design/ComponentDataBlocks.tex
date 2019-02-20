@@ -104,7 +104,7 @@ Steps of forward reading of top-level containers
   Forward reading of a single top-level container works as follows - whenever \texttt{next()} on the iterator is called to read the first or next container:
   \begin{enumerate}
   \item First, we do data format identification, i.e. finding out whether the data chunk ahead belongs to a data format the library supports - see \SectionLink{sec:MagicKeys} for details. If we cannot identify the data format, the process stops here with an exception.
-  \item After identifying the data format, we need to identify which concrete container we have, i.e. determining its actual id at runtime; this is necessary for data formats supporting generic containers which is most of the container data formats out there. 
+  \item After identifying the data format, we need to identify which concrete container type and id we have, i.e. determining its structure and actual id at runtime; this is especially necessary for data formats supporting generic containers which is most of the container data formats out there, or multiple different container types. 
   \item Then, as we forward-read, the headers of the container are parsed, which means understanding their content. This includes determining if there are other headers or footers, and also the length of the container's payload.
   \item After heaving determined the payload length, the payload object itself is created. 
   \item Then, if there are any footers, they are at least created and ready to be parsed.
@@ -122,6 +122,23 @@ No disadvantages known.
 }
 %%%% <-- DD %%%%
 
+Btw:
+%%%% DD --> %%%%
+\DD{dd:605a}
+{% Title
+Steps of forward reading for nested containers
+}
+{% Short description
+These are nearly identical except that data format identification is unnecessary.
+}
+{% Rationale
+Nested containers are other than the fact that the data format is already known in no way different to top-level containers.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 % =======================================================================================================
 \subsection{Buffering, Caching and Lazy Reading}%
 \label{sec:ReadingSteps}%
@@ -130,30 +147,37 @@ No disadvantages known.
 %%%% DD --> %%%%
 \DD{dd:606}
 {% Title
-Headers are buffered during forward reading
+General buffering using maximum read-write block size is done - for each overlap buffer the next block
 }
 {% Short description
-For static headers, they are buffered as a whole by first caching all bytes the header is made of; for dynamic-length headers, headers are buffered according to their known minimum length. Any upcoming fields are read using \COMPmedia{}'s \texttt{getData} and thus either use the buffered data or fetch it from the medium.
+  Most of the read operations in \COMPdataPartManagement{} do a buffering before accessing data. They always buffer at most maximum read-write block size of bytes. If a buffering call detects that the start offset of buffering plus maximum read-write block size exceeds current buffered data, it buffers the next block starting behind the currently buffered data with at most maximum read-write block size of bytes.
+
+  This decision strongly bases on the critical design decision \DesLink{dd:438a} for a sensible handling of objects (e.g. fields) overlapping two consecutive byte blocks read.
 }
 {% Rationale
-Reading byte by byte or field by field would be nonsense from performance point of view
+Reading byte by byte or field by field would be nonsense from performance point of view. The maximum read-write block size is a natural fit for buffering. The approach of buffering the next block when an overlap is detected is sensible as it leads to less cache fragmentation. The previously cached consecutive block will not fall out of the cache thanks to design decision \DesLink{dd:438a}.
 }
 {% Disadvantages
 No disadvantages known.
 }
 %%%% <-- DD %%%%
 
-During data format identification, the library might need to ``try'' multiple different magic keys to see what data format is ahead. This process is optimized as follows:
+Now the question arises: Where to buffer exactly to ensure that there is no ``buffer gap''?
+
 %%%% DD --> %%%%
 \DD{dd:606a}
 {% Title
-Use longest header size for initial buffering
+Buffering at start of container and field reading
 }
 {% Short description
-The buffering in \DesLink{dd:606} first calculates a minimum suitable size to read by obtaining the minimum sizes of all headers of all supported data format's top-level containers. It chooses the longest such size for its purpose. Thus, clearly, end of medium might be reached if a long header is read first while the actual data format has a short header and the medium ands early. Such an end of medium condition is not an error but simply rules out some candidate data formats.
+  It turned out to be fully sufficient if we do the following:
+  \begin{itemize}
+  \item Buffer at start of container identification/reading: Whenever it is checked if a container with a given type and id during container identification phase is done, we first buffer read-write block size of bytes. As this size has a lower bound (see \DesLink{dd:438a}) with a sensible default, this way all usual headers are already buffered, leading to speeding up data format identification for top-level containers.
+  \item Buffer at start of field reading: Whenever a single field of a header, footer or payload is read, buffering is done. Due to \DesLink{dd:606}, any overlapping bufferings will actually read the next block in addition, ensuring that always as sensible amount of future bytes is pre-buffered. This case also covers field based payload.
+  \end{itemize}
 }
 {% Rationale
-Otherwise we would probably do some very inefficient piece-wise reading during data format identification
+Thus, even if we have unusually long headers, footers or field-based payload, there is never a buffering gap.
 }
 {% Disadvantes
 No disadvantages known

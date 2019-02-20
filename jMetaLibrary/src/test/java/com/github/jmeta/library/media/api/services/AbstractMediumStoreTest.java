@@ -865,8 +865,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    protected MediumStore createFilledMediumStoreWithBigCache() {
       try {
-         currentMedium = createFilledMedium(testName.getMethodName(), TestMedia.FIRST_TEST_FILE_CONTENT.length() + 1000,
-            TestMedia.FIRST_TEST_FILE_CONTENT.length() + 1000);
+         int maxRWBSize = TestMedia.FIRST_TEST_FILE_CONTENT.length() + 1000;
+         currentMedium = createFilledMedium(testName.getMethodName(), 2 * maxRWBSize, maxRWBSize);
 
          return createMediumStoreToTest(currentMedium);
       } catch (IOException e) {

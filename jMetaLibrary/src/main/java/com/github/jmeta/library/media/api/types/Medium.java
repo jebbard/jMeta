@@ -33,12 +33,6 @@ import com.github.jmeta.library.media.api.services.MediumStore;
 public interface Medium<T> {
 
    /**
-    * The default maximum cache size in bytes, if no values are explicitly set. See {@link #getMaxCacheSizeInBytes()}
-    * for more details.
-    */
-   public static long DEFAULT_MAX_CACHE_SIZE_IN_BYTES = 1_048_576L;
-
-   /**
     * The default maximum read-write block size in bytes, if no values are explicitly set. See
     * {@link #getMaxReadWriteBlockSizeInBytes()} for more details.
     */
@@ -49,6 +43,17 @@ public interface Medium<T> {
     * for more details.
     */
    public static int MINIMUM_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES = 1024;
+
+   /**
+    * The default maximum cache size in bytes, if no values are explicitly set. See {@link #getMaxCacheSizeInBytes()}
+    * for more details.
+    */
+   public static long DEFAULT_MAX_CACHE_SIZE_IN_BYTES = 1_048_576L;
+
+   /**
+    * The minimum value for the maximum cache size in bytes. See {@link #getMaxCacheSizeInBytes()} for more details.
+    */
+   public static int MINIMUM_MAX_CACHE_SIZE_IN_BYTES = 2 * MINIMUM_MAX_READ_WRITE_BLOCK_SIZE_IN_BYTES;
 
    /**
     * Refers to an unknown length of this {@link Medium}.

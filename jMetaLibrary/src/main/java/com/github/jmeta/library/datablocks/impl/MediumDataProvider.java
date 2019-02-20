@@ -148,30 +148,36 @@ public class MediumDataProvider {
    }
 
    /**
+    * Retrieves data from the medium starting at the given offset with the given size. Assumes that the number of bytes
+    * is actually present and throws a runtime exception in case of an end of medium encountered.
     *
-    * TODO
-    * 
-    * @param reference
+    * See {@link MediumStore#getData(MediumOffset, int)} for more details.
+    *
+    * @param startOffset
+    *           The start offset
     * @param size
-    * @return
+    *           The number of bytes to fetch
+    * @return A {@link ByteBuffer} according to {@link MediumStore#getData(MediumOffset, int)}
     */
-   public ByteBuffer getData(MediumOffset reference, int size) {
-      Reject.ifNull(reference, "reference");
+   public ByteBuffer getData(MediumOffset startOffset, int size) {
+      Reject.ifNull(startOffset, "reference");
 
       try {
-         return mediumStore.getData(reference, size);
+         return mediumStore.getData(startOffset, size);
       } catch (EndOfMediumException e) {
          throw new RuntimeException("Unexpected end of medium", e);
       }
    }
 
    /**
-    * TODO
-    * 
-    * @param offset
-    * @return
+    * Creates a new instance of a {@link FieldDataProvider} able to provide subsequent byte chunks from the medium
+    * starting at the given start offset.
+    *
+    * @param startOffset
+    *           The start {@link MediumOffset}
+    * @return A new {@link FieldDataProvider} instance
     */
-   public FieldDataProvider createFieldDataProvider(MediumOffset offset) {
-      return new DefaultFieldDataProvider(offset);
+   public FieldDataProvider createFieldDataProvider(MediumOffset startOffset) {
+      return new DefaultFieldDataProvider(startOffset);
    }
 }
