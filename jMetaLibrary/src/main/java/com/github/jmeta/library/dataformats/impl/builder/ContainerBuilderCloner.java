@@ -12,7 +12,6 @@ package com.github.jmeta.library.dataformats.impl.builder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder;
@@ -49,7 +48,7 @@ public final class ContainerBuilderCloner {
 
    /**
     * Clones the {@link DataBlockDescription} of an existing container into the given {@link ContainerBuilder}.
-    * 
+    *
     * @param containerBuilder
     *           The {@link ContainerBuilder} to clone into
     * @param existingContainerRef
@@ -295,40 +294,33 @@ public final class ContainerBuilderCloner {
          fb.asMagicKey();
       }
 
-      List<FieldFunction> fieldFunctions = existingFieldProperties.getFieldFunctions();
+      List<FieldFunction<?>> fieldFunctions = existingFieldProperties.getFieldFunctions();
 
-      for (FieldFunction fieldFunction : fieldFunctions) {
+      for (FieldFunction<?> fieldFunction : fieldFunctions) {
          FieldFunctionType<?> ffType = fieldFunction.getFieldFunctionType();
-         Set<DataBlockId> affectedIds = fieldFunction.getAffectedBlockIds();
+         DataBlockId affectedId = fieldFunction.getAffectedBlockId();
 
-         DataBlockCrossReference[] references = new DataBlockCrossReference[affectedIds.size()];
-
-         // Replace affected ids (which are still referring to the original container) with the
+         // Replace affected id (which are still referring to the original container) with the
          // actual id of the cloned container
-         int i = 0;
-
-         for (DataBlockId dataBlockId : affectedIds) {
-            String replacedGlobalId = dataBlockId.getGlobalId().replace(existingContainerId.getGlobalId(),
-               clonedContainerId.getGlobalId());
-            DataBlockId replacedAffectedId = new DataBlockId(dataBlockId.getDataFormat(), replacedGlobalId);
-            references[i] = new DataBlockCrossReference(replacedAffectedId.getGlobalId() + "_" + UUID.randomUUID());
-            references[i].resolve(replacedAffectedId);
-
-            i++;
-         }
+         String replacedGlobalId = affectedId.getGlobalId().replace(existingContainerId.getGlobalId(),
+            clonedContainerId.getGlobalId());
+         DataBlockId replacedAffectedId = new DataBlockId(affectedId.getDataFormat(), replacedGlobalId);
+         DataBlockCrossReference resolvedReference = new DataBlockCrossReference(
+            replacedAffectedId.getGlobalId() + "_" + UUID.randomUUID());
+         resolvedReference.resolve(replacedAffectedId);
 
          if (ffType == FieldFunctionType.BYTE_ORDER_OF) {
-            fb.asByteOrderOf(references[0]);
+            fb.asByteOrderOf(resolvedReference);
          } else if (ffType == FieldFunctionType.CHARACTER_ENCODING_OF) {
-            fb.asCharacterEncodingOf(references[0]);
+            fb.asCharacterEncodingOf(resolvedReference);
          } else if (ffType == FieldFunctionType.COUNT_OF) {
-            fb.asCountOf(references[0]);
+            fb.asCountOf(resolvedReference);
          } else if (ffType == FieldFunctionType.ID_OF) {
-            fb.asIdOf(references[0]);
+            fb.asIdOf(resolvedReference);
          } else if (ffType == FieldFunctionType.PRESENCE_OF) {
-            fb.indicatesPresenceOf(fieldFunction.getFlagName(), fieldFunction.getFlagValue(), references[0]);
+            fb.indicatesPresenceOf(fieldFunction.getFlagName(), fieldFunction.getFlagValue(), resolvedReference);
          } else if (ffType == FieldFunctionType.SIZE_OF) {
-            fb.asSizeOf(references);
+            fb.asSizeOf(resolvedReference);
          }
       }
    }

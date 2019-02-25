@@ -12,12 +12,9 @@ package com.github.jmeta.library.dataformats.impl.builder;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
@@ -57,13 +54,13 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    private boolean isMagicKey = false;
    private final Map<I, byte[]> enumeratedValues = new HashMap<>();
    private final FieldType<I> fieldType;
-   private final List<FieldFunction> functions = new ArrayList<>();
+   private final List<FieldFunction<?>> functions = new ArrayList<>();
    private long magicKeyBitLength = DataBlockDescription.UNDEFINED;
    private FieldConverter<I> customConverter;
 
    /**
     * Creates a new {@link AbstractFieldBuilder}.
-    * 
+    *
     * @param parentBuilder
     *           The parent {@link DataFormatBuilder}. Required for allowing a fluent API, as it is returned by the
     *           {@link #finish()} method. Must not be null.
@@ -90,6 +87,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.impl.builder.AbstractFieldBuilder#asMagicKey()
     */
+   @Override
    @SuppressWarnings("unchecked")
    public C asMagicKey() {
       this.isMagicKey = true;
@@ -123,11 +121,11 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference[])
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(DataBlockCrossReference)
     */
    @Override
-   public C asSizeOf(DataBlockCrossReference... referencedBlocks) {
-      return addFieldFunction(FieldFunctionType.SIZE_OF, null, null, referencedBlocks);
+   public C asSizeOf(DataBlockCrossReference referencedBlock) {
+      return addFieldFunction(FieldFunctionType.SIZE_OF, null, null, referencedBlock);
    }
 
    /**
@@ -179,6 +177,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.BinaryFieldBuilder#withDefaultValue(byte[])
     */
+   @Override
    @SuppressWarnings("unchecked")
    public C withDefaultValue(I value) {
       this.defaultValue = value;
@@ -235,13 +234,11 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    }
 
    @SuppressWarnings("unchecked")
-   private C addFieldFunction(FieldFunctionType<?> type, String withFlagName, Integer withFlagValue,
-      DataBlockCrossReference... referencedBlocks) {
-      Reject.ifNull(referencedBlocks, "referencedBlock");
+   private <T> C addFieldFunction(FieldFunctionType<T> type, String withFlagName, Integer withFlagValue,
+      DataBlockCrossReference referencedBlock) {
+      Reject.ifNull(referencedBlock, "referencedBlock");
 
-      Set<DataBlockCrossReference> fakeBlocks = new HashSet<>(Arrays.asList(referencedBlocks));
-
-      functions.add(new FieldFunction(type, fakeBlocks, withFlagName, withFlagValue));
+      functions.add(new FieldFunction<>(type, referencedBlock, withFlagName, withFlagValue));
 
       return (C) this;
    }

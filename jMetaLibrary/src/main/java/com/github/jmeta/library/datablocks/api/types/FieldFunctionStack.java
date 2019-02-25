@@ -46,43 +46,39 @@ public class FieldFunctionStack {
 
       Reject.ifNull(field, "field");
       Reject.ifNull(desc, "desc");
-      Reject.ifFalse(desc.getId().equals(field.getId()),
-         "desc.getId().equals(field.getId())");
+      Reject.ifFalse(desc.getId().equals(field.getId()), "desc.getId().equals(field.getId())");
 
       // CONFIG_CHECK felder müssen immer typ feld haben
-      if (!desc.getPhysicalType().equals(PhysicalDataBlockType.FIELD))
+      if (!desc.getPhysicalType().equals(PhysicalDataBlockType.FIELD)) {
          throw new IllegalStateException("Field is not of type field!");
+      }
 
       final FieldProperties<?> fieldProperties = desc.getFieldProperties();
 
-      List<FieldFunction> fieldFunctions = fieldProperties.getFieldFunctions();
+      List<FieldFunction<?>> fieldFunctions = fieldProperties.getFieldFunctions();
 
       for (int i = 0; i < fieldFunctions.size(); ++i) {
-         FieldFunction function = fieldFunctions.get(i);
+         FieldFunction<?> function = fieldFunctions.get(i);
 
-         for (Iterator<DataBlockId> blockIterator = function.getAffectedBlockIds().iterator(); blockIterator
-            .hasNext();) {
-            DataBlockId id = blockIterator.next();
+         DataBlockId id = function.getAffectedBlockId();
 
-            final FieldFunctionType<?> type = function.getFieldFunctionType();
+         final FieldFunctionType<?> type = function.getFieldFunctionType();
 
-            updateCollections(id, type);
+         updateCollections(id, type);
 
-            try {
-               // Special treatment for flags field functions
-               if (function.getFlagName() != null) {
-                  Flags flags = (Flags) field.getInterpretedValue();
+         try {
+            // Special treatment for flags field functions
+            if (function.getFlagName() != null) {
+               Flags flags = (Flags) field.getInterpretedValue();
 
-                  addValue(id, type, flags.getFlagIntegerValue(function.getFlagName()) == function.getFlagValue());
-               }
-
-               else
-                  addValue(id, type, field.getInterpretedValue());
-            } catch (BinaryValueConversionException e) {
-               // Silently ignore: The local id remains by its previous value
-               LOGGER.warn(LOGGING_BINARY_TO_INTERPRETED_FAILED, type, field.getId());
-               LOGGER.error("pushFieldFunctions", e);
+               addValue(id, type, flags.getFlagIntegerValue(function.getFlagName()) == function.getFlagValue());
+            } else {
+               addValue(id, type, field.getInterpretedValue());
             }
+         } catch (BinaryValueConversionException e) {
+            // Silently ignore: The local id remains by its previous value
+            LOGGER.warn(LOGGING_BINARY_TO_INTERPRETED_FAILED, type, field.getId());
+            LOGGER.error("pushFieldFunctions", e);
          }
       }
    }
@@ -107,8 +103,9 @@ public class FieldFunctionStack {
 
       // DO NOT add count or size of zero to stack, as they would cause exceptions when parsing
       if (type == FieldFunctionType.COUNT_OF || type == FieldFunctionType.SIZE_OF) {
-         if (((Long) value) == 0)
+         if ((Long) value == 0) {
             return;
+         }
       }
 
       m_fieldFunctionStack.get(affectedBlockId).get(type).add(value);
@@ -148,8 +145,9 @@ public class FieldFunctionStack {
       if (fieldValues.isEmpty()) {
          m_fieldFunctionStack.get(id).remove(functionType);
 
-         if (m_fieldFunctionStack.get(id).isEmpty())
+         if (m_fieldFunctionStack.get(id).isEmpty()) {
             m_fieldFunctionStack.remove(id);
+         }
       }
 
       return returnedValue;
@@ -198,8 +196,9 @@ public class FieldFunctionStack {
 
       Map<FieldFunctionType<?>, List<Object>> functionTypeMap = m_fieldFunctionStack.get(id);
 
-      if (functionTypeMap.get(type) == null)
+      if (functionTypeMap.get(type) == null) {
          functionTypeMap.put(type, new ArrayList<>());
+      }
    }
 
    private static final String LOGGING_BINARY_TO_INTERPRETED_FAILED = "Could not add field function of type <%1$s> for field id <%2$s> to field function stack because the conversion from binary to interpreted value failed. Exception see below.";

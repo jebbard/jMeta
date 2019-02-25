@@ -32,7 +32,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     * Tags this field as representing a magic key. The field must be of type {@link FieldType#STRING},
     * {@link FieldType#BINARY} or {@link FieldType#FLAGS} and it must either have enumerated valuer or a non-null
     * default value with a fixed length.
-    * 
+    *
     * @return This builder
     */
    C asMagicKey();
@@ -40,7 +40,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
    /**
     * Tags this field as representing a magic key with an odd bit length. The field must be of type STRING, BINARY or
     * FLAGS and it must either have enumerated valuer or a non-null default value with a fixed length.
-    * 
+    *
     * @param bitLength
     *           The bit length to set, must be strictly positive
     * @return This builder
@@ -50,7 +50,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
    /**
     * Tags this field as representing the id of a target generic container data block. The field must be of
     * {@link FieldType#STRING}.
-    * 
+    *
     * @param referencedBlock
     *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
@@ -59,7 +59,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
 
    /**
     * Tags this field as indicating the presence of a target data block. The field must be of {@link FieldType#FLAGS}.
-    * 
+    *
     * @param withFlagName
     *           The name of the flag indicating the presence of the target data block, must not be null and refer to an
     *           existing flag name of the underlying {@link FlagSpecification}
@@ -74,17 +74,17 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
    /**
     * Tags this field as representing the size of a target data block. The field must be of
     * {@link FieldType#UNSIGNED_WHOLE_NUMBER}.
-    * 
+    *
     * @param referencedBlock
-    *           The target data blocks identified by their {@link DataBlockCrossReference}s, must not be null
+    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
     */
-   C asSizeOf(DataBlockCrossReference... referencedBlocks);
+   C asSizeOf(DataBlockCrossReference referencedBlock);
 
    /**
     * Tags this field as representing the number of occurrences of a target data block. The field must be of
     * {@link FieldType#UNSIGNED_WHOLE_NUMBER}.
-    * 
+    *
     * @param referencedBlock
     *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
@@ -94,7 +94,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
    /**
     * Tags this field as representing the id of a target generic container data block. The field must be of
     * {@link FieldType#STRING}.
-    * 
+    *
     * @param referencedBlock
     *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
@@ -104,7 +104,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
    /**
     * Tags this field as representing the id of a target generic container data block. The field must be of
     * {@link FieldType#STRING}.
-    * 
+    *
     * @param referencedBlock
     *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
     * @return This builder
@@ -113,7 +113,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
 
    /**
     * Adds an enumerated value to this field's data block description.
-    * 
+    *
     * @param binaryValue
     *           The binary value to add, must be unique
     * @param interpretedValue
@@ -125,7 +125,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
    /**
     * Sets a custom {@link FieldConverter} to be used when converting binary values into interpreted values and vice
     * versa.
-    * 
+    *
     * @param customConverter
     *           The custom converter, must not be null
     * @return This builder
@@ -134,7 +134,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
 
    /**
     * Sets the default value of the built field, which is initially null
-    * 
+    *
     * @param value
     *           The default value to set, may be null
     * @return This builder
@@ -145,7 +145,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     * Assigns a dynamic length (min length not equal to max length) to the data block. If this method is not called, the
     * default lengths are {@link DataBlockDescription#getMinimumByteLength()} = {@link DataBlockDescription#UNDEFINED}
     * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNDEFINED}.
-    * 
+    *
     * @param minimumByteLength
     *           The minimum byte length of the data block, must not be negative and must be smaller than or equal to the
     *           maximum byte length
@@ -160,7 +160,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     * Assigns a static length (min length = max length) to the data block. If this method is not called, the default
     * lengths are {@link DataBlockDescription#getMinimumByteLength()} = {@link DataBlockDescription#UNDEFINED} and
     * {@link DataBlockDescription#getMaximumByteLength()} = {@link DataBlockDescription#UNDEFINED}.
-    * 
+    *
     * @param staticByteLength
     *           The static length of the data block, must not be negative
     * @return The concrete builder instance
@@ -169,7 +169,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
 
    /**
     * Finishes building the field
-    * 
+    *
     * @return The parent builder
     */
    P finishField();

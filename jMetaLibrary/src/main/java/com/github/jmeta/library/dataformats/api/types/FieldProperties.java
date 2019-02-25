@@ -78,7 +78,7 @@ public class FieldProperties<T> {
    private final ByteOrder fixedByteOrder;
    private final Charset fixedCharacterEncoding;
    private final FlagSpecification flagSpecification;
-   private final List<FieldFunction> functions = new ArrayList<>();
+   private final List<FieldFunction<?>> functions = new ArrayList<>();
 
    private final boolean isMagicKey;
    private final long magicKeyBitLength;
@@ -113,7 +113,7 @@ public class FieldProperties<T> {
     */
    public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
-      ByteOrder fixedByteOrder, List<FieldFunction> functions, boolean isMagicKey, long magicKeyBitLength,
+      ByteOrder fixedByteOrder, List<FieldFunction<?>> functions, boolean isMagicKey, long magicKeyBitLength,
       FieldConverter<T> customConverter) {
       Reject.ifNull(fieldType, "fieldType");
       Reject.ifNull(enumeratedValues, "enumeratedValues");
@@ -269,7 +269,7 @@ public class FieldProperties<T> {
       return Collections.unmodifiableMap(enumeratedValues);
    }
 
-   public List<FieldFunction> getFieldFunctions() {
+   public List<FieldFunction<?>> getFieldFunctions() {
       return Collections.unmodifiableList(functions);
    }
 
@@ -482,9 +482,9 @@ public class FieldProperties<T> {
       }
 
       // Validate field functions stand-alone
-      List<FieldFunction> fieldFunctions = getFieldFunctions();
+      List<FieldFunction<?>> fieldFunctions = getFieldFunctions();
 
-      for (FieldFunction fieldFunction : fieldFunctions) {
+      for (FieldFunction<?> fieldFunction : fieldFunctions) {
          FieldFunctionType<?> ffType = fieldFunction.getFieldFunctionType();
          if (ffType == FieldFunctionType.ID_OF || ffType == FieldFunctionType.CHARACTER_ENCODING_OF
             || ffType == FieldFunctionType.BYTE_ORDER_OF) {

@@ -98,7 +98,7 @@ public class APEv2Extension implements Extension {
       DataBlockCrossReference footerReference = new DataBlockCrossReference("Footer");
       DataBlockCrossReference headerReference = new DataBlockCrossReference("Header");
       DataBlockCrossReference payloadReference = new DataBlockCrossReference("Payload");
-      
+
       DataBlockCrossReference itemPayloadReference = new DataBlockCrossReference("Item payload");
       return builder.addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
          .addHeader("header", "APEv2 header", "The APEv2 header")
@@ -114,7 +114,8 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 header tag size", "APEv2 header tag size")
                .withStaticLengthOf(4)
-               .asSizeOf(payloadReference, footerReference)
+               .asSizeOf(payloadReference)
+               .asSizeOf(footerReference)
             .finishField()
             .addNumericField("itemCount", "APEv2 header item count", "APEv2 header item count")
                .withStaticLengthOf(4)
@@ -150,7 +151,8 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 footer tag size", "APEv2 footer tag size")
                .withStaticLengthOf(4)
-               .asSizeOf(payloadReference, headerReference)
+               .asSizeOf(payloadReference)
+               .asSizeOf(headerReference)
             .finishField()
             .addNumericField("itemCount", "APEv2 footer item count", "APEv2 footer item count")
                .withStaticLengthOf(4)

@@ -94,7 +94,7 @@ public class Lyrics3v2Extension implements Extension {
       DataBlockCrossReference headerReference = new DataBlockCrossReference("Header");
       DataBlockCrossReference payloadReference = new DataBlockCrossReference("Payload");
       DataBlockCrossReference fieldPayloadReference = new DataBlockCrossReference("Field Payload");
-      
+
       return builder.addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
          .addHeader("header", "Lyrics3v2 header", "The Lyrics3v2 header")
             .referencedAs(headerReference)
@@ -108,7 +108,8 @@ public class Lyrics3v2Extension implements Extension {
             .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
                .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
                .withStaticLengthOf(FOOTER_SIZE_FIELD_LENGTH)
-               .asSizeOf(headerReference, payloadReference)
+               .asSizeOf(headerReference)
+               .asSizeOf(payloadReference)
             .finishField()
             .addStringField("id", "Lyrics3v2 footer id", "Lyrics3v2 footer id")
                .withStaticLengthOf(LYRICS3v2_MAGIC_FOOTER_STRING.length())

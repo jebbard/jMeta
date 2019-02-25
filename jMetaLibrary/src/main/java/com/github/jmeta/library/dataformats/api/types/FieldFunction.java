@@ -9,49 +9,43 @@
 
 package com.github.jmeta.library.dataformats.api.types;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link FieldFunction}
  *
  */
-public class FieldFunction {
+public class FieldFunction<T> {
 
-   private final Set<DataBlockCrossReference> referencedBlocks = new HashSet<>();
+   private final DataBlockCrossReference referencedBlock;
 
-   private final FieldFunctionType<?> fieldFunctionType;
+   private final FieldFunctionType<T> fieldFunctionType;
 
    private final String flagName;
 
    private final Integer flagValue;
 
-   public Set<DataBlockCrossReference> getReferencedBlocks() {
-      return Collections.unmodifiableSet(referencedBlocks);
+   public DataBlockCrossReference getReferencedBlock() {
+      return referencedBlock;
    }
 
    /**
     * Creates a new {@link FieldFunction}.
-    * 
+    *
     * @param fieldFunctionType
     * @param referencedBlocks
     * @param flagName
     * @param requiredFlagValue
     */
-   public FieldFunction(FieldFunctionType<?> fieldFunctionType, Set<DataBlockCrossReference> referencedBlocks,
+   public FieldFunction(FieldFunctionType<T> fieldFunctionType, DataBlockCrossReference referencedBlock,
       String flagName, Integer requiredFlagValue) {
-      Reject.ifNull(referencedBlocks, "affectedBlockIds");
+      Reject.ifNull(referencedBlock, "referencedBlock");
       Reject.ifNull(fieldFunctionType, "fieldFunctionType");
-      Reject.ifTrue(referencedBlocks.isEmpty(), "affectedBlockIds.isEmpty()");
 
       this.fieldFunctionType = fieldFunctionType;
       this.flagName = flagName;
       this.flagValue = requiredFlagValue;
-      this.referencedBlocks.addAll(referencedBlocks);
+      this.referencedBlock = referencedBlock;
    }
 
    /**
@@ -59,9 +53,8 @@ public class FieldFunction {
     *
     * @return affectedBlockIds
     */
-   public Set<DataBlockId> getAffectedBlockIds() {
-      return Collections
-         .unmodifiableSet(referencedBlocks.stream().map(ref -> ref.getReferencedId()).collect(Collectors.toSet()));
+   public DataBlockId getAffectedBlockId() {
+      return referencedBlock.getReferencedId();
    }
 
    /**
@@ -69,7 +62,7 @@ public class FieldFunction {
     *
     * @return fieldFunctionType
     */
-   public FieldFunctionType<?> getFieldFunctionType() {
+   public FieldFunctionType<T> getFieldFunctionType() {
 
       return fieldFunctionType;
    }
@@ -94,7 +87,7 @@ public class FieldFunction {
 
    @Override
    public String toString() {
-      return fieldFunctionType + ", " + getAffectedBlockIds();
+      return fieldFunctionType + ", " + getAffectedBlockId();
    }
 
 }
