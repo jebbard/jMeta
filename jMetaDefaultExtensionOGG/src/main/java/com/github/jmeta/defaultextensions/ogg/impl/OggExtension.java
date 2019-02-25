@@ -20,8 +20,10 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -111,13 +113,13 @@ public class OggExtension implements Extension {
              .finishField()
              .addNumericField("pageSegments", "Ogg page segments", "Ogg page segments")
                 .withStaticLengthOf(1)
-                .asCountOf(segmentTableEntryReference)
+                .withFieldFunction(new CountOf(segmentTableEntryReference))
              .finishField()
              .addNumericField("segmentTableEntry", "Ogg page segment table entry", "Ogg segment table entry")
                 .referencedAs(segmentTableEntryReference)
                 .withStaticLengthOf(1)
                 .withOccurrences(0, 99999)
-                .asSizeOf(segmentReference)
+                .withFieldFunction(new SizeOf(segmentReference))
              .finishField()
           .finishHeader()
           .getPayload()

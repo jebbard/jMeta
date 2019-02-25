@@ -20,11 +20,8 @@ import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescri
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
 import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
-import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
@@ -55,8 +52,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    private boolean isMagicKey = false;
    private final Map<I, byte[]> enumeratedValues = new HashMap<>();
    private final FieldType<I> fieldType;
-   private final List<FieldFunction<?>> functions = new ArrayList<>();
-   private final List<AbstractFieldFunction<?>> fieldFunctions = new ArrayList<>();
+   private final List<AbstractFieldFunction<?>> functions = new ArrayList<>();
    private long magicKeyBitLength = DataBlockDescription.UNDEFINED;
    private FieldConverter<I> customConverter;
 
@@ -103,55 +99,6 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    public C asMagicKeyWithOddBitLength(long bitLength) {
       this.magicKeyBitLength = bitLength;
       return asMagicKey();
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asIdOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
-    */
-   @Override
-   public C asIdOf(DataBlockCrossReference referencedBlock) {
-      return addFieldFunction(FieldFunctionType.ID_OF, null, null, referencedBlock);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#indicatesPresenceOf(java.lang.String,
-    *      int, com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
-    */
-   @Override
-   public C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockCrossReference referencedBlock) {
-      return addFieldFunction(FieldFunctionType.PRESENCE_OF, withFlagName, withFlagValue, referencedBlock);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asSizeOf(DataBlockCrossReference)
-    */
-   @Override
-   public C asSizeOf(DataBlockCrossReference referencedBlock) {
-      return addFieldFunction(FieldFunctionType.SIZE_OF, null, null, referencedBlock);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCountOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
-    */
-   @Override
-   public C asCountOf(DataBlockCrossReference referencedBlock) {
-      return addFieldFunction(FieldFunctionType.COUNT_OF, null, null, referencedBlock);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asByteOrderOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
-    */
-   @Override
-   public C asByteOrderOf(DataBlockCrossReference referencedBlock) {
-      return addFieldFunction(FieldFunctionType.BYTE_ORDER_OF, null, null, referencedBlock);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#asCharacterEncodingOf(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
-    */
-   @Override
-   public C asCharacterEncodingOf(DataBlockCrossReference referencedBlock) {
-      return addFieldFunction(FieldFunctionType.CHARACTER_ENCODING_OF, null, null, referencedBlock);
    }
 
    /**
@@ -235,25 +182,15 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
       this.fixedByteOrder = fixedByteOrder;
    }
 
-   @SuppressWarnings("unchecked")
-   private <T> C addFieldFunction(FieldFunctionType<T> type, String withFlagName, Integer withFlagValue,
-      DataBlockCrossReference referencedBlock) {
-      Reject.ifNull(referencedBlock, "referencedBlock");
-
-      functions.add(new FieldFunction<>(type, referencedBlock, withFlagName, withFlagValue));
-
-      return (C) this;
-   }
-
    /**
     * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#withFieldFunction(com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction)
     */
    @Override
    @SuppressWarnings("unchecked")
-   public C withFieldFunction(AbstractFieldFunction<I> fieldFunction) {
+   public C withFieldFunction(AbstractFieldFunction<?> fieldFunction) {
       Reject.ifNull(fieldFunction, "fieldFunction");
 
-      fieldFunctions.add(fieldFunction);
+      functions.add(fieldFunction);
 
       return (C) this;
    }

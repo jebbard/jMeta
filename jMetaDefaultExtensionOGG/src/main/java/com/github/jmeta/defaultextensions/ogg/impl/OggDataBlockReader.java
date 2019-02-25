@@ -16,10 +16,11 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
 
 // TODO primeRefactor010: cleanup and document OggDataBlockReader
 /**
@@ -64,12 +65,13 @@ public class OggDataBlockReader extends StandardDataBlockReader {
                totalPayloadSize += segmentSize;
                sizeOfCurrentPacket += segmentSize;
 
-               if (segmentSize != 0)
+               if (segmentSize != 0) {
                   segmentCountOfCurrentPacket++;
+               }
 
-               if (segmentSize < 0xFF || (segmentSize == 0xFF && i == header.getFields().size() - 1)) {
-                  context.pushFieldFunction(packetPayloadId, FieldFunctionType.SIZE_OF, sizeOfCurrentPacket);
-                  context.pushFieldFunction(segmentFieldId, FieldFunctionType.COUNT_OF, segmentCountOfCurrentPacket);
+               if (segmentSize < 0xFF || segmentSize == 0xFF && i == header.getFields().size() - 1) {
+                  context.pushFieldFunction(packetPayloadId, SizeOf.class, sizeOfCurrentPacket);
+                  context.pushFieldFunction(segmentFieldId, CountOf.class, segmentCountOfCurrentPacket);
                   sizeOfCurrentPacket = 0;
                   segmentCountOfCurrentPacket = 0;
                }
@@ -79,13 +81,13 @@ public class OggDataBlockReader extends StandardDataBlockReader {
             }
          }
 
-         context.pushFieldFunction(oggPagePayloadId, FieldFunctionType.SIZE_OF, totalPayloadSize);
+         context.pushFieldFunction(oggPagePayloadId, SizeOf.class, totalPayloadSize);
       }
    }
 
    /**
     * Creates a new {@link OggDataBlockReader}.
-    * 
+    *
     * @param spec
     * @param transformationHandlers
     * @param maxFieldBlockSize

@@ -1,6 +1,6 @@
 /**
  *
- * {@link FieldFunctionStack}.java
+ * {@link AbstractFieldFunctionStack}.java
  *
  * @author Jens Ebert
  *
@@ -20,17 +20,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
+import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.types.PresenceOf;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link FieldFunctionStack}
+ * {@link AbstractFieldFunctionStack}
  *
  */
 // TODO doItFirst001: consider using another data structure instead of list
@@ -55,30 +57,33 @@ public class FieldFunctionStack {
 
       final FieldProperties<?> fieldProperties = desc.getFieldProperties();
 
-      List<FieldFunction<?>> fieldFunctions = fieldProperties.getFieldFunctions();
+      List<AbstractFieldFunction<?>> fieldFunctions = fieldProperties.getFieldFunctions();
 
       for (int i = 0; i < fieldFunctions.size(); ++i) {
-         FieldFunction<?> function = fieldFunctions.get(i);
+         AbstractFieldFunction<?> function = fieldFunctions.get(i);
 
-         DataBlockId id = function.getAffectedBlockId();
+         DataBlockId id = function.getReferencedBlock().getReferencedId();
 
-         final FieldFunctionType<?> type = function.getFieldFunctionType();
+         Class<? extends AbstractFieldFunction<?>> type = (Class<? extends AbstractFieldFunction<?>>) function
+            .getClass();
 
          updateCollections(id, type);
 
          try {
             // Special treatment for flags field functions
-            if (function.getFlagName() != null) {
+            if (type == PresenceOf.class) {
                Flags flags = (Flags) field.getInterpretedValue();
 
-               addValue(id, type, flags.getFlagIntegerValue(function.getFlagName()) == function.getFlagValue());
+               addValue(id, type,
+                  flags.getFlagIntegerValue(((PresenceOf) function).getFlagName()) == ((PresenceOf) function)
+                     .getFlagValue());
             } else {
                addValue(id, type, field.getInterpretedValue());
             }
          } catch (BinaryValueConversionException e) {
             // Silently ignore: The local id remains by its previous value
             LOGGER.warn(LOGGING_BINARY_TO_INTERPRETED_FAILED, type, field.getId());
-            LOGGER.error("pushFieldFunctions", e);
+            LOGGER.error("pushAbstractFieldFunctions", e);
          }
       }
    }
@@ -88,7 +93,8 @@ public class FieldFunctionStack {
     * @param type
     * @param value
     */
-   public <T> void pushFieldFunction(DataBlockId affectedBlockId, FieldFunctionType<T> type, T value) {
+   public <T> void pushFieldFunction(DataBlockId affectedBlockId, Class<? extends AbstractFieldFunction<?>> type,
+      T value) {
 
       Reject.ifNull(value, "field");
       Reject.ifNull(type, "type");
@@ -99,10 +105,10 @@ public class FieldFunctionStack {
       addValue(affectedBlockId, type, value);
    }
 
-   private void addValue(DataBlockId affectedBlockId, FieldFunctionType<?> type, Object value) {
+   private void addValue(DataBlockId affectedBlockId, Class<? extends AbstractFieldFunction<?>> type, Object value) {
 
       // DO NOT add count or size of zero to stack, as they would cause exceptions when parsing
-      if (type == FieldFunctionType.COUNT_OF || type == FieldFunctionType.SIZE_OF) {
+      if (type == CountOf.class || type == SizeOf.class) {
          if ((Long) value == 0) {
             return;
          }
@@ -116,12 +122,12 @@ public class FieldFunctionStack {
     * @param functionType
     * @return true if it has the field function, false otherwise
     */
-   public boolean hasFieldFunction(DataBlockId id, FieldFunctionType<?> functionType) {
+   public boolean hasFieldFunction(DataBlockId id, Class<? extends AbstractFieldFunction<?>> type) {
 
       Reject.ifNull(id, "id");
-      Reject.ifNull(functionType, "functionType");
+      Reject.ifNull(type, "type");
 
-      return m_fieldFunctionStack.containsKey(id) && m_fieldFunctionStack.get(id).containsKey(functionType);
+      return m_fieldFunctionStack.containsKey(id) && m_fieldFunctionStack.get(id).containsKey(type);
    }
 
    /**
@@ -129,11 +135,11 @@ public class FieldFunctionStack {
     * @param functionType
     * @return the field function
     */
-   public <T> T popFieldFunction(DataBlockId id, FieldFunctionType<T> functionType) {
+   public <T> T popFieldFunction(DataBlockId id, Class<? extends AbstractFieldFunction<?>> functionType) {
 
       Reject.ifNull(id, "id");
       Reject.ifNull(functionType, "functionType");
-      Reject.ifFalse(hasFieldFunction(id, functionType), "hasFieldFunction(id, functionType)");
+      Reject.ifFalse(hasFieldFunction(id, functionType), "hasAbstractFieldFunction(id, functionType)");
 
       // Might throw ClassCastException!!
       List<Object> fieldValues = m_fieldFunctionStack.get(id).get(functionType);
@@ -160,14 +166,15 @@ public class FieldFunctionStack {
 
       for (Iterator<DataBlockId> iterator = m_fieldFunctionStack.keySet().iterator(); iterator.hasNext();) {
          DataBlockId affectedBlockId = iterator.next();
-         Map<FieldFunctionType<?>, List<Object>> fieldFunctionValues = m_fieldFunctionStack.get(affectedBlockId);
+         Map<Class<? extends AbstractFieldFunction<?>>, List<Object>> fieldFunctionValues = m_fieldFunctionStack
+            .get(affectedBlockId);
 
          stringRepresentation.append(affectedBlockId.getGlobalId());
          stringRepresentation.append("\n");
 
-         for (Iterator<FieldFunctionType<?>> fieldFuncIter = fieldFunctionValues.keySet().iterator(); fieldFuncIter
-            .hasNext();) {
-            FieldFunctionType<?> fieldFuncType = fieldFuncIter.next();
+         for (Iterator<Class<? extends AbstractFieldFunction<?>>> fieldFuncIter = fieldFunctionValues.keySet()
+            .iterator(); fieldFuncIter.hasNext();) {
+            Class<? extends AbstractFieldFunction<?>> fieldFuncType = fieldFuncIter.next();
             List<Object> valueList = fieldFunctionValues.get(fieldFuncType);
 
             stringRepresentation.append("\t→");
@@ -188,13 +195,13 @@ public class FieldFunctionStack {
       return stringRepresentation.toString();
    }
 
-   private void updateCollections(DataBlockId id, final FieldFunctionType<?> type) {
+   private void updateCollections(DataBlockId id, final Class<? extends AbstractFieldFunction<?>> type) {
 
       if (!m_fieldFunctionStack.containsKey(id)) {
-         m_fieldFunctionStack.put(id, new LinkedHashMap<FieldFunctionType<?>, List<Object>>());
+         m_fieldFunctionStack.put(id, new LinkedHashMap<Class<? extends AbstractFieldFunction<?>>, List<Object>>());
       }
 
-      Map<FieldFunctionType<?>, List<Object>> functionTypeMap = m_fieldFunctionStack.get(id);
+      Map<Class<? extends AbstractFieldFunction<?>>, List<Object>> functionTypeMap = m_fieldFunctionStack.get(id);
 
       if (functionTypeMap.get(type) == null) {
          functionTypeMap.put(type, new ArrayList<>());
@@ -203,5 +210,5 @@ public class FieldFunctionStack {
 
    private static final String LOGGING_BINARY_TO_INTERPRETED_FAILED = "Could not add field function of type <%1$s> for field id <%2$s> to field function stack because the conversion from binary to interpreted value failed. Exception see below.";
 
-   private final Map<DataBlockId, Map<FieldFunctionType<?>, List<Object>>> m_fieldFunctionStack = new HashMap<>();
+   private final Map<DataBlockId, Map<Class<? extends AbstractFieldFunction<?>>, List<Object>>> m_fieldFunctionStack = new HashMap<>();
 }

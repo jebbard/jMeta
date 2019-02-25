@@ -12,11 +12,9 @@ import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecifi
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_CONVERSION_FAILED;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_EXCEEDS_LENGTH;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_NOT_ENUMERATED;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_FLAG_PROPERTIES_UNNECESSARY;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_FLAGS;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_NUMERIC;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_STRING;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_PRESENCE_OF_MISSING_FIELDS;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIXED_BYTE_ORDER_NON_NUMERIC;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIXED_CHARSET_NON_STRING;
@@ -78,7 +76,7 @@ public class FieldProperties<T> {
    private final ByteOrder fixedByteOrder;
    private final Charset fixedCharacterEncoding;
    private final FlagSpecification flagSpecification;
-   private final List<FieldFunction<?>> functions = new ArrayList<>();
+   private final List<AbstractFieldFunction<?>> functions = new ArrayList<>();
 
    private final boolean isMagicKey;
    private final long magicKeyBitLength;
@@ -113,7 +111,7 @@ public class FieldProperties<T> {
     */
    public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
-      ByteOrder fixedByteOrder, List<FieldFunction<?>> functions, boolean isMagicKey, long magicKeyBitLength,
+      ByteOrder fixedByteOrder, List<AbstractFieldFunction<?>> functions, boolean isMagicKey, long magicKeyBitLength,
       FieldConverter<T> customConverter) {
       Reject.ifNull(fieldType, "fieldType");
       Reject.ifNull(enumeratedValues, "enumeratedValues");
@@ -269,7 +267,7 @@ public class FieldProperties<T> {
       return Collections.unmodifiableMap(enumeratedValues);
    }
 
-   public List<FieldFunction<?>> getFieldFunctions() {
+   public List<AbstractFieldFunction<?>> getFieldFunctions() {
       return Collections.unmodifiableList(functions);
    }
 
@@ -482,42 +480,26 @@ public class FieldProperties<T> {
       }
 
       // Validate field functions stand-alone
-      List<FieldFunction<?>> fieldFunctions = getFieldFunctions();
-
-      for (FieldFunction<?> fieldFunction : fieldFunctions) {
-         FieldFunctionType<?> ffType = fieldFunction.getFieldFunctionType();
-         if (ffType == FieldFunctionType.ID_OF || ffType == FieldFunctionType.CHARACTER_ENCODING_OF
-            || ffType == FieldFunctionType.BYTE_ORDER_OF) {
-            if (getFieldType() != FieldType.STRING) {
+      getFieldFunctions().stream().filter(fieldFunction -> !getFieldType().equals(fieldFunction.getRequiredFieldType()))
+         .forEach(fieldFunction -> {
+            if (fieldFunction.getClass() == IdOf.class || fieldFunction.getClass() == CharacterEncodingOf.class
+               || fieldFunction.getClass() == ByteOrderOf.class) {
                throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_STRING, desc);
-            }
-         } else if (ffType == FieldFunctionType.SIZE_OF || ffType == FieldFunctionType.COUNT_OF) {
-            if (getFieldType() != FieldType.UNSIGNED_WHOLE_NUMBER) {
+            } else if (fieldFunction.getClass() == SizeOf.class || fieldFunction.getClass() == CountOf.class) {
                throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_NUMERIC, desc);
-            }
-         } else if (ffType == FieldFunctionType.PRESENCE_OF) {
-            if (getFieldType() != FieldType.FLAGS) {
+            } else if (fieldFunction.getClass() == PresenceOf.class) {
                throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_FLAGS, desc);
             }
+         });
 
-            if (fieldFunction.getFlagName() == null || fieldFunction.getFlagValue() == null) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_PRESENCE_OF_MISSING_FIELDS, desc,
-                  fieldFunction.getFlagName(), fieldFunction.getFlagValue());
-            }
-
-            if (!getFlagSpecification().hasFlag(fieldFunction.getFlagName())) {
+      getFieldFunctions().stream().filter(fieldFunction -> fieldFunction.getClass() == PresenceOf.class)
+         .forEach(fieldFunction -> {
+            String flagName = ((PresenceOf) fieldFunction).getFlagName();
+            if (!getFlagSpecification().hasFlag(flagName)) {
                throw new InvalidSpecificationException(VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME, desc,
-                  fieldFunction.getFlagName());
+                  flagName);
             }
-         }
-
-         if (ffType != FieldFunctionType.PRESENCE_OF) {
-            if (fieldFunction.getFlagName() != null || fieldFunction.getFlagValue() != null) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_FLAG_PROPERTIES_UNNECESSARY, desc,
-                  fieldFunction.getFlagName(), fieldFunction.getFlagValue());
-            }
-         }
-      }
+         });
 
       validateDefaultValue(desc);
    }

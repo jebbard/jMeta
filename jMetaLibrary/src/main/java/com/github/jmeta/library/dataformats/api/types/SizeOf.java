@@ -26,16 +26,7 @@ public class SizeOf extends AbstractFieldFunction<Long> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
    public SizeOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock, Long.class);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#isValidFieldType(com.github.jmeta.library.dataformats.api.types.FieldType)
-    */
-   @Override
-   public boolean isValidFieldType(FieldType<?> type) {
-      Reject.ifNull(type, "type");
-      return type == FieldType.UNSIGNED_WHOLE_NUMBER;
+      super(referencedBlock, Long.class, FieldType.UNSIGNED_WHOLE_NUMBER);
    }
 
    /**
@@ -45,5 +36,13 @@ public class SizeOf extends AbstractFieldFunction<Long> {
    public boolean isValidTargetType(PhysicalDataBlockType type) {
       Reject.ifNull(type, "type");
       return true;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    */
+   @Override
+   public AbstractFieldFunction<Long> withReplacedReference(DataBlockCrossReference replacedReference) {
+      return new SizeOf(replacedReference);
    }
 }

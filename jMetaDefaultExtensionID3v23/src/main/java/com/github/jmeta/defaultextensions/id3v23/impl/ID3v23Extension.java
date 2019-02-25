@@ -20,11 +20,15 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
+import com.github.jmeta.library.dataformats.api.types.CharacterEncodingOf;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
+import com.github.jmeta.library.dataformats.api.types.IdOf;
+import com.github.jmeta.library.dataformats.api.types.PresenceOf;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -150,11 +154,11 @@ public class ID3v23Extension implements Extension {
                   .addFlagDescription(new FlagDescription(TAG_FLAGS_EXTENDED_HEADER, new BitAddress(0, 1), "", 1, null))
                   .addFlagDescription(new FlagDescription(TAG_FLAGS_EXPERIMENTAL_INDICATOR, new BitAddress(0, 2), "", 1, null))
                .finishFlagSpecification()
-               .indicatesPresenceOf(TAG_FLAGS_EXTENDED_HEADER, 1, extendedHeaderReference)
+               .withFieldFunction(new PresenceOf(extendedHeaderReference, TAG_FLAGS_EXTENDED_HEADER, 1))
             .finishField()
             .addNumericField("size", "id3v23 tag size", "The id3v23 tag size")
                .withStaticLengthOf(4)
-               .asSizeOf(payloadReference)
+               .withFieldFunction(new SizeOf(payloadReference))
                .withCustomConverter(SYNC_SAFE_INTEGER_CONVERTER)
             .finishField()
          .finishHeader()
@@ -171,7 +175,7 @@ public class ID3v23Extension implements Extension {
                   .withDefaultFlagBytes(new byte[] { 0 })
                   .addFlagDescription(new FlagDescription(EXT_HEADER_FLAG_CRC_DATA_PRESENT, new BitAddress(0, 0), "", 1, null))
                .finishFlagSpecification()
-               .indicatesPresenceOf(EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1, crcReference)
+               .withFieldFunction(new PresenceOf(crcReference, EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1))
             .finishField()
             .addNumericField("paddingSize", "id3v23 extended header padding size", "The id3v23 extended header padding size")
                .withStaticLengthOf(4)
@@ -190,12 +194,12 @@ public class ID3v23Extension implements Extension {
                .addHeader("header", "Generic frame header", "The generic frame header")
                   .addStringField("id", "Generic frame id field", "The generic frame id field")
                      .withStaticLengthOf(FRAME_ID_SIZE)
-                     .asIdOf(frameReference)
+                     .withFieldFunction(new IdOf(frameReference))
                      .withFixedCharset(Charsets.CHARSET_ISO)
                   .finishField()
                   .addNumericField("size", "Generic frame size field", "The generic frame size field")
                      .withStaticLengthOf(4)
-                     .asSizeOf(framePayloadReference)
+                     .withFieldFunction(new SizeOf(framePayloadReference))
                      .withCustomConverter(SYNC_SAFE_INTEGER_CONVERTER)
                   .finishField()
                   .addFlagsField("flags", "Generic frame flags field", "The generic frame flags field")
@@ -209,9 +213,9 @@ public class ID3v23Extension implements Extension {
                         .addFlagDescription(new FlagDescription(FRAME_FLAGS_ENCRYPTION, new BitAddress(1, 1), "", 1, null))
                         .addFlagDescription(new FlagDescription(FRAME_FLAGS_GROUP_IDENTITY, new BitAddress(1, 2), "", 1, null))
                      .finishFlagSpecification()
-                     .indicatesPresenceOf(FRAME_FLAGS_COMPRESSION, 1, decompressedSizeReference)
-                     .indicatesPresenceOf(FRAME_FLAGS_GROUP_IDENTITY, 1, groupIdReference)
-                     .indicatesPresenceOf(FRAME_FLAGS_ENCRYPTION, 1, encryptionMethodReference)
+                     .withFieldFunction(new PresenceOf(decompressedSizeReference, FRAME_FLAGS_COMPRESSION, 1))
+                     .withFieldFunction(new PresenceOf(groupIdReference, FRAME_FLAGS_GROUP_IDENTITY, 1))
+                     .withFieldFunction(new PresenceOf(encryptionMethodReference, FRAME_FLAGS_ENCRYPTION, 1))
                   .finishField()
                .finishHeader()
                .getPayload()
@@ -246,7 +250,7 @@ public class ID3v23Extension implements Extension {
                   .addStringField("textEncoding", "Text encoding", "Text encoding")
                      .withStaticLengthOf(1)
                      .withDefaultValue(Charsets.CHARSET_ISO.name())
-                     .asCharacterEncodingOf(informationReference)
+                     .withFieldFunction(new CharacterEncodingOf(informationReference))
                      .addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO.name())
                      .addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16.name())
                   .finishField()

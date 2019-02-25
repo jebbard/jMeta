@@ -23,6 +23,7 @@ import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
+import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -113,7 +114,7 @@ public class MP3Extension implements Extension {
                   .addFlagDescription(new FlagDescription("Mode extension bit", new BitAddress(3, 4), "", 2, null))
                   .addFlagDescription(new FlagDescription("Mode bit", new BitAddress(3, 6), "", 2, null))
                .finishFlagSpecification()
-               .indicatesPresenceOf("No protection bit", 0, crcReference)
+               .withFieldFunction(new PresenceOf(crcReference, "No protection bit", 0))
                .asMagicKeyWithOddBitLength(11)
             .finishField()
          .finishHeader()

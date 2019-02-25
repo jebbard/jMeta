@@ -21,9 +21,13 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilderFactory;
 import com.github.jmeta.library.dataformats.api.types.BitAddress;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
+import com.github.jmeta.library.dataformats.api.types.IdOf;
+import com.github.jmeta.library.dataformats.api.types.PresenceOf;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -114,12 +118,12 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 header tag size", "APEv2 header tag size")
                .withStaticLengthOf(4)
-               .asSizeOf(payloadReference)
-               .asSizeOf(footerReference)
+               .withFieldFunction(new SizeOf(payloadReference))
+               .withFieldFunction(new SizeOf(footerReference))
             .finishField()
             .addNumericField("itemCount", "APEv2 header item count", "APEv2 header item count")
                .withStaticLengthOf(4)
-               .asCountOf(itemReference)
+               .withFieldFunction(new CountOf(itemReference))
             .finishField()
             .addFlagsField("tagFlags", "APEv2 header tag flags", "APEv2 header tag flags")
                .withStaticLengthOf(4)
@@ -131,7 +135,7 @@ public class APEv2Extension implements Extension {
                   .addFlagDescription(tagContainsNoFooterFlag)
                   .addFlagDescription(tagContainsHeaderFlag)
                .finishFlagSpecification()
-               .indicatesPresenceOf(tagContainsNoFooterFlag.getFlagName(), 0, footerReference)
+               .withFieldFunction(new PresenceOf(footerReference, tagContainsNoFooterFlag.getFlagName(), 0))
             .finishField()
             .addBinaryField("reserved", "APEv2 header reserved", "APEv2 header reserved")
                .withStaticLengthOf(8)
@@ -151,12 +155,12 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 footer tag size", "APEv2 footer tag size")
                .withStaticLengthOf(4)
-               .asSizeOf(payloadReference)
-               .asSizeOf(headerReference)
+               .withFieldFunction(new SizeOf(payloadReference))
+               .withFieldFunction(new SizeOf(headerReference))
             .finishField()
             .addNumericField("itemCount", "APEv2 footer item count", "APEv2 footer item count")
                .withStaticLengthOf(4)
-               .asCountOf(itemReference)
+               .withFieldFunction(new CountOf(itemReference))
             .finishField()
             .addFlagsField("tagFlags", "APEv2 footer tag flags", "APEv2 footer tag flags")
                .withStaticLengthOf(4)
@@ -168,7 +172,7 @@ public class APEv2Extension implements Extension {
                   .addFlagDescription(tagContainsNoFooterFlag)
                   .addFlagDescription(tagContainsHeaderFlag)
                .finishFlagSpecification()
-               .indicatesPresenceOf(tagContainsHeaderFlag.getFlagName(), 1, headerReference)
+               .withFieldFunction(new PresenceOf(headerReference, tagContainsHeaderFlag.getFlagName(), 1))
             .finishField()
             .addBinaryField("reserved", "APEv2 footer reserved", "APEv2 footer reserved")
                .withStaticLengthOf(8)
@@ -184,7 +188,7 @@ public class APEv2Extension implements Extension {
                .addHeader("header", "APEv2 item header", "The APEv2 item header")
                   .addNumericField("size", "APEv2 item value size", "APEv2 item value size")
                      .withStaticLengthOf(4)
-                     .asSizeOf(itemPayloadReference)
+                     .withFieldFunction(new SizeOf(itemPayloadReference))
                   .finishField()
                   .addFlagsField("flags", "APEv2 item flags", "APEv2 item flags")
                      .withStaticLengthOf(4)
@@ -196,7 +200,7 @@ public class APEv2Extension implements Extension {
                   .finishField()
                   .addStringField("key", "APEv2 item key", "APEv2 item key")
                      .withLengthOf(2, 255)
-                     .asIdOf(itemReference)
+                     .withFieldFunction(new IdOf(itemReference))
                      .withTerminationCharacter('\u0000')
                   .finishField()
                .finishHeader()

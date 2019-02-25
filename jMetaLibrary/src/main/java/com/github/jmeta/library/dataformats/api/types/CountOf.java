@@ -23,16 +23,7 @@ public class CountOf extends AbstractFieldFunction<Long> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
    public CountOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock, Long.class);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#isValidFieldType(com.github.jmeta.library.dataformats.api.types.FieldType)
-    */
-   @Override
-   public boolean isValidFieldType(FieldType<?> type) {
-      Reject.ifNull(type, "type");
-      return type == FieldType.UNSIGNED_WHOLE_NUMBER;
+      super(referencedBlock, Long.class, FieldType.UNSIGNED_WHOLE_NUMBER);
    }
 
    /**
@@ -43,5 +34,13 @@ public class CountOf extends AbstractFieldFunction<Long> {
       Reject.ifNull(type, "type");
       return type == PhysicalDataBlockType.HEADER || type == PhysicalDataBlockType.FOOTER
          || type == PhysicalDataBlockType.FIELD;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    */
+   @Override
+   public AbstractFieldFunction<Long> withReplacedReference(DataBlockCrossReference replacedReference) {
+      return new CountOf(replacedReference);
    }
 }

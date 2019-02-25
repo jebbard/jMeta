@@ -23,16 +23,7 @@ public class ByteOrderOf extends AbstractFieldFunction<String> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
    public ByteOrderOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock, String.class);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#isValidFieldType(com.github.jmeta.library.dataformats.api.types.FieldType)
-    */
-   @Override
-   public boolean isValidFieldType(FieldType<?> type) {
-      Reject.ifNull(type, "type");
-      return type == FieldType.STRING;
+      super(referencedBlock, String.class, FieldType.STRING);
    }
 
    /**
@@ -42,5 +33,13 @@ public class ByteOrderOf extends AbstractFieldFunction<String> {
    public boolean isValidTargetType(PhysicalDataBlockType type) {
       Reject.ifNull(type, "type");
       return true;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    */
+   @Override
+   public AbstractFieldFunction<String> withReplacedReference(DataBlockCrossReference replacedReference) {
+      return new ByteOrderOf(replacedReference);
    }
 }

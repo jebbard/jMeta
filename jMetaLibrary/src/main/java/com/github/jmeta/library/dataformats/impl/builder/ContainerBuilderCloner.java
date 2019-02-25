@@ -27,11 +27,10 @@ import com.github.jmeta.library.dataformats.api.services.builder.FooterBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.HeaderBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.NumericFieldBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.StringFieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
@@ -294,11 +293,10 @@ public final class ContainerBuilderCloner {
          fb.asMagicKey();
       }
 
-      List<FieldFunction<?>> fieldFunctions = existingFieldProperties.getFieldFunctions();
+      List<AbstractFieldFunction<?>> fieldFunctions = existingFieldProperties.getFieldFunctions();
 
-      for (FieldFunction<?> fieldFunction : fieldFunctions) {
-         FieldFunctionType<?> ffType = fieldFunction.getFieldFunctionType();
-         DataBlockId affectedId = fieldFunction.getAffectedBlockId();
+      for (AbstractFieldFunction<?> fieldFunction : fieldFunctions) {
+         DataBlockId affectedId = fieldFunction.getReferencedBlock().getReferencedId();
 
          // Replace affected id (which are still referring to the original container) with the
          // actual id of the cloned container
@@ -309,19 +307,7 @@ public final class ContainerBuilderCloner {
             replacedAffectedId.getGlobalId() + "_" + UUID.randomUUID());
          resolvedReference.resolve(replacedAffectedId);
 
-         if (ffType == FieldFunctionType.BYTE_ORDER_OF) {
-            fb.asByteOrderOf(resolvedReference);
-         } else if (ffType == FieldFunctionType.CHARACTER_ENCODING_OF) {
-            fb.asCharacterEncodingOf(resolvedReference);
-         } else if (ffType == FieldFunctionType.COUNT_OF) {
-            fb.asCountOf(resolvedReference);
-         } else if (ffType == FieldFunctionType.ID_OF) {
-            fb.asIdOf(resolvedReference);
-         } else if (ffType == FieldFunctionType.PRESENCE_OF) {
-            fb.indicatesPresenceOf(fieldFunction.getFlagName(), fieldFunction.getFlagValue(), resolvedReference);
-         } else if (ffType == FieldFunctionType.SIZE_OF) {
-            fb.asSizeOf(resolvedReference);
-         }
+         fb.withFieldFunction(fieldFunction.withReplacedReference(resolvedReference));
       }
    }
 

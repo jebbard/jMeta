@@ -10,10 +10,8 @@
 package com.github.jmeta.library.dataformats.api.services.builder;
 
 import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
-import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.FlagSpecification;
 import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 
 /**
@@ -49,77 +47,13 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
    C asMagicKeyWithOddBitLength(long bitLength);
 
    /**
-    * Tags this field as representing the id of a target generic container data block. The field must be of
-    * {@link FieldType#STRING}.
-    *
-    * @param referencedBlock
-    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
-    * @return This builder
-    */
-   C asIdOf(DataBlockCrossReference referencedBlock);
-
-   /**
-    * Tags this field as indicating the presence of a target data block. The field must be of {@link FieldType#FLAGS}.
-    *
-    * @param withFlagName
-    *           The name of the flag indicating the presence of the target data block, must not be null and refer to an
-    *           existing flag name of the underlying {@link FlagSpecification}
-    * @param withFlagValue
-    *           The value of the flag the indicates presence, any other value found during parsing indicates absence
-    * @param referencedBlock
-    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
-    * @return This builder
-    */
-   C indicatesPresenceOf(String withFlagName, int withFlagValue, DataBlockCrossReference referencedBlock);
-
-   /**
-    * Tags this field as representing the size of a target data block. The field must be of
-    * {@link FieldType#UNSIGNED_WHOLE_NUMBER}.
-    *
-    * @param referencedBlock
-    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
-    * @return This builder
-    */
-   C asSizeOf(DataBlockCrossReference referencedBlock);
-
-   /**
-    * Tags this field as representing the number of occurrences of a target data block. The field must be of
-    * {@link FieldType#UNSIGNED_WHOLE_NUMBER}.
-    *
-    * @param referencedBlock
-    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
-    * @return This builder
-    */
-   C asCountOf(DataBlockCrossReference referencedBlock);
-
-   /**
-    * Tags this field as representing the id of a target generic container data block. The field must be of
-    * {@link FieldType#STRING}.
-    *
-    * @param referencedBlock
-    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
-    * @return This builder
-    */
-   C asByteOrderOf(DataBlockCrossReference referencedBlock);
-
-   /**
-    * Tags this field as representing the id of a target generic container data block. The field must be of
-    * {@link FieldType#STRING}.
-    *
-    * @param referencedBlock
-    *           The target data block identified by its {@link DataBlockCrossReference}, must not be null
-    * @return This builder
-    */
-   C asCharacterEncodingOf(DataBlockCrossReference referencedBlock);
-
-   /**
     * Adds the given {@link AbstractFieldFunction} to the field.
     *
     * @param fieldFunction
     *           The {@link AbstractFieldFunction} to add, must not be null
     * @return This builder
     */
-   C withFieldFunction(AbstractFieldFunction<FIT> fieldFunction);
+   C withFieldFunction(AbstractFieldFunction<?> fieldFunction);
 
    /**
     * Adds an enumerated value to this field's data block description.

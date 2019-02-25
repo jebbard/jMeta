@@ -11,7 +11,6 @@ package com.github.jmeta.library.dataformats.impl;
 
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_NESTED_CONTAINER_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_UNRESOLVED;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_BYTE_ORDER;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHARACTER_ENCODING;
@@ -32,12 +31,12 @@ import java.util.stream.Collectors;
 
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -115,15 +114,16 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     */
    private void validateFieldFunctions() {
 
-      Map<DataBlockId, List<FieldFunction<?>>> fieldFunctions = m_dataBlockDescriptions.values().stream()
+      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctions = m_dataBlockDescriptions.values().stream()
          .filter(desc -> desc.getPhysicalType() == PhysicalDataBlockType.FIELD)
          .collect(Collectors.toMap(DataBlockDescription::getId, desc -> desc.getFieldProperties().getFieldFunctions()));
 
-      Map<DataBlockId, List<FieldFunction<?>>> fieldFunctionsByTargetId = new HashMap<>();
+      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = new HashMap<>();
 
       fieldFunctions.forEach((fieldIdWithFunctions, functionsForField) -> {
-         for (FieldFunction<?> fieldFunction : functionsForField) {
-            FieldFunctionType<?> type = fieldFunction.getFieldFunctionType();
+         for (AbstractFieldFunction<?> fieldFunction : functionsForField) {
+
+            DataBlockId targetId = fieldFunction.getReferencedBlock().getReferencedId();
 
             // Check for unresolved field functions
             if (!fieldFunction.getReferencedBlock().isResolved()) {
@@ -131,26 +131,11 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                   getDataBlockDescription(fieldIdWithFunctions), fieldFunction);
             }
 
-            if (type == FieldFunctionType.ID_OF) {
-               Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.CONTAINER);
-
-               checkFieldFunctionTargetType(type, fieldFunction.getAffectedBlockId(), allowedTypes);
-            } else if (type == FieldFunctionType.SIZE_OF) {
-               // TODO prüfen, ob alle referenzierten Blöcke zusammenhängen?
-            } else if (type == FieldFunctionType.COUNT_OF) {
-               Set<PhysicalDataBlockType> allowedTypes = Set.of(PhysicalDataBlockType.FIELD,
-                  PhysicalDataBlockType.HEADER, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.CONTAINER);
-
-               checkFieldFunctionTargetType(type, fieldFunction.getAffectedBlockId(), allowedTypes);
+            if (!fieldFunctionsByTargetId.containsKey(targetId)) {
+               fieldFunctionsByTargetId.put(targetId, new ArrayList<>());
             }
 
-            DataBlockId affectedBlock = fieldFunction.getAffectedBlockId();
-
-            if (!fieldFunctionsByTargetId.containsKey(affectedBlock)) {
-               fieldFunctionsByTargetId.put(affectedBlock, new ArrayList<>());
-            }
-
-            fieldFunctionsByTargetId.get(affectedBlock).add(fieldFunction);
+            fieldFunctionsByTargetId.get(targetId).add(fieldFunction);
          }
       });
 
@@ -165,8 +150,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
          if (dataBlockWithDynamicOccurrences.getMinimumOccurrences() == 0
             && dataBlockWithDynamicOccurrences.getMaximumOccurrences() == 1) {
 
-            if (!hasFieldFunctionForId
-               || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), FieldFunctionType.PRESENCE_OF)) {
+            if (!hasFieldFunctionForId || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), PresenceOf.class)) {
                throw new InvalidSpecificationException(VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING,
                   dataBlockWithDynamicOccurrences);
             }
@@ -184,23 +168,9 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       // TODO verify SIZE_OF exists
    }
 
-   private boolean hasFieldFunctionOfType(List<FieldFunction<?>> functions, FieldFunctionType<?> type) {
-      return functions.stream().anyMatch(function -> function.getFieldFunctionType().equals(type));
-   }
-
-   /**
-    * @param fieldFunctionType
-    * @param targetId
-    * @param allowedTargetTypes
-    */
-   private void checkFieldFunctionTargetType(FieldFunctionType<?> fieldFunctionType, DataBlockId targetId,
-      Set<PhysicalDataBlockType> allowedTargetTypes) {
-      PhysicalDataBlockType affectedIdType = getDataBlockDescription(targetId).getPhysicalType();
-
-      if (!allowedTargetTypes.contains(affectedIdType)) {
-         throw new InvalidSpecificationException(VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE,
-            getDefaultNestedContainerDescription(), fieldFunctionType, allowedTargetTypes, targetId, affectedIdType);
-      }
+   private boolean hasFieldFunctionOfType(List<AbstractFieldFunction<?>> functions,
+      Class<? extends AbstractFieldFunction<?>> type) {
+      return functions.stream().anyMatch(function -> function.getClass().equals(type));
    }
 
    /**

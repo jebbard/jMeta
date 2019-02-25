@@ -19,6 +19,7 @@ public abstract class AbstractFieldFunction<T> {
 
    private final DataBlockCrossReference referencedBlock;
    private final Class<T> interpretedValueClass;
+   private final FieldType<?> requiredFieldType;
 
    /**
     * Creates a new {@link AbstractFieldFunction}.
@@ -27,13 +28,18 @@ public abstract class AbstractFieldFunction<T> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     * @param interpretedValueClass
     *           The concrete interpreted type of a field value, must not be null
+    * @param requiredFieldType
+    *           The {@link FieldType} required by this {@link AbstractFieldFunction}, must not be null
     */
-   public AbstractFieldFunction(DataBlockCrossReference referencedBlock, Class<T> interpretedValueClass) {
+   public AbstractFieldFunction(DataBlockCrossReference referencedBlock, Class<T> interpretedValueClass,
+      FieldType<?> requiredFieldType) {
       Reject.ifNull(referencedBlock, "referencedBlock");
       Reject.ifNull(interpretedValueClass, "interpretedValueClass");
+      Reject.ifNull(requiredFieldType, "requiredFieldType");
 
       this.referencedBlock = referencedBlock;
       this.interpretedValueClass = interpretedValueClass;
+      this.requiredFieldType = requiredFieldType;
    }
 
    /**
@@ -52,13 +58,11 @@ public abstract class AbstractFieldFunction<T> {
    }
 
    /**
-    * Tells whether this {@link AbstractFieldFunction} is allowed for the given {@link FieldType} or not.
-    *
-    * @param type
-    *           The {@link FieldType} to check, must not be null
-    * @return whether this {@link AbstractFieldFunction} is allowed for the given {@link FieldType} or not
+    * @return the {@link FieldType} that is required by this {@link AbstractFieldFunction}
     */
-   public abstract boolean isValidFieldType(FieldType<?> type);
+   public FieldType<?> getRequiredFieldType() {
+      return requiredFieldType;
+   }
 
    /**
     * Tells whether this {@link AbstractFieldFunction} is allowed to reference a data block of the given
@@ -70,4 +74,15 @@ public abstract class AbstractFieldFunction<T> {
     *         {@link PhysicalDataBlockType} or not
     */
    public abstract boolean isValidTargetType(PhysicalDataBlockType type);
+
+   /**
+    * Creates a cloned instance of this {@link AbstractFieldFunction} with the given {@link DataBlockCrossReference}
+    * instead of the current one.
+    *
+    * @param replacedReference
+    *           The replacement {@link DataBlockCrossReference}, must not be null
+    * @return a cloned instance of this {@link AbstractFieldFunction} with the given {@link DataBlockCrossReference}
+    *         instead of the current one
+    */
+   public abstract AbstractFieldFunction<T> withReplacedReference(DataBlockCrossReference replacedReference);
 }

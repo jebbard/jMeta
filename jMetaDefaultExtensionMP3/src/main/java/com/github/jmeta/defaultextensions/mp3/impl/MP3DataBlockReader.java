@@ -19,9 +19,9 @@ import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
 
 // TODO primeRefactor006: cleanup and document MP3DataBlockReader
 /**
@@ -92,12 +92,13 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
             int bitRateVersionIndex = mpegAudioVersionIdBits == 3 ? 0 : 1;
             int bitRateLayerIndex = 0;
 
-            if (layerBits == 1)
+            if (layerBits == 1) {
                bitRateLayerIndex = 2;
-            else if (layerBits == 2)
+            } else if (layerBits == 2) {
                bitRateLayerIndex = 1;
-            else if (layerBits == 3)
+            } else if (layerBits == 3) {
                bitRateLayerIndex = 0;
+            }
 
             int bitRate = bitRates[bitRateVersionIndex][bitRateLayerIndex][bitRateBits];
 
@@ -107,14 +108,13 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
 
             int samplingFreqVersionIndex = 0;
 
-            if (mpegAudioVersionIdBits == 0)
+            if (mpegAudioVersionIdBits == 0) {
                samplingFreqVersionIndex = 2;
-
-            else if (mpegAudioVersionIdBits == 2)
+            } else if (mpegAudioVersionIdBits == 2) {
                samplingFreqVersionIndex = 1;
-
-            else if (mpegAudioVersionIdBits == 3)
+            } else if (mpegAudioVersionIdBits == 3) {
                samplingFreqVersionIndex = 0;
+            }
 
             int samplingRateFrequency = samplingRateFrequencies[samplingFreqVersionIndex][sampleRateBits];
 
@@ -122,15 +122,16 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
             // System.out.println("Sampling freq bits: " + Integer.toBinaryString(sampleRateBits));
             // System.out.println("Sampling freq: " + samplingRateFrequency);
 
-            if (layerBits == 3)
-               totalPayloadSize = (12 * (bitRate * 1000) / samplingRateFrequency + paddingBits) * 4;
-
-            else if (layerBits == 1 || layerBits == 2)
-               totalPayloadSize = (144 * (bitRate * 1000) / samplingRateFrequency + paddingBits);
+            if (layerBits == 3) {
+               totalPayloadSize = (12 * bitRate * 1000 / samplingRateFrequency + paddingBits) * 4;
+            } else if (layerBits == 1 || layerBits == 2) {
+               totalPayloadSize = 144 * bitRate * 1000 / samplingRateFrequency + paddingBits;
+            }
 
             totalPayloadSize -= 4; // Minus header size
-            if (protectionBit == 0)
+            if (protectionBit == 0) {
                totalPayloadSize += 2;
+            }
 
             // System.out.println("Padding bit: " + paddingBits);
             // System.out.println("CRC NOT present: " + protectionBit);
@@ -140,7 +141,7 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
 
             context.pushFieldFunction(
                containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD).get(0).getId(),
-               FieldFunctionType.SIZE_OF, totalPayloadSize);
+               SizeOf.class, totalPayloadSize);
          } catch (BinaryValueConversionException e) {
             throw new RuntimeException("No conversion possible", e);
          }
@@ -149,7 +150,7 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
 
    /**
     * Creates a new {@link MP3DataBlockReader}.
-    * 
+    *
     * @param spec
     * @param transformationHandlers
     * @param maxFieldBlockSize

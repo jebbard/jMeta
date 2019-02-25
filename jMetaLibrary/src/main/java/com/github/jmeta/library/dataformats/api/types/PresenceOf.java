@@ -30,21 +30,12 @@ public class PresenceOf extends AbstractFieldFunction<Boolean> {
     *           The flag's value indicating presence, if the value differs, this indicates absence
     */
    public PresenceOf(DataBlockCrossReference referencedBlock, String flagName, int flagValue) {
-      super(referencedBlock, Boolean.class);
+      super(referencedBlock, Boolean.class, FieldType.FLAGS);
 
       Reject.ifNull(flagName, "flagName");
 
       this.flagName = flagName;
       this.flagValue = flagValue;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#isValidFieldType(com.github.jmeta.library.dataformats.api.types.FieldType)
-    */
-   @Override
-   public boolean isValidFieldType(FieldType<?> type) {
-      Reject.ifNull(type, "type");
-      return type == FieldType.FLAGS;
    }
 
    /**
@@ -69,5 +60,13 @@ public class PresenceOf extends AbstractFieldFunction<Boolean> {
     */
    public int getFlagValue() {
       return flagValue;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    */
+   @Override
+   public AbstractFieldFunction<Boolean> withReplacedReference(DataBlockCrossReference replacedReference) {
+      return new PresenceOf(replacedReference, flagName, flagValue);
    }
 }

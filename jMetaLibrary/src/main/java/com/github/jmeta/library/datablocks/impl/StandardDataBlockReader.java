@@ -27,14 +27,19 @@ import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
+import com.github.jmeta.library.dataformats.api.types.ByteOrderOf;
+import com.github.jmeta.library.dataformats.api.types.CharacterEncodingOf;
+import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.dataformats.api.types.FieldFunction;
-import com.github.jmeta.library.dataformats.api.types.FieldFunctionType;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
+import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.dataformats.api.types.PresenceOf;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.byteutils.api.services.ByteOrders;
@@ -151,12 +156,12 @@ public class StandardDataBlockReader implements DataBlockReader {
       if (!fieldDesc.hasFixedSize()) {
          // Search for a SIZE_OF function, i.e. the size of the current field is
          // determined by the value of a field already read before
-         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.SIZE_OF)) {
+         if (context.hasFieldFunction(fieldDesc.getId(), SizeOf.class)) {
             actualBlockSize = getSizeFromFieldFunction(context, fieldDesc.getId(), parentId);
          } else {
             DataBlockId matchingGenericId = m_spec.getMatchingGenericId(fieldDesc.getId());
 
-            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, FieldFunctionType.SIZE_OF)) {
+            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, SizeOf.class)) {
                actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
             }
          }
@@ -242,8 +247,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       if (minOccurrences == maxOccurrences) {
          actualOccurrences = minOccurrences;
       } else if (minOccurrences == 0 && maxOccurrences == 1) {
-         if (context.hasFieldFunction(desc.getId(), FieldFunctionType.PRESENCE_OF)) {
-            boolean present = context.popFieldFunction(desc.getId(), FieldFunctionType.PRESENCE_OF);
+         if (context.hasFieldFunction(desc.getId(), PresenceOf.class)) {
+            boolean present = context.popFieldFunction(desc.getId(), PresenceOf.class);
 
             if (present) {
                actualOccurrences = 1;
@@ -253,8 +258,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       // Data block has a variable number of occurrences
       else if (minOccurrences != maxOccurrences) {
-         if (context.hasFieldFunction(desc.getId(), FieldFunctionType.COUNT_OF)) {
-            final Long count = context.popFieldFunction(desc.getId(), FieldFunctionType.COUNT_OF);
+         if (context.hasFieldFunction(desc.getId(), CountOf.class)) {
+            final Long count = context.popFieldFunction(desc.getId(), CountOf.class);
 
             actualOccurrences = (int) count.longValue();
          }
@@ -280,12 +285,12 @@ public class StandardDataBlockReader implements DataBlockReader {
       if (!payloadDesc.hasFixedSize()) {
          // Search for a SIZE_OF function, i.e. the size of the current payload is
          // determined by the value of a field already read before
-         if (context.hasFieldFunction(payloadDesc.getId(), FieldFunctionType.SIZE_OF)) {
+         if (context.hasFieldFunction(payloadDesc.getId(), SizeOf.class)) {
             actualBlockSize = getSizeFromFieldFunction(context, payloadDesc.getId(), parentId);
          } else {
             DataBlockId matchingGenericId = m_spec.getMatchingGenericId(payloadDesc.getId());
 
-            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, FieldFunctionType.SIZE_OF)) {
+            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, SizeOf.class)) {
                actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
             }
          }
@@ -306,9 +311,9 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       if (parentDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD)) {
          for (int i = 0; i < parentDesc.getFieldProperties().getFieldFunctions().size(); ++i) {
-            FieldFunction function = parentDesc.getFieldProperties().getFieldFunctions().get(i);
+            AbstractFieldFunction<?> function = parentDesc.getFieldProperties().getFieldFunctions().get(i);
 
-            if (function.getFieldFunctionType().equals(FieldFunctionType.ID_OF)) {
+            if (function.getClass().equals(IdOf.class)) {
                return parentId;
             }
          }
@@ -353,7 +358,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       long sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
 
-      final Long size = context.popFieldFunction(sizeBlockId, FieldFunctionType.SIZE_OF);
+      final Long size = context.popFieldFunction(sizeBlockId, SizeOf.class);
 
       DataBlockDescription blockDesc = m_spec.getDataBlockDescription(sizeBlockId);
 
@@ -372,7 +377,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          for (int i = 0; i < headerAndFooterDescs.size(); ++i) {
             DataBlockDescription headerOrFooterDesc = headerAndFooterDescs.get(i);
 
-            if (context.hasFieldFunction(headerOrFooterDesc.getId(), FieldFunctionType.SIZE_OF)) {
+            if (context.hasFieldFunction(headerOrFooterDesc.getId(), SizeOf.class)) {
                if (!headerOrFooterDesc.hasFixedSize()) {
                   return DataBlockDescription.UNDEFINED;
                }
@@ -761,15 +766,14 @@ public class StandardDataBlockReader implements DataBlockReader {
          DataBlockDescription fieldDesc = fieldChildren.get(i);
 
          // Update current character encoding via CHARACTER_ENCODING_OF
-         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF)) {
-            String charsetName = context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.CHARACTER_ENCODING_OF);
+         if (context.hasFieldFunction(fieldDesc.getId(), CharacterEncodingOf.class)) {
+            String charsetName = context.popFieldFunction(fieldDesc.getId(), CharacterEncodingOf.class);
             currentCharset = Charset.forName(charsetName);
          }
 
          // Update current byte order via BYTE_ORDER_OF
-         if (context.hasFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF)) {
-            currentByteOrder = ByteOrders
-               .fromString(context.popFieldFunction(fieldDesc.getId(), FieldFunctionType.BYTE_ORDER_OF));
+         if (context.hasFieldFunction(fieldDesc.getId(), ByteOrderOf.class)) {
+            currentByteOrder = ByteOrders.fromString(context.popFieldFunction(fieldDesc.getId(), ByteOrderOf.class));
          }
 
          // Fixed charset and byte order override currently set charset or byte order
