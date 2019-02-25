@@ -9,6 +9,7 @@
  */
 package com.github.jmeta.library.dataformats.api.services.builder;
 
+import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
@@ -110,6 +111,15 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     * @return This builder
     */
    C asCharacterEncodingOf(DataBlockCrossReference referencedBlock);
+
+   /**
+    * Adds the given {@link AbstractFieldFunction} to the field.
+    *
+    * @param fieldFunction
+    *           The {@link AbstractFieldFunction} to add, must not be null
+    * @return This builder
+    */
+   C withFieldFunction(AbstractFieldFunction<FIT> fieldFunction);
 
    /**
     * Adds an enumerated value to this field's data block description.

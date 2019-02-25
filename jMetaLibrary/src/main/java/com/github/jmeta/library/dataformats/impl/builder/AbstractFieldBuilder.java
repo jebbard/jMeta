@@ -19,6 +19,7 @@ import java.util.Map;
 import com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder;
 import com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder;
+import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -55,6 +56,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    private final Map<I, byte[]> enumeratedValues = new HashMap<>();
    private final FieldType<I> fieldType;
    private final List<FieldFunction<?>> functions = new ArrayList<>();
+   private final List<AbstractFieldFunction<?>> fieldFunctions = new ArrayList<>();
    private long magicKeyBitLength = DataBlockDescription.UNDEFINED;
    private FieldConverter<I> customConverter;
 
@@ -242,4 +244,18 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
 
       return (C) this;
    }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.FieldBuilder#withFieldFunction(com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction)
+    */
+   @Override
+   @SuppressWarnings("unchecked")
+   public C withFieldFunction(AbstractFieldFunction<I> fieldFunction) {
+      Reject.ifNull(fieldFunction, "fieldFunction");
+
+      fieldFunctions.add(fieldFunction);
+
+      return (C) this;
+   }
+
 }
