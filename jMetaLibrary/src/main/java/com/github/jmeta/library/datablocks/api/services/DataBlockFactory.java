@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
@@ -44,10 +45,11 @@ public interface DataBlockFactory {
     * @param footers
     *           the footers building this {@link Container}.
     * @param reader TODO
+    * @param parentContainerContext TODO
     * @return the created {@link Container}.
     */
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader reader);
+      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext parentContainerContext);
 
    /**
     * @param id
@@ -57,10 +59,11 @@ public interface DataBlockFactory {
     * @param byteOrder
     * @param characterEncoding
     * @param sequenceNumber TODO
+    * @param containerContext TODO
     * @return the {@link Field}
     */
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber);
+      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber, ContainerContext containerContext);
 
    /**
     * @param id
@@ -69,9 +72,10 @@ public interface DataBlockFactory {
     * @param isFooter
     * @param reader TODO
     * @param sequenceNumber TODO
+    * @param containerContext TODO
     * @return the {@link Header}
     */
-   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader, int sequenceNumber);
+   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader, int sequenceNumber, ContainerContext containerContext);
 
    /**
     * @param id
@@ -79,8 +83,9 @@ public interface DataBlockFactory {
     * @param totalSize
     * @param reader
     * @param context
+    * @param containerContext TODO
     * @return the {@link Payload}
     */
    public Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader,
-      FieldFunctionStack context);
+      FieldFunctionStack context, ContainerContext containerContext);
 }

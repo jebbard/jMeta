@@ -122,7 +122,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
             m_remainingParentSize, true)) {
             Container container = m_reader.readContainerWithId(m_nextContainerReference, containerDesc.getId(),
-               m_parent, m_context, m_remainingParentSize);
+               m_parent, m_context, m_remainingParentSize, m_parent.getContainerContext());
 
             if (container != null) {
                updateProgress(container);
@@ -137,7 +137,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
 
       if (containerDesc != null) {
          Container container = m_reader.readContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            m_context, m_remainingParentSize);
+            m_context, m_remainingParentSize, m_parent.getContainerContext());
 
          if (container != null) {
             updateProgress(container);

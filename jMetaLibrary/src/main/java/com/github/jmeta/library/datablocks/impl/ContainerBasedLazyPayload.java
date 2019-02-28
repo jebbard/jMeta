@@ -14,6 +14,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -32,7 +33,7 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
 
    /**
     * Creates a new {@link FieldBasedLazyPayload}.
-    * 
+    *
     * @param id
     *           The {@link DataBlockId} of the payload
     * @param offset
@@ -45,8 +46,8 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     *           The current {@link FieldFunctionStack} context needed for parsing
     */
    public ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize,
-      DataBlockReader dataBlockReader, FieldFunctionStack context) {
-      super(id, null, offset, dataBlockReader, 0);
+      DataBlockReader dataBlockReader, FieldFunctionStack context, ContainerContext containerContext) {
+      super(id, null, offset, dataBlockReader, 0, containerContext);
 
       Reject.ifNull(context, "context");
 
@@ -76,7 +77,7 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     */
    @Override
    public long getTotalSize() {
-      return this.totalSize;
+      return totalSize;
    }
 
    /**
@@ -84,6 +85,6 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     */
    @Override
    public AbstractDataBlockIterator<Container> getContainerIterator() {
-      return new PayloadContainerIterator(this, getDataBlockReader(), getMediumReference(), this.context);
+      return new PayloadContainerIterator(this, getDataBlockReader(), getMediumReference(), context);
    }
 }

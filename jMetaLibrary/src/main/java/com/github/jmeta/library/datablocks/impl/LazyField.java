@@ -17,6 +17,7 @@ import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConver
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -49,11 +50,12 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
     * @param characterEncoding
     * @param sequenceNumber
     *           TODO
+    * @param containerContext TODO
     */
    public LazyField(DataBlockDescription fieldDesc, MediumOffset reference, DataBlock parent, long totalSize,
       DataBlockFactory factory, DataBlockReader dataBlockReader, ByteOrder byteOrder, Charset characterEncoding,
-      int sequenceNumber) {
-      super(fieldDesc.getId(), parent, reference, dataBlockReader, sequenceNumber);
+      int sequenceNumber, ContainerContext containerContext) {
+      super(fieldDesc.getId(), parent, reference, dataBlockReader, sequenceNumber, containerContext);
 
       Reject.ifNull(factory, "factory");
       Reject.ifNull(fieldDesc, "fieldDesc");
@@ -112,7 +114,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
          ByteBuffer binaryData = getDataBlockReader().readBytes(getMediumReference(), (int) m_totalSize);
 
          m_wrappedField = m_dbFactory.createFieldFromBytes(m_fieldDesc.getId(), getDataBlockReader().getSpecification(),
-            getMediumReference(), binaryData, m_byteOrder, m_characterEncoding, getSequenceNumber());
+            getMediumReference(), binaryData, m_byteOrder, m_characterEncoding, getSequenceNumber(), getContainerContext());
       }
    }
 

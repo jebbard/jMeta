@@ -33,9 +33,10 @@ public abstract class AbstractDataBlock implements DataBlock {
     * @param dataBlockReader
     * @param sequenceNumber
     *           TODO
+    * @param containerContext TODO
     */
    public AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader,
-      int sequenceNumber) {
+      int sequenceNumber, ContainerContext containerContext) {
       Reject.ifNull(id, "id");
       Reject.ifNull(dataBlockReader, "dataBlockReader");
       Reject.ifNull(reference, "reference");
@@ -46,9 +47,21 @@ public abstract class AbstractDataBlock implements DataBlock {
       m_mediumReference = reference;
       this.sequenceNumber = sequenceNumber;
 
+      this.containerContext = containerContext;
+
       if (parent != null) {
          initParent(parent);
       }
+   }
+
+   private final ContainerContext containerContext;
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.Container#getContainerContext()
+    */
+   @Override
+   public ContainerContext getContainerContext() {
+      return containerContext;
    }
 
    /**

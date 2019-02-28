@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
@@ -57,7 +58,8 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
          { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, -1 }, }, };
 
    @Override
-   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
+   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers,
+      ContainerContext containerContext) {
 
       if (containerId.getGlobalId().equals("mp3")) {
          Header header = headers.get(0);

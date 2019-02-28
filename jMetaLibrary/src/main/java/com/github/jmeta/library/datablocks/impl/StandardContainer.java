@@ -15,6 +15,7 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -29,7 +30,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
 
    /**
     * Creates a new {@link StandardContainer}.
-    * 
+    *
     * @param id
     * @param parent
     * @param reference
@@ -37,21 +38,24 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @param payload
     * @param footers
     * @param dataBlockReader
+    * @param containerContext
+    *           TODO
     */
-   public StandardContainer(DataBlockId id, DataBlock parent,
-      MediumOffset reference, List<Header> headers, Payload payload,
-      List<Header> footers, DataBlockReader dataBlockReader) {
-      super(id, parent, reference, dataBlockReader, 0);
+   public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
+      Payload payload, List<Header> footers, DataBlockReader dataBlockReader, ContainerContext containerContext) {
+      super(id, parent, reference, dataBlockReader, 0, containerContext);
 
       Reject.ifNull(footers, "footers");
       Reject.ifNull(payload, "payload");
       Reject.ifNull(headers, "headers");
 
-      for (int i = 0; i < headers.size(); ++i)
+      for (int i = 0; i < headers.size(); ++i) {
          addHeader(headers.get(i));
+      }
 
-      for (int i = 0; i < footers.size(); ++i)
+      for (int i = 0; i < footers.size(); ++i) {
          addFooter(footers.get(i));
+      }
 
       setPayload(payload);
    }
@@ -123,15 +127,13 @@ public class StandardContainer extends AbstractDataBlock implements Container {
 
       long totalSize = 0;
 
-      for (Iterator<Header> fieldIterator = m_headers.iterator(); fieldIterator
-         .hasNext();) {
+      for (Iterator<Header> fieldIterator = m_headers.iterator(); fieldIterator.hasNext();) {
          Header header = fieldIterator.next();
 
          totalSize += header.getTotalSize();
       }
 
-      for (Iterator<Header> fieldIterator = m_footers.iterator(); fieldIterator
-         .hasNext();) {
+      for (Iterator<Header> fieldIterator = m_footers.iterator(); fieldIterator.hasNext();) {
          Header footer = fieldIterator.next();
 
          totalSize += footer.getTotalSize();

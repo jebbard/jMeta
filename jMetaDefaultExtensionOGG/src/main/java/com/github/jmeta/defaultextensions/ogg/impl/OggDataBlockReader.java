@@ -11,6 +11,7 @@ package com.github.jmeta.defaultextensions.ogg.impl;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
@@ -33,7 +34,8 @@ public class OggDataBlockReader extends StandardDataBlockReader {
       "ogg.payload.packetPartContainer");
 
    @Override
-   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers) {
+   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers,
+      ContainerContext containerContext) {
 
       if (containerId.getGlobalId().equals("ogg")) {
 

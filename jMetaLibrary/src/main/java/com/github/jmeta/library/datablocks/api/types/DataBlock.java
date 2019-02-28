@@ -95,6 +95,14 @@ public interface DataBlock {
    public int getSequenceNumber();
 
    /**
+    * Returns the {@link ContainerContext} belonging to this {@link DataBlock}. The {@link ContainerContext} provides
+    * meta information previously picker up in the enclosing container such as size, byte ordering and character encodings of other data blocks in the same container.
+    *
+    * @return The {@link ContainerContext} of this {@link DataBlock}
+    */
+   public ContainerContext getContainerContext();
+
+   /**
     * Returns the parent {@link DataBlock} of this instance. May return null if this is a top-level {@link DataBlock}.
     *
     * @return the parent of this {@link DataBlock} or null if this is a top-level {@link DataBlock}.

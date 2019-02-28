@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -28,18 +29,18 @@ public class StandardHeader extends AbstractDataBlock implements Header {
 
    /**
     * Creates a new {@link StandardHeader}.
-    * 
+    *
     * @param id
     * @param reference
     * @param fields
     * @param isFooter
     * @param dataBlockReader
-    * @param sequenceNumber TODO
+    * @param sequenceNumber
+    *           TODO
     */
-   public StandardHeader(DataBlockId id, MediumOffset reference,
-      List<Field<?>> fields, boolean isFooter,
-      DataBlockReader dataBlockReader, int sequenceNumber) {
-      super(id, null, reference, dataBlockReader, 0);
+   public StandardHeader(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
+      DataBlockReader dataBlockReader, int sequenceNumber, ContainerContext containerContext) {
+      super(id, null, reference, dataBlockReader, 0, containerContext);
 
       Reject.ifNull(fields, "fields");
 
@@ -72,18 +73,19 @@ public class StandardHeader extends AbstractDataBlock implements Header {
    @Override
    public long getTotalSize() {
 
-      if (m_fields.size() == 0)
+      if (m_fields.size() == 0) {
          return DataBlockDescription.UNDEFINED;
+      }
 
       long returnedSize = 0;
 
-      for (Iterator<Field<?>> fieldIterator = m_fields
-         .iterator(); fieldIterator.hasNext();) {
+      for (Iterator<Field<?>> fieldIterator = m_fields.iterator(); fieldIterator.hasNext();) {
          Field<?> field = fieldIterator.next();
 
          // As soon as one child has unknown size, the whole header has unknown size
-         if (field.getTotalSize() == DataBlockDescription.UNDEFINED)
+         if (field.getTotalSize() == DataBlockDescription.UNDEFINED) {
             return DataBlockDescription.UNDEFINED;
+         }
 
          returnedSize += field.getTotalSize();
       }
@@ -100,16 +102,18 @@ public class StandardHeader extends AbstractDataBlock implements Header {
 
       m_fields.clear();
 
-      for (int i = 0; i < fields.size(); ++i)
+      for (int i = 0; i < fields.size(); ++i) {
          addField(fields.get(i));
+      }
    }
 
    private void addField(Field<?> field) {
 
       Reject.ifNull(field, "field");
 
-      if (field.getParent() == null)
+      if (field.getParent() == null) {
          field.initParent(this);
+      }
 
       m_fields.add(field);
    }

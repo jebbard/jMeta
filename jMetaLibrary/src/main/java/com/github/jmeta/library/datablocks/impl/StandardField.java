@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -48,6 +49,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public class StandardField<T> implements Field<T> {
 
    private int sequenceNumber;
+   private ContainerContext containerContext;
 
    /**
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSequenceNumber()
@@ -57,11 +59,13 @@ public class StandardField<T> implements Field<T> {
       return 0;
    }
 
-   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber) {
+   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber,
+      ContainerContext containerContext) {
       Reject.ifNull(fieldDesc, "fieldDesc");
 
       m_desc = fieldDesc;
       this.sequenceNumber = sequenceNumber;
+      this.containerContext = containerContext;
       m_mediumReference = reference;
       m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
    }
@@ -96,10 +100,12 @@ public class StandardField<T> implements Field<T> {
     * @param reference
     * @param sequenceNumber
     *           TODO
+    * @param containerContext
+    *           TODO
     */
-   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference,
-      int sequenceNumber) {
-      this(fieldDesc, reference, sequenceNumber);
+   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference, int sequenceNumber,
+      ContainerContext containerContext) {
+      this(fieldDesc, reference, sequenceNumber, containerContext);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
 
@@ -115,10 +121,12 @@ public class StandardField<T> implements Field<T> {
     * @param reference
     * @param sequenceNumber
     *           TODO
+    * @param containerContext
+    *           TODO
     */
    public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
-      int sequenceNumber) {
-      this(fieldDesc, reference, sequenceNumber);
+      int sequenceNumber, ContainerContext containerContext) {
+      this(fieldDesc, reference, sequenceNumber, containerContext);
 
       Reject.ifNull(byteValue, "byteValue");
 
@@ -252,6 +260,14 @@ public class StandardField<T> implements Field<T> {
       }
 
       return m_fieldConverter.toInterpreted(m_byteValue, m_desc, m_byteOrder, m_characterEncoding);
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getContainerContext()
+    */
+   @Override
+   public ContainerContext getContainerContext() {
+      return containerContext;
    }
 
    private ByteBuffer convertToBinary() throws InterpretedValueConversionException {

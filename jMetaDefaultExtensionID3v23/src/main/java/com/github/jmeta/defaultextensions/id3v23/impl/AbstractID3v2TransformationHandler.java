@@ -23,7 +23,7 @@ public abstract class AbstractID3v2TransformationHandler {
 
    /**
     * Creates a new {@link AbstractID3v2TransformationHandler}.
-    * 
+    *
     * @param transformationType
     *           The {@link ID3v2TransformationType} identifying the type of transformation
     * @param dataBlockFactory
@@ -66,7 +66,8 @@ public abstract class AbstractID3v2TransformationHandler {
       payload.setBytes(transformedPayloadBytes);
 
       return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
-         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader);
+         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader,
+         container.getContainerContext());
    }
 
    public Container untransform(Container container, DataBlockReader reader) {
@@ -89,7 +90,8 @@ public abstract class AbstractID3v2TransformationHandler {
       payload.setBytes(untransformedPayloadBytes);
 
       return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
-         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader);
+         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader,
+         container.getContainerContext());
    }
 
    protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);

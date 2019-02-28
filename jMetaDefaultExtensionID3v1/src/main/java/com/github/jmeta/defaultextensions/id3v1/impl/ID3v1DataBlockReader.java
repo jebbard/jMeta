@@ -12,6 +12,7 @@ package com.github.jmeta.defaultextensions.id3v1.impl;
 import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
@@ -28,7 +29,7 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
 
    /**
     * Creates a new {@link ID3v1DataBlockReader}.
-    * 
+    *
     * @param spec
     * @param maxFieldBlockSize
     */
@@ -38,9 +39,9 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
 
    @Override
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount) {
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext) {
       return readContainerWithId(reference.advance(-ID3v1Extension.id3v1TagLength), id, parent, context,
-         remainingDirectParentByteCount);
+         remainingDirectParentByteCount, containerContext);
    }
 
    @Override

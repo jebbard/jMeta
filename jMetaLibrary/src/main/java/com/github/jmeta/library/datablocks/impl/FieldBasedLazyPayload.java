@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
@@ -47,10 +48,11 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     *           The {@link DataBlockReader} to be used parsing the content of the payload
     * @param context
     *           The current {@link FieldFunctionStack} context needed for parsing
+    * @param containerContext TODO
     */
    public FieldBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader,
-      FieldFunctionStack context) {
-      super(id, null, offset, dataBlockReader, 0);
+      FieldFunctionStack context, ContainerContext containerContext) {
+      super(id, null, offset, dataBlockReader, 0, containerContext);
 
       Reject.ifNull(context, "context");
 
@@ -96,7 +98,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
 
          if (this.totalSize > 0) {
             List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), this.context,
-               this.totalSize);
+               this.totalSize, getContainerContext());
 
             for (int i = 0; i < readFields.size(); ++i) {
                Field<?> field = readFields.get(i);

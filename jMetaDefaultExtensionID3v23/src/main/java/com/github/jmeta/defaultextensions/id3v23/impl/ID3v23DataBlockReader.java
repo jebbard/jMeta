@@ -16,6 +16,7 @@ import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
@@ -56,8 +57,9 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     */
    @Override
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount) {
-      Container container = super.readContainerWithId(reference, id, parent, context, remainingDirectParentByteCount);
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext) {
+      Container container = super.readContainerWithId(reference, id, parent, context, remainingDirectParentByteCount,
+         containerContext);
 
       return applyTransformationsAfterRead(container, this);
    }
@@ -70,9 +72,9 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     */
    @Override
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount) {
-      return applyTransformationsAfterRead(
-         super.readContainerWithIdBackwards(reference, id, parent, context, remainingDirectParentByteCount), this);
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext) {
+      return applyTransformationsAfterRead(super.readContainerWithIdBackwards(reference, id, parent, context,
+         remainingDirectParentByteCount, containerContext), this);
    }
 
    /**
