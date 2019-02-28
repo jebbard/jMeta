@@ -80,6 +80,7 @@ public class ContainerContext {
                }
 
                fieldsPerSequenceNumber.put(field.getSequenceNumber(), (Field<T>) field);
+               fieldFunctionsPerSequenceNumber.put(field.getSequenceNumber(), (AbstractFieldFunction<T>) fieldFunction);
             }
          }
       }
@@ -302,8 +303,10 @@ public class ContainerContext {
     * Determines the {@link ByteOrder} of the given {@link DataBlockId} with the given sequence number within the
     * current {@link Container}. The approach is as follows:
     * <ul>
-    * <li>The field functions are searched for a field that contains the {@link ByteOrder} of the data block within this
-    * {@link ContainerContext}</li>
+    * <li>If the field has a fixed {@link ByteOrder} according to its specification, the fixed {@link ByteOrder} is
+    * taken</li>
+    * <li>Otherwise the field functions are searched for a field that contains the {@link ByteOrder} of the data block
+    * within this {@link ContainerContext}</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
     * <li>If there is none in the parent container context, the default {@link ByteOrder} of the
     * {@link DataFormatSpecification} is returned</li>
@@ -319,6 +322,12 @@ public class ContainerContext {
    public ByteOrder getByteOrderOf(DataBlockId id, int sequenceNumber) {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
+
+      DataBlockDescription desc = spec.getDataBlockDescription(id);
+
+      if (desc.getFieldProperties().getFixedByteOrder() != null) {
+         return desc.getFieldProperties().getFixedByteOrder();
+      }
 
       String byteOrderIndicatedByFieldFunction = byteOrders.getValue(id, sequenceNumber);
 
@@ -337,8 +346,10 @@ public class ContainerContext {
     * Determines the {@link Charset} of the given {@link DataBlockId} with the given sequence number within the current
     * {@link Container}. The approach is as follows:
     * <ul>
-    * <li>The field functions are searched for a field that contains the {@link Charset} of the data block within this
-    * {@link ContainerContext}</li>
+    * <li>If the field has a fixed {@link Charset} according to its specification, the fixed {@link Charset} is
+    * taken</li>
+    * <li>Otherwise the field functions are searched for a field that contains the {@link Charset} of the data block
+    * within this {@link ContainerContext}</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
     * <li>If there is none in the parent container context, the default {@link Charset} of the
     * {@link DataFormatSpecification} is returned</li>
@@ -354,6 +365,12 @@ public class ContainerContext {
    public Charset getCharacterEncodingOf(DataBlockId id, int sequenceNumber) {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
+
+      DataBlockDescription desc = spec.getDataBlockDescription(id);
+
+      if (desc.getFieldProperties().getFixedCharacterEncoding() != null) {
+         return desc.getFieldProperties().getFixedCharacterEncoding();
+      }
 
       String characterEncodingIndicatedByFieldFunction = characterEncodings.getValue(id, sequenceNumber);
 

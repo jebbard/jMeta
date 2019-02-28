@@ -29,9 +29,6 @@ import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
-import com.github.jmeta.library.dataformats.api.types.ByteOrderOf;
-import com.github.jmeta.library.dataformats.api.types.CharacterEncodingOf;
-import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
@@ -39,11 +36,9 @@ import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumOffset;
-import com.github.jmeta.utility.byteutils.api.services.ByteOrders;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -155,7 +150,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    private long determineActualFieldSize(DataBlockDescription fieldDesc, DataBlockId parentId,
       FieldFunctionStack context, long remainingDirectParentByteCount, MediumOffset reference, ByteOrder byteOrder,
-      Charset characterEncoding) {
+      Charset characterEncoding, ContainerContext containerContext) {
 
       long actualBlockSize = DataBlockDescription.UNDEFINED;
 
@@ -164,12 +159,12 @@ public class StandardDataBlockReader implements DataBlockReader {
          // Search for a SIZE_OF function, i.e. the size of the current field is
          // determined by the value of a field already read before
          if (context.hasFieldFunction(fieldDesc.getId(), SizeOf.class)) {
-            actualBlockSize = getSizeFromFieldFunction(context, fieldDesc.getId(), parentId);
+            actualBlockSize = getSizeFromFieldFunction(context, fieldDesc.getId(), parentId, containerContext);
          } else {
             DataBlockId matchingGenericId = m_spec.getMatchingGenericId(fieldDesc.getId());
 
             if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, SizeOf.class)) {
-               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
+               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId, containerContext);
             }
          }
 
@@ -221,7 +216,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          MediumOffset idFieldReference = reference.advance(byteOffset);
 
          long actualFieldSize = determineActualFieldSize(idFieldDesc, id, context,
-            remainingParentByteCount - byteOffset, idFieldReference, byteOrder, characterEncoding);
+            remainingParentByteCount - byteOffset, idFieldReference, byteOrder, characterEncoding, containerContext);
 
          if (actualFieldSize == DataBlockDescription.UNDEFINED) {
             throw new IllegalStateException(
@@ -241,39 +236,39 @@ public class StandardDataBlockReader implements DataBlockReader {
       return id;
    }
 
-   private long determineActualOccurrences(DataBlockId parentId, DataBlockDescription desc,
-      FieldFunctionStack context) {
-
-      long minOccurrences = 0;
-      long maxOccurrences = 0;
-      long actualOccurrences = 0;
-
-      maxOccurrences = desc.getMaximumOccurrences();
-      minOccurrences = desc.getMinimumOccurrences();
-
-      // Data block has fixed amount of mandatory occurrences
-      if (minOccurrences == maxOccurrences) {
-         actualOccurrences = minOccurrences;
-      } else if (minOccurrences == 0 && maxOccurrences == 1) {
-         if (context.hasFieldFunction(desc.getId(), PresenceOf.class)) {
-            boolean present = context.popFieldFunction(desc.getId(), PresenceOf.class);
-
-            if (present) {
-               actualOccurrences = 1;
-            }
-         }
-      }
-
-      // Data block has a variable number of occurrences
-      else if (minOccurrences != maxOccurrences) {
-         if (context.hasFieldFunction(desc.getId(), CountOf.class)) {
-            final Long count = context.popFieldFunction(desc.getId(), CountOf.class);
-
-            actualOccurrences = (int) count.longValue();
-         }
-      }
-      return actualOccurrences;
-   }
+   // private long determineActualOccurrences(DataBlockId parentId, DataBlockDescription desc,
+   // FieldFunctionStack context) {
+   //
+   // long minOccurrences = 0;
+   // long maxOccurrences = 0;
+   // long actualOccurrences = 0;
+   //
+   // maxOccurrences = desc.getMaximumOccurrences();
+   // minOccurrences = desc.getMinimumOccurrences();
+   //
+   // // Data block has fixed amount of mandatory occurrences
+   // if (minOccurrences == maxOccurrences) {
+   // actualOccurrences = minOccurrences;
+   // } else if (minOccurrences == 0 && maxOccurrences == 1) {
+   // if (context.hasFieldFunction(desc.getId(), PresenceOf.class)) {
+   // boolean present = context.popFieldFunction(desc.getId(), PresenceOf.class);
+   //
+   // if (present) {
+   // actualOccurrences = 1;
+   // }
+   // }
+   // }
+   //
+   // // Data block has a variable number of occurrences
+   // else if (minOccurrences != maxOccurrences) {
+   // if (context.hasFieldFunction(desc.getId(), CountOf.class)) {
+   // final Long count = context.popFieldFunction(desc.getId(), CountOf.class);
+   //
+   // actualOccurrences = (int) count.longValue();
+   // }
+   // }
+   // return actualOccurrences;
+   // }
 
    /**
     * @param payloadDesc
@@ -282,10 +277,13 @@ public class StandardDataBlockReader implements DataBlockReader {
     * @param headers
     * @param footers
     * @param remainingDirectParentByteCount
+    * @param containerContext
+    *           TODO
     * @return the actual payload size
     */
    private long determineActualPayloadSize(DataBlockDescription payloadDesc, DataBlockId parentId,
-      FieldFunctionStack context, List<Header> headers, List<Header> footers, long remainingDirectParentByteCount) {
+      FieldFunctionStack context, List<Header> headers, List<Header> footers, long remainingDirectParentByteCount,
+      ContainerContext containerContext) {
 
       long actualBlockSize = DataBlockDescription.UNDEFINED;
 
@@ -294,12 +292,12 @@ public class StandardDataBlockReader implements DataBlockReader {
          // Search for a SIZE_OF function, i.e. the size of the current payload is
          // determined by the value of a field already read before
          if (context.hasFieldFunction(payloadDesc.getId(), SizeOf.class)) {
-            actualBlockSize = getSizeFromFieldFunction(context, payloadDesc.getId(), parentId);
+            actualBlockSize = getSizeFromFieldFunction(context, payloadDesc.getId(), parentId, containerContext);
          } else {
             DataBlockId matchingGenericId = m_spec.getMatchingGenericId(payloadDesc.getId());
 
             if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, SizeOf.class)) {
-               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId);
+               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId, containerContext);
             }
          }
       } else {
@@ -362,7 +360,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       return payloadDescs.get(0);
    }
 
-   private long getSizeFromFieldFunction(FieldFunctionStack context, DataBlockId sizeBlockId, DataBlockId parentId) {
+   private long getSizeFromFieldFunction(FieldFunctionStack context, DataBlockId sizeBlockId, DataBlockId parentId,
+      ContainerContext containerContext) {
 
       long sizeFromFieldFunction = DataBlockDescription.UNDEFINED;
 
@@ -390,7 +389,9 @@ public class StandardDataBlockReader implements DataBlockReader {
                   return DataBlockDescription.UNDEFINED;
                }
 
-               long actualOccurrences = determineActualOccurrences(parentId, headerOrFooterDesc, context);
+               long actualOccurrences = containerContext.getOccurrencesOf(headerOrFooterDesc.getId());// determineActualOccurrences(parentId,
+                                                                                                      // headerOrFooterDesc,
+                                                                                                      // context);
 
                totalSizeToSubtract += actualOccurrences * headerOrFooterDesc.getMinimumByteLength();
             }
@@ -771,10 +772,6 @@ public class StandardDataBlockReader implements DataBlockReader {
       List<Field<?>> fields = new ArrayList<>();
 
       MediumOffset currentFieldReference = reference;
-      ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
-      Charset currentCharset = m_spec.getDefaultCharacterEncoding();
-      ByteOrder actualByteOrder = currentByteOrder;
-      Charset actualCharacterEncoding = currentCharset;
 
       long currentlyRemainingParentByteCount = remainingDirectParentByteCount;
 
@@ -783,43 +780,21 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          DataBlockDescription fieldDesc = fieldChildren.get(i);
 
-         // Update current character encoding via CHARACTER_ENCODING_OF
-         if (context.hasFieldFunction(fieldDesc.getId(), CharacterEncodingOf.class)) {
-            String charsetName = context.popFieldFunction(fieldDesc.getId(), CharacterEncodingOf.class);
-            currentCharset = Charset.forName(charsetName);
-         }
-
-         // Update current byte order via BYTE_ORDER_OF
-         if (context.hasFieldFunction(fieldDesc.getId(), ByteOrderOf.class)) {
-            currentByteOrder = ByteOrders.fromString(context.popFieldFunction(fieldDesc.getId(), ByteOrderOf.class));
-         }
-
-         // Fixed charset and byte order override currently set charset or byte order
-         actualByteOrder = currentByteOrder;
-         actualCharacterEncoding = currentCharset;
-
-         final ByteOrder fixedByteOrder = fieldDesc.getFieldProperties().getFixedByteOrder();
-
-         if (fixedByteOrder != null) {
-            actualByteOrder = fixedByteOrder;
-         }
-
-         final Charset fixedCharset = fieldDesc.getFieldProperties().getFixedCharacterEncoding();
-
-         if (fixedCharset != null) {
-            actualCharacterEncoding = fixedCharset;
-         }
-
-         long actualOccurrences = determineActualOccurrences(parentId, fieldDesc, context);
+         long actualOccurrences = containerContext.getOccurrencesOf(fieldDesc.getId());// determineActualOccurrences(parentId,
+                                                                                       // fieldDesc, context);
 
          for (int j = 0; j < actualOccurrences; j++) {
+            ByteOrder actualByteOrder = containerContext.getByteOrderOf(fieldDesc.getId(), j);
+            Charset actualCharacterEncoding = containerContext.getCharacterEncodingOf(fieldDesc.getId(), j);
+
             long fieldSize = determineActualFieldSize(fieldDesc, parentId, context, currentlyRemainingParentByteCount,
-               currentFieldReference, actualByteOrder, actualCharacterEncoding);
+               currentFieldReference, actualByteOrder, actualCharacterEncoding, containerContext);
 
             Field<?> newField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding, fieldDesc,
                fieldSize, currentlyRemainingParentByteCount, j, containerContext);
 
             context.pushFieldFunctions(fieldDesc, newField);
+            containerContext.addFieldFunctions(newField);
 
             fields.add(newField);
 
@@ -832,9 +807,14 @@ public class StandardDataBlockReader implements DataBlockReader {
       }
 
       if (currentlyRemainingParentByteCount > 0) {
+         DataBlockDescription unknownFieldDescription = createUnknownFieldDescription(parentId);
+
+         ByteOrder actualByteOrder = containerContext.getByteOrderOf(unknownFieldDescription.getId(), 0);
+         Charset actualCharacterEncoding = containerContext.getCharacterEncodingOf(unknownFieldDescription.getId(), 0);
+
          Field<?> unknownField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding,
-            createUnknownFieldDescription(parentId), currentlyRemainingParentByteCount,
-            currentlyRemainingParentByteCount, 0, containerContext);
+            unknownFieldDescription, currentlyRemainingParentByteCount, currentlyRemainingParentByteCount, 0,
+            containerContext);
 
          fields.add(unknownField);
       }
@@ -858,7 +838,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       // Get the actual occurrences of this headerId based on the fields of the previous
       // headers
-      long actualOccurrences = determineActualOccurrences(parentId, desc, context);
+      long actualOccurrences = containerContext.getOccurrencesOf(desc.getId());// determineActualOccurrences(parentId,
+                                                                               // desc, context);
 
       long staticLength = desc.hasFixedSize() ? desc.getMaximumByteLength() : DataBlockDescription.UNDEFINED;
 
@@ -889,7 +870,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       DataBlockDescription payloadDesc = m_spec.getDataBlockDescription(id);
 
       long totalPayloadSize = determineActualPayloadSize(payloadDesc, parentId, context, headers, null,
-         remainingDirectParentByteCount);
+         remainingDirectParentByteCount, containerContext);
 
       // If the medium is a stream-based medium, all the payload bytes must be cached first
       if (!reference.getMedium().isRandomAccess() && totalPayloadSize != DataBlockDescription.UNDEFINED
@@ -915,7 +896,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       DataBlockDescription payloadDesc = m_spec.getDataBlockDescription(id);
 
       long totalPayloadSize = determineActualPayloadSize(payloadDesc, parentId, context, footers, null,
-         remainingDirectParentByteCount);
+         remainingDirectParentByteCount, containerContext);
 
       if (totalPayloadSize == DataBlockDescription.UNDEFINED) {
          throw new IllegalStateException("Payload size could not be determined");
