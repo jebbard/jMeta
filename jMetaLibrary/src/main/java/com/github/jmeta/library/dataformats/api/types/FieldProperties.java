@@ -51,10 +51,10 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * {@link FieldProperties} represent all properties of a field.
  *
- * @param <T>
+ * @param <F>
  *           The interpreted type of the field
  */
-public class FieldProperties<T> {
+public class FieldProperties<F> {
 
    private static final Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
    static {
@@ -69,14 +69,14 @@ public class FieldProperties<T> {
       return (FieldConverter<F>) FIELD_CONVERTERS.get(fieldType);
    }
 
-   private final FieldConverter<T> converter;
-   private final T defaultValue;
-   private final Map<T, byte[]> enumeratedValues = new HashMap<>();
-   private final FieldType<T> fieldType;
+   private final FieldConverter<F> converter;
+   private final F defaultValue;
+   private final Map<F, byte[]> enumeratedValues = new HashMap<>();
+   private final FieldType<F> fieldType;
    private final ByteOrder fixedByteOrder;
    private final Charset fixedCharacterEncoding;
    private final FlagSpecification flagSpecification;
-   private final List<AbstractFieldFunction<T>> functions = new ArrayList<>();
+   private final List<AbstractFieldFunction<F>> functions = new ArrayList<>();
 
    private final boolean isMagicKey;
    private final long magicKeyBitLength;
@@ -109,10 +109,10 @@ public class FieldProperties<T> {
     * @param customConverter
     *           A custom {@link FieldConverter} to use, pass null to use a default {@link FieldConverter}
     */
-   public FieldProperties(FieldType<T> fieldType, T defaultValue, Map<T, byte[]> enumeratedValues,
+   public FieldProperties(FieldType<F> fieldType, F defaultValue, Map<F, byte[]> enumeratedValues,
       Character terminationCharacter, FlagSpecification flagSpecification, Charset fixedCharset,
-      ByteOrder fixedByteOrder, List<AbstractFieldFunction<T>> functions, boolean isMagicKey, long magicKeyBitLength,
-      FieldConverter<T> customConverter) {
+      ByteOrder fixedByteOrder, List<AbstractFieldFunction<F>> functions, boolean isMagicKey, long magicKeyBitLength,
+      FieldConverter<F> customConverter) {
       Reject.ifNull(fieldType, "fieldType");
       Reject.ifNull(enumeratedValues, "enumeratedValues");
       Reject.ifNull(functions, "functions");
@@ -157,8 +157,8 @@ public class FieldProperties<T> {
    private String enumValuesToString() {
       String toString = "{";
 
-      for (Iterator<T> iterator = enumeratedValues.keySet().iterator(); iterator.hasNext();) {
-         T nextKey = iterator.next();
+      for (Iterator<F> iterator = enumeratedValues.keySet().iterator(); iterator.hasNext();) {
+         F nextKey = iterator.next();
          byte[] nextValue = enumeratedValues.get(nextKey);
          toString += interpretedValueToString(nextKey) + "=" + Arrays.toString(nextValue);
       }
@@ -253,21 +253,21 @@ public class FieldProperties<T> {
       return true;
    }
 
-   public FieldConverter<T> getConverter() {
+   public FieldConverter<F> getConverter() {
       return converter;
    }
 
-   public T getDefaultValue() {
+   public F getDefaultValue() {
 
       return defaultValue;
    }
 
-   public Map<T, byte[]> getEnumeratedValues() {
+   public Map<F, byte[]> getEnumeratedValues() {
 
       return Collections.unmodifiableMap(enumeratedValues);
    }
 
-   public List<AbstractFieldFunction<T>> getFieldFunctions() {
+   public List<AbstractFieldFunction<F>> getFieldFunctions() {
       return Collections.unmodifiableList(functions);
    }
 
@@ -302,7 +302,7 @@ public class FieldProperties<T> {
       return fieldMagicKeys;
    }
 
-   public FieldType<T> getFieldType() {
+   public FieldType<F> getFieldType() {
 
       return fieldType;
    }
@@ -352,7 +352,7 @@ public class FieldProperties<T> {
       return result;
    }
 
-   private String interpretedValueToString(T interpretedValue) {
+   private String interpretedValueToString(F interpretedValue) {
       if (interpretedValue == null) {
          return "(null)";
       }

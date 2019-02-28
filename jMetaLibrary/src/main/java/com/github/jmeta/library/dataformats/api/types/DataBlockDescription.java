@@ -32,7 +32,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * parse data that is structured according to a data format. Data blocks might have different types as indicated by the
  * {@link PhysicalDataBlockType} enum. According to their type, different properties are valid or invalid. Thus, this
  * class also offers methods to validate the {@link DataBlockDescription} according to these rules in-place.
- * 
+ *
  * During validation, this class throws {@link InvalidSpecificationException}s in case that the properties of the
  * {@link DataBlockDescription} are invalidly set.
  */
@@ -64,7 +64,7 @@ public class DataBlockDescription {
 
    /**
     * Creates a new {@link DataBlockDescription}.
-    * 
+    *
     * @param id
     *           The {@link DataBlockId} of the data block, must not be null
     * @param name
@@ -198,6 +198,10 @@ public class DataBlockDescription {
       return minimumOccurrences;
    }
 
+   public boolean isOptional() {
+      return minimumOccurrences == 0 && maximumOccurrences == 1;
+   }
+
    public boolean isGeneric() {
       return isGeneric;
    }
@@ -224,7 +228,7 @@ public class DataBlockDescription {
 
    /**
     * Returns true if this {@link DataBlockDescription} contains the given child
-    * 
+    *
     * @param localId
     *           The child's local id, must not be null
     * @return true if this {@link DataBlockDescription} contains the given child, false otherwise
@@ -283,21 +287,21 @@ public class DataBlockDescription {
    public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + (int) (byteOffsetFromEndOfContainer ^ (byteOffsetFromEndOfContainer >>> 32));
-      result = prime * result + (int) (byteOffsetFromStartOfContainer ^ (byteOffsetFromStartOfContainer >>> 32));
-      result = prime * result + ((description == null) ? 0 : description.hashCode());
-      result = prime * result + ((fieldProperties == null) ? 0 : fieldProperties.hashCode());
-      result = prime * result + ((footerMagicKeys == null) ? 0 : footerMagicKeys.hashCode());
-      result = prime * result + ((headerMagicKeys == null) ? 0 : headerMagicKeys.hashCode());
-      result = prime * result + ((id == null) ? 0 : id.hashCode());
+      result = prime * result + (int) (byteOffsetFromEndOfContainer ^ byteOffsetFromEndOfContainer >>> 32);
+      result = prime * result + (int) (byteOffsetFromStartOfContainer ^ byteOffsetFromStartOfContainer >>> 32);
+      result = prime * result + (description == null ? 0 : description.hashCode());
+      result = prime * result + (fieldProperties == null ? 0 : fieldProperties.hashCode());
+      result = prime * result + (footerMagicKeys == null ? 0 : footerMagicKeys.hashCode());
+      result = prime * result + (headerMagicKeys == null ? 0 : headerMagicKeys.hashCode());
+      result = prime * result + (id == null ? 0 : id.hashCode());
       result = prime * result + (isGeneric ? 1231 : 1237);
-      result = prime * result + (int) (maximumByteLength ^ (maximumByteLength >>> 32));
-      result = prime * result + (int) (maximumOccurrences ^ (maximumOccurrences >>> 32));
-      result = prime * result + (int) (minimumByteLength ^ (minimumByteLength >>> 32));
-      result = prime * result + (int) (minimumOccurrences ^ (minimumOccurrences >>> 32));
-      result = prime * result + ((name == null) ? 0 : name.hashCode());
-      result = prime * result + ((orderedChildren == null) ? 0 : orderedChildren.hashCode());
-      result = prime * result + ((physicalType == null) ? 0 : physicalType.hashCode());
+      result = prime * result + (int) (maximumByteLength ^ maximumByteLength >>> 32);
+      result = prime * result + (int) (maximumOccurrences ^ maximumOccurrences >>> 32);
+      result = prime * result + (int) (minimumByteLength ^ minimumByteLength >>> 32);
+      result = prime * result + (int) (minimumOccurrences ^ minimumOccurrences >>> 32);
+      result = prime * result + (name == null ? 0 : name.hashCode());
+      result = prime * result + (orderedChildren == null ? 0 : orderedChildren.hashCode());
+      result = prime * result + (physicalType == null ? 0 : physicalType.hashCode());
       return result;
    }
 
@@ -306,64 +310,89 @@ public class DataBlockDescription {
     */
    @Override
    public boolean equals(Object obj) {
-      if (this == obj)
+      if (this == obj) {
          return true;
-      if (obj == null)
+      }
+      if (obj == null) {
          return false;
-      if (getClass() != obj.getClass())
+      }
+      if (getClass() != obj.getClass()) {
          return false;
+      }
       DataBlockDescription other = (DataBlockDescription) obj;
-      if (byteOffsetFromEndOfContainer != other.byteOffsetFromEndOfContainer)
+      if (byteOffsetFromEndOfContainer != other.byteOffsetFromEndOfContainer) {
          return false;
-      if (byteOffsetFromStartOfContainer != other.byteOffsetFromStartOfContainer)
+      }
+      if (byteOffsetFromStartOfContainer != other.byteOffsetFromStartOfContainer) {
          return false;
+      }
       if (description == null) {
-         if (other.description != null)
+         if (other.description != null) {
             return false;
-      } else if (!description.equals(other.description))
+         }
+      } else if (!description.equals(other.description)) {
          return false;
+      }
       if (fieldProperties == null) {
-         if (other.fieldProperties != null)
+         if (other.fieldProperties != null) {
             return false;
-      } else if (!fieldProperties.equals(other.fieldProperties))
+         }
+      } else if (!fieldProperties.equals(other.fieldProperties)) {
          return false;
+      }
       if (footerMagicKeys == null) {
-         if (other.footerMagicKeys != null)
+         if (other.footerMagicKeys != null) {
             return false;
-      } else if (!footerMagicKeys.equals(other.footerMagicKeys))
+         }
+      } else if (!footerMagicKeys.equals(other.footerMagicKeys)) {
          return false;
+      }
       if (headerMagicKeys == null) {
-         if (other.headerMagicKeys != null)
+         if (other.headerMagicKeys != null) {
             return false;
-      } else if (!headerMagicKeys.equals(other.headerMagicKeys))
+         }
+      } else if (!headerMagicKeys.equals(other.headerMagicKeys)) {
          return false;
+      }
       if (id == null) {
-         if (other.id != null)
+         if (other.id != null) {
             return false;
-      } else if (!id.equals(other.id))
+         }
+      } else if (!id.equals(other.id)) {
          return false;
-      if (isGeneric != other.isGeneric)
+      }
+      if (isGeneric != other.isGeneric) {
          return false;
-      if (maximumByteLength != other.maximumByteLength)
+      }
+      if (maximumByteLength != other.maximumByteLength) {
          return false;
-      if (maximumOccurrences != other.maximumOccurrences)
+      }
+      if (maximumOccurrences != other.maximumOccurrences) {
          return false;
-      if (minimumByteLength != other.minimumByteLength)
+      }
+      if (minimumByteLength != other.minimumByteLength) {
          return false;
-      if (minimumOccurrences != other.minimumOccurrences)
+      }
+      if (minimumOccurrences != other.minimumOccurrences) {
          return false;
+      }
       if (name == null) {
-         if (other.name != null)
+         if (other.name != null) {
             return false;
-      } else if (!name.equals(other.name))
+         }
+      } else if (!name.equals(other.name)) {
          return false;
+      }
       if (orderedChildren == null) {
-         if (other.orderedChildren != null)
+         if (other.orderedChildren != null) {
             return false;
-      } else if (!orderedChildren.equals(other.orderedChildren))
+         }
+      } else if (!orderedChildren.equals(other.orderedChildren)) {
          return false;
-      if (physicalType != other.physicalType)
+      }
+      if (physicalType != other.physicalType) {
          return false;
+      }
       return true;
    }
 

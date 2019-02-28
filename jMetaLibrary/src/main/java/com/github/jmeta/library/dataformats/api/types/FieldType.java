@@ -14,9 +14,9 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * {@link FieldType}
  *
- * @param <T>
+ * @param <F>
  */
-public class FieldType<T> {
+public class FieldType<F> {
 
    /**
     * @see java.lang.Object#hashCode()

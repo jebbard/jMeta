@@ -27,6 +27,7 @@ import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
+import com.github.jmeta.utility.byteutils.api.services.ByteOrders;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -41,6 +42,8 @@ public class ContainerContext {
 
       private final Map<DataBlockId, Map<Integer, Field<T>>> fields = new HashMap<>();
 
+      private final Map<DataBlockId, Map<Integer, AbstractFieldFunction<T>>> fieldFunctions = new HashMap<>();
+
       /**
        * Creates a new {@link FieldFunctionStore}.
        *
@@ -51,24 +54,29 @@ public class ContainerContext {
          this.fieldFunctionClass = fieldFunctionClass;
       }
 
+      @SuppressWarnings("unchecked")
       public void addField(Field<?> field) {
          Reject.ifNull(field, "field");
 
          DataBlockDescription fieldDesc = spec.getDataBlockDescription(field.getId());
 
-         List<?> fieldFunctions = fieldDesc.getFieldProperties().getFieldFunctions();
+         List<?> fieldFunctionList = fieldDesc.getFieldProperties().getFieldFunctions();
 
-         for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) fieldFunctions) {
+         for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) fieldFunctionList) {
             if (fieldFunction.getClass().equals(fieldFunctionClass)) {
                DataBlockId targetId = fieldFunction.getReferencedBlock().getReferencedId();
 
                Map<Integer, Field<T>> fieldsPerSequenceNumber = null;
+               Map<Integer, AbstractFieldFunction<T>> fieldFunctionsPerSequenceNumber = null;
 
                if (fields.containsKey(targetId)) {
                   fieldsPerSequenceNumber = fields.get(targetId);
+                  fieldFunctionsPerSequenceNumber = fieldFunctions.get(targetId);
                } else {
                   fieldsPerSequenceNumber = new HashMap<>();
+                  fieldFunctionsPerSequenceNumber = new HashMap<>();
                   fields.put(targetId, fieldsPerSequenceNumber);
+                  fieldFunctions.put(targetId, fieldFunctionsPerSequenceNumber);
                }
 
                fieldsPerSequenceNumber.put(field.getSequenceNumber(), (Field<T>) field);
@@ -85,13 +93,25 @@ public class ContainerContext {
             return null;
          }
 
-         Field<?> field = fields.get(targetId).get(sequenceNumber);
+         Field<T> field = fields.get(targetId).get(sequenceNumber);
 
          try {
-            return (T) field.getInterpretedValue();
+            return field.getInterpretedValue();
          } catch (BinaryValueConversionException e) {
             throw new RuntimeException("Unexpected exception during context field conversion", e);
          }
+      }
+
+      public AbstractFieldFunction<T> getFieldFunction(DataBlockId targetId, int sequenceNumber) {
+         if (!fieldFunctions.containsKey(targetId)) {
+            return null;
+         }
+
+         if (!fieldFunctions.get(targetId).containsKey(sequenceNumber)) {
+            return null;
+         }
+
+         return fieldFunctions.get(targetId).get(sequenceNumber);
       }
    }
 
@@ -195,10 +215,12 @@ public class ContainerContext {
    }
 
    /**
-    * Determines the number of occurrences of the given {@link DataBlockId} with the given sequence number within the
-    * current {@link Container}. The approach is as follows:
+    * Determines the number of occurrences of the given {@link DataBlockId} within the current {@link Container}. The
+    * approach is as follows:
     * <ul>
     * <li>If the data block has fixed number of occurrences according to its specification, this number is returned</li>
+    * <li>Otherwise if the data block is optional, the field functions are searched for a field that contains the
+    * presence of the data block within this {@link ContainerContext}</li>
     * <li>Otherwise the field functions are searched for a field that contains the count of the data block within this
     * {@link ContainerContext}</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
@@ -207,28 +229,39 @@ public class ContainerContext {
     *
     * @param id
     *           The {@link DataBlockId} of the data block, must not be null
-    * @param sequenceNumber
-    *           The sequence number of the data block, must not be negative
     * @return The count of the data block or {@link DataBlockDescription#UNDEFINED} if none is available
     */
-   public long getCountOf(DataBlockId id, int sequenceNumber) {
+   public long getOccurrencesOf(DataBlockId id) {
       Reject.ifNull(id, "id");
-      Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
-      if (desc.getMaximumOccurrences() == desc.getMaximumOccurrences()) {
+      if (desc.getMaximumOccurrences() == desc.getMinimumOccurrences()) {
          return desc.getMaximumOccurrences();
       }
 
-      Long countIndicatedByFieldFunction = counts.getValue(id, sequenceNumber);
+      if (desc.isOptional()) {
+         Flags flags = presences.getValue(id, 0);
+
+         if (flags != null) {
+            PresenceOf flagFunction = (PresenceOf) presences.getFieldFunction(id, 0);
+
+            if (flags.getFlagIntegerValue(flagFunction.getFlagName()) == flagFunction.getFlagValue()) {
+               return 1;
+            } else {
+               return 0;
+            }
+         }
+      }
+
+      Long countIndicatedByFieldFunction = counts.getValue(id, 0);
 
       if (countIndicatedByFieldFunction == null) {
          if (parentContainerContext == null) {
             return DataBlockDescription.UNDEFINED;
          }
 
-         return parentContainerContext.getCountOf(id, sequenceNumber);
+         return parentContainerContext.getOccurrencesOf(id);
       }
 
       return countIndicatedByFieldFunction;
@@ -265,11 +298,6 @@ public class ContainerContext {
       return idIndicatedByFieldFunction;
    }
 
-   // public boolean isPresent(DataBlockId id, int sequenceIndexInParent) {
-   // // TODO implement
-   // return false;
-   // }
-
    /**
     * Determines the {@link ByteOrder} of the given {@link DataBlockId} with the given sequence number within the
     * current {@link Container}. The approach is as follows:
@@ -292,18 +320,17 @@ public class ContainerContext {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
-      return null;
-      // ByteOrder byteOrderIndicatedByFieldFunction = byteOrders.getValue(id, sequenceNumber);
-      //
-      // if (byteOrderIndicatedByFieldFunction == null) {
-      // if (parentContainerContext != null) {
-      // return parentContainerContext.getByteOrderOf(id, sequenceNumber);
-      // } else {
-      // return spec.getDefaultByteOrder();
-      // }
-      // }
-      //
-      // return byteOrderIndicatedByFieldFunction;
+      String byteOrderIndicatedByFieldFunction = byteOrders.getValue(id, sequenceNumber);
+
+      if (byteOrderIndicatedByFieldFunction == null) {
+         if (parentContainerContext != null) {
+            return parentContainerContext.getByteOrderOf(id, sequenceNumber);
+         } else {
+            return spec.getDefaultByteOrder();
+         }
+      }
+
+      return ByteOrders.fromString(byteOrderIndicatedByFieldFunction);
    }
 
    /**
@@ -328,17 +355,16 @@ public class ContainerContext {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
-      return null;
-      // Charset characterEncodingIndicatedByFieldFunction = characterEncodings.getValue(id, sequenceNumber);
-      //
-      // if (characterEncodingIndicatedByFieldFunction == null) {
-      // if (parentContainerContext != null) {
-      // return parentContainerContext.getCharacterEncodingOf(id, sequenceNumber);
-      // } else {
-      // return spec.getDefaultCharacterEncoding();
-      // }
-      // }
-      //
-      // return characterEncodingIndicatedByFieldFunction;
+      String characterEncodingIndicatedByFieldFunction = characterEncodings.getValue(id, sequenceNumber);
+
+      if (characterEncodingIndicatedByFieldFunction == null) {
+         if (parentContainerContext != null) {
+            return parentContainerContext.getCharacterEncodingOf(id, sequenceNumber);
+         } else {
+            return spec.getDefaultCharacterEncoding();
+         }
+      }
+
+      return Charset.forName(characterEncodingIndicatedByFieldFunction);
    }
 }

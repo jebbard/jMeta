@@ -246,7 +246,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       // Data block has fixed amount of mandatory occurrences
       if (minOccurrences == maxOccurrences) {
          actualOccurrences = minOccurrences;
-      } else if (minOccurrences == 0 && maxOccurrences == 1) {
+      } else if (desc.isOptional()) {
          if (context.hasFieldFunction(desc.getId(), PresenceOf.class)) {
             boolean present = context.popFieldFunction(desc.getId(), PresenceOf.class);
 

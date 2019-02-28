@@ -147,9 +147,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
          boolean hasFieldFunctionForId = fieldFunctionsByTargetId.containsKey(id);
 
-         if (dataBlockWithDynamicOccurrences.getMinimumOccurrences() == 0
-            && dataBlockWithDynamicOccurrences.getMaximumOccurrences() == 1) {
-
+         if (dataBlockWithDynamicOccurrences.isOptional()) {
             if (!hasFieldFunctionForId || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), PresenceOf.class)) {
                throw new InvalidSpecificationException(VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING,
                   dataBlockWithDynamicOccurrences);
