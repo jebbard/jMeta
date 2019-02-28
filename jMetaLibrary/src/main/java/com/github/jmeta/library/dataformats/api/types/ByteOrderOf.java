@@ -23,7 +23,7 @@ public class ByteOrderOf extends AbstractFieldFunction<String> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
    public ByteOrderOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock, String.class, FieldType.STRING);
+      super(referencedBlock, FieldType.STRING);
    }
 
    /**

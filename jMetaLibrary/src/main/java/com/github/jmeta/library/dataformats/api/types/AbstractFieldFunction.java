@@ -15,30 +15,24 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link AbstractFieldFunction} is the base class of all field functions. A field function expresses that a field
  * indicates some property of another data block by its value and thus a reference to another data block.
  */
-public abstract class AbstractFieldFunction<T> {
+public abstract class AbstractFieldFunction<F> {
 
    private final DataBlockCrossReference referencedBlock;
-   private final Class<T> interpretedValueClass;
-   private final FieldType<?> requiredFieldType;
+   private final FieldType<F> requiredFieldType;
 
    /**
     * Creates a new {@link AbstractFieldFunction}.
     *
     * @param referencedBlock
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
-    * @param interpretedValueClass
-    *           The concrete interpreted type of a field value, must not be null
     * @param requiredFieldType
     *           The {@link FieldType} required by this {@link AbstractFieldFunction}, must not be null
     */
-   public AbstractFieldFunction(DataBlockCrossReference referencedBlock, Class<T> interpretedValueClass,
-      FieldType<?> requiredFieldType) {
+   public AbstractFieldFunction(DataBlockCrossReference referencedBlock, FieldType<F> requiredFieldType) {
       Reject.ifNull(referencedBlock, "referencedBlock");
-      Reject.ifNull(interpretedValueClass, "interpretedValueClass");
       Reject.ifNull(requiredFieldType, "requiredFieldType");
 
       this.referencedBlock = referencedBlock;
-      this.interpretedValueClass = interpretedValueClass;
       this.requiredFieldType = requiredFieldType;
    }
 
@@ -51,16 +45,9 @@ public abstract class AbstractFieldFunction<T> {
    }
 
    /**
-    * @return the interpreted value type
-    */
-   public Class<T> getInterpretedValueClass() {
-      return interpretedValueClass;
-   }
-
-   /**
     * @return the {@link FieldType} that is required by this {@link AbstractFieldFunction}
     */
-   public FieldType<?> getRequiredFieldType() {
+   public FieldType<F> getRequiredFieldType() {
       return requiredFieldType;
    }
 
@@ -84,5 +71,5 @@ public abstract class AbstractFieldFunction<T> {
     * @return a cloned instance of this {@link AbstractFieldFunction} with the given {@link DataBlockCrossReference}
     *         instead of the current one
     */
-   public abstract AbstractFieldFunction<T> withReplacedReference(DataBlockCrossReference replacedReference);
+   public abstract AbstractFieldFunction<F> withReplacedReference(DataBlockCrossReference replacedReference);
 }

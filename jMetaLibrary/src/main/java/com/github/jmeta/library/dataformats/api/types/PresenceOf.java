@@ -14,7 +14,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  * {@link PresenceOf} expresses that the field it refers tells whether the target data block id is present or not.
  */
-public class PresenceOf extends AbstractFieldFunction<Boolean> {
+public class PresenceOf extends AbstractFieldFunction<Flags> {
 
    private final String flagName;
    private final int flagValue;
@@ -30,7 +30,7 @@ public class PresenceOf extends AbstractFieldFunction<Boolean> {
     *           The flag's value indicating presence, if the value differs, this indicates absence
     */
    public PresenceOf(DataBlockCrossReference referencedBlock, String flagName, int flagValue) {
-      super(referencedBlock, Boolean.class, FieldType.FLAGS);
+      super(referencedBlock, FieldType.FLAGS);
 
       Reject.ifNull(flagName, "flagName");
 
@@ -66,7 +66,7 @@ public class PresenceOf extends AbstractFieldFunction<Boolean> {
     * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
-   public AbstractFieldFunction<Boolean> withReplacedReference(DataBlockCrossReference replacedReference) {
+   public AbstractFieldFunction<Flags> withReplacedReference(DataBlockCrossReference replacedReference) {
       return new PresenceOf(replacedReference, flagName, flagValue);
    }
 }

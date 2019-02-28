@@ -24,7 +24,7 @@ public class CharacterEncodingOf extends AbstractFieldFunction<String> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
    public CharacterEncodingOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock, String.class, FieldType.STRING);
+      super(referencedBlock, FieldType.STRING);
    }
 
    /**

@@ -114,14 +114,14 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
     */
    private void validateFieldFunctions() {
 
-      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctions = m_dataBlockDescriptions.values().stream()
+      Map<DataBlockId, Object> fieldFunctions = m_dataBlockDescriptions.values().stream()
          .filter(desc -> desc.getPhysicalType() == PhysicalDataBlockType.FIELD)
          .collect(Collectors.toMap(DataBlockDescription::getId, desc -> desc.getFieldProperties().getFieldFunctions()));
 
       Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = new HashMap<>();
 
       fieldFunctions.forEach((fieldIdWithFunctions, functionsForField) -> {
-         for (AbstractFieldFunction<?> fieldFunction : functionsForField) {
+         for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) functionsForField) {
 
             DataBlockId targetId = fieldFunction.getReferencedBlock().getReferencedId();
 

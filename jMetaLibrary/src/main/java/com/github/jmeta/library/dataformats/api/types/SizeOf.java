@@ -26,7 +26,7 @@ public class SizeOf extends AbstractFieldFunction<Long> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
    public SizeOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock, Long.class, FieldType.UNSIGNED_WHOLE_NUMBER);
+      super(referencedBlock, FieldType.UNSIGNED_WHOLE_NUMBER);
    }
 
    /**

@@ -44,7 +44,7 @@ public class FieldFunctionStack {
     * @param desc
     * @param field
     */
-   public void pushFieldFunctions(DataBlockDescription desc, Field<?> field) {
+   public <T> void pushFieldFunctions(DataBlockDescription desc, Field<T> field) {
 
       Reject.ifNull(field, "field");
       Reject.ifNull(desc, "desc");
@@ -55,9 +55,9 @@ public class FieldFunctionStack {
          throw new IllegalStateException("Field is not of type field!");
       }
 
-      final FieldProperties<?> fieldProperties = desc.getFieldProperties();
+      final FieldProperties<T> fieldProperties = (FieldProperties<T>) desc.getFieldProperties();
 
-      List<AbstractFieldFunction<?>> fieldFunctions = fieldProperties.getFieldFunctions();
+      List<AbstractFieldFunction<T>> fieldFunctions = fieldProperties.getFieldFunctions();
 
       for (int i = 0; i < fieldFunctions.size(); ++i) {
          AbstractFieldFunction<?> function = fieldFunctions.get(i);

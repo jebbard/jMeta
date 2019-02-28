@@ -53,7 +53,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     *           The {@link AbstractFieldFunction} to add, must not be null
     * @return This builder
     */
-   C withFieldFunction(AbstractFieldFunction<?> fieldFunction);
+   C withFieldFunction(AbstractFieldFunction<FIT> fieldFunction);
 
    /**
     * Adds an enumerated value to this field's data block description.

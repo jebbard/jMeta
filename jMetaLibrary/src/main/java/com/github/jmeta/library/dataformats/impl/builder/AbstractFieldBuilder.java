@@ -52,7 +52,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
    private boolean isMagicKey = false;
    private final Map<I, byte[]> enumeratedValues = new HashMap<>();
    private final FieldType<I> fieldType;
-   private final List<AbstractFieldFunction<?>> functions = new ArrayList<>();
+   private final List<AbstractFieldFunction<I>> functions = new ArrayList<>();
    private long magicKeyBitLength = DataBlockDescription.UNDEFINED;
    private FieldConverter<I> customConverter;
 
@@ -187,7 +187,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @Override
    @SuppressWarnings("unchecked")
-   public C withFieldFunction(AbstractFieldFunction<?> fieldFunction) {
+   public C withFieldFunction(AbstractFieldFunction<I> fieldFunction) {
       Reject.ifNull(fieldFunction, "fieldFunction");
 
       functions.add(fieldFunction);

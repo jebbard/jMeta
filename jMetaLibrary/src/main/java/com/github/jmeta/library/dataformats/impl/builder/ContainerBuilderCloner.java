@@ -293,9 +293,9 @@ public final class ContainerBuilderCloner {
          fb.asMagicKey();
       }
 
-      List<AbstractFieldFunction<?>> fieldFunctions = existingFieldProperties.getFieldFunctions();
+      List<AbstractFieldFunction<F>> fieldFunctions = existingFieldProperties.getFieldFunctions();
 
-      for (AbstractFieldFunction<?> fieldFunction : fieldFunctions) {
+      for (AbstractFieldFunction<F> fieldFunction : fieldFunctions) {
          DataBlockId affectedId = fieldFunction.getReferencedBlock().getReferencedId();
 
          // Replace affected id (which are still referring to the original container) with the
