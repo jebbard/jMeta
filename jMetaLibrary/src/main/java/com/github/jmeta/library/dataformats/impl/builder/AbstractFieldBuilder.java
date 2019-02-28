@@ -35,26 +35,26 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  * @param <P>
  *           The parent type of this builder
- * @param <I>
+ * @param <F>
  *           The interpreted type of the concrete field built by this class
  * @param <C>
  *           The concrete derived interface of the class implementing this
  *           {@link AbstractDataFormatSpecificationBuilder}
  */
-public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, I, C extends FieldBuilder<P, I, C>>
-   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, I, C> {
+public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder<P>, F, C extends FieldBuilder<P, F, C>>
+   extends AbstractDataFormatSpecificationBuilder<P, C> implements FieldBuilder<P, F, C> {
 
    private Character terminationCharacter;
-   private I defaultValue;
+   private F defaultValue;
    private FlagSpecification flagSpecification;
    private Charset fixedCharset;
    private ByteOrder fixedByteOrder;
    private boolean isMagicKey = false;
-   private final Map<I, byte[]> enumeratedValues = new HashMap<>();
-   private final FieldType<I> fieldType;
-   private final List<AbstractFieldFunction<I>> functions = new ArrayList<>();
+   private final Map<F, byte[]> enumeratedValues = new HashMap<>();
+   private final FieldType<F> fieldType;
+   private final List<AbstractFieldFunction<F>> functions = new ArrayList<>();
    private long magicKeyBitLength = DataBlockDescription.UNDEFINED;
-   private FieldConverter<I> customConverter;
+   private FieldConverter<F> customConverter;
 
    /**
     * Creates a new {@link AbstractFieldBuilder}.
@@ -74,7 +74,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     * @param isGeneric
     *           true if it is a generic data block, false otherwise
     */
-   public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description, FieldType<I> fieldType,
+   public AbstractFieldBuilder(P parentBuilder, String localId, String name, String description, FieldType<F> fieldType,
       boolean isGeneric) {
       super(parentBuilder, localId, name, description, PhysicalDataBlockType.FIELD, isGeneric);
       Reject.ifNull(fieldType, "fieldType");
@@ -107,7 +107,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @SuppressWarnings("unchecked")
    @Override
-   public C addEnumeratedValue(byte[] binaryValue, I interpretedValue) {
+   public C addEnumeratedValue(byte[] binaryValue, F interpretedValue) {
       enumeratedValues.put(interpretedValue, binaryValue);
       return (C) this;
    }
@@ -117,7 +117,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @SuppressWarnings("unchecked")
    @Override
-   public C withCustomConverter(FieldConverter<I> customConverter) {
+   public C withCustomConverter(FieldConverter<F> customConverter) {
       Reject.ifNull(customConverter, "customConverter");
       this.customConverter = customConverter;
       return (C) this;
@@ -128,7 +128,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @Override
    @SuppressWarnings("unchecked")
-   public C withDefaultValue(I value) {
+   public C withDefaultValue(F value) {
       this.defaultValue = value;
       return (C) this;
    }
@@ -157,7 +157,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @Override
    public P finishField() {
-      FieldProperties<I> fieldProperties = new FieldProperties<>(fieldType, defaultValue, enumeratedValues,
+      FieldProperties<F> fieldProperties = new FieldProperties<>(fieldType, defaultValue, enumeratedValues,
          terminationCharacter, flagSpecification, fixedCharset, fixedByteOrder, functions, isMagicKey,
          magicKeyBitLength, customConverter);
 
@@ -187,7 +187,7 @@ public abstract class AbstractFieldBuilder<P extends DataBlockDescriptionBuilder
     */
    @Override
    @SuppressWarnings("unchecked")
-   public C withFieldFunction(AbstractFieldFunction<I> fieldFunction) {
+   public C withFieldFunction(AbstractFieldFunction<F> fieldFunction) {
       Reject.ifNull(fieldFunction, "fieldFunction");
 
       functions.add(fieldFunction);

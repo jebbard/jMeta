@@ -19,12 +19,12 @@ import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
  *
  * @param <P>
  *           The concrete parent builder interface
- * @param <FIT>
+ * @param <F>
  *           The field's interpreted type
  * @param <C>
  *           The concrete {@link FieldBuilder} interface derived from this interface
  */
-public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
+public interface FieldBuilder<P, F, C extends FieldBuilder<P, F, C>>
    extends DataBlockDescriptionBuilder<C>, DynamicOccurrenceBuilder<C> {
 
    /**
@@ -53,7 +53,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     *           The {@link AbstractFieldFunction} to add, must not be null
     * @return This builder
     */
-   C withFieldFunction(AbstractFieldFunction<FIT> fieldFunction);
+   C withFieldFunction(AbstractFieldFunction<F> fieldFunction);
 
    /**
     * Adds an enumerated value to this field's data block description.
@@ -64,7 +64,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     *           The interpreted value to add, must be unique
     * @return This builder
     */
-   C addEnumeratedValue(byte[] binaryValue, FIT interpretedValue);
+   C addEnumeratedValue(byte[] binaryValue, F interpretedValue);
 
    /**
     * Sets a custom {@link FieldConverter} to be used when converting binary values into interpreted values and vice
@@ -74,7 +74,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     *           The custom converter, must not be null
     * @return This builder
     */
-   C withCustomConverter(FieldConverter<FIT> customConverter);
+   C withCustomConverter(FieldConverter<F> customConverter);
 
    /**
     * Sets the default value of the built field, which is initially null
@@ -83,7 +83,7 @@ public interface FieldBuilder<P, FIT, C extends FieldBuilder<P, FIT, C>>
     *           The default value to set, may be null
     * @return This builder
     */
-   C withDefaultValue(FIT value);
+   C withDefaultValue(F value);
 
    /**
     * Assigns a dynamic length (min length not equal to max length) to the data block. If this method is not called, the
