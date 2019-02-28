@@ -41,7 +41,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
    public StandardContainer(DataBlockId id, DataBlock parent,
       MediumOffset reference, List<Header> headers, Payload payload,
       List<Header> footers, DataBlockReader dataBlockReader) {
-      super(id, parent, reference, dataBlockReader);
+      super(id, parent, reference, dataBlockReader, 0);
 
       Reject.ifNull(footers, "footers");
       Reject.ifNull(payload, "payload");

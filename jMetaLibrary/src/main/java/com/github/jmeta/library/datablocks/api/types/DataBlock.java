@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
@@ -82,6 +83,16 @@ public interface DataBlock {
     * @return the id of the {@link DataBlock}.
     */
    public DataBlockId getId();
+
+   /**
+    * Returns the sequence number of this {@link DataBlock}. The sequence number is a zero-based index that the data
+    * block has within its parent. It is only non-zero for data blocks with multiple occurrences which might only be the
+    * case for {@link PhysicalDataBlockType#HEADER}, {@link PhysicalDataBlockType#FOOTER} or
+    * {@link PhysicalDataBlockType#FIELD} typed {@link DataBlock}s.
+    *
+    * @return the sequence number of this {@link DataBlock}
+    */
+   public int getSequenceNumber();
 
    /**
     * Returns the parent {@link DataBlock} of this instance. May return null if this is a top-level {@link DataBlock}.

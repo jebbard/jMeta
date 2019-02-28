@@ -187,7 +187,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    private DataBlockId determineActualId(MediumOffset reference, DataBlockId id, FieldFunctionStack context,
-      long remainingParentByteCount, ByteOrder byteOrder, Charset characterEncoding) {
+      long remainingParentByteCount, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber) {
 
       DataBlockDescription desc = m_spec.getDataBlockDescription(id);
 
@@ -225,7 +225,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          Charset currentCharacterEncoding = m_spec.getDefaultCharacterEncoding();
 
          Field<?> idField = readField(idFieldReference, currentByteOrder, currentCharacterEncoding, idFieldDesc,
-            actualFieldSize, actualFieldSize);
+            actualFieldSize, actualFieldSize, sequenceNumber);
 
          return concreteBlockIdFromGenericId(id, idField);
       }
@@ -520,7 +520,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       // TODO the actual current charset and byte order must be known here!
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
-         m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding());
+         m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding(), 0);
 
       FieldFunctionStack theContext = context;
 
@@ -618,7 +618,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       Reject.ifNull(id, "id");
 
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
-         m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding());
+         m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding(), 0);
 
       FieldFunctionStack theContext = context;
 
@@ -724,18 +724,18 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    private Field<?> readField(final MediumOffset reference, ByteOrder currentByteOrder, Charset currentCharset,
-      DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount) {
+      DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount, int sequenceNumber) {
 
       // A lazy field is created if the field size exceeds a maximum size
       if (fieldSize > m_maxFieldBlockSize) {
          return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, currentByteOrder,
-            currentCharset);
+            currentCharset, sequenceNumber);
       }
 
       ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
       return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer,
-         currentByteOrder, currentCharset);
+         currentByteOrder, currentCharset, sequenceNumber);
    }
 
    /**
@@ -794,12 +794,12 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          long actualOccurrences = determineActualOccurrences(parentId, fieldDesc, context);
 
-         for (long j = 0; j < actualOccurrences; j++) {
+         for (int j = 0; j < actualOccurrences; j++) {
             long fieldSize = determineActualFieldSize(fieldDesc, parentId, context, currentlyRemainingParentByteCount,
                currentFieldReference, actualByteOrder, actualCharacterEncoding);
 
             Field<?> newField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding, fieldDesc,
-               fieldSize, currentlyRemainingParentByteCount);
+               fieldSize, currentlyRemainingParentByteCount, j);
 
             context.pushFieldFunctions(fieldDesc, newField);
 
@@ -816,7 +816,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       if (currentlyRemainingParentByteCount > 0) {
          Field<?> unknownField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding,
             createUnknownFieldDescription(parentId), currentlyRemainingParentByteCount,
-            currentlyRemainingParentByteCount);
+            currentlyRemainingParentByteCount, 0);
 
          fields.add(unknownField);
       }
@@ -848,7 +848,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          List<Field<?>> headerFields = readFields(reference, headerOrFooterId, context, staticLength);
 
          nextHeadersOrFooters
-            .add(m_dataBlockFactory.createHeaderOrFooter(headerOrFooterId, reference, headerFields, isFooter, this));
+            .add(m_dataBlockFactory.createHeaderOrFooter(headerOrFooterId, reference, headerFields, isFooter, this, i));
       }
 
       return nextHeadersOrFooters;

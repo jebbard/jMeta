@@ -56,10 +56,11 @@ public interface DataBlockFactory {
     * @param fieldBytes
     * @param byteOrder
     * @param characterEncoding
+    * @param sequenceNumber TODO
     * @return the {@link Field}
     */
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding);
+      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber);
 
    /**
     * @param id
@@ -67,9 +68,10 @@ public interface DataBlockFactory {
     * @param fields
     * @param isFooter
     * @param reader TODO
+    * @param sequenceNumber TODO
     * @return the {@link Header}
     */
-   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader);
+   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader, int sequenceNumber);
 
    /**
     * @param id

@@ -50,7 +50,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     */
    public FieldBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader,
       FieldFunctionStack context) {
-      super(id, null, offset, dataBlockReader);
+      super(id, null, offset, dataBlockReader, 0);
 
       Reject.ifNull(context, "context");
 

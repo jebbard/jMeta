@@ -22,25 +22,41 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public abstract class AbstractDataBlock implements DataBlock {
 
+   private int sequenceNumber;
+
    /**
     * Creates a new {@link AbstractDataBlock}.
-    * 
+    *
     * @param id
     * @param parent
     * @param reference
     * @param dataBlockReader
+    * @param sequenceNumber
+    *           TODO
     */
-   public AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader) {
+   public AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader,
+      int sequenceNumber) {
       Reject.ifNull(id, "id");
       Reject.ifNull(dataBlockReader, "dataBlockReader");
       Reject.ifNull(reference, "reference");
+      Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
       m_id = id;
       m_dataBlockReader = dataBlockReader;
       m_mediumReference = reference;
+      this.sequenceNumber = sequenceNumber;
 
-      if (parent != null)
+      if (parent != null) {
          initParent(parent);
+      }
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSequenceNumber()
+    */
+   @Override
+   public int getSequenceNumber() {
+      return sequenceNumber;
    }
 
    /**
@@ -53,8 +69,9 @@ public abstract class AbstractDataBlock implements DataBlock {
       Reject.ifNegative(size, "size");
       Reject.ifNull(getMediumReference(), "getMediumReference()");
 
-      if (getTotalSize() != DataBlockDescription.UNDEFINED)
+      if (getTotalSize() != DataBlockDescription.UNDEFINED) {
          Reject.ifFalse(offset + size <= getTotalSize(), "offset + size <= getTotalSize()");
+      }
 
       return getDataBlockReader().readBytes(m_mediumReference.advance(offset), size);
    }

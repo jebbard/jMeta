@@ -51,11 +51,11 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
-    *      DataFormatSpecification, MediumOffset, BinaryValue, ByteOrder, Charset)
+    *      DataFormatSpecification, MediumOffset, BinaryValue, ByteOrder, Charset, int)
     */
    @Override
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding) {
+      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber) {
 
       Reject.ifNull(id, "fieldDesc");
       Reject.ifNull(reference, "reference");
@@ -63,7 +63,7 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
-      StandardField<T> field = new StandardField<>(desc, fieldBytes, reference);
+      StandardField<T> field = new StandardField<>(desc, fieldBytes, reference, sequenceNumber);
 
       field.initByteOrder(byteOrder);
       field.initCharacterEncoding(characterEncoding);
@@ -96,16 +96,16 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeaderOrFooter(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      MediumOffset, java.util.List, boolean, DataBlockReader)
+    *      MediumOffset, java.util.List, boolean, DataBlockReader, int)
     */
    @Override
    public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
-      DataBlockReader reader) {
+      DataBlockReader reader, int sequenceNumber) {
 
       Reject.ifNull(id, "headerRef");
       Reject.ifNull(reference, "parent");
       Reject.ifNull(fields, "fields");
 
-      return new StandardHeader(id, reference, fields, isFooter, reader);
+      return new StandardHeader(id, reference, fields, isFooter, reader, sequenceNumber);
    }
 }

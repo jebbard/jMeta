@@ -9,6 +9,8 @@
  */
 package com.github.jmeta.library.datablocks.api.types;
 
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+
 /**
  * {@link ContainerContext}
  *
@@ -16,18 +18,26 @@ package com.github.jmeta.library.datablocks.api.types;
 public class ContainerContext {
 
    // private final Map<FieldFunctionType<?>, Map<DataBlockId, List<Field<?>>>> fields = new HashMap<>();
-   //
-   // private final DataFormatSpecification spec;
-   //
-   // /**
-   // * Creates a new {@link ContainerContext}.
-   // *
-   // * @param spec
-   // */
-   // public ContainerContext(DataFormatSpecification spec) {
-   // this.spec = spec;
-   // }
-   //
+
+   private final DataFormatSpecification spec;
+   private final Container container;
+   private final ContainerContext parentContainerContext = null;
+
+   /**
+    * Creates a new {@link ContainerContext}.
+    *
+    * @param spec
+    *           The {@link DataFormatSpecification} of this context, must not be null
+    * @param container
+    *           The {@link Container} this context belongs to, must not be null
+    */
+   public ContainerContext(DataFormatSpecification spec, Container container) {
+      this.spec = spec;
+      this.container = container;
+      // TODO set parent container context to context of the provided container's parent
+      // this.parentContainerContext = parentContainerContext;
+   }
+
    // /**
    // * Adds all {@link FieldFunction}s of the given field to this {@link ContainerContext}. The concrete values can be
    // * later retrieved using the getters.

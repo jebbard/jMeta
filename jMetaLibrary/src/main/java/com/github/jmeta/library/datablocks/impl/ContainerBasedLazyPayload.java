@@ -46,7 +46,7 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     */
    public ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize,
       DataBlockReader dataBlockReader, FieldFunctionStack context) {
-      super(id, null, offset, dataBlockReader);
+      super(id, null, offset, dataBlockReader, 0);
 
       Reject.ifNull(context, "context");
 

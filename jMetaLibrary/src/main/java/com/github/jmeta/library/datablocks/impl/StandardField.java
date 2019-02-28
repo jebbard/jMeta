@@ -47,10 +47,21 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class StandardField<T> implements Field<T> {
 
-   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference) {
+   private int sequenceNumber;
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSequenceNumber()
+    */
+   @Override
+   public int getSequenceNumber() {
+      return 0;
+   }
+
+   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber) {
       Reject.ifNull(fieldDesc, "fieldDesc");
 
       m_desc = fieldDesc;
+      this.sequenceNumber = sequenceNumber;
       m_mediumReference = reference;
       m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
    }
@@ -79,13 +90,16 @@ public class StandardField<T> implements Field<T> {
 
    /**
     * Creates a new {@link StandardField}.
-    * 
+    *
     * @param fieldDesc
     * @param interpretedValue
     * @param reference
+    * @param sequenceNumber
+    *           TODO
     */
-   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference) {
-      this(fieldDesc, reference);
+   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference,
+      int sequenceNumber) {
+      this(fieldDesc, reference, sequenceNumber);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
 
@@ -95,13 +109,16 @@ public class StandardField<T> implements Field<T> {
 
    /**
     * Creates a new {@link StandardField}.
-    * 
+    *
     * @param fieldDesc
     * @param byteValue
     * @param reference
+    * @param sequenceNumber
+    *           TODO
     */
-   public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference) {
-      this(fieldDesc, reference);
+   public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
+      int sequenceNumber) {
+      this(fieldDesc, reference, sequenceNumber);
 
       Reject.ifNull(byteValue, "byteValue");
 
@@ -208,8 +225,9 @@ public class StandardField<T> implements Field<T> {
    @Override
    public T getInterpretedValue() throws BinaryValueConversionException {
 
-      if (m_interpretedValue == null)
+      if (m_interpretedValue == null) {
          m_interpretedValue = convertToInterpreted();
+      }
 
       return m_interpretedValue;
    }
@@ -218,34 +236,40 @@ public class StandardField<T> implements Field<T> {
     */
    private T convertToInterpreted() throws BinaryValueConversionException {
 
-      if (m_fieldConverter == null)
+      if (m_fieldConverter == null) {
          throw new BinaryValueConversionException("No field converter found for field id " + m_desc.getId(), null,
             m_desc, m_byteValue, m_byteOrder, m_characterEncoding);
+      }
 
-      if (m_byteOrder == null)
+      if (m_byteOrder == null) {
          throw new BinaryValueConversionException("No byte order set for field id " + m_desc.getId(), null, m_desc,
             m_byteValue, null, null);
+      }
 
-      if (m_characterEncoding == null)
+      if (m_characterEncoding == null) {
          throw new BinaryValueConversionException("No character encoding set for field id " + m_desc.getId(), null,
             m_desc, m_byteValue, null, null);
+      }
 
       return m_fieldConverter.toInterpreted(m_byteValue, m_desc, m_byteOrder, m_characterEncoding);
    }
 
    private ByteBuffer convertToBinary() throws InterpretedValueConversionException {
 
-      if (m_fieldConverter == null)
+      if (m_fieldConverter == null) {
          throw new InterpretedValueConversionException("No field converter found for field id " + m_desc.getId(), null,
             m_desc, m_interpretedValue, m_byteOrder, m_characterEncoding);
+      }
 
-      if (m_byteOrder == null)
+      if (m_byteOrder == null) {
          throw new InterpretedValueConversionException("No byte order set for field id " + m_desc.getId(), null, m_desc,
             m_interpretedValue, null, null);
+      }
 
-      if (m_characterEncoding == null)
+      if (m_characterEncoding == null) {
          throw new InterpretedValueConversionException("No character encoding set for field id " + m_desc.getId(), null,
             m_desc, m_interpretedValue, null, null);
+      }
 
       return m_fieldConverter.toBinary(m_interpretedValue, m_desc, m_byteOrder, m_characterEncoding);
    }

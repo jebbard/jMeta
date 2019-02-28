@@ -34,11 +34,12 @@ public class StandardHeader extends AbstractDataBlock implements Header {
     * @param fields
     * @param isFooter
     * @param dataBlockReader
+    * @param sequenceNumber TODO
     */
    public StandardHeader(DataBlockId id, MediumOffset reference,
       List<Field<?>> fields, boolean isFooter,
-      DataBlockReader dataBlockReader) {
-      super(id, null, reference, dataBlockReader);
+      DataBlockReader dataBlockReader, int sequenceNumber) {
+      super(id, null, reference, dataBlockReader, 0);
 
       Reject.ifNull(fields, "fields");
 

@@ -38,7 +38,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
 
    /**
     * Creates a new {@link LazyField}.
-    * 
+    *
     * @param fieldDesc
     * @param reference
     * @param parent
@@ -47,10 +47,13 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
     * @param dataBlockReader
     * @param byteOrder
     * @param characterEncoding
+    * @param sequenceNumber
+    *           TODO
     */
    public LazyField(DataBlockDescription fieldDesc, MediumOffset reference, DataBlock parent, long totalSize,
-      DataBlockFactory factory, DataBlockReader dataBlockReader, ByteOrder byteOrder, Charset characterEncoding) {
-      super(fieldDesc.getId(), parent, reference, dataBlockReader);
+      DataBlockFactory factory, DataBlockReader dataBlockReader, ByteOrder byteOrder, Charset characterEncoding,
+      int sequenceNumber) {
+      super(fieldDesc.getId(), parent, reference, dataBlockReader, sequenceNumber);
 
       Reject.ifNull(factory, "factory");
       Reject.ifNull(fieldDesc, "fieldDesc");
@@ -106,10 +109,10 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
    private void lazilyReadField() {
 
       if (m_wrappedField == null) {
-         ByteBuffer binaryData = getDataBlockReader().readBytes(getMediumReference(), (int) this.m_totalSize);
+         ByteBuffer binaryData = getDataBlockReader().readBytes(getMediumReference(), (int) m_totalSize);
 
          m_wrappedField = m_dbFactory.createFieldFromBytes(m_fieldDesc.getId(), getDataBlockReader().getSpecification(),
-            getMediumReference(), binaryData, m_byteOrder, m_characterEncoding);
+            getMediumReference(), binaryData, m_byteOrder, m_characterEncoding, getSequenceNumber());
       }
    }
 
