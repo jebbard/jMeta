@@ -133,7 +133,7 @@ public class ContainerContext {
 
          for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) fieldFunctionList) {
             if (fieldFunction.getClass().equals(fieldFunctionClass)) {
-               DataBlockId targetId = fieldFunction.getReferencedBlock().getReferencedId();
+               DataBlockId targetId = fieldFunction.getReferencedBlock().getId();
 
                Map<Integer, FieldCrossReference<T>> fieldCrossRefsPerSequenceNumber = null;
 
@@ -317,11 +317,12 @@ public class ContainerContext {
       }
 
       if (desc.isOptional()) {
-         Flags flags = presences.getCrossReference(id, 0).getValue();
+         FieldCrossReference<Flags> crossReference = presences.getCrossReference(id, 0);
 
-         if (flags != null) {
-            PresenceOf flagFunction = (PresenceOf) presences.getCrossReference(id, 0).getReferencingFieldFunction();
+         if (crossReference != null) {
+            PresenceOf flagFunction = (PresenceOf) crossReference.getReferencingFieldFunction();
 
+            Flags flags = crossReference.getValue();
             if (flags.getFlagIntegerValue(flagFunction.getFlagName()) == flagFunction.getFlagValue()) {
                return 1;
             } else {
@@ -330,9 +331,9 @@ public class ContainerContext {
          }
       }
 
-      Long countIndicatedByFieldFunction = counts.getCrossReference(id, 0).getValue();
+      FieldCrossReference<Long> crossReference = counts.getCrossReference(id, 0);
 
-      if (countIndicatedByFieldFunction == null) {
+      if (crossReference == null) {
          if (parentContainerContext == null) {
             return DataBlockDescription.UNDEFINED;
          }
@@ -340,7 +341,7 @@ public class ContainerContext {
          return parentContainerContext.getOccurrencesOf(id);
       }
 
-      return countIndicatedByFieldFunction;
+      return crossReference.getValue();
    }
 
    /**
@@ -363,15 +364,15 @@ public class ContainerContext {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
-      String idIndicatedByFieldFunction = ids.getCrossReference(id, sequenceNumber).getValue();
+      FieldCrossReference<String> crossReference = ids.getCrossReference(id, sequenceNumber);
 
-      if (idIndicatedByFieldFunction == null) {
+      if (crossReference == null) {
          if (parentContainerContext != null) {
             return parentContainerContext.getIdOf(id, sequenceNumber);
          }
       }
 
-      return idIndicatedByFieldFunction;
+      return crossReference.getValue();
    }
 
    /**
@@ -404,9 +405,9 @@ public class ContainerContext {
          return desc.getFieldProperties().getFixedByteOrder();
       }
 
-      String byteOrderIndicatedByFieldFunction = byteOrders.getCrossReference(id, sequenceNumber).getValue();
+      FieldCrossReference<String> crossReference = byteOrders.getCrossReference(id, sequenceNumber);
 
-      if (byteOrderIndicatedByFieldFunction == null) {
+      if (crossReference == null) {
          if (parentContainerContext != null) {
             return parentContainerContext.getByteOrderOf(id, sequenceNumber);
          } else {
@@ -414,7 +415,7 @@ public class ContainerContext {
          }
       }
 
-      return ByteOrders.fromString(byteOrderIndicatedByFieldFunction);
+      return ByteOrders.fromString(crossReference.getValue());
    }
 
    /**
@@ -447,10 +448,9 @@ public class ContainerContext {
          return desc.getFieldProperties().getFixedCharacterEncoding();
       }
 
-      String characterEncodingIndicatedByFieldFunction = characterEncodings.getCrossReference(id, sequenceNumber)
-         .getValue();
+      FieldCrossReference<String> crossReference = characterEncodings.getCrossReference(id, sequenceNumber);
 
-      if (characterEncodingIndicatedByFieldFunction == null) {
+      if (crossReference == null) {
          if (parentContainerContext != null) {
             return parentContainerContext.getCharacterEncodingOf(id, sequenceNumber);
          } else {
@@ -458,6 +458,6 @@ public class ContainerContext {
          }
       }
 
-      return Charset.forName(characterEncodingIndicatedByFieldFunction);
+      return Charset.forName(crossReference.getValue());
    }
 }

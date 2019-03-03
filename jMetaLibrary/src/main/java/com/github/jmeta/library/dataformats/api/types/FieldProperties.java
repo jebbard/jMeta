@@ -12,10 +12,6 @@ import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecifi
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_CONVERSION_FAILED;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_EXCEEDS_LENGTH;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_VALUE_NOT_ENUMERATED;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_FLAGS;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_NUMERIC;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_NON_STRING;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIXED_BYTE_ORDER_NON_NUMERIC;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIXED_CHARSET_NON_STRING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_BIT_LENGTH_BIGGER_THAN_FIXED_SIZE;
@@ -478,28 +474,6 @@ public class FieldProperties<F> {
             throw new InvalidSpecificationException(VLD_TERMINATION_CHAR_NON_STRING, desc);
          }
       }
-
-      // Validate field functions stand-alone
-      getFieldFunctions().stream().filter(fieldFunction -> !getFieldType().equals(fieldFunction.getRequiredFieldType()))
-         .forEach(fieldFunction -> {
-            if (fieldFunction.getClass() == IdOf.class || fieldFunction.getClass() == CharacterEncodingOf.class
-               || fieldFunction.getClass() == ByteOrderOf.class) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_STRING, desc);
-            } else if (fieldFunction.getClass() == SizeOf.class || fieldFunction.getClass() == CountOf.class) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_NUMERIC, desc);
-            } else if (fieldFunction.getClass() == PresenceOf.class) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_NON_FLAGS, desc);
-            }
-         });
-
-      getFieldFunctions().stream().filter(fieldFunction -> fieldFunction.getClass() == PresenceOf.class)
-         .forEach(fieldFunction -> {
-            String flagName = ((PresenceOf) fieldFunction).getFlagName();
-            if (!getFlagSpecification().hasFlag(flagName)) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME, desc,
-                  flagName);
-            }
-         });
 
       validateDefaultValue(desc);
    }

@@ -9,6 +9,10 @@
  */
 package com.github.jmeta.library.dataformats.api.types;
 
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME;
+
+import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -30,22 +34,12 @@ public class PresenceOf extends AbstractFieldFunction<Flags> {
     *           The flag's value indicating presence, if the value differs, this indicates absence
     */
    public PresenceOf(DataBlockCrossReference referencedBlock, String flagName, int flagValue) {
-      super(referencedBlock, FieldType.FLAGS);
+      super(referencedBlock);
 
       Reject.ifNull(flagName, "flagName");
 
       this.flagName = flagName;
       this.flagValue = flagValue;
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#isValidTargetType(com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType)
-    */
-   @Override
-   public boolean isValidTargetType(PhysicalDataBlockType type) {
-      Reject.ifNull(type, "type");
-      return type == PhysicalDataBlockType.FOOTER || type == PhysicalDataBlockType.HEADER
-         || type == PhysicalDataBlockType.FIELD;
    }
 
    /**
@@ -68,5 +62,22 @@ public class PresenceOf extends AbstractFieldFunction<Flags> {
    @Override
    public AbstractFieldFunction<Flags> withReplacedReference(DataBlockCrossReference replacedReference) {
       return new PresenceOf(replacedReference, flagName, flagValue);
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#validate(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+    *      com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
+    */
+   @Override
+   public void validate(DataBlockDescription fieldDesc, DataFormatSpecification spec) {
+      Reject.ifNull(fieldDesc, "fieldDesc");
+      Reject.ifNull(spec, "spec");
+
+      performDefaultValidation(fieldDesc, FieldType.FLAGS, spec.getDataBlockDescription(getReferencedBlock().getId()),
+         PhysicalDataBlockType.FIELD, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.HEADER);
+
+      if (!fieldDesc.getFieldProperties().getFlagSpecification().hasFlag(flagName)) {
+         throw new InvalidSpecificationException(VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME, fieldDesc, flagName);
+      }
    }
 }

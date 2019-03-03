@@ -62,7 +62,7 @@ public class FieldFunctionStack {
       for (int i = 0; i < fieldFunctions.size(); ++i) {
          AbstractFieldFunction<?> function = fieldFunctions.get(i);
 
-         DataBlockId id = function.getReferencedBlock().getReferencedId();
+         DataBlockId id = function.getReferencedBlock().getId();
 
          Class<? extends AbstractFieldFunction<?>> type = (Class<? extends AbstractFieldFunction<?>>) function
             .getClass();

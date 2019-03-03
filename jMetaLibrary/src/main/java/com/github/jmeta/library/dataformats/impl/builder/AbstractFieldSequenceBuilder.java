@@ -115,7 +115,7 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
             + "sequences which were already finished when cloning");
       }
 
-      String localId = fieldReference.getReferencedId().getLocalId();
+      String localId = fieldReference.getId().getLocalId();
 
       if (!fieldSequenceDescription.hasChildWithLocalId(localId)) {
          throw new IllegalArgumentException(

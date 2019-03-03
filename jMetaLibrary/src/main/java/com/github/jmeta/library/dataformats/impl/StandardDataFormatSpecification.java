@@ -11,7 +11,6 @@ package com.github.jmeta.library.dataformats.impl;
 
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_NESTED_CONTAINER_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_UNRESOLVED;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_BYTE_ORDER;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHARACTER_ENCODING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_MISSING;
@@ -110,7 +109,7 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    }
 
    /**
-    *
+    * Validates all field functions and ensures the dynamic occurrence / size data blocks have a fitting field function
     */
    private void validateFieldFunctions() {
 
@@ -123,13 +122,9 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       fieldFunctions.forEach((fieldIdWithFunctions, functionsForField) -> {
          for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) functionsForField) {
 
-            DataBlockId targetId = fieldFunction.getReferencedBlock().getReferencedId();
+            fieldFunction.validate(getDataBlockDescription(fieldIdWithFunctions), this);
 
-            // Check for unresolved field functions
-            if (!fieldFunction.getReferencedBlock().isResolved()) {
-               throw new InvalidSpecificationException(VLD_FIELD_FUNC_UNRESOLVED,
-                  getDataBlockDescription(fieldIdWithFunctions), fieldFunction);
-            }
+            DataBlockId targetId = fieldFunction.getReferencedBlock().getId();
 
             if (!fieldFunctionsByTargetId.containsKey(targetId)) {
                fieldFunctionsByTargetId.put(targetId, new ArrayList<>());

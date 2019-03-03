@@ -45,7 +45,7 @@ public class DataBlockCrossReference {
    /**
     * @return The referenced {@link DataBlockId} if already known or null
     */
-   public DataBlockId getReferencedId() {
+   public DataBlockId getId() {
       return referencedId;
    }
 

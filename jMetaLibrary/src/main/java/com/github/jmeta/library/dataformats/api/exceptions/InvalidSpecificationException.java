@@ -92,19 +92,11 @@ public class InvalidSpecificationException extends RuntimeException {
    public static final String VLD_TERMINATION_CHAR_NON_STRING =
       "Field has not " + FieldType.STRING + " type, but a termincation character is defined for it";
 
-   public static final String VLD_FIELD_FUNC_NON_STRING =
-      "Field is the id of, character encoding of or byte order of another data block, but it is not of type " +
-      FieldType.STRING;
-   public static final String VLD_FIELD_FUNC_NON_NUMERIC =
-      "Field is the size of or count of another data block, but it is not of type " + FieldType.UNSIGNED_WHOLE_NUMBER;
-   public static final String VLD_FIELD_FUNC_NON_FLAGS =
-      "Field indicates the presence of another data block, but it is not of type " + FieldType.UNSIGNED_WHOLE_NUMBER;
+   public static final String VLD_FIELD_FUNC_INVALID_FIELD_TYPE =
+      "Field has field function of type <%1$s> which requires field type <%2$s>, but the type of the field is <%3$s>";
    public static final String VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME =
       "Field indicates the presence of another data block, but its flag name <%1$s> is not specified in the field's " +
       "flag specification";
-   public static final String VLD_FIELD_FUNC_FLAG_PROPERTIES_UNNECESSARY =
-      "Field does not indicate the presence of another container, but either its flag name (=<%1$s>) or value " +
-      "(=<%2$s>) are nevertheless set";
    public static final String VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE =
       "Field function of type <%1$s> may only refer to data blocks of types <%2$s>, but referenced data block " +
       "<%3$s> has type <%4$s>";
@@ -115,7 +107,7 @@ public class InvalidSpecificationException extends RuntimeException {
       "For this data block with dynamic occurrences, there is no other field defined with a " +
       CountOf.class + " field function";
    public static final String VLD_FIELD_FUNC_UNRESOLVED =
-      "For this field, the field function of type <%1$s> has an unresolved cross references: <%2$s>";
+      "For this field, the field function of type <%1$s> has unresolved cross references: <%2$s>";
 
    public static final String VLD_CONTAINER_HAS_OCCURRENCES = "Data block type as " + PhysicalDataBlockType.CONTAINER +
       " must not have defined occurrences, as it by design may have arbitrary occurrences, but min occurrences = " +

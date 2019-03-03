@@ -9,6 +9,7 @@
  */
 package com.github.jmeta.library.dataformats.api.types;
 
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -26,16 +27,7 @@ public class SizeOf extends AbstractFieldFunction<Long> {
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
    public SizeOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock, FieldType.UNSIGNED_WHOLE_NUMBER);
-   }
-
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#isValidTargetType(com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType)
-    */
-   @Override
-   public boolean isValidTargetType(PhysicalDataBlockType type) {
-      Reject.ifNull(type, "type");
-      return true;
+      super(referencedBlock);
    }
 
    /**
@@ -44,5 +36,23 @@ public class SizeOf extends AbstractFieldFunction<Long> {
    @Override
    public AbstractFieldFunction<Long> withReplacedReference(DataBlockCrossReference replacedReference) {
       return new SizeOf(replacedReference);
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#validate(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+    *      com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
+    */
+   @Override
+   public void validate(DataBlockDescription fieldDesc, DataFormatSpecification spec) {
+      Reject.ifNull(fieldDesc, "fieldDesc");
+      Reject.ifNull(spec, "spec");
+
+      performDefaultValidation(fieldDesc, FieldType.UNSIGNED_WHOLE_NUMBER,
+         spec.getDataBlockDescription(getReferencedBlock().getId()), PhysicalDataBlockType.CONTAINER,
+         PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, PhysicalDataBlockType.FIELD,
+         PhysicalDataBlockType.FIELD_BASED_PAYLOAD, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.HEADER);
+
+      // TODO Validate only consecutive target blocks
+      // TODO Validate that for at most one target block there is no easier size of or fixed size present
    }
 }

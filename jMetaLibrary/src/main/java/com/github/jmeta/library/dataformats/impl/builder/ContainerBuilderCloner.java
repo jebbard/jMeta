@@ -70,7 +70,7 @@ public final class ContainerBuilderCloner {
       DataBlockId clonedContainerId = new DataBlockId(containerBuilder.getDataFormat(), containerBuilder.getGlobalId());
 
       DataBlockDescription existingContainerDescription = containerBuilder.getRootBuilder()
-         .getDataBlockDescription(existingContainerRef.getReferencedId());
+         .getDataBlockDescription(existingContainerRef.getId());
 
       String messagePrefix = "Cloning container with id <" + existingContainerRef + "> is not possible: ";
 
@@ -210,7 +210,7 @@ public final class ContainerBuilderCloner {
    private static void cloneFields(FieldSequenceBuilder<?> fsb, DataBlockDescription existingFieldSequenceDescription,
       DataBlockCrossReference existingContainerRef, DataBlockId clonedContainerId) {
 
-      DataBlockId existingContainerId = existingContainerRef.getReferencedId();
+      DataBlockId existingContainerId = existingContainerRef.getId();
 
       List<DataBlockDescription> fieldDescriptions = existingFieldSequenceDescription
          .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
@@ -296,7 +296,7 @@ public final class ContainerBuilderCloner {
       List<AbstractFieldFunction<F>> fieldFunctions = existingFieldProperties.getFieldFunctions();
 
       for (AbstractFieldFunction<F> fieldFunction : fieldFunctions) {
-         DataBlockId affectedId = fieldFunction.getReferencedBlock().getReferencedId();
+         DataBlockId affectedId = fieldFunction.getReferencedBlock().getId();
 
          // Replace affected id (which are still referring to the original container) with the
          // actual id of the cloned container
