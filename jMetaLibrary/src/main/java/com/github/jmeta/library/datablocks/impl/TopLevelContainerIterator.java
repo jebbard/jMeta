@@ -9,6 +9,7 @@ package com.github.jmeta.library.datablocks.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +43,8 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    private final List<ContainerDataFormat> precedenceList = new ArrayList<>();
 
    private final Map<ContainerDataFormat, DataBlockReader> readerMap = new LinkedHashMap<>();
+
+   private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
 
    /**
     * Creates a new {@link TopLevelContainerIterator}.
@@ -161,7 +164,17 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       for (int i = 0; i < containerDescs.size(); ++i) {
          DataBlockDescription containerDesc = containerDescs.get(i);
 
-         Container container = readContainerWithId(reader, currentOffset, containerDesc.getId());
+         DataBlockId containerId = containerDesc.getId();
+
+         int sequenceNumber = 0;
+
+         if (nextSequenceNumber.containsKey(containerId)) {
+            sequenceNumber = nextSequenceNumber.get(containerId);
+         }
+
+         Container container = readContainerWithId(reader, currentOffset, containerId, sequenceNumber);
+
+         nextSequenceNumber.put(containerId, sequenceNumber + 1);
 
          if (container != null) {
             currentOffset = currentOffset.advance(getBytesToAdvance(container));
@@ -174,13 +187,13 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    }
 
    private Container readContainerWithId(DataBlockReader reader, MediumOffset currentMediumOffset,
-      DataBlockId containerId) {
+      DataBlockId containerId, int sequenceNumber) {
       if (forwardRead) {
-         return reader.readContainerWithId(currentMediumOffset, containerId, null, null,
-            DataBlockDescription.UNDEFINED, null);
+         return reader.readContainerWithId(currentMediumOffset, containerId, null, null, DataBlockDescription.UNDEFINED,
+            null, sequenceNumber);
       } else {
          return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null, null,
-            DataBlockDescription.UNDEFINED, null);
+            DataBlockDescription.UNDEFINED, null, sequenceNumber);
       }
    }
 

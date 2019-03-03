@@ -46,4 +46,10 @@ public interface Container extends DataBlock {
     */
    public List<Header> getFooters();
 
+   void setPayload(Payload payload);
+
+   void addHeader(int index, Header header);
+
+   void addFooter(int index, Header footer);
+
 }

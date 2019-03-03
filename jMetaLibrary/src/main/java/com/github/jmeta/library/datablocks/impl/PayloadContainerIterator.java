@@ -8,7 +8,9 @@
 package com.github.jmeta.library.datablocks.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
@@ -17,6 +19,7 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -25,6 +28,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public class PayloadContainerIterator extends AbstractDataBlockIterator<Container> {
+
+   private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
 
    /**
     * @see java.io.Closeable#close()
@@ -74,8 +79,9 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          remainingParentByteCount = m_parent.getTotalSize() - (m_nextContainerReference.getAbsoluteMediumOffset()
             - m_parent.getMediumReference().getAbsoluteMediumOffset());
 
-         if (remainingParentByteCount <= 0)
+         if (remainingParentByteCount <= 0) {
             return false;
+         }
       }
 
       List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
@@ -85,8 +91,9 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
          if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            remainingParentByteCount, true))
+            remainingParentByteCount, true)) {
             return true;
+         }
       }
 
       // If no nested container with magic key was found, we assume the default nested container
@@ -119,15 +126,15 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       for (int i = 0; i < nestedContainerDescsWithMagicKeys.size(); ++i) {
          DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
-         if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            m_remainingParentSize, true)) {
-            Container container = m_reader.readContainerWithId(m_nextContainerReference, containerDesc.getId(),
-               m_parent, m_context, m_remainingParentSize, m_parent.getContainerContext());
+         DataBlockId containerId = containerDesc.getId();
 
-            if (container != null) {
-               updateProgress(container);
+         if (m_reader.hasContainerWithId(m_nextContainerReference, containerId, m_parent, m_remainingParentSize,
+            true)) {
 
-               return container;
+            Container nextContainer = readNextContainer(containerId);
+
+            if (nextContainer != null) {
+               return nextContainer;
             }
          }
       }
@@ -136,13 +143,10 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
 
       if (containerDesc != null) {
-         Container container = m_reader.readContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            m_context, m_remainingParentSize, m_parent.getContainerContext());
+         Container nextContainer = readNextContainer(containerDesc.getId());
 
-         if (container != null) {
-            updateProgress(container);
-
-            return container;
+         if (nextContainer != null) {
+            return nextContainer;
          }
       }
 
@@ -150,11 +154,34 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          "No child container found for payload " + m_parent + " at " + m_nextContainerReference);
    }
 
+   /**
+    * @param containerId
+    */
+   private Container readNextContainer(DataBlockId containerId) {
+      int sequenceNumber = 0;
+
+      if (nextSequenceNumber.containsKey(containerId)) {
+         sequenceNumber = nextSequenceNumber.get(containerId);
+      }
+
+      Container container = m_reader.readContainerWithId(m_nextContainerReference, containerId, m_parent, m_context,
+         m_remainingParentSize, m_parent.getContainerContext(), sequenceNumber);
+
+      nextSequenceNumber.put(containerId, sequenceNumber + 1);
+
+      if (container != null) {
+         updateProgress(container);
+      }
+
+      return container;
+   }
+
    private void updateProgress(Container container) {
       m_nextContainerReference = m_nextContainerReference.advance(container.getTotalSize());
 
-      if (m_remainingParentSize != DataBlockDescription.UNDEFINED)
+      if (m_remainingParentSize != DataBlockDescription.UNDEFINED) {
          m_remainingParentSize -= container.getTotalSize();
+      }
    }
 
    private final FieldFunctionStack m_context;

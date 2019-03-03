@@ -10,6 +10,7 @@ package com.github.jmeta.defaultextensions.mp3.impl;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 
 /**
@@ -27,7 +28,10 @@ public class MP3DataBlocksService extends AbstractDataBlockService {
 
    @Override
    public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
+      StandardDataBlockReader mp3DataBlockReader = new StandardDataBlockReader(spec, lazyFieldSize);
 
-      return new MP3DataBlockReader(spec, lazyFieldSize);
+      mp3DataBlockReader.setCustomSizeProvider(new MP3SizeProvider());
+
+      return mp3DataBlockReader;
    }
 }

@@ -9,27 +9,21 @@
 package com.github.jmeta.defaultextensions.mp3.impl;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
-import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
-import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.Flags;
-import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
-import com.github.jmeta.library.dataformats.api.types.SizeOf;
 
-// TODO primeRefactor006: cleanup and document MP3DataBlockReader
 /**
- * {@link MP3DataBlockReader}
+ * {@link MP3SizeProvider}
  *
  */
-public class MP3DataBlockReader extends StandardDataBlockReader {
+public class MP3SizeProvider implements SizeProvider {
 
    private int samplingRateFrequencies[][] = {
       // MPEG Version 1 sampling frequencies (-1 = reserved)
@@ -57,12 +51,15 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
          // Layer 3
          { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, -1 }, }, };
 
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.SizeProvider#getSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      int, com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    */
    @Override
-   protected void afterHeaderReading(DataBlockId containerId, FieldFunctionStack context, List<Header> headers,
-      ContainerContext containerContext) {
+   public long getSizeOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {
 
-      if (containerId.getGlobalId().equals("mp3")) {
-         Header header = headers.get(0);
+      if (id.getGlobalId().equals("mp3.payload")) {
+         Header header = containerContext.getContainer().getHeaders().get(0);
 
          ByteBuffer bytes = header.getBytes(0, 4);
          assert bytes != null;
@@ -139,25 +136,12 @@ public class MP3DataBlockReader extends StandardDataBlockReader {
             // System.out.println("CRC NOT present: " + protectionBit);
             // System.out.println("Total size = " + totalPayloadSize);
 
-            DataBlockDescription containerDesc = getSpecification().getDataBlockDescription(containerId);
-
-            context.pushFieldFunction(
-               containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD).get(0).getId(),
-               SizeOf.class, totalPayloadSize);
+            return totalPayloadSize;
          } catch (BinaryValueConversionException e) {
             throw new RuntimeException("No conversion possible", e);
          }
       }
-   }
 
-   /**
-    * Creates a new {@link MP3DataBlockReader}.
-    *
-    * @param spec
-    * @param transformationHandlers
-    * @param maxFieldBlockSize
-    */
-   public MP3DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
-      super(spec, maxFieldBlockSize);
+      return DataBlockDescription.UNDEFINED;
    }
 }

@@ -44,11 +44,13 @@ public interface DataBlockReader {
     * @param parent
     * @param context
     * @param remainingDirectParentByteCount
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
+    * @param sequenceNumber TODO
     * @return the {@link Container}
     */
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext);
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber);
 
    /**
     * @param reference
@@ -56,11 +58,13 @@ public interface DataBlockReader {
     * @param parent
     * @param context
     * @param remainingDirectParentByteCount
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
+    * @param sequenceNumber TODO
     * @return the {@link Container}
     */
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext);
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber);
 
    /**
     * @param reference
@@ -72,7 +76,8 @@ public interface DataBlockReader {
     * @return the {@link Payload}
     */
    public Payload readPayloadBackwards(MediumOffset reference, DataBlockId id, DataBlockId parentId,
-      List<Header> footers, FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext);
+      List<Header> footers, FieldFunctionStack context, long remainingDirectParentByteCount,
+      ContainerContext containerContext);
 
    /**
     * @param maxFieldBlockSize
@@ -99,12 +104,14 @@ public interface DataBlockReader {
     *           be empty.
     * @param isFooter
     *           Indicates if this refers to headers (false) or footers (true)
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
     * @return The {@link Header} with the given {@link DataBlockId} with its {@link StandardField}s read from the given
     *         {@link MediumOffset}.
     */
    public List<Header> readHeadersOrFootersWithId(MediumOffset reference, DataBlockId headerOrFooterId,
-      DataBlockId parentId, List<Header> previousHeadersOrFooters, FieldFunctionStack context, boolean isFooter, ContainerContext containerContext);
+      DataBlockId parentId, List<Header> previousHeadersOrFooters, FieldFunctionStack context, boolean isFooter,
+      ContainerContext containerContext);
 
    /**
     * @param reference
@@ -113,7 +120,8 @@ public interface DataBlockReader {
     * @param headers
     * @param context
     * @param remainingDirectParentByteCount
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
     * @return the {@link Payload}
     */
    public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId, List<Header> headers,
@@ -124,7 +132,8 @@ public interface DataBlockReader {
     * @param parentId
     * @param context
     * @param remainingDirectParentByteCount
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
     * @return the list of read {@link Field}s
     */
    public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, FieldFunctionStack context,
@@ -154,4 +163,8 @@ public interface DataBlockReader {
     * @return the {@link ByteBuffer}
     */
    public ByteBuffer readBytes(MediumOffset reference, int size);
+
+   public void setCustomSizeProvider(SizeProvider sizeProvider);
+
+   public void setCustomCountProvider(CountProvider countProvider);
 }

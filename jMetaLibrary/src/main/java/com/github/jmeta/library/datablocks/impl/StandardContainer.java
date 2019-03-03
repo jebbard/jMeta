@@ -40,51 +40,76 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @param dataBlockReader
     * @param containerContext
     *           TODO
+    * @param sequenceNumber
+    *           TODO
     */
    public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader dataBlockReader, ContainerContext containerContext) {
-      super(id, parent, reference, dataBlockReader, 0, containerContext);
+      Payload payload, List<Header> footers, DataBlockReader dataBlockReader, ContainerContext containerContext,
+      int sequenceNumber) {
+      this(id, parent, reference, dataBlockReader, containerContext, sequenceNumber);
 
       Reject.ifNull(footers, "footers");
       Reject.ifNull(payload, "payload");
       Reject.ifNull(headers, "headers");
 
       for (int i = 0; i < headers.size(); ++i) {
-         addHeader(headers.get(i));
+         addHeader(i, headers.get(i));
       }
 
       for (int i = 0; i < footers.size(); ++i) {
-         addFooter(footers.get(i));
+         addFooter(i, footers.get(i));
       }
 
       setPayload(payload);
    }
 
    /**
-    * @param footer
+    * Creates a new {@link StandardContainer}.
+    *
+    * @param id
+    * @param parent
+    * @param reference
+    * @param reader
+    * @param sequenceNumber
+    *           TODO
+    * @param parentContainerContext
     */
-   private void addFooter(Header footer) {
-
-      Reject.ifNull(footer, "footer");
-
-      footer.initParent(this);
-
-      m_footers.add(footer);
+   public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
+      ContainerContext containerContext, int sequenceNumber) {
+      super(id, parent, reference, reader, sequenceNumber, containerContext);
    }
 
    /**
+    * @param footer
+    */
+   @Override
+   public void addFooter(int index, Header footer) {
+
+      Reject.ifNull(footer, "footer");
+      Reject.ifNotInInterval(index, 0, m_footers.size(), "index");
+
+      footer.initParent(this);
+
+      m_footers.add(index, footer);
+   }
+
+   /**
+    * @param index
+    *           TODO
     * @param header
     */
-   private void addHeader(Header header) {
-
+   @Override
+   public void addHeader(int index, Header header) {
       Reject.ifNull(header, "header");
+      Reject.ifNotInInterval(index, 0, m_headers.size(), "index");
 
       header.initParent(this);
 
-      m_headers.add(header);
+      m_headers.add(index, header);
    }
 
-   private void setPayload(Payload payload) {
+   @Override
+   public void setPayload(Payload payload) {
 
       Reject.ifNull(payload, "payload");
 

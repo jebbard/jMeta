@@ -57,9 +57,9 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     */
    @Override
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext) {
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
       Container container = super.readContainerWithId(reference, id, parent, context, remainingDirectParentByteCount,
-         containerContext);
+         containerContext, sequenceNumber);
 
       return applyTransformationsAfterRead(container, this);
    }
@@ -72,9 +72,9 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     */
    @Override
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext) {
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
       return applyTransformationsAfterRead(super.readContainerWithIdBackwards(reference, id, parent, context,
-         remainingDirectParentByteCount, containerContext), this);
+         remainingDirectParentByteCount, containerContext, sequenceNumber), this);
    }
 
    /**

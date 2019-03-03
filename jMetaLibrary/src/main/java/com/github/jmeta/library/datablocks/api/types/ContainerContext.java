@@ -36,6 +36,15 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class ContainerContext {
 
+   /**
+    * Returns the attribute {@link #parentContainerContext}.
+    *
+    * @return the attribute {@link #parentContainerContext}
+    */
+   public ContainerContext getParentContainerContext() {
+      return parentContainerContext;
+   }
+
    private class FieldFunctionStore<T> {
 
       private final Class<? extends AbstractFieldFunction<T>> fieldFunctionClass;
@@ -126,6 +135,15 @@ public class ContainerContext {
    private final FieldFunctionStore<String> ids = new FieldFunctionStore<>(IdOf.class);
    private final FieldFunctionStore<String> byteOrders = new FieldFunctionStore<>(ByteOrderOf.class);
    private final FieldFunctionStore<String> characterEncodings = new FieldFunctionStore<>(CharacterEncodingOf.class);
+
+   /**
+    * Returns the attribute {@link #container}.
+    *
+    * @return the attribute {@link #container}
+    */
+   public Container getContainer() {
+      return container;
+   }
 
    /**
     * Creates a new {@link ContainerContext}.

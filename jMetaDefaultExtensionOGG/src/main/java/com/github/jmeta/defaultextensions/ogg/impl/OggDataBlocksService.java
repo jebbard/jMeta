@@ -10,6 +10,7 @@ package com.github.jmeta.defaultextensions.ogg.impl;
 
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 
 /**
@@ -28,6 +29,12 @@ public class OggDataBlocksService extends AbstractDataBlockService {
    @Override
    public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
 
-      return new OggDataBlockReader(spec, lazyFieldSize);
+      DataBlockReader oggDataBlockReader = new StandardDataBlockReader(spec, lazyFieldSize);
+
+      OggPacketSizeAndCountProvider countAndSizeProvider = new OggPacketSizeAndCountProvider();
+      oggDataBlockReader.setCustomCountProvider(countAndSizeProvider);
+      oggDataBlockReader.setCustomSizeProvider(countAndSizeProvider);
+
+      return oggDataBlockReader;
    }
 }

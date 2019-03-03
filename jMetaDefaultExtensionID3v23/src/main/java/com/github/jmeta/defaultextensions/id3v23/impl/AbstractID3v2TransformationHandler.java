@@ -67,7 +67,7 @@ public abstract class AbstractID3v2TransformationHandler {
 
       return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
          container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader,
-         container.getContainerContext());
+         container.getContainerContext(), container.getSequenceNumber());
    }
 
    public Container untransform(Container container, DataBlockReader reader) {
@@ -91,7 +91,7 @@ public abstract class AbstractID3v2TransformationHandler {
 
       return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
          container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader,
-         container.getContainerContext());
+         container.getContainerContext(), container.getSequenceNumber());
    }
 
    protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);

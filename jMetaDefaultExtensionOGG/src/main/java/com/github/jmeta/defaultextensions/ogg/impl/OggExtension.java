@@ -23,6 +23,7 @@ import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
@@ -39,11 +40,18 @@ public class OggExtension implements Extension {
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    private static final String OGG_MAGIC_KEY_STRING = "OggS";
+
    /**
     *
     */
    public static final ContainerDataFormat OGG = new ContainerDataFormat("Ogg", new HashSet<String>(),
       new HashSet<String>(), new ArrayList<String>(), "", new Date());
+
+   public static final DataBlockId OGG_PAYLOAD_ID = new DataBlockId(OGG, "ogg.payload");
+   public static final DataBlockId OGG_PACKET_PAYLOAD_ID = new DataBlockId(OGG,
+      "ogg.payload.packetPartContainer.payload");
+   public static final DataBlockId OGG_PACKET_PAYLOAD_FIELD_ID = new DataBlockId(OGG,
+      "ogg.payload.packetPartContainer.payload.segment");
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()

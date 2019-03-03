@@ -39,9 +39,9 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
 
    @Override
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext) {
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
       return readContainerWithId(reference.advance(-ID3v1Extension.id3v1TagLength), id, parent, context,
-         remainingDirectParentByteCount, containerContext);
+         remainingDirectParentByteCount, containerContext, sequenceNumber);
    }
 
    @Override

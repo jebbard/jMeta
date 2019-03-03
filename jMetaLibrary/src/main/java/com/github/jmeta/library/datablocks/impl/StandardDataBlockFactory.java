@@ -36,18 +36,26 @@ public class StandardDataBlockFactory implements DataBlockFactory {
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      com.github.jmeta.library.datablocks.api.types.DataBlock, MediumOffset, java.util.List,
-    *      com.github.jmeta.library.datablocks.api.types.Payload, java.util.List, DataBlockReader, ContainerContext)
+    *      com.github.jmeta.library.datablocks.api.types.Payload, java.util.List, DataBlockReader, ContainerContext, int)
     */
    @Override
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext parentContainerContext) {
+      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber) {
 
-      Reject.ifNull(id, "id");
-      Reject.ifNull(reference, "reference");
-      Reject.ifNull(footers, "footers");
-      Reject.ifNull(payload, "payload");
-      Reject.ifNull(headers, "headers");
-      return new StandardContainer(id, parent, reference, headers, payload, footers, reader, parentContainerContext);
+      return new StandardContainer(id, parent, reference, headers, payload, footers, reader, containerContext, sequenceNumber);
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.types.DataBlock,
+    *      com.github.jmeta.library.media.api.types.MediumOffset,
+    *      com.github.jmeta.library.datablocks.api.services.DataBlockReader,
+    *      com.github.jmeta.library.datablocks.api.types.ContainerContext, int)
+    */
+   @Override
+   public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
+      ContainerContext containerContext, int sequenceNumber) {
+      return new StandardContainer(id, parent, reference, reader, containerContext, sequenceNumber);
    }
 
    /**

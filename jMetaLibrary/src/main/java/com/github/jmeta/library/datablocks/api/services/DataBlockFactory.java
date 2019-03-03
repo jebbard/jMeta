@@ -44,12 +44,18 @@ public interface DataBlockFactory {
     *           the {@link Payload} building this {@link Container}.
     * @param footers
     *           the footers building this {@link Container}.
-    * @param reader TODO
-    * @param parentContainerContext TODO
+    * @param reader
+    *           TODO
+    * @param containerContext
+    *           TODO
+    * @param sequenceNumber TODO
     * @return the created {@link Container}.
     */
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext parentContainerContext);
+      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber);
+
+   public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
+      ContainerContext containerContext, int sequenceNumber);
 
    /**
     * @param id
@@ -58,24 +64,31 @@ public interface DataBlockFactory {
     * @param fieldBytes
     * @param byteOrder
     * @param characterEncoding
-    * @param sequenceNumber TODO
-    * @param containerContext TODO
+    * @param sequenceNumber
+    *           TODO
+    * @param containerContext
+    *           TODO
     * @return the {@link Field}
     */
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber, ContainerContext containerContext);
+      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber,
+      ContainerContext containerContext);
 
    /**
     * @param id
     * @param reference
     * @param fields
     * @param isFooter
-    * @param reader TODO
-    * @param sequenceNumber TODO
-    * @param containerContext TODO
+    * @param reader
+    *           TODO
+    * @param sequenceNumber
+    *           TODO
+    * @param containerContext
+    *           TODO
     * @return the {@link Header}
     */
-   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader, int sequenceNumber, ContainerContext containerContext);
+   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
+      DataBlockReader reader, int sequenceNumber, ContainerContext containerContext);
 
    /**
     * @param id
@@ -83,7 +96,8 @@ public interface DataBlockFactory {
     * @param totalSize
     * @param reader
     * @param context
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
     * @return the {@link Payload}
     */
    public Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader,
