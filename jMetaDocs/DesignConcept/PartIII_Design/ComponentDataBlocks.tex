@@ -225,6 +225,121 @@ No disadvantages known
 %%%% <-- DD %%%%
 
 % =======================================================================================================
+\subsection{Size Determination}%
+\label{sec:SizeDetermination}%
+
+How to determine the sizes of data blocks before parsing? It is clearly necessary to know the size of a container in advance to be able to parse or skip it. Unfortunately, all data formats seem to follow a distinct strategy of how to specify sizes as indicated around design decision \DesLink{dd:540}.
+
+The cases we have to handle are summarized as follows:
+%%%% DD --> %%%%
+\DD{dd:640}
+{% Title
+Cases for size determination
+}
+{% Short description
+  The easiest \textbf{Case 1:} Static size indicated in the specification. If a data block's specification indicates a static size, this size is taken during parsing.
+
+  Otherwise, the data block has a dynamic size which breaks down to the following cases:
+  \begin{enumerate}
+  \item[\textbf{Case 2:}] The data block's size is directly indicated by another field that must be parsed before (usually in header or footer) - Note that this size might include the size of other blocks in addition, see \DesLink{dd:540} and the discussion around for more details. Here, ``directly'' means that the field is a numeric value greater or equal to the size, and we do not need to calculate something.
+  \item[\textbf{Case 3:}] The data block's size is indirectly indicated by other fields that must be parsed before (usually in header or footer). ``Indirectly'' means that the field is not just single or summed size contained in a field, but there is a more complex calculation of combining multiple field values to calculate the size. This is e.g. the case for the size of the MP3 container payload or the Ogg page payload and packet part sizes.
+  \item[\textbf{Case 4:}] The data block is payload consisting of fields or containers, and there is no size indicator at all. However, it is clear how to determine the sizes of all children of the container, and thus the size of it is the sum of the sizes of all its children. This is e.g. the case for Lyrics3v2 tag payload.  
+  \item[\textbf{Case 5:}] The data block is a terminated field, i.e. its size must be determined by finding its termination. The handling of this case is defined in \SectionLink{sec:TerminatedFields}.
+  \item[\textbf{Case 6:}] The data block is a field and none of the other cases applies, but at least the overall remaining size of the parent data block is known. Take the remaining size of the parent data block as size of the field.
+  \end{enumerate}
+
+  \LibName{} supports exactly those cases.
+}
+{% Rationale
+The cases come from analysing different data formats \LibName{} is required to support, so it is sufficient to consider only those (if any others exist).
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Case 1 is already clear how to deal with, case 5 is treated later in \SectionLink{sec:TerminatedFields}. Thus we are left to deal with cases 2 to 4. First of all, we consider case 3:
+
+%%%% DD --> %%%%
+\DD{dd:641}
+{% Title
+Complex size calculation from fields done in custom implementation via \texttt{SizeProvider}
+}
+{% Short description
+Data format extensions are allowed to register a custom SizeProvider implementation which calculates the size of a data block as required by the format. This is used for Ogg and MP3.
+}
+{% Rationale
+More flexibility also for yet other future formats.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Case 4 is handled as follows:
+%%%% DD --> %%%%
+\DD{dd:642}
+{% Title
+Determine payload size by reading all children
+}
+{% Short description
+In case 4 of \DesLink{dd:640}, the size of the payload is calculated by reading all children, may it be containers or fields, and summing up their sizes. If at least one of their sizes could not be determined, this is a runtime exception.
+}
+{% Rationale
+Straightforward and not too complex in terms of ``lazyness''. If the data formats design is fucked up, the implementation cannot easily work around it.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now we have case 2 left. This one is adressed with using field functions - potentially referring to multiple consecutive blocks as indicated by \DesLink{dd:540}. We clarify how it works by summing up the whole progress of size determination in total:
+
+%%%% DD --> %%%%
+\DD{dd:644}
+{% Title
+Size determination process
+}
+{% Short description
+  Whenever the size of a single data block needs to be determined, the following steps are performed in the given order of precedence:
+\begin{enumerate}
+\item If the data block has a static size according to its specification, take this size (case 1)
+\item Otherwise if the current data format has a registered \texttt{SizeProvider} (see \DesLink{dd:641}), first ask this instance if it can provide a defined size (includes also case 3)
+\item Otherwise if the current ContainerContext has a ``size of'' field function for a single data block, take the size indicated by the ``size of'' field (part 1 of case 2)
+\item Otherwise if the current \texttt{ContainerContext} has a ``size of'' field function for multiple data blocks and the sizes of all other blocks are known, take the ``size of'' field's value minus the summed size of the other data blocks (part 2 of case 2) - How to avoid an infinite loop here? This is dealt with after this design decision.
+\item Otherwise if the parent \texttt{ContainerContext} has a ``size of'' field for it, take the size of the parent \texttt{ContainerContext}
+\item Otherwise if the data block is a terminated field, search for the termination bytes (case 5)
+\item Otherwise if the data block is a payload block, read all its children and sum up their sizes (case 4)
+\item Otherwise if the data block is a field and the remaining parent size is known, take the remaining direct parent size as its size (case 6)
+\end{enumerate}
+}
+{% Rationale
+The order of steps clearly focusses on least complexity first and tries to avoid unnecessary lookups by first considering fixed sizes and custom size providers.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Some subtle point in determining sizes of single data blocks whose ``size of'' field is the sum of multiple consecutive data blocks is: If we want to determine the size of a single one, we have to determine the size of all the others, sum this size and subtract it from the value stored in the ``size of'' field. If for some stupid reason there are multiple data blocks included with a dynamic size, this could end up in an infinite loop such as for ID3v2.3: Size of payload needs to be determined, thus determine the size of the extended header first. However, the size of the extended header is also dynamic. The implementation would see that it would need the size of the payload to calculate the size of the extended header and thus call the first function again... To avoid this crap, we state the following:
+%%%% DD --> %%%%
+\DD{dd:645}
+{% Title
+Multi-target block ``size of'' fields must not refer to more than one dynamic size blocks who do not have any other single ``size of'' fields  
+}
+{% Short description
+Put in different words: If there are say two dynamic size blocks referenced by a ``size of'' field, for at least one of those blocks, there must be another ``size of'' field referencing only this single dynamic size block. This is checked during specification validation in startup phase. 
+}
+{% Rationale
+This is sufficient for e.g. handling the case of ID3v2.3 and all other cases mentioned during the discussion of \DesLink{dd:540}.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+
+% =======================================================================================================
 \subsection{Field Parsing}%
 \label{sec:FieldParsing}%
 

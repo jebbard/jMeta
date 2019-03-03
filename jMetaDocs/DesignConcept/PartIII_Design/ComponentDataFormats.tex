@@ -1049,8 +1049,38 @@ No disadvantages known
 \label{sec:FieldFunctions}%
 
 
+The problem with the ``size of'' field function is that in a lot of formats, the size is not only referring to exactly the payload or just another field, but in a myriad of cases to multiple objects which we call data blocks - here are those dreadful examples from our reference formats:
+\begin{itemize}
+\item The ID3v2.3 and ID3v2.4 tag size refers to the tag payload size (including padding) \emph{plus} the size of the extended header, if any 
+\item The ID3v2.3 extended header size is the size of up to 4 fields that follow up the size field itself within the extended header
+\item The ID3v2.4 extended header size is the size of the entire extended header including the size field itself
+\item For RIFF and AIFF, a chunk's size field refers to the size of the form type field (fixed size of 4 bytes) \emph{plus} the size of the actual chunk's payload
+\item In QuickTime file format, the atom size is the size of the whole atom considered as container, i.e. header \emph{plus} payload
+\item In APEv2, the size field in header or footer is the size of the payload \emph{plus} the footer's or header's size, if present
+\item In APEv1 and APEv2, the item size is the size only of the value, i.e. not including key or flags
+\item For Lyrics3v2, the tag size includes the payload size \emph{plus} the size of the header 
+\end{itemize}
 
+If each and every format would use the very same strategy to determine the size of its payload, it would be nice. Instead, we see that nearly every format has its special case. Not to mention that MP3 and Ogg do not have size fields at all but rely on a more complex way of calculating the payload size based on combining multiple fields in the container header.
 
+How to handle this overwhelming variety? First of all, from a specification point of view, we have to state:
+%%%% DD --> %%%%
+\DD{dd:540}
+{% Title
+Size field functions must support multiple consecutive target blocks
+}
+{% Short description
+A size field function either refers to just one data block, or to multiple data blocks that - however - must be strictly consecutive according to their specification. This has the meaning: This field is the \emph{summed size of all} the referenced data blocks, if present.
+}
+{% Rationale
+This is cleary required from a data format perspective as outlined above.
+}
+{% Disadvantes
+Of course, field function handling will get more complex due to this special case.
+}
+%%%% <-- DD %%%%
+
+Other implications of this complexity are dealt with when designing the actual parsing process.
 
 % =======================================================================================================
 \subsection{Header and Footer Properties}%

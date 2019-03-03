@@ -133,6 +133,8 @@ public class ID3v23Extension implements Extension {
       DataBlockCrossReference framePayloadReference = new DataBlockCrossReference("Frame payload");
       DataBlockCrossReference dataFieldReference = new DataBlockCrossReference("Data");
 
+      // TODO: Wrong size: The size of the ID3v23 tag not only includes the tag payload, but also the extended header!
+
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
          .addHeader("header", "id3v23 tag header", "The id3v23 tag header")

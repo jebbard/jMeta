@@ -6,6 +6,7 @@
     "sec:BasicConceptforReading"
     "fig:III_ForwardReading"
     "sec:ReadingSteps"
+    "sec:SizeDetermination"
     "sec:FieldParsing"
     "sec:TerminatedFields"
     "sec:BackwardReading"

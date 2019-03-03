@@ -12,8 +12,10 @@ package com.github.jmeta.library.datablocks.api.types;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -45,13 +47,71 @@ public class ContainerContext {
       return parentContainerContext;
    }
 
+   public static class FieldCrossReference<T> {
+
+      private final DataBlockId referencedBlock;
+      private final Field<T> referencingField;
+      private final AbstractFieldFunction<T> referencingFieldFunction;
+
+      /**
+       * Creates a new {@link FieldCrossReference}.
+       *
+       * @param referencedBlock
+       * @param referencedBlockSequenceNumber
+       * @param referencingField
+       * @param referencingFieldFunction
+       */
+      public FieldCrossReference(DataBlockId referencedBlock, Field<T> referencingField,
+         AbstractFieldFunction<T> referencingFieldFunction) {
+         super();
+         this.referencedBlock = referencedBlock;
+         this.referencingField = referencingField;
+         this.referencingFieldFunction = referencingFieldFunction;
+      }
+
+      /**
+       * Returns the attribute {@link #referencedBlock}.
+       *
+       * @return the attribute {@link #referencedBlock}
+       */
+      public DataBlockId getReferencedBlock() {
+         return referencedBlock;
+      }
+
+      /**
+       * Returns the attribute {@link #referencingField}.
+       *
+       * @return the attribute {@link #referencingField}
+       */
+      public Field<T> getReferencingField() {
+         return referencingField;
+      }
+
+      /**
+       * Returns the attribute {@link #referencingFieldFunction}.
+       *
+       * @return the attribute {@link #referencingFieldFunction}
+       */
+      public AbstractFieldFunction<T> getReferencingFieldFunction() {
+         return referencingFieldFunction;
+      }
+
+      public T getValue() {
+         try {
+            return referencingField.getInterpretedValue();
+         } catch (BinaryValueConversionException e) {
+            throw new RuntimeException("Unexpected exception during context field conversion", e);
+         }
+      }
+   }
+
    private class FieldFunctionStore<T> {
 
       private final Class<? extends AbstractFieldFunction<T>> fieldFunctionClass;
 
-      private final Map<DataBlockId, Map<Integer, Field<T>>> fields = new HashMap<>();
+      private final Map<DataBlockId, Map<Integer, FieldCrossReference<T>>> fieldCrossRefs = new HashMap<>();
 
-      private final Map<DataBlockId, Map<Integer, AbstractFieldFunction<T>>> fieldFunctions = new HashMap<>();
+      private final Map<Field<T>, Set<FieldCrossReference<T>>> fieldCrossRefsBySourceField = new HashMap<>();
 
       /**
        * Creates a new {@link FieldFunctionStore}.
@@ -75,53 +135,47 @@ public class ContainerContext {
             if (fieldFunction.getClass().equals(fieldFunctionClass)) {
                DataBlockId targetId = fieldFunction.getReferencedBlock().getReferencedId();
 
-               Map<Integer, Field<T>> fieldsPerSequenceNumber = null;
-               Map<Integer, AbstractFieldFunction<T>> fieldFunctionsPerSequenceNumber = null;
+               Map<Integer, FieldCrossReference<T>> fieldCrossRefsPerSequenceNumber = null;
 
-               if (fields.containsKey(targetId)) {
-                  fieldsPerSequenceNumber = fields.get(targetId);
-                  fieldFunctionsPerSequenceNumber = fieldFunctions.get(targetId);
+               if (fieldCrossRefs.containsKey(targetId)) {
+                  fieldCrossRefsPerSequenceNumber = fieldCrossRefs.get(targetId);
                } else {
-                  fieldsPerSequenceNumber = new HashMap<>();
-                  fieldFunctionsPerSequenceNumber = new HashMap<>();
-                  fields.put(targetId, fieldsPerSequenceNumber);
-                  fieldFunctions.put(targetId, fieldFunctionsPerSequenceNumber);
+                  fieldCrossRefsPerSequenceNumber = new HashMap<>();
+                  fieldCrossRefs.put(targetId, fieldCrossRefsPerSequenceNumber);
                }
 
-               fieldsPerSequenceNumber.put(field.getSequenceNumber(), (Field<T>) field);
-               fieldFunctionsPerSequenceNumber.put(field.getSequenceNumber(), (AbstractFieldFunction<T>) fieldFunction);
+               FieldCrossReference<T> crossRef = new FieldCrossReference<>(targetId, (Field<T>) field,
+                  (AbstractFieldFunction<T>) fieldFunction);
+               fieldCrossRefsPerSequenceNumber.put(field.getSequenceNumber(), crossRef);
+
+               Set<FieldCrossReference<T>> crossRefsForField = null;
+
+               if (fieldCrossRefsBySourceField.containsKey(field)) {
+                  crossRefsForField = fieldCrossRefsBySourceField.get(field);
+               } else {
+                  crossRefsForField = new HashSet<>();
+                  fieldCrossRefsBySourceField.put((Field<T>) field, crossRefsForField);
+               }
+
+               crossRefsForField.add(crossRef);
             }
          }
       }
 
-      public T getValue(DataBlockId targetId, int sequenceNumber) {
-         if (!fields.containsKey(targetId)) {
+      public FieldCrossReference<T> getCrossReference(DataBlockId targetId, int sequenceNumber) {
+         if (!fieldCrossRefs.containsKey(targetId)) {
             return null;
          }
 
-         if (!fields.get(targetId).containsKey(sequenceNumber)) {
+         if (!fieldCrossRefs.get(targetId).containsKey(sequenceNumber)) {
             return null;
          }
 
-         Field<T> field = fields.get(targetId).get(sequenceNumber);
-
-         try {
-            return field.getInterpretedValue();
-         } catch (BinaryValueConversionException e) {
-            throw new RuntimeException("Unexpected exception during context field conversion", e);
-         }
+         return fieldCrossRefs.get(targetId).get(sequenceNumber);
       }
 
-      public AbstractFieldFunction<T> getFieldFunction(DataBlockId targetId, int sequenceNumber) {
-         if (!fieldFunctions.containsKey(targetId)) {
-            return null;
-         }
-
-         if (!fieldFunctions.get(targetId).containsKey(sequenceNumber)) {
-            return null;
-         }
-
-         return fieldFunctions.get(targetId).get(sequenceNumber);
+      public Set<FieldCrossReference<T>> getAllCrossRefsForField(Field<?> field) {
+         return fieldCrossRefsBySourceField.get(field);
       }
    }
 
@@ -220,17 +274,20 @@ public class ContainerContext {
          return desc.getMaximumByteLength();
       }
 
-      Long sizeIndicatedByFieldFunction = sizes.getValue(id, sequenceNumber);
+      FieldCrossReference<Long> sizeCrossRef = sizes.getCrossReference(id, sequenceNumber);
 
-      if (sizeIndicatedByFieldFunction == null) {
+      if (sizeCrossRef == null) {
          if (parentContainerContext == null) {
             return DataBlockDescription.UNDEFINED;
          }
 
          return parentContainerContext.getSizeOf(id, sequenceNumber);
-      }
+      } else {
+         Set<FieldCrossReference<Long>> fieldCrossRefsForField = sizes
+            .getAllCrossRefsForField(sizeCrossRef.getReferencingField());
 
-      return sizeIndicatedByFieldFunction;
+         return sizeCrossRef.getValue();
+      }
    }
 
    /**
@@ -260,10 +317,10 @@ public class ContainerContext {
       }
 
       if (desc.isOptional()) {
-         Flags flags = presences.getValue(id, 0);
+         Flags flags = presences.getCrossReference(id, 0).getValue();
 
          if (flags != null) {
-            PresenceOf flagFunction = (PresenceOf) presences.getFieldFunction(id, 0);
+            PresenceOf flagFunction = (PresenceOf) presences.getCrossReference(id, 0).getReferencingFieldFunction();
 
             if (flags.getFlagIntegerValue(flagFunction.getFlagName()) == flagFunction.getFlagValue()) {
                return 1;
@@ -273,7 +330,7 @@ public class ContainerContext {
          }
       }
 
-      Long countIndicatedByFieldFunction = counts.getValue(id, 0);
+      Long countIndicatedByFieldFunction = counts.getCrossReference(id, 0).getValue();
 
       if (countIndicatedByFieldFunction == null) {
          if (parentContainerContext == null) {
@@ -306,7 +363,7 @@ public class ContainerContext {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
-      String idIndicatedByFieldFunction = ids.getValue(id, sequenceNumber);
+      String idIndicatedByFieldFunction = ids.getCrossReference(id, sequenceNumber).getValue();
 
       if (idIndicatedByFieldFunction == null) {
          if (parentContainerContext != null) {
@@ -347,7 +404,7 @@ public class ContainerContext {
          return desc.getFieldProperties().getFixedByteOrder();
       }
 
-      String byteOrderIndicatedByFieldFunction = byteOrders.getValue(id, sequenceNumber);
+      String byteOrderIndicatedByFieldFunction = byteOrders.getCrossReference(id, sequenceNumber).getValue();
 
       if (byteOrderIndicatedByFieldFunction == null) {
          if (parentContainerContext != null) {
@@ -390,7 +447,8 @@ public class ContainerContext {
          return desc.getFieldProperties().getFixedCharacterEncoding();
       }
 
-      String characterEncodingIndicatedByFieldFunction = characterEncodings.getValue(id, sequenceNumber);
+      String characterEncodingIndicatedByFieldFunction = characterEncodings.getCrossReference(id, sequenceNumber)
+         .getValue();
 
       if (characterEncodingIndicatedByFieldFunction == null) {
          if (parentContainerContext != null) {
