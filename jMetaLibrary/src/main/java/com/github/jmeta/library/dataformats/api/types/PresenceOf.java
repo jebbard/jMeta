@@ -57,11 +57,11 @@ public class PresenceOf extends AbstractFieldFunction<Flags> {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReferences(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
-   public AbstractFieldFunction<Flags> withReplacedReference(DataBlockCrossReference replacedReference) {
-      return new PresenceOf(replacedReference, flagName, flagValue);
+   public AbstractFieldFunction<Flags> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      return new PresenceOf(replacedReferences[0], flagName, flagValue);
    }
 
    /**

@@ -13,10 +13,8 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link SizeOf} is a field function expressing that the field it refers to contains the size of another data block.
- * Here it must be considered that it might be just a summed size, i.e. the field indicates the size of several
- * consecutive data blocks summed together. If so, one must add multiple instances of this class to the same field, each
- * pointing to a different target id.
+ * {@link SizeOf} is a field function expressing that the field it refers to contains the size of exactly one other data
+ * block.
  */
 public class SizeOf extends AbstractFieldFunction<Long> {
 
@@ -31,11 +29,11 @@ public class SizeOf extends AbstractFieldFunction<Long> {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReferences(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
-   public AbstractFieldFunction<Long> withReplacedReference(DataBlockCrossReference replacedReference) {
-      return new SizeOf(replacedReference);
+   public AbstractFieldFunction<Long> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      return new SizeOf(replacedReferences[0]);
    }
 
    /**

@@ -307,7 +307,7 @@ public final class ContainerBuilderCloner {
             replacedAffectedId.getGlobalId() + "_" + UUID.randomUUID());
          resolvedReference.resolve(replacedAffectedId);
 
-         fb.withFieldFunction(fieldFunction.withReplacedReference(resolvedReference));
+         fb.withFieldFunction(fieldFunction.withReplacedReferences(resolvedReference));
       }
    }
 

@@ -29,11 +29,11 @@ public class IdOf extends AbstractFieldFunction<String> {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReferences(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
-   public AbstractFieldFunction<String> withReplacedReference(DataBlockCrossReference replacedReference) {
-      return new IdOf(replacedReference);
+   public AbstractFieldFunction<String> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      return new IdOf(replacedReferences[0]);
    }
 
    /**

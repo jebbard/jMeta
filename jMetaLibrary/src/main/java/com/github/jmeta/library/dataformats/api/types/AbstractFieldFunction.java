@@ -67,7 +67,7 @@ public abstract class AbstractFieldFunction<F> {
     * @return a cloned instance of this {@link AbstractFieldFunction} with the given {@link DataBlockCrossReference}
     *         instead of the current one
     */
-   public abstract AbstractFieldFunction<F> withReplacedReference(DataBlockCrossReference replacedReference);
+   public abstract AbstractFieldFunction<F> withReplacedReferences(DataBlockCrossReference... replacedReference);
 
    /**
     * Performs a default validation of this {@link AbstractFieldFunction} against the provided

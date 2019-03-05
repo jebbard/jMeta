@@ -23,12 +23,14 @@ import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.ByteOrderOf;
 import com.github.jmeta.library.dataformats.api.types.CharacterEncodingOf;
 import com.github.jmeta.library.dataformats.api.types.CountOf;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.Flags;
 import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
+import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
 import com.github.jmeta.utility.byteutils.api.services.ByteOrders;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -47,11 +49,11 @@ public class ContainerContext {
       return parentContainerContext;
    }
 
-   public static class FieldCrossReference<T> {
+   public static class FieldCrossReference<T, F extends AbstractFieldFunction<T>> {
 
       private final DataBlockId referencedBlock;
       private final Field<T> referencingField;
-      private final AbstractFieldFunction<T> referencingFieldFunction;
+      private final F referencingFieldFunction;
 
       /**
        * Creates a new {@link FieldCrossReference}.
@@ -61,9 +63,7 @@ public class ContainerContext {
        * @param referencingField
        * @param referencingFieldFunction
        */
-      public FieldCrossReference(DataBlockId referencedBlock, Field<T> referencingField,
-         AbstractFieldFunction<T> referencingFieldFunction) {
-         super();
+      public FieldCrossReference(DataBlockId referencedBlock, Field<T> referencingField, F referencingFieldFunction) {
          this.referencedBlock = referencedBlock;
          this.referencingField = referencingField;
          this.referencingFieldFunction = referencingFieldFunction;
@@ -92,7 +92,7 @@ public class ContainerContext {
        *
        * @return the attribute {@link #referencingFieldFunction}
        */
-      public AbstractFieldFunction<T> getReferencingFieldFunction() {
+      public F getReferencingFieldFunction() {
          return referencingFieldFunction;
       }
 
@@ -105,20 +105,20 @@ public class ContainerContext {
       }
    }
 
-   private class FieldFunctionStore<T> {
+   private class FieldFunctionStore<T, F extends AbstractFieldFunction<T>> {
 
-      private final Class<? extends AbstractFieldFunction<T>> fieldFunctionClass;
+      private final Class<F> fieldFunctionClass;
 
-      private final Map<DataBlockId, Map<Integer, FieldCrossReference<T>>> fieldCrossRefs = new HashMap<>();
+      private final Map<DataBlockId, Map<Integer, FieldCrossReference<T, F>>> fieldCrossRefs = new HashMap<>();
 
-      private final Map<Field<T>, Set<FieldCrossReference<T>>> fieldCrossRefsBySourceField = new HashMap<>();
+      private final Map<Field<T>, Set<FieldCrossReference<T, F>>> fieldCrossRefsBySourceField = new HashMap<>();
 
       /**
        * Creates a new {@link FieldFunctionStore}.
        *
        * @param fieldFunctionClass
        */
-      public FieldFunctionStore(Class<? extends AbstractFieldFunction<T>> fieldFunctionClass) {
+      public FieldFunctionStore(Class<F> fieldFunctionClass) {
          Reject.ifNull(fieldFunctionClass, "fieldFunctionClass");
          this.fieldFunctionClass = fieldFunctionClass;
       }
@@ -135,7 +135,7 @@ public class ContainerContext {
             if (fieldFunction.getClass().equals(fieldFunctionClass)) {
                DataBlockId targetId = fieldFunction.getReferencedBlock().getId();
 
-               Map<Integer, FieldCrossReference<T>> fieldCrossRefsPerSequenceNumber = null;
+               Map<Integer, FieldCrossReference<T, F>> fieldCrossRefsPerSequenceNumber = null;
 
                if (fieldCrossRefs.containsKey(targetId)) {
                   fieldCrossRefsPerSequenceNumber = fieldCrossRefs.get(targetId);
@@ -144,11 +144,11 @@ public class ContainerContext {
                   fieldCrossRefs.put(targetId, fieldCrossRefsPerSequenceNumber);
                }
 
-               FieldCrossReference<T> crossRef = new FieldCrossReference<>(targetId, (Field<T>) field,
-                  (AbstractFieldFunction<T>) fieldFunction);
+               FieldCrossReference<T, F> crossRef = new FieldCrossReference<>(targetId, (Field<T>) field,
+                  (F) fieldFunction);
                fieldCrossRefsPerSequenceNumber.put(field.getSequenceNumber(), crossRef);
 
-               Set<FieldCrossReference<T>> crossRefsForField = null;
+               Set<FieldCrossReference<T, F>> crossRefsForField = null;
 
                if (fieldCrossRefsBySourceField.containsKey(field)) {
                   crossRefsForField = fieldCrossRefsBySourceField.get(field);
@@ -162,7 +162,7 @@ public class ContainerContext {
          }
       }
 
-      public FieldCrossReference<T> getCrossReference(DataBlockId targetId, int sequenceNumber) {
+      public FieldCrossReference<T, F> getCrossReference(DataBlockId targetId, int sequenceNumber) {
          if (!fieldCrossRefs.containsKey(targetId)) {
             return null;
          }
@@ -173,22 +173,20 @@ public class ContainerContext {
 
          return fieldCrossRefs.get(targetId).get(sequenceNumber);
       }
-
-      public Set<FieldCrossReference<T>> getAllCrossRefsForField(Field<?> field) {
-         return fieldCrossRefsBySourceField.get(field);
-      }
    }
 
    private final DataFormatSpecification spec;
    private Container container;
    private final ContainerContext parentContainerContext;
 
-   private final FieldFunctionStore<Long> sizes = new FieldFunctionStore<>(SizeOf.class);
-   private final FieldFunctionStore<Long> counts = new FieldFunctionStore<>(CountOf.class);
-   private final FieldFunctionStore<Flags> presences = new FieldFunctionStore<>(PresenceOf.class);
-   private final FieldFunctionStore<String> ids = new FieldFunctionStore<>(IdOf.class);
-   private final FieldFunctionStore<String> byteOrders = new FieldFunctionStore<>(ByteOrderOf.class);
-   private final FieldFunctionStore<String> characterEncodings = new FieldFunctionStore<>(CharacterEncodingOf.class);
+   private final FieldFunctionStore<Long, SizeOf> sizes = new FieldFunctionStore<>(SizeOf.class);
+   private final FieldFunctionStore<Long, SummedSizeOf> summedSizes = new FieldFunctionStore<>(SummedSizeOf.class);
+   private final FieldFunctionStore<Long, CountOf> counts = new FieldFunctionStore<>(CountOf.class);
+   private final FieldFunctionStore<Flags, PresenceOf> presences = new FieldFunctionStore<>(PresenceOf.class);
+   private final FieldFunctionStore<String, IdOf> ids = new FieldFunctionStore<>(IdOf.class);
+   private final FieldFunctionStore<String, ByteOrderOf> byteOrders = new FieldFunctionStore<>(ByteOrderOf.class);
+   private final FieldFunctionStore<String, CharacterEncodingOf> characterEncodings = new FieldFunctionStore<>(
+      CharacterEncodingOf.class);
 
    /**
     * Returns the attribute {@link #container}.
@@ -240,6 +238,7 @@ public class ContainerContext {
       Reject.ifNull(field, "field");
 
       sizes.addField(field);
+      summedSizes.addField(field);
       counts.addField(field);
       presences.addField(field);
       byteOrders.addField(field);
@@ -274,20 +273,38 @@ public class ContainerContext {
          return desc.getMaximumByteLength();
       }
 
-      FieldCrossReference<Long> sizeCrossRef = sizes.getCrossReference(id, sequenceNumber);
+      FieldCrossReference<Long, SizeOf> sizeCrossRef = sizes.getCrossReference(id, sequenceNumber);
 
       if (sizeCrossRef == null) {
+         FieldCrossReference<Long, SummedSizeOf> summedSizeCrossReference = summedSizes.getCrossReference(id,
+            sequenceNumber);
+
+         if (summedSizeCrossReference != null) {
+            DataBlockCrossReference[] allReferences = summedSizeCrossReference.getReferencingFieldFunction()
+               .getReferencedBlocks();
+
+            long partialSize = summedSizeCrossReference.getValue();
+
+            for (DataBlockCrossReference dataBlockCrossReference : allReferences) {
+               DataBlockId siblingId = dataBlockCrossReference.getId();
+               if (!siblingId.equals(id)) {
+                  if (getOccurrencesOf(siblingId) > 1) {
+                     partialSize -= getSizeOf(siblingId, 0);
+                  }
+               }
+            }
+
+            return partialSize;
+         }
+
          if (parentContainerContext == null) {
             return DataBlockDescription.UNDEFINED;
          }
 
          return parentContainerContext.getSizeOf(id, sequenceNumber);
-      } else {
-         Set<FieldCrossReference<Long>> fieldCrossRefsForField = sizes
-            .getAllCrossRefsForField(sizeCrossRef.getReferencingField());
-
-         return sizeCrossRef.getValue();
       }
+
+      return sizeCrossRef.getValue();
    }
 
    /**
@@ -317,10 +334,10 @@ public class ContainerContext {
       }
 
       if (desc.isOptional()) {
-         FieldCrossReference<Flags> crossReference = presences.getCrossReference(id, 0);
+         FieldCrossReference<Flags, PresenceOf> crossReference = presences.getCrossReference(id, 0);
 
          if (crossReference != null) {
-            PresenceOf flagFunction = (PresenceOf) crossReference.getReferencingFieldFunction();
+            PresenceOf flagFunction = crossReference.getReferencingFieldFunction();
 
             Flags flags = crossReference.getValue();
             if (flags.getFlagIntegerValue(flagFunction.getFlagName()) == flagFunction.getFlagValue()) {
@@ -331,7 +348,7 @@ public class ContainerContext {
          }
       }
 
-      FieldCrossReference<Long> crossReference = counts.getCrossReference(id, 0);
+      FieldCrossReference<Long, CountOf> crossReference = counts.getCrossReference(id, 0);
 
       if (crossReference == null) {
          if (parentContainerContext == null) {
@@ -364,7 +381,7 @@ public class ContainerContext {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
-      FieldCrossReference<String> crossReference = ids.getCrossReference(id, sequenceNumber);
+      FieldCrossReference<String, IdOf> crossReference = ids.getCrossReference(id, sequenceNumber);
 
       if (crossReference == null) {
          if (parentContainerContext != null) {
@@ -405,7 +422,7 @@ public class ContainerContext {
          return desc.getFieldProperties().getFixedByteOrder();
       }
 
-      FieldCrossReference<String> crossReference = byteOrders.getCrossReference(id, sequenceNumber);
+      FieldCrossReference<String, ByteOrderOf> crossReference = byteOrders.getCrossReference(id, sequenceNumber);
 
       if (crossReference == null) {
          if (parentContainerContext != null) {
@@ -448,7 +465,8 @@ public class ContainerContext {
          return desc.getFieldProperties().getFixedCharacterEncoding();
       }
 
-      FieldCrossReference<String> crossReference = characterEncodings.getCrossReference(id, sequenceNumber);
+      FieldCrossReference<String, CharacterEncodingOf> crossReference = characterEncodings.getCrossReference(id,
+         sequenceNumber);
 
       if (crossReference == null) {
          if (parentContainerContext != null) {

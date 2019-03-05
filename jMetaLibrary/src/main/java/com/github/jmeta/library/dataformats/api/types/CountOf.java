@@ -28,11 +28,11 @@ public class CountOf extends AbstractFieldFunction<Long> {
    }
 
    /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReference(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReferences(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
     */
    @Override
-   public AbstractFieldFunction<Long> withReplacedReference(DataBlockCrossReference replacedReference) {
-      return new CountOf(replacedReference);
+   public AbstractFieldFunction<Long> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      return new CountOf(replacedReferences[0]);
    }
 
    /**
