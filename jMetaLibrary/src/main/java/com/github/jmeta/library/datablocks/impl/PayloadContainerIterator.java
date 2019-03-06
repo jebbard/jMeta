@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -47,17 +46,14 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
     * @param reference
     * @param context
     */
-   public PayloadContainerIterator(Payload parent, DataBlockReader reader, MediumOffset reference,
-      FieldFunctionStack context) {
+   public PayloadContainerIterator(Payload parent, DataBlockReader reader, MediumOffset reference) {
       Reject.ifNull(parent, "parent");
       Reject.ifNull(reader, "reader");
       Reject.ifNull(reference, "reference");
-      Reject.ifNull(context, "context");
 
       m_parent = parent;
       m_nextContainerReference = reference;
       m_reader = reader;
-      m_context = context;
       m_remainingParentSize = m_parent.getTotalSize();
 
       DataBlockDescription parentDescription = m_reader.getSpecification().getDataBlockDescription(m_parent.getId());
@@ -164,7 +160,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          sequenceNumber = nextSequenceNumber.get(containerId);
       }
 
-      Container container = m_reader.readContainerWithId(m_nextContainerReference, containerId, m_parent, m_context,
+      Container container = m_reader.readContainerWithId(m_nextContainerReference, containerId, m_parent,
          m_remainingParentSize, m_parent.getContainerContext(), sequenceNumber);
 
       nextSequenceNumber.put(containerId, sequenceNumber + 1);
@@ -183,8 +179,6 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
          m_remainingParentSize -= container.getTotalSize();
       }
    }
-
-   private final FieldFunctionStack m_context;
 
    private final Payload m_parent;
 

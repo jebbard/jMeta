@@ -17,7 +17,6 @@ import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -33,11 +32,9 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
 
    private List<Field<?>> fields;
 
-   private final FieldFunctionStack context;
-
    /**
     * Creates a new {@link FieldBasedLazyPayload}.
-    * 
+    *
     * @param id
     *           The {@link DataBlockId} of the payload
     * @param offset
@@ -48,15 +45,12 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     *           The {@link DataBlockReader} to be used parsing the content of the payload
     * @param context
     *           The current {@link FieldFunctionStack} context needed for parsing
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
     */
    public FieldBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader,
-      FieldFunctionStack context, ContainerContext containerContext) {
+      ContainerContext containerContext) {
       super(id, null, offset, dataBlockReader, 0, containerContext);
-
-      Reject.ifNull(context, "context");
-
-      this.context = context;
 
       // The size of the payload is still unknown - There is no other way than to read
       // its children and sum up their sizes
@@ -91,14 +85,13 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     */
    @Override
    public List<Field<?>> getFields() {
-      if (this.fields == null) {
-         this.fields = new ArrayList<>();
+      if (fields == null) {
+         fields = new ArrayList<>();
 
          MediumOffset fieldReference = getMediumReference();
 
-         if (this.totalSize > 0) {
-            List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), this.context,
-               this.totalSize, getContainerContext());
+         if (totalSize > 0) {
+            List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), totalSize, getContainerContext());
 
             for (int i = 0; i < readFields.size(); ++i) {
                Field<?> field = readFields.get(i);
@@ -108,7 +101,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
          }
       }
 
-      return this.fields;
+      return fields;
    }
 
    private void addField(Field<?> field) {
@@ -117,6 +110,6 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
 
       field.initParent(this);
 
-      this.fields.add(field);
+      fields.add(field);
    }
 }

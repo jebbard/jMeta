@@ -189,11 +189,11 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    private Container readContainerWithId(DataBlockReader reader, MediumOffset currentMediumOffset,
       DataBlockId containerId, int sequenceNumber) {
       if (forwardRead) {
-         return reader.readContainerWithId(currentMediumOffset, containerId, null, null, DataBlockDescription.UNDEFINED,
-            null, sequenceNumber);
+         return reader.readContainerWithId(currentMediumOffset, containerId, null, DataBlockDescription.UNDEFINED, null,
+            sequenceNumber);
       } else {
-         return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null, null,
-            DataBlockDescription.UNDEFINED, null, sequenceNumber);
+         return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null, DataBlockDescription.UNDEFINED,
+            null, sequenceNumber);
       }
    }
 

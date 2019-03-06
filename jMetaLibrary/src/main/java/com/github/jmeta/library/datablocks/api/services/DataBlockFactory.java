@@ -16,7 +16,6 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -48,11 +47,13 @@ public interface DataBlockFactory {
     *           TODO
     * @param containerContext
     *           TODO
-    * @param sequenceNumber TODO
+    * @param sequenceNumber
+    *           TODO
     * @return the created {@link Container}.
     */
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber);
+      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext,
+      int sequenceNumber);
 
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
       ContainerContext containerContext, int sequenceNumber);
@@ -101,5 +102,5 @@ public interface DataBlockFactory {
     * @return the {@link Payload}
     */
    public Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader,
-      FieldFunctionStack context, ContainerContext containerContext);
+      ContainerContext containerContext);
 }

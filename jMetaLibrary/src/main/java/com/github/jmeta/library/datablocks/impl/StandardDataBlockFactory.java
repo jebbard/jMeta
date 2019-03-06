@@ -18,7 +18,6 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -36,13 +35,16 @@ public class StandardDataBlockFactory implements DataBlockFactory {
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createContainer(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      com.github.jmeta.library.datablocks.api.types.DataBlock, MediumOffset, java.util.List,
-    *      com.github.jmeta.library.datablocks.api.types.Payload, java.util.List, DataBlockReader, ContainerContext, int)
+    *      com.github.jmeta.library.datablocks.api.types.Payload, java.util.List, DataBlockReader, ContainerContext,
+    *      int)
     */
    @Override
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber) {
+      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext,
+      int sequenceNumber) {
 
-      return new StandardContainer(id, parent, reference, headers, payload, footers, reader, containerContext, sequenceNumber);
+      return new StandardContainer(id, parent, reference, headers, payload, footers, reader, containerContext,
+         sequenceNumber);
    }
 
    /**
@@ -83,12 +85,11 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      MediumOffset, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader, FieldFunctionStack,
-    *      ContainerContext)
+    *      MediumOffset, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader, ContainerContext)
     */
    @Override
    public Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader,
-      FieldFunctionStack context, ContainerContext containerContext) {
+      ContainerContext containerContext) {
 
       Reject.ifNull(id, "id");
       Reject.ifNull(reference, "reference");
@@ -99,9 +100,9 @@ public class StandardDataBlockFactory implements DataBlockFactory {
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
       if (desc.getPhysicalType() == PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
-         return new ContainerBasedLazyPayload(id, reference, totalSize, reader, context, containerContext);
+         return new ContainerBasedLazyPayload(id, reference, totalSize, reader, containerContext);
       } else {
-         return new FieldBasedLazyPayload(id, reference, totalSize, reader, context, containerContext);
+         return new FieldBasedLazyPayload(id, reference, totalSize, reader, containerContext);
       }
    }
 

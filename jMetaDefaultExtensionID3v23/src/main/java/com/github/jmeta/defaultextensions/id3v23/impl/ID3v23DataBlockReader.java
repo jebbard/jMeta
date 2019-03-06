@@ -17,7 +17,6 @@ import java.util.Map;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
 import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
@@ -57,8 +56,8 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     */
    @Override
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
-      Container container = super.readContainerWithId(reference, id, parent, context, remainingDirectParentByteCount,
+      long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
+      Container container = super.readContainerWithId(reference, id, parent, remainingDirectParentByteCount,
          containerContext, sequenceNumber);
 
       return applyTransformationsAfterRead(container, this);
@@ -72,8 +71,8 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     */
    @Override
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
-      return applyTransformationsAfterRead(super.readContainerWithIdBackwards(reference, id, parent, context,
+      long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
+      return applyTransformationsAfterRead(super.readContainerWithIdBackwards(reference, id, parent,
          remainingDirectParentByteCount, containerContext, sequenceNumber), this);
    }
 

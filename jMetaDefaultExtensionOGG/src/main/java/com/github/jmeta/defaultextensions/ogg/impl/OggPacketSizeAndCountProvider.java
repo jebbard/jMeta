@@ -35,13 +35,7 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
    @Override
    public long getCountOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {
       if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_FIELD_ID)) {
-         Header oggPageHeader = containerContext.getParentContainerContext().getContainer().getHeaders().get(0);
-
-         List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
-
-         int containerSequenceNumber = containerContext.getContainer().getSequenceNumber();
-
-         return segmentSizesPerPacket.get(containerSequenceNumber).stream().filter(s -> s > 0).count();
+         return getSegmentSizesForPacket(containerContext).stream().filter(s -> s > 0).count();
       }
 
       return DataBlockDescription.UNDEFINED;
@@ -62,26 +56,23 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
       }
 
       if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_ID)) {
-         Header oggPageHeader = containerContext.getParentContainerContext().getContainer().getHeaders().get(0);
-
-         List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
-
-         int containerSequenceNumber = containerContext.getContainer().getSequenceNumber();
-
-         return segmentSizesPerPacket.get(containerSequenceNumber).stream()
-            .collect(Collectors.summingLong(size -> size));
+         return getSegmentSizesForPacket(containerContext).stream().collect(Collectors.summingLong(size -> size));
       }
       if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_FIELD_ID)) {
-         Header oggPageHeader = containerContext.getParentContainerContext().getContainer().getHeaders().get(0);
-
-         List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
-
-         int containerSequenceNumber = containerContext.getContainer().getSequenceNumber();
-
-         return segmentSizesPerPacket.get(containerSequenceNumber).get(sequenceNumber);
+         return getSegmentSizesForPacket(containerContext).get(sequenceNumber);
       }
 
       return DataBlockDescription.UNDEFINED;
+   }
+
+   private List<Long> getSegmentSizesForPacket(ContainerContext containerContext) {
+      Header oggPageHeader = containerContext.getParentContainerContext().getContainer().getHeaders().get(0);
+
+      List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
+
+      int containerSequenceNumber = containerContext.getContainer().getSequenceNumber();
+
+      return segmentSizesPerPacket.get(containerSequenceNumber);
    }
 
    private List<List<Long>> getSegmentSizesPerPacket(Header oggPageHeader) {

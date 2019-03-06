@@ -15,11 +15,9 @@ import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
-import com.github.jmeta.library.datablocks.api.types.FieldFunctionStack;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
-import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * {@link ContainerBasedLazyPayload} is the default implementation of {@link ContainerBasedPayload}. It lazily reads
@@ -28,8 +26,6 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public class ContainerBasedLazyPayload extends AbstractDataBlock implements ContainerBasedPayload {
 
    private long totalSize;
-
-   private final FieldFunctionStack context;
 
    /**
     * Creates a new {@link FieldBasedLazyPayload}.
@@ -46,12 +42,8 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     *           The current {@link FieldFunctionStack} context needed for parsing
     */
    public ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize,
-      DataBlockReader dataBlockReader, FieldFunctionStack context, ContainerContext containerContext) {
+      DataBlockReader dataBlockReader, ContainerContext containerContext) {
       super(id, null, offset, dataBlockReader, 0, containerContext);
-
-      Reject.ifNull(context, "context");
-
-      this.context = context;
 
       this.totalSize = totalSize;
 
@@ -85,6 +77,6 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     */
    @Override
    public AbstractDataBlockIterator<Container> getContainerIterator() {
-      return new PayloadContainerIterator(this, getDataBlockReader(), getMediumReference(), context);
+      return new PayloadContainerIterator(this, getDataBlockReader(), getMediumReference());
    }
 }

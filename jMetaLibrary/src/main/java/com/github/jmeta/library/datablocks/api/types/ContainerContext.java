@@ -286,9 +286,11 @@ public class ContainerContext {
     *           The {@link DataBlockId} of the data block, must not be null
     * @param sequenceNumber
     *           The sequence number of the data block, must not be negative
+    * @param remainingDirectParentByteCount
+    *           TODO
     * @return The size of the data block or {@link DataBlockDescription#UNDEFINED} if none is available
     */
-   public long getSizeOf(DataBlockId id, int sequenceNumber) {
+   public long getSizeOf(DataBlockId id, int sequenceNumber, long remainingDirectParentByteCount) {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
@@ -324,7 +326,7 @@ public class ContainerContext {
                   long occurrencesOf = getOccurrencesOf(siblingId);
                   if (occurrencesOf >= 1) {
                      for (int i = 0; i < occurrencesOf; i++) {
-                        partialSize -= getSizeOf(siblingId, i);
+                        partialSize -= getSizeOf(siblingId, i, remainingDirectParentByteCount);
                      }
                   }
                }
@@ -337,11 +339,17 @@ public class ContainerContext {
             return partialSize;
          }
 
-         if (parentContainerContext == null) {
-            return DataBlockDescription.UNDEFINED;
+         DataBlockId matchingGenericId = spec.getMatchingGenericId(id);
+
+         if (matchingGenericId != null && !matchingGenericId.equals(id)) {
+            return getSizeOf(matchingGenericId, sequenceNumber, remainingDirectParentByteCount);
          }
 
-         return parentContainerContext.getSizeOf(id, sequenceNumber);
+         if (parentContainerContext == null) {
+            return remainingDirectParentByteCount;
+         }
+
+         return parentContainerContext.getSizeOf(id, sequenceNumber, remainingDirectParentByteCount);
       }
 
       return sizeCrossRef.getValue();
