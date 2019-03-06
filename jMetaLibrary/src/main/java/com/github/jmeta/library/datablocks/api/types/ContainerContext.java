@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
+import com.github.jmeta.library.datablocks.api.services.CountProvider;
+import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.ByteOrderOf;
@@ -39,6 +41,9 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *
  */
 public class ContainerContext {
+
+   private final SizeProvider customSizeProvider;
+   private final CountProvider customCountProvider;
 
    /**
     * Returns the attribute {@link #parentContainerContext}.
@@ -133,31 +138,44 @@ public class ContainerContext {
 
          for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) fieldFunctionList) {
             if (fieldFunction.getClass().equals(fieldFunctionClass)) {
-               DataBlockId targetId = fieldFunction.getReferencedBlock().getId();
+               Set<DataBlockId> targetIds = new HashSet<>();
 
-               Map<Integer, FieldCrossReference<T, F>> fieldCrossRefsPerSequenceNumber = null;
+               if (fieldFunction.getClass().equals(SummedSizeOf.class)) {
+                  DataBlockCrossReference[] refBlocks = ((SummedSizeOf) fieldFunction).getReferencedBlocks();
 
-               if (fieldCrossRefs.containsKey(targetId)) {
-                  fieldCrossRefsPerSequenceNumber = fieldCrossRefs.get(targetId);
+                  for (DataBlockCrossReference refBlock : refBlocks) {
+                     targetIds.add(refBlock.getId());
+                  }
+
                } else {
-                  fieldCrossRefsPerSequenceNumber = new HashMap<>();
-                  fieldCrossRefs.put(targetId, fieldCrossRefsPerSequenceNumber);
+                  targetIds.add(fieldFunction.getReferencedBlock().getId());
                }
 
-               FieldCrossReference<T, F> crossRef = new FieldCrossReference<>(targetId, (Field<T>) field,
-                  (F) fieldFunction);
-               fieldCrossRefsPerSequenceNumber.put(field.getSequenceNumber(), crossRef);
+               for (DataBlockId targetId : targetIds) {
+                  Map<Integer, FieldCrossReference<T, F>> fieldCrossRefsPerSequenceNumber = null;
 
-               Set<FieldCrossReference<T, F>> crossRefsForField = null;
+                  if (fieldCrossRefs.containsKey(targetId)) {
+                     fieldCrossRefsPerSequenceNumber = fieldCrossRefs.get(targetId);
+                  } else {
+                     fieldCrossRefsPerSequenceNumber = new HashMap<>();
+                     fieldCrossRefs.put(targetId, fieldCrossRefsPerSequenceNumber);
+                  }
 
-               if (fieldCrossRefsBySourceField.containsKey(field)) {
-                  crossRefsForField = fieldCrossRefsBySourceField.get(field);
-               } else {
-                  crossRefsForField = new HashSet<>();
-                  fieldCrossRefsBySourceField.put((Field<T>) field, crossRefsForField);
+                  FieldCrossReference<T, F> crossRef = new FieldCrossReference<>(targetId, (Field<T>) field,
+                     (F) fieldFunction);
+                  fieldCrossRefsPerSequenceNumber.put(field.getSequenceNumber(), crossRef);
+
+                  Set<FieldCrossReference<T, F>> crossRefsForField = null;
+
+                  if (fieldCrossRefsBySourceField.containsKey(field)) {
+                     crossRefsForField = fieldCrossRefsBySourceField.get(field);
+                  } else {
+                     crossRefsForField = new HashSet<>();
+                     fieldCrossRefsBySourceField.put((Field<T>) field, crossRefsForField);
+                  }
+
+                  crossRefsForField.add(crossRef);
                }
-
-               crossRefsForField.add(crossRef);
             }
          }
       }
@@ -205,12 +223,19 @@ public class ContainerContext {
     * @param parentContainerContext
     *           The parent {@link ContainerContext}, might be null if this {@link ContainerContext} belongs to a
     *           top-level container
+    * @param customSizeProvider
+    *           TODO
+    * @param customCountProvider
+    *           TODO
     */
-   public ContainerContext(DataFormatSpecification spec, ContainerContext parentContainerContext) {
+   public ContainerContext(DataFormatSpecification spec, ContainerContext parentContainerContext,
+      SizeProvider customSizeProvider, CountProvider customCountProvider) {
       Reject.ifNull(spec, "spec");
 
       this.spec = spec;
       this.parentContainerContext = parentContainerContext;
+      this.customSizeProvider = customSizeProvider;
+      this.customCountProvider = customCountProvider;
    }
 
    /**
@@ -269,6 +294,14 @@ public class ContainerContext {
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
+      if (customSizeProvider != null) {
+         long actualSize = customSizeProvider.getSizeOf(id, sequenceNumber, this);
+
+         if (actualSize != DataBlockDescription.UNDEFINED) {
+            return actualSize;
+         }
+      }
+
       if (desc.hasFixedSize()) {
          return desc.getMaximumByteLength();
       }
@@ -288,10 +321,17 @@ public class ContainerContext {
             for (DataBlockCrossReference dataBlockCrossReference : allReferences) {
                DataBlockId siblingId = dataBlockCrossReference.getId();
                if (!siblingId.equals(id)) {
-                  if (getOccurrencesOf(siblingId) > 1) {
-                     partialSize -= getSizeOf(siblingId, 0);
+                  long occurrencesOf = getOccurrencesOf(siblingId);
+                  if (occurrencesOf >= 1) {
+                     for (int i = 0; i < occurrencesOf; i++) {
+                        partialSize -= getSizeOf(siblingId, i);
+                     }
                   }
                }
+            }
+
+            if (partialSize < 0) {
+               partialSize = DataBlockDescription.UNDEFINED;
             }
 
             return partialSize;
@@ -331,6 +371,14 @@ public class ContainerContext {
 
       if (desc.getMaximumOccurrences() == desc.getMinimumOccurrences()) {
          return desc.getMaximumOccurrences();
+      }
+
+      if (customCountProvider != null) {
+         long actualOccurrences = customCountProvider.getCountOf(desc.getId(), 0, this);
+
+         if (actualOccurrences != DataBlockDescription.UNDEFINED) {
+            return actualOccurrences;
+         }
       }
 
       if (desc.isOptional()) {

@@ -208,13 +208,14 @@ public class StandardDataBlockReader implements DataBlockReader {
       if (!fieldDesc.hasFixedSize()) {
          // Search for a SIZE_OF function, i.e. the size of the current field is
          // determined by the value of a field already read before
-         if (context.hasFieldFunction(fieldDesc.getId(), SizeOf.class)) {
-            actualBlockSize = getSizeFromFieldFunction(context, fieldDesc.getId(), parentId, containerContext);
-         } else {
+         actualBlockSize = containerContext.getSizeOf(fieldDesc.getId(), sequenceNumber);
+
+         if (actualBlockSize == DataBlockDescription.UNDEFINED) {
             DataBlockId matchingGenericId = m_spec.getMatchingGenericId(fieldDesc.getId());
 
-            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, SizeOf.class)) {
-               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId, containerContext);
+            if (matchingGenericId != null/* && context.hasFieldFunction(matchingGenericId, SizeOf.class) */) {
+               actualBlockSize = containerContext.getSizeOf(matchingGenericId, sequenceNumber);
+               // getSizeFromFieldFunction(context, matchingGenericId, parentId, containerContext);
             }
          }
 
@@ -263,13 +264,12 @@ public class StandardDataBlockReader implements DataBlockReader {
       if (!payloadDesc.hasFixedSize()) {
          // Search for a SIZE_OF function, i.e. the size of the current payload is
          // determined by the value of a field already read before
-         if (context.hasFieldFunction(payloadDesc.getId(), SizeOf.class)) {
-            actualBlockSize = getSizeFromFieldFunction(context, payloadDesc.getId(), parentId, containerContext);
-         } else {
+         actualBlockSize = containerContext.getSizeOf(payloadDesc.getId(), 0);
+         if (actualBlockSize == DataBlockDescription.UNDEFINED) {
             DataBlockId matchingGenericId = m_spec.getMatchingGenericId(payloadDesc.getId());
 
-            if (matchingGenericId != null && context.hasFieldFunction(matchingGenericId, SizeOf.class)) {
-               actualBlockSize = getSizeFromFieldFunction(context, matchingGenericId, parentId, containerContext);
+            if (matchingGenericId != null) {
+               actualBlockSize = containerContext.getSizeOf(matchingGenericId, 0);
             }
          }
       } else {
@@ -496,11 +496,13 @@ public class StandardDataBlockReader implements DataBlockReader {
    /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
     * {@link MediumOffset} or null. If the {@link Container}s presence is optional, its actual presence is determined
+    *
     * @param parent
     */
    @Override
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext,
+      int sequenceNumber) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
@@ -513,7 +515,8 @@ public class StandardDataBlockReader implements DataBlockReader {
          theContext = new FieldFunctionStack();
       }
 
-      ContainerContext newContainerContext = new ContainerContext(m_spec, containerContext);
+      ContainerContext newContainerContext = new ContainerContext(m_spec, containerContext, customSizeProvider,
+         customCountProvider);
 
       // TODO the actual current charset and byte order must be known here!
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
@@ -612,7 +615,8 @@ public class StandardDataBlockReader implements DataBlockReader {
    // readPayloadBackwards
    @Override
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
+      FieldFunctionStack context, long remainingDirectParentByteCount, ContainerContext containerContext,
+      int sequenceNumber) {
 
       Reject.ifNull(reference, "reference");
       Reject.ifNull(id, "id");
@@ -623,7 +627,8 @@ public class StandardDataBlockReader implements DataBlockReader {
          theContext = new FieldFunctionStack();
       }
 
-      ContainerContext newContainerContext = new ContainerContext(m_spec, containerContext);
+      ContainerContext newContainerContext = new ContainerContext(m_spec, containerContext, customSizeProvider,
+         customCountProvider);
 
       DataBlockId actualId = determineActualId(reference, id, context, remainingDirectParentByteCount,
          m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding(), 0, newContainerContext);

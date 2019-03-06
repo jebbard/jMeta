@@ -25,6 +25,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
+import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -110,8 +111,7 @@ public class Lyrics3v2Extension implements Extension {
             .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
                .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
                .withStaticLengthOf(FOOTER_SIZE_FIELD_LENGTH)
-               .withFieldFunction(new SizeOf(headerReference))
-               .withFieldFunction(new SizeOf(payloadReference))
+               .withFieldFunction(new SummedSizeOf(headerReference, payloadReference))
             .finishField()
             .addStringField("id", "Lyrics3v2 footer id", "Lyrics3v2 footer id")
                .withStaticLengthOf(LYRICS3v2_MAGIC_FOOTER_STRING.length())

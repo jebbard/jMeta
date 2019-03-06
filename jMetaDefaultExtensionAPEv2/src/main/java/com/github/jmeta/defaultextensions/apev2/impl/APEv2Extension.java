@@ -28,6 +28,7 @@ import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
+import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -118,8 +119,7 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 header tag size", "APEv2 header tag size")
                .withStaticLengthOf(4)
-               .withFieldFunction(new SizeOf(payloadReference))
-               .withFieldFunction(new SizeOf(footerReference))
+               .withFieldFunction(new SummedSizeOf(payloadReference, footerReference))
             .finishField()
             .addNumericField("itemCount", "APEv2 header item count", "APEv2 header item count")
                .withStaticLengthOf(4)
@@ -155,8 +155,7 @@ public class APEv2Extension implements Extension {
             .finishField()
             .addNumericField("tagSize", "APEv2 footer tag size", "APEv2 footer tag size")
                .withStaticLengthOf(4)
-               .withFieldFunction(new SizeOf(payloadReference))
-               .withFieldFunction(new SizeOf(headerReference))
+               .withFieldFunction(new SummedSizeOf(payloadReference, headerReference))
             .finishField()
             .addNumericField("itemCount", "APEv2 footer item count", "APEv2 footer item count")
                .withStaticLengthOf(4)

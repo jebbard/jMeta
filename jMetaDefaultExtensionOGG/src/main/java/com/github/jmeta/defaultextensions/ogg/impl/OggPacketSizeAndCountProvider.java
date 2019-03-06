@@ -37,28 +37,11 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
       if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_FIELD_ID)) {
          Header oggPageHeader = containerContext.getParentContainerContext().getContainer().getHeaders().get(0);
 
-         List<Long> segmentSizesFromHeader = getSegmentSizesFromHeader(oggPageHeader);
-         List<Long> packetSegmentCounts = new ArrayList<>();
-
-         long segmentCountOfCurrentPacket = 0;
-
-         for (int segmentIndex = 0; segmentIndex < segmentSizesFromHeader.size(); segmentIndex++) {
-
-            long segmentSize = segmentSizesFromHeader.get(segmentIndex);
-
-            if (segmentSize != 0) {
-               segmentCountOfCurrentPacket++;
-            }
-
-            if (segmentSize < 0xFF || segmentSize == 0xFF && segmentIndex == segmentSizesFromHeader.size() - 1) {
-               packetSegmentCounts.add(segmentCountOfCurrentPacket);
-               segmentCountOfCurrentPacket = 0;
-            }
-         }
+         List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
 
          int containerSequenceNumber = containerContext.getContainer().getSequenceNumber();
 
-         return packetSegmentCounts.get(containerSequenceNumber);
+         return segmentSizesPerPacket.get(containerSequenceNumber).stream().filter(s -> s > 0).count();
       }
 
       return DataBlockDescription.UNDEFINED;
@@ -73,40 +56,38 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
       if (id.equals(OggExtension.OGG_PAYLOAD_ID)) {
          Header oggPageHeader = containerContext.getContainer().getHeaders().get(0);
 
-         List<Long> segmentSizesFromHeader = getSegmentSizesFromHeader(oggPageHeader);
-         return segmentSizesFromHeader.stream().collect(Collectors.summingLong(size -> size));
+         List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
+         return segmentSizesPerPacket.stream().flatMap(segmentSizesForPacket -> segmentSizesForPacket.stream())
+            .collect(Collectors.summingLong(size -> size));
       }
 
       if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_ID)) {
          Header oggPageHeader = containerContext.getParentContainerContext().getContainer().getHeaders().get(0);
 
-         List<Long> segmentSizesFromHeader = getSegmentSizesFromHeader(oggPageHeader);
-         List<Long> packetSizes = new ArrayList<>();
-
-         long sizeOfCurrentPacket = 0;
-
-         for (int segmentIndex = 0; segmentIndex < segmentSizesFromHeader.size(); segmentIndex++) {
-
-            long segmentSize = segmentSizesFromHeader.get(segmentIndex);
-
-            sizeOfCurrentPacket += segmentSize;
-
-            if (segmentSize < 0xFF || segmentSize == 0xFF && segmentIndex == segmentSizesFromHeader.size() - 1) {
-               packetSizes.add(sizeOfCurrentPacket);
-               sizeOfCurrentPacket = 0;
-            }
-         }
+         List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
 
          int containerSequenceNumber = containerContext.getContainer().getSequenceNumber();
 
-         return packetSizes.get(containerSequenceNumber);
+         return segmentSizesPerPacket.get(containerSequenceNumber).stream()
+            .collect(Collectors.summingLong(size -> size));
+      }
+      if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_FIELD_ID)) {
+         Header oggPageHeader = containerContext.getParentContainerContext().getContainer().getHeaders().get(0);
+
+         List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
+
+         int containerSequenceNumber = containerContext.getContainer().getSequenceNumber();
+
+         return segmentSizesPerPacket.get(containerSequenceNumber).get(sequenceNumber);
       }
 
       return DataBlockDescription.UNDEFINED;
    }
 
-   private List<Long> getSegmentSizesFromHeader(Header oggPageHeader) {
-      List<Long> segmentSizes = new ArrayList<>();
+   private List<List<Long>> getSegmentSizesPerPacket(Header oggPageHeader) {
+      List<List<Long>> segmentSizesPerPacket = new ArrayList<>();
+
+      List<Long> currentPacketSegmentSizes = new ArrayList<>();
 
       // Ogg segment sizes start with ogg page header field with index 8
       for (int fieldIndex = 8; fieldIndex < oggPageHeader.getFields().size(); ++fieldIndex) {
@@ -114,12 +95,19 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
 
          try {
             long segmentSize = (Long) segmentTableEntry.getInterpretedValue();
-            segmentSizes.add(segmentSize);
+
+            if (segmentSize < 0xFF || segmentSize == 0xFF && fieldIndex == oggPageHeader.getFields().size() - 1) {
+               currentPacketSegmentSizes.add(segmentSize);
+               segmentSizesPerPacket.add(currentPacketSegmentSizes);
+               currentPacketSegmentSizes = new ArrayList<>();
+            } else {
+               currentPacketSegmentSizes.add(segmentSize);
+            }
          } catch (BinaryValueConversionException e) {
             throw new RuntimeException("Unexpected field conversion exception", e);
          }
       }
 
-      return segmentSizes;
+      return segmentSizesPerPacket;
    }
 }

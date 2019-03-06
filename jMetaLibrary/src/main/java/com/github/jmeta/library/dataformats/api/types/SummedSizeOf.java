@@ -32,7 +32,7 @@ public class SummedSizeOf extends SizeOf {
    public SummedSizeOf(DataBlockCrossReference... referencedBlocks) {
       super(referencedBlocks[0]);
 
-      Reject.ifTrue(referencedBlocks.length > 1, "referencedBlocks.length > 1");
+      Reject.ifFalse(referencedBlocks.length > 1, "referencedBlocks.length > 1");
 
       this.referencedBlocks = referencedBlocks;
    }
