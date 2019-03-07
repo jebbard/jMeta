@@ -29,6 +29,7 @@ import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
+import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.extmanager.api.services.Extension;
@@ -132,6 +133,9 @@ public class ID3v23Extension implements Extension {
       DataBlockCrossReference payloadReference = new DataBlockCrossReference("Tag Payload");
       DataBlockCrossReference framePayloadReference = new DataBlockCrossReference("Frame payload");
       DataBlockCrossReference dataFieldReference = new DataBlockCrossReference("Data");
+      DataBlockCrossReference paddingReference = new DataBlockCrossReference("Padding");
+      DataBlockCrossReference paddingSizeReference = new DataBlockCrossReference("Padding Size");
+      DataBlockCrossReference extHeaderFlagsReference = new DataBlockCrossReference("Ext Header Flags");
 
       // TODO: Wrong size: The size of the ID3v23 tag not only includes the tag payload, but also the extended header!
 
@@ -160,7 +164,7 @@ public class ID3v23Extension implements Extension {
             .finishField()
             .addNumericField("size", "id3v23 tag size", "The id3v23 tag size")
                .withStaticLengthOf(4)
-               .withFieldFunction(new SizeOf(payloadReference))
+               .withFieldFunction(new SummedSizeOf(extendedHeaderReference, payloadReference))
                .withCustomConverter(SYNC_SAFE_INTEGER_CONVERTER)
             .finishField()
          .finishHeader()
@@ -170,8 +174,10 @@ public class ID3v23Extension implements Extension {
             .addNumericField("size", "id3v23 extended header size", "The id3v23 extended header size")
                .withStaticLengthOf(4)
                .withDefaultValue(Long.valueOf(0x2000))
+               .withFieldFunction(new SummedSizeOf(extHeaderFlagsReference, paddingSizeReference, crcReference))
             .finishField()
             .addFlagsField("flags", "id3v23 extended header flags", "The id3v23 extended header flags")
+               .referencedAs(extHeaderFlagsReference)
                .withStaticLengthOf(ID3V23_TAG_FLAG_SIZE)
                .withFlagSpecification(1, ByteOrder.BIG_ENDIAN)
                   .withDefaultFlagBytes(new byte[] { 0 })
@@ -180,7 +186,9 @@ public class ID3v23Extension implements Extension {
                .withFieldFunction(new PresenceOf(crcReference, EXT_HEADER_FLAG_CRC_DATA_PRESENT, 1))
             .finishField()
             .addNumericField("paddingSize", "id3v23 extended header padding size", "The id3v23 extended header padding size")
+               .referencedAs(paddingSizeReference)
                .withStaticLengthOf(4)
+               .withFieldFunction(new SizeOf(paddingReference))
             .finishField()
             .addNumericField("crc", "id3v23 extended header CRC", "The id3v23 extended header CRC")
                .referencedAs(crcReference)
@@ -273,6 +281,7 @@ public class ID3v23Extension implements Extension {
                .cloneFrom(textFrameReference)
             .finishContainer()
             .addContainerWithFieldBasedPayload("padding", "Padding", "Padding")
+               .referencedAs(paddingReference)
                .addHeader("header", "Padding header", "Padding header")
                   .addBinaryField("key", "id3v23 padding header key", "The id3v23 padding header key")
                      .withDefaultValue(new byte[] { 0 })
