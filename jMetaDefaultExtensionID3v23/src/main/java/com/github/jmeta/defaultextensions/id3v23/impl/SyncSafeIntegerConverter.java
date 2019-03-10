@@ -11,6 +11,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
@@ -39,16 +40,40 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
       Reject.ifNull(byteOrder, "byteOrder");
       Reject.ifNull(desc, "desc");
       Reject.ifNull(binaryValue, "binaryValue");
-      if (binaryValue.remaining() != Integer.SIZE / Byte.SIZE)
+      if (binaryValue.remaining() != Integer.SIZE / Byte.SIZE) {
          throw new BinaryValueConversionException(
             "ID3v23 size fields must have integer (" + Integer.SIZE / Byte.SIZE + " bytes) size", null, desc,
             binaryValue, byteOrder, characterEncoding);
+      }
 
       byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
 
       int size = ByteBuffer.wrap(copiedBytes).getInt();
 
       return Long.valueOf(synchSafeToInt(size));
+   }
+
+   public static void main(String[] args) {
+      System.out.println("Converting ID3v2.x bytes to sync safe integer");
+      ByteBuffer bb = ByteBuffer.wrap(new byte[] { 0, 0, 0xf, 0x76 });
+      bb.order(ByteOrder.BIG_ENDIAN);
+      System.out.println(new SyncSafeIntegerConverter().synchSafeToInt(bb.getInt()));
+      System.out.println(new SyncSafeIntegerConverter().intToSynchSafe(2038));
+
+      int syncSafeSize = new SyncSafeIntegerConverter().intToSynchSafe(2052);
+
+      System.out.println(new SyncSafeIntegerConverter().intToSynchSafe(syncSafeSize));
+
+      ByteBuffer bbout = ByteBuffer.allocate(4);
+      bbout.order(ByteOrder.BIG_ENDIAN);
+      bbout.putInt(syncSafeSize);
+      System.out.println(Arrays.toString(bbout.array()));
+
+      ByteBuffer bbout2 = ByteBuffer.allocate(4);
+      bbout2.order(ByteOrder.BIG_ENDIAN);
+      bbout2.putInt(1876);
+      System.out.println(Arrays.toString(bbout2.array()));
+
    }
 
    @Override
@@ -60,10 +85,11 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
       Reject.ifNull(desc, "desc");
       Reject.ifNull(interpretedValue, "interpretedValue");
 
-      if (interpretedValue > MAX_SYNC_SAFE_INTEGER)
+      if (interpretedValue > MAX_SYNC_SAFE_INTEGER) {
          throw new InterpretedValueConversionException(
             "ID3v23 sync-safe integers may not be larger than " + MAX_SYNC_SAFE_INTEGER, null, desc, interpretedValue,
             byteOrder, characterEncoding);
+      }
 
       long converted = intToSynchSafe(interpretedValue.intValue());
 
