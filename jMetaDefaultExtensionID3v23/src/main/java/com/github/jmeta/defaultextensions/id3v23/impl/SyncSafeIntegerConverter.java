@@ -8,10 +8,11 @@
  */
 package com.github.jmeta.defaultextensions.id3v23.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
@@ -54,26 +55,21 @@ public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
    }
 
    public static void main(String[] args) {
-      System.out.println("Converting ID3v2.x bytes to sync safe integer");
-      ByteBuffer bb = ByteBuffer.wrap(new byte[] { 0, 0, 0xf, 0x76 });
-      bb.order(ByteOrder.BIG_ENDIAN);
-      System.out.println(new SyncSafeIntegerConverter().synchSafeToInt(bb.getInt()));
-      System.out.println(new SyncSafeIntegerConverter().intToSynchSafe(2038));
+      System.out.println("SyncSafe integer converter");
+      System.out.print("Enter normal integer: ");
+      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-      int syncSafeSize = new SyncSafeIntegerConverter().intToSynchSafe(2052);
+      try {
+         String intString = reader.readLine();
 
-      System.out.println(new SyncSafeIntegerConverter().intToSynchSafe(syncSafeSize));
+         int normalInt = Integer.parseInt(intString);
+         int syncSafe = new SyncSafeIntegerConverter().intToSynchSafe(normalInt);
 
-      ByteBuffer bbout = ByteBuffer.allocate(4);
-      bbout.order(ByteOrder.BIG_ENDIAN);
-      bbout.putInt(syncSafeSize);
-      System.out.println(Arrays.toString(bbout.array()));
-
-      ByteBuffer bbout2 = ByteBuffer.allocate(4);
-      bbout2.order(ByteOrder.BIG_ENDIAN);
-      bbout2.putInt(1876);
-      System.out.println(Arrays.toString(bbout2.array()));
-
+         System.out.println(
+            "Sync safe version of " + normalInt + " is = " + syncSafe + "d = " + Integer.toHexString(syncSafe) + "h");
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
    }
 
    @Override

@@ -635,9 +635,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
     */
    @Test
    public void getData_forFilledMediumWithSmallCache_fromStartAndNoCacheBefore_returnsExpectedDataAndReadsBlockWiseAndUpdatesCache() {
-      
-      System.out.println(TestMedia.FIRST_TEST_FILE_CONTENT.length());
-      
       mediumStoreUnderTest = createFilledMediumStoreWithSmallCache();
 
       String currentMediumContent = getMediumContentAsString(currentMedium);

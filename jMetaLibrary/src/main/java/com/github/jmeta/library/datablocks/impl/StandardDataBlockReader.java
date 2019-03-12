@@ -397,7 +397,7 @@ public class StandardDataBlockReader implements DataBlockReader {
             Header nextHeader = nextHeaders.get(j);
 
             totalHeaderSize += nextHeader.getTotalSize();
-            createdContainer.addHeader(j, nextHeader);
+            createdContainer.addHeader(createdContainer.getHeaders().size(), nextHeader);
          }
 
          overallHeaderSize += totalHeaderSize;
