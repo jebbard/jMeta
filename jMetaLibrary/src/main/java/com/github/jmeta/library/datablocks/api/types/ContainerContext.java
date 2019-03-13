@@ -46,6 +46,15 @@ public class ContainerContext {
    private final CountProvider customCountProvider;
 
    /**
+    * Returns the attribute {@link #spec}.
+    *
+    * @return the attribute {@link #spec}
+    */
+   public DataFormatSpecification getDataFormatSpecification() {
+      return spec;
+   }
+
+   /**
     * Returns the attribute {@link #parentContainerContext}.
     *
     * @return the attribute {@link #parentContainerContext}

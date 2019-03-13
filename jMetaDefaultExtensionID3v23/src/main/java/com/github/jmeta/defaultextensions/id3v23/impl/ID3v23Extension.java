@@ -41,40 +41,34 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  */
 public class ID3v23Extension implements Extension {
 
-   private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
-      .lookupService(DataFormatSpecificationBuilderFactory.class);
+   public static final ContainerDataFormat ID3v23 = new ContainerDataFormat("ID3v2.3", new HashSet<String>(),
+      new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
+
+   static final String FRAME_FLAGS_COMPRESSION = "Compression";
+   static final String FRAME_FLAGS_ENCRYPTION = "Encryption";
+   static final String FRAME_FLAGS_FILE_ALTER_PRESERVATION = "File Alter Preservation";
+   static final String FRAME_FLAGS_GROUP_IDENTITY = "Group Identity";
+   static final String FRAME_FLAGS_READ_ONLY = "Read Only";
+   static final String FRAME_FLAGS_TAG_ALTER_PRESERVATION = "Tag Alter Preservation";
+
+   static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
+
+   static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
+   static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
+   static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
 
    private static final SyncSafeIntegerConverter SYNC_SAFE_INTEGER_CONVERTER = new SyncSafeIntegerConverter();
 
-   private static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
-   public static final String FRAME_FLAGS_COMPRESSION = "Compression";
-   private static final String FRAME_FLAGS_ENCRYPTION = "Encryption";
-   private static final String FRAME_FLAGS_FILE_ALTER_PRESERVATION = "File Alter Preservation";
-   private static final String FRAME_FLAGS_GROUP_IDENTITY = "Group Identity";
-   private static final String FRAME_FLAGS_READ_ONLY = "Read Only";
-   private static final String FRAME_FLAGS_TAG_ALTER_PRESERVATION = "Tag Alter Preservation";
-   private static final int FRAME_ID_SIZE = 4;
    private static final String ID3V23_GENERIC_CONTAINER_ID = "id3v23.payload.${FRAME_ID}";
-   private static final byte[] ID3V23_TAG_VERSION_BYTES = new byte[] { 3, 0 };
-   /**
-    *
-    */
-   public static final ContainerDataFormat ID3v23 = new ContainerDataFormat("ID3v2.3", new HashSet<String>(),
-      new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
    public static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
       ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
 
-   private static final int ID3V23_FRAME_FLAG_SIZE = 2;
    public static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.flags");
-   private static final int ID3V23_TAG_FLAG_SIZE = 1;
-   public static final DataBlockId ID3V23_TAG_ID = new DataBlockId(ID3v23, "id3v23");
+
+   private static final byte[] ID3V23_TAG_VERSION_BYTES = new byte[] { 3, 0 };
    private static final byte[] ID3V23_TAG_ID_BYTES = new byte[] { 'I', 'D', '3' };
-   private static final String ID3V23_TAG_ID_STRING = "ID3";
    private static final byte[] ID3V23_TAG_MAGIC_KEY_BYTES = new byte[ID3V23_TAG_ID_BYTES.length
       + ID3V23_TAG_VERSION_BYTES.length];
-   private static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
-   private static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
-   public static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
 
    static {
       for (int i = 0; i < ID3V23_TAG_ID_BYTES.length; i++) {
@@ -85,6 +79,11 @@ public class ID3v23Extension implements Extension {
          ID3V23_TAG_MAGIC_KEY_BYTES[ID3V23_TAG_ID_BYTES.length + i] = ID3V23_TAG_VERSION_BYTES[i];
       }
    }
+
+   public static final DataBlockCrossReference REF_EXT_HEADER = new DataBlockCrossReference("Extended header");
+
+   private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
+      .lookupService(DataFormatSpecificationBuilderFactory.class);
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -124,7 +123,6 @@ public class ID3v23Extension implements Extension {
 
       DataBlockCrossReference frameReference = new DataBlockCrossReference("Frame");
       DataBlockCrossReference textFrameReference = new DataBlockCrossReference("Text Frame");
-      DataBlockCrossReference extendedHeaderReference = new DataBlockCrossReference("Extended header");
       DataBlockCrossReference crcReference = new DataBlockCrossReference("CRC");
       DataBlockCrossReference decompressedSizeReference = new DataBlockCrossReference("Decompressed size");
       DataBlockCrossReference groupIdReference = new DataBlockCrossReference("Group id");
@@ -137,14 +135,12 @@ public class ID3v23Extension implements Extension {
       DataBlockCrossReference paddingSizeReference = new DataBlockCrossReference("Padding Size");
       DataBlockCrossReference extHeaderFlagsReference = new DataBlockCrossReference("Ext Header Flags");
 
-      // TODO: Wrong size: The size of the ID3v23 tag not only includes the tag payload, but also the extended header!
-
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
          .addHeader("header", "id3v23 tag header", "The id3v23 tag header")
             .addStringField("id", "id3v23 tag header id", "The id3v23 tag header id")
                .withStaticLengthOf(3)
-               .withDefaultValue(ID3V23_TAG_ID_STRING)
+               .withDefaultValue("ID3")
                .withFixedCharset(Charsets.CHARSET_ISO)
                .asMagicKey()
             .finishField()
@@ -153,23 +149,23 @@ public class ID3v23Extension implements Extension {
                .withDefaultValue(ID3V23_TAG_VERSION_BYTES)
             .finishField()
             .addFlagsField("flags", "id3v23 tag header flags", "The id3v23 tag header flags")
-               .withStaticLengthOf(ID3V23_TAG_FLAG_SIZE)
+               .withStaticLengthOf(1)
                .withFlagSpecification(1,ByteOrder.BIG_ENDIAN)
                   .withDefaultFlagBytes(new byte[] { 0 })
                   .addFlagDescription(new FlagDescription(TAG_FLAGS_UNSYNCHRONIZATION, new BitAddress(0, 7), "", 1, null))
                   .addFlagDescription(new FlagDescription(TAG_FLAGS_EXTENDED_HEADER, new BitAddress(0, 6), "", 1, null))
                   .addFlagDescription(new FlagDescription(TAG_FLAGS_EXPERIMENTAL_INDICATOR, new BitAddress(0, 5), "", 1, null))
                .finishFlagSpecification()
-               .withFieldFunction(new PresenceOf(extendedHeaderReference, TAG_FLAGS_EXTENDED_HEADER, 1))
+               .withFieldFunction(new PresenceOf(REF_EXT_HEADER, TAG_FLAGS_EXTENDED_HEADER, 1))
             .finishField()
             .addNumericField("size", "id3v23 tag size", "The id3v23 tag size")
                .withStaticLengthOf(4)
-               .withFieldFunction(new SummedSizeOf(extendedHeaderReference, payloadReference))
+               .withFieldFunction(new SummedSizeOf(REF_EXT_HEADER, payloadReference))
                .withCustomConverter(SYNC_SAFE_INTEGER_CONVERTER)
             .finishField()
          .finishHeader()
          .addHeader("extHeader", "id3v23 extended header", "The id3v23 extended header")
-            .referencedAs(extendedHeaderReference)
+            .referencedAs(REF_EXT_HEADER)
             .asOptional()
             .addNumericField("size", "id3v23 extended header size", "The id3v23 extended header size")
                .withStaticLengthOf(4)
@@ -192,6 +188,7 @@ public class ID3v23Extension implements Extension {
             .finishField()
             .addNumericField("crc", "id3v23 extended header CRC", "The id3v23 extended header CRC")
                .referencedAs(crcReference)
+               .asOptional()
                .withStaticLengthOf(4)
             .finishField()
          .finishHeader()
@@ -203,7 +200,7 @@ public class ID3v23Extension implements Extension {
                .asDefaultNestedContainer()
                .addHeader("header", "Generic frame header", "The generic frame header")
                   .addStringField("id", "Generic frame id field", "The generic frame id field")
-                     .withStaticLengthOf(FRAME_ID_SIZE)
+                     .withStaticLengthOf(4)
                      .withFieldFunction(new IdOf(frameReference))
                      .withFixedCharset(Charsets.CHARSET_ISO)
                   .finishField()
@@ -214,7 +211,7 @@ public class ID3v23Extension implements Extension {
                   .finishField()
                   .addFlagsField("flags", "Generic frame flags field", "The generic frame flags field")
                      .withStaticLengthOf(2)
-                     .withFlagSpecification(ID3V23_FRAME_FLAG_SIZE, ByteOrder.BIG_ENDIAN)
+                     .withFlagSpecification(2, ByteOrder.BIG_ENDIAN)
                         .withDefaultFlagBytes(new byte[] { 0, 0 })
                         .addFlagDescription(new FlagDescription(FRAME_FLAGS_TAG_ALTER_PRESERVATION, new BitAddress(0, 0), "", 1, null))
                         .addFlagDescription(new FlagDescription(FRAME_FLAGS_FILE_ALTER_PRESERVATION, new BitAddress(0, 1), "", 1, null))

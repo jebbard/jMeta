@@ -43,6 +43,8 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
    public ID3v23DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
       super(spec, maxFieldBlockSize);
 
+      setCustomSizeProvider(new ID3v23ExtHeaderSizeProvider());
+
       transformationsReadOrder.put(ID3v2TransformationType.UNSYNCHRONIZATION,
          new UnsynchronisationHandler(getDataBlockFactory()));
       transformationsReadOrder.put(ID3v2TransformationType.COMPRESSION, new CompressionHandler(getDataBlockFactory()));
