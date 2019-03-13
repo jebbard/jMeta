@@ -35,12 +35,24 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  */
 public class MP3Extension implements Extension {
 
+   static final String HEADER_FLAGS_MODE_BIT = "Mode bit";
+   static final String HEADER_FLAGS_MODE_EXTENSION_BIT = "Mode extension bit";
+   static final String HEADER_FLAGS_COPYRIGHT_BIT = "Copyright bit";
+   static final String HEADER_FLAGS_ORIGINAL_OR_COPY = "Original or copy";
+   static final String HEADER_FLAGS_EMPHASIS_BIT = "Emphasis bit";
+   static final String HEADER_FLAGS_BITRATE_INDEX = "Bitrate index";
+   static final String HEADER_FLAGS_SAMPLING_FREQUENCY = "Sampling frequency";
+   static final String HEADER_FLAGS_PADDING_BIT = "Padding bit";
+   static final String HEADER_FLAGS_PRIVATE_BIT = "Private bit";
+   static final String HEADER_FLAGS_ID = "Id";
+   static final String HEADER_FLAGS_LAYER = "Layer";
+   static final String HEADER_FLAGS_NO_PROTECTION_BIT = "No protection bit";
+   static final String HEADER_FLAGS_FRAME_SYNC = "Frame sync";
+
    private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
-   private static final int FRAME_SYNC_BIT_COUNT = 11;
-   private static final byte[] MP3_FRAME_SYNC = new byte[] { -1, -32, 0, 0 }; // 11 one bits
-   private static final int MP3_HEADER_BYTE_LENGTH = 4;
+   static final DataBlockCrossReference REF_PAYLOAD = new DataBlockCrossReference("Payload");
 
    /**
     *
@@ -81,6 +93,7 @@ public class MP3Extension implements Extension {
    }
 
    private DataFormatSpecification createSpecification() {
+      final int mp3HeaderByteLength = 4;
 
       // Data blocks
       /*
@@ -96,25 +109,25 @@ public class MP3Extension implements Extension {
       builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
          .addHeader("header", "MP3 header", "The MP3 header")
             .addFlagsField("content", "MP3 header contents", "The MP3 header contents")
-               .withStaticLengthOf(MP3_HEADER_BYTE_LENGTH)
-               .withFlagSpecification(MP3_HEADER_BYTE_LENGTH,
+               .withStaticLengthOf(mp3HeaderByteLength)
+               .withFlagSpecification(mp3HeaderByteLength,
                   ByteOrder.BIG_ENDIAN)
-                  .withDefaultFlagBytes(MP3_FRAME_SYNC)
-                  .addFlagDescription(new FlagDescription("Frame sync", new BitAddress(0, 0), "", FRAME_SYNC_BIT_COUNT, null))
-                  .addFlagDescription(new FlagDescription("No protection bit", new BitAddress(1, 0), "", 1, null))
-                  .addFlagDescription(new FlagDescription("Layer", new BitAddress(1, 1), "", 2, List.of("reserved", "Layer III", "Layer II", "Layer I")))
-                  .addFlagDescription(new FlagDescription("Id", new BitAddress(1, 3), "", 2, List.of("MPEG Version 2.5", "reserved", "MPEG Version 2 (ISO/IEC 13818-3)", "MPEG Version 1 (ISO/IEC 11172-3)")))
-                  .addFlagDescription(new FlagDescription("Private bit", new BitAddress(2, 0), "", 1, null))
-                  .addFlagDescription(new FlagDescription("Padding bit", new BitAddress(2, 1), "", 1, null))
-                  .addFlagDescription(new FlagDescription("Sampling frequency", new BitAddress(2, 2), "", 2, null))
-                  .addFlagDescription(new FlagDescription("Bitrate index", new BitAddress(2, 4), "", 4, null))
-                  .addFlagDescription(new FlagDescription("Emphasis bit", new BitAddress(3, 0), "", 2, null))
-                  .addFlagDescription(new FlagDescription("Original or copy", new BitAddress(3, 2), "", 1, null))
-                  .addFlagDescription(new FlagDescription("Copyright bit", new BitAddress(3, 3), "", 1, null))
-                  .addFlagDescription(new FlagDescription("Mode extension bit", new BitAddress(3, 4), "", 2, null))
-                  .addFlagDescription(new FlagDescription("Mode bit", new BitAddress(3, 6), "", 2, null))
+                  .withDefaultFlagBytes(new byte[] { -1, -32, 0, 0 }) // 11 one bits
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_FRAME_SYNC, new BitAddress(0, 0), "", 11, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_NO_PROTECTION_BIT, new BitAddress(1, 0), "", 1, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_LAYER, new BitAddress(1, 1), "", 2, List.of("reserved", "Layer III", "Layer II", "Layer I")))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_ID, new BitAddress(1, 3), "", 2, List.of("MPEG Version 2.5", "reserved", "MPEG Version 2 (ISO/IEC 13818-3)", "MPEG Version 1 (ISO/IEC 11172-3)")))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_PRIVATE_BIT, new BitAddress(2, 0), "", 1, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_PADDING_BIT, new BitAddress(2, 1), "", 1, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_SAMPLING_FREQUENCY, new BitAddress(2, 2), "", 2, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_BITRATE_INDEX, new BitAddress(2, 4), "", 4, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_EMPHASIS_BIT, new BitAddress(3, 0), "", 2, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_ORIGINAL_OR_COPY, new BitAddress(3, 2), "", 1, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_COPYRIGHT_BIT, new BitAddress(3, 3), "", 1, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_MODE_EXTENSION_BIT, new BitAddress(3, 4), "", 2, null))
+                  .addFlagDescription(new FlagDescription(HEADER_FLAGS_MODE_BIT, new BitAddress(3, 6), "", 2, null))
                .finishFlagSpecification()
-               .withFieldFunction(new PresenceOf(crcReference, "No protection bit", 0))
+               .withFieldFunction(new PresenceOf(crcReference, HEADER_FLAGS_NO_PROTECTION_BIT, 0))
                .asMagicKeyWithOddBitLength(11)
             .finishField()
          .finishHeader()
@@ -126,6 +139,7 @@ public class MP3Extension implements Extension {
             .finishField()
          .finishHeader()
          .getPayload()
+            .referencedAs(REF_PAYLOAD)
             .addBinaryField("data", "payloadData", "The MP3 payload data")
                .withLengthOf(1, 998)
             .finishField()

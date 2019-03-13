@@ -43,8 +43,6 @@ public class APEv2Extension implements Extension {
    private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
-   private static final String APE_MAGIC_KEY_STRING = "APETAGEX";
-   private static final int PREAMPLE_BYTE_LENGTH = 8;
    /**
     *
     */
@@ -84,6 +82,8 @@ public class APEv2Extension implements Extension {
    }
 
    private DataFormatSpecification createSpecification() {
+      final String apeMagicKeyString = "APETAGEX";
+      final int preampleByteLength = 8;
 
       // TODO: APEv2 tag header and footer must be declared optional but it does not work!
 
@@ -109,8 +109,8 @@ public class APEv2Extension implements Extension {
          .addHeader("header", "APEv2 header", "The APEv2 header")
             .referencedAs(headerReference)
             .addStringField("preample", "APEv2 header preample", "APEv2 header preample")
-               .withStaticLengthOf(PREAMPLE_BYTE_LENGTH)
-               .withDefaultValue(APE_MAGIC_KEY_STRING)
+               .withStaticLengthOf(preampleByteLength)
+               .withDefaultValue(apeMagicKeyString)
                .asMagicKey()
             .finishField()
             .addNumericField("versionNumber", "APEv2 header version number", "APEv2 header version number")
@@ -145,8 +145,8 @@ public class APEv2Extension implements Extension {
          .addFooter("footer", "APEv2 footer", "The APEv2 footer")
             .referencedAs(footerReference)
             .addStringField("preample", "APEv2 footer preample", "APEv2 footer preample")
-               .withStaticLengthOf(PREAMPLE_BYTE_LENGTH)
-               .withDefaultValue(APE_MAGIC_KEY_STRING)
+               .withStaticLengthOf(preampleByteLength)
+               .withDefaultValue(apeMagicKeyString)
                .asMagicKey()
             .finishField()
             .addNumericField("versionNumber", "APEv2 footer version number", "APEv2 footer version number")

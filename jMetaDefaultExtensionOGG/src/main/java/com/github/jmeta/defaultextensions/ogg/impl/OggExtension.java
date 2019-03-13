@@ -23,7 +23,6 @@ import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
@@ -39,19 +38,15 @@ public class OggExtension implements Extension {
    private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
       .lookupService(DataFormatSpecificationBuilderFactory.class);
 
-   private static final String OGG_MAGIC_KEY_STRING = "OggS";
-
    /**
     *
     */
    public static final ContainerDataFormat OGG = new ContainerDataFormat("Ogg", new HashSet<String>(),
       new HashSet<String>(), new ArrayList<String>(), "", new Date());
 
-   public static final DataBlockId OGG_PAYLOAD_ID = new DataBlockId(OGG, "ogg.payload");
-   public static final DataBlockId OGG_PACKET_PAYLOAD_ID = new DataBlockId(OGG,
-      "ogg.payload.packetPartContainer.payload");
-   public static final DataBlockId OGG_PACKET_PAYLOAD_FIELD_ID = new DataBlockId(OGG,
-      "ogg.payload.packetPartContainer.payload.segment");
+   static final DataBlockCrossReference REF_OGG_PAYLOAD = new DataBlockCrossReference("Ogg Payload");
+   static final DataBlockCrossReference REF_OGG_PACKET_PAYLOAD = new DataBlockCrossReference("Ogg Packet Payload");
+   static final DataBlockCrossReference REF_SEGMENT = new DataBlockCrossReference("Segment");
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -90,14 +85,13 @@ public class OggExtension implements Extension {
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(OggExtension.OGG);
 
       DataBlockCrossReference segmentTableEntryReference = new DataBlockCrossReference("Segment table entry");
-      DataBlockCrossReference segmentReference = new DataBlockCrossReference("Segment");
 
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("ogg", "Ogg page", "The ogg page")
           .addHeader("header", "Ogg page header", "Ogg page header")
              .addStringField("capturePattern", "Ogg page header capture pattern", "Ogg page header capture pattern")
                 .withStaticLengthOf(4)
-                .withDefaultValue(OGG_MAGIC_KEY_STRING)
+                .withDefaultValue("OggS")
                 .asMagicKey()
              .finishField()
              .addBinaryField("streamStructureVersion", "Ogg page header stream structure version", "Ogg page header structure version")
@@ -127,16 +121,18 @@ public class OggExtension implements Extension {
                 .referencedAs(segmentTableEntryReference)
                 .withStaticLengthOf(1)
                 .withOccurrences(0, 99999)
-                .withFieldFunction(new SizeOf(segmentReference))
+                .withFieldFunction(new SizeOf(REF_SEGMENT))
              .finishField()
           .finishHeader()
           .getPayload()
+             .referencedAs(REF_OGG_PAYLOAD)
              .addContainerWithFieldBasedPayload("packetPartContainer", "Ogg packet", "Ogg packet")
                 .asDefaultNestedContainer()
                 .getPayload()
+                   .referencedAs(REF_OGG_PACKET_PAYLOAD)
                    .withDescription("Ogg packet", "Ogg packet")
                    .addBinaryField("segment", "Ogg segment", "Ogg segment")
-                      .referencedAs(segmentReference)
+                      .referencedAs(REF_SEGMENT)
                       .withLengthOf(0, DataBlockDescription.UNDEFINED)
                       .withOccurrences(1, 999999)
                    .finishField()

@@ -26,7 +26,7 @@ public class Lyrics3v2DataBlockReader extends StandardDataBlockReader {
 
    /**
     * Creates a new {@link Lyrics3v2DataBlockReader}.
-    * 
+    *
     * @param spec
     * @param maxFieldBlockSize
     */
@@ -42,11 +42,10 @@ public class Lyrics3v2DataBlockReader extends StandardDataBlockReader {
          return super.hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, forwardRead);
       }
 
-      MagicKey lyrics3v2FooterMagicKey = getSpecification().getDataBlockDescription(Lyrics3v2Extension.lyrics3V2TagId)
+      MagicKey lyrics3v2FooterMagicKey = getSpecification().getDataBlockDescription(Lyrics3v2Extension.REF_TAG.getId())
          .getFooterMagicKeys().get(0);
 
-      final ByteBuffer readBytes = readBytes(reference.advance(Lyrics3v2Extension.FOOTER_SIZE_FIELD_LENGTH),
-         lyrics3v2FooterMagicKey.getByteLength());
+      final ByteBuffer readBytes = readBytes(reference.advance(6), lyrics3v2FooterMagicKey.getByteLength());
 
       if (lyrics3v2FooterMagicKey.isPresentIn(readBytes)) {
          return false;

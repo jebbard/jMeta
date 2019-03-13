@@ -33,7 +33,7 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
 
    /**
     * Creates a new {@link UnsynchronisationHandler}.
-    * 
+    *
     * @param dbFactory
     *           The {@link DataBlockFactory}
     */
@@ -47,15 +47,16 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
    @Override
    public boolean requiresTransform(Container container) {
 
-      if (container.getHeaders().size() == 0)
+      if (container.getHeaders().size() == 0) {
          return false;
+      }
 
       Header id3v2Header = container.getHeaders().get(0);
 
       for (int i = 0; i < id3v2Header.getFields().size(); ++i) {
          Field<?> field = id3v2Header.getFields().get(i);
 
-         if (field.getId().equals(ID3v23Extension.ID3V23_HEADER_FLAGS_FIELD_ID)) {
+         if (field.getId().equals(ID3v23Extension.REF_TAG_HEADER_FLAGS.getId())) {
             try {
                Flags flags = (Flags) field.getInterpretedValue();
 
@@ -88,8 +89,9 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
    @Override
    protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 
-      if (payloadBytes.remaining() < 1)
+      if (payloadBytes.remaining() < 1) {
          return new byte[][] { payloadBytes.array() };
+      }
 
       List<Byte> synchronisedByteList = new ArrayList<>(payloadBytes.remaining());
 
@@ -97,11 +99,11 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
          byte previousByte = payloadBytes.get(i - 1);
          byte nextByte = payloadBytes.get(i);
 
-         if (previousByte == 0xFF && nextByte == 0x00)
+         if (previousByte == 0xFF && nextByte == 0x00) {
             synchronisedByteList.add(previousByte);
-
-         else
+         } else {
             synchronisedByteList.add(nextByte);
+         }
       }
 
       synchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));
@@ -117,8 +119,9 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
    @Override
    protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
 
-      if (payloadBytes.remaining() < 1)
+      if (payloadBytes.remaining() < 1) {
          return new byte[][] { payloadBytes.array() };
+      }
 
       List<Byte> unsynchronisedByteList = new ArrayList<>(payloadBytes.remaining());
 
@@ -128,8 +131,9 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
 
          unsynchronisedByteList.add(firstByte);
 
-         if (firstByte == 0xFF && (secondByte >= 0xE0 || secondByte == 0))
+         if (firstByte == 0xFF && (secondByte >= 0xE0 || secondByte == 0)) {
             unsynchronisedByteList.add((byte) 0);
+         }
       }
 
       unsynchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));

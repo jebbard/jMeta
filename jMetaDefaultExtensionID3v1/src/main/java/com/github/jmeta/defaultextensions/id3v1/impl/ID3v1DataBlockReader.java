@@ -39,7 +39,7 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
    @Override
    public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
       long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
-      return readContainerWithId(reference.advance(-ID3v1Extension.id3v1TagLength), id, parent,
+      return readContainerWithId(reference.advance(-ID3v1Extension.ID3V1_TAG_LENGTH), id, parent,
          remainingDirectParentByteCount, containerContext, sequenceNumber);
    }
 
@@ -50,7 +50,7 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
       if (forwardRead) {
          return super.hasContainerWithId(reference, id, parent, remainingDirectParentByteCount, forwardRead);
       } else {
-         if (reference.getAbsoluteMediumOffset() - ID3v1Extension.id3v1TagLength < 0) {
+         if (reference.getAbsoluteMediumOffset() - ID3v1Extension.ID3V1_TAG_LENGTH < 0) {
             return false;
          }
 
@@ -58,7 +58,7 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
 
          int magicKeySizeInBytes = id3v1TagMagicKey.getByteLength();
 
-         MediumOffset magicKeyReference = reference.advance(-ID3v1Extension.id3v1TagLength);
+         MediumOffset magicKeyReference = reference.advance(-ID3v1Extension.ID3V1_TAG_LENGTH);
 
          final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
 

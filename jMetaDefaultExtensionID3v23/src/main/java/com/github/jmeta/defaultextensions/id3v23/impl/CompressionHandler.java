@@ -36,7 +36,7 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
 
    /**
     * Creates a new {@link CompressionHandler}.
-    * 
+    *
     * @param dbFactory
     *           The {@link DataBlockFactory}
     */
@@ -51,15 +51,16 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
    public boolean requiresTransform(Container container) {
       Reject.ifNull(container, "container");
 
-      if (container.getHeaders().size() == 0)
+      if (container.getHeaders().size() == 0) {
          return false;
+      }
 
       Header firstHeader = container.getHeaders().get(0);
 
       for (int i = 0; i < firstHeader.getFields().size(); ++i) {
          Field<?> field = firstHeader.getFields().get(i);
 
-         if (field.getId().equals(ID3v23Extension.GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID)) {
+         if (field.getId().equals(ID3v23Extension.REF_GENERIC_FRAME_HEADER_FLAGS.getId())) {
             try {
                Flags flags = (Flags) field.getInterpretedValue();
 
@@ -103,11 +104,13 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
       try {
          int count = 0;
 
-         while ((count = compressor.deflate(buf)) > 0)
+         while ((count = compressor.deflate(buf)) > 0) {
             bos.write(buf, 0, count);
+         }
 
-         if (!compressor.finished())
+         if (!compressor.finished()) {
             throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
+         }
       } finally {
          compressor.end();
       }
@@ -135,11 +138,13 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
       try {
          int count = 0;
 
-         while ((count = decompressor.inflate(buf)) > 0)
+         while ((count = decompressor.inflate(buf)) > 0) {
             bos.write(buf, 0, count);
+         }
 
-         if (!decompressor.finished())
+         if (!decompressor.finished()) {
             throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
+         }
       } catch (DataFormatException t) {
          throw new RuntimeException(t);
       } finally {

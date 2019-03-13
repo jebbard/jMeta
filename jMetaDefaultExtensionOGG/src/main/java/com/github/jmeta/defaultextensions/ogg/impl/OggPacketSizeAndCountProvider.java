@@ -34,7 +34,7 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
     */
    @Override
    public long getCountOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {
-      if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_FIELD_ID)) {
+      if (id.equals(OggExtension.REF_SEGMENT.getId())) {
          return getSegmentSizesForPacket(containerContext).stream().filter(s -> s > 0).count();
       }
 
@@ -47,7 +47,7 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
     */
    @Override
    public long getSizeOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {
-      if (id.equals(OggExtension.OGG_PAYLOAD_ID)) {
+      if (id.equals(OggExtension.REF_OGG_PAYLOAD.getId())) {
          Header oggPageHeader = containerContext.getContainer().getHeaders().get(0);
 
          List<List<Long>> segmentSizesPerPacket = getSegmentSizesPerPacket(oggPageHeader);
@@ -55,10 +55,10 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
             .collect(Collectors.summingLong(size -> size));
       }
 
-      if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_ID)) {
+      if (id.equals(OggExtension.REF_OGG_PACKET_PAYLOAD.getId())) {
          return getSegmentSizesForPacket(containerContext).stream().collect(Collectors.summingLong(size -> size));
       }
-      if (id.equals(OggExtension.OGG_PACKET_PAYLOAD_FIELD_ID)) {
+      if (id.equals(OggExtension.REF_SEGMENT.getId())) {
          return getSegmentSizesForPacket(containerContext).get(sequenceNumber);
       }
 

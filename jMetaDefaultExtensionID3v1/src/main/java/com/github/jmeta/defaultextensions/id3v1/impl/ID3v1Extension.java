@@ -34,10 +34,10 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  */
 public class ID3v1Extension implements Extension {
 
+   public final static int ID3V1_TAG_LENGTH = 128;
+
    private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
       .lookupService(DataFormatSpecificationBuilderFactory.class);
-
-   private static final String ID3V1_TAG_ID_STRING = "TAG";
 
    /**
     *
@@ -77,8 +77,6 @@ public class ID3v1Extension implements Extension {
       return serviceProviders;
    }
 
-   public final static int id3v1TagLength = 128;
-
    private DataFormatSpecification createSpecification() {
 
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(ID3v1Extension.ID3v1);
@@ -89,7 +87,7 @@ public class ID3v1Extension implements Extension {
       return builder.addContainerWithFieldBasedPayload("id3v1", "ID3v1 tag", "The ID3v1 tag")
           .addHeader("header", "ID3v1 tag header", "The ID3v1 tag header")
              .addStringField("id", "ID3v1 tag header id", "The ID3v1 tag header id")
-                .asMagicKey().withDefaultValue(ID3V1_TAG_ID_STRING).withStaticLengthOf(3)
+                .asMagicKey().withDefaultValue("TAG").withStaticLengthOf(3)
              .finishField()
           .finishHeader()
           .getPayload()

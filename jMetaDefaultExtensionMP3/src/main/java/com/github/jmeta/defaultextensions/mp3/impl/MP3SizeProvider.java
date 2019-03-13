@@ -58,7 +58,7 @@ public class MP3SizeProvider implements SizeProvider {
    @Override
    public long getSizeOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {
 
-      if (id.getGlobalId().equals("mp3.payload")) {
+      if (id.equals(MP3Extension.REF_PAYLOAD.getId())) {
          Header header = containerContext.getContainer().getHeaders().get(0);
 
          ByteBuffer bytes = header.getBytes(0, 4);
@@ -78,12 +78,12 @@ public class MP3SizeProvider implements SizeProvider {
          try {
             Flags flags = flagsHeaderField.getInterpretedValue();
 
-            int mpegAudioVersionIdBits = flags.getFlagIntegerValue("Id");
-            int layerBits = flags.getFlagIntegerValue("Layer");
-            int bitRateBits = flags.getFlagIntegerValue("Bitrate index");
-            int sampleRateBits = flags.getFlagIntegerValue("Sampling frequency");
-            int paddingBits = flags.getFlagIntegerValue("Padding bit");
-            int protectionBit = flags.getFlagIntegerValue("No protection bit");
+            int mpegAudioVersionIdBits = flags.getFlagIntegerValue(MP3Extension.HEADER_FLAGS_ID);
+            int layerBits = flags.getFlagIntegerValue(MP3Extension.HEADER_FLAGS_LAYER);
+            int bitRateBits = flags.getFlagIntegerValue(MP3Extension.HEADER_FLAGS_BITRATE_INDEX);
+            int sampleRateBits = flags.getFlagIntegerValue(MP3Extension.HEADER_FLAGS_SAMPLING_FREQUENCY);
+            int paddingBits = flags.getFlagIntegerValue(MP3Extension.HEADER_FLAGS_PADDING_BIT);
+            int protectionBit = flags.getFlagIntegerValue(MP3Extension.HEADER_FLAGS_NO_PROTECTION_BIT);
 
             // System.out.println(flags.getFlagValueString("Id"));
             // System.out.println(flags.getFlagValueString("Layer"));

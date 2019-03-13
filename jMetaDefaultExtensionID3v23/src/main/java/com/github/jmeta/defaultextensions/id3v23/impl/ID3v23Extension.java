@@ -24,7 +24,6 @@ import com.github.jmeta.library.dataformats.api.types.CharacterEncodingOf;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
 import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
@@ -57,30 +56,12 @@ public class ID3v23Extension implements Extension {
    static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
    static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
 
+   static final DataBlockCrossReference REF_EXT_HEADER = new DataBlockCrossReference("Extended header");
+   static final DataBlockCrossReference REF_TAG_HEADER_FLAGS = new DataBlockCrossReference("Header flags");
+   static final DataBlockCrossReference REF_GENERIC_FRAME_HEADER_FLAGS = new DataBlockCrossReference(
+      "Generic frame header flags");
+
    private static final SyncSafeIntegerConverter SYNC_SAFE_INTEGER_CONVERTER = new SyncSafeIntegerConverter();
-
-   private static final String ID3V23_GENERIC_CONTAINER_ID = "id3v23.payload.${FRAME_ID}";
-   public static final DataBlockId GENERIC_FRAME_HEADER_FRAME_FLAGS_FIELD_ID = new DataBlockId(ID3v23,
-      ID3V23_GENERIC_CONTAINER_ID + ".header.flags");
-
-   public static final DataBlockId ID3V23_HEADER_FLAGS_FIELD_ID = new DataBlockId(ID3v23, "id3v23.header.flags");
-
-   private static final byte[] ID3V23_TAG_VERSION_BYTES = new byte[] { 3, 0 };
-   private static final byte[] ID3V23_TAG_ID_BYTES = new byte[] { 'I', 'D', '3' };
-   private static final byte[] ID3V23_TAG_MAGIC_KEY_BYTES = new byte[ID3V23_TAG_ID_BYTES.length
-      + ID3V23_TAG_VERSION_BYTES.length];
-
-   static {
-      for (int i = 0; i < ID3V23_TAG_ID_BYTES.length; i++) {
-         ID3V23_TAG_MAGIC_KEY_BYTES[i] = ID3V23_TAG_ID_BYTES[i];
-      }
-
-      for (int i = 0; i < ID3V23_TAG_VERSION_BYTES.length; i++) {
-         ID3V23_TAG_MAGIC_KEY_BYTES[ID3V23_TAG_ID_BYTES.length + i] = ID3V23_TAG_VERSION_BYTES[i];
-      }
-   }
-
-   public static final DataBlockCrossReference REF_EXT_HEADER = new DataBlockCrossReference("Extended header");
 
    private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
       .lookupService(DataFormatSpecificationBuilderFactory.class);
@@ -119,6 +100,18 @@ public class ID3v23Extension implements Extension {
 
    private DataFormatSpecification createSpecification() {
 
+      final byte[] id3v23TagVersionBytes = new byte[] { 3, 0 };
+      final byte[] id3v23TagIdBytes = new byte[] { 'I', 'D', '3' };
+      final byte[] id3v23TagMagicKeyBytes = new byte[id3v23TagIdBytes.length + id3v23TagVersionBytes.length];
+
+      for (int i = 0; i < id3v23TagIdBytes.length; i++) {
+         id3v23TagMagicKeyBytes[i] = id3v23TagIdBytes[i];
+      }
+
+      for (int i = 0; i < id3v23TagVersionBytes.length; i++) {
+         id3v23TagMagicKeyBytes[id3v23TagIdBytes.length + i] = id3v23TagVersionBytes[i];
+      }
+
       DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(ID3v23Extension.ID3v23);
 
       DataBlockCrossReference frameReference = new DataBlockCrossReference("Frame");
@@ -138,6 +131,7 @@ public class ID3v23Extension implements Extension {
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
          .addHeader("header", "id3v23 tag header", "The id3v23 tag header")
+            .referencedAs(REF_TAG_HEADER_FLAGS)
             .addStringField("id", "id3v23 tag header id", "The id3v23 tag header id")
                .withStaticLengthOf(3)
                .withDefaultValue("ID3")
@@ -146,7 +140,7 @@ public class ID3v23Extension implements Extension {
             .finishField()
             .addBinaryField("version", "id3v23 tag header version", "The id3v23 tag header version")
                .withStaticLengthOf(2)
-               .withDefaultValue(ID3V23_TAG_VERSION_BYTES)
+               .withDefaultValue(id3v23TagVersionBytes)
             .finishField()
             .addFlagsField("flags", "id3v23 tag header flags", "The id3v23 tag header flags")
                .withStaticLengthOf(1)
@@ -199,6 +193,7 @@ public class ID3v23Extension implements Extension {
                .referencedAs(frameReference)
                .asDefaultNestedContainer()
                .addHeader("header", "Generic frame header", "The generic frame header")
+                  .referencedAs(REF_GENERIC_FRAME_HEADER_FLAGS)
                   .addStringField("id", "Generic frame id field", "The generic frame id field")
                      .withStaticLengthOf(4)
                      .withFieldFunction(new IdOf(frameReference))
