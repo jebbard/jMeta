@@ -9,6 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.api.types;
 
+import java.util.stream.Collectors;
+
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -44,7 +46,9 @@ public class ByteOrderOf extends AbstractFieldFunction<String> {
       Reject.ifNull(fieldDesc, "fieldDesc");
       Reject.ifNull(spec, "spec");
 
-      performDefaultValidation(fieldDesc, FieldType.STRING, spec.getDataBlockDescription(getReferencedBlock().getId()),
+      performDefaultValidation(fieldDesc, FieldType.STRING,
+         getReferencedBlocks().stream().map(ref -> spec.getDataBlockDescription(ref.getId()))
+            .collect(Collectors.toSet()),
          PhysicalDataBlockType.CONTAINER, PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, PhysicalDataBlockType.FIELD,
          PhysicalDataBlockType.FIELD_BASED_PAYLOAD, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.HEADER);
    }

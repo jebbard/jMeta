@@ -148,15 +148,10 @@ public class ContainerContext {
             if (fieldFunction.getClass().equals(fieldFunctionClass)) {
                Set<DataBlockId> targetIds = new HashSet<>();
 
-               if (fieldFunction.getClass().equals(SummedSizeOf.class)) {
-                  DataBlockCrossReference[] refBlocks = ((SummedSizeOf) fieldFunction).getReferencedBlocks();
+               Set<DataBlockCrossReference> refBlocks = fieldFunction.getReferencedBlocks();
 
-                  for (DataBlockCrossReference refBlock : refBlocks) {
-                     targetIds.add(refBlock.getId());
-                  }
-
-               } else {
-                  targetIds.add(fieldFunction.getReferencedBlock().getId());
+               for (DataBlockCrossReference refBlock : refBlocks) {
+                  targetIds.add(refBlock.getId());
                }
 
                for (DataBlockId targetId : targetIds) {
@@ -321,7 +316,7 @@ public class ContainerContext {
             sequenceNumber);
 
          if (summedSizeCrossReference != null) {
-            DataBlockCrossReference[] allReferences = summedSizeCrossReference.getReferencingFieldFunction()
+            Set<DataBlockCrossReference> allReferences = summedSizeCrossReference.getReferencingFieldFunction()
                .getReferencedBlocks();
 
             long partialSize = summedSizeCrossReference.getValue();

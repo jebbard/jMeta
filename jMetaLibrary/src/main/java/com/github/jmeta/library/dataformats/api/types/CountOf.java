@@ -9,6 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.api.types;
 
+import java.util.stream.Collectors;
+
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -45,7 +47,9 @@ public class CountOf extends AbstractFieldFunction<Long> {
       Reject.ifNull(spec, "spec");
 
       performDefaultValidation(fieldDesc, FieldType.UNSIGNED_WHOLE_NUMBER,
-         spec.getDataBlockDescription(getReferencedBlock().getId()), PhysicalDataBlockType.CONTAINER,
-         PhysicalDataBlockType.FIELD, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.HEADER);
+         getReferencedBlocks().stream().map(ref -> spec.getDataBlockDescription(ref.getId()))
+            .collect(Collectors.toSet()),
+         PhysicalDataBlockType.CONTAINER, PhysicalDataBlockType.FIELD, PhysicalDataBlockType.FOOTER,
+         PhysicalDataBlockType.HEADER);
    }
 }

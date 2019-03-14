@@ -9,6 +9,8 @@
  */
 package com.github.jmeta.library.dataformats.api.types;
 
+import java.util.stream.Collectors;
+
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -24,8 +26,8 @@ public class SizeOf extends AbstractFieldFunction<Long> {
     * @param referencedBlock
     *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
     */
-   public SizeOf(DataBlockCrossReference referencedBlock) {
-      super(referencedBlock);
+   public SizeOf(DataBlockCrossReference... referencedBlocks) {
+      super(referencedBlocks);
    }
 
    /**
@@ -46,8 +48,9 @@ public class SizeOf extends AbstractFieldFunction<Long> {
       Reject.ifNull(spec, "spec");
 
       performDefaultValidation(fieldDesc, FieldType.UNSIGNED_WHOLE_NUMBER,
-         spec.getDataBlockDescription(getReferencedBlock().getId()), PhysicalDataBlockType.CONTAINER,
-         PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, PhysicalDataBlockType.FIELD,
+         getReferencedBlocks().stream().map(ref -> spec.getDataBlockDescription(ref.getId()))
+            .collect(Collectors.toSet()),
+         PhysicalDataBlockType.CONTAINER, PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, PhysicalDataBlockType.FIELD,
          PhysicalDataBlockType.FIELD_BASED_PAYLOAD, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.HEADER);
 
       // TODO Validate only consecutive target blocks

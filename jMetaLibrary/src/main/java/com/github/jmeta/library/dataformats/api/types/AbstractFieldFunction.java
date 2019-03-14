@@ -14,6 +14,8 @@ import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecifi
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_UNRESOLVED;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -25,26 +27,26 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public abstract class AbstractFieldFunction<F> {
 
-   private final DataBlockCrossReference referencedBlock;
+   private final Set<DataBlockCrossReference> referencedBlocks;
 
    /**
     * Creates a new {@link AbstractFieldFunction}.
     *
-    * @param referencedBlock
-    *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
+    * @param referencedBlocks
+    *           The {@link DataBlockCrossReference}s to the referenced data blocks, must not be null
     */
-   public AbstractFieldFunction(DataBlockCrossReference referencedBlock) {
-      Reject.ifNull(referencedBlock, "referencedBlock");
+   public AbstractFieldFunction(DataBlockCrossReference... referencedBlocks) {
+      Reject.ifNull(referencedBlocks, "referencedBlocks");
 
-      this.referencedBlock = referencedBlock;
+      this.referencedBlocks = new HashSet<>(Arrays.asList(referencedBlocks));
    }
 
    /**
     * @return the {@link DataBlockCrossReference} indicating the id of another data block which is referenced by this
     *         field
     */
-   public DataBlockCrossReference getReferencedBlock() {
-      return referencedBlock;
+   public Set<DataBlockCrossReference> getReferencedBlocks() {
+      return referencedBlocks;
    }
 
    /**
@@ -81,15 +83,15 @@ public abstract class AbstractFieldFunction<F> {
     *           The host field's {@link DataBlockDescription}, must not be null
     * @param expectedFieldType
     *           The expected {@link FieldType} of the host field, must not be null
-    * @param referencedBlockDesc
+    * @param referencedBlockDescs
     *           The referenced block {@link DataBlockDescription}s, must not be null
     * @param validTypes
     *           The valid target {@link PhysicalDataBlockType}s, must not be null or empty
     */
    protected void performDefaultValidation(DataBlockDescription fieldDesc, FieldType<F> expectedFieldType,
-      DataBlockDescription referencedBlockDesc, PhysicalDataBlockType... validTypes) {
+      Set<DataBlockDescription> referencedBlockDescs, PhysicalDataBlockType... validTypes) {
       Reject.ifNull(validTypes, "validTypes");
-      Reject.ifNull(referencedBlockDesc, "referencedBlockDesc");
+      Reject.ifNull(referencedBlockDescs, "referencedBlockDescs");
       Reject.ifNull(expectedFieldType, "expectedFieldType");
       Reject.ifNull(fieldDesc, "fieldDesc");
       Reject.ifTrue(validTypes.length == 0, "validTypes.length == 0");
@@ -101,15 +103,19 @@ public abstract class AbstractFieldFunction<F> {
       }
 
       // Validate target type
-      PhysicalDataBlockType typeToCheck = referencedBlockDesc.getPhysicalType();
-      if (!Arrays.asList(validTypes).contains(typeToCheck)) {
-         throw new InvalidSpecificationException(VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE, fieldDesc, getClass(),
-            Arrays.toString(validTypes), referencedBlockDesc.getId(), typeToCheck);
-      }
+      referencedBlockDescs.forEach(referencedBlockDesc -> {
+         PhysicalDataBlockType typeToCheck = referencedBlockDesc.getPhysicalType();
+         if (!Arrays.asList(validTypes).contains(typeToCheck)) {
+            throw new InvalidSpecificationException(VLD_FIELD_FUNC_REFERENCING_WRONG_TYPE, fieldDesc, getClass(),
+               Arrays.toString(validTypes), referencedBlockDesc.getId(), typeToCheck);
+         }
+      });
 
       // Validate field function is resolved
-      if (!getReferencedBlock().isResolved()) {
-         throw new InvalidSpecificationException(VLD_FIELD_FUNC_UNRESOLVED, fieldDesc, getClass());
-      }
+      getReferencedBlocks().forEach(block -> {
+         if (!block.isResolved()) {
+            throw new InvalidSpecificationException(VLD_FIELD_FUNC_UNRESOLVED, fieldDesc, getClass());
+         }
+      });
    }
 }

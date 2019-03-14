@@ -32,6 +32,7 @@ import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationE
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
@@ -124,13 +125,15 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
             fieldFunction.validate(getDataBlockDescription(fieldIdWithFunctions), this);
 
-            DataBlockId targetId = fieldFunction.getReferencedBlock().getId();
+            Set<DataBlockCrossReference> targetRefs = fieldFunction.getReferencedBlocks();
 
-            if (!fieldFunctionsByTargetId.containsKey(targetId)) {
-               fieldFunctionsByTargetId.put(targetId, new ArrayList<>());
+            for (DataBlockCrossReference targetRef : targetRefs) {
+               if (!fieldFunctionsByTargetId.containsKey(targetRef.getId())) {
+                  fieldFunctionsByTargetId.put(targetRef.getId(), new ArrayList<>());
+               }
+
+               fieldFunctionsByTargetId.get(targetRef.getId()).add(fieldFunction);
             }
-
-            fieldFunctionsByTargetId.get(targetId).add(fieldFunction);
          }
       });
 

@@ -11,6 +11,8 @@ package com.github.jmeta.library.dataformats.api.types;
 
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_PRESENCE_OF_UNSPECIFIED_FLAG_NAME;
 
+import java.util.stream.Collectors;
+
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -73,7 +75,9 @@ public class PresenceOf extends AbstractFieldFunction<Flags> {
       Reject.ifNull(fieldDesc, "fieldDesc");
       Reject.ifNull(spec, "spec");
 
-      performDefaultValidation(fieldDesc, FieldType.FLAGS, spec.getDataBlockDescription(getReferencedBlock().getId()),
+      performDefaultValidation(fieldDesc, FieldType.FLAGS,
+         getReferencedBlocks().stream().map(ref -> spec.getDataBlockDescription(ref.getId()))
+            .collect(Collectors.toSet()),
          PhysicalDataBlockType.FIELD, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.HEADER);
 
       if (!fieldDesc.getFieldProperties().getFlagSpecification().hasFlag(flagName)) {

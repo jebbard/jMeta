@@ -9,6 +9,7 @@
  */
 package com.github.jmeta.library.dataformats.impl.builder;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -296,18 +297,24 @@ public final class ContainerBuilderCloner {
       List<AbstractFieldFunction<F>> fieldFunctions = existingFieldProperties.getFieldFunctions();
 
       for (AbstractFieldFunction<F> fieldFunction : fieldFunctions) {
-         DataBlockId affectedId = fieldFunction.getReferencedBlock().getId();
+         List<DataBlockCrossReference> affectedRefs = new ArrayList<>(fieldFunction.getReferencedBlocks());
 
-         // Replace affected id (which are still referring to the original container) with the
-         // actual id of the cloned container
-         String replacedGlobalId = affectedId.getGlobalId().replace(existingContainerId.getGlobalId(),
-            clonedContainerId.getGlobalId());
-         DataBlockId replacedAffectedId = new DataBlockId(affectedId.getDataFormat(), replacedGlobalId);
-         DataBlockCrossReference resolvedReference = new DataBlockCrossReference(
-            replacedAffectedId.getGlobalId() + "_" + UUID.randomUUID());
-         resolvedReference.resolve(replacedAffectedId);
+         DataBlockCrossReference[] resolvedRefs = new DataBlockCrossReference[affectedRefs.size()];
 
-         fb.withFieldFunction(fieldFunction.withReplacedReferences(resolvedReference));
+         for (int i = 0; i < affectedRefs.size(); ++i) {
+            DataBlockCrossReference affectedRef = affectedRefs.get(i);
+            // Replace affected id (which are still referring to the original container) with the
+            // actual id of the cloned container
+            String replacedGlobalId = affectedRef.getId().getGlobalId().replace(existingContainerId.getGlobalId(),
+               clonedContainerId.getGlobalId());
+            DataBlockId replacedAffectedId = new DataBlockId(affectedRef.getId().getDataFormat(), replacedGlobalId);
+            DataBlockCrossReference resolvedReference = new DataBlockCrossReference(
+               replacedAffectedId.getGlobalId() + "_" + UUID.randomUUID());
+            resolvedReference.resolve(replacedAffectedId);
+            resolvedRefs[i] = resolvedReference;
+         }
+
+         fb.withFieldFunction(fieldFunction.withReplacedReferences(resolvedRefs));
       }
    }
 
