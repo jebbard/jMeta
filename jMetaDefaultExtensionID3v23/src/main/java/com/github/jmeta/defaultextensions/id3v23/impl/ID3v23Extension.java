@@ -25,7 +25,6 @@ import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
@@ -128,6 +127,7 @@ public class ID3v23Extension implements Extension {
       DataBlockCrossReference paddingSizeReference = new DataBlockCrossReference("Padding Size");
       DataBlockCrossReference extHeaderFlagsReference = new DataBlockCrossReference("Ext Header Flags");
 
+      DataBlockCrossReference frameIdReference = new DataBlockCrossReference("Frame Id");
       // @formatter:off
       return builder.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
          .addHeader("header", "id3v23 tag header", "The id3v23 tag header")
@@ -192,12 +192,13 @@ public class ID3v23Extension implements Extension {
             .addGenericContainerWithFieldBasedPayload("FRAME_ID", "GENERIC_ID3v23_FRAME", "The id3v23 GENERIC_FRAME")
                .referencedAs(frameReference)
                .asDefaultNestedContainer()
+               .withIdField(frameIdReference)
                .addHeader("header", "Generic frame header", "The generic frame header")
                   .referencedAs(REF_GENERIC_FRAME_HEADER_FLAGS)
                   .addStringField("id", "Generic frame id field", "The generic frame id field")
                      .withStaticLengthOf(4)
-                     .withFieldFunction(new IdOf(frameReference))
                      .withFixedCharset(Charsets.CHARSET_ISO)
+                     .referencedAs(frameIdReference)
                   .finishField()
                   .addNumericField("size", "Generic frame size field", "The generic frame size field")
                      .withStaticLengthOf(4)

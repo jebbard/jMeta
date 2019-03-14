@@ -58,10 +58,11 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    private long minimumOccurrences = 1;
    private long maximumOccurrences = 1;
    private final boolean isGeneric;
+   private DataBlockCrossReference idFieldRef;
 
    /**
     * Creates a new {@link AbstractDataFormatSpecificationBuilder}.
-    * 
+    *
     * @param parentBuilder
     *           The parent {@link DataFormatBuilder}. Required for allowing a fluent API, as it is returned by the
     *           {@link #finish()} method. Must not be null.
@@ -182,7 +183,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 
    /**
     * Allows derived builders to remove a child {@link DataBlockDescription} with a given id
-    * 
+    *
     * @param childId
     *           The {@link DataBlockId} of the child to remove, must not be null
     */
@@ -196,13 +197,18 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
     * Finishes building of this {@link AbstractDataFormatSpecificationBuilder} by creating its
     * {@link DataBlockDescription}, and adding it as child description to its parent {@link DataFormatBuilder} as well
     * as to the root builder.
-    * 
+    *
     * @return The parent {@link DataFormatBuilder}.
     */
    protected P finish() {
+
+      if (idFieldRef != null && !idFieldRef.isResolved()) {
+         throw new IllegalArgumentException("Unresolved id field reference: " + idFieldRef);
+      }
+
       DataBlockDescription myDescription = new DataBlockDescription(createId(), name, description, type,
          new ArrayList<>(childDescriptions.values()), fieldProperties, minimumOccurrences, maximumOccurrences,
-         minimumByteLength, maximumByteLength, isGeneric);
+         minimumByteLength, maximumByteLength, isGeneric, idFieldRef == null ? null : idFieldRef.getId());
 
       parentBuilder.addChildDescription(myDescription);
 
@@ -221,7 +227,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 
    /**
     * Allows to modify the lengths of the data block build by this class
-    * 
+    *
     * @param minimumByteLength
     *           The minimum byte length
     * @param maximumByteLength
@@ -234,7 +240,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 
    /**
     * Allows to set or unset the container {@link DataBlockDescription} built by this class as default nested container.
-    * 
+    *
     * @param isDefaultNestedContainer
     *           true for setting it as default nested container, false otherwise
     */
@@ -243,8 +249,18 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
    }
 
    /**
+    * Allows to set the id field's {@link DataBlockCrossReference} of this generic container
+    *
+    * @param the
+    *           id field's {@link DataBlockCrossReference}
+    */
+   protected void setIdFieldRef(DataBlockCrossReference idFieldRef) {
+      this.idFieldRef = idFieldRef;
+   }
+
+   /**
     * Allows to set {@link FieldProperties} for the field {@link DataBlockDescription} built by this class.
-    * 
+    *
     * @param fieldProperties
     */
    protected void setFieldProperties(FieldProperties<?> fieldProperties) {

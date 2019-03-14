@@ -9,6 +9,7 @@ package com.github.jmeta.library.dataformats.api.types;
 
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_PROPERTIES_UNNECESSARY;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_ID_FIELD_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_CONTAINER;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_CONTAINER_BASED_PAYLOAD;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHILDREN_FIELD;
@@ -61,6 +62,7 @@ public class DataBlockDescription {
 
    private final List<MagicKey> headerMagicKeys = new ArrayList<>();
    private final List<MagicKey> footerMagicKeys = new ArrayList<>();
+   private final DataBlockId idField;
 
    /**
     * Creates a new {@link DataBlockDescription}.
@@ -93,10 +95,12 @@ public class DataBlockDescription {
     *           than or equal to the minimum byte length
     * @param isGeneric
     *           true if instances of this data block generic, false otherwise
+    * @param idField
+    *           The {@link DataBlockId} of the id field if the data block is a generic container, null otherwise
     */
    public DataBlockDescription(DataBlockId id, String name, String description, PhysicalDataBlockType physicalType,
       List<DataBlockDescription> orderedChildren, FieldProperties<?> fieldProperties, long minimumOccurrences,
-      long maximumOccurrences, long minimumByteLength, long maximumByteLength, boolean isGeneric) {
+      long maximumOccurrences, long minimumByteLength, long maximumByteLength, boolean isGeneric, DataBlockId idField) {
 
       Reject.ifNull(id, "id");
       Reject.ifNull(name, "name");
@@ -115,6 +119,7 @@ public class DataBlockDescription {
       this.minimumByteLength = minimumByteLength;
       this.maximumByteLength = maximumByteLength;
       this.isGeneric = isGeneric;
+      this.idField = idField;
 
       // (A) Stand-alone validation of all fields
       validateDataBlockDescription();
@@ -216,6 +221,15 @@ public class DataBlockDescription {
 
    public List<MagicKey> getFooterMagicKeys() {
       return Collections.unmodifiableList(footerMagicKeys);
+   }
+
+   /**
+    * Returns the id field's {@link DataBlockId}.
+    *
+    * @return the id field's {@link DataBlockId}
+    */
+   public DataBlockId getIdField() {
+      return idField;
    }
 
    /**
@@ -438,6 +452,11 @@ public class DataBlockDescription {
 
       // Validate children
       validateChildren();
+
+      // Validate generic container
+      if (physicalType == PhysicalDataBlockType.CONTAINER && isGeneric && idField == null) {
+         throw new InvalidSpecificationException(VLD_ID_FIELD_MISSING, this);
+      }
 
       // Validate field properties
       if (physicalType == PhysicalDataBlockType.FIELD && fieldProperties == null) {

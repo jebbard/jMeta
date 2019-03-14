@@ -34,7 +34,7 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
 
    /**
     * Creates a new {@link StandardContainerBasedPayloadContainerBuilder}.
-    * 
+    *
     * @param parentBuilder
     *           The parent {@link DataFormatBuilder}. Required for allowing a fluent API, as it is returned by the
     *           {@link #finish()} method. Must not be null.
@@ -99,6 +99,15 @@ public class StandardContainerBasedPayloadContainerBuilder<P extends ContainerSe
    @Override
    public ContainerBuilder<P, ContainerBasedPayloadBuilder<P>> asDefaultNestedContainer() {
       setDefaultNestedContainer(true);
+      return this;
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerBuilder#withIdField(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
+    */
+   @Override
+   public ContainerBuilder<P, ContainerBasedPayloadBuilder<P>> withIdField(DataBlockCrossReference idField) {
+      setIdFieldRef(idField);
       return this;
    }
 

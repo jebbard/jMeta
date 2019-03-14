@@ -25,7 +25,6 @@ import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FlagDescription;
-import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
@@ -105,6 +104,7 @@ public class APEv2Extension implements Extension {
       DataBlockCrossReference payloadReference = new DataBlockCrossReference("Payload");
 
       DataBlockCrossReference itemPayloadReference = new DataBlockCrossReference("Item payload");
+      DataBlockCrossReference itemKeyReference = new DataBlockCrossReference("Item key");
       return builder.addContainerWithContainerBasedPayload("apev2", "APEv2 Tag", "The APEv2 Tag")
          .addHeader("header", "APEv2 header", "The APEv2 header")
             .referencedAs(headerReference)
@@ -184,6 +184,7 @@ public class APEv2Extension implements Extension {
             .addGenericContainerWithFieldBasedPayload("ITEM_ID", "APEv2 item", "The APEv2 item")
                .referencedAs(itemReference)
                .asDefaultNestedContainer()
+               .withIdField(itemKeyReference)
                .addHeader("header", "APEv2 item header", "The APEv2 item header")
                   .addNumericField("size", "APEv2 item value size", "APEv2 item value size")
                      .withStaticLengthOf(4)
@@ -199,8 +200,8 @@ public class APEv2Extension implements Extension {
                   .finishField()
                   .addStringField("key", "APEv2 item key", "APEv2 item key")
                      .withLengthOf(2, 255)
-                     .withFieldFunction(new IdOf(itemReference))
                      .withTerminationCharacter('\u0000')
+                     .referencedAs(itemKeyReference)
                   .finishField()
                .finishHeader()
                .getPayload()

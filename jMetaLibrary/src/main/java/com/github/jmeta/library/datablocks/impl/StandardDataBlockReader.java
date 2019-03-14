@@ -29,12 +29,10 @@ import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
-import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.media.api.services.MediumStore;
@@ -121,22 +119,16 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       return new DataBlockDescription(unknownBlockId, DataFormatSpecification.UNKNOWN_FIELD_ID,
          DataFormatSpecification.UNKNOWN_FIELD_ID, PhysicalDataBlockType.FIELD, new ArrayList<>(),
-         unknownFieldProperties, 1, 1, DataBlockDescription.UNDEFINED, DataBlockDescription.UNDEFINED, false);
+         unknownFieldProperties, 1, 1, DataBlockDescription.UNDEFINED, DataBlockDescription.UNDEFINED, false, null);
    }
 
-   private DataBlockId determineActualId(MediumOffset reference, DataBlockId id, long remainingParentByteCount,
+   private DataBlockId determineActualContainerId(MediumOffset reference, DataBlockId id, long remainingParentByteCount,
       ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber, ContainerContext containerContext) {
 
       DataBlockDescription desc = m_spec.getDataBlockDescription(id);
 
       if (desc.isGeneric()) {
-         DataBlockId idFieldId = findFirstIdField(id);
-
-         // CONFIG_CHECK For generic data blocks, exactly one child field with ID_OF(genericDataBlockId) must be defined
-         if (idFieldId == null) {
-            throw new IllegalStateException(
-               "For generic data block " + id + ", no child field with ID_OF function is defined.");
-         }
+         DataBlockId idFieldId = desc.getIdField();
 
          final DataBlockDescription idFieldDesc = m_spec.getDataBlockDescription(idFieldId);
 
@@ -144,8 +136,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          if (byteOffset == DataBlockDescription.UNDEFINED) {
             throw new IllegalStateException("For generic data block " + id
-               + ", a LocationProperties object with the exact offset for its container parent " + id
-               + " must be specified.");
+               + ", the exact offset of its id field in its container parent " + id + " must be specified.");
          }
 
          MediumOffset idFieldReference = reference.advance(byteOffset);
@@ -193,30 +184,6 @@ public class StandardDataBlockReader implements DataBlockReader {
       }
 
       return actualBlockSize;
-   }
-
-   private DataBlockId findFirstIdField(DataBlockId parentId) {
-
-      DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
-
-      if (parentDesc.getPhysicalType().equals(PhysicalDataBlockType.FIELD)) {
-         for (int i = 0; i < parentDesc.getFieldProperties().getFieldFunctions().size(); ++i) {
-            AbstractFieldFunction<?> function = parentDesc.getFieldProperties().getFieldFunctions().get(i);
-
-            if (function.getClass().equals(IdOf.class)) {
-               return parentId;
-            }
-         }
-      }
-
-      for (int i = 0; i < parentDesc.getOrderedChildren().size(); ++i) {
-         final DataBlockId id = findFirstIdField(parentDesc.getOrderedChildren().get(i).getId());
-         if (id != null) {
-            return id;
-         }
-      }
-
-      return null;
    }
 
    /**
@@ -366,7 +333,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          customCountProvider);
 
       // TODO the actual current charset and byte order must be known here!
-      DataBlockId actualId = determineActualId(reference, id, remainingDirectParentByteCount,
+      DataBlockId actualId = determineActualContainerId(reference, id, remainingDirectParentByteCount,
          m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding(), 0, newContainerContext);
 
       Container createdContainer = m_dataBlockFactory.createContainer(actualId, parent, reference, this,
@@ -462,7 +429,7 @@ public class StandardDataBlockReader implements DataBlockReader {
       ContainerContext newContainerContext = new ContainerContext(m_spec, containerContext, customSizeProvider,
          customCountProvider);
 
-      DataBlockId actualId = determineActualId(reference, id, remainingDirectParentByteCount,
+      DataBlockId actualId = determineActualContainerId(reference, id, remainingDirectParentByteCount,
          m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding(), 0, newContainerContext);
 
       // Read footers

@@ -22,7 +22,6 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
 import com.github.jmeta.utility.charset.api.services.Charsets;
@@ -93,31 +92,61 @@ public class Lyrics3v2Extension implements Extension {
       DataBlockCrossReference payloadReference = new DataBlockCrossReference("Payload");
       DataBlockCrossReference fieldPayloadReference = new DataBlockCrossReference("Field Payload");
 
+      DataBlockCrossReference idFieldReference = new DataBlockCrossReference("Field id");
+      // @formatter:off
       return builder.addContainerWithContainerBasedPayload("lyrics3v2", "Lyrics3v2 Tag", "The Lyrics3v2 Tag")
-         .referencedAs(REF_TAG).addHeader("header", "Lyrics3v2 header", "The Lyrics3v2 header")
-         .referencedAs(headerReference).addStringField("id", "Lyrics3v2 header id", "Lyrics3v2 header id")
-         .withStaticLengthOf(lyrics3v2MagicHeaderString.length()).withDefaultValue(lyrics3v2MagicHeaderString)
-         .asMagicKey().finishField().finishHeader().addFooter("footer", "Lyrics3v2 footer", "The Lyrics3v2 footer")
-         .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
-         .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER).withStaticLengthOf(6)
-         .withFieldFunction(new SummedSizeOf(headerReference, payloadReference)).finishField()
-         .addStringField("id", "Lyrics3v2 footer id", "Lyrics3v2 footer id")
-         .withStaticLengthOf(lyrics3v2MagicFooterString.length()).withDefaultValue(lyrics3v2MagicFooterString)
-         .asMagicKey().finishField().finishFooter().getPayload().referencedAs(payloadReference)
-         .withDescription("Lyrics3v2 payload", "The Lyrics3v2 payload")
-         .addGenericContainerWithFieldBasedPayload("FIELD_ID", "Lyrics3v2 field", "The Lyrics3v2 field")
-         .referencedAs(fieldReference).asDefaultNestedContainer()
-         .addHeader("header", "Lyrics3v2 field header", "The Lyrics3v2 field header")
-         .addStringField("id", "Lyrics3v2 field id", "Lyrics3v2 field id").withStaticLengthOf(3)
-         .withFieldFunction(new IdOf(fieldReference)).finishField()
-         .addNumericField("size", "Lyrics3v2 item value size", "Lyrics3v2 item value size")
-         .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER).withStaticLengthOf(5)
-         .withFieldFunction(new SizeOf(fieldPayloadReference)).finishField().finishHeader().getPayload()
-         .referencedAs(fieldPayloadReference).withDescription("Lyrics3v2 field payload", "The Lyrics3v2 field payload")
-         .addStringField("value", "Lyrics3v2 field data", "Lyrics3v2 field data")
-         .withLengthOf(0, DataBlockDescription.UNDEFINED).finishField().finishFieldBasedPayload().finishContainer()
-         .finishContainerBasedPayload().finishContainer().withByteOrders(ByteOrder.LITTLE_ENDIAN)
-         .withCharsets(Charsets.CHARSET_ISO).build();
+         .referencedAs(REF_TAG)
+         .addHeader("header", "Lyrics3v2 header", "The Lyrics3v2 header")
+            .referencedAs(headerReference)
+            .addStringField("id", "Lyrics3v2 header id", "Lyrics3v2 header id")
+               .withStaticLengthOf(lyrics3v2MagicHeaderString.length())
+               .withDefaultValue(lyrics3v2MagicHeaderString)
+               .asMagicKey()
+            .finishField()
+         .finishHeader()
+         .addFooter("footer", "Lyrics3v2 footer", "The Lyrics3v2 footer")
+            .addNumericField("size", "Lyrics3v2 footer tag size", "Lyrics3v2 footer tag size")
+               .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
+               .withStaticLengthOf(6)
+               .withFieldFunction(new SummedSizeOf(headerReference, payloadReference))
+            .finishField()
+            .addStringField("id", "Lyrics3v2 footer id", "Lyrics3v2 footer id")
+               .withStaticLengthOf(lyrics3v2MagicFooterString.length())
+               .withDefaultValue(lyrics3v2MagicFooterString)
+               .asMagicKey()
+            .finishField()
+         .finishFooter()
+         .getPayload()
+            .referencedAs(payloadReference)
+            .withDescription("Lyrics3v2 payload", "The Lyrics3v2 payload")
+            .addGenericContainerWithFieldBasedPayload("FIELD_ID", "Lyrics3v2 field", "The Lyrics3v2 field")
+               .referencedAs(fieldReference)
+               .asDefaultNestedContainer()
+               .withIdField(idFieldReference = new DataBlockCrossReference("Field id"))
+               .addHeader("header", "Lyrics3v2 field header", "The Lyrics3v2 field header")
+                  .addStringField("id", "Lyrics3v2 field id", "Lyrics3v2 field id")
+                     .withStaticLengthOf(3)
+                     .referencedAs(idFieldReference)
+                  .finishField()
+                  .addNumericField("size", "Lyrics3v2 item value size", "Lyrics3v2 item value size")
+                     .withCustomConverter(STRING_SIZE_INTEGER_CONVERTER)
+                     .withStaticLengthOf(5)
+                     .withFieldFunction(new SizeOf(fieldPayloadReference))
+                  .finishField()
+               .finishHeader()
+               .getPayload()
+                  .referencedAs(fieldPayloadReference)
+                  .withDescription("Lyrics3v2 field payload", "The Lyrics3v2 field payload")
+                  .addStringField("value", "Lyrics3v2 field data", "Lyrics3v2 field data")
+                     .withLengthOf(0, DataBlockDescription.UNDEFINED)
+                  .finishField()
+               .finishFieldBasedPayload()
+            .finishContainer()
+         .finishContainerBasedPayload()
+      .finishContainer()
+      .withByteOrders(ByteOrder.LITTLE_ENDIAN)
+      .withCharsets(Charsets.CHARSET_ISO)
+      .build();
       // @formatter:on
    }
 

@@ -28,14 +28,14 @@ public interface ContainerBuilder<P extends ContainerSequenceBuilder<P>, PB>
    /**
     * Provides the implicitly created payload builder of this {@link ContainerBuilder}, such that e.g. its description
     * can be changed or children can be added to it.
-    * 
+    *
     * @return the implicitly created payload builder of this {@link ContainerBuilder}
     */
    PB getPayload();
 
    /**
     * Adds a header to this container.
-    * 
+    *
     * @param localId
     *           The local id of the new data block, must not be null, must not contain the character
     *           {@link DataBlockId#SEGMENT_SEPARATOR}
@@ -49,7 +49,7 @@ public interface ContainerBuilder<P extends ContainerSequenceBuilder<P>, PB>
 
    /**
     * Adds a footer to this container.
-    * 
+    *
     * @param localId
     *           The local id of the new data block, must not be null, must not contain the character
     *           {@link DataBlockId#SEGMENT_SEPARATOR}
@@ -62,24 +62,26 @@ public interface ContainerBuilder<P extends ContainerSequenceBuilder<P>, PB>
    FooterBuilder<ContainerBuilder<P, PB>> addFooter(String localId, String name, String description);
 
    /**
-    * Finishes building the container
-    * 
-    * @return The parent builder
-    */
-   P finishContainer();
-
-   /**
     * Tags the container built by this {@link ContainerBuilder} as default nested container.
-    * 
+    *
     * @return the current builder
     */
    ContainerBuilder<P, PB> asDefaultNestedContainer();
 
    /**
+    * Sets an id field for a generic container
+    *
+    * @param idField
+    *           The {@link DataBlockCrossReference} to the id field to set, must not be null
+    * @return the current builder
+    */
+   ContainerBuilder<P, PB> withIdField(DataBlockCrossReference idField);
+
+   /**
     * Clones all properties of the given container id into this container. This method implicitly validates the the
     * given container exists and has the same type, and that all of its children are valid. If this is not the case,
     * this method directly throws an {@link IllegalArgumentException}.
-    * 
+    *
     * @param existingContainerRef
     *           The existing container {@link DataBlockCrossReference}, must indeed refer to a container of the same
     *           type (field-based or container-based payload) and must exist in the root builder already, i.e. it must
@@ -87,4 +89,11 @@ public interface ContainerBuilder<P extends ContainerSequenceBuilder<P>, PB>
     * @return the current builder
     */
    ContainerBuilder<P, PB> cloneFrom(DataBlockCrossReference existingContainerRef);
+
+   /**
+    * Finishes building the container
+    *
+    * @return The parent builder
+    */
+   P finishContainer();
 }

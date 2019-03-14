@@ -29,7 +29,6 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.Flags;
-import com.github.jmeta.library.dataformats.api.types.IdOf;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
 import com.github.jmeta.library.dataformats.api.types.SizeOf;
 import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
@@ -210,7 +209,6 @@ public class ContainerContext {
    private final FieldFunctionStore<Long, SummedSizeOf> summedSizes = new FieldFunctionStore<>(SummedSizeOf.class);
    private final FieldFunctionStore<Long, CountOf> counts = new FieldFunctionStore<>(CountOf.class);
    private final FieldFunctionStore<Flags, PresenceOf> presences = new FieldFunctionStore<>(PresenceOf.class);
-   private final FieldFunctionStore<String, IdOf> ids = new FieldFunctionStore<>(IdOf.class);
    private final FieldFunctionStore<String, ByteOrderOf> byteOrders = new FieldFunctionStore<>(ByteOrderOf.class);
    private final FieldFunctionStore<String, CharacterEncodingOf> characterEncodings = new FieldFunctionStore<>(
       CharacterEncodingOf.class);
@@ -277,7 +275,6 @@ public class ContainerContext {
       presences.addField(field);
       byteOrders.addField(field);
       characterEncodings.addField(field);
-      ids.addField(field);
    }
 
    /**
@@ -421,37 +418,6 @@ public class ContainerContext {
          }
 
          return parentContainerContext.getOccurrencesOf(id);
-      }
-
-      return crossReference.getValue();
-   }
-
-   /**
-    * Determines the actual id of the given (generic) {@link DataBlockId} with the given sequence number within the
-    * current {@link Container}. The approach is as follows:
-    * <ul>
-    * <li>The field functions are searched for a field that contains the id of the data block within this
-    * {@link ContainerContext}</li>
-    * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
-    * <li>If there is none in the parent container context, null is returned</li>
-    * </ul>
-    *
-    * @param id
-    *           The {@link DataBlockId} of the data block, must not be null
-    * @param sequenceNumber
-    *           The sequence number of the data block, must not be negative
-    * @return The id of the data block or null if none is available
-    */
-   public String getIdOf(DataBlockId id, int sequenceNumber) {
-      Reject.ifNull(id, "id");
-      Reject.ifNegative(sequenceNumber, "sequenceNumber");
-
-      FieldCrossReference<String, IdOf> crossReference = ids.getCrossReference(id, sequenceNumber);
-
-      if (crossReference == null) {
-         if (parentContainerContext != null) {
-            return parentContainerContext.getIdOf(id, sequenceNumber);
-         }
       }
 
       return crossReference.getValue();

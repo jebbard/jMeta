@@ -109,9 +109,11 @@ public class InvalidSpecificationException extends RuntimeException {
    public static final String VLD_FIELD_FUNC_UNRESOLVED =
       "For this field, the field function of type <%1$s> has unresolved cross references: <%2$s>";
 
-   public static final String VLD_CONTAINER_HAS_OCCURRENCES = "Data block type as " + PhysicalDataBlockType.CONTAINER +
+   public static final String VLD_CONTAINER_HAS_OCCURRENCES = "Data block typed as " + PhysicalDataBlockType.CONTAINER +
       " must not have defined occurrences, as it by design may have arbitrary occurrences, but min occurrences = " +
       "<%1$s> and max occurrences = <%2$s>";
+
+   public static final String VLD_ID_FIELD_MISSING = "Every generic container must have an id field";
    // @formatter:on
 
    private static final long serialVersionUID = -2426654412196106699L;

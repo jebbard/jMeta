@@ -256,7 +256,8 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       return new DataBlockDescription(id, genericDescription.getName(), "Unspecified data block",
          genericDescription.getPhysicalType(), realChildren, genericDescription.getFieldProperties(),
          genericDescription.getMinimumOccurrences(), genericDescription.getMaximumOccurrences(),
-         genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), false);
+         genericDescription.getMinimumByteLength(), genericDescription.getMaximumByteLength(), false,
+         genericDescription.getIdField());
    }
 
    /**
