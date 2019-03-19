@@ -84,7 +84,11 @@ public class APEv2Extension implements Extension {
       final String apeMagicKeyString = "APETAGEX";
       final int preampleByteLength = 8;
 
-      // TODO: APEv2 tag header and footer must be declared optional but it does not work!
+      // NOTE: Although the APEv2 tag header and footer are optional (header is mandatory if tag is at beginning of
+      // file,
+      // footer is mandatory if at end of file), we do not declare both as optional because there is no clear criterion.
+      // This way, APEv2 tags are only recognized if they have a header (when forward reading) or if they have a footer
+      // (when backward reading).
 
       FlagDescription readOnlyFlag = new FlagDescription("Read-only", new BitAddress(0, 0), "", 1, null);
       FlagDescription itemTypeFlag = new FlagDescription("Item type", new BitAddress(0, 1), "", 2, null);

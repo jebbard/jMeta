@@ -8,8 +8,6 @@
 package com.github.jmeta.library.datablocks.api.services;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
@@ -63,8 +61,6 @@ public interface DataBlockFactory {
     * @param spec
     * @param reference
     * @param fieldBytes
-    * @param byteOrder
-    * @param characterEncoding
     * @param sequenceNumber
     *           TODO
     * @param containerContext
@@ -72,8 +68,7 @@ public interface DataBlockFactory {
     * @return the {@link Field}
     */
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber,
-      ContainerContext containerContext);
+      ByteBuffer fieldBytes, int sequenceNumber, ContainerContext containerContext);
 
    /**
     * @param id

@@ -10,7 +10,6 @@
 package com.github.jmeta.library.datablocks.impl;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +122,7 @@ public class StandardDataBlockReader implements DataBlockReader {
    }
 
    private DataBlockId determineActualContainerId(MediumOffset reference, DataBlockId id, long remainingParentByteCount,
-      ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber, ContainerContext containerContext) {
+      int sequenceNumber, ContainerContext containerContext) {
 
       DataBlockDescription desc = m_spec.getDataBlockDescription(id);
 
@@ -141,8 +140,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          MediumOffset idFieldReference = reference.advance(byteOffset);
 
-         long actualFieldSize = determineActualFieldSize(idFieldDesc, id, remainingParentByteCount - byteOffset,
-            idFieldReference, characterEncoding, containerContext, 0);
+         long actualFieldSize = determineActualFieldSize(idFieldDesc, remainingParentByteCount - byteOffset,
+            idFieldReference, containerContext, 0);
 
          if (actualFieldSize == DataBlockDescription.UNDEFINED) {
             throw new IllegalStateException(
@@ -150,11 +149,7 @@ public class StandardDataBlockReader implements DataBlockReader {
          }
 
          // Read the field that defines the actual id for the container
-         ByteOrder currentByteOrder = m_spec.getDefaultByteOrder();
-         Charset currentCharacterEncoding = m_spec.getDefaultCharacterEncoding();
-
-         Field<?> idField = readField(idFieldReference, currentByteOrder, currentCharacterEncoding, idFieldDesc,
-            actualFieldSize, actualFieldSize, sequenceNumber, containerContext);
+         Field<?> idField = readField(idFieldReference, idFieldDesc, actualFieldSize, sequenceNumber, containerContext);
 
          return concreteBlockIdFromGenericId(id, idField);
       }
@@ -162,9 +157,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       return id;
    }
 
-   private long determineActualFieldSize(DataBlockDescription fieldDesc, DataBlockId parentId,
-      long remainingDirectParentByteCount, MediumOffset reference, Charset characterEncoding,
-      ContainerContext containerContext, int sequenceNumber) {
+   private long determineActualFieldSize(DataBlockDescription fieldDesc, long remainingDirectParentByteCount,
+      MediumOffset reference, ContainerContext containerContext, int sequenceNumber) {
 
       long actualBlockSize = containerContext.getSizeOf(fieldDesc.getId(), sequenceNumber,
          remainingDirectParentByteCount);
@@ -174,6 +168,8 @@ public class StandardDataBlockReader implements DataBlockReader {
 
          // Determine termination bytes from termination character
          if (terminationCharacter != null) {
+            Charset characterEncoding = containerContext.getCharacterEncodingOf(fieldDesc.getId(), sequenceNumber);
+
             actualBlockSize = getSizeUpToTerminationBytes(reference, characterEncoding, terminationCharacter,
                remainingDirectParentByteCount);
          }
@@ -296,7 +292,6 @@ public class StandardDataBlockReader implements DataBlockReader {
       for (int i = 0; i < topLevelContainerDescs.size(); ++i) {
          DataBlockDescription desc = topLevelContainerDescs.get(i);
 
-         // TODO stage2_010: What value should remaining parent byte count really have here?
          if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNDEFINED, forwardRead)) {
             return true;
          }
@@ -332,9 +327,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       ContainerContext newContainerContext = new ContainerContext(m_spec, containerContext, customSizeProvider,
          customCountProvider);
 
-      // TODO the actual current charset and byte order must be known here!
-      DataBlockId actualId = determineActualContainerId(reference, id, remainingDirectParentByteCount,
-         m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding(), 0, newContainerContext);
+      DataBlockId actualId = determineActualContainerId(reference, id, remainingDirectParentByteCount, 0,
+         newContainerContext);
 
       Container createdContainer = m_dataBlockFactory.createContainer(actualId, parent, reference, this,
          newContainerContext, sequenceNumber);
@@ -429,8 +423,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       ContainerContext newContainerContext = new ContainerContext(m_spec, containerContext, customSizeProvider,
          customCountProvider);
 
-      DataBlockId actualId = determineActualContainerId(reference, id, remainingDirectParentByteCount,
-         m_spec.getDefaultByteOrder(), m_spec.getDefaultCharacterEncoding(), 0, newContainerContext);
+      DataBlockId actualId = determineActualContainerId(reference, id, remainingDirectParentByteCount, 0,
+         newContainerContext);
 
       // Read footers
       MediumOffset nextReference = reference;
@@ -521,20 +515,19 @@ public class StandardDataBlockReader implements DataBlockReader {
       return container;
    }
 
-   private Field<?> readField(final MediumOffset reference, ByteOrder currentByteOrder, Charset currentCharset,
-      DataBlockDescription fieldDesc, long fieldSize, long remainingDirectParentByteCount, int sequenceNumber,
-      ContainerContext containerContext) {
+   private Field<?> readField(final MediumOffset reference, DataBlockDescription fieldDesc, long fieldSize,
+      int sequenceNumber, ContainerContext containerContext) {
 
       // A lazy field is created if the field size exceeds a maximum size
       if (fieldSize > m_maxFieldBlockSize) {
-         return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, currentByteOrder,
-            currentCharset, sequenceNumber, containerContext);
+         return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, sequenceNumber,
+            containerContext);
       }
 
       ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
-      return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer,
-         currentByteOrder, currentCharset, sequenceNumber, containerContext);
+      return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer, sequenceNumber,
+         containerContext);
    }
 
    /**
@@ -563,14 +556,10 @@ public class StandardDataBlockReader implements DataBlockReader {
          long actualOccurrences = containerContext.getOccurrencesOf(fieldDesc.getId());
 
          for (int j = 0; j < actualOccurrences; j++) {
-            ByteOrder actualByteOrder = containerContext.getByteOrderOf(fieldDesc.getId(), j);
-            Charset actualCharacterEncoding = containerContext.getCharacterEncodingOf(fieldDesc.getId(), j);
+            long fieldSize = determineActualFieldSize(fieldDesc, currentlyRemainingParentByteCount,
+               currentFieldReference, containerContext, j);
 
-            long fieldSize = determineActualFieldSize(fieldDesc, parentId, currentlyRemainingParentByteCount,
-               currentFieldReference, actualCharacterEncoding, containerContext, j);
-
-            Field<?> newField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding, fieldDesc,
-               fieldSize, currentlyRemainingParentByteCount, j, containerContext);
+            Field<?> newField = readField(currentFieldReference, fieldDesc, fieldSize, j, containerContext);
 
             containerContext.addFieldFunctions(newField);
 
@@ -587,12 +576,8 @@ public class StandardDataBlockReader implements DataBlockReader {
       if (currentlyRemainingParentByteCount > 0) {
          DataBlockDescription unknownFieldDescription = createUnknownFieldDescription(parentId);
 
-         ByteOrder actualByteOrder = containerContext.getByteOrderOf(unknownFieldDescription.getId(), 0);
-         Charset actualCharacterEncoding = containerContext.getCharacterEncodingOf(unknownFieldDescription.getId(), 0);
-
-         Field<?> unknownField = readField(currentFieldReference, actualByteOrder, actualCharacterEncoding,
-            unknownFieldDescription, currentlyRemainingParentByteCount, currentlyRemainingParentByteCount, 0,
-            containerContext);
+         Field<?> unknownField = readField(currentFieldReference, unknownFieldDescription,
+            currentlyRemainingParentByteCount, 0, containerContext);
 
          fields.add(unknownField);
       }

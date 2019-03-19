@@ -68,28 +68,8 @@ public class StandardField<T> implements Field<T> {
       this.containerContext = containerContext;
       m_mediumReference = reference;
       m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
-   }
-
-   /**
-    * @param byteOrder
-    */
-   public void initByteOrder(ByteOrder byteOrder) {
-
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifFalse(m_byteOrder == null, "m_byteOrder == null");
-
-      m_byteOrder = byteOrder;
-   }
-
-   /**
-    * @param characterEncoding
-    */
-   public void initCharacterEncoding(Charset characterEncoding) {
-
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifFalse(m_characterEncoding == null, "m_characterEncoding == null");
-
-      m_characterEncoding = characterEncoding;
+      m_byteOrder = containerContext.getByteOrderOf(getId(), sequenceNumber);
+      m_characterEncoding = containerContext.getCharacterEncodingOf(getId(), sequenceNumber);
    }
 
    /**

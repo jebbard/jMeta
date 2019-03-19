@@ -46,15 +46,14 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
     * @param totalSize
     * @param factory
     * @param dataBlockReader
-    * @param byteOrder
-    * @param characterEncoding
     * @param sequenceNumber
     *           TODO
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
     */
    public LazyField(DataBlockDescription fieldDesc, MediumOffset reference, DataBlock parent, long totalSize,
-      DataBlockFactory factory, DataBlockReader dataBlockReader, ByteOrder byteOrder, Charset characterEncoding,
-      int sequenceNumber, ContainerContext containerContext) {
+      DataBlockFactory factory, DataBlockReader dataBlockReader, int sequenceNumber,
+      ContainerContext containerContext) {
       super(fieldDesc.getId(), parent, reference, dataBlockReader, sequenceNumber, containerContext);
 
       Reject.ifNull(factory, "factory");
@@ -64,8 +63,6 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
       m_totalSize = totalSize;
       m_dbFactory = factory;
       m_fieldDesc = fieldDesc;
-      m_characterEncoding = characterEncoding;
-      m_byteOrder = byteOrder;
    }
 
    /**
@@ -114,7 +111,7 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
          ByteBuffer binaryData = getDataBlockReader().readBytes(getMediumReference(), (int) m_totalSize);
 
          m_wrappedField = m_dbFactory.createFieldFromBytes(m_fieldDesc.getId(), getDataBlockReader().getSpecification(),
-            getMediumReference(), binaryData, m_byteOrder, m_characterEncoding, getSequenceNumber(), getContainerContext());
+            getMediumReference(), binaryData, getSequenceNumber(), getContainerContext());
       }
    }
 
@@ -125,8 +122,4 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
    private final long m_totalSize;
 
    private final DataBlockFactory m_dbFactory;
-
-   private final ByteOrder m_byteOrder;
-
-   private final Charset m_characterEncoding;
 }

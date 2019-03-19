@@ -8,8 +8,6 @@
 package com.github.jmeta.library.datablocks.impl;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
@@ -62,12 +60,11 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
-    *      DataFormatSpecification, MediumOffset, BinaryValue, ByteOrder, Charset, int, ContainerContext)
+    *      DataFormatSpecification, MediumOffset, BinaryValue, int, ContainerContext)
     */
    @Override
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, ByteOrder byteOrder, Charset characterEncoding, int sequenceNumber,
-      ContainerContext containerContext) {
+      ByteBuffer fieldBytes, int sequenceNumber, ContainerContext containerContext) {
 
       Reject.ifNull(id, "fieldDesc");
       Reject.ifNull(reference, "reference");
@@ -76,9 +73,6 @@ public class StandardDataBlockFactory implements DataBlockFactory {
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
       StandardField<T> field = new StandardField<>(desc, fieldBytes, reference, sequenceNumber, containerContext);
-
-      field.initByteOrder(byteOrder);
-      field.initCharacterEncoding(characterEncoding);
 
       return field;
    }
