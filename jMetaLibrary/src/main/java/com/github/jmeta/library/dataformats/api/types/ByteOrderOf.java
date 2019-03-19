@@ -34,6 +34,8 @@ public class ByteOrderOf extends AbstractFieldFunction<String> {
     */
    @Override
    public AbstractFieldFunction<String> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      Reject.ifNull(replacedReferences, "replacedReferences");
+
       return new ByteOrderOf(replacedReferences[0]);
    }
 

@@ -23,17 +23,17 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 /**
- * {@link OggPacketSizeAndCountProvider}
- *
+ * {@link OggPacketSizeAndCountProvider} implements the very special ogg way of determining the size of a packet and the
+ * number of segments it contains.
  */
 public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvider {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.CountProvider#getCountOf(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      int, com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
     */
    @Override
-   public long getCountOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {
+   public long getCountOf(DataBlockId id, ContainerContext containerContext) {
       if (id.equals(OggExtension.REF_SEGMENT.getId())) {
          return getSegmentSizesForPacket(containerContext).stream().filter(s -> s > 0).count();
       }

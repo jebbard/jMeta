@@ -35,6 +35,8 @@ public class CharacterEncodingOf extends AbstractFieldFunction<String> {
     */
    @Override
    public AbstractFieldFunction<String> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      Reject.ifNull(replacedReferences, "replacedReferences");
+
       return new CharacterEncodingOf(replacedReferences[0]);
    }
 

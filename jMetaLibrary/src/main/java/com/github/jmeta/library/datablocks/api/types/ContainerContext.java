@@ -12,10 +12,10 @@ package com.github.jmeta.library.datablocks.api.types;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.CountProvider;
@@ -36,168 +36,22 @@ import com.github.jmeta.utility.byteutils.api.services.ByteOrders;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link ContainerContext}
+ * {@link ContainerContext} contains contextual bits of metadata for the current container like sizes, counts, byte
+ * orders etc. of fields or other data blocks within this container. Saying this, during parsing e.g. header or footer
+ * fields, this context of metadata is built up, and {@link ContainerContext} allows parsing code to later access this
+ * information.
  *
+ * {@link ContainerContext}s are hierarchical in a way that they contain a reference to the {@link ContainerContext} of
+ * the parent container (if any). If a size could not be determined, the delegate to the parent
+ * {@link ContainerContext}.
  */
 public class ContainerContext {
 
+   private Container container;
    private final SizeProvider customSizeProvider;
    private final CountProvider customCountProvider;
 
-   /**
-    * Returns the attribute {@link #spec}.
-    *
-    * @return the attribute {@link #spec}
-    */
-   public DataFormatSpecification getDataFormatSpecification() {
-      return spec;
-   }
-
-   /**
-    * Returns the attribute {@link #parentContainerContext}.
-    *
-    * @return the attribute {@link #parentContainerContext}
-    */
-   public ContainerContext getParentContainerContext() {
-      return parentContainerContext;
-   }
-
-   public static class FieldCrossReference<T, F extends AbstractFieldFunction<T>> {
-
-      private final DataBlockId referencedBlock;
-      private final Field<T> referencingField;
-      private final F referencingFieldFunction;
-
-      /**
-       * Creates a new {@link FieldCrossReference}.
-       *
-       * @param referencedBlock
-       * @param referencedBlockSequenceNumber
-       * @param referencingField
-       * @param referencingFieldFunction
-       */
-      public FieldCrossReference(DataBlockId referencedBlock, Field<T> referencingField, F referencingFieldFunction) {
-         this.referencedBlock = referencedBlock;
-         this.referencingField = referencingField;
-         this.referencingFieldFunction = referencingFieldFunction;
-      }
-
-      /**
-       * Returns the attribute {@link #referencedBlock}.
-       *
-       * @return the attribute {@link #referencedBlock}
-       */
-      public DataBlockId getReferencedBlock() {
-         return referencedBlock;
-      }
-
-      /**
-       * Returns the attribute {@link #referencingField}.
-       *
-       * @return the attribute {@link #referencingField}
-       */
-      public Field<T> getReferencingField() {
-         return referencingField;
-      }
-
-      /**
-       * Returns the attribute {@link #referencingFieldFunction}.
-       *
-       * @return the attribute {@link #referencingFieldFunction}
-       */
-      public F getReferencingFieldFunction() {
-         return referencingFieldFunction;
-      }
-
-      public T getValue() {
-         try {
-            return referencingField.getInterpretedValue();
-         } catch (BinaryValueConversionException e) {
-            throw new RuntimeException("Unexpected exception during context field conversion", e);
-         }
-      }
-   }
-
-   private class FieldFunctionStore<T, F extends AbstractFieldFunction<T>> {
-
-      private final Class<F> fieldFunctionClass;
-
-      private final Map<DataBlockId, Map<Integer, FieldCrossReference<T, F>>> fieldCrossRefs = new HashMap<>();
-
-      private final Map<Field<T>, Set<FieldCrossReference<T, F>>> fieldCrossRefsBySourceField = new HashMap<>();
-
-      /**
-       * Creates a new {@link FieldFunctionStore}.
-       *
-       * @param fieldFunctionClass
-       */
-      public FieldFunctionStore(Class<F> fieldFunctionClass) {
-         Reject.ifNull(fieldFunctionClass, "fieldFunctionClass");
-         this.fieldFunctionClass = fieldFunctionClass;
-      }
-
-      @SuppressWarnings("unchecked")
-      public void addField(Field<?> field) {
-         Reject.ifNull(field, "field");
-
-         DataBlockDescription fieldDesc = spec.getDataBlockDescription(field.getId());
-
-         List<?> fieldFunctionList = fieldDesc.getFieldProperties().getFieldFunctions();
-
-         for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) fieldFunctionList) {
-            if (fieldFunction.getClass().equals(fieldFunctionClass)) {
-               Set<DataBlockId> targetIds = new HashSet<>();
-
-               Set<DataBlockCrossReference> refBlocks = fieldFunction.getReferencedBlocks();
-
-               for (DataBlockCrossReference refBlock : refBlocks) {
-                  targetIds.add(refBlock.getId());
-               }
-
-               for (DataBlockId targetId : targetIds) {
-                  Map<Integer, FieldCrossReference<T, F>> fieldCrossRefsPerSequenceNumber = null;
-
-                  if (fieldCrossRefs.containsKey(targetId)) {
-                     fieldCrossRefsPerSequenceNumber = fieldCrossRefs.get(targetId);
-                  } else {
-                     fieldCrossRefsPerSequenceNumber = new HashMap<>();
-                     fieldCrossRefs.put(targetId, fieldCrossRefsPerSequenceNumber);
-                  }
-
-                  FieldCrossReference<T, F> crossRef = new FieldCrossReference<>(targetId, (Field<T>) field,
-                     (F) fieldFunction);
-                  fieldCrossRefsPerSequenceNumber.put(field.getSequenceNumber(), crossRef);
-
-                  Set<FieldCrossReference<T, F>> crossRefsForField = null;
-
-                  if (fieldCrossRefsBySourceField.containsKey(field)) {
-                     crossRefsForField = fieldCrossRefsBySourceField.get(field);
-                  } else {
-                     crossRefsForField = new HashSet<>();
-                     fieldCrossRefsBySourceField.put((Field<T>) field, crossRefsForField);
-                  }
-
-                  crossRefsForField.add(crossRef);
-               }
-            }
-         }
-      }
-
-      public FieldCrossReference<T, F> getCrossReference(DataBlockId targetId, int sequenceNumber) {
-         if (!fieldCrossRefs.containsKey(targetId)) {
-            return null;
-         }
-
-         if (!fieldCrossRefs.get(targetId).containsKey(sequenceNumber)) {
-            return null;
-         }
-
-         return fieldCrossRefs.get(targetId).get(sequenceNumber);
-      }
-   }
-
    private final DataFormatSpecification spec;
-   private Container container;
    private final ContainerContext parentContainerContext;
 
    private final FieldFunctionStore<Long, SizeOf> sizes = new FieldFunctionStore<>(SizeOf.class);
@@ -209,12 +63,146 @@ public class ContainerContext {
       CharacterEncodingOf.class);
 
    /**
-    * Returns the attribute {@link #container}.
+    * {@link FieldCrossReference} combines a {@link Field} containing a field function with the {@link DataBlockId}
+    * referenced by it for easier access by the {@link FieldFunctionStore} and {@link ContainerContext}.
     *
-    * @return the attribute {@link #container}
+    * @param <T>
+    *           The interpreted field type
+    * @param <F>
+    *           The concrete type of {@link AbstractFieldFunction}
     */
-   public Container getContainer() {
-      return container;
+   public static class FieldCrossReference<T, F extends AbstractFieldFunction<T>> {
+
+      private final DataBlockId referencedBlock;
+      private final Field<T> referencingField;
+      private final F referencingFieldFunction;
+
+      /**
+       * Creates a new {@link FieldCrossReference}.
+       *
+       * @param referencedBlock
+       *           The referenced {@link DataBlockId}, must not be null
+       * @param referencingField
+       *           The {@link Field} referencing the referenced {@link DataBlockId}, must not be null
+       * @param referencingFieldFunction
+       *           The {@link AbstractFieldFunction} the field uses to reference the data block, must not be null
+       */
+      public FieldCrossReference(DataBlockId referencedBlock, Field<T> referencingField, F referencingFieldFunction) {
+         Reject.ifNull(referencingField, "referencingField");
+         Reject.ifNull(referencedBlock, "referencedBlock");
+         Reject.ifNull(referencingField, "referencingField");
+
+         this.referencedBlock = referencedBlock;
+         this.referencingField = referencingField;
+         this.referencingFieldFunction = referencingFieldFunction;
+      }
+
+      public DataBlockId getReferencedBlock() {
+         return referencedBlock;
+      }
+
+      public Field<T> getReferencingField() {
+         return referencingField;
+      }
+
+      public F getReferencingFieldFunction() {
+         return referencingFieldFunction;
+      }
+
+      /**
+       * @return The interpreted value of the referencing field
+       */
+      public T getValue() {
+         try {
+            return referencingField.getInterpretedValue();
+         } catch (BinaryValueConversionException e) {
+            throw new RuntimeException("Unexpected exception during context field conversion", e);
+         }
+      }
+   }
+
+   /**
+    * {@link FieldFunctionStore} stores all {@link FieldCrossReference}s for a concrete type of
+    * {@link AbstractFieldFunction}.
+    *
+    * @param <T>
+    *           The interpreted field type
+    * @param <F>
+    *           The concrete type of {@link AbstractFieldFunction}
+    */
+   private class FieldFunctionStore<T, F extends AbstractFieldFunction<T>> {
+
+      private final Class<F> fieldFunctionClass;
+
+      private final Map<DataBlockId, Map<Integer, FieldCrossReference<T, F>>> fieldCrossRefsByTargetId = new HashMap<>();
+
+      /**
+       * Creates a new {@link FieldFunctionStore}.
+       *
+       * @param fieldFunctionClass
+       *           The concrete class of {@link AbstractFieldFunction}, must not be null
+       */
+      public FieldFunctionStore(Class<F> fieldFunctionClass) {
+         Reject.ifNull(fieldFunctionClass, "fieldFunctionClass");
+         this.fieldFunctionClass = fieldFunctionClass;
+      }
+
+      /**
+       * Adds the field function of the given field and the type represented by this {@link FieldFunctionStore}.
+       *
+       * @param field
+       *           The field, must not be null
+       */
+      @SuppressWarnings("unchecked")
+      public void addField(Field<?> field) {
+         Reject.ifNull(field, "field");
+
+         DataBlockDescription fieldDesc = spec.getDataBlockDescription(field.getId());
+
+         List<?> fieldFunctionList = fieldDesc.getFieldProperties().getFieldFunctions();
+
+         for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) fieldFunctionList) {
+            if (fieldFunction.getClass().equals(fieldFunctionClass)) {
+               Set<DataBlockCrossReference> refBlocks = fieldFunction.getReferencedBlocks();
+
+               Set<DataBlockId> targetIds = refBlocks.stream().map(DataBlockCrossReference::getId)
+                  .collect(Collectors.toSet());
+
+               for (DataBlockId targetId : targetIds) {
+                  if (!fieldCrossRefsByTargetId.containsKey(targetId)) {
+                     fieldCrossRefsByTargetId.put(targetId, new HashMap<>());
+                  }
+
+                  fieldCrossRefsByTargetId.get(targetId).put(field.getSequenceNumber(),
+                     new FieldCrossReference<>(targetId, (Field<T>) field, (F) fieldFunction));
+               }
+            }
+         }
+      }
+
+      /**
+       * Returns the {@link FieldCrossReference} for the given target id and sequence number or null if there is none.
+       *
+       * @param targetId
+       *           The target {@link DataBlockId}, must not be null
+       * @param sequenceNumber
+       *           The sequence number, must not be negative
+       * @return the {@link FieldCrossReference} for the given target id and sequence number or null if there is none
+       */
+      public FieldCrossReference<T, F> getCrossReference(DataBlockId targetId, int sequenceNumber) {
+         Reject.ifNull(targetId, "targetId");
+         Reject.ifNegative(sequenceNumber, "sequenceNumber");
+
+         if (!fieldCrossRefsByTargetId.containsKey(targetId)) {
+            return null;
+         }
+
+         if (!fieldCrossRefsByTargetId.get(targetId).containsKey(sequenceNumber)) {
+            return null;
+         }
+
+         return fieldCrossRefsByTargetId.get(targetId).get(sequenceNumber);
+      }
    }
 
    /**
@@ -226,9 +214,9 @@ public class ContainerContext {
     *           The parent {@link ContainerContext}, might be null if this {@link ContainerContext} belongs to a
     *           top-level container
     * @param customSizeProvider
-    *           TODO
+    *           A custom {@link SizeProvider} implementation to be used or null if none
     * @param customCountProvider
-    *           TODO
+    *           A custom {@link CountProvider} implementation to be used or null if none
     */
    public ContainerContext(DataFormatSpecification spec, ContainerContext parentContainerContext,
       SizeProvider customSizeProvider, CountProvider customCountProvider) {
@@ -238,6 +226,27 @@ public class ContainerContext {
       this.parentContainerContext = parentContainerContext;
       this.customSizeProvider = customSizeProvider;
       this.customCountProvider = customCountProvider;
+   }
+
+   /**
+    * @return the {@link DataFormatSpecification} the container of this context belongs to
+    */
+   public DataFormatSpecification getDataFormatSpecification() {
+      return spec;
+   }
+
+   /**
+    * @return the parent {@link ContainerContext} or null if this is a top-level {@link ContainerContext}
+    */
+   public ContainerContext getParentContainerContext() {
+      return parentContainerContext;
+   }
+
+   /**
+    * @return the {@link Container} this {@link ContainerContext} belongs to
+    */
+   public Container getContainer() {
+      return container;
    }
 
    /**
@@ -276,11 +285,17 @@ public class ContainerContext {
     * Determines the size of the given {@link DataBlockId} with the given sequence number within the current
     * {@link Container}. The approach is as follows:
     * <ul>
-    * <li>If the data block has fixed size according to its specification, this size is returned</li>
-    * <li>Otherwise the field functions are searched for a field that contains the size of the data block within this
-    * {@link ContainerContext}</li>
+    * <li>If there is a custom {@link SizeProvider} returning a size that is not equal to
+    * {@link DataBlockDescription#UNDEFINED}, this size is returned</li>
+    * <li>Otherwise if the data block has fixed size according to its specification, this size is returned</li>
+    * <li>Otherwise the size of field functions (single block size) are searched for a field that contains the size of
+    * the data block within this {@link ContainerContext}</li>
+    * <li>Otherwise the size of field functions (multiple block size) are searched for a field that contains the size of
+    * the data block within this {@link ContainerContext}</li>
+    * <li>If there is no single block size function found, it is checked if there is one for the matching generic id of
+    * the target data block</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
-    * <li>If there is none in the parent container context, {@link DataBlockDescription#UNDEFINED} is returned</li>
+    * <li>If there is none in the parent container context, the given remaining parent byte count is returned</li>
     * </ul>
     *
     * @param id
@@ -288,12 +303,16 @@ public class ContainerContext {
     * @param sequenceNumber
     *           The sequence number of the data block, must not be negative
     * @param remainingDirectParentByteCount
-    *           TODO
+    *           The number of remaining direct parent bytes, if known; must either be
+    *           {@link DataBlockDescription#UNDEFINED} or strictly positive
     * @return The size of the data block or {@link DataBlockDescription#UNDEFINED} if none is available
     */
    public long getSizeOf(DataBlockId id, int sequenceNumber, long remainingDirectParentByteCount) {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
+      Reject.ifTrue(
+         remainingDirectParentByteCount != DataBlockDescription.UNDEFINED && remainingDirectParentByteCount < 0,
+         "remainingDirectParentByteCount != DataBlockDescription.UNDEFINED && remainingDirectParentByteCount < 0");
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
@@ -316,13 +335,12 @@ public class ContainerContext {
             sequenceNumber);
 
          if (summedSizeCrossReference != null) {
-            Set<DataBlockCrossReference> allReferences = summedSizeCrossReference.getReferencingFieldFunction()
-               .getReferencedBlocks();
+            Set<DataBlockId> allTargetIds = summedSizeCrossReference.getReferencingFieldFunction().getReferencedBlocks()
+               .stream().map(DataBlockCrossReference::getId).collect(Collectors.toSet());
 
             long partialSize = summedSizeCrossReference.getValue();
 
-            for (DataBlockCrossReference dataBlockCrossReference : allReferences) {
-               DataBlockId siblingId = dataBlockCrossReference.getId();
+            for (DataBlockId siblingId : allTargetIds) {
                if (!siblingId.equals(id)) {
                   long occurrencesOf = getOccurrencesOf(siblingId);
                   if (occurrencesOf >= 1) {
@@ -360,11 +378,14 @@ public class ContainerContext {
     * Determines the number of occurrences of the given {@link DataBlockId} within the current {@link Container}. The
     * approach is as follows:
     * <ul>
-    * <li>If the data block has fixed number of occurrences according to its specification, this number is returned</li>
+    * <li>If there is a custom {@link CountProvider} returning a size that is not equal to
+    * {@link DataBlockDescription#UNDEFINED}, this size is returned</li>
+    * <li>Otherwise if the data block has fixed number of occurrences according to its specification, this number is
+    * returned</li>
     * <li>Otherwise if the data block is optional, the field functions are searched for a field that contains the
     * presence of the data block within this {@link ContainerContext}</li>
-    * <li>Otherwise the field functions are searched for a field that contains the count of the data block within this
-    * {@link ContainerContext}</li>
+    * <li>Otherwise the {@link CountOf} field functions are searched for a field that contains the count of the data
+    * block within this {@link ContainerContext}</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
     * <li>If there is none in the parent container context, {@link DataBlockDescription#UNDEFINED} is returned</li>
     * </ul>
@@ -378,16 +399,16 @@ public class ContainerContext {
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
-      if (desc.getMaximumOccurrences() == desc.getMinimumOccurrences()) {
-         return desc.getMaximumOccurrences();
-      }
-
       if (customCountProvider != null) {
-         long actualOccurrences = customCountProvider.getCountOf(desc.getId(), 0, this);
+         long actualOccurrences = customCountProvider.getCountOf(desc.getId(), this);
 
          if (actualOccurrences != DataBlockDescription.UNDEFINED) {
             return actualOccurrences;
          }
+      }
+
+      if (desc.getMaximumOccurrences() == desc.getMinimumOccurrences()) {
+         return desc.getMaximumOccurrences();
       }
 
       if (desc.isOptional()) {

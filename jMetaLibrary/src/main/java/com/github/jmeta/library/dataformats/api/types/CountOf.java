@@ -34,6 +34,8 @@ public class CountOf extends AbstractFieldFunction<Long> {
     */
    @Override
    public AbstractFieldFunction<Long> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      Reject.ifNull(replacedReferences, "replacedReferences");
+
       return new CountOf(replacedReferences[0]);
    }
 

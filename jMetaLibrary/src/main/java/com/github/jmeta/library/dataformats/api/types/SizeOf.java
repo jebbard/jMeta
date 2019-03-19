@@ -23,8 +23,8 @@ public class SizeOf extends AbstractFieldFunction<Long> {
    /**
     * Creates a new {@link SizeOf} field function.
     *
-    * @param referencedBlock
-    *           The {@link DataBlockCrossReference} to the referenced data block, must not be null
+    * @param referencedBlocks
+    *           The {@link DataBlockCrossReference}s to the referenced data blocks, must not be null
     */
    public SizeOf(DataBlockCrossReference... referencedBlocks) {
       super(referencedBlocks);
@@ -35,6 +35,8 @@ public class SizeOf extends AbstractFieldFunction<Long> {
     */
    @Override
    public AbstractFieldFunction<Long> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      Reject.ifNull(replacedReferences, "replacedReferences");
+
       return new SizeOf(replacedReferences[0]);
    }
 

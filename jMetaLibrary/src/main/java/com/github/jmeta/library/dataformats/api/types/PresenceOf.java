@@ -63,6 +63,8 @@ public class PresenceOf extends AbstractFieldFunction<Flags> {
     */
    @Override
    public AbstractFieldFunction<Flags> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+      Reject.ifNull(replacedReferences, "replacedReferences");
+
       return new PresenceOf(replacedReferences[0], flagName, flagValue);
    }
 
