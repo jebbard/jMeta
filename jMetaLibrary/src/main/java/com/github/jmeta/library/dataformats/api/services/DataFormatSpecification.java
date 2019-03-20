@@ -10,7 +10,9 @@ package com.github.jmeta.library.dataformats.api.services;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 
+import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -76,4 +78,9 @@ public interface DataFormatSpecification {
     */
    public boolean specifiesBlockWithId(DataBlockId id);
 
+   /**
+    * @return all {@link AbstractFieldFunction}s specified in this {@link DataFormatSpecification}, mapped to the target
+    *         block id they reference
+    */
+   public Map<DataBlockId, List<AbstractFieldFunction<?>>> getAllFieldFunctionsByTargetId();
 }

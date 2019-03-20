@@ -9,7 +9,11 @@
  */
 package com.github.jmeta.library.dataformats.api.types;
 
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_UNRESOLVED;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -46,14 +50,27 @@ public class SummedSizeOf extends SizeOf {
    public void validate(DataBlockDescription fieldDesc, DataFormatSpecification spec) {
       super.validate(fieldDesc, spec);
 
-      // Validate field function is resolved
-      for (DataBlockCrossReference dataBlockCrossReference : getReferencedBlocks()) {
-         if (!dataBlockCrossReference.isResolved()) {
-            throw new InvalidSpecificationException(VLD_FIELD_FUNC_UNRESOLVED, fieldDesc, getClass());
+      List<DataBlockId> targetDataBlockIds = getReferencedBlocks().stream().map(DataBlockCrossReference::getId)
+         .collect(Collectors.toList());
+
+      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = spec.getAllFieldFunctionsByTargetId();
+
+      Set<DataBlockId> targetBlocksWithoutSize = new HashSet<>();
+
+      for (DataBlockId targetId : targetDataBlockIds) {
+         DataBlockDescription targetDescc = spec.getDataBlockDescription(targetId);
+
+         boolean hasSuitableFieldFunction = fieldFunctionsByTargetId.containsKey(targetId)
+            && fieldFunctionsByTargetId.get(targetId).stream().anyMatch(ff -> ff.getClass().equals(SizeOf.class));
+
+         if (!targetDescc.hasFixedSize() && !hasSuitableFieldFunction) {
+            targetBlocksWithoutSize.add(targetId);
          }
       }
 
-      // TODO Validate only consecutive target blocks
-      // TODO Validate that for at most one target block there is no easier size of or fixed size present
+      if (targetBlocksWithoutSize.size() > 1) {
+         throw new InvalidSpecificationException(InvalidSpecificationException.VLD_FIELD_FUNC_INVALID_SUMMED_SIZE,
+            fieldDesc, targetBlocksWithoutSize);
+      }
    }
 }

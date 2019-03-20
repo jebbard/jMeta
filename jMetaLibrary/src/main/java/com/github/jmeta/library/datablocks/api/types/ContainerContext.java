@@ -163,7 +163,7 @@ public class ContainerContext {
 
          for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) fieldFunctionList) {
             if (fieldFunction.getClass().equals(fieldFunctionClass)) {
-               Set<DataBlockCrossReference> refBlocks = fieldFunction.getReferencedBlocks();
+               List<DataBlockCrossReference> refBlocks = fieldFunction.getReferencedBlocks();
 
                Set<DataBlockId> targetIds = refBlocks.stream().map(DataBlockCrossReference::getId)
                   .collect(Collectors.toSet());

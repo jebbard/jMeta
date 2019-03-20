@@ -165,6 +165,9 @@ public class ID3v23Extension implements Extension {
                .withStaticLengthOf(4)
                .withDefaultValue(Long.valueOf(0x2000))
                .withFieldFunction(new SummedSizeOf(extHeaderFlagsReference, paddingSizeReference, crcReference))
+               // NOTE: This additional SizeOf is necessary to ensure the validation of the SummedSizeOf for id3v23 tag
+               // header size is working
+               .withFieldFunction(new SizeOf(REF_EXT_HEADER))
             .finishField()
             .addFlagsField("flags", "id3v23 extended header flags", "The id3v23 extended header flags")
                .referencedAs(extHeaderFlagsReference)

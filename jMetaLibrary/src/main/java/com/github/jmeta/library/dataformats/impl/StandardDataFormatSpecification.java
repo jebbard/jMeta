@@ -112,30 +112,18 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
    /**
     * Validates all field functions and ensures the dynamic occurrence / size data blocks have a fitting field function
     */
+   @SuppressWarnings("unchecked")
    private void validateFieldFunctions() {
 
-      Map<DataBlockId, Object> fieldFunctions = m_dataBlockDescriptions.values().stream()
-         .filter(desc -> desc.getPhysicalType() == PhysicalDataBlockType.FIELD)
-         .collect(Collectors.toMap(DataBlockDescription::getId, desc -> desc.getFieldProperties().getFieldFunctions()));
-
-      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = new HashMap<>();
+      Map<DataBlockId, Object> fieldFunctions = getFieldFunctionMap();
 
       fieldFunctions.forEach((fieldIdWithFunctions, functionsForField) -> {
          for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) functionsForField) {
-
             fieldFunction.validate(getDataBlockDescription(fieldIdWithFunctions), this);
-
-            Set<DataBlockCrossReference> targetRefs = fieldFunction.getReferencedBlocks();
-
-            for (DataBlockCrossReference targetRef : targetRefs) {
-               if (!fieldFunctionsByTargetId.containsKey(targetRef.getId())) {
-                  fieldFunctionsByTargetId.put(targetRef.getId(), new ArrayList<>());
-               }
-
-               fieldFunctionsByTargetId.get(targetRef.getId()).add(fieldFunction);
-            }
          }
       });
+
+      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = getAllFieldFunctionsByTargetId();
 
       List<DataBlockDescription> dataBlocksWithDynamicOccurrences = m_dataBlockDescriptions.values().stream()
          .filter(desc -> desc.getMaximumOccurrences() != desc.getMinimumOccurrences()).collect(Collectors.toList());
@@ -162,6 +150,39 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
       }
 
       // TODO verify SIZE_OF exists
+   }
+
+   /**
+    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecification#getAllFieldFunctionsByTargetId()
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public Map<DataBlockId, List<AbstractFieldFunction<?>>> getAllFieldFunctionsByTargetId() {
+      Map<DataBlockId, Object> fieldFunctions = getFieldFunctionMap();
+
+      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = new HashMap<>();
+
+      fieldFunctions.forEach((fieldIdWithFunctions, functionsForField) -> {
+         for (AbstractFieldFunction<?> fieldFunction : (List<AbstractFieldFunction<?>>) functionsForField) {
+            List<DataBlockCrossReference> targetRefs = fieldFunction.getReferencedBlocks();
+
+            for (DataBlockCrossReference targetRef : targetRefs) {
+               if (!fieldFunctionsByTargetId.containsKey(targetRef.getId())) {
+                  fieldFunctionsByTargetId.put(targetRef.getId(), new ArrayList<>());
+               }
+
+               fieldFunctionsByTargetId.get(targetRef.getId()).add(fieldFunction);
+            }
+         }
+      });
+      return fieldFunctionsByTargetId;
+   }
+
+   private Map<DataBlockId, Object> getFieldFunctionMap() {
+      Map<DataBlockId, Object> fieldFunctions = m_dataBlockDescriptions.values().stream()
+         .filter(desc -> desc.getPhysicalType() == PhysicalDataBlockType.FIELD)
+         .collect(Collectors.toMap(DataBlockDescription::getId, desc -> desc.getFieldProperties().getFieldFunctions()));
+      return fieldFunctions;
    }
 
    private boolean hasFieldFunctionOfType(List<AbstractFieldFunction<?>> functions,

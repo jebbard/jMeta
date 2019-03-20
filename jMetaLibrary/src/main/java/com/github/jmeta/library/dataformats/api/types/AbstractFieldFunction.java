@@ -14,7 +14,7 @@ import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecifi
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_UNRESOLVED;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException;
@@ -27,25 +27,27 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public abstract class AbstractFieldFunction<F> {
 
-   private final Set<DataBlockCrossReference> referencedBlocks;
+   private final List<DataBlockCrossReference> referencedBlocks;
 
    /**
     * Creates a new {@link AbstractFieldFunction}.
     *
     * @param referencedBlocks
-    *           The {@link DataBlockCrossReference}s to the referenced data blocks, must not be null
+    *           The {@link DataBlockCrossReference}s to the referenced data blocks, must not be null and must not be
+    *           empty
     */
    public AbstractFieldFunction(DataBlockCrossReference... referencedBlocks) {
       Reject.ifNull(referencedBlocks, "referencedBlocks");
+      Reject.ifTrue(referencedBlocks.length == 0, "referencedBlocks.length == 0");
 
-      this.referencedBlocks = new HashSet<>(Arrays.asList(referencedBlocks));
+      this.referencedBlocks = Arrays.asList(referencedBlocks);
    }
 
    /**
     * @return the {@link DataBlockCrossReference} indicating the id of another data block which is referenced by this
     *         field
     */
-   public Set<DataBlockCrossReference> getReferencedBlocks() {
+   public List<DataBlockCrossReference> getReferencedBlocks() {
       return referencedBlocks;
    }
 

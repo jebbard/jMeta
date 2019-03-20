@@ -14,6 +14,8 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
+import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -108,6 +110,10 @@ public class InvalidSpecificationException extends RuntimeException {
       CountOf.class + " field function";
    public static final String VLD_FIELD_FUNC_UNRESOLVED =
       "For this field, the field function of type <%1$s> has unresolved cross references: <%2$s>";
+   public static final String VLD_FIELD_FUNC_INVALID_SUMMED_SIZE =
+      "For this field, the field function of type " + SummedSizeOf.class.getSimpleName() + " must have at most one " +
+      "field without either a fixed size or a " + SizeOf.class + " function referencing it - but found following ids " +
+      "for which this is the case: <%1$s>";
 
    public static final String VLD_CONTAINER_HAS_OCCURRENCES = "Data block typed as " + PhysicalDataBlockType.CONTAINER +
       " must not have defined occurrences, as it by design may have arbitrary occurrences, but min occurrences = " +

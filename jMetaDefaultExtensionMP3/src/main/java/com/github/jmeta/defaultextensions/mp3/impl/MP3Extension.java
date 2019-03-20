@@ -133,7 +133,7 @@ public class MP3Extension implements Extension {
          .finishHeader()
          .addHeader("crc", "MP3 CRC", "The MP3 CRC")
             .referencedAs(crcReference)
-            .withOccurrences(0, 1)
+            .asOptional()
             .addBinaryField("data", "MP3 CRC data", "The MP3 CRC data")
                .withStaticLengthOf(2)
             .finishField()

@@ -54,8 +54,5 @@ public class SizeOf extends AbstractFieldFunction<Long> {
             .collect(Collectors.toSet()),
          PhysicalDataBlockType.CONTAINER, PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD, PhysicalDataBlockType.FIELD,
          PhysicalDataBlockType.FIELD_BASED_PAYLOAD, PhysicalDataBlockType.FOOTER, PhysicalDataBlockType.HEADER);
-
-      // TODO Validate only consecutive target blocks
-      // TODO Validate that for at most one target block there is no easier size of or fixed size present
    }
 }
