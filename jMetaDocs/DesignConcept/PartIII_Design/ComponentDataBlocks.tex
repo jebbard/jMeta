@@ -225,6 +225,48 @@ No disadvantages known
 %%%% <-- DD %%%%
 
 % =======================================================================================================
+\subsection{Container Context Information}%
+\label{sec:ContainerContextInformation}%
+
+In section \SectionLink{sec:FieldFunctions}, we already mentioned the \emph{parsing metadata} that is vital for understanding and reading a container. This information is tagged as such by each extension in the form of field functions that link fields to target blocks they refer to. This information is of course relevant for generically parsing a container at runtime. As soon as you encounter e.g. a field that contains the size of the container's payload during parsing, you have to store this size somewhere to be accessible later when actually parsing the payload.
+
+Here, we summarize all the parsing metadata known at one point in time during container parsing as the \emph{container context information}. However, the container context information shall not only be a simple map storing the already known field functions, but it is intended to be more:
+
+%%%% DD --> %%%%
+\DD{dd:620}
+{% Title
+\texttt{ContainerContext} provides sizes, counts, byte orders and character encoding of all data blocks in a container; it is available in each data block; one instance per container
+}
+{% Short description
+A helper class \texttt{ContainerContext} provides sizes, counts, byte orders and character encoding of \emph{all} data blocks in the current container. That means it not only stores the field functions refering to some of them, but also knows about static sizes, static occurrences, default byte orders and character encodings etc. It is an attribute of each data block such that it can be accessed from most places during as well as after parsing. The details of size determination are described in \SectionLink{sec:SizeDetermination}, the details of count determination in \SectionLink{sec:CountDetermination}.
+}
+{% Rationale
+Having just one place that not only stores field function values but also knows in a more abstract way how to determine sizes, counts, byte orders and character encodings allows for better separation of concerns. This also allows to pass around corresponding objects to everywhere you need this information in contrast to having this logic only in a reader class that is not availabe anywhere else after parsing.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+One question that comes up here: How about parsing metadata available in the top-level container, but needed in a child container? We define:
+
+%%%% DD --> %%%%
+\DD{dd:621}
+{% Title
+\texttt{ContainerContext} contains a reference to the direct parent container's context and searches the parent for metadata if none is found in itself
+}
+{% Short description
+\texttt{ContainerContext} contains a reference to the direct parent container's context (if any). If it cannot come up with a size, count, byte order or character encoding itself, it asks the parent for such metadata.
+}
+{% Rationale
+This way, parsing metadata only defined in the top-level container headers can be transported to children deeper in the hierarchy.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% =======================================================================================================
 \subsection{Size Determination}%
 \label{sec:SizeDetermination}%
 
@@ -241,17 +283,17 @@ Cases for size determination
 
   Otherwise, the data block has a dynamic size which breaks down to the following cases:
   \begin{enumerate}
-  \item[\textbf{Case 2:}] The data block's size is directly indicated by another field that must be parsed before (usually in header or footer) - Note that this size might include the size of other blocks in addition, see \DesLink{dd:540} and the discussion around for more details. Here, ``directly'' means that the field is a numeric value greater or equal to the size, and we do not need to calculate something.
+  \item[\textbf{Case 2:}] The data block's size is directly indicated by another field that must be parsed before (usually in header or footer) - Note that this size might include the size of other blocks in addition, see \DesLink{dd:542} and the discussion around for more details. Here, ``directly'' means that the field is a numeric value greater or equal to the size, and we do not need to calculate something.
   \item[\textbf{Case 3:}] The data block's size is indirectly indicated by other fields that must be parsed before (usually in header or footer). ``Indirectly'' means that the field is not just single or summed size contained in a field, but there is a more complex calculation of combining multiple field values to calculate the size. This is e.g. the case for the size of the MP3 container payload or the Ogg page payload and packet part sizes.
-  \item[\textbf{Case 4:}] The data block is payload consisting of fields or containers, and there is no size indicator at all. However, it is clear how to determine the sizes of all children of the container, and thus the size of it is the sum of the sizes of all its children. This is e.g. the case for Lyrics3v2 tag payload.  
+  \item[\textbf{Case 4:}] The data block is payload consisting of fields or containers, and there is no size indicator at all. However, it is clear how to determine the sizes of all children of the payload block, and thus the size of it is the sum of the sizes of all its children. This is e.g. the case for Lyrics3v2 tag payload.  
   \item[\textbf{Case 5:}] The data block is a terminated field, i.e. its size must be determined by finding its termination. The handling of this case is defined in \SectionLink{sec:TerminatedFields}.
   \item[\textbf{Case 6:}] The data block is a field and none of the other cases applies, but at least the overall remaining size of the parent data block is known. Take the remaining size of the parent data block as size of the field.
   \end{enumerate}
 
-  \LibName{} supports exactly those cases.
+  \LibName{} supports exactly those cases. Despite case 5, they are implemented in the \texttt{ContainerContext}, see \SectionLink{sec:ContainerContextInformation}.
 }
 {% Rationale
-The cases come from analysing different data formats \LibName{} is required to support, so it is sufficient to consider only those (if any others exist).
+The cases come from analyzing different data formats \LibName{} is required to support, so it is sufficient to consider only those (if any others exist). Why is case 5 not implemented in \texttt{ContainerContext}? The reason is that finding termination bytes requires parsing itself, so it must be implemented in the reader.
 }
 {% Disadvantes
 No disadvantages known
@@ -266,7 +308,7 @@ Case 1 is already clear how to deal with, case 5 is treated later in \SectionLin
 Complex size calculation from fields done in custom implementation via \texttt{SizeProvider}
 }
 {% Short description
-Data format extensions are allowed to register a custom SizeProvider implementation which calculates the size of a data block as required by the format. This is used for Ogg and MP3.
+Data format extensions are allowed to register a custom \texttt{SizeProvider} implementation which calculates the size of a data block as required by the format. This is used for Ogg, ID3v2.3 extended header size and MP3.
 }
 {% Rationale
 More flexibility also for yet other future formats.
@@ -303,14 +345,15 @@ Size determination process
 {% Short description
   Whenever the size of a single data block needs to be determined, the following steps are performed in the given order of precedence:
 \begin{enumerate}
-\item If the data block has a static size according to its specification, take this size (case 1)
-\item Otherwise if the current data format has a registered \texttt{SizeProvider} (see \DesLink{dd:641}), first ask this instance if it can provide a defined size (includes also case 3)
-\item Otherwise if the current ContainerContext has a ``size of'' field function for a single data block, take the size indicated by the ``size of'' field (part 1 of case 2)
-\item Otherwise if the current \texttt{ContainerContext} has a ``size of'' field function for multiple data blocks and the sizes of all other blocks are known, take the ``size of'' field's value minus the summed size of the other data blocks (part 2 of case 2) - How to avoid an infinite loop here? This is dealt with after this design decision.
-\item Otherwise if the parent \texttt{ContainerContext} has a ``size of'' field for it, take the size of the parent \texttt{ContainerContext}
-\item Otherwise if the data block is a terminated field, search for the termination bytes (case 5)
-\item Otherwise if the data block is a payload block, read all its children and sum up their sizes (case 4)
-\item Otherwise if the data block is a field and the remaining parent size is known, take the remaining direct parent size as its size (case 6)
+\item If the current data format has a registered \texttt{SizeProvider} (see \DesLink{dd:641}), first ask this instance if it can provide a defined size (includes also case 3)
+\item Otherwise if the data block has a static size according to its specification, take this size (case 1)
+\item Otherwise if the current \texttt{ContainerContext} has a \texttt{SizeOf} field function, take the size indicated by the \texttt{SizeOf} field (part 1 of case 2)
+\item Otherwise if the current \texttt{ContainerContext} has a \texttt{SummedSizeOf} field function for multiple data blocks and the sizes of all other blocks are known, take the \texttt{SummedSizeOf} field's value minus the summed size of the other data blocks (part 2 of case 2) - How to avoid an infinite loop here? This has been treated in design decision \DesLink{dd:541} and is also discussed with an example after this design decision.
+\item Otherwise if the data block is a concrete data block that is derived from a generic data block, it is checked if there is a known size for the generic id  
+\item Otherwise if the parent \texttt{ContainerContext} has a \texttt{SizeOf} field for it, take the size of the parent \texttt{ContainerContext}
+\item (Outside of \texttt{ContainerContext}) Otherwise if the data block is a terminated field, search for the termination character (case 5)
+\item (Outside of \texttt{ContainerContext}) Otherwise if the data block is a payload block, read all its children and sum up their sizes (case 4)
+\item (Outside of \texttt{ContainerContext}) Otherwise if the data block is a field and the remaining parent size is known, take the remaining direct parent size as its size (case 6)
 \end{enumerate}
 }
 {% Rationale
@@ -321,23 +364,38 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-Some subtle point in determining sizes of single data blocks whose ``size of'' field is the sum of multiple consecutive data blocks is: If we want to determine the size of a single one, we have to determine the size of all the others, sum this size and subtract it from the value stored in the ``size of'' field. If for some stupid reason there are multiple data blocks included with a dynamic size, this could end up in an infinite loop such as for ID3v2.3: Size of payload needs to be determined, thus determine the size of the extended header first. However, the size of the extended header is also dynamic. The implementation would see that it would need the size of the payload to calculate the size of the extended header and thus call the first function again... To avoid this crap, we state the following:
+Some subtle point in determining sizes of single data blocks whose \texttt{SummedSizeOf} field is the sum of multiple consecutive data blocks is: If we want to determine the size of a single one, we have to determine the size of all the others, sum this size and subtract it from the value stored in the \texttt{SummedSizeOf} field. If for some stupid reason there are multiple data blocks included with a dynamic size, this could end up in an infinite loop such as for ID3v2.3: Size of payload needs to be determined, thus determine the size of the extended header first. However, the size of the extended header is also dynamic. The implementation would see that it would need the size of the payload to calculate the size of the extended header and thus call the first function again... To avoid this crap, we already stated the validity criteria in \DesLink{dd:541}.
+
+% =======================================================================================================
+\subsection{Count Determination}%
+\label{sec:CountDetermination}%
+
+Here we discuss how the determination of the number of occurrences of a data block (i.e. count determination) works. First of all, we can state that the number of payload containers is always 1, so no need to consider this case. For all other types of data blocks, there can be 0 to multiple occurrences.
+
+The process to handle is summarized as follows:
+
 %%%% DD --> %%%%
 \DD{dd:645}
 {% Title
-Multi-target block ``size of'' fields must not refer to more than one dynamic size blocks who do not have any other single ``size of'' fields  
+Count determination process
 }
 {% Short description
-Put in different words: If there are say two dynamic size blocks referenced by a ``size of'' field, for at least one of those blocks, there must be another ``size of'' field referencing only this single dynamic size block. This is checked during specification validation in startup phase. 
+  Whenever the count of a single data block needs to be determined, the following steps are performed in the given order of precedence:
+\begin{enumerate}
+\item If the current data format has a registered \texttt{CountProvider}, first ask this instance if it can provide a defined size
+\item Otherwise if the data block has a static number of occurrences according to its specification, take this count
+\item Otherwise if the data block is optional, i.e. either is present once or not at all, and if the current \texttt{ContainerContext} has a \texttt{PresenceOf} field function, take 1 as count if its presence is indicated by the flags, 0 otherwise
+\item Otherwise if the current \texttt{ContainerContext} has a \texttt{CountOf} field function, take the count indicated by the \texttt{CountOf} field
+\item Otherwise if the parent \texttt{ContainerContext} has a \texttt{CountOf} field for it, take the size of the parent \texttt{ContainerContext}
+\end{enumerate}
 }
 {% Rationale
-This is sufficient for e.g. handling the case of ID3v2.3 and all other cases mentioned during the discussion of \DesLink{dd:540}.
+The order of steps clearly focusses on least complexity first and tries to avoid unnecessary lookups by first considering fixed counts and custom count providers.
 }
 {% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
-
 
 % =======================================================================================================
 \subsection{Field Parsing}%

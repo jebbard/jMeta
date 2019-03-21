@@ -15,6 +15,7 @@
     "sec:Sizes"
     "sec:FieldProperties"
     "sec:FieldFunctions"
+    "tab:ffvalidity"
     "sec:HeaderProperties"
     "sec:ContainerProperties"
     "sec:PayloadProperties"

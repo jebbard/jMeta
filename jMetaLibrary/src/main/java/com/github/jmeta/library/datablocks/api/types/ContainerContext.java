@@ -288,10 +288,10 @@ public class ContainerContext {
     * <li>If there is a custom {@link SizeProvider} returning a size that is not equal to
     * {@link DataBlockDescription#UNDEFINED}, this size is returned</li>
     * <li>Otherwise if the data block has fixed size according to its specification, this size is returned</li>
-    * <li>Otherwise the size of field functions (single block size) are searched for a field that contains the size of
-    * the data block within this {@link ContainerContext}</li>
-    * <li>Otherwise the size of field functions (multiple block size) are searched for a field that contains the size of
-    * the data block within this {@link ContainerContext}</li>
+    * <li>Otherwise the {@link SizeOf} field functions (single block size) are searched for a field that contains the
+    * size of the data block within this {@link ContainerContext}</li>
+    * <li>Otherwise the {@link SummedSizeOf} field functions (multiple block size) are searched for a field that
+    * contains the size of the data block within this {@link ContainerContext}</li>
     * <li>If there is no single block size function found, it is checked if there is one for the matching generic id of
     * the target data block</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
@@ -447,7 +447,9 @@ public class ContainerContext {
     * taken</li>
     * <li>Otherwise the field functions are searched for a field that contains the {@link ByteOrder} of the data block
     * within this {@link ContainerContext}</li>
-    * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
+    * <li>If there is none, the same is done hierarchically for the parent {@link DataBlockId}s of the requested id
+    * (sequence number 0)</li>
+    * <li>If there is none, the same steps are done hierarchically using the parent {@link ContainerContext}</li>
     * <li>If there is none in the parent container context, the default {@link ByteOrder} of the
     * {@link DataFormatSpecification} is returned</li>
     * </ul>
@@ -472,6 +474,19 @@ public class ContainerContext {
       FieldCrossReference<String, ByteOrderOf> crossReference = byteOrders.getCrossReference(id, sequenceNumber);
 
       if (crossReference == null) {
+
+         DataBlockId currentId = id.getParentId();
+
+         while (currentId != null) {
+            FieldCrossReference<String, ByteOrderOf> parentCrossReference = byteOrders.getCrossReference(currentId, 0);
+
+            if (parentCrossReference != null) {
+               return ByteOrders.fromString(parentCrossReference.getValue());
+            }
+
+            currentId = currentId.getParentId();
+         }
+
          if (parentContainerContext != null) {
             return parentContainerContext.getByteOrderOf(id, sequenceNumber);
          } else {
@@ -490,6 +505,8 @@ public class ContainerContext {
     * taken</li>
     * <li>Otherwise the field functions are searched for a field that contains the {@link Charset} of the data block
     * within this {@link ContainerContext}</li>
+    * <li>If there is none, the same is done hierarchically for the parent {@link DataBlockId}s of the requested id
+    * (sequence number 0)</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
     * <li>If there is none in the parent container context, the default {@link Charset} of the
     * {@link DataFormatSpecification} is returned</li>
@@ -516,6 +533,20 @@ public class ContainerContext {
          sequenceNumber);
 
       if (crossReference == null) {
+
+         DataBlockId currentId = id.getParentId();
+
+         while (currentId != null) {
+            FieldCrossReference<String, CharacterEncodingOf> parentCrossReference = characterEncodings
+               .getCrossReference(currentId, 0);
+
+            if (parentCrossReference != null) {
+               return Charset.forName(parentCrossReference.getValue());
+            }
+
+            currentId = currentId.getParentId();
+         }
+
          if (parentContainerContext != null) {
             return parentContainerContext.getCharacterEncodingOf(id, sequenceNumber);
          } else {

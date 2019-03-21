@@ -1048,11 +1048,72 @@ No disadvantages known
 \subsection{Field Functions}%
 \label{sec:FieldFunctions}%
 
+Some fields contain values that are contributing to so-called \emph{parsing metadata}, i.e. metadata that is required to correctly read the contents of a container. Most prominent case is a size field which e.g. contains the size of the payload in bytes. When parsing the container, it is vital to know where the container ends and the next one starts. So this context information is necessary for reading. But how to implement generic reading if different data formats have different size fields? A second question that comes up is: How to ensure the size field is consistently updated if the payload size increases? Of course we could burden this to the user of the library. But there is an idea that solves both problems at once: \emph{Field functions}.
 
-The problem with the ``size of'' field function is that in a lot of formats, the size is not only referring to exactly the payload or just another field, but in a myriad of cases to multiple objects which we call data blocks - here are those dreadful examples from our reference formats:
+%%%% DD --> %%%%
+\DD{dd:540}
+{% Title
+\LibName{} uses field functions to link parsing metadata fields with the target data blocks they refer to
+}
+{% Short description
+ To ensure consistency of container content and parsing metadata, so-called field functions are used in \LibName{}. They represent a reference of a single field to one or multiple target data blocks of any type, supporting the following categories:
+  \begin{itemize}
+  \item \texttt{SizeOf}: The field contains the size of a single other data block
+  \item \texttt{SummedSizeOf}: The field contains the summed size of several other data blocks that must be consecutive
+  \item \texttt{PresenceOf}: The field indicates that an optional data block is present or not
+  \item \texttt{CountOf}: The field contains the number of occurrences of a data block that might have multiple occurrences
+  \item \texttt{ByteOrderOf}: The field contains the byte order of a data block
+  \item \texttt{CharacterEncodingOf}: The field contains the character encoding of a data block
+  \end{itemize}
+}
+{% Rationale
+Formalizing connections between data blocks is at first allowing to ensure consistency and facilitates a generic parsing approach. The categories represent the most common types of parsing metadata encountered.
+}
+{% Disadvantes
+Added complexity
+}
+%%%% <-- DD %%%%
+
+Future functions might be introduced such as ``CRC of'', but this is yet to be planned.
+
+How this generic parsing approach exactly works is described in \SectionLink{sec:ContainerContextInformation}.
+
+Here we focus on the specification aspects of field functions. First of all, let's examine some sane validity criteria for each field function. Table \ref{tab:ffvalidity} is listing them.
+
+\begin{longtable}{p{0.5\textwidth}|p{0.5\textwidth}} \hline
+  \textbf{Field function} & \textbf{Validity criteria} \\ \endhead \hline
+  \texttt{SizeOf} & Must be a numeric field; must refer to exactly one target data block \\
+  \texttt{SummedSizeOf} & Must be a numeric field; must refer to at least two sibling data blocks which have the same parent; at most one of the target data blocks must have undetermined size (i.e. neither fixed size, nor terminated nor \texttt{SizeOf} function for it) \\
+  \texttt{CountOf} & Must be a numeric field; must refer to a data block of type header, footer, container or field (i.e. not to payload) \\
+  \texttt{PresenceOf} & Must be a flags field; must refer to an optional data block of type header, footer or field (i.e. not to payload or container) \\
+  \texttt{ByteOrderOf} & Must be a string field \\
+  \texttt{CharacterEncodingOf} & Must be a string field \\
+  \caption{Validity criteria for field functions}
+  \label{tab:ffvalidity}
+\end{longtable}
+
+%%%% DD --> %%%%
+\DD{dd:541}
+{% Title
+\LibName{} enforces the validity criteria listed in table \ref{tab:ffvalidity} for field functions
+}
+{% Short description
+The field functions supported by \LibName{} adhere to the validity criteria listed in table \ref{tab:ffvalidity}. That means that these criteria are checked at specification creation time and lead to runtime exceptions if not met.
+}
+{% Rationale
+  These criteria ensure that an extension cannot use nonsense functional links which lead to arkward errors during parsing. Specifically for \texttt{SummedSizeOf}, forcing just at max one with undermined size is ensuring that there are now infinite loops during parsing.
+
+  Why only these and not more? E.g. we could enforce that \texttt{SizeOf} refers only to dynamic size targets. This is not done because there could be formats defining a size as static in current version, yet still having a \texttt{SizeOf} field to refer to. Similar things could be said for \texttt{CountOf} and dynamic occurrences. One could force \texttt{ByteOrderOf} to refer only to numeric fields or \texttt{CharacterEncodingOf} only to string fields. However, this is not helpful as a specification might state the byte order or character encoding just once referring to all fields. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now we are just left to discuss the complexities of the \texttt{SizeOf} field function and why we need a separate \texttt{SummedSizeOf} field function. The problem with the \texttt{SizeOf} field function is that in a lot of formats, the size is not only referring to exactly the payload or just another field, but in a myriad of cases to multiple objects which we call data blocks - here are those dreadful examples from our reference formats:
 \begin{itemize}
 \item The ID3v2.3 and ID3v2.4 tag size refers to the tag payload size (including padding) \emph{plus} the size of the extended header, if any 
-\item The ID3v2.3 extended header size is the size of up to 4 fields that follow up the size field itself within the extended header
+\item The ID3v2.3 extended header size is the size of up to 3 fields that follow up the size field itself within the extended header
 \item The ID3v2.4 extended header size is the size of the entire extended header including the size field itself
 \item For RIFF and AIFF, a chunk's size field refers to the size of the form type field (fixed size of 4 bytes) \emph{plus} the size of the actual chunk's payload
 \item In QuickTime file format, the atom size is the size of the whole atom considered as container, i.e. header \emph{plus} payload
@@ -1065,15 +1126,15 @@ If each and every format would use the very same strategy to determine the size 
 
 How to handle this overwhelming variety? First of all, from a specification point of view, we have to state:
 %%%% DD --> %%%%
-\DD{dd:540}
+\DD{dd:542}
 {% Title
-Size field functions must support multiple consecutive target blocks
+\texttt{SummedSizeOf} field function in addition to \texttt{SizeOf} to support multiple consecutive target blocks
 }
 {% Short description
-A size field function either refers to just one data block, or to multiple data blocks that - however - must be strictly consecutive according to their specification. This has the meaning: This field is the \emph{summed size of all} the referenced data blocks, if present.
+A \texttt{SummedSizeOf} field function refers to at least two data blocks that - however - must be strictly consecutive according to their specification. This has the meaning: This field is the \emph{summed size of all} the referenced data blocks, if present.
 }
 {% Rationale
-This is cleary required from a data format perspective as outlined above.
+This is cleary required from a data format perspective as outlined above. The question is why not to use \texttt{SizeOf} both for single and multiple fields? The special case turns out to simplify implementation.
 }
 {% Disadvantes
 Of course, field function handling will get more complex due to this special case.
