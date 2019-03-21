@@ -159,23 +159,26 @@ public class StandardDataBlockReader implements DataBlockReader {
    private long determineActualFieldSize(DataBlockDescription fieldDesc, long remainingDirectParentByteCount,
       MediumOffset reference, ContainerContext containerContext, int sequenceNumber) {
 
-      long actualBlockSize = containerContext.getSizeOf(fieldDesc.getId(), sequenceNumber,
-         remainingDirectParentByteCount);
+      long actualBlockSize = DataBlockDescription.UNDEFINED;
 
-      if (actualBlockSize == DataBlockDescription.UNDEFINED) {
-         final Character terminationCharacter = fieldDesc.getFieldProperties().getTerminationCharacter();
+      final Character terminationCharacter = fieldDesc.getFieldProperties().getTerminationCharacter();
 
-         // Determine termination bytes from termination character
-         if (terminationCharacter != null) {
-            Charset characterEncoding = containerContext.getCharacterEncodingOf(fieldDesc.getId(), sequenceNumber);
+      // Determine termination bytes from termination character - Note that e.g. for ID3v1 there exists the case that
+      // fields are terminated and have a fixed size at the same time
+      if (!fieldDesc.hasFixedSize() && terminationCharacter != null) {
+         Charset characterEncoding = containerContext.getCharacterEncodingOf(fieldDesc.getId(), sequenceNumber);
 
-            actualBlockSize = getSizeUpToTerminationBytes(reference, characterEncoding, terminationCharacter,
-               remainingDirectParentByteCount);
-         }
+         actualBlockSize = getSizeUpToTerminationBytes(reference, characterEncoding, terminationCharacter,
+            remainingDirectParentByteCount);
       }
 
       if (actualBlockSize == DataBlockDescription.UNDEFINED) {
-         actualBlockSize = remainingDirectParentByteCount;
+         actualBlockSize = containerContext.getSizeOf(fieldDesc.getId(), sequenceNumber,
+            remainingDirectParentByteCount);
+
+         if (actualBlockSize == DataBlockDescription.UNDEFINED) {
+            actualBlockSize = remainingDirectParentByteCount;
+         }
       }
 
       return actualBlockSize;

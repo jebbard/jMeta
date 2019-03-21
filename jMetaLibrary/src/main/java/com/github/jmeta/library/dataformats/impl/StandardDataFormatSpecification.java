@@ -370,6 +370,10 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
 
       Reject.ifNull(id, "id");
 
+      if (id.getLocalId().equals(UNKNOWN_FIELD_ID)) {
+         return true;
+      }
+
       if (!m_dataBlockDescriptions.containsKey(id)) {
          return getMatchingGenericId(id) != null;
       }

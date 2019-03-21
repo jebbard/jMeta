@@ -97,7 +97,7 @@ public class FieldProperties<F> {
     * @param fixedByteOrder
     *           The fixed {@link ByteOrder} for numeric fields or null
     * @param functions
-    *           The {@link FieldFunction}s of the field
+    *           The {@link FieldFunction}s of the field, must not be null
     * @param isMagicKey
     *           true if the field acts as a magic key, false otherwise
     * @param magicKeyBitLength
