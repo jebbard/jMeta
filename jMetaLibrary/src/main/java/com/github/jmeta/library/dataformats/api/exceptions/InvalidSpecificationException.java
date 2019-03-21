@@ -103,9 +103,9 @@ public class InvalidSpecificationException extends RuntimeException {
       "Field function of type <%1$s> may only refer to data blocks of types <%2$s>, but referenced data block " +
       "<%3$s> has type <%4$s>";
    public static final String VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING =
-      "For this optional data block, there is no other field defined with a " + PresenceOf.class +
+      "For this optional data block, there is no other field defined with a " + PresenceOf.class.getSimpleName() +
       " field function";
-   public static final String VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING =
+   public static final String VLD_FIELD_FUNC_DYN_OCCUR_COUNT_OF_MISSING =
       "For this data block with dynamic occurrences, there is no other field defined with a " +
       CountOf.class + " field function";
    public static final String VLD_FIELD_FUNC_UNRESOLVED =
@@ -114,6 +114,11 @@ public class InvalidSpecificationException extends RuntimeException {
       "For this field, the field function of type " + SummedSizeOf.class.getSimpleName() + " must have at most one " +
       "field without either a fixed size or a " + SizeOf.class + " function referencing it - but found following ids " +
       "for which this is the case: <%1$s>";
+   public static final String VLD_FIELD_FUNC_SUMMED_SIZE_DIFFERENT_PARENT = "This field is the summed size of target " +
+      "ids <%1$s> which do not have the same parent; found multiple distinct parents <%2$s> which is invalid";
+   public static final String VLD_FIELD_FUNC_SUMMED_SIZE_NON_SIBLING_CHILDREN = "This field is the summed size of " +
+      "target ids <%1$s> which are not consecutive children within their parent <%2$s>; ensure the target ids are " +
+      "specified to " + SummedSizeOf.class.getSimpleName() + " in order of occurrence; children in order are: <%3$s>";
 
    public static final String VLD_CONTAINER_HAS_OCCURRENCES = "Data block typed as " + PhysicalDataBlockType.CONTAINER +
       " must not have defined occurrences, as it by design may have arbitrary occurrences, but min occurrences = " +

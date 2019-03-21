@@ -46,7 +46,7 @@ public class OggExtension implements Extension {
 
    static final DataBlockCrossReference REF_OGG_PAYLOAD = new DataBlockCrossReference("Ogg Payload");
    static final DataBlockCrossReference REF_OGG_PACKET_PAYLOAD = new DataBlockCrossReference("Ogg Packet Payload");
-   static final DataBlockCrossReference REF_SEGMENT = new DataBlockCrossReference("Segment");
+   static final DataBlockCrossReference REF_OGG_SEGMENT = new DataBlockCrossReference("Segment");
 
    /**
     * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
@@ -121,7 +121,10 @@ public class OggExtension implements Extension {
                 .referencedAs(segmentTableEntryReference)
                 .withStaticLengthOf(1)
                 .withOccurrences(0, 99999)
-                .withFieldFunction(new SizeOf(REF_SEGMENT))
+                .withFieldFunction(new SizeOf(REF_OGG_SEGMENT))
+                // NOTE: This additional CountOf is necessary to ensure the field function validation is working for
+                // the segments which are blocks with dynamic occurrences
+                .withFieldFunction(new CountOf(REF_OGG_SEGMENT))
              .finishField()
           .finishHeader()
           .getPayload()
@@ -132,7 +135,7 @@ public class OggExtension implements Extension {
                    .referencedAs(REF_OGG_PACKET_PAYLOAD)
                    .withDescription("Ogg packet", "Ogg packet")
                    .addBinaryField("segment", "Ogg segment", "Ogg segment")
-                      .referencedAs(REF_SEGMENT)
+                      .referencedAs(REF_OGG_SEGMENT)
                       .withLengthOf(0, DataBlockDescription.UNDEFINED)
                       .withOccurrences(1, 999999)
                    .finishField()

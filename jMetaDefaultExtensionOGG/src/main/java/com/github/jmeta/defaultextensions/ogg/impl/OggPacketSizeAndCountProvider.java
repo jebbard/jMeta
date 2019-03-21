@@ -34,7 +34,7 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
     */
    @Override
    public long getCountOf(DataBlockId id, ContainerContext containerContext) {
-      if (id.equals(OggExtension.REF_SEGMENT.getId())) {
+      if (id.equals(OggExtension.REF_OGG_SEGMENT.getId())) {
          return getSegmentSizesForPacket(containerContext).stream().filter(s -> s > 0).count();
       }
 
@@ -58,7 +58,7 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
       if (id.equals(OggExtension.REF_OGG_PACKET_PAYLOAD.getId())) {
          return getSegmentSizesForPacket(containerContext).stream().collect(Collectors.summingLong(size -> size));
       }
-      if (id.equals(OggExtension.REF_SEGMENT.getId())) {
+      if (id.equals(OggExtension.REF_OGG_SEGMENT.getId())) {
          return getSegmentSizesForPacket(containerContext).get(sequenceNumber);
       }
 

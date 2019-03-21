@@ -110,8 +110,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    private DataBlockDescription createUnknownFieldDescription(DataBlockId parentId) {
 
-      DataBlockId unknownBlockId = new DataBlockId(m_spec.getDataFormat(), parentId,
-         DataFormatSpecification.UNKNOWN_FIELD_ID);
+      DataBlockId unknownBlockId = new DataBlockId(parentId, DataFormatSpecification.UNKNOWN_FIELD_ID);
 
       FieldProperties<byte[]> unknownFieldProperties = new FieldProperties<>(FieldType.BINARY, new byte[] { 0 }, null,
          null, null, null, null, null, false, DataBlockDescription.UNDEFINED, null);

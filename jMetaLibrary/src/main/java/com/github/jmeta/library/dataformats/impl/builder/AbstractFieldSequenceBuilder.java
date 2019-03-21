@@ -122,7 +122,7 @@ public abstract class AbstractFieldSequenceBuilder<P extends DataBlockDescriptio
             "Field local id <" + localId + "> - not found as a a child id of <" + getGlobalId() + ">");
       }
 
-      DataBlockId existingChildId = new DataBlockId(getDataFormat(), fieldSequenceId, localId);
+      DataBlockId existingChildId = new DataBlockId(fieldSequenceId, localId);
 
       getRootBuilder().removeDataBlockDescription(existingChildId);
 

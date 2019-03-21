@@ -10,6 +10,7 @@
 package com.github.jmeta.library.dataformats.impl;
 
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_DEFAULT_NESTED_CONTAINER_MISSING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_DYN_OCCUR_COUNT_OF_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_OPTIONAL_FIELD_PRESENCE_OF_MISSING;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_BYTE_ORDER;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_INVALID_CHARACTER_ENCODING;
@@ -32,11 +33,14 @@ import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationE
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
+import com.github.jmeta.library.dataformats.api.types.SizeOf;
+import com.github.jmeta.library.dataformats.api.types.SummedSizeOf;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -139,17 +143,37 @@ public class StandardDataFormatSpecification implements DataFormatSpecification 
                   dataBlockWithDynamicOccurrences);
             }
          } else {
-            // TODO This does not work for the Ogg special case...
-            // if (!hasFieldFunctionForId
-            // || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), FieldFunctionType.COUNT_OF)) {
-            // throw new InvalidSpecificationException(VLD_FIELD_FUNC_DYN_OCCUR_FIELD_COUNT_OF_MISSING,
-            // dataBlockWithDynamicOccurrences);
-            // }
+            if (!hasFieldFunctionForId || !hasFieldFunctionOfType(fieldFunctionsByTargetId.get(id), CountOf.class)) {
+               throw new InvalidSpecificationException(VLD_FIELD_FUNC_DYN_OCCUR_COUNT_OF_MISSING,
+                  dataBlockWithDynamicOccurrences);
+            }
          }
-
       }
 
-      // TODO verify SIZE_OF exists
+      // NOTE: It would be an idea to check that for every block with dynamic size, there is a SizeOf or SummedSizeOf
+      // field function. However, this turns out to be very complex, as this is incomplete: (1) Terminated fields exist.
+      // (2) Sometimes the size of a data block (e.g. field-based payload) is just given by the summed size of its
+      // children.
+      // (3) Sometimes the size of a data block is implicitly given by the known size of its parent. (4) Sometimes the
+      // size calculations are so complex you need custom code for it, deriving the size from a multitude of header
+      // fields (see e.g. MP3).
+   }
+
+   /**
+    * @param desc
+    * @param fieldFunctionsByTargetId
+    * @return
+    */
+   private boolean hasDefinedSizeFor(DataBlockDescription desc,
+      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId) {
+      boolean isTerminatedField = desc.getPhysicalType() == PhysicalDataBlockType.FIELD
+         && desc.getFieldProperties().getTerminationCharacter() != null;
+
+      boolean hasFieldFunctionForId = fieldFunctionsByTargetId.containsKey(desc.getId());
+
+      return isTerminatedField || desc.hasFixedSize()
+         || hasFieldFunctionForId && (hasFieldFunctionOfType(fieldFunctionsByTargetId.get(desc.getId()), SizeOf.class)
+            || hasFieldFunctionOfType(fieldFunctionsByTargetId.get(desc.getId()), SummedSizeOf.class));
    }
 
    /**
