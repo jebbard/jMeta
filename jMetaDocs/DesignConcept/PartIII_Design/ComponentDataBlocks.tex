@@ -266,7 +266,7 @@ No disadvantages known
 }
 %%%% <-- DD %%%%
 
-% =======================================================================================================
+% -------------------------------------------------------------------------------------------------------
 \subsubsection{Size Determination}%
 \label{sec:SizeDetermination}%
 
@@ -287,7 +287,7 @@ Cases for size determination
   \item[\textbf{Case 3:}] The data block's size is indirectly indicated by other fields that must be parsed before (usually in header or footer). ``Indirectly'' means that the field is not just single or summed size contained in a field, but there is a more complex calculation of combining multiple field values to calculate the size. This is e.g. the case for the size of the MP3 container payload or the Ogg page payload and packet part sizes.
   \item[\textbf{Case 4:}] The data block is payload consisting of fields or containers, and there is no size indicator at all. However, it is clear how to determine the sizes of all children of the payload block, and thus the size of it is the sum of the sizes of all its children. This is e.g. the case for Lyrics3v2 tag payload.  
   \item[\textbf{Case 5:}] The data block is a terminated field, i.e. its size must be determined by finding its termination. The handling of this case is defined in \SectionLink{sec:TerminatedFields}.
-  \item[\textbf{Case 6:}] The data block is a field and none of the other cases applies, but at least the overall remaining size of the parent data block is known. Take the remaining size of the parent data block as size of the field.
+  \item[\textbf{Case 6:}] None of the other cases applies, but at least the overall remaining size of the parent data block is known. Take the remaining size of the parent data block as size of the data block.
   \end{enumerate}
 
   \LibName{} supports exactly those cases. Despite case 5, they are implemented in the \texttt{ContainerContext}, see \SectionLink{sec:ContainerContextInformation}.
@@ -352,7 +352,7 @@ Size determination process
 \item Otherwise if the current \texttt{ContainerContext} has a \texttt{SummedSizeOf} field function for multiple data blocks and the sizes of all other blocks are known, take the \texttt{SummedSizeOf} field's value minus the summed size of the other data blocks (part 2 of case 2) - How to avoid an infinite loop here? This has been treated in design decision \DesLink{dd:541} and is also discussed with an example after this design decision.
 \item Otherwise if the data block is a concrete data block that is derived from a generic data block, it is checked if there is a known size for the generic id  
 \item Otherwise if the parent \texttt{ContainerContext} has a \texttt{SizeOf} field for it, take the size of the parent \texttt{ContainerContext}
-\item Otherwise if the data block is a field and the remaining parent size is known, take the remaining direct parent size as its size (case 6)
+\item Otherwise if the data block is a field or payload and the remaining parent size is known, take the remaining direct parent size as its size (case 6)
 \item (Outside of \texttt{ContainerContext}) Otherwise if the data block is a payload block, read all its children and sum up their sizes (case 4)
 \end{enumerate}
 }
@@ -366,7 +366,7 @@ No disadvantages known
 
 Some subtle point in determining sizes of single data blocks whose \texttt{SummedSizeOf} field is the sum of multiple consecutive data blocks is: If we want to determine the size of a single one, we have to determine the size of all the others, sum this size and subtract it from the value stored in the \texttt{SummedSizeOf} field. If for some stupid reason there are multiple data blocks included with a dynamic size, this could end up in an infinite loop such as for ID3v2.3: Size of payload needs to be determined, thus determine the size of the extended header first. However, the size of the extended header is also dynamic. The implementation would see that it would need the size of the payload to calculate the size of the extended header and thus call the first function again... To avoid this crap, we already stated the validity criteria in \DesLink{dd:541}.
 
-% =======================================================================================================
+% -------------------------------------------------------------------------------------------------------
 \subsubsection{Count Determination}%
 \label{sec:CountDetermination}%
 
@@ -403,9 +403,9 @@ No disadvantages known
 
 Field parsing is the most complex part of reading data format bytes. It requires answers to following questions:
 \begin{itemize}
-\item How to determine the size of the field?
-\item How to determine the number of occurrences of a field, especially the case of optional fields?
-\item Which byte order (for numeric fields) and character encoding (for string or enumerated fields) needs to be used when?
+\item How to determine the size of the field? - This has been answered already in \SectionLink{sec:SizeDetermination}, except the case of terminated fields which we treat here
+\item How to determine the number of occurrences of a field, especially the case of optional fields? - This has been answered already in \SectionLink{sec:CountDetermination}
+\item Which byte order (for numeric fields) and character encoding (for string or enumerated fields) needs to be used when? - This has been answered already in \SectionLink{sec:ContainerContextInformation}
 \item How to convert the binary field value to an interpreted one?
 \item How to use caching during field parsing?
 \end{itemize}
@@ -495,6 +495,38 @@ This process is efficient in terms of avoiding unknown steps and using only spar
 }
 {% Disadvantes
 No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% -------------------------------------------------------------------------------------------------------
+\subsubsection{Lazy Fields}%
+\label{sec:LazyFields}%
+
+In this section, we want to investigate if we need a kind of lazy field (similar to lazy payload as described in \DesLink{dd:607}). The idea: What if a field is large and we know this in advance? Should we read all field bytes into memory or rather not?
+
+First of all, we shall check if there are cases that clearly come to mind here:
+\begin{itemize}
+\item Ogg contains segments within its payload that only get a max size of 255, so no need here for lazy fields; also the ogg header is quite harmless
+\item APEv2, Lyrics3v2, ID3v1 and ID3v2 only define small fields
+\item MP3 payload fields might not be longer than 998 bytes, so no lazyness required here
+\item RIFF, QuickTime and Matroska might have arbitrary large payload, and thus arbitrary large fields to read
+\end{itemize}
+
+Thus, considering the formats, we already see that large fields might occur. So we define:
+
+%%%% DD --> %%%%
+\DD{dd:652}
+{% Title
+Lazy fields in case field size is known and exceeds the maximum read-write block size 
+}
+{% Short description
+A special case for large fields is introduced: If the field size is known in advance (i.e. is either static or given by field function or remaining parent size) and is bigger than the maximum read-write block size, the field is created as lazy field and its bytes are only first read when explicitly requested by the user.
+}
+{% Rationale
+This avoids unwanted out-of-memory conditions. Terminated fields, where field size is not known in advance, need not be lazy, as when determining their size, they are anyway read into memory.
+}
+{% Disadvantes
+Slight increase in complexity
 }
 %%%% <-- DD %%%%
 

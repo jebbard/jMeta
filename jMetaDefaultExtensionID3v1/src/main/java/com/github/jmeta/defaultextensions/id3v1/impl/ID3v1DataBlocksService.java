@@ -26,8 +26,8 @@ public class ID3v1DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
-      return new ID3v1DataBlockReader(spec, lazyFieldSize);
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+      return new ID3v1DataBlockReader(spec);
    }
 
 }

@@ -26,7 +26,7 @@ public class Lyrics3v2DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
-      return new Lyrics3v2DataBlockReader(spec, lazyFieldSize);
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+      return new Lyrics3v2DataBlockReader(spec);
    }
 }

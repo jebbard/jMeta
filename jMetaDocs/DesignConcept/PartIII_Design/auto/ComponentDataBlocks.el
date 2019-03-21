@@ -11,6 +11,7 @@
     "sec:CountDetermination"
     "sec:FieldParsing"
     "sec:TerminatedFields"
+    "sec:LazyFields"
     "sec:BackwardReading"
     "sec:APIDesign"))
  :latex)

@@ -52,8 +52,6 @@ public class StandardDataBlockReader implements DataBlockReader {
 
    private DataBlockFactory m_dataBlockFactory;
 
-   private int m_maxFieldBlockSize;
-
    private final DataFormatSpecification m_spec;
 
    private SizeProvider customSizeProvider;
@@ -65,14 +63,11 @@ public class StandardDataBlockReader implements DataBlockReader {
     *
     * @param spec
     * @param transformationHandlers
-    * @param maxFieldBlockSize
     */
-   public StandardDataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
+   public StandardDataBlockReader(DataFormatSpecification spec) {
       Reject.ifNull(spec, "spec");
-      Reject.ifTrue(maxFieldBlockSize < 1, "Maximum field block size may not be smaller than 1");
 
       m_spec = spec;
-      m_maxFieldBlockSize = maxFieldBlockSize;
       m_dataBlockFactory = new StandardDataBlockFactory();
    }
 
@@ -83,13 +78,6 @@ public class StandardDataBlockReader implements DataBlockReader {
     */
    public MediumDataProvider getMediumDataProvider() {
       return mediumDataProvider;
-   }
-
-   private String buildEOFExceptionMessage(MediumOffset reference, long byteCount, final int bytesRead) {
-
-      return "Unexpected EOF occurred during read from medium " + reference.getMedium() + " [offset="
-         + reference.getAbsoluteMediumOffset() + ", byteCount=" + byteCount + "]. Only " + bytesRead
-         + " were read before EOF.";
    }
 
    private DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, Field<?> headerField) {
@@ -173,12 +161,11 @@ public class StandardDataBlockReader implements DataBlockReader {
       }
 
       if (actualBlockSize == DataBlockDescription.UNDEFINED) {
-         actualBlockSize = containerContext.getSizeOf(fieldDesc.getId(), sequenceNumber,
-            remainingDirectParentByteCount);
+         actualBlockSize = containerContext.getSizeOf(fieldDesc.getId(), sequenceNumber);
+      }
 
-         if (actualBlockSize == DataBlockDescription.UNDEFINED) {
-            actualBlockSize = remainingDirectParentByteCount;
-         }
+      if (actualBlockSize == DataBlockDescription.UNDEFINED) {
+         actualBlockSize = remainingDirectParentByteCount;
       }
 
       return actualBlockSize;
@@ -521,11 +508,15 @@ public class StandardDataBlockReader implements DataBlockReader {
       int sequenceNumber, ContainerContext containerContext) {
 
       // A lazy field is created if the field size exceeds a maximum size
-      if (fieldSize > m_maxFieldBlockSize) {
+      // There is no point in making terminated fields lazy as - anyway - to determine their size, they have to be read
+      // anyway.
+      if (fieldDesc.getFieldProperties().getTerminationCharacter() == null
+         && fieldSize > reference.getMedium().getMaxReadWriteBlockSizeInBytes()) {
          return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, sequenceNumber,
             containerContext);
       }
 
+      // This cast is ok as we check for upper bound above
       ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
       return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer, sequenceNumber,
@@ -607,7 +598,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       // Read all header occurrences
       for (int i = 0; i < actualOccurrences; i++) {
-         long headerOrFooterSize = containerContext.getSizeOf(headerOrFooterId, i, DataBlockDescription.UNDEFINED);
+         long headerOrFooterSize = containerContext.getSizeOf(headerOrFooterId, i);
 
          List<Field<?>> headerFields = readFields(reference, headerOrFooterId, headerOrFooterSize, containerContext);
 
@@ -633,7 +624,11 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       DataBlockDescription payloadDesc = m_spec.getDataBlockDescription(id);
 
-      long totalPayloadSize = containerContext.getSizeOf(payloadDesc.getId(), 0, remainingDirectParentByteCount);
+      long totalPayloadSize = containerContext.getSizeOf(payloadDesc.getId(), 0);
+
+      if (totalPayloadSize == DataBlockDescription.UNDEFINED) {
+         totalPayloadSize = remainingDirectParentByteCount;
+      }
 
       // If the medium is a stream-based medium, all the payload bytes must be cached first
       if (!reference.getMedium().isRandomAccess() && totalPayloadSize != DataBlockDescription.UNDEFINED
@@ -657,7 +652,7 @@ public class StandardDataBlockReader implements DataBlockReader {
 
       DataBlockDescription payloadDesc = m_spec.getDataBlockDescription(id);
 
-      long totalPayloadSize = containerContext.getSizeOf(payloadDesc.getId(), 0, remainingDirectParentByteCount);
+      long totalPayloadSize = containerContext.getSizeOf(payloadDesc.getId(), 0);
 
       if (totalPayloadSize == DataBlockDescription.UNDEFINED) {
          throw new IllegalStateException("Payload size could not be determined");
@@ -667,14 +662,6 @@ public class StandardDataBlockReader implements DataBlockReader {
          reference.advance(-totalPayloadSize), totalPayloadSize, this, containerContext);
 
       return createPayloadAfterRead;
-   }
-
-   @Override
-   public void setMaxFieldBlockSize(int maxFieldBlockSize) {
-
-      Reject.ifNull(maxFieldBlockSize, "maxFieldBlockSize");
-
-      m_maxFieldBlockSize = maxFieldBlockSize;
    }
 
    /**

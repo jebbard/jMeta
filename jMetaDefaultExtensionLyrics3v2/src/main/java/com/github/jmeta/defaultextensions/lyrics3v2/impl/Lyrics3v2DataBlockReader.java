@@ -28,10 +28,9 @@ public class Lyrics3v2DataBlockReader extends StandardDataBlockReader {
     * Creates a new {@link Lyrics3v2DataBlockReader}.
     *
     * @param spec
-    * @param maxFieldBlockSize
     */
-   public Lyrics3v2DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
-      super(spec, maxFieldBlockSize);
+   public Lyrics3v2DataBlockReader(DataFormatSpecification spec) {
+      super(spec);
    }
 
    @Override

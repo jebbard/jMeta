@@ -98,11 +98,11 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
             + format + " must have a corresponding registered data format specification for the format.", iExtension2);
       }
 
-      DataBlockReader dataBlockReader = dataBlocksExtensions.getDataBlockReader(spec, m_lazyFieldSize);
+      DataBlockReader dataBlockReader = dataBlocksExtensions.getDataBlockReader(spec);
 
       // Set default data block reader
       if (dataBlockReader == null) {
-         dataBlockReader = new StandardDataBlockReader(spec, m_lazyFieldSize);
+         dataBlockReader = new StandardDataBlockReader(spec);
       }
 
       m_readers.put(format, dataBlockReader);

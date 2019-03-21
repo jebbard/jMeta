@@ -30,10 +30,9 @@ public class ID3v1DataBlockReader extends StandardDataBlockReader {
     * Creates a new {@link ID3v1DataBlockReader}.
     *
     * @param spec
-    * @param maxFieldBlockSize
     */
-   public ID3v1DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
-      super(spec, maxFieldBlockSize);
+   public ID3v1DataBlockReader(DataFormatSpecification spec) {
+      super(spec);
    }
 
    @Override

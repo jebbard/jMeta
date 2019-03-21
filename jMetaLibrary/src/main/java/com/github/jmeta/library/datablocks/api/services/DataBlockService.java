@@ -16,8 +16,7 @@ public interface DataBlockService {
 
    /**
     * @param spec
-    * @param lazyFieldSize
     * @return null to indicate usage of the default {@link DataBlockReader}
     */
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize);
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec);
 }

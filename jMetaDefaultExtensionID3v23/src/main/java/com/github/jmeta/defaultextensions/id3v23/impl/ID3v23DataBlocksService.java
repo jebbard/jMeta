@@ -11,12 +11,11 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 public class ID3v23DataBlocksService extends AbstractDataBlockService {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#getDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification,
-    *      int)
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#getDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
     */
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
-      return new ID3v23DataBlockReader(spec, lazyFieldSize);
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+      return new ID3v23DataBlockReader(spec);
    }
 
    /**

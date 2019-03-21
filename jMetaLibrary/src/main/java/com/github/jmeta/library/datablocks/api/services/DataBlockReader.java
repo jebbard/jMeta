@@ -80,11 +80,6 @@ public interface DataBlockReader {
       List<Header> footers, long remainingDirectParentByteCount, ContainerContext containerContext);
 
    /**
-    * @param maxFieldBlockSize
-    */
-   public void setMaxFieldBlockSize(int maxFieldBlockSize);
-
-   /**
     * Returns the next {@link Header} instance with the given {@link DataBlockId} assumed to be stored starting at the
     * given {@link MediumOffset} or null. If the {@link Header}s presence is optional, its actual presence is determined
     * using the given previous {@link Header}s. The method returns null if no {@link Header} with the

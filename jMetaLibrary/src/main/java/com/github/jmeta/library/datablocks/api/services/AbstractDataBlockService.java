@@ -27,11 +27,10 @@ public abstract class AbstractDataBlockService implements DataBlockService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockReader(DataFormatSpecification,
-    *      int)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockReader(DataFormatSpecification)
     */
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
 
       // Choose to use default IDataBlockReader
       return null;

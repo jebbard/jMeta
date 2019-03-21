@@ -27,9 +27,9 @@ public class OggDataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
 
-      DataBlockReader oggDataBlockReader = new StandardDataBlockReader(spec, lazyFieldSize);
+      DataBlockReader oggDataBlockReader = new StandardDataBlockReader(spec);
 
       OggPacketSizeAndCountProvider countAndSizeProvider = new OggPacketSizeAndCountProvider();
       oggDataBlockReader.setCustomCountProvider(countAndSizeProvider);

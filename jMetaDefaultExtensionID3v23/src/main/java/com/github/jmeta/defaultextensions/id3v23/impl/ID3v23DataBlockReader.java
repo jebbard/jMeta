@@ -38,10 +38,9 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
     * Creates a new {@link ID3v23DataBlockReader}.
     *
     * @param spec
-    * @param maxFieldBlockSize
     */
-   public ID3v23DataBlockReader(DataFormatSpecification spec, int maxFieldBlockSize) {
-      super(spec, maxFieldBlockSize);
+   public ID3v23DataBlockReader(DataFormatSpecification spec) {
+      super(spec);
 
       setCustomSizeProvider(new ID3v23ExtHeaderSizeProvider());
 

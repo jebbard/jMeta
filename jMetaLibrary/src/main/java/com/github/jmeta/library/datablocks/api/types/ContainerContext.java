@@ -295,24 +295,18 @@ public class ContainerContext {
     * <li>If there is no single block size function found, it is checked if there is one for the matching generic id of
     * the target data block</li>
     * <li>If there is none, the same is done hierarchically for the parent {@link ContainerContext}</li>
-    * <li>If there is none in the parent container context, the given remaining parent byte count is returned</li>
+    * <li>If there is none in the parent container context, {@link DataBlockDescription#UNDEFINED} is returned</li>
     * </ul>
     *
     * @param id
     *           The {@link DataBlockId} of the data block, must not be null
     * @param sequenceNumber
     *           The sequence number of the data block, must not be negative
-    * @param remainingDirectParentByteCount
-    *           The number of remaining direct parent bytes, if known; must either be
-    *           {@link DataBlockDescription#UNDEFINED} or strictly positive
     * @return The size of the data block or {@link DataBlockDescription#UNDEFINED} if none is available
     */
-   public long getSizeOf(DataBlockId id, int sequenceNumber, long remainingDirectParentByteCount) {
+   public long getSizeOf(DataBlockId id, int sequenceNumber) {
       Reject.ifNull(id, "id");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
-      Reject.ifTrue(
-         remainingDirectParentByteCount != DataBlockDescription.UNDEFINED && remainingDirectParentByteCount < 0,
-         "remainingDirectParentByteCount != DataBlockDescription.UNDEFINED && remainingDirectParentByteCount < 0");
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
@@ -345,7 +339,7 @@ public class ContainerContext {
                   long occurrencesOf = getOccurrencesOf(siblingId);
                   if (occurrencesOf >= 1) {
                      for (int i = 0; i < occurrencesOf; i++) {
-                        partialSize -= getSizeOf(siblingId, i, remainingDirectParentByteCount);
+                        partialSize -= getSizeOf(siblingId, i);
                      }
                   }
                }
@@ -361,14 +355,14 @@ public class ContainerContext {
          DataBlockId matchingGenericId = spec.getMatchingGenericId(id);
 
          if (matchingGenericId != null && !matchingGenericId.equals(id)) {
-            return getSizeOf(matchingGenericId, sequenceNumber, remainingDirectParentByteCount);
+            return getSizeOf(matchingGenericId, sequenceNumber);
          }
 
          if (parentContainerContext == null) {
-            return remainingDirectParentByteCount;
+            return DataBlockDescription.UNDEFINED;
          }
 
-         return parentContainerContext.getSizeOf(id, sequenceNumber, remainingDirectParentByteCount);
+         return parentContainerContext.getSizeOf(id, sequenceNumber);
       }
 
       return sizeCrossRef.getValue();

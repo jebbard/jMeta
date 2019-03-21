@@ -27,8 +27,8 @@ public class MP3DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec, int lazyFieldSize) {
-      StandardDataBlockReader mp3DataBlockReader = new StandardDataBlockReader(spec, lazyFieldSize);
+   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+      StandardDataBlockReader mp3DataBlockReader = new StandardDataBlockReader(spec);
 
       mp3DataBlockReader.setCustomSizeProvider(new MP3SizeProvider());
 
