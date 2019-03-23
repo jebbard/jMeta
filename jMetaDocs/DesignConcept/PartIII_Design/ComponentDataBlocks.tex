@@ -534,6 +534,16 @@ Slight increase in complexity
 \subsection{Backward Reading}%
 \label{sec:BackwardReading}%
 
+The feature of reading backward is just a convenience and performance improvement functionality. It has a lot of differences compared to forward reading, i.e. it is not only just ``reversed forward reading''. The reason is that APIs do not know some kind of ``backward read mode'', i.e. file I/O and array APIs only allow to read forward starting at offset $x$. The problem with this is that you do not know where $x$ is during backward reading, because e.g. $x$ is the starting point of a dynamic length data block, but you are currently positioned at its end and have no idea where it starts.
+
+Nevertheless, some data formats support backward reading by providing a so-called footer. The reason for this feature is that multimedia files are easier to modify at their end than at the beginning: Wen inserting a tag of length $n$ at the beginning of the file, you actually have to read all bytes of the file, write them to offsets $x+n$, and then write the tag bytes at offset 0. This requires a lot of I/O and can be expensive, especially for large files. Appending tags at the end of file avoids this. To ensure that parsers can identify such end-of-file tags, footers have to be defined and present. From the supported formats, Lyrics3v2, ID3v2.4 and APEv2 support footers. ID3v1 can be read backwards, too, as it is of static length.
+
+DD: Rückwärtslesen geht nur für Random Access medien
+DD: Only static header and footer lengths allowed, thus currently excluding cases such as ID3v2.4 header + dynamic size ext header + footer for backward reading
+DD: Backward readable formats must define footers with magic keys
+DD: How to handle ID3v1 backward reading
+
+
 % =======================================================================================================
 \subsection{API Design}%
 \label{sec:APIDesign}%

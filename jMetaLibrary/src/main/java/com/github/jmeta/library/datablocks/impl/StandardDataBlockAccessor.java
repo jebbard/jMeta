@@ -39,8 +39,6 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
 
-   private static final int DEFAULT_LAZY_FIELD_SIZE = 8192;
-
    /**
     * Creates a new {@link StandardDataBlockAccessor}.
     */
@@ -127,16 +125,15 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       boolean forceMediumReadOnly) {
       Reject.ifNull(medium, "medium");
 
-      if (!medium.isRandomAccess())
+      if (!medium.isRandomAccess()) {
          throw new UnsupportedMediumException("Medium " + medium + " must be a random access medium.");
+      }
 
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
       return new TopLevelContainerIterator(medium, m_readers, mediumStore, false);
    }
-
-   private int m_lazyFieldSize = DEFAULT_LAZY_FIELD_SIZE;
 
    private final DataFormatRepository m_repository;
 
