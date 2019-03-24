@@ -26,7 +26,7 @@ public class Lyrics3v2DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
       return new Lyrics3v2DataBlockReader(spec);
    }
 }

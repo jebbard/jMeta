@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Payload;
-import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
+import com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
@@ -24,7 +24,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
  * {@link ID3v1DataBlockReader}
  *
  */
-public class ID3v1DataBlockReader extends StandardDataBlockReader {
+public class ID3v1DataBlockReader extends AbstractDataBlockReader {
 
    /**
     * Creates a new {@link ID3v1DataBlockReader}.

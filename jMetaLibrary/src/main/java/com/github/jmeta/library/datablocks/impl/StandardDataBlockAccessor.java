@@ -70,7 +70,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
                throw new InvalidExtensionException(message, iExtension2);
             }
 
-            if (m_readers.containsKey(extensionDataFormat)) {
+            if (forwardReaders.containsKey(extensionDataFormat) || backwardReaders.containsKey(extensionDataFormat)) {
                LOGGER.warn(
                   "The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
                   iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
@@ -96,14 +96,23 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
             + format + " must have a corresponding registered data format specification for the format.", iExtension2);
       }
 
-      DataBlockReader dataBlockReader = dataBlocksExtensions.getDataBlockReader(spec);
+      DataBlockReader forwardReader = dataBlocksExtensions.getForwardDataBlockReader(spec);
 
       // Set default data block reader
-      if (dataBlockReader == null) {
-         dataBlockReader = new StandardDataBlockReader(spec);
+      if (forwardReader == null) {
+         forwardReader = new ForwardDataBlockReader(spec);
       }
 
-      m_readers.put(format, dataBlockReader);
+      forwardReaders.put(format, forwardReader);
+
+      DataBlockReader backwardReader = dataBlocksExtensions.getBackwardDataBlockReader(spec);
+
+      // Set default data block reader
+      if (backwardReader == null) {
+         backwardReader = new BackwardDataBlockReader(spec);
+      }
+
+      backwardReaders.put(format, forwardReader);
    }
 
    /**
@@ -117,7 +126,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new TopLevelContainerIterator(medium, m_readers, mediumStore, true);
+      return new ForwardTopLevelContainerIterator(medium, forwardReaders, mediumStore, true);
    }
 
    @Override
@@ -132,13 +141,14 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new TopLevelContainerIterator(medium, m_readers, mediumStore, false);
+      return new BackwardTopLevelContainerIterator(medium, backwardReaders, mediumStore, false);
    }
 
    private final DataFormatRepository m_repository;
 
    private final MediaAPI m_mediumFactory;
-   private final Map<ContainerDataFormat, DataBlockReader> m_readers = new HashMap<>();
+   private final Map<ContainerDataFormat, DataBlockReader> forwardReaders = new HashMap<>();
+   private final Map<ContainerDataFormat, DataBlockReader> backwardReaders = new HashMap<>();
 
    private final ExtensionManager extManager;
 }

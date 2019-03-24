@@ -19,7 +19,7 @@ public abstract class AbstractDataBlockService implements DataBlockService {
 
    /**
     * Creates a new {@link AbstractDataBlockService}.
-    * 
+    *
     * @param myDataFormat
     */
    public AbstractDataBlockService(ContainerDataFormat myDataFormat) {
@@ -27,10 +27,17 @@ public abstract class AbstractDataBlockService implements DataBlockService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getDataBlockReader(DataFormatSpecification)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getForwardDataBlockReader(DataFormatSpecification)
     */
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
+
+      // Choose to use default IDataBlockReader
+      return null;
+   }
+
+   @Override
+   public DataBlockReader getBackwardDataBlockReader(DataFormatSpecification spec) {
 
       // Choose to use default IDataBlockReader
       return null;

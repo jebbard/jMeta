@@ -1,6 +1,6 @@
 /**
  *
- * {@link StandardDataBlockReader}.java
+ * {@link AbstractDataBlockReader}.java
  *
  * @author Jens Ebert
  *
@@ -39,12 +39,12 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link StandardDataBlockReader}
+ * {@link AbstractDataBlockReader}
  *
  */
-public class StandardDataBlockReader implements DataBlockReader {
+public abstract class AbstractDataBlockReader implements DataBlockReader {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockReader.class);
+   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDataBlockReader.class);
 
    private static final String LOGGING_BINARY_TO_INTERPRETED_FAILED = "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.";
 
@@ -59,12 +59,12 @@ public class StandardDataBlockReader implements DataBlockReader {
    private CountProvider customCountProvider;
 
    /**
-    * Creates a new {@link StandardDataBlockReader}.
+    * Creates a new {@link AbstractDataBlockReader}.
     *
     * @param spec
     * @param transformationHandlers
     */
-   public StandardDataBlockReader(DataFormatSpecification spec) {
+   public AbstractDataBlockReader(DataFormatSpecification spec) {
       Reject.ifNull(spec, "spec");
 
       m_spec = spec;

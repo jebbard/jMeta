@@ -26,7 +26,7 @@ public class ID3v1DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
       return new ID3v1DataBlockReader(spec);
    }
 

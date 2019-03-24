@@ -18,5 +18,11 @@ public interface DataBlockService {
     * @param spec
     * @return null to indicate usage of the default {@link DataBlockReader}
     */
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec);
+   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec);
+
+   /**
+    * @param spec
+    * @return null to indicate usage of the default {@link DataBlockReader}
+    */
+   public DataBlockReader getBackwardDataBlockReader(DataFormatSpecification spec);
 }

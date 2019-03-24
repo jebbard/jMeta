@@ -12,7 +12,7 @@ package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.datablocks.api.types.Payload;
-import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
+import com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
@@ -22,7 +22,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
  * {@link Lyrics3v2DataBlockReader}
  *
  */
-public class Lyrics3v2DataBlockReader extends StandardDataBlockReader {
+public class Lyrics3v2DataBlockReader extends AbstractDataBlockReader {
 
    /**
     * Creates a new {@link Lyrics3v2DataBlockReader}.

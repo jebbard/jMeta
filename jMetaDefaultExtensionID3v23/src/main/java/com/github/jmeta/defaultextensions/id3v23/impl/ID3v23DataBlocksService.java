@@ -11,10 +11,10 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 public class ID3v23DataBlocksService extends AbstractDataBlockService {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#getDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#getForwardDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
     */
    @Override
-   public DataBlockReader getDataBlockReader(DataFormatSpecification spec) {
+   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
       return new ID3v23DataBlockReader(spec);
    }
 

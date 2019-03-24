@@ -19,7 +19,7 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
-import com.github.jmeta.library.datablocks.impl.StandardDataBlockReader;
+import com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -30,7 +30,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link ID3v23DataBlockReader}
  *
  */
-public class ID3v23DataBlockReader extends StandardDataBlockReader {
+public class ID3v23DataBlockReader extends AbstractDataBlockReader {
 
    private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> transformationsReadOrder = new LinkedHashMap<>();
 
@@ -50,7 +50,7 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.impl.StandardDataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
+    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      com.github.jmeta.library.datablocks.api.types.Payload,
     *      com.github.jmeta.library.datablocks.api.types.FieldFunctionStack, long)
@@ -65,7 +65,7 @@ public class ID3v23DataBlockReader extends StandardDataBlockReader {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.impl.StandardDataBlockReader#readContainerWithIdBackwards(com.github.jmeta.library.media.api.types.MediumOffset,
+    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#readContainerWithIdBackwards(com.github.jmeta.library.media.api.types.MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      com.github.jmeta.library.datablocks.api.types.Payload,
     *      com.github.jmeta.library.datablocks.api.types.FieldFunctionStack, long)

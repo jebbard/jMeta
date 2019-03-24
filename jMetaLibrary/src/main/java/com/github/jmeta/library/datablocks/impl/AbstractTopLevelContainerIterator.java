@@ -1,5 +1,5 @@
 /**
- * {@link TopLevelContainerIterator}.java
+ * {@link AbstractTopLevelContainerIterator}.java
  *
  * @author Jens Ebert
  * @date 31.12.10 19:47:08 (December 31, 2010)
@@ -28,15 +28,24 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link TopLevelContainerIterator} is used to read all {@link Container}s present in a {@link Medium}. It can be
- * operated in two modes: Forward reading (the default mode) where the medium is iterated with increasing offsets and
+ * {@link AbstractTopLevelContainerIterator} is used to read all {@link Container}s present in a {@link Medium}. It can
+ * be operated in two modes: Forward reading (the default mode) where the medium is iterated with increasing offsets and
  * backward reading for reading a medium (mainly: files or byte arrays) from back to front.
  */
-public class TopLevelContainerIterator extends AbstractDataBlockIterator<Container> {
+public abstract class AbstractTopLevelContainerIterator extends AbstractDataBlockIterator<Container> {
 
    private MediumOffset currentOffset;
 
    private final boolean forwardRead;
+
+   /**
+    * Returns the attribute {@link #mediumStore}.
+    *
+    * @return the attribute {@link #mediumStore}
+    */
+   protected MediumStore getMediumStore() {
+      return mediumStore;
+   }
 
    private final MediumStore mediumStore;
 
@@ -47,7 +56,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
 
    /**
-    * Creates a new {@link TopLevelContainerIterator}.
+    * Creates a new {@link AbstractTopLevelContainerIterator}.
     *
     * @param medium
     *           The {@link Medium} to iterate
@@ -58,7 +67,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
     * @param forwardRead
     *           true for forward reading, false for backward reading
     */
-   public TopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
+   public AbstractTopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
       MediumStore mediumStore, boolean forwardRead) {
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
@@ -67,16 +76,15 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       readerMap.putAll(readers);
       this.mediumStore = mediumStore;
       this.forwardRead = forwardRead;
-
-      if (this.forwardRead) {
-         currentOffset = mediumStore.createMediumOffset(0);
-      } else {
-         currentOffset = mediumStore.createMediumOffset(medium.getCurrentLength());
-      }
+      currentOffset = getReadStartOffset();
 
       precedenceList.addAll(new ArrayList<>(readerMap.keySet()));
       setMedium(medium);
    }
+
+   public abstract long getBytesToAdvanceToNextContainer(Container currentContainer);
+
+   public abstract MediumOffset getReadStartOffset();
 
    /**
     * @see java.io.Closeable#close()
@@ -86,34 +94,13 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
       mediumStore.close();
    }
 
-   private long getBytesToAdvance(Container container) {
-      if (forwardRead) {
-         return container.getTotalSize();
-      } else {
-         return -container.getTotalSize();
-      }
-   }
-
    /**
-    * @see java.util.Iterator#hasNext()
+    * Returns the attribute {@link #currentOffset}.
+    *
+    * @return the attribute {@link #currentOffset}
     */
-   @Override
-   public boolean hasNext() {
-      if (forwardRead) {
-         // NOTE: For streaming media, the offset parameter for MediumStore.isAtEndOfMedium is actually ignored, but
-         // the test is always done at the current stream position.
-         // Thus, if pre-buffering occurs for a streaming medium, the actual stream position might be already at EOM,
-         // but at this.currentOffset, there are still some cached bytes available waiting to be fetched.
-         boolean cachedBytesExist = mediumStore.getCachedByteCountAt(currentOffset) > 0;
-
-         if (cachedBytesExist) {
-            return true;
-         }
-
-         return !mediumStore.isAtEndOfMedium(currentOffset);
-      } else {
-         return currentOffset.getAbsoluteMediumOffset() != 0;
-      }
+   protected MediumOffset getCurrentOffset() {
+      return currentOffset;
    }
 
    /**
@@ -177,7 +164,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
          nextSequenceNumber.put(containerId, sequenceNumber + 1);
 
          if (container != null) {
-            currentOffset = currentOffset.advance(getBytesToAdvance(container));
+            currentOffset = currentOffset.advance(getBytesToAdvanceToNextContainer(container));
 
             return container;
          }
@@ -192,8 +179,8 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
          return reader.readContainerWithId(currentMediumOffset, containerId, null, DataBlockDescription.UNDEFINED, null,
             sequenceNumber);
       } else {
-         return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null, DataBlockDescription.UNDEFINED,
-            null, sequenceNumber);
+         return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null,
+            DataBlockDescription.UNDEFINED, null, sequenceNumber);
       }
    }
 
