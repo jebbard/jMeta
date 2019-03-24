@@ -27,12 +27,10 @@ public interface DataBlockReader {
     * @param id
     * @param parent
     * @param remainingDirectParentByteCount
-    * @param forwardRead
-    *           TODO
     * @return true if it has, false otherwise
     */
    public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, boolean forwardRead);
+      long remainingDirectParentByteCount);
 
    /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given
@@ -51,33 +49,6 @@ public interface DataBlockReader {
     */
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
       long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber);
-
-   /**
-    * @param reference
-    * @param id
-    * @param parent
-    * @param context
-    * @param remainingDirectParentByteCount
-    * @param containerContext
-    *           TODO
-    * @param sequenceNumber
-    *           TODO
-    * @return the {@link Container}
-    */
-   public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber);
-
-   /**
-    * @param reference
-    * @param id
-    * @param parentId
-    * @param footers
-    * @param context
-    * @param containerContext
-    * @return the {@link Payload}
-    */
-   public Payload readPayloadBackwards(MediumOffset reference, DataBlockId id, DataBlockId parentId,
-      List<Header> footers, long remainingDirectParentByteCount, ContainerContext containerContext);
 
    /**
     * Returns the next {@link Header} instance with the given {@link DataBlockId} assumed to be stored starting at the
@@ -140,11 +111,9 @@ public interface DataBlockReader {
 
    /**
     * @param reference
-    * @param forwardRead
-    *           TODO
     * @return true if it identifies, false otherwise
     */
-   public boolean identifiesDataFormat(MediumOffset reference, boolean forwardRead);
+   public boolean identifiesDataFormat(MediumOffset reference);
 
    /**
     * @return the {@link DataFormatSpecification}

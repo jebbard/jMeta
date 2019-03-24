@@ -34,7 +34,7 @@ public class ForwardTopLevelContainerIterator extends AbstractTopLevelContainerI
     */
    public ForwardTopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
       MediumStore mediumStore, boolean forwardRead) {
-      super(medium, readers, mediumStore, forwardRead);
+      super(medium, readers, mediumStore);
    }
 
    /**

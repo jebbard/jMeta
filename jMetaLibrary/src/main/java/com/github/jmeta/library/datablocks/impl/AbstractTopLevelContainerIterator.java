@@ -36,8 +36,6 @@ public abstract class AbstractTopLevelContainerIterator extends AbstractDataBloc
 
    private MediumOffset currentOffset;
 
-   private final boolean forwardRead;
-
    /**
     * Returns the attribute {@link #mediumStore}.
     *
@@ -64,18 +62,15 @@ public abstract class AbstractTopLevelContainerIterator extends AbstractDataBloc
     *           All {@link DataBlockReader}s per supported {@link ContainerDataFormat}
     * @param mediumStore
     *           The {@link MediumStore} used to read from the {@link Medium}
-    * @param forwardRead
-    *           true for forward reading, false for backward reading
     */
    public AbstractTopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
-      MediumStore mediumStore, boolean forwardRead) {
+      MediumStore mediumStore) {
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");
       Reject.ifNull(mediumStore, "mediumFactory");
 
       readerMap.putAll(readers);
       this.mediumStore = mediumStore;
-      this.forwardRead = forwardRead;
       currentOffset = getReadStartOffset();
 
       precedenceList.addAll(new ArrayList<>(readerMap.keySet()));
@@ -121,7 +116,7 @@ public abstract class AbstractTopLevelContainerIterator extends AbstractDataBloc
          ContainerDataFormat dataFormat = iterator.next();
          DataBlockReader reader = readerMap.get(dataFormat);
 
-         if (reader.identifiesDataFormat(reference, forwardRead)) {
+         if (reader.identifiesDataFormat(reference)) {
             return dataFormat;
          }
       }
@@ -175,13 +170,8 @@ public abstract class AbstractTopLevelContainerIterator extends AbstractDataBloc
 
    private Container readContainerWithId(DataBlockReader reader, MediumOffset currentMediumOffset,
       DataBlockId containerId, int sequenceNumber) {
-      if (forwardRead) {
-         return reader.readContainerWithId(currentMediumOffset, containerId, null, DataBlockDescription.UNDEFINED, null,
-            sequenceNumber);
-      } else {
-         return reader.readContainerWithIdBackwards(currentMediumOffset, containerId, null,
-            DataBlockDescription.UNDEFINED, null, sequenceNumber);
-      }
+      return reader.readContainerWithId(currentMediumOffset, containerId, null, DataBlockDescription.UNDEFINED, null,
+         sequenceNumber);
    }
 
    private void setMedium(Medium<?> medium) {

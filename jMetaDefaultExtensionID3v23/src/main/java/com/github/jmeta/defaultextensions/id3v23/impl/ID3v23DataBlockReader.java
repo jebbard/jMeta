@@ -18,8 +18,8 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
-import com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -30,7 +30,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link ID3v23DataBlockReader}
  *
  */
-public class ID3v23DataBlockReader extends AbstractDataBlockReader {
+public class ID3v23DataBlockReader extends ForwardDataBlockReader {
 
    private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> transformationsReadOrder = new LinkedHashMap<>();
 
@@ -62,19 +62,6 @@ public class ID3v23DataBlockReader extends AbstractDataBlockReader {
          containerContext, sequenceNumber);
 
       return applyTransformationsAfterRead(container, this);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#readContainerWithIdBackwards(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.Payload,
-    *      com.github.jmeta.library.datablocks.api.types.FieldFunctionStack, long)
-    */
-   @Override
-   public Container readContainerWithIdBackwards(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
-      return applyTransformationsAfterRead(super.readContainerWithIdBackwards(reference, id, parent,
-         remainingDirectParentByteCount, containerContext, sequenceNumber), this);
    }
 
    /**

@@ -109,10 +109,10 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
       // Set default data block reader
       if (backwardReader == null) {
-         backwardReader = new BackwardDataBlockReader(spec);
+         backwardReader = new BackwardDataBlockReader(spec, forwardReader);
       }
 
-      backwardReaders.put(format, forwardReader);
+      backwardReaders.put(format, backwardReader);
    }
 
    /**
