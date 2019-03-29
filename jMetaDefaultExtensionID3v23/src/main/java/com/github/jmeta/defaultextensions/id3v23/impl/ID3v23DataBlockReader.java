@@ -57,9 +57,9 @@ public class ID3v23DataBlockReader extends ForwardDataBlockReader {
     */
    @Override
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
+      long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext) {
       Container container = super.readContainerWithId(reference, id, parent, remainingDirectParentByteCount,
-         containerContext, sequenceNumber);
+         sequenceNumber, containerContext);
 
       return applyTransformationsAfterRead(container, this);
    }

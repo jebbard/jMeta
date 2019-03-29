@@ -40,9 +40,9 @@ public class ID3v1BackwardDataBlockReader extends BackwardDataBlockReader {
 
    @Override
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
+      long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext) {
       return getForwardReader().readContainerWithId(reference.advance(-ID3v1Extension.ID3V1_TAG_LENGTH), id, parent,
-         remainingDirectParentByteCount, containerContext, sequenceNumber);
+         remainingDirectParentByteCount, sequenceNumber, containerContext);
    }
 
    @Override

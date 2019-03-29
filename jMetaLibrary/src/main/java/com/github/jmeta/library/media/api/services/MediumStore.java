@@ -100,6 +100,10 @@ public interface MediumStore {
     * the {@link MediumOffset} is ignored and it is checked if - when currently read would start - the stream is now at
     * its end or not.
     *
+    * Note that reading methods such as {@link #getData(MediumOffset, int)} only see the currently flushed (i.e.
+    * persisted) state of the medium, i.e. if you already scheduled any changes, you will <i>not</i> re-read them until
+    * you flushed them.
+    *
     * @param offset
     *           The {@link MediumOffset} offset to check, ignored for stream-based media. Must not be null and must
     *           point to the same {@link Medium} as this {@link MediumStore}
@@ -170,6 +174,10 @@ public interface MediumStore {
     * explicit read calls to the external medium. The buffered data can then later be fetched using
     * {@link #getData(MediumOffset, int)}. As an alternative, using code can directly call
     * {@link #getData(MediumOffset, int)}, if it is suitable to work with all the read data right away.
+    *
+    * Note that reading methods such as {@link #getData(MediumOffset, int)} only see the currently flushed (i.e.
+    * persisted) state of the medium, i.e. if you already scheduled any changes, you will <i>not</i> re-read them until
+    * you flushed them.
     *
     * @param offset
     *           The offset to start caching, must point to the same {@link Medium} as this {@link MediumStore}, must not
@@ -243,6 +251,10 @@ public interface MediumStore {
     * stream-based media, if parts of the range are not found in the cache, and the range is before the current highest
     * read offset, an {@link InvalidMediumOffsetException} is thrown, as with streams, you cannot go back.
     *
+    * Note that reading methods such as {@link #getData(MediumOffset, int)} only see the currently flushed (i.e.
+    * persisted) state of the medium, i.e. if you already scheduled any changes, you will <i>not</i> re-read them until
+    * you flushed them.
+    *
     * @param offset
     *           The offset to use, must point to the same {@link Medium} as this {@link MediumStore}, must not be beyond
     *           the current medium size for random-access media, otherwise an {@link EndOfMediumException} is thrown
@@ -289,6 +301,10 @@ public interface MediumStore {
     * If data before the given offset is removed, replaced or inserted by prior calls to the corresponding methods, the
     * actual insert position is shifted correspondingly.
     *
+    * Note that reading methods such as {@link #getData(MediumOffset, int)} only see the currently flushed (i.e.
+    * persisted) state of the medium, i.e. if you already scheduled any changes, you will <i>not</i> re-read them until
+    * you flushed them.
+    *
     * @param offset
     *           The {@link MediumOffset} at which to insert the data. Must point to the {@link Medium} this
     *           {@link MediumStore} works on. Must not exceed the {@link Medium}'s length as returned by
@@ -325,6 +341,10 @@ public interface MediumStore {
     * Other subsequent calls to {@link #removeData(MediumOffset, int)} or
     * {@link #replaceData(MediumOffset, int, ByteBuffer)} referring to overlapping regions are not allowed and lead to
     * an {@link InvalidOverlappingWriteException}.
+    *
+    * Note that reading methods such as {@link #getData(MediumOffset, int)} only see the currently flushed (i.e.
+    * persisted) state of the medium, i.e. if you already scheduled any changes, you will <i>not</i> re-read them until
+    * you flushed them.
     *
     * @param offset
     *           The {@link MediumOffset} at which to remove the data. Must point to the {@link Medium} this
@@ -367,6 +387,10 @@ public interface MediumStore {
     * Other subsequent calls to {@link #removeData(MediumOffset, int)} or
     * {@link #replaceData(MediumOffset, int, ByteBuffer)} referring to overlapping regions are not allowed and lead to
     * an {@link InvalidOverlappingWriteException}.
+    *
+    * Note that reading methods such as {@link #getData(MediumOffset, int)} only see the currently flushed (i.e.
+    * persisted) state of the medium, i.e. if you already scheduled any changes, you will <i>not</i> re-read them until
+    * you flushed them.
     *
     * @param offset
     *           The {@link MediumOffset} at which to replace the data. Must point to the {@link Medium} this
@@ -462,6 +486,10 @@ public interface MediumStore {
     * If this method throws a runtime exception - which always indicates an abnormal situation - the content of the
     * {@link Medium} might have got corrupted, as it does not guarantee ACID for changes. You should close this
     * {@link MediumStore} and retry in this case.
+    *
+    * Note that reading methods such as {@link #getData(MediumOffset, int)} only see the currently flushed (i.e.
+    * persisted) state of the medium, i.e. if you already scheduled any changes, you will <i>not</i> re-read them until
+    * you flushed them.
     *
     * @throws MediumAccessException
     *            If any other errors occurred during accessing the medium

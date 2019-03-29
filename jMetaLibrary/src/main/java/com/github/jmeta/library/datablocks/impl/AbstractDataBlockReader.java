@@ -38,8 +38,12 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractDataBlockReader}
- *
+ * {@link AbstractDataBlockReader} contains the default implementation of {@link DataBlockReader}, i.e. everything that
+ * is not depending on whether forward or backward reading happens. Differentiation between forward and backward reading
+ * is done by different implementations of {@link #hasEnoughBytesForMagicKey(MediumOffset, MagicKey, long)},
+ * {@link #getMagicKeys(DataBlockDescription)} as well as
+ * {@link #readContainerWithId(MediumOffset, DataBlockId, Payload, long, int, ContainerContext)} and
+ * {@link #readPayload(MediumOffset, DataBlockId, DataBlockId, long, ContainerContext)}.
  */
 public abstract class AbstractDataBlockReader implements DataBlockReader {
 
@@ -47,36 +51,359 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
 
    private static final String LOGGING_BINARY_TO_INTERPRETED_FAILED = "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.";
 
-   private MediumDataProvider mediumDataProvider;
+   private final DataFormatSpecification spec;
 
-   private DataBlockFactory m_dataBlockFactory;
-
-   private final DataFormatSpecification m_spec;
+   private DataBlockFactory dataBlockFactory;
 
    private SizeProvider customSizeProvider;
 
    private CountProvider customCountProvider;
 
+   private MediumDataProvider mediumDataProvider;
+
    /**
     * Creates a new {@link AbstractDataBlockReader}.
     *
     * @param spec
-    * @param transformationHandlers
+    *           The {@link DataFormatSpecification}, must not be null
     */
    public AbstractDataBlockReader(DataFormatSpecification spec) {
       Reject.ifNull(spec, "spec");
 
-      m_spec = spec;
-      m_dataBlockFactory = new StandardDataBlockFactory();
+      this.spec = spec;
+      dataBlockFactory = new StandardDataBlockFactory();
    }
 
    /**
-    * Returns the attribute {@link #mediumDataProvider}.
-    *
-    * @return the attribute {@link #mediumDataProvider}
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#hasContainerWithId(MediumOffset,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.types.Payload, long)
+    */
+   @Override
+   public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
+      long remainingDirectParentByteCount) {
+      Reject.ifNull(reference, "reference");
+      Reject.ifNull(id, "id");
+
+      mediumDataProvider.bufferBeforeRead(reference, remainingDirectParentByteCount);
+
+      DataBlockDescription defaultNestedContainerDescription = getSpecification()
+         .getDefaultNestedContainerDescription();
+
+      if (defaultNestedContainerDescription != null && id.equals(defaultNestedContainerDescription.getId())) {
+         return true;
+      }
+
+      DataBlockDescription containerDesc = spec.getDataBlockDescription(id);
+
+      List<MagicKey> magicKeys = getMagicKeys(containerDesc);
+
+      for (int i = 0; i < magicKeys.size(); ++i) {
+         MagicKey magicKey = magicKeys.get(i);
+
+         // Does the magic key equal the medium bytes at the given reference?
+         int magicKeySizeInBytes = magicKey.getByteLength();
+
+         // This container cannot be stored in the parent, as there are not enough bytes in the parent
+         // left for its magic key.
+         if (!hasEnoughBytesForMagicKey(reference, magicKey, remainingDirectParentByteCount)) {
+            return false;
+         }
+
+         MediumOffset magicKeyReference = reference.advance(magicKey.getDeltaOffset());
+
+         final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
+
+         if (magicKey.isPresentIn(readBytes)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumOffset)
+    */
+   @Override
+   public boolean identifiesDataFormat(MediumOffset reference) {
+      Reject.ifNull(reference, "reference");
+
+      List<DataBlockDescription> topLevelContainerDescs = spec.getTopLevelDataBlockDescriptions();
+
+      for (int i = 0; i < topLevelContainerDescs.size(); ++i) {
+         DataBlockDescription desc = topLevelContainerDescs.get(i);
+
+         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNDEFINED)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumOffset,
+    *      int)
+    */
+   @Override
+   public ByteBuffer readBytes(MediumOffset reference, int size) {
+      return mediumDataProvider.getData(reference, size);
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumOffset,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, long, ContainerContext)
+    */
+   @Override
+   public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, long remainingDirectParentByteCount,
+      ContainerContext containerContext) {
+
+      DataBlockDescription parentDesc = spec.getDataBlockDescription(parentId);
+
+      List<DataBlockDescription> fieldChildren = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
+
+      List<Field<?>> fields = new ArrayList<>();
+
+      MediumOffset currentFieldReference = reference;
+
+      long currentlyRemainingParentByteCount = remainingDirectParentByteCount;
+
+      for (int i = 0; i < fieldChildren.size(); ++i) {
+         mediumDataProvider.bufferBeforeRead(currentFieldReference, currentlyRemainingParentByteCount);
+
+         DataBlockDescription fieldDesc = fieldChildren.get(i);
+
+         long actualOccurrences = containerContext.getOccurrencesOf(fieldDesc.getId());
+
+         for (int j = 0; j < actualOccurrences; j++) {
+            long fieldSize = determineActualFieldSize(fieldDesc, currentlyRemainingParentByteCount,
+               currentFieldReference, j, containerContext);
+
+            Field<?> newField = readField(currentFieldReference, fieldDesc, fieldSize, j, containerContext);
+
+            containerContext.addFieldFunctions(newField);
+
+            fields.add(newField);
+
+            if (currentlyRemainingParentByteCount != DataBlockDescription.UNDEFINED) {
+               currentlyRemainingParentByteCount -= fieldSize;
+            }
+
+            currentFieldReference = currentFieldReference.advance(fieldSize);
+         }
+      }
+
+      if (currentlyRemainingParentByteCount > 0) {
+         DataBlockDescription unknownFieldDescription = createUnknownFieldDescription(parentId);
+
+         Field<?> unknownField = readField(currentFieldReference, unknownFieldDescription,
+            currentlyRemainingParentByteCount, 0, containerContext);
+
+         fields.add(unknownField);
+      }
+
+      return fields;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readHeadersOrFootersWithId(com.github.jmeta.library.media.api.types.MediumOffset,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, boolean,
+    *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    */
+   @Override
+   public List<Header> readHeadersOrFootersWithId(MediumOffset startOffset, DataBlockId headerOrFooterId,
+      boolean isFooter, ContainerContext containerContext) {
+      Reject.ifNull(headerOrFooterId, "headerOrFooterId");
+      Reject.ifNull(startOffset, "reference");
+      Reject.ifFalse(spec.specifiesBlockWithId(headerOrFooterId), "m_spec.specifiesBlockWithId(headerOrFooterId)");
+
+      DataBlockDescription desc = spec.getDataBlockDescription(headerOrFooterId);
+
+      List<Header> nextHeadersOrFooters = new ArrayList<>();
+
+      // Get the actual occurrences of this headerId based on the fields of the previous
+      // headers
+      long actualOccurrences = containerContext.getOccurrencesOf(desc.getId());
+
+      // Read all header occurrences
+      for (int i = 0; i < actualOccurrences; i++) {
+         long headerOrFooterSize = containerContext.getSizeOf(headerOrFooterId, i);
+
+         List<Field<?>> headerFields = readFields(startOffset, headerOrFooterId, headerOrFooterSize, containerContext);
+
+         nextHeadersOrFooters.add(dataBlockFactory.createHeaderOrFooter(headerOrFooterId, startOffset, headerFields,
+            isFooter, this, i, containerContext));
+      }
+
+      return nextHeadersOrFooters;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setMediumStore(MediumStore)
+    */
+   @Override
+   public void setMediumStore(MediumStore mediumStore) {
+      Reject.ifNull(mediumStore, "mediumStore");
+
+      mediumDataProvider = new MediumDataProvider(mediumStore);
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setCustomSizeProvider(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.services.SizeProvider)
+    */
+   @Override
+   public void setCustomSizeProvider(SizeProvider sizeProvider) {
+      Reject.ifNull(sizeProvider, "sizeProvider");
+
+      customSizeProvider = sizeProvider;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setCustomCountProvider(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.services.CountProvider)
+    */
+   @Override
+   public void setCustomCountProvider(CountProvider countProvider) {
+      Reject.ifNull(countProvider, "countProvider");
+
+      customCountProvider = countProvider;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#getSpecification()
+    */
+   @Override
+   public DataFormatSpecification getSpecification() {
+      return spec;
+   }
+
+   /**
+    * @return the {@link MediumDataProvider}
     */
    public MediumDataProvider getMediumDataProvider() {
       return mediumDataProvider;
+   }
+
+   /**
+    * Tells whether there are sufficient bytes available for storing the given {@link MagicKey} at the given offset.
+    *
+    * @param reference
+    *           The {@link MediumOffset}, must not be null
+    * @param magicKey
+    *           The {@link MagicKey}, must not be null
+    * @param remainingDirectParentByteCount
+    *           The number of parent bytes remaining in the medium at the given offset or
+    *           {@link DataBlockDescription#UNDEFINED} if unknown
+    * @return
+    */
+   protected abstract boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey,
+      long remainingDirectParentByteCount);
+
+   /**
+    * Gets all magic keys relevant for reading a container with the given {@link DataBlockDescription}.
+    *
+    * @param containerDesc
+    *           The container's {@link DataBlockDescription}, must not be null
+    * @return all magic keys relevant for reading a container with the given {@link DataBlockDescription}
+    */
+   protected abstract List<MagicKey> getMagicKeys(DataBlockDescription containerDesc);
+
+   /**
+    * @return the {@link DataBlockFactory}
+    */
+   protected DataBlockFactory getDataBlockFactory() {
+      return dataBlockFactory;
+   }
+
+   /**
+    * @return the custom {@link SizeProvider} or null if none set
+    */
+   protected SizeProvider getCustomSizeProvider() {
+      return customSizeProvider;
+   }
+
+   /**
+    * @return the custom {@link CountProvider} or null if none set
+    */
+   protected CountProvider getCustomCountProvider() {
+      return customCountProvider;
+   }
+
+   /**
+    * Validates and gets the payload's {@link DataBlockDescription} belonging to the given container's
+    * {@link DataBlockDescription}.
+    *
+    * @param containerDesc
+    *           The container's {@link DataBlockDescription}, must not be null
+    * @return the payload's {@link DataBlockDescription} belonging to the given container's {@link DataBlockDescription}
+    */
+   protected DataBlockDescription getPayloadDescription(DataBlockDescription containerDesc) {
+      List<DataBlockDescription> payloadDescs = containerDesc
+         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+
+      payloadDescs.addAll(containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
+
+      if (payloadDescs.size() != 1) {
+         throw new IllegalStateException(
+            "For container parents, there must be a single data block of type FIELD_BASED_PAYLOAD or CONTAINER_BASED_PAYLOAD");
+      }
+
+      return payloadDescs.get(0);
+   }
+
+   /**
+    * Determines the concrete container id for a generic container with the given id.
+    *
+    * @param currentOffset
+    *           The current read {@link MediumOffset}, must not be null
+    * @param genericContainerId
+    *           The generic container's {@link DataBlockId}, must not be null
+    * @param remainingParentByteCount
+    *           The number of remaining parent bytes at the given offset or {@link DataBlockDescription#UNDEFINED} if
+    *           unknown
+    * @param sequenceNumber
+    *           The sequence number of the container
+    * @param containerContext
+    *           The {@link ContainerContext} of the container, must not be null
+    * @return the concrete container id for a generic container with the given id
+    */
+   protected DataBlockId determineConcreteContainerId(MediumOffset currentOffset, DataBlockId genericContainerId,
+      long remainingParentByteCount, int sequenceNumber, ContainerContext containerContext) {
+
+      DataBlockDescription desc = spec.getDataBlockDescription(genericContainerId);
+
+      if (desc.isGeneric()) {
+         DataBlockId idFieldId = desc.getIdField();
+
+         final DataBlockDescription idFieldDesc = spec.getDataBlockDescription(idFieldId);
+
+         long byteOffset = idFieldDesc.getByteOffsetFromStartOfContainer();
+
+         if (byteOffset == DataBlockDescription.UNDEFINED) {
+            throw new IllegalStateException("For generic data block " + genericContainerId
+               + ", the exact offset of its id field in its container parent " + genericContainerId
+               + " must be specified.");
+         }
+
+         MediumOffset idFieldReference = currentOffset.advance(byteOffset);
+
+         long actualFieldSize = determineActualFieldSize(idFieldDesc, remainingParentByteCount - byteOffset,
+            idFieldReference, 0, containerContext);
+
+         if (actualFieldSize == DataBlockDescription.UNDEFINED) {
+            throw new IllegalStateException(
+               "Could not determine size of field " + idFieldId + " which stores the id of a generic data block");
+         }
+
+         // Read the field that defines the actual id for the container
+         Field<?> idField = readField(idFieldReference, idFieldDesc, actualFieldSize, sequenceNumber, containerContext);
+
+         return concreteBlockIdFromGenericId(genericContainerId, idField);
+      }
+
+      return genericContainerId;
    }
 
    private DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, Field<?> headerField) {
@@ -107,44 +434,8 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
          unknownFieldProperties, 1, 1, DataBlockDescription.UNDEFINED, DataBlockDescription.UNDEFINED, false, null);
    }
 
-   protected DataBlockId determineActualContainerId(MediumOffset reference, DataBlockId id,
-      long remainingParentByteCount, int sequenceNumber, ContainerContext containerContext) {
-
-      DataBlockDescription desc = m_spec.getDataBlockDescription(id);
-
-      if (desc.isGeneric()) {
-         DataBlockId idFieldId = desc.getIdField();
-
-         final DataBlockDescription idFieldDesc = m_spec.getDataBlockDescription(idFieldId);
-
-         long byteOffset = idFieldDesc.getByteOffsetFromStartOfContainer();
-
-         if (byteOffset == DataBlockDescription.UNDEFINED) {
-            throw new IllegalStateException("For generic data block " + id
-               + ", the exact offset of its id field in its container parent " + id + " must be specified.");
-         }
-
-         MediumOffset idFieldReference = reference.advance(byteOffset);
-
-         long actualFieldSize = determineActualFieldSize(idFieldDesc, remainingParentByteCount - byteOffset,
-            idFieldReference, containerContext, 0);
-
-         if (actualFieldSize == DataBlockDescription.UNDEFINED) {
-            throw new IllegalStateException(
-               "Could not determine size of field " + idFieldId + " which stores the id of a generic data block");
-         }
-
-         // Read the field that defines the actual id for the container
-         Field<?> idField = readField(idFieldReference, idFieldDesc, actualFieldSize, sequenceNumber, containerContext);
-
-         return concreteBlockIdFromGenericId(id, idField);
-      }
-
-      return id;
-   }
-
    private long determineActualFieldSize(DataBlockDescription fieldDesc, long remainingDirectParentByteCount,
-      MediumOffset reference, ContainerContext containerContext, int sequenceNumber) {
+      MediumOffset reference, int sequenceNumber, ContainerContext containerContext) {
 
       long actualBlockSize = DataBlockDescription.UNDEFINED;
 
@@ -170,31 +461,6 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       return actualBlockSize;
    }
 
-   /**
-    * @return the {@link DataBlockFactory}
-    */
-   protected DataBlockFactory getDataBlockFactory() {
-
-      return m_dataBlockFactory;
-   }
-
-   /**
-    * @param actualDesc
-    * @return
-    */
-   protected DataBlockDescription getPayloadDescription(DataBlockDescription actualDesc) {
-      List<DataBlockDescription> payloadDescs = actualDesc
-         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
-
-      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
-
-      if (payloadDescs.size() != 1) {
-         throw new IllegalStateException("For container parents, there must be a single data block of type PAYLOAD");
-      }
-
-      return payloadDescs.get(0);
-   }
-
    private long getSizeUpToTerminationBytes(MediumOffset reference, Charset charset, Character terminationCharacter,
       long remainingDirectParentByteCount) {
       FieldTerminationFinder finder = new FieldTerminationFinder();
@@ -202,108 +468,6 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       return finder.getSizeUntilTermination(charset, terminationCharacter,
          mediumDataProvider.createFieldDataProvider(reference), remainingDirectParentByteCount,
          reference.getMedium().getMaxReadWriteBlockSizeInBytes());
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#getSpecification()
-    */
-   @Override
-   public DataFormatSpecification getSpecification() {
-
-      return m_spec;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#hasContainerWithId(MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.Payload, long)
-    */
-   @Override
-   public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount) {
-
-      Reject.ifNull(reference, "reference");
-      Reject.ifNull(id, "id");
-
-      mediumDataProvider.bufferBeforeRead(reference, remainingDirectParentByteCount);
-
-      DataBlockDescription defaultNestedContainerDescription = getSpecification()
-         .getDefaultNestedContainerDescription();
-
-      if (defaultNestedContainerDescription != null && id.equals(defaultNestedContainerDescription.getId())) {
-         return true;
-      }
-
-      DataBlockDescription containerDesc = m_spec.getDataBlockDescription(id);
-
-      List<MagicKey> magicKeys = getMagicKeys(containerDesc);
-
-      for (int i = 0; i < magicKeys.size(); ++i) {
-         MagicKey magicKey = magicKeys.get(i);
-
-         // Does the magic key equal the medium bytes at the given reference?
-         int magicKeySizeInBytes = magicKey.getByteLength();
-
-         // This container cannot be stored in the parent, as there are not enough bytes in the parent
-         // left for its magic key.
-         if (!hasEnoughBytesForMagicKey(reference, magicKey, remainingDirectParentByteCount)) {
-            return false;
-         }
-
-         MediumOffset magicKeyReference = reference.advance(magicKey.getDeltaOffset());
-
-         final ByteBuffer readBytes = readBytes(magicKeyReference, magicKeySizeInBytes);
-
-         if (magicKey.isPresentIn(readBytes)) {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   /**
-    * @param reference
-    * @param magicKey
-    * @param remainingDirectParentByteCount
-    *           TODO
-    * @return
-    */
-   protected abstract boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey,
-      long remainingDirectParentByteCount);
-
-   /**
-    * @param containerDesc
-    * @return
-    */
-   protected abstract List<MagicKey> getMagicKeys(DataBlockDescription containerDesc);
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#identifiesDataFormat(MediumOffset)
-    */
-   @Override
-   public boolean identifiesDataFormat(MediumOffset reference) {
-
-      List<DataBlockDescription> topLevelContainerDescs = m_spec.getTopLevelDataBlockDescriptions();
-
-      for (int i = 0; i < topLevelContainerDescs.size(); ++i) {
-         DataBlockDescription desc = topLevelContainerDescs.get(i);
-
-         if (hasContainerWithId(reference, desc.getId(), null, DataBlockDescription.UNDEFINED)) {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readBytes(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      int)
-    */
-   @Override
-   public ByteBuffer readBytes(MediumOffset reference, int size) {
-      return mediumDataProvider.getData(reference, size);
    }
 
    private Field<?> readField(final MediumOffset reference, DataBlockDescription fieldDesc, long fieldSize,
@@ -314,152 +478,15 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       // anyway.
       if (fieldDesc.getFieldProperties().getTerminationCharacter() == null
          && fieldSize > reference.getMedium().getMaxReadWriteBlockSizeInBytes()) {
-         return new LazyField(fieldDesc, reference, null, fieldSize, m_dataBlockFactory, this, sequenceNumber,
+         return new LazyField(fieldDesc, reference, null, fieldSize, dataBlockFactory, this, sequenceNumber,
             containerContext);
       }
 
       // This cast is ok as we check for upper bound above
       ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
-      return m_dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), m_spec, reference, fieldBuffer, sequenceNumber,
+      return dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), spec, reference, fieldBuffer, sequenceNumber,
          containerContext);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, long, ContainerContext)
-    */
-   @Override
-   public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, long remainingDirectParentByteCount,
-      ContainerContext containerContext) {
-
-      DataBlockDescription parentDesc = m_spec.getDataBlockDescription(parentId);
-
-      List<DataBlockDescription> fieldChildren = parentDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FIELD);
-
-      List<Field<?>> fields = new ArrayList<>();
-
-      MediumOffset currentFieldReference = reference;
-
-      long currentlyRemainingParentByteCount = remainingDirectParentByteCount;
-
-      for (int i = 0; i < fieldChildren.size(); ++i) {
-         mediumDataProvider.bufferBeforeRead(currentFieldReference, currentlyRemainingParentByteCount);
-
-         DataBlockDescription fieldDesc = fieldChildren.get(i);
-
-         long actualOccurrences = containerContext.getOccurrencesOf(fieldDesc.getId());
-
-         for (int j = 0; j < actualOccurrences; j++) {
-            long fieldSize = determineActualFieldSize(fieldDesc, currentlyRemainingParentByteCount,
-               currentFieldReference, containerContext, j);
-
-            Field<?> newField = readField(currentFieldReference, fieldDesc, fieldSize, j, containerContext);
-
-            containerContext.addFieldFunctions(newField);
-
-            fields.add(newField);
-
-            if (currentlyRemainingParentByteCount != DataBlockDescription.UNDEFINED) {
-               currentlyRemainingParentByteCount -= fieldSize;
-            }
-
-            currentFieldReference = currentFieldReference.advance(fieldSize);
-         }
-      }
-
-      if (currentlyRemainingParentByteCount > 0) {
-         DataBlockDescription unknownFieldDescription = createUnknownFieldDescription(parentId);
-
-         Field<?> unknownField = readField(currentFieldReference, unknownFieldDescription,
-            currentlyRemainingParentByteCount, 0, containerContext);
-
-         fields.add(unknownField);
-      }
-
-      return fields;
-   }
-
-   @Override
-   public List<Header> readHeadersOrFootersWithId(MediumOffset reference, DataBlockId headerOrFooterId,
-      DataBlockId parentId, List<Header> previousHeadersOrFooters, boolean isFooter,
-      ContainerContext containerContext) {
-
-      Reject.ifNull(previousHeadersOrFooters, "previousHeadersOrFooters");
-      Reject.ifNull(headerOrFooterId, "headerOrFooterId");
-      Reject.ifNull(reference, "reference");
-      Reject.ifFalse(m_spec.specifiesBlockWithId(headerOrFooterId), "m_spec.specifiesBlockWithId(headerOrFooterId)");
-
-      DataBlockDescription desc = m_spec.getDataBlockDescription(headerOrFooterId);
-
-      List<Header> nextHeadersOrFooters = new ArrayList<>();
-
-      // Get the actual occurrences of this headerId based on the fields of the previous
-      // headers
-      long actualOccurrences = containerContext.getOccurrencesOf(desc.getId());
-
-      // Read all header occurrences
-      for (int i = 0; i < actualOccurrences; i++) {
-         long headerOrFooterSize = containerContext.getSizeOf(headerOrFooterId, i);
-
-         List<Field<?>> headerFields = readFields(reference, headerOrFooterId, headerOrFooterSize, containerContext);
-
-         nextHeadersOrFooters.add(m_dataBlockFactory.createHeaderOrFooter(headerOrFooterId, reference, headerFields,
-            isFooter, this, i, containerContext));
-      }
-
-      return nextHeadersOrFooters;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setMediumCache(MediumStore)
-    */
-   @Override
-   public void setMediumCache(MediumStore cache) {
-
-      Reject.ifNull(cache, "cache");
-
-      mediumDataProvider = new MediumDataProvider(cache);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setCustomSizeProvider(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.services.SizeProvider)
-    */
-   @Override
-   public void setCustomSizeProvider(SizeProvider sizeProvider) {
-      Reject.ifNull(sizeProvider, "sizeProvider");
-
-      customSizeProvider = sizeProvider;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setCustomCountProvider(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.services.CountProvider)
-    */
-   @Override
-   public void setCustomCountProvider(CountProvider countProvider) {
-      Reject.ifNull(countProvider, "countProvider");
-
-      customCountProvider = countProvider;
-   }
-
-   /**
-    * Returns the attribute {@link #customSizeProvider}.
-    *
-    * @return the attribute {@link #customSizeProvider}
-    */
-   protected SizeProvider getCustomSizeProvider() {
-      return customSizeProvider;
-   }
-
-   /**
-    * Returns the attribute {@link #customCountProvider}.
-    *
-    * @return the attribute {@link #customCountProvider}
-    */
-   protected CountProvider getCustomCountProvider() {
-      return customCountProvider;
    }
 
 }

@@ -538,11 +538,93 @@ The feature of reading backward is just a convenience and performance improvemen
 
 Nevertheless, some data formats support backward reading by providing a so-called footer. The reason for this feature is that multimedia files are easier to modify at their end than at the beginning: Wen inserting a tag of length $n$ at the beginning of the file, you actually have to read all bytes of the file, write them to offsets $x+n$, and then write the tag bytes at offset 0. This requires a lot of I/O and can be expensive, especially for large files. Appending tags at the end of file avoids this. To ensure that parsers can identify such end-of-file tags, footers have to be defined and present. From the supported formats, Lyrics3v2, ID3v2.4 and APEv2 support footers. ID3v1 can be read backwards, too, as it is of static length.
 
-DD: Rückwärtslesen geht nur für Random Access medien
-DD: Only static header and footer lengths allowed, thus currently excluding cases such as ID3v2.4 header + dynamic size ext header + footer for backward reading
-DD: Backward readable formats must define footers with magic keys
-DD: How to handle ID3v1 backward reading
+However, first of all, we have to note down:
+%%%% DD --> %%%%
+\DD{dd:653}
+{% Title
+Streaming media cannot be read backwards
+}
+{% Short description
+\LibName{} cannot read stream-based media backwards and reacts with a runtime exception if a user tries to do that
+}
+{% Rationale
+Random access media allow starting reading from any point, streams by design do only start at the beginning.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
+If we do backward reading, the first question that might come up is: How do we actually do it? Quite similar to forward reading but with some important differences:
+%%%% DD --> %%%%
+\DD{dd:654}
+{% Title
+Backward reading uses footer magic keys
+}
+{% Short description
+When backward reading, \COMPdataPartManagement{} tries to find a footer magic key at a fixed position in front of the current offset. If it can find it there, this is a signal that a container of the given data format is present. The implementation tries to extract a static payload size from the footer(s). Then it reads the payload using this static size by going that much bytes backward. Finally, it reads any header(s) in front. If start of medium is encountered during this, this is quite similar to an end of medium unexpected error.
+}
+{% Rationale
+This allows to reuse some parts of forward-reading and thus avoids to invent something totally different.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+\DesLink{dd:654} did mention a basic approach and also footer(s) and header(s). But how to deal with dynamic length headers or footers or unknown length payload? The problem here is that you only know where a footer, payload or header ends, but not where it actually starts if it is dynamic or unknown length. For now, we state:
+
+%%%% DD --> %%%%
+\DD{dd:655}
+{% Title
+Only static length headers, payload and footers are supported for backward-reading
+}
+{% Short description
+As of the current release, \LibName{} cannot deal with dynamic length headers or footers during backward reading. It throws a runtime exception if the presence of such a dynamic-length header is detected. The same is done if the lenght of payload could not be determined. However, \LibName{} fully supports multiple static-length headers or footers as well as optional ones, with quite the same mechanisms as for forward-reading. 
+}
+{% Rationale
+This is e.g. the case for ID3v2.4: If there is an extended header (which has dynamic length) there is no way to find out where it starts during backward reading except you search for the actual main header starting point. This would somehow not exactly fit with the forward-read approach. There is an option to implement it later or for the extensions to overwrite the default implementation in a more flexible way.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+One observation that is important to grasp comes when you think about parsing the content of a container that has already been backward-read:
+
+%%%% DD --> %%%%
+\DD{dd:656}
+{% Title
+Payload content of a backward-read container is forward-read
+}
+{% Short description
+As soon as we have fully read a container backwards, we of cause know where its payload starts and ends. Thus, we can of course read the payload \emph{forward} instead of backward. The same is of course true for headers and footers during backward-reading: As we know where they start, we wouldn't want to read their fields somehow backwards. Instead we simply reuse the existing code that forward-reads fields.
+}
+{% Rationale
+We can reuse a lot of code for forward-reading instead of coming up with new code. Decreases complexity.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Finally, we look at a special case of backward reading: ID3v1.
+
+%%%% DD --> %%%%
+\DD{dd:657}
+{% Title
+ID3v1 can be backward-read as it is static size, this is done in the extension
+}
+{% Short description
+As ID3v1 has a static size of 128 bytes, we can always check if there is the header's magic key at -128 bytes from the current offset. If so, we've found the tag during backward reading. However, as ID3v1 does not have a footer but only a header, this special case has to be implemented in a custom implementation of the extension and not in the generic centralized code.
+}
+{% Rationale
+ID3v1 frequently occurs at the end of a medium and thus it makes sense to support this.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 % =======================================================================================================
 \subsection{API Design}%

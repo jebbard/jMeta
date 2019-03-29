@@ -160,7 +160,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       }
 
       Container container = m_reader.readContainerWithId(m_nextContainerReference, containerId, m_parent,
-         m_remainingParentSize, m_parent.getContainerContext(), sequenceNumber);
+         m_remainingParentSize, sequenceNumber, m_parent.getContainerContext());
 
       nextSequenceNumber.put(containerId, sequenceNumber + 1);
 

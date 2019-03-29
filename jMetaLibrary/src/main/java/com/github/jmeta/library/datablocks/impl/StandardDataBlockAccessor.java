@@ -126,7 +126,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new ForwardTopLevelContainerIterator(medium, forwardReaders, mediumStore, true);
+      return new TopLevelContainerIterator(medium, forwardReaders, mediumStore, true);
    }
 
    @Override
@@ -141,7 +141,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new BackwardTopLevelContainerIterator(medium, backwardReaders, mediumStore, false);
+      return new TopLevelContainerIterator(medium, backwardReaders, mediumStore, false);
    }
 
    private final DataFormatRepository m_repository;

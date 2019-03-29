@@ -27,17 +27,16 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link BackwardDataBlockReader}
- *
+ * {@link BackwardDataBlockReader} is used for backward-reading of data blocks. One important thing to know is that once
+ * a top-level container has been backward-read, its contents is <i>forward read</i>. This is the reason why this class
+ * has a reference to its brother forward {@link DataBlockReader} which might need to be passed to a child.
  */
 public class BackwardDataBlockReader extends AbstractDataBlockReader {
 
    private final DataBlockReader forwardReader;
 
    /**
-    * Returns the attribute {@link #forwardReader}.
-    *
-    * @return the attribute {@link #forwardReader}
+    * @return the forward {@link DataBlockReader}
     */
    protected DataBlockReader getForwardReader() {
       return forwardReader;
@@ -47,130 +46,116 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
     * Creates a new {@link BackwardDataBlockReader}.
     *
     * @param spec
+    *           The {@link DataFormatSpecification}, must not be null
+    * @param forwardReader
+    *           The forward {@link DataBlockReader}, must not be null
     */
    public BackwardDataBlockReader(DataFormatSpecification spec, DataBlockReader forwardReader) {
       super(spec);
+      Reject.ifNull(forwardReader, "forwardReader");
 
       this.forwardReader = forwardReader;
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#setMediumCache(com.github.jmeta.library.media.api.services.MediumStore)
+    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#setMediumStore(com.github.jmeta.library.media.api.services.MediumStore)
     */
    @Override
-   public void setMediumCache(MediumStore cache) {
-      super.setMediumCache(cache);
+   public void setMediumStore(MediumStore mediumStore) {
+      super.setMediumStore(mediumStore);
 
-      getForwardReader().setMediumCache(cache);
+      getForwardReader().setMediumStore(mediumStore);
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.datablocks.api.types.Payload, long, int,
+    *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    */
    @Override
-   public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, ContainerContext containerContext, int sequenceNumber) {
-
-      Reject.ifNull(reference, "reference");
+   public Container readContainerWithId(MediumOffset currentOffset, DataBlockId id, Payload parent,
+      long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext) {
       Reject.ifNull(id, "id");
+      Reject.ifNull(currentOffset, "currentOffset");
 
       ContainerContext newContainerContext = new ContainerContext(getSpecification(), containerContext,
          getCustomSizeProvider(), getCustomCountProvider());
 
-      DataBlockId actualId = determineActualContainerId(reference, id, remainingDirectParentByteCount, 0,
-         newContainerContext);
+      DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,
+         0, newContainerContext);
+
+      DataBlockDescription containerDesc = getSpecification().getDataBlockDescription(concreteContainerId);
 
       // Read footers
-      MediumOffset nextReference = reference;
+      MediumOffset nextReference = currentOffset;
 
       List<Header> footers = new ArrayList<>();
 
-      DataBlockDescription actualDesc = getSpecification().getDataBlockDescription(actualId);
-
-      List<DataBlockDescription> footerDescs = actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
+      List<DataBlockDescription> footerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
 
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         long staticLength = footerDesc.hasFixedSize() ? footerDesc.getMaximumByteLength()
-            : DataBlockDescription.UNDEFINED;
-
-         nextReference = nextReference.advance(-staticLength);
-
-         List<Header> nextFooters = readHeadersOrFootersWithId(nextReference, footerDesc.getId(), actualId, footers,
-            true, newContainerContext);
-
-         @SuppressWarnings("unused")
-         long totalFooterSize = 0;
-
-         for (int j = 0; j < nextFooters.size(); ++j) {
-            Header nextFooter = nextFooters.get(j);
-
-            totalFooterSize += nextFooter.getTotalSize();
+         if (!footerDesc.hasFixedSize()) {
+            throw new IllegalStateException("Cannot backward-read a footer with dynamic size");
          }
 
-         // TODO primeRefactor003: handle multiple footers
+         nextReference = nextReference.advance(-footerDesc.getMaximumByteLength());
 
-         footers.addAll(nextFooters);
+         List<Header> nextFooters = readHeadersOrFootersWithId(nextReference, footerDesc.getId(), true,
+            newContainerContext);
+
+         footers.addAll(0, nextFooters);
       }
 
       // Read payload
-      List<DataBlockDescription> payloadDescs = actualDesc
-         .getChildDescriptionsOfType(PhysicalDataBlockType.FIELD_BASED_PAYLOAD);
+      DataBlockDescription payloadDesc = getPayloadDescription(containerDesc);
 
-      payloadDescs.addAll(actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD));
-
-      // CONFIG_CHECK: Any container must specify a single PAYLOAD block
-      if (payloadDescs.size() != 1) {
-         throw new IllegalStateException("For container parents, there must be a single data block of type PAYLOAD");
-      }
-
-      DataBlockDescription payloadDesc = payloadDescs.get(0);
-
-      Payload payload = readPayload(nextReference, payloadDesc.getId(), actualId, footers,
+      Payload payload = readPayload(nextReference, payloadDesc.getId(), concreteContainerId,
          remainingDirectParentByteCount, newContainerContext);
 
       // Read headers
       nextReference = nextReference.advance(-payload.getTotalSize());
 
       List<Header> headers = new ArrayList<>();
-
-      List<DataBlockDescription> headerDescs = actualDesc.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
+      List<DataBlockDescription> headerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
 
       for (int i = 0; i < headerDescs.size(); ++i) {
          DataBlockDescription headerDesc = headerDescs.get(i);
 
-         // TODO primeRefactor003: handle multiple headers?
-
-         // TODO primeRefactor003: expects static header size?
-         nextReference = nextReference.advance(-headerDesc.getMaximumByteLength());
-
-         List<Header> nextHeaders = readHeadersOrFootersWithId(nextReference, headerDesc.getId(), actualId, headers,
-            false, newContainerContext);
-
-         @SuppressWarnings("unused")
-         long totalHeaderSize = 0;
-
-         for (int j = 0; j < nextHeaders.size(); ++j) {
-            Header nextHeader = nextHeaders.get(j);
-
-            totalHeaderSize += nextHeader.getTotalSize();
+         if (!headerDesc.hasFixedSize()) {
+            throw new IllegalStateException("Cannot backward-read a header with dynamic size");
          }
 
-         headers.addAll(nextHeaders);
+         nextReference = nextReference.advance(-headerDesc.getMaximumByteLength());
+
+         List<Header> nextHeaders = readHeadersOrFootersWithId(nextReference, headerDesc.getId(), false,
+            newContainerContext);
+
+         headers.addAll(0, nextHeaders);
       }
 
       // Create container
       // IMPORTANT: The containers StandardMediumReference MUST NOT be set to the original passed
       // StandardMediumReference because that one points to the containers back!
-      final Container container = getDataBlockFactory().createContainer(actualId, parent, nextReference, headers,
-         payload, footers, this, newContainerContext, sequenceNumber);
+      final Container container = getDataBlockFactory().createContainer(concreteContainerId, parent, nextReference,
+         headers, payload, footers, this, newContainerContext, sequenceNumber);
+      newContainerContext.initContainer(container);
 
       return container;
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readPayload(com.github.jmeta.library.media.api.types.MediumOffset,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, long,
+    *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    */
    @Override
-   public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId, List<Header> footers,
+   public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId,
       long remainingDirectParentByteCount, ContainerContext containerContext) {
 
-      Reject.ifNull(footers, "footers");
       Reject.ifNull(id, "id");
       Reject.ifNull(reference, "reference");
 
@@ -188,12 +173,19 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
       return createPayloadAfterRead;
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#hasEnoughBytesForMagicKey(com.github.jmeta.library.media.api.types.MediumOffset,
+    *      com.github.jmeta.library.dataformats.api.types.MagicKey, long)
+    */
    @Override
    protected boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey,
       long remainingDirectParentByteCount) {
       return reference.getAbsoluteMediumOffset() + magicKey.getDeltaOffset() >= 0;
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#getMagicKeys(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
+    */
    @Override
    protected List<MagicKey> getMagicKeys(DataBlockDescription containerDesc) {
       return containerDesc.getFooterMagicKeys();
