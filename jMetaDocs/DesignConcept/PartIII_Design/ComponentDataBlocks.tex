@@ -134,7 +134,7 @@ These are nearly identical except that data format identification is unnecessary
 {% Rationale
 Nested containers are other than the fact that the data format is already known in no way different to top-level containers.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -179,7 +179,7 @@ Buffering at start of container and field reading
 {% Rationale
 Thus, even if we have unusually long headers, footers or field-based payload, there is never a buffering gap.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -197,7 +197,7 @@ Any field-based or container-based payload is lazy by default, i.e. its bytes ar
 {% Rationale
 This way, we do not read unnecessary data the user might never look at, especially allowing to skip over large containers without risking out of memory and long read times, just perfectly meeting requirement \SectionLink{sec:REQ009LesenSchreibenGrosse}.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -219,7 +219,7 @@ For formats not having a static payload size and not having a size indicator in 
 
   For the special case of formats not having a payload size in their header, see \DesLink{dd:529d}.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -243,7 +243,7 @@ A helper class \texttt{ContainerContext} provides sizes, counts, byte orders and
 {% Rationale
 Having just one place that not only stores field function values but also knows in a more abstract way how to determine sizes, counts, byte orders and character encodings allows for better separation of concerns. This also allows to pass around corresponding objects to everywhere you need this information in contrast to having this logic only in a reader class that is not availabe anywhere else after parsing.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -261,7 +261,7 @@ One question that comes up here: How about parsing metadata available in the top
 {% Rationale
 This way, parsing metadata only defined in the top-level container headers can be transported to children deeper in the hierarchy.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -295,7 +295,7 @@ Cases for size determination
 {% Rationale
 The cases come from analyzing different data formats \LibName{} is required to support, so it is sufficient to consider only those (if any others exist). Why is case 5 not implemented in \texttt{ContainerContext}? The reason is that finding termination bytes requires parsing itself, so it must be implemented in the reader.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -313,7 +313,7 @@ Data format extensions are allowed to register a custom \texttt{SizeProvider} im
 {% Rationale
 More flexibility also for yet other future formats.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -330,7 +330,7 @@ In case 4 of \DesLink{dd:640}, the size of the payload is calculated by reading 
 {% Rationale
 Straightforward and not too complex in terms of ``lazyness''. If the data formats design is fucked up, the implementation cannot easily work around it.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -359,7 +359,7 @@ Size determination process
 {% Rationale
 The order of steps clearly focusses on least complexity first and tries to avoid unnecessary lookups by first considering fixed sizes and custom size providers.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -392,7 +392,7 @@ Count determination process
 {% Rationale
 The order of steps clearly focusses on least complexity first and tries to avoid unnecessary lookups by first considering fixed counts and custom count providers.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -437,7 +437,7 @@ Block-wise reading is necessary in order to find field termination. According to
 {% Rationale
 Block-wise reading avoids out-of-memory conditions and is a compromise between reading too much and reading too few bytes at once. Of course this compromise comes with the cost of added complexity. We mitigate this complexity by not coming up with further ``optimizations'' such as only reading up to a known upper bound like the medium end or parent end. In the end, both might not be known, especially in case 4, thus anyway we have to do a ``blind'' reading in this case.
 }
-{% Disadvantes
+{% Disadvantages
 Added complexity, but in conformance with \DesLink{dd:438}. The complexity is adressed as specified in the rationale.
 }
 %%%% <-- DD %%%%
@@ -464,7 +464,7 @@ We use character-based termination detection (approach 2) for finding terminatio
 {% Rationale
 This is possible due to the fact that only string and string list fields can be terminated (see \DesLink{dd:531} and \DesLink{dd:532}). Approach 1 seems even harder as we need to re-implement parsing of strange encodings while approach 2 at least provides an out-of-the box solution in the form of  \texttt{CharsetDecoder}.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -493,7 +493,7 @@ Determining the end of a terminated field
 {% Rationale
 This process is efficient in terms of avoiding unknown steps and using only sparse memory. It is as simple as it can get without risking incorrectness.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -525,7 +525,7 @@ A special case for large fields is introduced: If the field size is known in adv
 {% Rationale
 This avoids unwanted out-of-memory conditions. Terminated fields, where field size is not known in advance, need not be lazy, as when determining their size, they are anyway read into memory.
 }
-{% Disadvantes
+{% Disadvantages
 Slight increase in complexity
 }
 %%%% <-- DD %%%%
@@ -550,7 +550,7 @@ Streaming media cannot be read backwards
 {% Rationale
 Random access media allow starting reading from any point, streams by design do only start at the beginning.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -567,7 +567,7 @@ When backward reading, \COMPdataPartManagement{} tries to find a footer magic ke
 {% Rationale
 This allows to reuse some parts of forward-reading and thus avoids to invent something totally different.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -585,7 +585,7 @@ As of the current release, \LibName{} cannot deal with dynamic length headers or
 {% Rationale
 This is e.g. the case for ID3v2.4: If there is an extended header (which has dynamic length) there is no way to find out where it starts during backward reading except you search for the actual main header starting point. This would somehow not exactly fit with the forward-read approach. There is an option to implement it later or for the extensions to overwrite the default implementation in a more flexible way.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -603,7 +603,7 @@ As soon as we have fully read a container backwards, we of cause know where its 
 {% Rationale
 We can reuse a lot of code for forward-reading instead of coming up with new code. Decreases complexity.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -621,10 +621,472 @@ As ID3v1 has a static size of 128 bytes, we can always check if there is the hea
 {% Rationale
 ID3v1 frequently occurs at the end of a medium and thus it makes sense to support this.
 }
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% =======================================================================================================
+\subsection{Basic Concept for Writing}%
+\label{sec:BasicConceptforWriting}%
+
+Here, we care about the basics for writing. Writing data is an intgral part of the \COMPdataPartManagement{} component. The question is: How can a user manipulate data? What is already clear is that we cannot write to stream-based media and the attempt will lead to a runtime exception (see \SectionLink{sec:ZugriffEinesTERMmedium}).
+
+What can be already noted is that we will of course use the features of \COMPmedia{}:
+%%%% DD --> %%%%
+\DD{dd:660}
+{% Title
+Using \COMPmedia{} with two-staged write protocol
+}
+{% Short description
+\COMPdataPartManagement{} uses the \COMPmedia{} API to perform the writing. Thus, it also has to adhere to the two-stage write protocol as described in \SectionLink{sec:GrundSchreiben}. That means that first, changes are done as needed, and then the user needs to perform an actual flush of the changes in a second step. For read-only media, an exception is thrown only when trying to flush changes.
+}
+{% Rationale
+Otherwise we needn't do the fuss in \COMPmedia{}. Two-stage writing is sensible as usually one change is not done isolated but leads to a series of other changes. The user can safely do the changes and then ``commit'' at a sensible time, leading to even a better performance.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+However, if we do it like that, one question immediately arises: What does the user ``see'' after having done changes but not yet having flushed them? For instance, the user may add an extended header to an ID3v2.3 tag or remove a frame from it. If the user then iterates the frames, will the removed frame still be returned or not? 
+
+%%%% DD --> %%%%
+\DD{dd:661}
+{% Title
+The user sees the dirty state of the containers when calling read methods
+}
+{% Short description
+Once the user has done changes on a \IMediumStore{} using the writing API of \COMPdataPartManagement{}, these changes will be visible and active in the reading API of \COMPdataPartManagement{}, even if they are not yet flushed. Removed blocks won't be returned anymore, inserted blocks will be returned, and changed field values will also be returned. The user would not see these changes using another \IMediumStore{} to access the medium. However, this is not possible due to the locking concept of \COMPmedia{}.
+}
+{% Rationale
+  This seems to entirely contradict with \DesLink{dd:410c} that states: \COMPmedia{} read methods always return the currently persisted state. However, the written data is still available in terms of added data blocks.
+  
+It would be quite strange for the user if data blocks previously inserted would not be returned again when reiterating the blocks. This could cause confusion for the users and would e.g. not offer the possibility to undo changes if the user did not keep a reference to an insterted block.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+In section \SectionLink{sec:FieldFunctions} we introduced the so-called field functions as a way to indicate dependencies between fields and other data blocks. However, just modeling this dependency without using it in anyway is of course nonsense. The main driver for introducing this concept is consistency: If you have a size field indicating the size of payload, and if that payload changes, we want the size field to change consistently without manual intervention of the user. Thus, we have to implement this feature during writing. This goes hand in hand with the two-stage write protocol decided in \DesLink{dd:660}.
+
+%%%% DD --> %%%%
+\DD{dd:662}
+{% Title
+Fields with functions are consistently updated during writing 
+}
+{% Short description
+Whenever a user changes a datablock that is referenced by another field with a field function, the field's value must be updated according to the kind of change: \texttt{SizeOf}, \texttt{SummedSizeOf}, \texttt{CountOf} and \texttt{PresenceOf} are updated once a user writes to data blocks these field functions refer to. The fields themselves need to be read-only to ensure consistency. On the other hand, \texttt{CharacterEncodingOf} and \texttt{ByteOrderOf} fields can be written, leading to an inverse change to all data blocks they refer to: If you change the fields value, the byte order or character encodings of the target data blocks must change automatically, leading to a potential change to any numeric or string target fields. The two-stage write protocol of \DesLink{dd:660} minimizes the chance that there is an inconsistent state where the field value changes but not the referred data blocks, because the change is first getting only scheduled consistently, and later written in a ``single'' operation. 
+}
+{% Rationale
+Consistency and user convenience
+}
+{% Disadvantages
+Of course this makes the implementation more complex and in the first place requires the concept of field functions.
+}
+%%%% <-- DD %%%%
+
+A second inference from using a two-stage write protocol is the possibility of a ``rollback'' - which MUST not be confused with ACID in any way:
+%%%% DD --> %%%%
+\DD{dd:663}
+{% Title
+Undo possibilities of unflushed changes are necessary
+}
+{% Short description
+It needs to be necessary that the user can undo all changes he has done before a flush. However, it must be clearly communicated in the API and documentation that this whole thing is in no way ACID! Thus we do not actually call it ``rollback''. Flushing changes can go wrong in the middle, leaving part of the changes already written to the medium. Likewise, ``rollback'' could fail in between, but will at least not messing up the medium, as nothing has been written yet. See \DesLink{dd:410b} for further details.
+}
+{% Rationale
+If having a two-stage write protocol, this desire comes to mind. If I can mark something for change, why can I not undo it? The second thing is field functions (\DesLink{dd:662}): If we change fields according to other changes, then being able to undo these connected changes also in a consistent way is necessary. Another argument is that we have some possibility to do that in the undo functionalities of \COMPmedia{}, see \DesLink{dd:420}.
+}
+{% Disadvantages
+Implementing this of course requires some effort: You need to ensure that every change is properly undone.
+}
+%%%% <-- DD %%%%
+
+Having talked about consistency, it comes to mind: Whenever a user changes something or creates something new, there are a myriad of possibilities why this change is utterly against the data formatt's specification. A field value could be invalid, the size of something could be too big or small, the type or structure of the thing to add could be tried to be added at the complete wrong place etc. How do we deal with such things?
+
+%%%% DD --> %%%%
+\DD{dd:662}
+{% Title
+Strict validation of specification conformance as early as possible
+}
+{% Short description
+For every writing action, \COMPdataPartManagement{} strictly checks the validity of the things done against the data format specification. If the change violates properties of the data block changed or its parent, this is clearly and directly communicated with a runtime exception. The details are defined in later individual design decisions.
+}
+{% Rationale
+Fail fast is a good principle, here even more. We want to avoid the user to write any crap to the medium that cannot be re-read, as it might be utter nonsense.
+}
 {% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
+
+Already now, it clearly emerges that the writing API will be fundamentally different from the reading API:
+%%%% DD --> %%%%
+\DD{dd:663}
+{% Title
+Writing methods are scattered in the API in contrast to reading
+}
+{% Short description
+There is a fundamental asymmetry between reading and writing: While reading is done using an iterator approach and a core class that does the reading, writing is done by methods associated with the datablocks themselves. For extensibility this means that there is no single class the user can subclass to extend the writing functionality.
+}
+{% Rationale
+Reading is done step by step at once in a linear process, while writing means to manipulate the individual objects that have previously been read or created.
+}
+{% Disadvantages
+Writing is harder to extend, but currently there seems to be no need to do so
+}
+%%%% <-- DD %%%%
+
+% =======================================================================================================
+\subsection{The State of a Datablock}%
+\label{sec:StatesofDatablocks}%
+
+If \LibName{} would only support reading of datablocks, a datablock state would probably not be necessary. However, if datablocks are modified and as we have a two-stage write protocol, states become indeed a necessity, as actions depend on the current state of a datablock. We can think of the following states:
+\begin{longtable}{|p{0.15\textwidth}|p{0.8\textwidth}|} \hline
+  \textbf{State} & \textbf{Description} \\ \endhead \hline
+  \texttt{NEW} & The datablock has been newly created or persistently removed from the medium. That means it is not attached to a parent datblock and does not have an offset. \\
+  \hline
+  \texttt{PERSISTED} & The datablock is persisted on a medium and thus has an offset. There are no modifications in the datablock that are not yet flushed. This is the state of a datablock after reading. \\
+  \hline
+  \texttt{INSERTED} & The datablock has been newly inserted into the medium and attached to a parent, but this change was not yet flushed. \\
+  \hline
+  \texttt{REMOVED} & The datablock has been removed from the medium and detached from a parent, but this change was not yet flushed. \\
+  \hline
+  \texttt{MODIFIED} & The datablock has been modified, but this change was not yet flushed. \\
+  \hline
+  \caption{Datablock states}
+  \label{tab:Datablockstates}
+\end{longtable}
+
+%%%% DD --> %%%%
+\DD{dd:670}
+{% Title
+A datablock in \LibName{} has one of the states listed in table \ref{tab:Datablockstates}.
+}
+{% Short description
+A datablock in \LibName{} has one of the states listed in table \ref{tab:Datablockstates}.
+}
+{% Rationale
+Depending on the state, some actions are legal or illegal, or need to be performed differently. Further on, the user must have transparency what has been done with a block so far, so the state is a good indication. Other states than the ones mentioned are not required. A separate \texttt{MODIFIED} is needed due to fields whose values can be changed.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+The questions remaining now are: How do states exactly change? And what about the hierarchical dependencies between datablocks? The latter question needs to be investigated first. What if a parent of a datablock is removed, does state of the child change correspondingly?
+
+%%%% DD --> %%%%
+\DD{dd:671}
+{% Title
+If a datablock changes state, all its descendant blocks change to the same state
+}
+{% Short description
+Any change to a datablock leads to the same state change in all its children and further descendants.
+}
+{% Rationale
+Obviously, all descendants are contained within the bounds of the datablock. So if it becomes \texttt{NEW}, \texttt{PERSISTED}, \texttt{INSERTED}, \texttt{REMOVED} or \texttt{MODIFIED}, all its descendants also do.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+What about a change in a child or other descendant, does it have any effect on its parent?
+%%%% DD --> %%%%
+\DD{dd:672}
+{% Title
+Modification, insertion or removal of a descendant leads to all its parents transitioning to \texttt{MODIFIED} state  
+}
+{% Short description
+A datablock changes into the \texttt{MODIFIED} state once any of its descendants are modified, inserted or removed.
+}
+{% Rationale
+A change in any child leads to an actual change of data contained in the datablock. It would be misleading if the API would still say the datablock is \texttt{PERSISTED}, no matter there are unflushed changes in a child. Furthermore, implementing things such as flushing or undo will probably be easier if you can tell which top-level data blocks were modified in some way instead of needing to search all children until the leaf nodes of the hierarchy to find out.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now we have all ingredients to come up with a suitable state transition diagram, without actual method calls yet, see figure \ref{fig:III_DBStates.pdf}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1.0\linewidth]{figures/III_DBStates.pdf}
+  \caption{Datablock state transitions}
+  \label{fig:III_DBStates.pdf}
+\end{figure}
+
+% =======================================================================================================
+\subsection{Writing Actions}%
+\label{sec:WritingActions}%
+
+In this section, we clarify in detail which write actions there are and how they need to work.
+
+% -------------------------------------------------------------------------------------------------------
+\subsubsection{Creating New Data blocks}%
+\label{sec:CreatingNewDatablocks}%
+
+First of all, in order to insert new data blocks, the user must be able to create new data blocks. The natural place to go is a factory:
+%%%% DD --> %%%%
+\DD{dd:675}
+{% Title
+A factory to create new data blocks
+}
+{% Short description
+A factory instance accessible by the user is required to create new instances of containers, fields, headers, footers or payload. The created data blocks have the state \texttt{NEW}. The user specifies the id of the data block to create. The factory ensures that the given id belongs to the expected data format and has the correct type. Further validations are only done during insertion only. Of course for the user being able to specify an id during creation, every id must be publicly available in the API of the data format extension.
+}
+{% Rationale
+A factory is a class that can create a family of products. This is clearly the case for data blocks. Different implementations can be created in future, if necessary. There is no direct dependency from user code to concrete data block classes. Some validations are done here already according to \DesLink{dd:662}.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% -------------------------------------------------------------------------------------------------------
+\subsubsection{Inserting Datablocks}%
+\label{sec:InsertingDatablocks}%
+
+\texttt{NEW} datablocks are inserted in their parent or at the top-level of the medium, respectively:
+%%%% DD --> %%%%
+\DD{dd:676}
+{% Title
+Insert methods for headers, footers and fields in their parent data block
+}
+{% Short description
+To insert new headers, footers or fields, there are corresponding insert methods that do the job in the corresponding datablock class. They take an index that must be valid.
+}
+{% Rationale
+You anyway need to have the parent instance, thus it makes sense to perform insertion in the parent itself, as the children are also anyway part of the parent.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+%%%% DD --> %%%%
+\DD{dd:677}
+{% Title
+Insert methods for containers in container iterators
+}
+{% Short description
+For both top-level as well as payload container iterators, there is an insert method in the iterator inserting a new container before the next container. That means to insert at a specific position, users first need to iterate to it. Containers can be inserted/appended at the end of the medium as soon as hasNext returns false. 
+}
+{% Rationale
+This is quite similar to the insertion of headers, footers and fields.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now what about payload datablocks? For these insert methods wouldn't make much sense. Thus we define:
+%%%% DD --> %%%%
+\DD{dd:678}
+{% Title
+Simple setter method for payload datablocks
+}
+{% Short description
+Payload children can be set with a setter method
+}
+{% Rationale
+There is always just exactly one payload in a container
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+One thing for parent datablocks containing lists of children: Can a user modify the returned lists?
+%%%% DD --> %%%%
+\DD{dd:679}
+{% Title
+Lists of headers, footers and fields are unmodifiable
+}
+{% Short description
+A user can retrieve the child headers, footers or fields as a list. However, it is prevented that the user adds new children or otherwise modifies theses lists.
+}
+{% Rationale
+This way, there is no way in messing up the internal lists, and it is quite clear that the insert methods are the intended way to go.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+In \DesLink{dd:662} it was said that specification validity should be ensured as early as possible, for insertion that means:
+%%%% DD --> %%%%
+\DD{dd:680}
+{% Title
+Specification validations during insertion
+}
+{% Short description
+The following checks against the specification are performed when inserting a new child, and if these checks fail, a runtime exception is thrown:
+\begin{itemize}
+\item Is the datablock id of the inserted block indeed a child of this datablock?
+\item Can it be inserted at the given position, i.e. is it specified to be located there?
+\item Is there already a datablock of the same type, and maximum occurrences are already reached?
+\item Is the parent read-only?
+\item Is the maximum parent size exceeded with this insertion (e.g. is the parent fixed size)?
+\item Is the inserted child of the expected datablock type, e.g. indeed a header, footer or field as indicated by the insert method called?
+\item Is the inserted child complete in a sense: Does it have all mandatory children?
+\end{itemize}
+}
+{% Rationale
+In accordance to \DesLink{dd:662}
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+If all these checks are done, further validations regarding the parent and child state are necessary:
+%%%% DD --> %%%%
+\DD{dd:681}
+{% Title
+Required datablock states
+}
+{% Short description
+The datablock to insert must have the state \texttt{NEW}. The parent datablock must have one of the states \texttt{NEW}, \texttt{PERSISTED}, \texttt{MODIFIED} or \texttt{INSERTED}, i.e. it must not be \texttt{REMOVED}. If one of these conditions is not met, a runtime exception is thrown.
+}
+{% Rationale
+Allowing other states than \texttt{NEW} for the to-be-inserted block would lead to strange use cases such as ``remounting'' an already persisted datablocks which we want to avoid. It is thus clear to the user: If I want to insert a data block, I have to newly create it or at least remove and flush it before. The parent state must not be \texttt{REMOVED}, because what sense would it make to add new children to a parent block which is entirely removed anyway on next flush?
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+The next question regarding states is: How do states change after the insert?
+%%%% DD --> %%%%
+\DD{dd:682}
+{% Title
+State changes caused by an insert
+}
+{% Short description
+If the parent block is \texttt{NEW}, the inserted datablock remains \texttt{NEW}. Otherwise the inserted block and all its descendants are changed into state \texttt{INSERTED} while the parent becomes \texttt{MODIFIED}, if not yet in that state.
+}
+{% Rationale
+The states thus are quite conceivable.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+As described in \DesLink{dd:662}, we need to adress fields with field functions during insertion. How this is done is described in the following design decision:
+%%%% DD --> %%%%
+\DD{dd:683}
+{% Title
+Changes in field functions fields during inserts
+}
+{% Short description
+  If a datablock is inserted into a previously \texttt{PERSISTED}, \texttt{INSERTED} or \texttt{MODIFIED} parent, it needs to be checked which fields refer to the size, count or presence of the block itself or one of its ancestors. For each affected field function field, the following is done:
+  \begin{itemize}
+  \item \texttt{SizeOf} and \texttt{SummedSizeOf}: Add the newly inserted block's size to the current interpreted value of the field
+  \item \texttt{PresenceOf}: Set the flag indicating the presence to the value indicated by the field function
+  \item \texttt{CountOf}: Increment the current interpreted value of the field by 1
+  \end{itemize}
+}
+{% Rationale
+Required by \DesLink{dd:662}
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Finally, we need to think about how the insertion of bytes really happens. First of all, let us think about what we need to achieve after the insert:
+\begin{itemize}
+\item Each inserted data block (i.e. the actually inserted one and all its descendants) needs to have an associated \texttt{MediumOffset} which is the insertion offset for all of them at insert time, and gets updated to its final offset during a flush.
+\item One or several inserts of concrete bytes must be scheduled in \COMPmedia{} in correct order.
+\end{itemize}
+
+One could come up with two distinct strategies to achieve these goals:
+\begin{enumerate}
+\item [\textbf{Option 1:}] \textbf{Insert bottom-up (fine-grained insertions)} - Only fields as leafs of the hierarchy are actually inserted one by one in correct order
+\item [\textbf{Option 2:}] \textbf{Insert top-down (coarse-grained insertions)} - At the level of insertion (container, header, field etc.), all leaf fields are collected and their binary representations are merged to form larger chunks which are then inserted as needed.
+\end{enumerate}
+
+We can come up with pros and cons for both approaches:
+\begin{longtable}{|p{0.2\textwidth}|p{0.35\textwidth}|p{0.35\textwidth}|}
+	\hline
+	\rowcolor[gray]{.9} & \textbf{Advantages} & \textbf{Disadvantages} \\
+	\endhead
+	\hline
+        \textbf{Option 1:} Insert bottom- up (fine-grained insertions) & 
+	$+$ Field offsets after flush need not be calculated, as \DesLink{dd:418b} takes effect & $-$ Offsets for parent data blocks need to be determined and assigned  \\
+	\hline
+         & 
+	$+$ Merging of data and potential memory doubling not necessary & $-$ Probably imperformant writing, as a lot of small byte sequences (field-by-field) are written \\
+	\hline \textbf{Option 2:} Insert top- down (coarse-grained insertions) & 
+  $+$ Better write performance as we can write large chunks instead of only small ones & $-$ Offsets of child data blocks need to be determined and assigned \\
+	\hline
+         & 
+	& $-$ Complex merging requiring tree traversal and most probably doubling of memory and copying of bytes \\
+	\hline
+\caption{Pros and cons of two insertion approaches}
+\label{tab:InsertProCon}
+\end{longtable}
+
+This already indicates we have a winner:
+
+%%%% DD --> %%%%
+\DD{dd:684}
+{% Title
+Insertion uses \COMPmedia{}s insert scheduling, done for each field in field order
+}
+{% Short description
+We choose \textbf{Option 1: Insert bottom-up (fine-grained insertions)}: When inserting a datablock into a parent, for each field contained in the data block (or for  itself, if it is a field), its binary value is inserted at the insertion offset using \COMPmedia{}s \texttt{insertData} method (see section \SectionLink{sec:ZugriffEinesTERMmedium}). Thereby the fields are visited in their specification order. The \texttt{MediumAction} instance returned by \texttt{insertData} is stored in each field.
+}
+{% Rationale
+  There is no other reason for the existence of insert scheduling. Why do we persist only fields and no other types of datablocks? Clearly, a container and every other data block in the end consists of fields in a defined order as the leafs of the data block hierarchy. The fields contain interpreted values that can be converted to binary values. These binary values are then ultimately persisted on the medium. Determine parent offsets is much easier than determining child offsets as a parent data block always starts at the same offset as its first leaf field. If necessary, \COMPmedia{}'s flush can be changed to ensure small consecutive write actions are not written one by one but rather merged (up to reaching maximum read write block size) before being written.
+
+  Doing it in field order is clearly indicated by \DesLink{dd:422}, as the insert offset for all new fields will be the same, their order must be clearly indicated by the call order of \texttt{insertData}. Doing it in another order thus would mess up the structure of the datablock, as fields are not persisted in the correct order as indicated in the data format specification.
+}
+{% Disadvantes
+See table \ref{tab:InsertProCon}, disadvantes of option 1, but note the mitigations we noted down in the rationale.
+}
+%%%% <-- DD %%%%
+
+A follow-up question is: Should we allow additional inserts in the middle of an already inserted data block? E.g. imagine you have inserted a container, but now after insertion you want to add another optional header to it. Is it allowed?
+
+%%%% DD --> %%%%
+\DD{dd:685}
+{% Title
+Insert into an already \texttt{INSERTED} ancestor is rejected
+}
+{% Short description
+It is not allowed to insert a new data block into an already \texttt{INSERTED} ancestor.
+}
+{% Rationale
+This reduces complexity, as otherwise one would need to first undo all inserts of fields that come behind the newly inserted child, and then reinsert to ensure they have the right order after a flush (compare \DesLink{dd:422}).
+}
+{% Disadvantes
+Of course this is less convenient for the user, as he must ensure that such ``late'' insertions do not happen, but he only inserts fully assembled data blocks before a flush.
+}
+%%%% <-- DD %%%%
+
+% -------------------------------------------------------------------------------------------------------
+
+\subsubsection{Removing Data Blocks}%
+\label{sec:RemovingDatablocks}%
+
+% -------------------------------------------------------------------------------------------------------
+\subsubsection{Modifying Datablocks}%
+\label{sec:ModifyingDatablocks}%
+
+% -------------------------------------------------------------------------------------------------------
+\subsubsection{Flushing}%
+\label{sec:Flushing}%
+
+% -------------------------------------------------------------------------------------------------------
+\subsubsection{Undo all Changes}%
+\label{sec:UndoallChanges}%
 
 % =======================================================================================================
 \subsection{API Design}%

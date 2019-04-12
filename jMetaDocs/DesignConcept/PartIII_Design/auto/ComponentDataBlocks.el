@@ -13,6 +13,18 @@
     "sec:TerminatedFields"
     "sec:LazyFields"
     "sec:BackwardReading"
+    "sec:BasicConceptforWriting"
+    "sec:StatesofDatablocks"
+    "tab:Datablockstates"
+    "fig:III_DBStates.pdf"
+    "sec:WritingActions"
+    "sec:CreatingNewDatablocks"
+    "sec:InsertingDatablocks"
+    "tab:InsertProCon"
+    "sec:RemovingDatablocks"
+    "sec:ModifyingDatablocks"
+    "sec:Flushing"
+    "sec:UndoallChanges"
     "sec:APIDesign"))
  :latex)
 
