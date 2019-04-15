@@ -22,6 +22,7 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
@@ -77,8 +78,7 @@ public class DataFormatsSmoke_ReverseReading {
          System.out.println("All data blocks in the AbstractMedium: " + medium);
          System.out.println("***********************************************************************");
 
-         printContainers(accessor.getReverseContainerIterator(medium, false),
-            Integer.valueOf(1));
+         printContainers(accessor.getReverseContainerIterator(medium, false), Integer.valueOf(1));
       }
    }
 
@@ -101,8 +101,9 @@ public class DataFormatsSmoke_ReverseReading {
 
       String prependWith = "";
 
-      for (int i = 0; i < level; i++)
+      for (int i = 0; i < level; i++) {
          prependWith += "\t";
+      }
 
       while (containerIterator.hasNext()) {
          Container nextBlock = containerIterator.next();
@@ -116,7 +117,7 @@ public class DataFormatsSmoke_ReverseReading {
          }
 
          for (int i = 0; i < nextBlock.getFooters().size(); i++) {
-            Header footer = nextBlock.getFooters().get(i);
+            Footer footer = nextBlock.getFooters().get(i);
             System.out.println(prependWith + "\tFooter: " + footer);
             printFields(footer.getFields(), level + 2);
          }
@@ -137,8 +138,9 @@ public class DataFormatsSmoke_ReverseReading {
 
       String prependWith = "";
 
-      for (int i = 0; i < level; i++)
+      for (int i = 0; i < level; i++) {
          prependWith += "\t";
+      }
 
       final Iterator<Field<?>> fieldIterator = fieldList.iterator();
       while (fieldIterator.hasNext()) {
@@ -155,7 +157,7 @@ public class DataFormatsSmoke_ReverseReading {
       }
    }
 
-   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, ContainerDataFormat>();
+   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<>();
 
    static {
       TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);

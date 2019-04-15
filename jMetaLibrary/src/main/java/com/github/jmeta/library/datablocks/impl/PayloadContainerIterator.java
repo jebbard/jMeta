@@ -54,7 +54,7 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       m_parent = parent;
       m_nextContainerReference = reference;
       m_reader = reader;
-      m_remainingParentSize = m_parent.getTotalSize();
+      m_remainingParentSize = m_parent.getSize();
 
       DataBlockDescription parentDescription = m_reader.getSpecification().getDataBlockDescription(m_parent.getId());
 
@@ -71,9 +71,9 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       // payload => no further children available
       long remainingParentByteCount = DataBlockDescription.UNDEFINED;
 
-      if (m_parent.getTotalSize() != DataBlockDescription.UNDEFINED) {
-         remainingParentByteCount = m_parent.getTotalSize() - (m_nextContainerReference.getAbsoluteMediumOffset()
-            - m_parent.getMediumReference().getAbsoluteMediumOffset());
+      if (m_parent.getSize() != DataBlockDescription.UNDEFINED) {
+         remainingParentByteCount = m_parent.getSize() - (m_nextContainerReference.getAbsoluteMediumOffset()
+            - m_parent.getOffset().getAbsoluteMediumOffset());
 
          if (remainingParentByteCount <= 0) {
             return false;
@@ -172,10 +172,10 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
    }
 
    private void updateProgress(Container container) {
-      m_nextContainerReference = m_nextContainerReference.advance(container.getTotalSize());
+      m_nextContainerReference = m_nextContainerReference.advance(container.getSize());
 
       if (m_remainingParentSize != DataBlockDescription.UNDEFINED) {
-         m_remainingParentSize -= container.getTotalSize();
+         m_remainingParentSize -= container.getSize();
       }
    }
 

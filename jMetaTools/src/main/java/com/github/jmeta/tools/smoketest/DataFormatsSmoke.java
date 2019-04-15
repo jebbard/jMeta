@@ -25,6 +25,7 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
@@ -38,7 +39,7 @@ import com.github.jmeta.library.startup.api.services.LibraryJMeta;
  */
 public class DataFormatsSmoke {
 
-   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<File, ContainerDataFormat>();
+   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<>();
 
    static {
       TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
@@ -124,8 +125,9 @@ public class DataFormatsSmoke {
 
       String prependWith = "";
 
-      for (int i = 0; i < level; i++)
+      for (int i = 0; i < level; i++) {
          prependWith += "\t";
+      }
 
       while (containerIterator.hasNext()) {
          Container nextBlock = containerIterator.next();
@@ -139,7 +141,7 @@ public class DataFormatsSmoke {
          }
 
          for (int i = 0; i < nextBlock.getFooters().size(); i++) {
-            Header footer = nextBlock.getFooters().get(i);
+            Footer footer = nextBlock.getFooters().get(i);
             PRIVATE_LOGGER.info(prependWith + "\tFooter: " + footer);
             printFields(footer.getFields(), level + 2);
          }
@@ -160,8 +162,9 @@ public class DataFormatsSmoke {
 
       String prependWith = "";
 
-      for (int i = 0; i < level; i++)
+      for (int i = 0; i < level; i++) {
          prependWith += "\t";
+      }
 
       final Iterator<Field<?>> fieldIterator = fieldList.iterator();
       while (fieldIterator.hasNext()) {

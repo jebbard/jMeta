@@ -61,7 +61,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
          for (int i = 0; i < fields.size(); ++i) {
             Field<?> field = fields.get(i);
 
-            summedUpTotalSize += field.getTotalSize();
+            summedUpTotalSize += field.getSize();
          }
 
          this.totalSize = summedUpTotalSize;
@@ -73,10 +73,10 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
     */
    @Override
-   public long getTotalSize() {
+   public long getSize() {
       return totalSize;
    }
 
@@ -88,7 +88,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
       if (fields == null) {
          fields = new ArrayList<>();
 
-         MediumOffset fieldReference = getMediumReference();
+         MediumOffset fieldReference = getOffset();
 
          if (totalSize > 0) {
             List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), totalSize, getContainerContext());

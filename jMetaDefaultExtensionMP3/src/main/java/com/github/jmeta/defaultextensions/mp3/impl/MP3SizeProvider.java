@@ -8,8 +8,6 @@
  */
 package com.github.jmeta.defaultextensions.mp3.impl;
 
-import java.nio.ByteBuffer;
-
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
@@ -60,9 +58,6 @@ public class MP3SizeProvider implements SizeProvider {
 
       if (id.equals(MP3Extension.REF_PAYLOAD.getId())) {
          Header header = containerContext.getContainer().getHeaders().get(0);
-
-         ByteBuffer bytes = header.getBytes(0, 4);
-         assert bytes != null;
 
          // System.out.println("########################");
          // System.out.println("######### Next frame");

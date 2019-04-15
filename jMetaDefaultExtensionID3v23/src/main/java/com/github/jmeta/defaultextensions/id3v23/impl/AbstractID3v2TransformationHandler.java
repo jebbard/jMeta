@@ -53,21 +53,21 @@ public abstract class AbstractID3v2TransformationHandler {
 
       Payload payload = container.getPayload();
 
-      if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE) {
+      if (payload.getSize() > MAX_ID3V2_PAYLOAD_SIZE) {
          throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
       }
 
       // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
-      int size = (int) payload.getTotalSize();
+      int size = (int) payload.getSize();
 
-      ByteBuffer payloadBytes = payload.getBytes(0, size);
+      ByteBuffer payloadBytes = payload.getBytes(container.getOffset(), size);
       byte[][] transformedPayloadBytes = transformRawBytes(payloadBytes);
 
       payload.setBytes(transformedPayloadBytes);
 
-      return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
-         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader,
-         container.getContainerContext(), container.getSequenceNumber());
+      return getDataBlockFactory().createContainer(container.getId(), container.getParent(), container.getOffset(),
+         container.getHeaders(), payload, container.getFooters(), reader, container.getContainerContext(),
+         container.getSequenceNumber());
    }
 
    public Container untransform(Container container, DataBlockReader reader) {
@@ -77,21 +77,21 @@ public abstract class AbstractID3v2TransformationHandler {
 
       Payload payload = container.getPayload();
 
-      if (payload.getTotalSize() > MAX_ID3V2_PAYLOAD_SIZE) {
+      if (payload.getSize() > MAX_ID3V2_PAYLOAD_SIZE) {
          throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
       }
 
       // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
-      int size = (int) payload.getTotalSize();
+      int size = (int) payload.getSize();
 
-      ByteBuffer payloadBytes = payload.getBytes(0, size);
+      ByteBuffer payloadBytes = payload.getBytes(container.getOffset(), size);
       byte[][] untransformedPayloadBytes = untransformRawBytes(payloadBytes);
 
       payload.setBytes(untransformedPayloadBytes);
 
-      return getDataBlockFactory().createContainer(container.getId(), container.getParent(),
-         container.getMediumReference(), container.getHeaders(), payload, container.getFooters(), reader,
-         container.getContainerContext(), container.getSequenceNumber());
+      return getDataBlockFactory().createContainer(container.getId(), container.getParent(), container.getOffset(),
+         container.getHeaders(), payload, container.getFooters(), reader, container.getContainerContext(),
+         container.getSequenceNumber());
    }
 
    protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);

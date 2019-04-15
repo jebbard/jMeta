@@ -14,6 +14,8 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldSequence;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -50,7 +52,7 @@ public interface DataBlockFactory {
     * @return the created {@link Container}.
     */
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext,
+      Payload payload, List<Footer> footers, DataBlockReader reader, ContainerContext containerContext,
       int sequenceNumber);
 
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
@@ -74,7 +76,6 @@ public interface DataBlockFactory {
     * @param id
     * @param reference
     * @param fields
-    * @param isFooter
     * @param reader
     *           TODO
     * @param sequenceNumber
@@ -83,8 +84,9 @@ public interface DataBlockFactory {
     *           TODO
     * @return the {@link Header}
     */
-   public Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
-      DataBlockReader reader, int sequenceNumber, ContainerContext containerContext);
+   public <T extends FieldSequence> T createHeaderOrFooter(Class<T> fieldSequenceClass, DataBlockId id,
+      MediumOffset reference, List<Field<?>> fields, DataBlockReader reader, int sequenceNumber,
+      ContainerContext containerContext);
 
    /**
     * @param id

@@ -1,5 +1,5 @@
 /**
- * {@link StandardHeader}.java
+ * {@link StandardHeaderOrFooter}.java
  *
  * @author Jens Ebert
  * @date 31.12.10 19:47:08 (December 31, 2010)
@@ -16,6 +16,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -25,10 +26,10 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
-public class StandardHeader extends AbstractDataBlock implements Header {
+public class StandardHeaderOrFooter extends AbstractDataBlock implements Header, Footer {
 
    /**
-    * Creates a new {@link StandardHeader}.
+    * Creates a new {@link StandardHeaderOrFooter}.
     *
     * @param id
     * @param reference
@@ -38,7 +39,7 @@ public class StandardHeader extends AbstractDataBlock implements Header {
     * @param sequenceNumber
     *           TODO
     */
-   public StandardHeader(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
+   public StandardHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
       DataBlockReader dataBlockReader, int sequenceNumber, ContainerContext containerContext) {
       super(id, null, reference, dataBlockReader, 0, containerContext);
 
@@ -47,15 +48,6 @@ public class StandardHeader extends AbstractDataBlock implements Header {
       m_isFooter = isFooter;
 
       setFields(fields);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Header#isFooter()
-    */
-   @Override
-   public boolean isFooter() {
-
-      return m_isFooter;
    }
 
    /**
@@ -68,10 +60,10 @@ public class StandardHeader extends AbstractDataBlock implements Header {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
     */
    @Override
-   public long getTotalSize() {
+   public long getSize() {
 
       if (m_fields.size() == 0) {
          return DataBlockDescription.UNDEFINED;
@@ -83,11 +75,11 @@ public class StandardHeader extends AbstractDataBlock implements Header {
          Field<?> field = fieldIterator.next();
 
          // As soon as one child has unknown size, the whole header has unknown size
-         if (field.getTotalSize() == DataBlockDescription.UNDEFINED) {
+         if (field.getSize() == DataBlockDescription.UNDEFINED) {
             return DataBlockDescription.UNDEFINED;
          }
 
-         returnedSize += field.getTotalSize();
+         returnedSize += field.getSize();
       }
 
       return returnedSize;

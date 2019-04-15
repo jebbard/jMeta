@@ -15,11 +15,11 @@ import java.util.List;
  * <i>packet</i>, <i>segment</i>, <i>frame</i> and so on - the basic principles are the same. Thereby, a container part
  * wraps payload data, usually multimedia data such as audio, image, textual or video data, but also metadata. It
  * contains metainformation required for parsing the payload. The structure of an {@link Container} in the same data
- * format is well-defined which usually allows extensions of the data format with new container parts,
- * "without breaking existing software". The latter sentence is an important phrase often written when describing the
- * advantages of such "chunky" formats. The idea is that software that does not know the type of a container part can
- * safely skip and ignore it.
- * 
+ * format is well-defined which usually allows extensions of the data format with new container parts, "without breaking
+ * existing software". The latter sentence is an important phrase often written when describing the advantages of such
+ * "chunky" formats. The idea is that software that does not know the type of a container part can safely skip and
+ * ignore it.
+ *
  * Here, an {@link Container} consists of an arbitrary number of optional headers and footers, both represented by
  * {@link Header} instances and exactly one {@link Payload} .
  */
@@ -27,29 +27,29 @@ public interface Container extends DataBlock {
 
    /**
     * Returns the {@link Payload} of this {@link Container}.
-    * 
+    *
     * @return the {@link Payload} of this {@link Container}.
     */
    public Payload getPayload();
 
    /**
     * Returns the headers of this {@link Container}. This might return an empty {@link List} if there are no headers.
-    * 
+    *
     * @return the {@link Header}s of this {@link Container}, maybe zero headers.
     */
    public List<Header> getHeaders();
 
    /**
     * Returns the footers of this {@link Container}. This might return an empty {@link List} if there are no footers.
-    * 
+    *
     * @return the footers of this {@link Container}, maybe zero footers.
     */
-   public List<Header> getFooters();
+   public List<Footer> getFooters();
 
    void setPayload(Payload payload);
 
-   void addHeader(int index, Header header);
+   void insertHeader(int index, Header header);
 
-   void addFooter(int index, Header footer);
+   void insertFooter(int index, Footer footer);
 
 }

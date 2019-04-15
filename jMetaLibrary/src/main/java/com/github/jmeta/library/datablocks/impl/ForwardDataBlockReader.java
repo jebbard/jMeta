@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -78,7 +79,7 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
       for (int i = 0; i < headerDescs.size(); ++i) {
          DataBlockDescription headerDesc = headerDescs.get(i);
 
-         List<Header> nextHeaders = readHeadersOrFootersWithId(nextReference, headerDesc.getId(), true,
+         List<Header> nextHeaders = readHeadersOrFootersWithId(Header.class, nextReference, headerDesc.getId(),
             newContainerContext);
 
          long totalHeaderSize = 0;
@@ -86,8 +87,8 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
          for (int j = 0; j < nextHeaders.size(); ++j) {
             Header nextHeader = nextHeaders.get(j);
 
-            totalHeaderSize += nextHeader.getTotalSize();
-            createdContainer.addHeader(createdContainer.getHeaders().size(), nextHeader);
+            totalHeaderSize += nextHeader.getSize();
+            createdContainer.insertHeader(createdContainer.getHeaders().size(), nextHeader);
          }
 
          overallHeaderSize += totalHeaderSize;
@@ -112,24 +113,24 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
       createdContainer.setPayload(payload);
 
       // Read footers
-      nextReference = nextReference.advance(payload.getTotalSize());
+      nextReference = nextReference.advance(payload.getSize());
 
-      List<Header> footers = new ArrayList<>();
+      List<Footer> footers = new ArrayList<>();
       List<DataBlockDescription> footerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
 
       for (int i = 0; i < footerDescs.size(); ++i) {
          DataBlockDescription footerDesc = footerDescs.get(i);
 
-         List<Header> nextFooters = readHeadersOrFootersWithId(nextReference, footerDesc.getId(), true,
+         List<Footer> nextFooters = readHeadersOrFootersWithId(Footer.class, nextReference, footerDesc.getId(),
             newContainerContext);
 
          long totalFooterSize = 0;
 
          for (int j = 0; j < nextFooters.size(); ++j) {
-            Header nextFooter = nextFooters.get(j);
+            Footer nextFooter = nextFooters.get(j);
 
-            totalFooterSize += nextFooter.getTotalSize();
-            createdContainer.addFooter(createdContainer.getFooters().size(), nextFooter);
+            totalFooterSize += nextFooter.getSize();
+            createdContainer.insertFooter(createdContainer.getFooters().size(), nextFooter);
          }
 
          nextReference = nextReference.advance(totalFooterSize);

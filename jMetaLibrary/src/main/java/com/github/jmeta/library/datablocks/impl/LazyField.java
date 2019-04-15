@@ -89,10 +89,10 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
     */
    @Override
-   public long getTotalSize() {
+   public long getSize() {
 
       return m_totalSize;
    }
@@ -108,10 +108,10 @@ public class LazyField extends AbstractDataBlock implements Field<Object> {
    private void lazilyReadField() {
 
       if (m_wrappedField == null) {
-         ByteBuffer binaryData = getDataBlockReader().readBytes(getMediumReference(), (int) m_totalSize);
+         ByteBuffer binaryData = getDataBlockReader().readBytes(getOffset(), (int) m_totalSize);
 
          m_wrappedField = m_dbFactory.createFieldFromBytes(m_fieldDesc.getId(), getDataBlockReader().getSpecification(),
-            getMediumReference(), binaryData, getSequenceNumber(), getContainerContext());
+            getOffset(), binaryData, getSequenceNumber(), getContainerContext());
       }
    }
 

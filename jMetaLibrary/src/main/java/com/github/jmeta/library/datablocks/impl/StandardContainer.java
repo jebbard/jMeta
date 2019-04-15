@@ -17,6 +17,7 @@ import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -44,7 +45,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     *           TODO
     */
    public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Header> footers, DataBlockReader dataBlockReader, ContainerContext containerContext,
+      Payload payload, List<Footer> footers, DataBlockReader dataBlockReader, ContainerContext containerContext,
       int sequenceNumber) {
       this(id, parent, reference, dataBlockReader, containerContext, sequenceNumber);
 
@@ -53,11 +54,11 @@ public class StandardContainer extends AbstractDataBlock implements Container {
       Reject.ifNull(headers, "headers");
 
       for (int i = 0; i < headers.size(); ++i) {
-         addHeader(i, headers.get(i));
+         insertHeader(i, headers.get(i));
       }
 
       for (int i = 0; i < footers.size(); ++i) {
-         addFooter(i, footers.get(i));
+         insertFooter(i, footers.get(i));
       }
 
       setPayload(payload);
@@ -83,7 +84,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @param footer
     */
    @Override
-   public void addFooter(int index, Header footer) {
+   public void insertFooter(int index, Footer footer) {
 
       Reject.ifNull(footer, "footer");
       Reject.ifNotInInterval(index, 0, m_footers.size(), "index");
@@ -99,7 +100,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @param header
     */
    @Override
-   public void addHeader(int index, Header header) {
+   public void insertHeader(int index, Header header) {
       Reject.ifNull(header, "header");
       Reject.ifNotInInterval(index, 0, m_headers.size(), "index");
 
@@ -130,7 +131,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @see com.github.jmeta.library.datablocks.api.types.Container#getFooters()
     */
    @Override
-   public List<Header> getFooters() {
+   public List<Footer> getFooters() {
 
       return Collections.unmodifiableList(m_footers);
    }
@@ -145,33 +146,33 @@ public class StandardContainer extends AbstractDataBlock implements Container {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
     */
    @Override
-   public long getTotalSize() {
+   public long getSize() {
 
       long totalSize = 0;
 
       for (Iterator<Header> fieldIterator = m_headers.iterator(); fieldIterator.hasNext();) {
          Header header = fieldIterator.next();
 
-         totalSize += header.getTotalSize();
+         totalSize += header.getSize();
       }
 
-      for (Iterator<Header> fieldIterator = m_footers.iterator(); fieldIterator.hasNext();) {
-         Header footer = fieldIterator.next();
+      for (Iterator<Footer> fieldIterator = m_footers.iterator(); fieldIterator.hasNext();) {
+         Footer footer = fieldIterator.next();
 
-         totalSize += footer.getTotalSize();
+         totalSize += footer.getSize();
       }
 
-      totalSize += m_payload.getTotalSize();
+      totalSize += m_payload.getSize();
 
       return totalSize;
    }
 
    private final List<Header> m_headers = new ArrayList<>();
 
-   private final List<Header> m_footers = new ArrayList<>();
+   private final List<Footer> m_footers = new ArrayList<>();
 
    private Payload m_payload;
 }

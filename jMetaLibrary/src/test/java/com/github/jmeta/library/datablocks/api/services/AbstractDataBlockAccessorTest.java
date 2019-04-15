@@ -555,15 +555,15 @@ public abstract class AbstractDataBlockAccessorTest {
    private void checkHeadersFooters(Container parentContainer, DataBlockInstanceId parentContainerInstanceId,
       boolean checkHeaders) {
 
-      List<Header> headerList = null;
+      List<FieldSequence> headerOrFooterList = new ArrayList<>();
 
       if (checkHeaders) {
-         headerList = parentContainer.getHeaders();
+         headerOrFooterList.addAll(parentContainer.getHeaders());
       } else {
-         headerList = parentContainer.getFooters();
+         headerOrFooterList.addAll(parentContainer.getFooters());
       }
 
-      Assert.assertNotNull(headerList);
+      Assert.assertNotNull(headerOrFooterList);
 
       List<DataBlockInstanceId> expectedHeaderIds = null;
 
@@ -575,12 +575,12 @@ public abstract class AbstractDataBlockAccessorTest {
             PhysicalDataBlockType.FOOTER);
       }
 
-      Assert.assertEquals(expectedHeaderIds.size(), headerList.size());
+      Assert.assertEquals(expectedHeaderIds.size(), headerOrFooterList.size());
 
       for (int i = 0; i < expectedHeaderIds.size(); ++i) {
          DataBlockInstanceId expectedHeaderId = expectedHeaderIds.get(i);
 
-         Header header = headerList.get(i);
+         FieldSequence header = headerOrFooterList.get(i);
 
          Assert.assertEquals(expectedHeaderId.getId(), header.getId());
          // Check size of the header or footer
@@ -674,20 +674,20 @@ public abstract class AbstractDataBlockAccessorTest {
     */
    private void checkDataBlockBytes(DataBlock dataBlock) {
 
-      long totalSize = dataBlock.getTotalSize();
+      long totalSize = dataBlock.getSize();
 
       long[] readOffsets = new long[] { 0, totalSize / 2, totalSize - 1, };
       int[] readSizes = new int[] { totalSize > 30 ? 31 : (int) totalSize,
          totalSize / 2 < 10 ? (int) totalSize / 2 : (int) totalSize / 10, 1, };
 
-      long absOffset = dataBlock.getMediumReference().getAbsoluteMediumOffset();
+      long absOffset = dataBlock.getOffset().getAbsoluteMediumOffset();
 
       for (int i = 0; i < readSizes.length; i++) {
 
          if (readSizes[i] != 0) {
             ByteBuffer expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
 
-            ByteBuffer actualBytes = dataBlock.getBytes(readOffsets[i], readSizes[i]);
+            ByteBuffer actualBytes = dataBlock.getBytes(dataBlock.getOffset().advance(readOffsets[i]), readSizes[i]);
 
             org.junit.Assert.assertEquals(expectedBytes, actualBytes);
          }
@@ -702,13 +702,13 @@ public abstract class AbstractDataBlockAccessorTest {
     */
    private void checkFieldBinaryValue(Field<?> field) {
 
-      long totalSize = field.getTotalSize();
+      long totalSize = field.getSize();
 
       long[] readOffsets = new long[] { 0, totalSize / 2, totalSize - 1, };
       int[] readSizes = new int[] { totalSize > 30 ? 31 : (int) totalSize,
          totalSize / 2 < 10 ? (int) totalSize / 2 : (int) totalSize / 10, 1, };
 
-      long absOffset = field.getMediumReference().getAbsoluteMediumOffset();
+      long absOffset = field.getOffset().getAbsoluteMediumOffset();
 
       for (int i = 0; i < readSizes.length; i++) {
          ByteBuffer expectedBytes = expectationProvider.getExpectedBytes(absOffset + readOffsets[i], readSizes[i]);
@@ -737,7 +737,7 @@ public abstract class AbstractDataBlockAccessorTest {
 
       long expectedSize = expectationProvider.getExpectedDataBlockSize(instanceId);
 
-      Assert.assertEquals("Block size for instance: <" + instanceId + "> ", expectedSize, dataBlock.getTotalSize());
+      Assert.assertEquals("Block size for instance: <" + instanceId + "> ", expectedSize, dataBlock.getSize());
    }
 
    /**

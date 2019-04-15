@@ -57,7 +57,7 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
          while (containerIter.hasNext()) {
             Container container = containerIter.next();
 
-            summedUpTotalSize += container.getTotalSize();
+            summedUpTotalSize += container.getSize();
          }
 
          this.totalSize = summedUpTotalSize;
@@ -65,10 +65,10 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
     */
    @Override
-   public long getTotalSize() {
+   public long getSize() {
       return totalSize;
    }
 
@@ -77,6 +77,6 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     */
    @Override
    public AbstractDataBlockIterator<Container> getContainerIterator() {
-      return new PayloadContainerIterator(this, getDataBlockReader(), getMediumReference());
+      return new PayloadContainerIterator(this, getDataBlockReader(), getOffset());
    }
 }

@@ -13,7 +13,7 @@ package com.github.jmeta.library.datablocks.api.types;
  * fixed-size header or footer. Such an {@link DataBlock} is used to identify the data chunk to belong to a given data
  * format or to have a specific type.
  *
- * An {@link Header} may only consist of {@link Field}s.
+ * An {@link Footer} may only consist of {@link Field}s.
  */
-public interface Header extends FieldSequence {
+public interface Footer extends FieldSequence {
 }

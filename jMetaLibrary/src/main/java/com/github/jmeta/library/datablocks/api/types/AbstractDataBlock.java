@@ -33,7 +33,8 @@ public abstract class AbstractDataBlock implements DataBlock {
     * @param dataBlockReader
     * @param sequenceNumber
     *           TODO
-    * @param containerContext TODO
+    * @param containerContext
+    *           TODO
     */
    public AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader,
       int sequenceNumber, ContainerContext containerContext) {
@@ -76,24 +77,24 @@ public abstract class AbstractDataBlock implements DataBlock {
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(long, int)
     */
    @Override
-   public ByteBuffer getBytes(long offset, int size) {
-
-      Reject.ifNegative(offset, "offset");
+   public ByteBuffer getBytes(MediumOffset offset, int size) {
       Reject.ifNegative(size, "size");
-      Reject.ifNull(getMediumReference(), "getMediumReference()");
+      Reject.ifNull(offset, "offset");
+      Reject.ifTrue(offset.before(getOffset()), "offset.before(getOffset())");
 
-      if (getTotalSize() != DataBlockDescription.UNDEFINED) {
-         Reject.ifFalse(offset + size <= getTotalSize(), "offset + size <= getTotalSize()");
+      if (getSize() != DataBlockDescription.UNDEFINED) {
+         Reject.ifFalse(offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize(),
+            "offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize()");
       }
 
-      return getDataBlockReader().readBytes(m_mediumReference.advance(offset), size);
+      return getDataBlockReader().readBytes(offset, size);
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getMediumReference()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getOffset()
     */
    @Override
-   public MediumOffset getMediumReference() {
+   public MediumOffset getOffset() {
 
       return m_mediumReference;
    }
@@ -135,8 +136,8 @@ public abstract class AbstractDataBlock implements DataBlock {
    public String toString() {
 
       return getClass().getName() + "[id=" + getId() + ", parentId="
-         + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getMediumReference()
-         + ", totalSize=" + getTotalSize() + "]";
+         + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getOffset() + ", totalSize="
+         + getSize() + "]";
    }
 
    private DataBlock m_parent;

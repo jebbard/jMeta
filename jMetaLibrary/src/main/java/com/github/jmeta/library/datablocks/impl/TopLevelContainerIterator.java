@@ -162,9 +162,9 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
     */
    public long getBytesToAdvanceToNextContainer(Container currentContainer) {
       if (forwardRead) {
-         return currentContainer.getTotalSize();
+         return currentContainer.getSize();
       } else {
-         return -currentContainer.getTotalSize();
+         return -currentContainer.getSize();
       }
    }
 

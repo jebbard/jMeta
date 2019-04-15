@@ -121,20 +121,24 @@ public class StandardField<T> implements Field<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(long, int)
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(MediumOffset, int)
     */
    @Override
-   public ByteBuffer getBytes(long offset, int size) {
-      Reject.ifNegative(offset, "offset");
+   public ByteBuffer getBytes(MediumOffset offset, int size) {
       Reject.ifNegative(size, "size");
-      Reject.ifFalse(offset + size <= getTotalSize(), "offset + size <= getTotalSize()");
+      Reject.ifNull(offset, "offset");
+      Reject.ifTrue(offset.before(getOffset()), "offset.before(getOffset())");
+      Reject.ifFalse(offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize(),
+         "offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize()");
 
       ByteBuffer subBytes = ByteBuffer.allocate(size);
 
       ByteBuffer value;
       try {
          value = getBinaryValue();
-         for (int currentIndex = (int) offset; currentIndex < offset + size; currentIndex++) {
+         int relativeOffset = (int) (offset.getAbsoluteMediumOffset() - getOffset().getAbsoluteMediumOffset());
+
+         for (int currentIndex = relativeOffset; currentIndex < relativeOffset + size; currentIndex++) {
             subBytes.put(value.get(value.position() + currentIndex));
          }
       } catch (InterpretedValueConversionException e) {
@@ -160,10 +164,10 @@ public class StandardField<T> implements Field<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getMediumReference()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getOffset()
     */
    @Override
-   public MediumOffset getMediumReference() {
+   public MediumOffset getOffset() {
 
       return m_mediumReference;
    }
@@ -187,10 +191,10 @@ public class StandardField<T> implements Field<T> {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getTotalSize()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
     */
    @Override
-   public long getTotalSize() {
+   public long getSize() {
 
       return m_totalSize;
    }
@@ -285,9 +289,9 @@ public class StandardField<T> implements Field<T> {
    @Override
    public String toString() {
 
-      return getClass().getSimpleName() + "[id=" + getId().getGlobalId() + ", totalSize=" + getTotalSize()
+      return getClass().getSimpleName() + "[id=" + getId().getGlobalId() + ", totalSize=" + getSize()
          + ", m_interpretedValue=" + m_interpretedValue + ", parentId="
-         + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getMediumReference() + "]";
+         + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getOffset() + "]";
    }
 
    private final FieldConverter<T> m_fieldConverter;

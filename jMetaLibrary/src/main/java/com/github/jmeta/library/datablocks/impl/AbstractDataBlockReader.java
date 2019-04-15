@@ -24,7 +24,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
-import com.github.jmeta.library.datablocks.api.types.Header;
+import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -212,15 +212,16 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
     *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
     */
    @Override
-   public List<Header> readHeadersOrFootersWithId(MediumOffset startOffset, DataBlockId headerOrFooterId,
-      boolean isFooter, ContainerContext containerContext) {
+   public <T extends FieldSequence> List<T> readHeadersOrFootersWithId(Class<T> fieldSequenceClass,
+      MediumOffset startOffset, DataBlockId headerOrFooterId, ContainerContext containerContext) {
+      Reject.ifNull(fieldSequenceClass, "fieldSequenceClass");
       Reject.ifNull(headerOrFooterId, "headerOrFooterId");
       Reject.ifNull(startOffset, "reference");
       Reject.ifFalse(spec.specifiesBlockWithId(headerOrFooterId), "m_spec.specifiesBlockWithId(headerOrFooterId)");
 
       DataBlockDescription desc = spec.getDataBlockDescription(headerOrFooterId);
 
-      List<Header> nextHeadersOrFooters = new ArrayList<>();
+      List<T> nextHeadersOrFooters = new ArrayList<>();
 
       // Get the actual occurrences of this headerId based on the fields of the previous
       // headers
@@ -230,10 +231,11 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       for (int i = 0; i < actualOccurrences; i++) {
          long headerOrFooterSize = containerContext.getSizeOf(headerOrFooterId, i);
 
-         List<Field<?>> headerFields = readFields(startOffset, headerOrFooterId, headerOrFooterSize, containerContext);
+         List<Field<?>> headerOrFooterFields = readFields(startOffset, headerOrFooterId, headerOrFooterSize,
+            containerContext);
 
-         nextHeadersOrFooters.add(dataBlockFactory.createHeaderOrFooter(headerOrFooterId, startOffset, headerFields,
-            isFooter, this, i, containerContext));
+         nextHeadersOrFooters.add(dataBlockFactory.createHeaderOrFooter(fieldSequenceClass, headerOrFooterId,
+            startOffset, headerOrFooterFields, this, i, containerContext));
       }
 
       return nextHeadersOrFooters;

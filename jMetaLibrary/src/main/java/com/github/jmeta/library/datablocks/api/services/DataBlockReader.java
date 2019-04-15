@@ -7,12 +7,14 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.StandardField;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.services.MediumStore;
+import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
@@ -75,8 +77,8 @@ public interface DataBlockReader {
     * @return The {@link Header} with the given {@link DataBlockId} with its {@link StandardField}s read from the given
     *         {@link MediumOffset}.
     */
-   public List<Header> readHeadersOrFootersWithId(MediumOffset startOffset, DataBlockId headerOrFooterId,
-      boolean isFooter, ContainerContext containerContext);
+   public <T extends FieldSequence> List<T> readHeadersOrFootersWithId(Class<T> fieldSequenceClass,
+      MediumOffset startOffset, DataBlockId headerOrFooterId, ContainerContext containerContext);
 
    /**
     * @param reference
@@ -88,8 +90,8 @@ public interface DataBlockReader {
     * @param context
     * @return the {@link Payload}
     */
-   public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId, long remainingDirectParentByteCount,
-      ContainerContext containerContext);
+   public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId,
+      long remainingDirectParentByteCount, ContainerContext containerContext);
 
    /**
     * Returns the next {@link Container} with the given {@link DataBlockId} assumed to be stored starting at the given

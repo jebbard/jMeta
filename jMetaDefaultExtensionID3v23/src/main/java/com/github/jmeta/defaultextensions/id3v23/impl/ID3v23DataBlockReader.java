@@ -92,8 +92,8 @@ public class ID3v23DataBlockReader extends ForwardDataBlockReader {
          AbstractID3v2TransformationHandler transformationHandler = handlerIterator.next();
 
          if (transformationHandler.requiresUntransform(transformedContainer)) {
-            mediumDataProvider.bufferBeforeRead(transformedContainer.getMediumReference(),
-               transformedContainer.getTotalSize());
+            mediumDataProvider.bufferBeforeRead(transformedContainer.getOffset(),
+               transformedContainer.getSize());
             transformedContainer = transformationHandler.untransform(transformedContainer, reader);
          }
       }

@@ -15,6 +15,7 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -90,7 +91,7 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
       // Read footers
       MediumOffset nextReference = currentOffset;
 
-      List<Header> footers = new ArrayList<>();
+      List<Footer> footers = new ArrayList<>();
 
       List<DataBlockDescription> footerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
 
@@ -103,7 +104,7 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
 
          nextReference = nextReference.advance(-footerDesc.getMaximumByteLength());
 
-         List<Header> nextFooters = readHeadersOrFootersWithId(nextReference, footerDesc.getId(), true,
+         List<Footer> nextFooters = readHeadersOrFootersWithId(Footer.class, nextReference, footerDesc.getId(),
             newContainerContext);
 
          footers.addAll(0, nextFooters);
@@ -116,7 +117,7 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
          remainingDirectParentByteCount, newContainerContext);
 
       // Read headers
-      nextReference = nextReference.advance(-payload.getTotalSize());
+      nextReference = nextReference.advance(-payload.getSize());
 
       List<Header> headers = new ArrayList<>();
       List<DataBlockDescription> headerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
@@ -130,7 +131,7 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
 
          nextReference = nextReference.advance(-headerDesc.getMaximumByteLength());
 
-         List<Header> nextHeaders = readHeadersOrFootersWithId(nextReference, headerDesc.getId(), false,
+         List<Header> nextHeaders = readHeadersOrFootersWithId(Header.class, nextReference, headerDesc.getId(),
             newContainerContext);
 
          headers.addAll(0, nextHeaders);

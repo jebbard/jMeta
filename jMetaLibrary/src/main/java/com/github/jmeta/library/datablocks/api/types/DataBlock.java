@@ -43,7 +43,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
  * 2^63-1 bytes.
  *
  * An {@link DataBlock} may have an unknown size which is reflected by a return value of
- * {@link DataBlockDescription#UNDEFINED} by the method {@link #getTotalSize()}.
+ * {@link DataBlockDescription#UNDEFINED} by the method {@link #getSize()}.
  */
 public interface DataBlock {
 
@@ -54,7 +54,7 @@ public interface DataBlock {
     * @return the {@link AbstractMedium} the {@link DataBlock} is currently stored on. May return null if the
     *         {@link DataBlock} has not been persisted yet.
     */
-   public MediumOffset getMediumReference();
+   public MediumOffset getOffset();
 
    /**
     * Returns the total size of the {@link DataBlock} in bytes.
@@ -62,20 +62,20 @@ public interface DataBlock {
     * @return the total size of the {@link DataBlock} in bytes or {@link DataBlockDescription#UNDEFINED} if the size of
     *         this {@link DataBlock} is unknown.
     */
-   public long getTotalSize();
+   public long getSize();
 
    /**
     * Reads raw bytes that build the {@link DataBlock}.
     *
     * @param offset
-    *           the start offset from which to retrieve the bytes. The offset is given relative to the start byte of the
-    *           {@link DataBlock} with index 0. The offset must not be equal to or bigger than the total size of
-    *           {@link DataBlock}.
+    *           the start {@link MediumOffset} from which to retrieve the bytes. The offset is given relative to the
+    *           start byte of the {@link DataBlock} with index 0. The offset must not be equal to or bigger than the
+    *           total size of {@link DataBlock}.
     * @param size
     *           the size of the bytes to read. Must not reach beyond the total size of the {@link DataBlock}.
     * @return the bytes that build this {@link DataBlock} from the given offset and size.
     */
-   public ByteBuffer getBytes(long offset, int size);
+   public ByteBuffer getBytes(MediumOffset offset, int size);
 
    /**
     * Returns the {@link DataBlockId} of the {@link DataBlock}.
@@ -96,7 +96,8 @@ public interface DataBlock {
 
    /**
     * Returns the {@link ContainerContext} belonging to this {@link DataBlock}. The {@link ContainerContext} provides
-    * meta information previously picker up in the enclosing container such as size, byte ordering and character encodings of other data blocks in the same container.
+    * meta information previously picker up in the enclosing container such as size, byte ordering and character
+    * encodings of other data blocks in the same container.
     *
     * @return The {@link ContainerContext} of this {@link DataBlock}
     */

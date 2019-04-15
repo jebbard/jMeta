@@ -37,7 +37,7 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
-import com.github.jmeta.library.datablocks.api.types.Header;
+import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -97,6 +97,7 @@ public class DataBlockViewerMainDialog extends JFrame {
       /**
        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
        */
+      @Override
       public void actionPerformed(ActionEvent arg0) {
 
          Reject.ifNull(arg0, "arg0");
@@ -112,6 +113,7 @@ public class DataBlockViewerMainDialog extends JFrame {
       /**
        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
        */
+      @Override
       public void actionPerformed(ActionEvent arg0) {
 
          Reject.ifNull(arg0, "arg0");
@@ -130,6 +132,7 @@ public class DataBlockViewerMainDialog extends JFrame {
       /**
        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
        */
+      @Override
       public void actionPerformed(ActionEvent arg0) {
 
          Reject.ifNull(arg0, "arg0");
@@ -149,6 +152,7 @@ public class DataBlockViewerMainDialog extends JFrame {
       /**
        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
        */
+      @Override
       public void actionPerformed(ActionEvent arg0) {
 
          Reject.ifNull(arg0, "arg0");
@@ -201,7 +205,7 @@ public class DataBlockViewerMainDialog extends JFrame {
 
          parent.add(tagNode);
 
-         fillInHeaders(nextOne, nextOne.getHeaders(), tagNode);
+         fillInHeadersOrFooters(nextOne, nextOne.getHeaders(), tagNode);
 
          Payload payload = nextOne.getPayload();
          DefaultMutableTreeNode payloadNode = new DefaultMutableTreeNode(payload.getId());
@@ -214,7 +218,7 @@ public class DataBlockViewerMainDialog extends JFrame {
             fillInFields(payloadNode, ((FieldBasedPayload) payload).getFields());
          }
 
-         fillInHeaders(nextOne, nextOne.getFooters(), tagNode);
+         fillInHeadersOrFooters(nextOne, nextOne.getFooters(), tagNode);
       }
    }
 
@@ -234,16 +238,17 @@ public class DataBlockViewerMainDialog extends JFrame {
       }
    }
 
-   private void fillInHeaders(Container container, List<Header> headers, DefaultMutableTreeNode parent) {
+   private void fillInHeadersOrFooters(Container container, List<? extends FieldSequence> headersOrFooters,
+      DefaultMutableTreeNode parent) {
 
-      for (int i = 0; i < headers.size(); ++i) {
-         Header header = headers.get(i);
+      for (int i = 0; i < headersOrFooters.size(); ++i) {
+         FieldSequence headerOrFooter = headersOrFooters.get(i);
 
-         DefaultMutableTreeNode headerNode = new DefaultMutableTreeNode(header.getId());
+         DefaultMutableTreeNode headerNode = new DefaultMutableTreeNode(headerOrFooter.getId());
 
          parent.add(headerNode);
 
-         fillInFields(headerNode, header.getFields());
+         fillInFields(headerNode, headerOrFooter.getFields());
       }
    }
 

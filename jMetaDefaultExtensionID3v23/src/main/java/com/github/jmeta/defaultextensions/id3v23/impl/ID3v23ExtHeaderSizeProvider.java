@@ -44,7 +44,7 @@ public class ID3v23ExtHeaderSizeProvider implements SizeProvider {
 
          Header id3v23ExtHeader = containerContext.getContainer().getHeaders().get(1);
 
-         return id3v23ExtHeader.getFields().stream().collect(Collectors.summingLong(Field::getTotalSize));
+         return id3v23ExtHeader.getFields().stream().collect(Collectors.summingLong(Field::getSize));
       }
 
       return DataBlockDescription.UNDEFINED;
