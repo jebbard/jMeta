@@ -23,6 +23,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -42,8 +43,8 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * is not depending on whether forward or backward reading happens. Differentiation between forward and backward reading
  * is done by different implementations of {@link #hasEnoughBytesForMagicKey(MediumOffset, MagicKey, long)},
  * {@link #getMagicKeys(DataBlockDescription)} as well as
- * {@link #readContainerWithId(MediumOffset, DataBlockId, Payload, long, int, ContainerContext)} and
- * {@link #readPayload(MediumOffset, DataBlockId, DataBlockId, long, ContainerContext)}.
+ * {@link #readContainerWithId(MediumOffset, DataBlockId, Payload, long, int, StandardContainerContext)} and
+ * {@link #readPayload(MediumOffset, DataBlockId, DataBlockId, long, StandardContainerContext)}.
  */
 public abstract class AbstractDataBlockReader implements DataBlockReader {
 
@@ -153,11 +154,11 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readFields(MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, long, ContainerContext)
+    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, long, DataBlock, ContainerContext)
     */
    @Override
    public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, long remainingDirectParentByteCount,
-      ContainerContext containerContext) {
+      DataBlock parent, ContainerContext containerContext) {
 
       DataBlockDescription parentDesc = spec.getDataBlockDescription(parentId);
 
@@ -180,7 +181,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
             long fieldSize = determineActualFieldSize(fieldDesc, currentlyRemainingParentByteCount,
                currentFieldReference, j, containerContext);
 
-            Field<?> newField = readField(currentFieldReference, fieldDesc, fieldSize, j, containerContext);
+            Field<?> newField = readField(currentFieldReference, fieldDesc, fieldSize, j, parent, containerContext);
 
             containerContext.addFieldFunctions(newField);
 
@@ -198,7 +199,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
          DataBlockDescription unknownFieldDescription = createUnknownFieldDescription(parentId);
 
          Field<?> unknownField = readField(currentFieldReference, unknownFieldDescription,
-            currentlyRemainingParentByteCount, 0, containerContext);
+            currentlyRemainingParentByteCount, 0, parent, containerContext);
 
          fields.add(unknownField);
       }
@@ -209,7 +210,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
    /**
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readHeadersOrFootersWithId(com.github.jmeta.library.media.api.types.MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId, boolean,
-    *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    *      com.github.jmeta.library.datablocks.impl.ContainerContext)
     */
    @Override
    public <T extends FieldSequence> List<T> readHeadersOrFootersWithId(Class<T> fieldSequenceClass,
@@ -231,7 +232,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       for (int i = 0; i < actualOccurrences; i++) {
          long headerOrFooterSize = containerContext.getSizeOf(headerOrFooterId, i);
 
-         List<Field<?>> headerOrFooterFields = readFields(startOffset, headerOrFooterId, headerOrFooterSize,
+         List<Field<?>> headerOrFooterFields = readFields(startOffset, headerOrFooterId, headerOrFooterSize, null,
             containerContext);
 
          nextHeadersOrFooters.add(dataBlockFactory.createHeaderOrFooter(fieldSequenceClass, headerOrFooterId,
@@ -400,7 +401,8 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
          }
 
          // Read the field that defines the actual id for the container
-         Field<?> idField = readField(idFieldReference, idFieldDesc, actualFieldSize, sequenceNumber, containerContext);
+         Field<?> idField = readField(idFieldReference, idFieldDesc, actualFieldSize, sequenceNumber, null,
+            containerContext);
 
          return concreteBlockIdFromGenericId(genericContainerId, idField);
       }
@@ -473,22 +475,17 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
    }
 
    private Field<?> readField(final MediumOffset reference, DataBlockDescription fieldDesc, long fieldSize,
-      int sequenceNumber, ContainerContext containerContext) {
+      int sequenceNumber, DataBlock parent, ContainerContext containerContext) {
 
-      // A lazy field is created if the field size exceeds a maximum size
-      // There is no point in making terminated fields lazy as - anyway - to determine their size, they have to be read
-      // anyway.
-      if (fieldDesc.getFieldProperties().getTerminationCharacter() == null
-         && fieldSize > reference.getMedium().getMaxReadWriteBlockSizeInBytes()) {
-         return new LazyField(fieldDesc, reference, null, fieldSize, dataBlockFactory, this, sequenceNumber,
-            containerContext);
+      if (fieldSize > FieldProperties.MAX_FIELD_SIZE) {
+         throw new IllegalStateException("Field size must not exceed " + FieldProperties.MAX_FIELD_SIZE + " bytes");
       }
 
       // This cast is ok as we check for upper bound above
       ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
       return dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), spec, reference, fieldBuffer, sequenceNumber,
-         containerContext);
+         this, null, containerContext);
    }
 
 }

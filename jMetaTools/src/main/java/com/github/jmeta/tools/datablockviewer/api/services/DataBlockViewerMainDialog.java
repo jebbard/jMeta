@@ -232,7 +232,7 @@ public class DataBlockViewerMainDialog extends JFrame {
          parent.add(fieldNode);
 
          try {
-            fieldNode.add(new DefaultMutableTreeNode(field.getStringRepresentation()));
+            fieldNode.add(new DefaultMutableTreeNode(field.getInterpretedValue().toString()));
          } catch (BinaryValueConversionException e) {
          }
       }

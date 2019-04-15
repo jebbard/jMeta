@@ -30,7 +30,7 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.CountProvider#getCountOf(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    *      com.github.jmeta.library.datablocks.api.types.StandardContainerContext)
     */
    @Override
    public long getCountOf(DataBlockId id, ContainerContext containerContext) {
@@ -43,7 +43,7 @@ public class OggPacketSizeAndCountProvider implements SizeProvider, CountProvide
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.SizeProvider#getSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      int, com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    *      int, com.github.jmeta.library.datablocks.api.types.StandardContainerContext)
     */
    @Override
    public long getSizeOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {

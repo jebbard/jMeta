@@ -51,7 +51,7 @@ public class MP3SizeProvider implements SizeProvider {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.SizeProvider#getSizeOf(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      int, com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    *      int, com.github.jmeta.library.datablocks.api.types.StandardContainerContext)
     */
    @Override
    public long getSizeOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext) {

@@ -19,7 +19,7 @@ import com.github.jmeta.defaultextensions.id3v23.impl.ID3v23Extension;
 import com.github.jmeta.defaultextensions.mp3.impl.MP3Extension;
 import com.github.jmeta.defaultextensions.ogg.impl.OggExtension;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.ContainerIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
@@ -121,7 +121,7 @@ public class DataFormatsSmoke {
       }
    }
 
-   private void printContainers(AbstractDataBlockIterator<Container> containerIterator, Integer level) {
+   private void printContainers(ContainerIterator containerIterator, Integer level) {
 
       String prependWith = "";
 

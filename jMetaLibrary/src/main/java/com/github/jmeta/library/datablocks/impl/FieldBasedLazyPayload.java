@@ -91,7 +91,8 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
          MediumOffset fieldReference = getOffset();
 
          if (totalSize > 0) {
-            List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), totalSize, getContainerContext());
+            List<Field<?>> readFields = getDataBlockReader().readFields(fieldReference, getId(), totalSize, this,
+               getContainerContext());
 
             for (int i = 0; i < readFields.size(); ++i) {
                Field<?> field = readFields.get(i);

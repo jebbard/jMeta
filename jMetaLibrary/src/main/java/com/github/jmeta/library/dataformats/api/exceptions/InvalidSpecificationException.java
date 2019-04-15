@@ -11,6 +11,7 @@ package com.github.jmeta.library.dataformats.api.exceptions;
 
 import com.github.jmeta.library.dataformats.api.types.CountOf;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.FieldProperties;
 import com.github.jmeta.library.dataformats.api.types.FieldType;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
 import com.github.jmeta.library.dataformats.api.types.PresenceOf;
@@ -47,6 +48,10 @@ public class InvalidSpecificationException extends RuntimeException {
       "Data block typed as " + PhysicalDataBlockType.FIELD + ", but its field properties are null";
    public static final String VLD_FIELD_PROPERTIES_UNNECESSARY =
       "Data block not typed as " + PhysicalDataBlockType.FIELD + ", but it has non-null field properties";
+
+   public static final String VLD_TOO_BIG_FIELD_LENGTH =
+      "Data block typed as " + PhysicalDataBlockType.FIELD + ", but its minimum or maximum lenght exceeds "
+      + FieldProperties.MAX_FIELD_SIZE + " bytes: <%1$s>";
 
    public static final String VLD_MAGIC_KEY_MISSING =
       "Every lop-level container must define at least one magic key";

@@ -65,12 +65,14 @@ public interface DataBlockFactory {
     * @param fieldBytes
     * @param sequenceNumber
     *           TODO
+    * @param reader TODO
+    * @param parent TODO
     * @param containerContext
     *           TODO
     * @return the {@link Field}
     */
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, int sequenceNumber, ContainerContext containerContext);
+      ByteBuffer fieldBytes, int sequenceNumber, DataBlockReader reader, DataBlock parent, ContainerContext containerContext);
 
    /**
     * @param id

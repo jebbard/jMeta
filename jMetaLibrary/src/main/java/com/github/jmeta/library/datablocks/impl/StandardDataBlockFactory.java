@@ -46,7 +46,7 @@ public class StandardDataBlockFactory implements DataBlockFactory {
     *      com.github.jmeta.library.datablocks.api.types.DataBlock,
     *      com.github.jmeta.library.media.api.types.MediumOffset,
     *      com.github.jmeta.library.datablocks.api.services.DataBlockReader,
-    *      com.github.jmeta.library.datablocks.api.types.ContainerContext, int)
+    *      com.github.jmeta.library.datablocks.impl.StandardContainerContext, int)
     */
    @Override
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
@@ -56,11 +56,13 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createFieldFromBytes(DataBlockId,
-    *      DataFormatSpecification, MediumOffset, BinaryValue, int, ContainerContext)
+    *      DataFormatSpecification, MediumOffset, BinaryValue, int, DataBlockReader, DataBlock,
+    *      StandardContainerContext)
     */
    @Override
    public <T> Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference,
-      ByteBuffer fieldBytes, int sequenceNumber, ContainerContext containerContext) {
+      ByteBuffer fieldBytes, int sequenceNumber, DataBlockReader reader, DataBlock parent,
+      ContainerContext containerContext) {
 
       Reject.ifNull(id, "fieldDesc");
       Reject.ifNull(reference, "reference");
@@ -68,14 +70,16 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
-      StandardField<T> field = new StandardField<>(desc, fieldBytes, reference, sequenceNumber, containerContext);
+      StandardField<T> field = new StandardField<>(desc, fieldBytes, reference, sequenceNumber, containerContext,
+         reader, parent);
 
       return field;
    }
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createPayloadAfterRead(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      MediumOffset, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader, ContainerContext)
+    *      MediumOffset, long, com.github.jmeta.library.datablocks.api.services.DataBlockReader,
+    *      StandardContainerContext)
     */
    @Override
    public Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader,
@@ -98,7 +102,7 @@ public class StandardDataBlockFactory implements DataBlockFactory {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      MediumOffset, java.util.List, DataBlockReader, int, ContainerContext)
+    *      MediumOffset, java.util.List, DataBlockReader, int, StandardContainerContext)
     */
    @Override
    public <T extends FieldSequence> T createHeaderOrFooter(Class<T> fieldSequenceClass, DataBlockId id,

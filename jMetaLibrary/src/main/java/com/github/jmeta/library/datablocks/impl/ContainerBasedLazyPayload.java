@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.datablocks.impl;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.ContainerIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
@@ -52,7 +52,7 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
       if (totalSize == DataBlockDescription.UNDEFINED) {
          long summedUpTotalSize = 0;
 
-         AbstractDataBlockIterator<Container> containerIter = getContainerIterator();
+         ContainerIterator containerIter = getContainerIterator();
 
          while (containerIter.hasNext()) {
             Container container = containerIter.next();
@@ -76,7 +76,7 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     * @see com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload#getContainerIterator()
     */
    @Override
-   public AbstractDataBlockIterator<Container> getContainerIterator() {
+   public ContainerIterator getContainerIterator() {
       return new PayloadContainerIterator(this, getDataBlockReader(), getOffset());
    }
 }

@@ -11,7 +11,7 @@ package com.github.jmeta.library.datablocks.api.types;
 
 import java.util.Iterator;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.ContainerIterator;
 
 /**
  * {@link ContainerBasedPayload} represents a {@link Payload} that solely consists of {@link Container}s only.
@@ -25,6 +25,6 @@ public interface ContainerBasedPayload extends Payload {
     * @return an {@link Iterator} for retrieving the child {@link Container}s of this {@link Payload}. Might return an
     *         {@link Iterator} that does not return any children if this {@link Payload} has none.
     */
-   public AbstractDataBlockIterator<Container> getContainerIterator();
+   public ContainerIterator getContainerIterator();
 
 }

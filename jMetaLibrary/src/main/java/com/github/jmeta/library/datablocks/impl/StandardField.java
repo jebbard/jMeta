@@ -13,11 +13,12 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
+import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
-import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -46,27 +47,27 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * @param <T>
  *           the exact type of interpreted value stored in this {@link StandardField}.
  */
-public class StandardField<T> implements Field<T> {
-
-   private int sequenceNumber;
-   private ContainerContext containerContext;
+public class StandardField<T> extends AbstractDataBlock implements Field<T> {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSequenceNumber()
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
     */
    @Override
-   public int getSequenceNumber() {
-      return 0;
+   public long getSize() {
+
+      if (m_byteValue != null) {
+         return m_byteValue.remaining();
+      }
+
+      return DataBlockDescription.UNDEFINED;
    }
 
    private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext) {
+      ContainerContext containerContext, DataBlockReader reader, DataBlock parent) {
+      super(fieldDesc.getId(), parent, reference, reader, sequenceNumber, containerContext);
       Reject.ifNull(fieldDesc, "fieldDesc");
 
       m_desc = fieldDesc;
-      this.sequenceNumber = sequenceNumber;
-      this.containerContext = containerContext;
-      m_mediumReference = reference;
       m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
       m_byteOrder = containerContext.getByteOrderOf(getId(), sequenceNumber);
       m_characterEncoding = containerContext.getCharacterEncodingOf(getId(), sequenceNumber);
@@ -84,13 +85,12 @@ public class StandardField<T> implements Field<T> {
     *           TODO
     */
    public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext) {
-      this(fieldDesc, reference, sequenceNumber, containerContext);
+      ContainerContext containerContext, DataBlockReader reader) {
+      this(fieldDesc, reference, sequenceNumber, containerContext, reader, null);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
 
       m_interpretedValue = interpretedValue;
-      m_totalSize = DataBlockDescription.UNDEFINED;
    }
 
    /**
@@ -105,51 +105,12 @@ public class StandardField<T> implements Field<T> {
     *           TODO
     */
    public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
-      int sequenceNumber, ContainerContext containerContext) {
-      this(fieldDesc, reference, sequenceNumber, containerContext);
+      int sequenceNumber, ContainerContext containerContext, DataBlockReader reader, DataBlock parent) {
+      this(fieldDesc, reference, sequenceNumber, containerContext, reader, parent);
 
       Reject.ifNull(byteValue, "byteValue");
 
       m_byteValue = byteValue;
-      m_totalSize = byteValue.remaining();
-   }
-
-   @Override
-   public String getStringRepresentation() throws BinaryValueConversionException {
-
-      return getInterpretedValue().toString();
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(MediumOffset, int)
-    */
-   @Override
-   public ByteBuffer getBytes(MediumOffset offset, int size) {
-      Reject.ifNegative(size, "size");
-      Reject.ifNull(offset, "offset");
-      Reject.ifTrue(offset.before(getOffset()), "offset.before(getOffset())");
-      Reject.ifFalse(offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize(),
-         "offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize()");
-
-      ByteBuffer subBytes = ByteBuffer.allocate(size);
-
-      ByteBuffer value;
-      try {
-         value = getBinaryValue();
-         int relativeOffset = (int) (offset.getAbsoluteMediumOffset() - getOffset().getAbsoluteMediumOffset());
-
-         for (int currentIndex = relativeOffset; currentIndex < relativeOffset + size; currentIndex++) {
-            subBytes.put(value.get(value.position() + currentIndex));
-         }
-      } catch (InterpretedValueConversionException e) {
-         // TODO writeConcept003: log conversion error or return null?
-         assert e != null;
-         return null;
-      }
-
-      subBytes.rewind();
-
-      return subBytes;
    }
 
    @Override
@@ -157,58 +118,9 @@ public class StandardField<T> implements Field<T> {
 
       if (m_byteValue == null) {
          m_byteValue = convertToBinary();
-         m_totalSize = m_byteValue.remaining();
       }
 
       return m_byteValue;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getOffset()
-    */
-   @Override
-   public MediumOffset getOffset() {
-
-      return m_mediumReference;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getParent()
-    */
-   @Override
-   public DataBlock getParent() {
-
-      return m_parent;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getId()
-    */
-   @Override
-   public DataBlockId getId() {
-
-      return m_desc.getId();
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
-    */
-   @Override
-   public long getSize() {
-
-      return m_totalSize;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#initParent(com.github.jmeta.library.datablocks.api.types.DataBlock)
-    */
-   @Override
-   public void initParent(DataBlock parent) {
-
-      Reject.ifNull(parent, "parent");
-      Reject.ifFalse(getParent() == null, "getParent() == null");
-
-      m_parent = parent;
    }
 
    /**
@@ -244,14 +156,6 @@ public class StandardField<T> implements Field<T> {
       }
 
       return m_fieldConverter.toInterpreted(m_byteValue, m_desc, m_byteOrder, m_characterEncoding);
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getContainerContext()
-    */
-   @Override
-   public ContainerContext getContainerContext() {
-      return containerContext;
    }
 
    private ByteBuffer convertToBinary() throws InterpretedValueConversionException {
@@ -303,10 +207,6 @@ public class StandardField<T> implements Field<T> {
    private Charset m_characterEncoding;
 
    private ByteOrder m_byteOrder;
-
-   private MediumOffset m_mediumReference;
-
-   private long m_totalSize;
 
    private ByteBuffer m_byteValue;
 

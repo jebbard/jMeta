@@ -394,8 +394,7 @@ public abstract class AbstractDataBlockAccessorTest {
     *           The medium to check
     */
    private void assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
-      AbstractDataBlockIterator<Container> topLevelContainerIterator = getTestling().getContainerIterator(medium,
-         false);
+      TopLevelContainerIterator topLevelContainerIterator = getTestling().getContainerIterator(medium, false);
 
       Assert.assertNotNull(topLevelContainerIterator);
 
@@ -416,8 +415,8 @@ public abstract class AbstractDataBlockAccessorTest {
     *           The medium to check
     */
    private void assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
-      AbstractDataBlockIterator<Container> topLevelReverseContainerIterator = getTestling()
-         .getReverseContainerIterator(medium, false);
+      TopLevelContainerIterator topLevelReverseContainerIterator = getTestling().getReverseContainerIterator(medium,
+         false);
 
       Assert.assertNotNull(topLevelReverseContainerIterator);
 
@@ -435,14 +434,14 @@ public abstract class AbstractDataBlockAccessorTest {
     * Recursively checks all {@link Container}s starting with the given iterator.
     *
     * @param containerIterator
-    *           The {@link AbstractDataBlockIterator}
+    *           The {@link ContainerIterator}
     * @param parentInstanceId
     *           The parent of the iterated children or null if it is a top-level container iterator.
     * @param reverseReading
     *           true if the containers are currently read in reverse mode, false otherwise.
     */
-   private void checkContainers(AbstractDataBlockIterator<Container> containerIterator,
-      DataBlockInstanceId parentInstanceId, boolean reverseReading) {
+   private void checkContainers(ContainerIterator containerIterator, DataBlockInstanceId parentInstanceId,
+      boolean reverseReading) {
 
       List<DataBlockInstanceId> expectedIds = null;
 
@@ -642,10 +641,6 @@ public abstract class AbstractDataBlockAccessorTest {
             } else {
                Assert.assertEquals(expectedFieldValue, actualFieldValue);
             }
-
-            String stringRepresentation = field.getStringRepresentation();
-
-            Assert.assertNotNull(stringRepresentation);
          } catch (BinaryValueConversionException e) {
             ExpectedFailedFieldConversionData convData = expectationProvider
                .getExpectedFailingFieldConversions(expectedFieldId);

@@ -1,5 +1,5 @@
 /**
- * {@link TopLevelContainerIterator}.java
+ * {@link StandardTopLevelContainerIterator}.java
  *
  * @author Jens Ebert
  * @date 31.12.10 19:47:08 (December 31, 2010)
@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -28,11 +28,18 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link TopLevelContainerIterator} is used to read all top-level {@link Container}s present in a {@link Medium}. It
- * can be operated in two modes: Forward reading (the default mode) where the medium is iterated with increasing offsets
- * and backward reading for reading a medium (mainly: files or byte arrays) from back to front.
+ * {@link StandardTopLevelContainerIterator} is used to read all top-level {@link Container}s present in a
+ * {@link Medium}. It can be operated in two modes: Forward reading (the default mode) where the medium is iterated with
+ * increasing offsets and backward reading for reading a medium (mainly: files or byte arrays) from back to front.
  */
-public class TopLevelContainerIterator extends AbstractDataBlockIterator<Container> {
+public class StandardTopLevelContainerIterator implements TopLevelContainerIterator {
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.ContainerIterator#remove()
+    */
+   @Override
+   public void remove() {
+   }
 
    private MediumOffset currentOffset;
 
@@ -47,7 +54,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
    private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
 
    /**
-    * Creates a new {@link TopLevelContainerIterator}.
+    * Creates a new {@link StandardTopLevelContainerIterator}.
     *
     * @param medium
     *           The {@link Medium} to iterate, must not be null
@@ -58,7 +65,7 @@ public class TopLevelContainerIterator extends AbstractDataBlockIterator<Contain
     * @param forwardRead
     *           true for forward reading, false for backward reading
     */
-   public TopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
+   public StandardTopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
       MediumStore mediumStore, boolean forwardRead) {
       Reject.ifNull(medium, "medium");
       Reject.ifNull(readers, "readers");

@@ -14,11 +14,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
-import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
@@ -119,19 +118,18 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
     * @see DataBlockAccessor#getContainerIterator
     */
    @Override
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
+   public TopLevelContainerIterator getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
 
       Reject.ifNull(medium, "medium");
 
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new TopLevelContainerIterator(medium, forwardReaders, mediumStore, true);
+      return new StandardTopLevelContainerIterator(medium, forwardReaders, mediumStore, true);
    }
 
    @Override
-   public AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium,
-      boolean forceMediumReadOnly) {
+   public TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
       Reject.ifNull(medium, "medium");
 
       if (!medium.isRandomAccess()) {
@@ -141,7 +139,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new TopLevelContainerIterator(medium, backwardReaders, mediumStore, false);
+      return new StandardTopLevelContainerIterator(medium, backwardReaders, mediumStore, false);
    }
 
    private final DataFormatRepository m_repository;

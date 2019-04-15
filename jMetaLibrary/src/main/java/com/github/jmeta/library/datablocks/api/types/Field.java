@@ -26,10 +26,4 @@ public interface Field<T> extends DataBlock {
     * @throws InterpretedValueConversionException
     */
    public ByteBuffer getBinaryValue() throws InterpretedValueConversionException;
-
-   /**
-    * @return the string representation
-    * @throws BinaryValueConversionException
-    */
-   public String getStringRepresentation() throws BinaryValueConversionException;
 }

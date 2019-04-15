@@ -10,7 +10,6 @@ package com.github.jmeta.library.datablocks.api.services;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
@@ -35,14 +34,12 @@ public interface DataBlockAccessor {
     *           false if the default behavior should be chosen.
     * @return the {@link Iterator} for iterating all the top-level {@link DataBlock}s of the {@link AbstractMedium}.
     */
-   public AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium,
-      boolean forceMediumReadOnly);
+   public TopLevelContainerIterator getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly);
 
    /**
     * @param medium
     * @param forceMediumReadOnly
-    * @return a reverse {@link AbstractDataBlockIterator}
+    * @return a reverse {@link ContainerIterator}
     */
-   public AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium,
-      boolean forceMediumReadOnly);
+   public TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly);
 }

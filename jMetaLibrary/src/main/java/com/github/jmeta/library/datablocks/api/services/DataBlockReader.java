@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Header;
@@ -49,14 +50,15 @@ public interface DataBlockReader {
    /**
     * @param reference
     * @param parentId
-    * @param context
     * @param remainingDirectParentByteCount
+    * @param parent TODO
     * @param containerContext
     *           TODO
+    * @param context
     * @return the list of read {@link Field}s
     */
    public List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, long remainingDirectParentByteCount,
-      ContainerContext containerContext);
+      DataBlock parent, ContainerContext containerContext);
 
    /**
     * Returns the next {@link Header} instance with the given {@link DataBlockId} assumed to be stored starting at the

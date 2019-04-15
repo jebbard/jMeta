@@ -22,6 +22,7 @@ import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecifi
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_MAGIC_KEY_INVALID_FIELD_VALUE;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_NUMERIC_FIELD_TOO_LONG;
 import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_TERMINATION_CHAR_NON_STRING;
+import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_TOO_BIG_FIELD_LENGTH;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -51,6 +52,11 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  *           The interpreted type of the field
  */
 public class FieldProperties<F> {
+
+   /**
+    * The maximum size of a field
+    */
+   public static final long MAX_FIELD_SIZE = Integer.MAX_VALUE;
 
    private static final Map<FieldType<?>, FieldConverter<?>> FIELD_CONVERTERS = new HashMap<>();
    static {
@@ -402,6 +408,14 @@ public class FieldProperties<F> {
       long maximumByteLength = desc.getMaximumByteLength();
 
       boolean hasFixedSize = minimumByteLength == maximumByteLength;
+
+      if (maximumByteLength != DataBlockDescription.UNDEFINED && maximumByteLength > MAX_FIELD_SIZE) {
+         throw new InvalidSpecificationException(VLD_TOO_BIG_FIELD_LENGTH, desc, maximumByteLength);
+      }
+
+      if (minimumByteLength != DataBlockDescription.UNDEFINED && minimumByteLength > MAX_FIELD_SIZE) {
+         throw new InvalidSpecificationException(VLD_TOO_BIG_FIELD_LENGTH, desc, minimumByteLength);
+      }
 
       // Validate magic key
       if (isMagicKey()) {

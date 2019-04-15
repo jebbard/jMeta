@@ -44,7 +44,7 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
     * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
     *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      com.github.jmeta.library.datablocks.api.types.Payload, long, int,
-    *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    *      com.github.jmeta.library.datablocks.impl.ContainerContext)
     */
    @Override
    public Container readContainerWithId(MediumOffset currentOffset, DataBlockId id, Payload parent,
@@ -54,7 +54,7 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
 
       getMediumDataProvider().bufferBeforeRead(currentOffset, remainingDirectParentByteCount);
 
-      ContainerContext newContainerContext = new ContainerContext(getSpecification(), containerContext,
+      ContainerContext newContainerContext = new StandardContainerContext(getSpecification(), containerContext,
          getCustomSizeProvider(), getCustomCountProvider());
 
       DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,

@@ -7,13 +7,12 @@
 
 package com.github.jmeta.library.datablocks.impl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator;
+import com.github.jmeta.library.datablocks.api.services.ContainerIterator;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -26,17 +25,16 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
-public class PayloadContainerIterator extends AbstractDataBlockIterator<Container> {
-
-   private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
+public class PayloadContainerIterator implements ContainerIterator {
 
    /**
-    * @see java.io.Closeable#close()
+    * @see com.github.jmeta.library.datablocks.api.services.ContainerIterator#remove()
     */
    @Override
-   public void close() throws IOException {
-      // Closing a PayloadContainerIterator has no effect
+   public void remove() {
    }
+
+   private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
 
    /**
     * Creates a new instance of {@link PayloadContainerIterator}.
@@ -72,8 +70,8 @@ public class PayloadContainerIterator extends AbstractDataBlockIterator<Containe
       long remainingParentByteCount = DataBlockDescription.UNDEFINED;
 
       if (m_parent.getSize() != DataBlockDescription.UNDEFINED) {
-         remainingParentByteCount = m_parent.getSize() - (m_nextContainerReference.getAbsoluteMediumOffset()
-            - m_parent.getOffset().getAbsoluteMediumOffset());
+         remainingParentByteCount = m_parent.getSize()
+            - (m_nextContainerReference.getAbsoluteMediumOffset() - m_parent.getOffset().getAbsoluteMediumOffset());
 
          if (remainingParentByteCount <= 0) {
             return false;
