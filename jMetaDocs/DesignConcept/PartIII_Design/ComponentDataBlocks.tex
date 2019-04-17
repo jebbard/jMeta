@@ -499,7 +499,7 @@ No disadvantages known
 %%%% <-- DD %%%%
 
 % -------------------------------------------------------------------------------------------------------
-\subsubsection{Lazy Fields}%
+\subsubsection{A Need for Lazy Fields?}%
 \label{sec:LazyFields}%
 
 In this section, we want to investigate if we need a kind of lazy field (similar to lazy payload as described in \DesLink{dd:607}). The idea: What if a field is large and we know this in advance? Should we read all field bytes into memory or rather not?
@@ -512,21 +512,21 @@ First of all, we shall check if there are cases that clearly come to mind here:
 \item RIFF, QuickTime and Matroska might have arbitrary large payload, and thus arbitrary large fields to read
 \end{itemize}
 
-Thus, considering the formats, we already see that large fields might occur. So we define:
+It looks like that it is unavoidable that large fields might occur. However, there is still an easy way to circumvent this and define a maximum size, and no field lazyness:
 
 %%%% DD --> %%%%
 \DD{dd:652}
 {% Title
-Lazy fields in case field size is known and exceeds the maximum read-write block size 
+Fields must only have a maximum size of \texttt{Integer.MAX\_VALUE}, no lazy field mechanism 
 }
 {% Short description
-A special case for large fields is introduced: If the field size is known in advance (i.e. is either static or given by field function or remaining parent size) and is bigger than the maximum read-write block size, the field is created as lazy field and its bytes are only first read when explicitly requested by the user.
+There is no special case for large fields in \LibName{}. Instead, we simply define that the maximum length of a field must not exceed \texttt{Integer.MAX\_VALUE}. This is already checked during specification validation. If a need arises to support unstructured payload longer than this, the specification can simply define a field with maximum size \texttt{Integer.MAX\_VALUE} and more than one occurrence.
 }
 {% Rationale
-This avoids unwanted out-of-memory conditions. Terminated fields, where field size is not known in advance, need not be lazy, as when determining their size, they are anyway read into memory.
+Avoids unnecessary complexity due to yet another special case.
 }
 {% Disadvantages
-Slight increase in complexity
+In theory, if fields actually reach \texttt{Integer.MAX\_VALUE} and the user actually reads the field, an OOM might occur.
 }
 %%%% <-- DD %%%%
 
@@ -654,7 +654,7 @@ However, if we do it like that, one question immediately arises: What does the u
 %%%% DD --> %%%%
 \DD{dd:661}
 {% Title
-The user sees the dirty state of the containers when calling read methods
+The user sees the dirty state of the containers when calling getter methods with just one exception (see next design decision)
 }
 {% Short description
 Once the user has done changes on a \IMediumStore{} using the writing API of \COMPdataPartManagement{}, these changes will be visible and active in the reading API of \COMPdataPartManagement{}, even if they are not yet flushed. Removed blocks won't be returned anymore, inserted blocks will be returned, and changed field values will also be returned. The user would not see these changes using another \IMediumStore{} to access the medium. However, this is not possible due to the locking concept of \COMPmedia{}.
@@ -665,6 +665,23 @@ Once the user has done changes on a \IMediumStore{} using the writing API of \CO
 It would be quite strange for the user if data blocks previously inserted would not be returned again when reiterating the blocks. This could cause confusion for the users and would e.g. not offer the possibility to undo changes if the user did not keep a reference to an insterted block.
 }
 {% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Here comes the sole exception:
+%%%% DD --> %%%%
+\DD{dd:661b}
+{% Title
+Retrieval of raw bytes always only returns currently flushed state
+}
+{% Short description
+Retrieval of raw bytes always only returns currently flushed state. That means it will still return bytes for currently removed data blocks, but it won't return bytes for inserted or new data blocks.
+}
+{% Rationale
+Read methods in \COMPmedia{} only return the medium state (see \DesLink{dd:410c}), because doing things otherwise would have made it all even more complex. Likewise, also here, instead of building castles in the sky just for the rare case that a user might find it convenient to get the bytes according to the not-yet-persisted dirty state, we won't waste much time. Javadocs could state this behaviour easily.
+}
+{% Disadvantes
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -717,7 +734,7 @@ For every writing action, \COMPdataPartManagement{} strictly checks the validity
 {% Rationale
 Fail fast is a good principle, here even more. We want to avoid the user to write any crap to the medium that cannot be re-read, as it might be utter nonsense.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -771,7 +788,7 @@ A datablock in \LibName{} has one of the states listed in table \ref{tab:Datablo
 {% Rationale
 Depending on the state, some actions are legal or illegal, or need to be performed differently. Further on, the user must have transparency what has been done with a block so far, so the state is a good indication. Other states than the ones mentioned are not required. A separate \texttt{MODIFIED} is needed due to fields whose values can be changed.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -789,7 +806,7 @@ Any change to a datablock leads to the same state change in all its children and
 {% Rationale
 Obviously, all descendants are contained within the bounds of the datablock. So if it becomes \texttt{NEW}, \texttt{PERSISTED}, \texttt{INSERTED}, \texttt{REMOVED} or \texttt{MODIFIED}, all its descendants also do.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -806,7 +823,7 @@ A datablock changes into the \texttt{MODIFIED} state once any of its descendants
 {% Rationale
 A change in any child leads to an actual change of data contained in the datablock. It would be misleading if the API would still say the datablock is \texttt{PERSISTED}, no matter there are unflushed changes in a child. Furthermore, implementing things such as flushing or undo will probably be easier if you can tell which top-level data blocks were modified in some way instead of needing to search all children until the leaf nodes of the hierarchy to find out.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -841,6 +858,23 @@ A factory instance accessible by the user is required to create new instances of
 }
 {% Rationale
 A factory is a class that can create a family of products. This is clearly the case for data blocks. Different implementations can be created in future, if necessary. There is no direct dependency from user code to concrete data block classes. Some validations are done here already according to \DesLink{dd:662}.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Another question to be answered is about the lifecycle of the factory. Should it be stateless and singleton or is there any use in having multiple instances?
+%%%% DD --> %%%%
+\DD{dd:675b}
+{% Title
+One factory instance per medium
+}
+{% Short description
+There is exactly one instance of the factory per medium and reader.
+}
+{% Rationale
+The only reason for this is that thus the create methods may have less parameters, as we can pass reader, specification and \IMediumStore{} to the factory via constructor instead of passing them every time.
 }
 {% Disadvantes
 No disadvantages known
@@ -905,15 +939,15 @@ One thing for parent datablocks containing lists of children: Can a user modify 
 %%%% DD --> %%%%
 \DD{dd:679}
 {% Title
-Lists of headers, footers and fields are unmodifiable
+Lists of headers, footers and fields are unmodifiable for the user, but are internally updated by the insert methods
 }
 {% Short description
-A user can retrieve the child headers, footers or fields as a list. However, it is prevented that the user adds new children or otherwise modifies theses lists.
+A user can retrieve the child headers, footers or fields as a list. However, it is prevented that the user adds new children or otherwise modifies theses lists. Insert methods take care to also insert the child into the internal lists, if necessary.
 }
 {% Rationale
 This way, there is no way in messing up the internal lists, and it is quite clear that the insert methods are the intended way to go.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -939,7 +973,7 @@ The following checks against the specification are performed when inserting a ne
 {% Rationale
 In accordance to \DesLink{dd:662}
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -956,7 +990,7 @@ The datablock to insert must have the state \texttt{NEW}. The parent datablock m
 {% Rationale
 Allowing other states than \texttt{NEW} for the to-be-inserted block would lead to strange use cases such as ``remounting'' an already persisted datablocks which we want to avoid. It is thus clear to the user: If I want to insert a data block, I have to newly create it or at least remove and flush it before. The parent state must not be \texttt{REMOVED}, because what sense would it make to add new children to a parent block which is entirely removed anyway on next flush?
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -973,7 +1007,7 @@ If the parent block is \texttt{NEW}, the inserted datablock remains \texttt{NEW}
 {% Rationale
 The states thus are quite conceivable.
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -985,7 +1019,7 @@ As described in \DesLink{dd:662}, we need to adress fields with field functions 
 Changes in field functions fields during inserts
 }
 {% Short description
-  If a datablock is inserted into a previously \texttt{PERSISTED}, \texttt{INSERTED} or \texttt{MODIFIED} parent, it needs to be checked which fields refer to the size, count or presence of the block itself or one of its ancestors. For each affected field function field, the following is done:
+  If a datablock is inserted into a parent of any state, it needs to be checked which fields refer to the size, count or presence of the block itself or one of its ancestors. For each affected field function field, the following is done:
   \begin{itemize}
   \item \texttt{SizeOf} and \texttt{SummedSizeOf}: Add the newly inserted block's size to the current interpreted value of the field
   \item \texttt{PresenceOf}: Set the flag indicating the presence to the value indicated by the field function
@@ -995,7 +1029,7 @@ Changes in field functions fields during inserts
 {% Rationale
 Required by \DesLink{dd:662}
 }
-{% Disadvantes
+{% Disadvantages
 No disadvantages known
 }
 %%%% <-- DD %%%%
@@ -1048,7 +1082,7 @@ We choose \textbf{Option 1: Insert bottom-up (fine-grained insertions)}: When in
 
   Doing it in field order is clearly indicated by \DesLink{dd:422}, as the insert offset for all new fields will be the same, their order must be clearly indicated by the call order of \texttt{insertData}. Doing it in another order thus would mess up the structure of the datablock, as fields are not persisted in the correct order as indicated in the data format specification.
 }
-{% Disadvantes
+{% Disadvantages
 See table \ref{tab:InsertProCon}, disadvantes of option 1, but note the mitigations we noted down in the rationale.
 }
 %%%% <-- DD %%%%
@@ -1066,42 +1100,857 @@ It is not allowed to insert a new data block into an already \texttt{INSERTED} a
 {% Rationale
 This reduces complexity, as otherwise one would need to first undo all inserts of fields that come behind the newly inserted child, and then reinsert to ensure they have the right order after a flush (compare \DesLink{dd:422}).
 }
-{% Disadvantes
+{% Disadvantages
 Of course this is less convenient for the user, as he must ensure that such ``late'' insertions do not happen, but he only inserts fully assembled data blocks before a flush.
 }
 %%%% <-- DD %%%%
+
+At first glance, it seems utterly inlikely that a user of \LibName{} would want to insert a data block larger than int size (i.e. 2.15 gigabytes). However, a data block may have theoretically long size. Thus, however unlikely this might be, we have to cover this case:
+%%%% DD --> %%%%
+\DD{dd:685b}
+{% Title
+Inserting a data block longer than max int size by multiple inserts in \COMPmedia{}
+}
+{% Short description
+Inserting a data block being longer than maximum integer size is done by issuing multiple inserts in \COMPmedia{}. The datablock thus has to keep multiple \texttt{MediumAction}s.
+}
+{% Rationale
+All \COMPmedia{} methods taking a size are using int as data type to ensure only single \texttt{ByteBuffer}s need to be handled, see section \SectionLink{sec:ZugriffEinesTERMmedium}. And as our data blocks could have max long size, we need to cover this case, too. Anyway, it might not be unlikely anymore that a user comes with huge data blocks, as RAMs also increase year by year.
+}
+{% Disadvantes
+We have to manage multiple \texttt{MediumAction}s in a data block, probably leading to more complexity for undo operations and the like.
+}
+%%%% <-- DD %%%%
+
 
 % -------------------------------------------------------------------------------------------------------
 
 \subsubsection{Removing Data Blocks}%
 \label{sec:RemovingDatablocks}%
 
+Removal of data blocks can be designed in a very similar way to insertion.
+
+\texttt{PERSISTED}, \texttt{MODIFIED}, \texttt{INSERTED} or \texttt{NEW} datablocks are removed in their parent or at the top-level of the medium, respectively. Here, one could argue that also having a remove method on the child itself could be valid, as a data block has at most one parent. But we go for the same approach as for insertion:
+%%%% DD --> %%%%
+\DD{dd:690}
+{% Title
+Remove methods for headers, footers and fields in their parent data block
+}
+{% Short description
+To remove headers, footers or fields, there are corresponding insert methods that do the job in the corresponding datablock class. They take an index that must be valid.
+}
+{% Rationale
+We are in line with insertion design and this is the way of least surprise. Having a remove method in the child would only confuse API users. Anyway, there are not so much commonalitities that a single method would make sense, i.e. removing of a header might differ from removal of a field.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+%%%% DD --> %%%%
+\DD{dd:691}
+{% Title
+Remove methods for containers in container iterators
+}
+{% Short description
+For both top-level as well as payload container iterators, there is a remove method in the iterator removing a container before the next container. That means to remove at a specific position, users first need to iterate to it. Likewise, the iterator's remove method can be designed to also the container remove method. 
+}
+{% Rationale
+This is quite similar to the removal of headers, footers and fields.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Payload is simply a mandatory datablock and thus cannot be removed:
+%%%% DD --> %%%%
+\DD{dd:692}
+{% Title
+No remove method for payload datablocks
+}
+{% Short description
+Payload children cannot be removed
+}
+{% Rationale
+There is always just exactly one payload in a container and it is mandatory.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+For the lists of children in parents, the very same design decision holds true as for insertions, see \DesLink{dd:679}, meaning that remove methods manage also removing the child from the internal lists, if necessary.
+
+In \DesLink{dd:662} it was said that specification validity should be ensured as early as possible, for removals that means:
+%%%% DD --> %%%%
+\DD{dd:693}
+{% Title
+Specification validations during removal
+}
+{% Short description
+The following checks against the specification are performed when removing a child, and if these checks fail, a runtime exception is thrown:
+\begin{itemize}
+\item Is the parent read-only?
+\item Is the minimum parent size reached with this removal (e.g. is the parent fixed size)?
+\item Is the minimum number of occurrences reached, e.g. is the data block present just once and not optional?
+\end{itemize}
+}
+{% Rationale
+In accordance to \DesLink{dd:662}
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+If all these checks are done, further validations regarding the parent and child state are necessary:
+%%%% DD --> %%%%
+\DD{dd:694}
+{% Title
+Required datablock states
+}
+{% Short description
+The datablock to remove as well as its parent must have one of the states \texttt{NEW}, \texttt{PERSISTED}, \texttt{MODIFIED} or \texttt{INSERTED}. That means neither the block to remove nor its parent must have been already removed. If one of these conditions is not met, a runtime exception is thrown.
+}
+{% Rationale
+For all of these states, it would be a valid need for a user to remove a block. We could even be tolerant in accepting removes for already removed blocks.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+The next question regarding states is: How do states change after the remove?
+%%%% DD --> %%%%
+\DD{dd:695}
+{% Title
+State changes caused by a removal
+}
+{% Short description
+If the parent block or the to-be-removed block is \texttt{NEW}, it remains \texttt{NEW}. If the removed block is \texttt{INSERTED}, it becomes \texttt{NEW}. Otherwise the removed block and all its descendants are changed into state \texttt{REMOVED}. The parent becomes \texttt{MODIFIED}, if it was \texttt{PERSISTED} before, otherwise it remains in its previous state.
+}
+{% Rationale
+The states thus are quite conceivable.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+As described in \DesLink{dd:662}, we need to adress fields with field functions during removal. How this is done is described in the following design decision:
+%%%% DD --> %%%%
+\DD{dd:696}
+{% Title
+Changes in field functions fields during removals
+}
+{% Short description
+  If a datablock is removed from a parent of any state, it needs to be checked which fields refer to the size, count or presence of the block itself or one of its ancestors. For each affected field function field, the following is done:
+  \begin{itemize}
+  \item \texttt{SizeOf} and \texttt{SummedSizeOf}: Subtract the removed block's size from the current interpreted value of the field
+  \item \texttt{PresenceOf}: Set the flag indicating the absence to the value indicated by the field function
+  \item \texttt{CountOf}: Decrement the current interpreted value of the field by 1
+  \end{itemize}
+}
+{% Rationale
+Required by \DesLink{dd:662}
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Finally, we need to think about how the removal of bytes really happens. For insertions, we said that it would be best to have one low-level \COMPmedia{} insert for each inserted field as these contain the bytes. For removals, we do it the other way round:
+
+%%%% DD --> %%%%
+\DD{dd:697}
+{% Title
+Remove uses \COMPmedia{}s remove scheduling, done for the actually removed data block
+}
+{% Short description
+A remove is scheduled for the data block that is removed over its whole size.
+}
+{% Rationale
+In contrast to insertions, we do not need to state which bytes to remove by having these, but you just can say \emph{how much} bytes to remove (see section \SectionLink{sec:ZugriffEinesTERMmedium}). It is more efficient to issue just one such remove instead of hierarchically traversing all fields and issueing separate removes. 
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Removes of children that are already removed are not possible (see \DesLink{dd:694}). However, at least it could happen that a user first removes a child, then the parent. This is allowed:
+
+%%%% DD --> %%%%
+\DD{dd:698}
+{% Title
+Removing an ancestor of an already \texttt{REMOVED} datablock is allowed
+}
+{% Short description
+It is allowed to remove an ancestor of an already \texttt{REMOVED} block.
+}
+{% Rationale
+Removing a region from the medium fully encompassing an already removed region is also an allowed use case in \COMPmedia{} and leads to the first remove being cancelled (see \DesLink{dd:424bb}).
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Quite in accordance with insertion (\DesLink{dd:685b}), we have to handle the case of removal of data blocks larger than int size:
+%%%% DD --> %%%%
+\DD{dd:698b}
+{% Title
+Removing a data block longer than max int size by multiple removes in \COMPmedia{}
+}
+{% Short description
+Removing a data block being longer than maximum integer size is done by issuing multiple removes in \COMPmedia{}. The datablock thus has to keep multiple \texttt{MediumAction}s.
+}
+{% Rationale
+All \COMPmedia{} methods taking a size are using int as data type to ensure only single \texttt{ByteBuffer}s need to be handled, see section \SectionLink{sec:ZugriffEinesTERMmedium}. And as our data blocks could have max long size, we need to cover this case, too. Anyway, it might not be unlikely anymore that a user comes with huge data blocks, as RAMs also increase year by year.
+}
+{% Disadvantes
+We have to manage multiple \texttt{MediumAction}s in a data block, probably leading to more complexity for undo operations and the like.
+}
+%%%% <-- DD %%%%
+
 % -------------------------------------------------------------------------------------------------------
 \subsubsection{Modifying Datablocks}%
 \label{sec:ModifyingDatablocks}%
+
+Modifying data blocks mostly means modifying the value of a field. Clearly this is because all other data blocks are consisting of children, and these can be modified. Here we define the conditions for modifying field values.
+
+For modification, the user can use the following:
+%%%% DD --> %%%%
+\DD{dd:705}
+{% Title
+Setter for setting the interpreted as well as binary value of a field
+}
+{% Short description
+For fields, there is a setter for the binary value to directly set the bytes of the field as well as a setter for the interpreted value, i.e. ``human-readable'' value. Calling the interpreted value setter will immediately transform the value to bytes and vice versa.
+}
+{% Rationale
+This is quite fair to allow both representations to be changed.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now let us clarify the state handling of modifications of fields:
+%%%% DD --> %%%%
+\DD{dd:706}
+{% Title
+Fields in all states but \texttt{REMOVED} can be modified  
+}
+{% Short description
+The only state rejecting modification with a runtime exception is \texttt{REMOVED}.
+}
+{% Rationale
+Modifying a field's value that is anyway getting removed makes no sense, and would lead to runtime exceptions because of \DesLink{dd:424a}.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+In line with that, let's cover the state changes:
+%%%% DD --> %%%%
+\DD{dd:707}
+{% Title
+State changes caused by a modification
+}
+{% Short description
+If the parent block or the to-be-modified field is \texttt{NEW}, \texttt{MODIFIED} or \texttt{INSERTED}, both parent and field remain so. If the modified field and its parent are in state \texttt{PERSISTED}, both change into \texttt{MODIFIED} state.
+}
+{% Rationale
+The states thus are quite conceivable.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Field value changes of course also underly validation against specification:
+%%%% DD --> %%%%
+\DD{dd:708}
+{% Title
+Specification validations during field modification
+}
+{% Short description
+The following checks against the specification are performed when modifying a field, and if these checks fail, a runtime exception is thrown:
+\begin{itemize}
+\item Is the field read-only?
+\item Is the minimum or maximum field size reached with this change (e.g. is it fixed size)?
+\item Is the field value one of the allowed enumerated values?
+\item Can the field's interpreted value be converted to binary (and vice versa) without error?
+\end{itemize}
+}
+{% Rationale
+In accordance to \DesLink{dd:662}
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Quite the same way as for insertions and removals, we need to adress fields with field functions during modifications of a field. However, this has two aspects to it:
+%%%% DD --> %%%%
+\DD{dd:709}
+{% Title
+Changes in field functions fields during field modification
+}
+{% Short description
+  If a field is modified and its size changes by this modification, it needs to be checked which fields refer to the size of the field itself or one of its ancestors. For each affected field function field, the following is done for \texttt{SizeOf} and \texttt{SummedSizeOf}: Subtract or add the field size change from the current interpreted value of the field.
+}
+{% Rationale
+Required by \DesLink{dd:662}
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+%%%% DD --> %%%%
+\DD{dd:710}
+{% Title
+\texttt{CharacterEncodingOf} and \texttt{ByteOrderOf} fields lead to inverse changes
+}
+{% Short description
+If a field defines a \texttt{CharacterEncodingOf} or \texttt{ByteOrderOf} field function, it can be modified itself to reflect a different character encoding or byte order. Of course, to ensure consistency of the data according to \DesLink{dd:662}, the affected target blocks might need to be changed then: They need to be reformatted to match the newly set character encoding or byte order.
+}
+{% Rationale
+See \DesLink{dd:662}
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Finally, we have to think about how modifications of fields are brought to the medium:
+%%%% DD --> %%%%
+\DD{dd:711}
+{% Title
+Field modifications use \COMPmedia{}s replace scheduling
+}
+{% Short description
+Changing the value of a field schedules a replace in \COMPmedia{} as long as the field is not \texttt{NEW} or \texttt{INSERTED}.
+}
+{% Rationale
+Clearly the way to go as \texttt{PERSISTED} and \texttt{MODIFIED} fields clearly already are present on the medium, and thus modifying their value means to replace their previous value with something new. This also easily covers subsequent modificaitons of the same field: Simply issue the same replace multiple times, always specifying the old size as to be replaced and the new bytes (see \DesLink{dd:424a}).
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+For \texttt{NEW} and \texttt{INSERTED} fields, it holds:
+
+%%%% DD --> %%%%
+\DD{dd:711b}
+{% Title
+For fields still \texttt{NEW}, no replace is scheduled yet, for \texttt{INSERTED} fields, another insert is scheduled
+}
+{% Short description
+If a \texttt{NEW} field is modified, it means it anyway hasn't yet a scheduled \texttt{MediumAction}, so we also won't be scheduling any replace when modifying the field's value. For \texttt{INSERTED} fields, it holds that there is already a scheduled insert in accordance to \DesLink{dd:684}. This \texttt{MediumAction} needs to be undone, and instead a new insert with the new data needs to be scheduled.
+}
+{% Rationale
+These two states are different than the others and thus require the special handling.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+As unlikely as it seems now, again we have to handle the case of field modifications where the new field size exceeds integer maximum value:
+%%%% DD --> %%%%
+\DD{dd:712}
+{% Title
+Modifying a field to longer than max int size by multiple replaces in \COMPmedia{}
+}
+{% Short description
+Modifying a field being longer than maximum integer size is done by issuing multiple replaces in \COMPmedia{}. The datablock thus has to keep multiple \texttt{MediumAction}s.
+}
+{% Rationale
+All \COMPmedia{} methods taking a size are using int as data type to ensure only single \texttt{ByteBuffer}s need to be handled, see section \SectionLink{sec:ZugriffEinesTERMmedium}. And as our data blocks could have max long size, we need to cover this case, too. Anyway, it might not be unlikely anymore that a user comes with huge data blocks, as RAMs also increase year by year.
+}
+{% Disadvantes
+We have to manage multiple \texttt{MediumAction}s in a data block, probably leading to more complexity for undo operations and the like.
+}
+%%%% <-- DD %%%%
 
 % -------------------------------------------------------------------------------------------------------
 \subsubsection{Flushing}%
 \label{sec:Flushing}%
 
+Flushing all changes is unfortunately not exactly done by just calling flush of \COMPmedia{}.
+
+First of all, we have to think of where the flush actually happens:
+%%%% DD --> %%%%
+\DD{dd:720}
+{% Title
+Writing of all changes done in top-level container iterator
+}
+{% Short description
+The top-level container iterator offers a method to flush all previously made changes onto the medium. It is clear that this operation is not ACID as already pointed out in \DesLink{dd:663}.
+}
+{% Rationale
+The top-level container iterator is the starting point of working with a medium and the logical place to have the flushing method(s).
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Flushing in \COMPdataPartManagement{} needs to do the following:
+%%%% DD --> %%%%
+\DD{dd:721}
+{% Title
+Steps of flushing
+}
+{% Short description
+First of all, we call \texttt{MediumStore.flush()} to actually write all changes to the medium. Second, we set the states of all previously \texttt{INSERTED} or \texttt{MODIFIED} data blocks to \texttt{PERSISTED} again, and the states of all previously \texttt{REMOVED} data blocks to \texttt{NEW}.
+}
+{% Rationale
+Flushing the store actually invalidates all \texttt{MediumAction}s (see \DesLink{dd:439f}) and finally determins the actual \texttt{MediumOffset}s of each data block (see \DesLink{dd:418b}). Also cleaning up the states is clearly indicated. The order of operations is as such to at least have some basic sanity in case of failure: If flushing fails in the middle, i.e. some changes have been written and others not, at least the \texttt{MediumAction} and \texttt{MediumOffset}s up to the point of failure are valid and these updates are present in the data blocks. Only their states would not be correct. Even ``retrying'' would then probably be possible with just a few lines of special handling.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
 % -------------------------------------------------------------------------------------------------------
 \subsubsection{Undo all Changes}%
 \label{sec:UndoallChanges}%
+
+According to \DesLink{dd:663}, it has to be possible to undo changes done previously using insertions, removals or modifications. This especially becomes interesting if multiple changes are done before a flush.
+
+First of all, we have to think of where the ``undo all'' actually happens:
+%%%% DD --> %%%%
+\DD{dd:730}
+{% Title
+Undoing all changes is done in top-level container iterator
+}
+{% Short description
+The top-level container iterator offers a method to undo all previously made changes. It is clear that this operation is not ACID as already pointed out in \DesLink{dd:663}.
+}
+{% Rationale
+The top-level container iterator is the starting point of working with a medium and the logical place to have the undo all method(s).
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Now we not only need an undo all, but also the possibility to undo single changes with the following rules:
+%%%% DD --> %%%%
+\DD{dd:731}
+{% Title
+Undoing changes for \texttt{MODIFIED} and \texttt{INSERTED} data blocks
+}
+{% Short description
+For \texttt{MODIFIED} and \texttt{INSERTED} data blocks, there is an undo operation that undoes the change in \COMPmedia{} for fields or traverses all field children for non-fields and calls undo. During this process, for all \texttt{MODIFIED} fields, the previous field's value is re-read from the medium to be restored in place. For all \texttt{INSERTED} fields, the values remain unchanged. For previously \texttt{MODIFIED} data blocks, their state is set to \texttt{PERSISTED}, for previously \texttt{INSERTED} data blocks, their state is set to \texttt{NEW}.
+}
+{% Rationale
+  We have to somehow restore the initial state of the fields when undoing.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+%%%% DD --> %%%%
+\DD{dd:732}
+{% Title
+Undoing changes for \texttt{REMOVED} data blocks
+}
+{% Short description
+For \texttt{REMOVED} data blocks, the undo operation can only be called if the data blocks parent is not \texttt{REMOVED}, otherwise it fails. Then it undoes the \texttt{MediumAction} on the data block it is called and sets the states of all data blocks to \texttt{PERSISTED}.
+}
+{% Rationale
+  We have to somehow restore the initial state of the fields when undoing.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+However, a bigger complexity arises when assuming multiple changes done on the same data block before the removal. We first have to state clearly:
+%%%% DD --> %%%%
+\DD{dd:733}
+{% Title
+Undo is rather a reset as it does only reset to the \emph{initial} state
+}
+{% Short description
+When undoing, the operation does not restore the \emph{previous} state, but the \emph{initial} state of the data block. E.g. first inserting a new child, then removing it: Undo does not restore the child on first call and remove it again on the second. So undo uses no history or stack of any kind to behave like undo in an editor, e.g.
+}
+{% Rationale
+Otherwise we would need to keep tracke of a change history of some sort for each data block which would make things overly complicated. It is also not very likely that users actually need incremental undo functionalities. Rather, they just need the possibility to reset the initial state as read from the medium. 
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Still, even if we now made our lives easier, there is one case that requires a re-read of fields again:
+%%%% DD --> %%%%
+\DD{dd:774}
+{% Title
+Undo removal of fields that were previously modified
+}
+{% Short description
+If the user modifies a field previously read from the medium, the fields value (interpreted and binary) is changed to the new value. If the user than removes the field itself or its ancestor, it is set to \texttt{REMOVED}, still keeping the modified value. If the user now calls undo, the field would be \texttt{PERSISTED}, but with a value that does not match the fields actual value on the external medium. To mitigate this, whenever a \texttt{MODIFIED} field gets \texttt{REMOVED}, we re-read the fields actual value from the medium.
+}
+{% Rationale
+This is the most efficient way to handle this situation. Another possibility would have been to ``simple'' re-read all field values from the medium once a user undoes a remove, but this is very inefficient.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+% =======================================================================================================
+\subsection{Datablock Event Handling}%
+\label{sec:DatablockEventHandling}%
+
+We can see that insertion, removal or modification of a data block lead to a lot of things happening:
+\begin{itemize}
+\item State changes in the data block itself
+\item State changes in its ancestors as well as descendants
+\item Field function field updates
+\end{itemize}
+
+In addition, we need some way to know which data blocks were updated to be able to either flush or undo them all at once.
+
+These things can all be handled by a single measure:
+%%%% DD --> %%%%
+\DD{dd:740}
+{% Title
+Event handling mechanism for processing data block changes
+}
+{% Short description
+Data block changes emit events that are propagated to any interested party, i.e. those being registered for events. This includes ancestors, descendants as well as the container context and the top-level container iterator.
+}
+{% Rationale
+Changes do not only have local effect in the data block itself but need to cause changes at some other places, too. Instead of directly couple all those places together, we opt for a decoupling via event handling: A set of listeners registers to the event emitter and is notified if something changes. The listener decides if the event is of interest and processes it correspondingly. This decouples emitters and receivers way better, yet even allowing extending receivers to add new functionality in future.
+}
+{% Disadvantes
+Slight increase of complexity by introducing corresponding methods and classes for event handling
+}
+%%%% <-- DD %%%%
+
+One question we should answer is: How do the events look like, i.e. which data is contained? We can state that all events are somehow related to data blocks. Thus we define:
+%%%% DD --> %%%%
+\DD{dd:741}
+{% Title
+Class \texttt{DataBlockEvent} contains the event type and causing data block
+}
+{% Short description
+  We introduce a new class \texttt{DataBlockEvent} that contains:
+  \begin{itemize}
+  \item \textbf{The event type:} One of \texttt{INSERTED} (data block has been inserted), \texttt{PERSISTED} (data block has been persisted due to a flush), \texttt{REMOVED} (data block has been removed), \texttt{MODIFIED} (data block has been modified), \texttt{RESET} (data block has been reset, i.e. undone), \texttt{FLUSHED} (all changes where flushed), \texttt{RESET\_ALL} (all changes where reset, i.e. undone)
+  \item \textbf{The event time stamp:} States the point in time the event occurred
+  \item \textbf{The causing data block:} The data block that has caused the event, null for \texttt{FLUSHED} and \texttt{RESET\_ALL} 
+  \end{itemize}
+}
+{% Rationale
+Except flush and reset, we only have events related to data blocks. The receiver needs to know who caused the event to do the right thing, as well as what exactly has happened with the block.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+Another question is: How are events exactly propagated?
+%%%% DD --> %%%%
+\DD{dd:742}
+{% Title
+Broadcast bus  with all data blocks, container contexts and the top-level iterator as listeners
+}
+{% Short description
+A broadcast mechanism with a bus is used, all data blocks and container contexts as well as top-level iterators are registered as listeners. Every event causes a broadcast on the bus to all other receivers. They filter the event to decide if they need to do something and otherwise ignore it.
+}
+{% Rationale
+We have a central point for registration of listeners, notification as well as monitoring. Broadcasts are fine because all of the events are relevant for multiple, sometimes even all listeners. It is also more flexible and easier to extend than rigid solutions. 
+}
+{% Disadvantes
+Some listeners are unnecessarily informed about an event they do not care about. Second, it is not clear how we ensure that events are not repeated or lead to too much follow-up events.
+}
+%%%% <-- DD %%%%
+
+Finally, we shall ensure that an event does not lead to a flood of follow-up events:
+%%%% DD --> %%%%
+\DD{dd:743}
+{% Title
+A state change in a data block alone is not enough for an event
+}
+{% Short description
+Whenever a child is \texttt{MODIFIED}, \texttt{INSERTED} or \texttt{REMOVED}, a corresponding event is sent that lead to corresponding changes of states also in ancestors and descendants. However, for these indirect changes, no additional event is sent to the bus.
+}
+{% Rationale
+Avoids flooding of bus and listeners with secondary events and thus excludes the need for special case handling. Also, this might reduce the possibility of endless event loops.
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
 
 % =======================================================================================================
 \subsection{API Design}%
 \label{sec:APIDesign}%
 
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getId()} & Gets the \texttt{DataBlockId} of the \texttt{DataBlock} \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getSequenceNumber()} & Gets sequence number, which is the occurrence index in its parent \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getOffset()} & Returns the \texttt{MediumOffset} this \texttt{DataBlock} is currently located on the external medium or at least scheduled to be inserted at this position. Returns null if the \texttt{DataBlock} is still \texttt{NEW} or \texttt{INSERTED}. \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getSize()} & Returns the total size of the \texttt{DataBlock} in bytes, if currently known, or \texttt{DataBlockDescription.UNDEFINED} otherwise \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getState()} & Gets the current state of the \texttt{DataBlock}. \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getBytes(ofs, n)} & Gets the DataBlock's bytes starting at the given global offset with the given length. Both offset and length must be within the actual start offset plus total size range. The bytes are only returned if the \texttt{DataBlock} is in state \texttt{PERSISTED}, \texttt{REMOVED} or \texttt{MODIFIED}, and then taken from the external medium. For fields, this method also returns bytes for other states, which are the bytes actually set by the user. \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getContainerContext()} & Returns the \texttt{ContainerContext} of the next higher ancestor \texttt{Container} this \texttt{DataBlock} is associated with (either as it is the \texttt{Container} itself or its descendant). Returns null for \texttt{NEW} \texttt{DataBlock}s. \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.getParent()} & Returns the direct parent of the \texttt{DataBlock} if it is not \texttt{NEW}. Otherwise it returns null. For top-level \texttt{DataBlock}s, this method also returns null. \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.initParent(DataBlock)} & Initializes the parent \texttt{DataBlock}, i.e. must only be called once. \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.initContainerContext(ContainerContext)} & Initializes the \texttt{ContainerContext}, i.e. must only be called once. \\
+\hline
+\texttt{DataBlock}\linebreak\texttt{.reset()} & Resets all changes within this \texttt{DataBlock} itself and all its descendends, i.e. resets any modifications, removals and inserts. \\
+\hline
+\caption{Operations of the \texttt{DataBlock} interface}
+\label{tab:DBOpsDatablock}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{ContainerIterator}\linebreak\texttt{.hasNext()} & Tells whether there is a next \texttt{Container} available that can be retrieved using \texttt{next()}. \\
+\hline
+\texttt{ContainerIterator}\linebreak\texttt{.next()} & Returns the next \texttt{Container} instance if available or throws a runtime exception if not. It thus also advances the iterator. \\
+\hline
+\texttt{ContainerIterator}\linebreak\texttt{.remove()}, \texttt{ContainerIterator.removeContainer()} & Schedules the current \texttt{Container} for removal. If done before any calls to \texttt{next()}, this removes the first \texttt{Container}, if any. If there is no next \texttt{Container}, a runtime exception is thrown. \\
+\hline
+\texttt{ContainerIterator}\linebreak\texttt{.insertContainer(Container)} & Inserts a \texttt{NEW} \texttt{Container} in front of the current \texttt{Container}. This method is allowed to be called even if \texttt{hasNext()} returns false in order to append a new \texttt{Container} at the end of the current payload or medium. \\
+\hline
+\caption{Operations of the \texttt{ContainerIterator} interface}
+\label{tab:DBOpsContainerIterator}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{TopLevelContainerIterator}\linebreak\texttt{.close()} & Closes the use of the iterator for top-level container retrieval and writing. Once this is done, the instance must not be used anymore. It also closes the access to the underlying medium and cleans up any further resources. \\
+\hline
+\texttt{TopLevelContainerIterator}\linebreak\texttt{.writeAllChanges()} & Flushes all previously made changes (removals, inserts and modifications) to the external medium. \\
+\hline
+\texttt{TopLevelContainerIterator}\linebreak\texttt{.resetAllChanges()} & Resets all previously made changes (removals, inserts and modifications) as if they never happened. \\
+\hline
+\caption{Operations of the \texttt{TopLevelContainerIterator} interface}
+\label{tab:DBOpsTopLevelContainerIterator}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.getDataFormatSpecification()} & Returns the DataFormatSpecification this context belongs to. \\
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.getContainer()} & Returns the \texttt{Container} this context belongs to. \\
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.getParentContainerContext()} & Returns the parent \texttt{ContainerContext} or null if it refers to a top-level \texttt{Container}. \\
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.addFieldFunctions(Field)} & During reading: Adds all field functions of a given field (if any) to the \texttt{ContainerContext} \\
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.getSizeOf(DataBlockId, int)} & Tries to determine the size of the indicated \texttt{DataBlockId} with the given sequence number or \texttt{DataBlockDescription.UNDEFINED} if it cannot be determined.\\
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.getOccurrencesOf(DataBlockId)} & Tries to determine the number of occurrences of the indicated \texttt{DataBlockId}  or \texttt{DataBlockDescription.UNDEFINED} if it cannot be determined. \\
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.getByteOrderOf(DataBlockId, int)} & Tries to determine the byte order of the indicated \texttt{DataBlockId}  with the given sequence number or \texttt{null} if it cannot be determined. \\
+\hline
+\texttt{ContainerContext}\linebreak\texttt{.getCharacterEncodingOf(DataBlockId, int)} & Tries to determine the character encoding of the indicated \texttt{DataBlockId}  with the given sequence number or \texttt{null} if it cannot be determined. \\
+\hline
+\caption{Operations of the \texttt{ContainerContext} interface}
+\label{tab:DBOpsContainerContext}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{Container}\linebreak\texttt{.getHeaders()} & Returns the \texttt{Header}s of this \texttt{Container}. Unmodifiable list. \\
+\hline
+\texttt{Container}\linebreak\texttt{.getPayload()} & Returns the \texttt{Payload} of this \texttt{Container}. \\
+\hline
+\texttt{Container}\linebreak\texttt{.getFooters()} & Returns the \texttt{Footer}s of this \texttt{Container}. Unmodifiable list. \\
+\hline
+\texttt{Container}\linebreak\texttt{.setPayload(Payload)} & Sets the \texttt{Payload} of this \texttt{Container}. Must be a \texttt{NEW} \texttt{Payload} that actually belongs to this \texttt{Container}. The previous \texttt{Payload} is replaced by the new one. \\
+\hline
+\texttt{Container}\linebreak\texttt{.insertHeader(int, Header)} & Inserts a \texttt{NEW} \texttt{Header} into this \texttt{Container}. The given index must be valid. Must be a \texttt{NEW} \texttt{Header} that actually belongs to this \texttt{Container} and must not exceed the maximum occurrences of this header type. \\
+\hline
+\texttt{Container}\linebreak\texttt{.insertFooter(int, Footer)} & Inserts a \texttt{NEW} \texttt{Footer} into this \texttt{Container}. The given index must be valid. Must be a \texttt{NEW} \texttt{Footer} that actually belongs to this \texttt{Container} and must not exceed the maximum occurrences of this header type. \\
+\hline
+\caption{Operations of the \texttt{Container} interface}
+\label{tab:DBOpsContainer}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{FieldSequence}\linebreak\texttt{.getFields()} & Returns the \texttt{Field}s of this \texttt{FieldSequence}. Unmodifiable list. \\
+\hline
+\texttt{FieldSequence}\linebreak\texttt{.insertField(int, Field)} & Inserts a \texttt{NEW} \texttt{Field} into this \texttt{FieldSequence}. The given index must be valid. Must be a \texttt{NEW} \texttt{Field} that actually belongs to this \texttt{FieldSequence} and must not exceed the maximum occurrences of this header type. \\
+\hline
+\caption{Operations of the \texttt{FieldSequence} interface, thus also for \texttt{FieldBasedPayload}, \texttt{Header} and \texttt{Footer}}
+\label{tab:DBOpsFieldSequence}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.35\linewidth}|p{0.6\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{Field}\linebreak\texttt{.getInterpretedValue()} & Returns the interpreted value of the \texttt{Field}. \\
+\hline
+\texttt{Field}\linebreak\texttt{.getBinaryValue()} & Returns the binary value of the field as \texttt{ByteBuffer}. \\
+\hline
+\texttt{Field}\linebreak\texttt{.setInterpretedValue(T)} & Sets a new interpreted value for the Field. Must be a valid value and must not exceed the field's maximum size. \\
+\hline
+\texttt{Field}\linebreak\texttt{.setBinaryValue(ByteBuffer)} & Sets a new binary value for the field. Must be a valid value and must not exceed the field's maximum size. \\
+\hline
+\caption{Operations of the \texttt{Field} interface}
+\label{tab:DBOpsField}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{ContainerBasedPayload}\linebreak\texttt{.getContainerIterator()} & Returns the \texttt{ContainerIterator} for iterating the child containers. \\
+\hline
+\caption{Operations of the \texttt{ContainerBasedPayload} interface}
+\label{tab:DBOpsContainerBasedPayload}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.35\linewidth}|p{0.6\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{SizeProvider}\linebreak\texttt{.getSizeOf(DataBlockId, int, ContainerContext)} & Determins a custom size of the given \texttt{DataBlockId} and sequence number or \texttt{DataBlockDescription.UNDEFINED} if it cannot be determined. \\
+\hline
+\texttt{CountProvider}\linebreak\texttt{.getCountOf(DataBlockId, ContainerContext)} & Determins a custom count of the given \texttt{DataBlockId} or \texttt{DataBlockDescription.UNDEFINED} if it cannot be determined. \\
+\hline
+\caption{Operations of the \texttt{CountProvider} and \texttt{SizeProvider} interfaces}
+\label{tab:DBOpsCountProvider}
+\end{longtable}
+\end{landscape}
+\normalsize
+
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{DataBlockEventBus}\linebreak\texttt{.registerListener(DataBlockEventListener)} & Registers a new \texttt{DataBlockEventListener}. \\
+\hline
+\texttt{DataBlockEventBus}\linebreak\texttt{.publishEvent(DataBlockEvent)} & Notifies all currently registered \texttt{DataBlockEventListener}s that a new event has occurred. The order of notification is undefined and listeners must not rely on it. \\
+\hline
+\texttt{DataBlockEventListener}\linebreak\texttt{.dataBlockEventOccurred(DataBlockEvent)} & Is called once whenever a new \texttt{DataBlockEvent} has occurred on the \texttt{DataBlockEventBus}. \\
+\hline
+\caption{Operations of the \texttt{DataBlockEventBus} and \texttt{DataBlockEventListener} interfaces}
+\label{tab:DBOpsDataBlockEventBus}
+\end{longtable}
+\end{landscape}
+\normalsize
 
 
+\small
+\begin{landscape}
+\begin{longtable}{|p{0.3\linewidth}|p{0.65\linewidth}|}
+\hline
+\rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
+\endhead
+\hline
+\texttt{DataBlockFactory.}\texttt{createPersistedContainer(DataBlockId, int, MediumOffset, ContainerContext)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createPersistedHeader(DataBlockId, int, MediumOffset, ContainerContext)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createPersistedFooter(DataBlockId, int, MediumOffset, ContainerContext)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createPersistedPayload(DataBlockId, int, MediumOffset, ContainerContext, long)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createPersistedField(DataBlockId, int, MediumOffset, ContainerContext, ByteBuffer)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createNewContainer(DataBlockId)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createNewHeader(DataBlockId)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createNewFooter(DataBlockId)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createNewPayload(DataBlockId)} &  \\
+\hline
+\texttt{DataBlockFactory.}\texttt{createNewField(DataBlockId, T)} &  \\
+\hline
+\caption{Operations of the \texttt{DataBlockFactory} interface}
+\label{tab:DBOpsDataBlockFactory}
+\end{longtable}
+\end{landscape}
+\normalsize
 
-
-
-
-
-
-
-
+TODO: DataBlockAccessor + DataBlockService
 
 %###############################################################################################
 %###############################################################################################

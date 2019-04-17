@@ -25,6 +25,18 @@
     "sec:ModifyingDatablocks"
     "sec:Flushing"
     "sec:UndoallChanges"
-    "sec:APIDesign"))
+    "sec:DatablockEventHandling"
+    "sec:APIDesign"
+    "tab:DBOpsDatablock"
+    "tab:DBOpsContainerIterator"
+    "tab:DBOpsTopLevelContainerIterator"
+    "tab:DBOpsContainerContext"
+    "tab:DBOpsContainer"
+    "tab:DBOpsFieldSequence"
+    "tab:DBOpsField"
+    "tab:DBOpsContainerBasedPayload"
+    "tab:DBOpsCountProvider"
+    "tab:DBOpsDataBlockEventBus"
+    "tab:DBOpsDataBlockFactory"))
  :latex)
 
