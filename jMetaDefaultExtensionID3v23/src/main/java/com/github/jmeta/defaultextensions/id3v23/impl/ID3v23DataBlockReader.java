@@ -23,6 +23,7 @@ import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -38,9 +39,10 @@ public class ID3v23DataBlockReader extends ForwardDataBlockReader {
     * Creates a new {@link ID3v23DataBlockReader}.
     *
     * @param spec
+    * @param mediumStore TODO
     */
-   public ID3v23DataBlockReader(DataFormatSpecification spec) {
-      super(spec);
+   public ID3v23DataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+      super(spec, mediumStore);
 
       setCustomSizeProvider(new ID3v23ExtHeaderSizeProvider());
 

@@ -12,6 +12,7 @@ import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.media.api.services.MediumStore;
 
 /**
  * {@link OggDataBlocksService}
@@ -27,9 +28,9 @@ public class OggDataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
+   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
 
-      DataBlockReader oggDataBlockReader = new ForwardDataBlockReader(spec);
+      DataBlockReader oggDataBlockReader = new ForwardDataBlockReader(spec, mediumStore);
 
       OggPacketSizeAndCountProvider countAndSizeProvider = new OggPacketSizeAndCountProvider();
       oggDataBlockReader.setCustomCountProvider(countAndSizeProvider);

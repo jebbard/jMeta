@@ -50,22 +50,15 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
     *           The {@link DataFormatSpecification}, must not be null
     * @param forwardReader
     *           The forward {@link DataBlockReader}, must not be null
+    * @param mediumStore
+    *           TODO
     */
-   public BackwardDataBlockReader(DataFormatSpecification spec, DataBlockReader forwardReader) {
-      super(spec);
+   public BackwardDataBlockReader(DataFormatSpecification spec, DataBlockReader forwardReader,
+      MediumStore mediumStore) {
+      super(spec, mediumStore);
       Reject.ifNull(forwardReader, "forwardReader");
 
       this.forwardReader = forwardReader;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#setMediumStore(com.github.jmeta.library.media.api.services.MediumStore)
-    */
-   @Override
-   public void setMediumStore(MediumStore mediumStore) {
-      super.setMediumStore(mediumStore);
-
-      getForwardReader().setMediumStore(mediumStore);
    }
 
    /**

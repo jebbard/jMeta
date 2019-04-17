@@ -12,6 +12,7 @@ import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.media.api.services.MediumStore;
 
 /**
  * {@link ID3v1DataBlocksService}
@@ -27,8 +28,8 @@ public class ID3v1DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getBackwardDataBlockReader(DataFormatSpecification spec) {
-      return new ID3v1BackwardDataBlockReader(spec, new ForwardDataBlockReader(spec));
+   public DataBlockReader createBackwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+      return new ID3v1BackwardDataBlockReader(spec, new ForwardDataBlockReader(spec, mediumStore), mediumStore);
    }
 
 }

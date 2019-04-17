@@ -3,6 +3,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.media.api.services.MediumStore;
 
 /**
  * {@link ID3v23DataBlocksService}
@@ -11,11 +12,11 @@ import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification
 public class ID3v23DataBlocksService extends AbstractDataBlockService {
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#getForwardDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
+    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#createForwardDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification, MediumStore)
     */
    @Override
-   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
-      return new ID3v23DataBlockReader(spec);
+   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+      return new ID3v23DataBlockReader(spec, mediumStore);
    }
 
    /**

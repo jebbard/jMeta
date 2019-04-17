@@ -14,7 +14,6 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.StandardField;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
@@ -51,7 +50,8 @@ public interface DataBlockReader {
     * @param reference
     * @param parentId
     * @param remainingDirectParentByteCount
-    * @param parent TODO
+    * @param parent
+    *           TODO
     * @param containerContext
     *           TODO
     * @param context
@@ -112,11 +112,6 @@ public interface DataBlockReader {
     */
    public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
       long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext);
-
-   /**
-    * @param mediumStore
-    */
-   public void setMediumStore(MediumStore mediumStore);
 
    public void setCustomSizeProvider(SizeProvider sizeProvider);
 

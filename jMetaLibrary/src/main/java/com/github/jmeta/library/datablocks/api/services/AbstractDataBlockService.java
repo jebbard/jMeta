@@ -10,6 +10,7 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.media.api.services.MediumStore;
 
 /**
  * {@link AbstractDataBlockService} provides a default implementation of {@link DataBlockService} that only returns a
@@ -27,17 +28,17 @@ public abstract class AbstractDataBlockService implements DataBlockService {
    }
 
    /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#getForwardDataBlockReader(DataFormatSpecification)
+    * @see com.github.jmeta.library.datablocks.api.services.DataBlockService#createForwardDataBlockReader(DataFormatSpecification, MediumStore)
     */
    @Override
-   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
+   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
 
       // Choose to use default IDataBlockReader
       return null;
    }
 
    @Override
-   public DataBlockReader getBackwardDataBlockReader(DataFormatSpecification spec) {
+   public DataBlockReader createBackwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
 
       // Choose to use default IDataBlockReader
       return null;

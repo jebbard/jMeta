@@ -8,6 +8,7 @@
 package com.github.jmeta.library.datablocks.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
-import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
@@ -38,6 +38,8 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
 
+   private final DataFormatRepository m_repository;
+
    /**
     * Creates a new {@link StandardDataBlockAccessor}.
     */
@@ -46,6 +48,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
       m_repository = ComponentRegistry.lookupService(DataFormatRepository.class);
+
       m_mediumFactory = ComponentRegistry.lookupService(MediaAPI.class);
 
       List<Extension> extBundles = extManager.getAllExtensions();
@@ -69,49 +72,28 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
                throw new InvalidExtensionException(message, iExtension2);
             }
 
-            if (forwardReaders.containsKey(extensionDataFormat) || backwardReaders.containsKey(extensionDataFormat)) {
+            final DataFormatSpecification spec = m_repository.getDataFormatSpecification(extensionDataFormat);
+
+            if (spec == null) {
+               throw new InvalidExtensionException(
+                  "The extension " + iExtension2.getExtensionId() + " for data format " + extensionDataFormat
+                     + " must have a corresponding registered data format specification for the format.",
+                  iExtension2);
+            }
+
+            if (dataBlockServices.containsKey(extensionDataFormat)) {
                LOGGER.warn(
                   "The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
                   iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
             }
 
             else {
-               addDataBlockExtensions(iExtension2, dataBlocksExtension);
+               dataBlockServices.put(extensionDataFormat, dataBlocksExtension);
             }
          }
       }
 
       LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
-   }
-
-   private void addDataBlockExtensions(Extension iExtension2, DataBlockService dataBlocksExtensions) {
-
-      ContainerDataFormat format = dataBlocksExtensions.getDataFormat();
-
-      final DataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
-
-      if (spec == null) {
-         throw new InvalidExtensionException("The extension " + iExtension2.getExtensionId() + " for data format "
-            + format + " must have a corresponding registered data format specification for the format.", iExtension2);
-      }
-
-      DataBlockReader forwardReader = dataBlocksExtensions.getForwardDataBlockReader(spec);
-
-      // Set default data block reader
-      if (forwardReader == null) {
-         forwardReader = new ForwardDataBlockReader(spec);
-      }
-
-      forwardReaders.put(format, forwardReader);
-
-      DataBlockReader backwardReader = dataBlocksExtensions.getBackwardDataBlockReader(spec);
-
-      // Set default data block reader
-      if (backwardReader == null) {
-         backwardReader = new BackwardDataBlockReader(spec, forwardReader);
-      }
-
-      backwardReaders.put(format, backwardReader);
    }
 
    /**
@@ -125,7 +107,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new StandardTopLevelContainerIterator(medium, forwardReaders, mediumStore, true);
+      return new StandardTopLevelContainerIterator(mediumStore, true, new HashSet<>(dataBlockServices.values()));
    }
 
    @Override
@@ -139,14 +121,11 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
       MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
       mediumStore.open();
 
-      return new StandardTopLevelContainerIterator(medium, backwardReaders, mediumStore, false);
+      return new StandardTopLevelContainerIterator(mediumStore, false, new HashSet<>(dataBlockServices.values()));
    }
 
-   private final DataFormatRepository m_repository;
-
    private final MediaAPI m_mediumFactory;
-   private final Map<ContainerDataFormat, DataBlockReader> forwardReaders = new HashMap<>();
-   private final Map<ContainerDataFormat, DataBlockReader> backwardReaders = new HashMap<>();
+   private final Map<ContainerDataFormat, DataBlockService> dataBlockServices = new HashMap<>();
 
    private final ExtensionManager extManager;
 }

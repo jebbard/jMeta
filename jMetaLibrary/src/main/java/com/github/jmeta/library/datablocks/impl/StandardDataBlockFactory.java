@@ -32,6 +32,18 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class StandardDataBlockFactory implements DataBlockFactory {
 
+   private final MediumDataProvider mediumDataProvider;
+
+   /**
+    * Creates a new {@link StandardDataBlockFactory}.
+    * 
+    * @param mediumDataProvider
+    */
+   public StandardDataBlockFactory(MediumDataProvider mediumDataProvider) {
+      super();
+      this.mediumDataProvider = mediumDataProvider;
+   }
+
    @Override
    public Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
       Payload payload, List<Footer> footers, DataBlockReader reader, ContainerContext containerContext,
@@ -106,8 +118,8 @@ public class StandardDataBlockFactory implements DataBlockFactory {
     */
    @Override
    public <T extends FieldSequence> T createHeaderOrFooter(Class<T> fieldSequenceClass, DataBlockId id,
-      MediumOffset reference, List<Field<?>> fields, DataBlockReader reader, int sequenceNumber,
-      ContainerContext containerContext) {
+      MediumOffset reference, List<Field<?>> fields, int sequenceNumber, ContainerContext containerContext,
+      DataBlockReader reader) {
 
       Reject.ifNull(id, "headerRef");
       Reject.ifNull(reference, "parent");

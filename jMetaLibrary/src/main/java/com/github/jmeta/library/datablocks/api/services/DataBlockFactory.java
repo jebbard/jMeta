@@ -78,17 +78,15 @@ public interface DataBlockFactory {
     * @param id
     * @param reference
     * @param fields
-    * @param reader
-    *           TODO
     * @param sequenceNumber
     *           TODO
     * @param containerContext
     *           TODO
+    * @param reader TODO
     * @return the {@link Header}
     */
    public <T extends FieldSequence> T createHeaderOrFooter(Class<T> fieldSequenceClass, DataBlockId id,
-      MediumOffset reference, List<Field<?>> fields, DataBlockReader reader, int sequenceNumber,
-      ContainerContext containerContext);
+      MediumOffset reference, List<Field<?>> fields, int sequenceNumber, ContainerContext containerContext, DataBlockReader reader);
 
    /**
     * @param id

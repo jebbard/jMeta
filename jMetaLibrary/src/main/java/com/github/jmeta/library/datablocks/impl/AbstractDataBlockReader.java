@@ -54,25 +54,30 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
 
    private final DataFormatSpecification spec;
 
-   private DataBlockFactory dataBlockFactory;
+   private final DataBlockFactory dataBlockFactory;
 
    private SizeProvider customSizeProvider;
 
    private CountProvider customCountProvider;
 
-   private MediumDataProvider mediumDataProvider;
+   private final MediumDataProvider mediumDataProvider;
 
    /**
     * Creates a new {@link AbstractDataBlockReader}.
     *
     * @param spec
     *           The {@link DataFormatSpecification}, must not be null
+    * @param mediumStore
+    *           TODO
     */
-   public AbstractDataBlockReader(DataFormatSpecification spec) {
+   public AbstractDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
       Reject.ifNull(spec, "spec");
+      Reject.ifNull(mediumStore, "mediumStore");
+
+      mediumDataProvider = new MediumDataProvider(mediumStore);
 
       this.spec = spec;
-      dataBlockFactory = new StandardDataBlockFactory();
+      dataBlockFactory = new StandardDataBlockFactory(mediumDataProvider);
    }
 
    /**
@@ -236,20 +241,10 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
             containerContext);
 
          nextHeadersOrFooters.add(dataBlockFactory.createHeaderOrFooter(fieldSequenceClass, headerOrFooterId,
-            startOffset, headerOrFooterFields, this, i, containerContext));
+            startOffset, headerOrFooterFields, i, containerContext, this));
       }
 
       return nextHeadersOrFooters;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#setMediumStore(MediumStore)
-    */
-   @Override
-   public void setMediumStore(MediumStore mediumStore) {
-      Reject.ifNull(mediumStore, "mediumStore");
-
-      mediumDataProvider = new MediumDataProvider(mediumStore);
    }
 
    /**

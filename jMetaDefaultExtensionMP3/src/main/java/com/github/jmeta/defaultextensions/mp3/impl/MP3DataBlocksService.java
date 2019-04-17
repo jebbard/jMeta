@@ -13,6 +13,7 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader;
 import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.media.api.services.MediumStore;
 
 /**
  * {@link MP3DataBlocksService}
@@ -28,8 +29,8 @@ public class MP3DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
-      AbstractDataBlockReader mp3DataBlockReader = new ForwardDataBlockReader(spec);
+   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+      AbstractDataBlockReader mp3DataBlockReader = new ForwardDataBlockReader(spec, mediumStore);
 
       mp3DataBlockReader.setCustomSizeProvider(new MP3SizeProvider());
 

@@ -19,6 +19,7 @@ import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
@@ -33,9 +34,10 @@ public class ID3v1BackwardDataBlockReader extends BackwardDataBlockReader {
     * @param spec
     * @param forwardReader
     *           TODO
+    * @param mediumStore TODO
     */
-   public ID3v1BackwardDataBlockReader(DataFormatSpecification spec, ForwardDataBlockReader forwardReader) {
-      super(spec, forwardReader);
+   public ID3v1BackwardDataBlockReader(DataFormatSpecification spec, ForwardDataBlockReader forwardReader, MediumStore mediumStore) {
+      super(spec, forwardReader, mediumStore);
    }
 
    @Override

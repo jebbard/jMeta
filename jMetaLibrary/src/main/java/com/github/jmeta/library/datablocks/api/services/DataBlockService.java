@@ -2,6 +2,7 @@ package com.github.jmeta.library.datablocks.api.services;
 
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
+import com.github.jmeta.library.media.api.services.MediumStore;
 
 /**
  * {@link DataBlockService}
@@ -16,13 +17,15 @@ public interface DataBlockService {
 
    /**
     * @param spec
+    * @param mediumStore TODO
     * @return null to indicate usage of the default {@link DataBlockReader}
     */
-   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec);
+   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore);
 
    /**
     * @param spec
+    * @param mediumStore TODO
     * @return null to indicate usage of the default {@link DataBlockReader}
     */
-   public DataBlockReader getBackwardDataBlockReader(DataFormatSpecification spec);
+   public DataBlockReader createBackwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore);
 }

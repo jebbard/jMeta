@@ -16,6 +16,7 @@ import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
@@ -28,9 +29,10 @@ public class Lyrics3v2ForwardDataBlockReader extends ForwardDataBlockReader {
     * Creates a new {@link Lyrics3v2ForwardDataBlockReader}.
     *
     * @param spec
+    * @param mediumStore TODO
     */
-   public Lyrics3v2ForwardDataBlockReader(DataFormatSpecification spec) {
-      super(spec);
+   public Lyrics3v2ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+      super(spec, mediumStore);
    }
 
    @Override

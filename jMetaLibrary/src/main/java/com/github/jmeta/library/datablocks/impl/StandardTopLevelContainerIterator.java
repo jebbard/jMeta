@@ -14,17 +14,23 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
+import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -56,34 +62,36 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
    /**
     * Creates a new {@link StandardTopLevelContainerIterator}.
     *
-    * @param medium
-    *           The {@link Medium} to iterate, must not be null
-    * @param readers
-    *           All {@link DataBlockReader}s per supported {@link ContainerDataFormat}, must not be null
     * @param mediumStore
     *           The {@link MediumStore} used to read from the {@link Medium}, must not be null
     * @param forwardRead
     *           true for forward reading, false for backward reading
+    * @param dataBlockServices
+    *           All {@link DataBlockReader}s per supported {@link ContainerDataFormat}, must not be null
     */
-   public StandardTopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat, DataBlockReader> readers,
-      MediumStore mediumStore, boolean forwardRead) {
-      Reject.ifNull(medium, "medium");
-      Reject.ifNull(readers, "readers");
-      Reject.ifNull(mediumStore, "mediumFactory");
+   public StandardTopLevelContainerIterator(MediumStore mediumStore, boolean forwardRead,
+      Set<DataBlockService> dataBlockServices) {
+      Reject.ifNull(mediumStore, "mediumStore");
+      Reject.ifNull(dataBlockServices, "dataBlockServices");
 
-      this.readers.putAll(readers);
+      m_repository = ComponentRegistry.lookupService(DataFormatRepository.class);
+
       this.mediumStore = mediumStore;
       this.forwardRead = forwardRead;
 
       if (this.forwardRead) {
          currentOffset = mediumStore.createMediumOffset(0);
       } else {
-         currentOffset = mediumStore.createMediumOffset(medium.getCurrentLength());
+         currentOffset = mediumStore.createMediumOffset(mediumStore.getMedium().getCurrentLength());
       }
 
-      dataFormatPrecedence.addAll(new ArrayList<>(readers.keySet()));
-      setMediumStore();
+      dataBlockServices.forEach(service -> addDataBlockService(service, forwardRead, mediumStore));
+
+      dataFormatPrecedence.addAll(
+         new ArrayList<>(dataBlockServices.stream().map(DataBlockService::getDataFormat).collect(Collectors.toSet())));
    }
+
+   private final DataFormatRepository m_repository;
 
    /**
     * @see java.util.Iterator#hasNext()
@@ -201,7 +209,56 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
       return null;
    }
 
-   private void setMediumStore() {
-      readers.values().stream().forEach(reader -> reader.setMediumStore(mediumStore));
+   private void addDataBlockService(DataBlockService dataBlocksService, boolean forwardRead, MediumStore mediumStore) {
+
+      ContainerDataFormat format = dataBlocksService.getDataFormat();
+      final DataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
+
+      if (forwardRead) {
+         DataBlockReader forwardReader = createForwardReader(dataBlocksService, spec, mediumStore);
+
+         readers.put(format, forwardReader);
+      } else {
+         DataBlockReader backwardReader = createBackwardReader(dataBlocksService, spec, mediumStore);
+
+         readers.put(format, backwardReader);
+      }
+   }
+
+   /**
+    * @param dataBlocksExtensions
+    * @param spec
+    * @param mediumStore
+    *           TODO
+    * @return
+    */
+   private DataBlockReader createBackwardReader(DataBlockService dataBlocksExtensions,
+      final DataFormatSpecification spec, MediumStore mediumStore) {
+      DataBlockReader backwardReader = dataBlocksExtensions.createBackwardDataBlockReader(spec, mediumStore);
+
+      // Set default data block reader
+      if (backwardReader == null) {
+         backwardReader = new BackwardDataBlockReader(spec,
+            createForwardReader(dataBlocksExtensions, spec, mediumStore), mediumStore);
+      }
+      return backwardReader;
+   }
+
+   /**
+    * @param dataBlocksExtensions
+    * @param spec
+    * @param mediumStore
+    *           TODO
+    * @return
+    */
+   private DataBlockReader createForwardReader(DataBlockService dataBlocksExtensions,
+      final DataFormatSpecification spec, MediumStore mediumStore) {
+      DataBlockReader forwardReader = dataBlocksExtensions.createForwardDataBlockReader(spec, mediumStore);
+
+      // Set default data block reader
+      if (forwardReader == null) {
+         forwardReader = new ForwardDataBlockReader(spec, mediumStore);
+      }
+      return forwardReader;
    }
 }

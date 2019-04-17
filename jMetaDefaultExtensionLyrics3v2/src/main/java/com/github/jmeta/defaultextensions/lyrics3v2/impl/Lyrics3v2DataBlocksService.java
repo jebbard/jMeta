@@ -11,6 +11,7 @@ package com.github.jmeta.defaultextensions.lyrics3v2.impl;
 import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
+import com.github.jmeta.library.media.api.services.MediumStore;
 
 /**
  * {@link Lyrics3v2DataBlocksService}
@@ -26,7 +27,7 @@ public class Lyrics3v2DataBlocksService extends AbstractDataBlockService {
    }
 
    @Override
-   public DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec) {
-      return new Lyrics3v2ForwardDataBlockReader(spec);
+   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+      return new Lyrics3v2ForwardDataBlockReader(spec, mediumStore);
    }
 }

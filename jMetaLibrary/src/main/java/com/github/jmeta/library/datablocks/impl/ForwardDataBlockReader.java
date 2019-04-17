@@ -22,6 +22,7 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
 import com.github.jmeta.library.dataformats.api.types.PhysicalDataBlockType;
+import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
@@ -35,9 +36,10 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
     *
     * @param spec
     *           The {@link DataFormatSpecification}, must not be null
+    * @param mediumStore TODO
     */
-   public ForwardDataBlockReader(DataFormatSpecification spec) {
-      super(spec);
+   public ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+      super(spec, mediumStore);
    }
 
    /**
