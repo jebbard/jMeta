@@ -20,6 +20,7 @@ import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConver
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.FieldSequence;
@@ -470,6 +471,9 @@ public abstract class AbstractDataBlockAccessorTest {
          Container nextContainer = containerIterator.next();
 
          Assert.assertNotNull(nextContainer);
+
+         Assert.assertEquals(DataBlockState.PERSISTED, nextContainer.getState());
+
          Assert.assertEquals(expectedContainerId.getId(), nextContainer.getId());
          // Check size of the container
          checkDataBlockSize(nextContainer, expectedContainerId);
@@ -524,6 +528,9 @@ public abstract class AbstractDataBlockAccessorTest {
       }
 
       if (expectedPayloadId != null) {
+
+         Assert.assertEquals(DataBlockState.PERSISTED, payload.getState());
+
          Assert.assertEquals(expectedPayloadId.getId(), payload.getId());
          // Check size of the payload
          checkDataBlockSize(payload, expectedPayloadId);
@@ -581,6 +588,8 @@ public abstract class AbstractDataBlockAccessorTest {
 
          FieldSequence header = headerOrFooterList.get(i);
 
+         Assert.assertEquals(DataBlockState.PERSISTED, header.getState());
+
          Assert.assertEquals(expectedHeaderId.getId(), header.getId());
          // Check size of the header or footer
          checkDataBlockSize(header, expectedHeaderId);
@@ -615,6 +624,8 @@ public abstract class AbstractDataBlockAccessorTest {
          DataBlockInstanceId expectedFieldId = expectedFieldIds.get(i);
 
          Field<?> field = fieldList.get(i);
+
+         Assert.assertEquals(DataBlockState.PERSISTED, field.getState());
 
          Assert.assertEquals(expectedFieldId.getId(), field.getId());
          // Check size of the field

@@ -17,6 +17,7 @@ import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -77,7 +78,7 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     */
    public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
       ContainerContext containerContext, int sequenceNumber) {
-      super(id, parent, reference, reader, sequenceNumber, containerContext);
+      super(id, parent, reference, reader, sequenceNumber, containerContext, DataBlockState.PERSISTED);
    }
 
    /**

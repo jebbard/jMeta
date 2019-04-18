@@ -15,6 +15,7 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
@@ -41,7 +42,7 @@ public class StandardHeaderOrFooter extends AbstractDataBlock implements Header,
     */
    public StandardHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
       DataBlockReader dataBlockReader, int sequenceNumber, ContainerContext containerContext) {
-      super(id, null, reference, dataBlockReader, 0, containerContext);
+      super(id, null, reference, dataBlockReader, 0, containerContext, DataBlockState.PERSISTED);
 
       Reject.ifNull(fields, "fields");
 

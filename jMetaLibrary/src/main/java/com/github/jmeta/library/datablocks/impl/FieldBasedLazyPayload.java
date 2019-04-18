@@ -15,6 +15,7 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
@@ -50,7 +51,7 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     */
    public FieldBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader,
       ContainerContext containerContext) {
-      super(id, null, offset, dataBlockReader, 0, containerContext);
+      super(id, null, offset, dataBlockReader, 0, containerContext, DataBlockState.PERSISTED);
 
       // The size of the payload is still unknown - There is no other way than to read
       // its children and sum up their sizes

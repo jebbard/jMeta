@@ -22,7 +22,28 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public abstract class AbstractDataBlock implements DataBlock {
 
-   private int sequenceNumber;
+   private final int sequenceNumber;
+   private DataBlockState state;
+
+   /**
+    * Sets the attribute {@link #state}.
+    *
+    * @param new
+    *           vakue for attribute {@link #state state}.
+    */
+   protected void setState(DataBlockState state) {
+      Reject.ifNull(state, "state");
+
+      this.state = state;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getState()
+    */
+   @Override
+   public DataBlockState getState() {
+      return state;
+   }
 
    /**
     * Creates a new {@link AbstractDataBlock}.
@@ -35,15 +56,19 @@ public abstract class AbstractDataBlock implements DataBlock {
     *           TODO
     * @param containerContext
     *           TODO
+    * @param state
+    *           TODO
     */
    public AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader,
-      int sequenceNumber, ContainerContext containerContext) {
+      int sequenceNumber, ContainerContext containerContext, DataBlockState state) {
       Reject.ifNull(id, "id");
       Reject.ifNull(dataBlockReader, "dataBlockReader");
       Reject.ifNull(reference, "reference");
+      Reject.ifNull(state, "state");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
       m_id = id;
+      this.state = state;
       m_dataBlockReader = dataBlockReader;
       m_mediumReference = reference;
       this.sequenceNumber = sequenceNumber;

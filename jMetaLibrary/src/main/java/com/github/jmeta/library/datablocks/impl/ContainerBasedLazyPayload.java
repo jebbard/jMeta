@@ -15,6 +15,7 @@ import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -43,7 +44,7 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     */
    public ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize,
       DataBlockReader dataBlockReader, ContainerContext containerContext) {
-      super(id, null, offset, dataBlockReader, 0, containerContext);
+      super(id, null, offset, dataBlockReader, 0, containerContext, DataBlockState.PERSISTED);
 
       this.totalSize = totalSize;
 

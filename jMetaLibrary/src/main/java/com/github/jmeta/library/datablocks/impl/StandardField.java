@@ -17,22 +17,13 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
-
-// TODO writeTests001: Test failing conversion when Enum interpr. value is unknown
-// TODO writeTests002: Test failing conversion when Numeric interpr. value > specified static field size
-// TODO writeTests003: Test failing conversion when SyncSafe interpr. value > 2^28
-// TODO writeTests004: Test conversion of ANY fields: No converter found
-
-// TODO stage2_011: Test cases for specification validation:
-// - Flag bytes length != field static length
-// - Numeric field length > 8
-// - String field: Unsupported encoding (Spec default and enumerated value)
 
 /**
  * Represents a leaf node in the data hierarchy of a {@link AbstractMedium}. A {@link StandardField} usually has a small
@@ -64,7 +55,7 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
 
    private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber,
       ContainerContext containerContext, DataBlockReader reader, DataBlock parent) {
-      super(fieldDesc.getId(), parent, reference, reader, sequenceNumber, containerContext);
+      super(fieldDesc.getId(), parent, reference, reader, sequenceNumber, containerContext, DataBlockState.PERSISTED);
       Reject.ifNull(fieldDesc, "fieldDesc");
 
       m_desc = fieldDesc;

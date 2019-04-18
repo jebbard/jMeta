@@ -65,6 +65,11 @@ public interface DataBlock {
    public long getSize();
 
    /**
+    * @return the current {@link DataBlockState} of this {@link DataBlock}
+    */
+   public DataBlockState getState();
+
+   /**
     * Reads raw bytes that build the {@link DataBlock}.
     *
     * @param offset
