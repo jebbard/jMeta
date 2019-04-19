@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -23,6 +23,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 public abstract class AbstractDataBlock implements DataBlock {
 
    private final int sequenceNumber;
+   private final MediumDataProvider mediumDataProvider;
    private DataBlockState state;
 
    /**
@@ -49,28 +50,28 @@ public abstract class AbstractDataBlock implements DataBlock {
     * Creates a new {@link AbstractDataBlock}.
     *
     * @param id
-    * @param parent
-    * @param reference
-    * @param dataBlockReader
     * @param sequenceNumber
     *           TODO
+    * @param offset
+    * @param parent
+    * @param mediumDataProvider
     * @param containerContext
     *           TODO
     * @param state
     *           TODO
     */
-   public AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader,
-      int sequenceNumber, ContainerContext containerContext, DataBlockState state) {
+   public AbstractDataBlock(DataBlockId id, int sequenceNumber, MediumOffset offset, DataBlock parent,
+      MediumDataProvider mediumDataProvider, ContainerContext containerContext, DataBlockState state) {
       Reject.ifNull(id, "id");
-      Reject.ifNull(dataBlockReader, "dataBlockReader");
-      Reject.ifNull(reference, "reference");
+      Reject.ifNull(mediumDataProvider, "dataBlockReader");
+      Reject.ifNull(offset, "reference");
       Reject.ifNull(state, "state");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
       m_id = id;
       this.state = state;
-      m_dataBlockReader = dataBlockReader;
-      m_mediumReference = reference;
+      this.mediumDataProvider = mediumDataProvider;
+      m_mediumReference = offset;
       this.sequenceNumber = sequenceNumber;
 
       this.containerContext = containerContext;
@@ -112,7 +113,7 @@ public abstract class AbstractDataBlock implements DataBlock {
             "offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize()");
       }
 
-      return getDataBlockReader().readBytes(offset, size);
+      return mediumDataProvider.getData(offset, size);
    }
 
    /**
@@ -184,17 +185,5 @@ public abstract class AbstractDataBlock implements DataBlock {
       }
 
       // m_mediumReference.setCache(cache);
-   }
-
-   private final DataBlockReader m_dataBlockReader;
-
-   /**
-    * Returns dataBlockReader
-    *
-    * @return dataBlockReader
-    */
-   protected DataBlockReader getDataBlockReader() {
-
-      return m_dataBlockReader;
    }
 }

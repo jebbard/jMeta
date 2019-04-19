@@ -13,7 +13,6 @@ import java.nio.charset.Charset;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
@@ -54,8 +53,8 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
    }
 
    private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext, DataBlockReader reader, DataBlock parent) {
-      super(fieldDesc.getId(), parent, reference, reader, sequenceNumber, containerContext, DataBlockState.PERSISTED);
+      ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent) {
+      super(fieldDesc.getId(), sequenceNumber, reference, parent, mediumDataProvider, containerContext, DataBlockState.PERSISTED);
       Reject.ifNull(fieldDesc, "fieldDesc");
 
       m_desc = fieldDesc;
@@ -76,8 +75,8 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
     *           TODO
     */
    public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext, DataBlockReader reader) {
-      this(fieldDesc, reference, sequenceNumber, containerContext, reader, null);
+      ContainerContext containerContext, MediumDataProvider mediumDataProvider) {
+      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, null);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
 
@@ -96,8 +95,8 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
     *           TODO
     */
    public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
-      int sequenceNumber, ContainerContext containerContext, DataBlockReader reader, DataBlock parent) {
-      this(fieldDesc, reference, sequenceNumber, containerContext, reader, parent);
+      int sequenceNumber, ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent) {
+      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, parent);
 
       Reject.ifNull(byteValue, "byteValue");
 

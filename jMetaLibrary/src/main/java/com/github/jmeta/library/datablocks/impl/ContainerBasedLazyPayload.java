@@ -27,6 +27,7 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 public class ContainerBasedLazyPayload extends AbstractDataBlock implements ContainerBasedPayload {
 
    private long totalSize;
+   private DataBlockReader reader;
 
    /**
     * Creates a new {@link FieldBasedLazyPayload}.
@@ -39,14 +40,17 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     *           The total payload size, if already known, or {@link DataBlockDescription#UNDEFINED} if not yet known
     * @param dataBlockReader
     *           The {@link DataBlockReader} to be used parsing the content of the payload
+    * @param mediumDataProvider
+    *           TODO
     * @param context
     *           The current {@link FieldFunctionStack} context needed for parsing
     */
    public ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize,
-      DataBlockReader dataBlockReader, ContainerContext containerContext) {
-      super(id, null, offset, dataBlockReader, 0, containerContext, DataBlockState.PERSISTED);
+      DataBlockReader dataBlockReader, ContainerContext containerContext, MediumDataProvider mediumDataProvider) {
+      super(id, 0, offset, null, mediumDataProvider, containerContext, DataBlockState.PERSISTED);
 
       this.totalSize = totalSize;
+      reader = dataBlockReader;
 
       // The size of the payload is still unknown - There is no other way than to read
       // its children and sum up their sizes...
@@ -78,6 +82,6 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
     */
    @Override
    public ContainerIterator getContainerIterator() {
-      return new PayloadContainerIterator(this, getDataBlockReader(), getOffset());
+      return new PayloadContainerIterator(this, reader, getOffset());
    }
 }

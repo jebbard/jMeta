@@ -77,7 +77,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       mediumDataProvider = new MediumDataProvider(mediumStore);
 
       this.spec = spec;
-      dataBlockFactory = new StandardDataBlockFactory(mediumDataProvider);
+      dataBlockFactory = new StandardDataBlockFactory(mediumDataProvider, spec);
    }
 
    /**
@@ -241,7 +241,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
             containerContext);
 
          nextHeadersOrFooters.add(dataBlockFactory.createHeaderOrFooter(fieldSequenceClass, headerOrFooterId,
-            startOffset, headerOrFooterFields, i, containerContext, this));
+            startOffset, headerOrFooterFields, i, containerContext));
       }
 
       return nextHeadersOrFooters;
@@ -479,8 +479,8 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       // This cast is ok as we check for upper bound above
       ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
-      return dataBlockFactory.createFieldFromBytes(fieldDesc.getId(), spec, reference, fieldBuffer, sequenceNumber,
-         this, null, containerContext);
+      return dataBlockFactory.createPersistedField(fieldDesc.getId(), sequenceNumber, null, reference, fieldBuffer,
+         containerContext);
    }
 
 }

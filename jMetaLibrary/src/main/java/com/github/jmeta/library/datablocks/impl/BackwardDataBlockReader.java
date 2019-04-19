@@ -133,8 +133,8 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
       // Create container
       // IMPORTANT: The containers StandardMediumReference MUST NOT be set to the original passed
       // StandardMediumReference because that one points to the containers back!
-      final Container container = getDataBlockFactory().createContainer(concreteContainerId, parent, nextReference,
-         headers, payload, footers, this, newContainerContext, sequenceNumber);
+      final Container container = getDataBlockFactory().createPersistedContainer(concreteContainerId, sequenceNumber, parent,
+         nextReference, headers, payload, footers, this, newContainerContext);
       newContainerContext.initContainer(container);
 
       return container;
@@ -161,8 +161,8 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
          throw new IllegalStateException("Payload size could not be determined");
       }
 
-      final Payload createPayloadAfterRead = getDataBlockFactory().createPayloadAfterRead(payloadDesc.getId(),
-         reference.advance(-totalPayloadSize), totalPayloadSize, getForwardReader(), containerContext);
+      final Payload createPayloadAfterRead = getDataBlockFactory().createPersistedPayload(payloadDesc.getId(),
+         reference.advance(-totalPayloadSize), containerContext, totalPayloadSize, getForwardReader());
 
       return createPayloadAfterRead;
    }

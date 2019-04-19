@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
@@ -39,16 +38,16 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @param headers
     * @param payload
     * @param footers
-    * @param dataBlockReader
+    * @param mediumDataProvider
     * @param containerContext
     *           TODO
     * @param sequenceNumber
     *           TODO
     */
    public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Footer> footers, DataBlockReader dataBlockReader, ContainerContext containerContext,
+      Payload payload, List<Footer> footers, MediumDataProvider mediumDataProvider, ContainerContext containerContext,
       int sequenceNumber) {
-      this(id, parent, reference, dataBlockReader, containerContext, sequenceNumber);
+      this(id, parent, reference, mediumDataProvider, containerContext, sequenceNumber);
 
       Reject.ifNull(footers, "footers");
       Reject.ifNull(payload, "payload");
@@ -71,14 +70,14 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * @param id
     * @param parent
     * @param reference
-    * @param reader
+    * @param mediumDataProvider
     * @param sequenceNumber
     *           TODO
     * @param parentContainerContext
     */
-   public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader,
+   public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, MediumDataProvider mediumDataProvider,
       ContainerContext containerContext, int sequenceNumber) {
-      super(id, parent, reference, reader, sequenceNumber, containerContext, DataBlockState.PERSISTED);
+      super(id, sequenceNumber, reference, parent, mediumDataProvider, containerContext, DataBlockState.PERSISTED);
    }
 
    /**
