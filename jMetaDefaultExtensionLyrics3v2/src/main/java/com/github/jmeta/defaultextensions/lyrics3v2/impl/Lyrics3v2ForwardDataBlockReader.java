@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
@@ -29,10 +30,12 @@ public class Lyrics3v2ForwardDataBlockReader extends ForwardDataBlockReader {
     * Creates a new {@link Lyrics3v2ForwardDataBlockReader}.
     *
     * @param spec
-    * @param mediumStore TODO
+    * @param mediumStore
+    *           TODO
     */
-   public Lyrics3v2ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
-      super(spec, mediumStore);
+   public Lyrics3v2ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+      DataBlockEventBus eventBus) {
+      super(spec, mediumStore, eventBus);
    }
 
    @Override

@@ -20,6 +20,7 @@ import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -39,10 +40,11 @@ public class ID3v23DataBlockReader extends ForwardDataBlockReader {
     * Creates a new {@link ID3v23DataBlockReader}.
     *
     * @param spec
-    * @param mediumStore TODO
+    * @param mediumStore
+    *           TODO
     */
-   public ID3v23DataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
-      super(spec, mediumStore);
+   public ID3v23DataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus) {
+      super(spec, mediumStore, eventBus);
 
       setCustomSizeProvider(new ID3v23ExtHeaderSizeProvider());
 
@@ -94,8 +96,7 @@ public class ID3v23DataBlockReader extends ForwardDataBlockReader {
          AbstractID3v2TransformationHandler transformationHandler = handlerIterator.next();
 
          if (transformationHandler.requiresUntransform(transformedContainer)) {
-            mediumDataProvider.bufferBeforeRead(transformedContainer.getOffset(),
-               transformedContainer.getSize());
+            mediumDataProvider.bufferBeforeRead(transformedContainer.getOffset(), transformedContainer.getSize());
             transformedContainer = transformationHandler.untransform(transformedContainer, reader);
          }
       }

@@ -16,6 +16,7 @@ import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.BackwardDataBlockReader;
 import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.MagicKey;
@@ -34,10 +35,12 @@ public class ID3v1BackwardDataBlockReader extends BackwardDataBlockReader {
     * @param spec
     * @param forwardReader
     *           TODO
-    * @param mediumStore TODO
+    * @param mediumStore
+    *           TODO
     */
-   public ID3v1BackwardDataBlockReader(DataFormatSpecification spec, ForwardDataBlockReader forwardReader, MediumStore mediumStore) {
-      super(spec, forwardReader, mediumStore);
+   public ID3v1BackwardDataBlockReader(DataFormatSpecification spec, ForwardDataBlockReader forwardReader,
+      MediumStore mediumStore, DataBlockEventBus eventBus) {
+      super(spec, forwardReader, mediumStore, eventBus);
    }
 
    @Override

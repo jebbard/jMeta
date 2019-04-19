@@ -27,6 +27,7 @@ import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -62,6 +63,17 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
 
    private final MediumDataProvider mediumDataProvider;
 
+   private final DataBlockEventBus eventBus;
+
+   /**
+    * Returns the attribute {@link #eventBus}.
+    *
+    * @return the attribute {@link #eventBus}
+    */
+   protected DataBlockEventBus getEventBus() {
+      return eventBus;
+   }
+
    /**
     * Creates a new {@link AbstractDataBlockReader}.
     *
@@ -69,15 +81,19 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
     *           The {@link DataFormatSpecification}, must not be null
     * @param mediumStore
     *           TODO
+    * @param eventBus
+    *           TODO
     */
-   public AbstractDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
+   public AbstractDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus) {
       Reject.ifNull(spec, "spec");
       Reject.ifNull(mediumStore, "mediumStore");
+      Reject.ifNull(eventBus, "eventBus");
 
       mediumDataProvider = new MediumDataProvider(mediumStore);
 
       this.spec = spec;
-      dataBlockFactory = new StandardDataBlockFactory(mediumDataProvider, spec);
+      this.eventBus = eventBus;
+      dataBlockFactory = new StandardDataBlockFactory(mediumDataProvider, spec, eventBus);
    }
 
    /**

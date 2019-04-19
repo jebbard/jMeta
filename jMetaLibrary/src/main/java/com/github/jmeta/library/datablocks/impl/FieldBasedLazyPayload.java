@@ -18,6 +18,7 @@ import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -53,8 +54,8 @@ public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBas
     *           The current {@link FieldFunctionStack} context needed for parsing
     */
    public FieldBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader,
-      ContainerContext containerContext, MediumDataProvider mediumDataProvider) {
-      super(id, 0, offset, null, mediumDataProvider, containerContext, DataBlockState.PERSISTED);
+      ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlockEventBus eventBus) {
+      super(id, 0, offset, null, mediumDataProvider, containerContext, DataBlockState.PERSISTED, eventBus);
       reader = dataBlockReader;
 
       // The size of the payload is still unknown - There is no other way than to read

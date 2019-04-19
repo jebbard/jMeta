@@ -22,6 +22,9 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
 import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
 import com.github.jmeta.library.datablocks.api.types.Container;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEvent;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
@@ -38,7 +41,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link Medium}. It can be operated in two modes: Forward reading (the default mode) where the medium is iterated with
  * increasing offsets and backward reading for reading a medium (mainly: files or byte arrays) from back to front.
  */
-public class StandardTopLevelContainerIterator implements TopLevelContainerIterator {
+public class StandardTopLevelContainerIterator implements TopLevelContainerIterator, DataBlockEventListener {
 
    /**
     * @see com.github.jmeta.library.datablocks.api.services.ContainerIterator#remove()
@@ -47,6 +50,15 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
    public void remove() {
    }
 
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
+    */
+   @Override
+   public void dataBlockEventOccurred(DataBlockEvent event) {
+      // TODO implement
+   }
+
+   private DataBlockEventBus eventBus = new DataBlockEventBus();
    private MediumOffset currentOffset;
 
    private final boolean forwardRead;
@@ -89,6 +101,8 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
 
       dataFormatPrecedence.addAll(
          new ArrayList<>(dataBlockServices.stream().map(DataBlockService::getDataFormat).collect(Collectors.toSet())));
+
+      eventBus.registerListener(this);
    }
 
    private final DataFormatRepository m_repository;
@@ -234,12 +248,12 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
     */
    private DataBlockReader createBackwardReader(DataBlockService dataBlocksExtensions,
       final DataFormatSpecification spec, MediumStore mediumStore) {
-      DataBlockReader backwardReader = dataBlocksExtensions.createBackwardDataBlockReader(spec, mediumStore);
+      DataBlockReader backwardReader = dataBlocksExtensions.createBackwardDataBlockReader(spec, mediumStore, eventBus);
 
       // Set default data block reader
       if (backwardReader == null) {
          backwardReader = new BackwardDataBlockReader(spec,
-            createForwardReader(dataBlocksExtensions, spec, mediumStore), mediumStore);
+            createForwardReader(dataBlocksExtensions, spec, mediumStore), mediumStore, eventBus);
       }
       return backwardReader;
    }
@@ -253,11 +267,11 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
     */
    private DataBlockReader createForwardReader(DataBlockService dataBlocksExtensions,
       final DataFormatSpecification spec, MediumStore mediumStore) {
-      DataBlockReader forwardReader = dataBlocksExtensions.createForwardDataBlockReader(spec, mediumStore);
+      DataBlockReader forwardReader = dataBlocksExtensions.createForwardDataBlockReader(spec, mediumStore, eventBus);
 
       // Set default data block reader
       if (forwardReader == null) {
-         forwardReader = new ForwardDataBlockReader(spec, mediumStore);
+         forwardReader = new ForwardDataBlockReader(spec, mediumStore, eventBus);
       }
       return forwardReader;
    }

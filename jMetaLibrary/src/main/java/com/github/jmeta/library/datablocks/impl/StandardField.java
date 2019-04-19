@@ -18,6 +18,7 @@ import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
@@ -53,8 +54,10 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
    }
 
    private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent) {
-      super(fieldDesc.getId(), sequenceNumber, reference, parent, mediumDataProvider, containerContext, DataBlockState.PERSISTED);
+      ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent,
+      DataBlockEventBus eventBus) {
+      super(fieldDesc.getId(), sequenceNumber, reference, parent, mediumDataProvider, containerContext,
+         DataBlockState.PERSISTED, eventBus);
       Reject.ifNull(fieldDesc, "fieldDesc");
 
       m_desc = fieldDesc;
@@ -75,8 +78,8 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
     *           TODO
     */
    public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext, MediumDataProvider mediumDataProvider) {
-      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, null);
+      ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlockEventBus eventBus) {
+      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, null, eventBus);
 
       Reject.ifNull(interpretedValue, "interpretedValue");
 
@@ -95,8 +98,9 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
     *           TODO
     */
    public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
-      int sequenceNumber, ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent) {
-      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, parent);
+      int sequenceNumber, ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent,
+      DataBlockEventBus eventBus) {
+      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, parent, eventBus);
 
       Reject.ifNull(byteValue, "byteValue");
 

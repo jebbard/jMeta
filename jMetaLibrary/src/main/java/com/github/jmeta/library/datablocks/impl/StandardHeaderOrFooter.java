@@ -18,6 +18,7 @@ import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -40,8 +41,9 @@ public class StandardHeaderOrFooter extends AbstractDataBlock implements Header,
     *           TODO
     */
    public StandardHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
-      MediumDataProvider mediumDataProvider, int sequenceNumber, ContainerContext containerContext) {
-      super(id, 0, reference, null, mediumDataProvider, containerContext, DataBlockState.PERSISTED);
+      MediumDataProvider mediumDataProvider, int sequenceNumber, ContainerContext containerContext,
+      DataBlockEventBus eventBus) {
+      super(id, 0, reference, null, mediumDataProvider, containerContext, DataBlockState.PERSISTED, eventBus);
 
       Reject.ifNull(fields, "fields");
 

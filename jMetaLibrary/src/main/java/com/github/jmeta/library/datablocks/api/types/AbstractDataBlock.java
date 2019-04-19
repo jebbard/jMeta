@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEvent;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -20,11 +23,20 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
-public abstract class AbstractDataBlock implements DataBlock {
+public abstract class AbstractDataBlock implements DataBlock, DataBlockEventListener {
 
    private final int sequenceNumber;
    private final MediumDataProvider mediumDataProvider;
    private DataBlockState state;
+   private final DataBlockEventBus eventBus;
+
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
+    */
+   @Override
+   public void dataBlockEventOccurred(DataBlockEvent event) {
+      // TODO implement
+   }
 
    /**
     * Sets the attribute {@link #state}.
@@ -59,22 +71,29 @@ public abstract class AbstractDataBlock implements DataBlock {
     *           TODO
     * @param state
     *           TODO
+    * @param eventBus
+    *           TODO
     */
    public AbstractDataBlock(DataBlockId id, int sequenceNumber, MediumOffset offset, DataBlock parent,
-      MediumDataProvider mediumDataProvider, ContainerContext containerContext, DataBlockState state) {
+      MediumDataProvider mediumDataProvider, ContainerContext containerContext, DataBlockState state,
+      DataBlockEventBus eventBus) {
       Reject.ifNull(id, "id");
       Reject.ifNull(mediumDataProvider, "dataBlockReader");
       Reject.ifNull(offset, "reference");
       Reject.ifNull(state, "state");
+      Reject.ifNull(eventBus, "eventBus");
       Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
       m_id = id;
       this.state = state;
+      this.eventBus = eventBus;
       this.mediumDataProvider = mediumDataProvider;
       m_mediumReference = offset;
       this.sequenceNumber = sequenceNumber;
 
       this.containerContext = containerContext;
+
+      this.eventBus.registerListener(this);
 
       if (parent != null) {
          initParent(parent);

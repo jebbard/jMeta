@@ -18,6 +18,7 @@ import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -53,9 +54,9 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
     * @param mediumStore
     *           TODO
     */
-   public BackwardDataBlockReader(DataFormatSpecification spec, DataBlockReader forwardReader,
-      MediumStore mediumStore) {
-      super(spec, mediumStore);
+   public BackwardDataBlockReader(DataFormatSpecification spec, DataBlockReader forwardReader, MediumStore mediumStore,
+      DataBlockEventBus eventBus) {
+      super(spec, mediumStore, eventBus);
       Reject.ifNull(forwardReader, "forwardReader");
 
       this.forwardReader = forwardReader;
@@ -74,7 +75,7 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
       Reject.ifNull(currentOffset, "currentOffset");
 
       ContainerContext newContainerContext = new StandardContainerContext(getSpecification(), containerContext,
-         getCustomSizeProvider(), getCustomCountProvider());
+         getCustomSizeProvider(), getCustomCountProvider(), getEventBus());
 
       DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,
          0, newContainerContext);
@@ -133,8 +134,8 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
       // Create container
       // IMPORTANT: The containers StandardMediumReference MUST NOT be set to the original passed
       // StandardMediumReference because that one points to the containers back!
-      final Container container = getDataBlockFactory().createPersistedContainer(concreteContainerId, sequenceNumber, parent,
-         nextReference, headers, payload, footers, this, newContainerContext);
+      final Container container = getDataBlockFactory().createPersistedContainer(concreteContainerId, sequenceNumber,
+         parent, nextReference, headers, payload, footers, this, newContainerContext);
       newContainerContext.initContainer(container);
 
       return container;

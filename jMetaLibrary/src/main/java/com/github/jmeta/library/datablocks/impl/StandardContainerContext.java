@@ -23,6 +23,9 @@ import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Field;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEvent;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction;
 import com.github.jmeta.library.dataformats.api.types.ByteOrderOf;
@@ -48,7 +51,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  * {@link StandardContainerContext} of the parent container (if any). If a size could not be determined, the delegate to
  * the parent {@link StandardContainerContext}.
  */
-public class StandardContainerContext implements ContainerContext {
+public class StandardContainerContext implements ContainerContext, DataBlockEventListener {
 
    private Container container;
    private final SizeProvider customSizeProvider;
@@ -56,6 +59,7 @@ public class StandardContainerContext implements ContainerContext {
 
    private final DataFormatSpecification spec;
    private final ContainerContext parentContainerContext;
+   private final DataBlockEventBus eventBus;
 
    private final FieldFunctionStore<Long, SizeOf> sizes = new FieldFunctionStore<>(SizeOf.class);
    private final FieldFunctionStore<Long, SummedSizeOf> summedSizes = new FieldFunctionStore<>(SummedSizeOf.class);
@@ -220,15 +224,21 @@ public class StandardContainerContext implements ContainerContext {
     *           A custom {@link SizeProvider} implementation to be used or null if none
     * @param customCountProvider
     *           A custom {@link CountProvider} implementation to be used or null if none
+    * @param eventBus
+    *           The {@link DataBlockEventBus}, must not be null
     */
    public StandardContainerContext(DataFormatSpecification spec, ContainerContext parentContainerContext,
-      SizeProvider customSizeProvider, CountProvider customCountProvider) {
+      SizeProvider customSizeProvider, CountProvider customCountProvider, DataBlockEventBus eventBus) {
       Reject.ifNull(spec, "spec");
+      Reject.ifNull(eventBus, "eventBus");
 
       this.spec = spec;
       this.parentContainerContext = parentContainerContext;
       this.customSizeProvider = customSizeProvider;
       this.customCountProvider = customCountProvider;
+      this.eventBus = eventBus;
+
+      this.eventBus.registerListener(this);
    }
 
    /**
@@ -481,5 +491,13 @@ public class StandardContainerContext implements ContainerContext {
       }
 
       return Charset.forName(crossReference.getValue());
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
+    */
+   @Override
+   public void dataBlockEventOccurred(DataBlockEvent event) {
+      // TODO implement
    }
 }

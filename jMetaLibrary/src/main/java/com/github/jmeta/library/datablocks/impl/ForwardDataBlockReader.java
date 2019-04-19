@@ -17,6 +17,7 @@ import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
+import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
@@ -36,10 +37,11 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
     *
     * @param spec
     *           The {@link DataFormatSpecification}, must not be null
-    * @param mediumStore TODO
+    * @param mediumStore
+    *           TODO
     */
-   public ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore) {
-      super(spec, mediumStore);
+   public ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus) {
+      super(spec, mediumStore, eventBus);
    }
 
    /**
@@ -57,13 +59,13 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
       getMediumDataProvider().bufferBeforeRead(currentOffset, remainingDirectParentByteCount);
 
       ContainerContext newContainerContext = new StandardContainerContext(getSpecification(), containerContext,
-         getCustomSizeProvider(), getCustomCountProvider());
+         getCustomSizeProvider(), getCustomCountProvider(), getEventBus());
 
       DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,
          0, newContainerContext);
 
-      Container createdContainer = getDataBlockFactory().createPersistedContainer(concreteContainerId, sequenceNumber, parent,
-         currentOffset, this, newContainerContext);
+      Container createdContainer = getDataBlockFactory().createPersistedContainer(concreteContainerId, sequenceNumber,
+         parent, currentOffset, this, newContainerContext);
 
       newContainerContext.initContainer(createdContainer);
 
@@ -167,8 +169,8 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
          getMediumDataProvider().bufferBeforeRead(reference, totalPayloadSize);
       }
 
-      return getDataBlockFactory().createPersistedPayload(payloadDesc.getId(), reference, containerContext, totalPayloadSize,
-         this);
+      return getDataBlockFactory().createPersistedPayload(payloadDesc.getId(), reference, containerContext,
+         totalPayloadSize, this);
    }
 
    /**
