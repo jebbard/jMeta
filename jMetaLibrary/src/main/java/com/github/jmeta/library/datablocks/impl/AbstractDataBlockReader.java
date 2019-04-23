@@ -21,11 +21,13 @@ import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionE
 import com.github.jmeta.library.datablocks.api.services.CountProvider;
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldSequence;
+import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
@@ -55,7 +57,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
 
    private final DataFormatSpecification spec;
 
-   private final DataBlockFactory dataBlockFactory;
+   private final ExtendedDataBlockFactory dataBlockFactory;
 
    private SizeProvider customSizeProvider;
 
@@ -256,8 +258,13 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
          List<Field<?>> headerOrFooterFields = readFields(startOffset, headerOrFooterId, headerOrFooterSize, null,
             containerContext);
 
-         nextHeadersOrFooters.add(dataBlockFactory.createHeaderOrFooter(fieldSequenceClass, headerOrFooterId,
-            startOffset, headerOrFooterFields, i, containerContext));
+         if (fieldSequenceClass == Footer.class) {
+            nextHeadersOrFooters.add((T) dataBlockFactory.createPersistedFooter(headerOrFooterId, startOffset,
+               headerOrFooterFields, i, containerContext, this));
+         } else {
+            nextHeadersOrFooters.add((T) dataBlockFactory.createPersistedHeader(headerOrFooterId, startOffset,
+               headerOrFooterFields, i, containerContext, this));
+         }
       }
 
       return nextHeadersOrFooters;
@@ -327,7 +334,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
    /**
     * @return the {@link DataBlockFactory}
     */
-   protected DataBlockFactory getDataBlockFactory() {
+   protected ExtendedDataBlockFactory getDataBlockFactory() {
       return dataBlockFactory;
    }
 
@@ -496,7 +503,7 @@ public abstract class AbstractDataBlockReader implements DataBlockReader {
       ByteBuffer fieldBuffer = readBytes(reference, (int) fieldSize);
 
       return dataBlockFactory.createPersistedField(fieldDesc.getId(), sequenceNumber, null, reference, fieldBuffer,
-         containerContext);
+         containerContext, this);
    }
 
 }

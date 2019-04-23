@@ -13,15 +13,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
-import com.github.jmeta.library.datablocks.api.types.ContainerContext;
-import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
-import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -33,23 +30,12 @@ public class StandardHeaderOrFooter extends AbstractDataBlock implements Header,
     * Creates a new {@link StandardHeaderOrFooter}.
     *
     * @param id
-    * @param reference
-    * @param fields
-    * @param isFooter
-    * @param mediumDataProvider
-    * @param sequenceNumber
-    *           TODO
+    * @param spec
     */
-   public StandardHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter,
-      MediumDataProvider mediumDataProvider, int sequenceNumber, ContainerContext containerContext,
-      DataBlockEventBus eventBus) {
-      super(id, 0, reference, null, mediumDataProvider, containerContext, DataBlockState.PERSISTED, eventBus);
-
-      Reject.ifNull(fields, "fields");
+   public StandardHeaderOrFooter(DataBlockId id, DataFormatSpecification spec, boolean isFooter) {
+      super(id, spec);
 
       m_isFooter = isFooter;
-
-      setFields(fields);
    }
 
    /**

@@ -10,11 +10,12 @@ package com.github.jmeta.library.datablocks.impl;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldSequence;
 import com.github.jmeta.library.datablocks.api.types.Footer;
@@ -31,7 +32,7 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 /**
  *
  */
-public class StandardDataBlockFactory implements DataBlockFactory {
+public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
    private final MediumDataProvider mediumDataProvider;
    private final DataFormatSpecification spec;
@@ -69,9 +70,33 @@ public class StandardDataBlockFactory implements DataBlockFactory {
     *      com.github.jmeta.library.datablocks.impl.StandardContainerContext)
     */
    @Override
-   public Container createPersistedContainer(DataBlockId id, int sequenceNumber, DataBlock parent, MediumOffset offset,
-      DataBlockReader reader, ContainerContext containerContext) {
+   public Container createPersistedContainerWithoutChildren(DataBlockId id, int sequenceNumber, DataBlock parent,
+      MediumOffset offset, DataBlockReader reader, ContainerContext containerContext) {
       return new StandardContainer(id, parent, offset, mediumDataProvider, containerContext, sequenceNumber, eventBus);
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createPersistedHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.media.api.types.MediumOffset, java.util.List, int,
+    *      com.github.jmeta.library.datablocks.api.types.ContainerContext,
+    *      com.github.jmeta.library.datablocks.api.services.DataBlockReader)
+    */
+   @Override
+   public Header createPersistedHeader(DataBlockId id, MediumOffset reference, List<Field<?>> fields,
+      int sequenceNumber, ContainerContext containerContext, DataBlockReader reader) {
+      return createHeaderOrFooter(Header.class, id, reference, fields, sequenceNumber, containerContext);
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createPersistedFooter(com.github.jmeta.library.dataformats.api.types.DataBlockId,
+    *      com.github.jmeta.library.media.api.types.MediumOffset, java.util.List, int,
+    *      com.github.jmeta.library.datablocks.api.types.ContainerContext,
+    *      com.github.jmeta.library.datablocks.api.services.DataBlockReader)
+    */
+   @Override
+   public Footer createPersistedFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields,
+      int sequenceNumber, ContainerContext containerContext, DataBlockReader reader) {
+      return createHeaderOrFooter(Footer.class, id, reference, fields, sequenceNumber, containerContext);
    }
 
    /**
@@ -80,16 +105,21 @@ public class StandardDataBlockFactory implements DataBlockFactory {
     */
    @Override
    public <T> Field<T> createPersistedField(DataBlockId id, int sequenceNumber, DataBlock parent, MediumOffset offset,
-      ByteBuffer fieldBytes, ContainerContext containerContext) {
+      ByteBuffer fieldBytes, ContainerContext containerContext, DataBlockReader reader) {
 
       Reject.ifNull(id, "fieldDesc");
       Reject.ifNull(offset, "reference");
       Reject.ifNegative(fieldBytes.remaining(), "fieldBytes.remaining()");
 
-      DataBlockDescription desc = spec.getDataBlockDescription(id);
+      StandardField<T> field = new StandardField<>(id, spec);
 
-      StandardField<T> field = new StandardField<>(desc, fieldBytes, offset, sequenceNumber, containerContext,
-         mediumDataProvider, parent, eventBus);
+      if (parent != null) {
+         field.initParent(parent);
+      }
+
+      field.attachToMedium(offset, sequenceNumber, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
+      field.initContainerContext(containerContext);
+      field.setBinaryValue(fieldBytes);
 
       return field;
    }
@@ -112,11 +142,19 @@ public class StandardDataBlockFactory implements DataBlockFactory {
       DataBlockDescription desc = spec.getDataBlockDescription(id);
 
       if (desc.getPhysicalType() == PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
-         return new ContainerBasedLazyPayload(id, offset, totalSize, reader, containerContext, mediumDataProvider,
-            eventBus);
+         ContainerBasedLazyPayload containerBasedLazyPayload = new ContainerBasedLazyPayload(id, spec, reader);
+         containerBasedLazyPayload.initContainerContext(containerContext);
+         containerBasedLazyPayload.attachToMedium(offset, 0, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
+         containerBasedLazyPayload.initSize(totalSize);
+
+         return containerBasedLazyPayload;
       } else {
-         return new FieldBasedLazyPayload(id, offset, totalSize, reader, containerContext, mediumDataProvider,
-            eventBus);
+         FieldBasedLazyPayload fieldBasedLazyPayload = new FieldBasedLazyPayload(id, spec, reader);
+         fieldBasedLazyPayload.initContainerContext(containerContext);
+         fieldBasedLazyPayload.attachToMedium(offset, 0, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
+         fieldBasedLazyPayload.initSize(totalSize);
+
+         return fieldBasedLazyPayload;
       }
    }
 
@@ -124,15 +162,19 @@ public class StandardDataBlockFactory implements DataBlockFactory {
     * @see com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory#createHeader(com.github.jmeta.library.dataformats.api.types.DataBlockId,
     *      MediumOffset, java.util.List, DataBlockReader, int, StandardContainerContext)
     */
-   @Override
-   public <T extends FieldSequence> T createHeaderOrFooter(Class<T> fieldSequenceClass, DataBlockId id,
+   private <T extends FieldSequence> T createHeaderOrFooter(Class<T> fieldSequenceClass, DataBlockId id,
       MediumOffset reference, List<Field<?>> fields, int sequenceNumber, ContainerContext containerContext) {
 
       Reject.ifNull(id, "headerRef");
       Reject.ifNull(reference, "parent");
       Reject.ifNull(fields, "fields");
 
-      return (T) new StandardHeaderOrFooter(id, reference, fields, fieldSequenceClass == Footer.class,
-         mediumDataProvider, sequenceNumber, containerContext, eventBus);
+      StandardHeaderOrFooter headerOrFooter = new StandardHeaderOrFooter(id, spec, fieldSequenceClass == Footer.class);
+
+      headerOrFooter.initContainerContext(containerContext);
+      headerOrFooter.attachToMedium(reference, sequenceNumber, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
+      headerOrFooter.setFields(fields);
+
+      return (T) headerOrFooter;
    }
 }

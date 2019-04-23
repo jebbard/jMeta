@@ -64,8 +64,8 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
       DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,
          0, newContainerContext);
 
-      Container createdContainer = getDataBlockFactory().createPersistedContainer(concreteContainerId, sequenceNumber,
-         parent, currentOffset, this, newContainerContext);
+      Container createdContainer = getDataBlockFactory().createPersistedContainerWithoutChildren(concreteContainerId,
+         sequenceNumber, parent, currentOffset, this, newContainerContext);
 
       newContainerContext.initContainer(createdContainer);
 

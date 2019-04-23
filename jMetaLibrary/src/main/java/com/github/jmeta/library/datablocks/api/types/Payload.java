@@ -16,4 +16,5 @@ package com.github.jmeta.library.datablocks.api.types;
  */
 public interface Payload extends DataBlock {
 
+   public void initSize(long totalSize);
 }

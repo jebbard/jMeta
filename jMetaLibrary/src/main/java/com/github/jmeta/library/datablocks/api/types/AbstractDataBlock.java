@@ -15,6 +15,7 @@ import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
 import com.github.jmeta.library.datablocks.impl.events.DataBlockEvent;
 import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -25,10 +26,48 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public abstract class AbstractDataBlock implements DataBlock, DataBlockEventListener {
 
-   private final int sequenceNumber;
-   private final MediumDataProvider mediumDataProvider;
+   private int sequenceNumber;
+   private MediumDataProvider mediumDataProvider;
    private DataBlockState state;
-   private final DataBlockEventBus eventBus;
+   private DataBlockEventBus eventBus;
+
+   private ContainerContext containerContext;
+
+   private DataBlock m_parent;
+   private MediumOffset m_mediumReference;
+   private final DataBlockId m_id;
+   private final DataFormatSpecification spec;
+
+   public AbstractDataBlock(DataBlockId id, DataFormatSpecification spec) {
+      Reject.ifNull(spec, "spec");
+      Reject.ifNull(id, "id");
+
+      m_id = id;
+      this.spec = spec;
+   }
+
+   public void initContainerContext(ContainerContext containerContext) {
+      Reject.ifNull(containerContext, "containerContext");
+
+      this.containerContext = containerContext;
+   }
+
+   public void attachToMedium(MediumOffset offset, int sequenceNumber, MediumDataProvider mediumDataProvider,
+      DataBlockEventBus eventBus, DataBlockState attachedState) {
+      Reject.ifNull(mediumDataProvider, "dataBlockReader");
+      Reject.ifNull(offset, "reference");
+      Reject.ifNull(eventBus, "eventBus");
+      Reject.ifNull(attachedState, "attachedState");
+      Reject.ifNegative(sequenceNumber, "sequenceNumber");
+
+      this.eventBus = eventBus;
+      this.mediumDataProvider = mediumDataProvider;
+      m_mediumReference = offset;
+      this.sequenceNumber = sequenceNumber;
+      state = attachedState;
+
+      this.eventBus.registerListener(this);
+   }
 
    /**
     * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
@@ -90,6 +129,7 @@ public abstract class AbstractDataBlock implements DataBlock, DataBlockEventList
       this.mediumDataProvider = mediumDataProvider;
       m_mediumReference = offset;
       this.sequenceNumber = sequenceNumber;
+      spec = null;
 
       this.containerContext = containerContext;
 
@@ -99,8 +139,6 @@ public abstract class AbstractDataBlock implements DataBlock, DataBlockEventList
          initParent(parent);
       }
    }
-
-   private final ContainerContext containerContext;
 
    /**
     * @see com.github.jmeta.library.datablocks.api.types.Container#getContainerContext()
@@ -184,12 +222,6 @@ public abstract class AbstractDataBlock implements DataBlock, DataBlockEventList
          + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getOffset() + ", totalSize="
          + getSize() + "]";
    }
-
-   private DataBlock m_parent;
-
-   private MediumOffset m_mediumReference;
-
-   private DataBlockId m_id;
 
    /**
     * @see com.github.jmeta.library.datablocks.api.types.DataBlock#setBytes(byte[][])

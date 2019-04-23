@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.Header;
@@ -40,7 +41,7 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
     * @param dbFactory
     *           The {@link DataBlockFactory}
     */
-   public CompressionHandler(DataBlockFactory dbFactory) {
+   public CompressionHandler(ExtendedDataBlockFactory dbFactory) {
       super(ID3v2TransformationType.COMPRESSION, dbFactory);
    }
 

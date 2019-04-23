@@ -16,14 +16,12 @@ import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConver
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
-import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Field;
-import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
+import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.dataformats.api.types.converter.FieldConverter;
 import com.github.jmeta.library.media.api.types.AbstractMedium;
-import com.github.jmeta.library.media.api.types.MediumOffset;
-import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
  * Represents a leaf node in the data hierarchy of a {@link AbstractMedium}. A {@link StandardField} usually has a small
@@ -53,58 +51,71 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
       return DataBlockDescription.UNDEFINED;
    }
 
-   private StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent,
-      DataBlockEventBus eventBus) {
-      super(fieldDesc.getId(), sequenceNumber, reference, parent, mediumDataProvider, containerContext,
-         DataBlockState.PERSISTED, eventBus);
-      Reject.ifNull(fieldDesc, "fieldDesc");
+   // /**
+   // * Creates a new {@link StandardField}.
+   // *
+   // * @param fieldDesc
+   // * @param byteValue
+   // * @param reference
+   // * @param sequenceNumber
+   // * TODO
+   // * @param containerContext
+   // * TODO
+   // */
+   // public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
+   // int sequenceNumber, ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent,
+   // DataBlockEventBus eventBus) {
+   // super(fieldDesc.getId(), sequenceNumber, reference, parent, mediumDataProvider, containerContext,
+   // DataBlockState.PERSISTED, eventBus);
+   // Reject.ifNull(fieldDesc, "fieldDesc");
+   //
+   // m_desc = fieldDesc;
+   // m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
+   // m_byteOrder = containerContext.getByteOrderOf(getId(), sequenceNumber);
+   // m_characterEncoding = containerContext.getCharacterEncodingOf(getId(), sequenceNumber);
+   //
+   // Reject.ifNull(byteValue, "byteValue");
+   //
+   // m_byteValue = byteValue;
+   // }
 
-      m_desc = fieldDesc;
-      m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
-      m_byteOrder = containerContext.getByteOrderOf(getId(), sequenceNumber);
-      m_characterEncoding = containerContext.getCharacterEncodingOf(getId(), sequenceNumber);
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.AbstractDataBlock#initContainerContext(com.github.jmeta.library.datablocks.api.types.ContainerContext)
+    */
+   @Override
+   public void initContainerContext(ContainerContext containerContext) {
+      super.initContainerContext(containerContext);
+
+      m_byteOrder = containerContext.getByteOrderOf(getId(), getSequenceNumber());
+      m_characterEncoding = containerContext.getCharacterEncodingOf(getId(), getSequenceNumber());
    }
 
    /**
     * Creates a new {@link StandardField}.
     *
-    * @param fieldDesc
-    * @param interpretedValue
-    * @param reference
-    * @param sequenceNumber
-    *           TODO
-    * @param containerContext
-    *           TODO
+    * @param id
+    * @param spec
     */
-   public StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference, int sequenceNumber,
-      ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlockEventBus eventBus) {
-      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, null, eventBus);
-
-      Reject.ifNull(interpretedValue, "interpretedValue");
-
-      m_interpretedValue = interpretedValue;
+   public StandardField(DataBlockId id, DataFormatSpecification spec) {
+      super(id, spec);
+      m_desc = spec.getDataBlockDescription(id);
+      m_fieldConverter = (FieldConverter<T>) m_desc.getFieldProperties().getConverter();
    }
 
    /**
-    * Creates a new {@link StandardField}.
-    *
-    * @param fieldDesc
-    * @param byteValue
-    * @param reference
-    * @param sequenceNumber
-    *           TODO
-    * @param containerContext
-    *           TODO
+    * @see com.github.jmeta.library.datablocks.api.types.Field#setInterpretedValue(java.lang.Object)
     */
-   public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
-      int sequenceNumber, ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent,
-      DataBlockEventBus eventBus) {
-      this(fieldDesc, reference, sequenceNumber, containerContext, mediumDataProvider, parent, eventBus);
+   @Override
+   public void setInterpretedValue(T interpretedValue) {
+      this.m_interpretedValue = interpretedValue;
+   }
 
-      Reject.ifNull(byteValue, "byteValue");
-
-      m_byteValue = byteValue;
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.Field#setBinaryValue(java.nio.ByteBuffer)
+    */
+   @Override
+   public void setBinaryValue(ByteBuffer binaryValue) {
+      this.m_byteValue = binaryValue;
    }
 
    @Override

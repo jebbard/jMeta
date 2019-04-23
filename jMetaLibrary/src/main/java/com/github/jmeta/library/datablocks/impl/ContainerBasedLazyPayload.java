@@ -14,12 +14,9 @@ import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
-import com.github.jmeta.library.datablocks.api.types.ContainerContext;
-import com.github.jmeta.library.datablocks.api.types.DataBlockState;
-import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
  * {@link ContainerBasedLazyPayload} is the default implementation of {@link ContainerBasedPayload}. It lazily reads
@@ -31,28 +28,11 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
    private DataBlockReader reader;
 
    /**
-    * Creates a new {@link FieldBasedLazyPayload}.
-    *
-    * @param id
-    *           The {@link DataBlockId} of the payload
-    * @param offset
-    *           The start {@link MediumOffset} of the payload
-    * @param totalSize
-    *           The total payload size, if already known, or {@link DataBlockDescription#UNDEFINED} if not yet known
-    * @param dataBlockReader
-    *           The {@link DataBlockReader} to be used parsing the content of the payload
-    * @param mediumDataProvider
-    *           TODO
-    * @param context
-    *           The current {@link FieldFunctionStack} context needed for parsing
+    * @see com.github.jmeta.library.datablocks.api.types.Payload#initSize(long)
     */
-   public ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize,
-      DataBlockReader dataBlockReader, ContainerContext containerContext, MediumDataProvider mediumDataProvider,
-      DataBlockEventBus eventBus) {
-      super(id, 0, offset, null, mediumDataProvider, containerContext, DataBlockState.PERSISTED, eventBus);
-
+   @Override
+   public void initSize(long totalSize) {
       this.totalSize = totalSize;
-      reader = dataBlockReader;
 
       // The size of the payload is still unknown - There is no other way than to read
       // its children and sum up their sizes...
@@ -69,6 +49,21 @@ public class ContainerBasedLazyPayload extends AbstractDataBlock implements Cont
 
          this.totalSize = summedUpTotalSize;
       }
+   }
+
+   /**
+    * Creates a new {@link ContainerBasedLazyPayload}.
+    *
+    * @param id
+    * @param spec
+    */
+   public ContainerBasedLazyPayload(DataBlockId id, DataFormatSpecification spec) {
+      super(id, spec);
+   }
+
+   public ContainerBasedLazyPayload(DataBlockId id, DataFormatSpecification spec, DataBlockReader reader) {
+      super(id, spec);
+      this.reader = reader;
    }
 
    /**

@@ -26,4 +26,18 @@ public interface Field<T> extends DataBlock {
     * @throws InterpretedValueConversionException
     */
    public ByteBuffer getBinaryValue() throws InterpretedValueConversionException;
+
+   /**
+    * Returns interpretedValue
+    *
+    * @return interpretedValue
+    * @throws BinaryValueConversionException
+    */
+   public void setInterpretedValue(T interpretedBalue);
+
+   /**
+    * @return the binary value
+    * @throws InterpretedValueConversionException
+    */
+   public void setBinaryValue(ByteBuffer binaryValue);
 }

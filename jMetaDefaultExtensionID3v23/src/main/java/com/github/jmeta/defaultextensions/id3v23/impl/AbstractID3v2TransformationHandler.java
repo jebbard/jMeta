@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
+import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.utility.dbc.api.services.Reject;
@@ -19,7 +20,7 @@ public abstract class AbstractID3v2TransformationHandler {
 
    private final ID3v2TransformationType transformationType;
 
-   private final DataBlockFactory dataBlockFactory;
+   private final ExtendedDataBlockFactory dataBlockFactory;
 
    /**
     * Creates a new {@link AbstractID3v2TransformationHandler}.
@@ -30,7 +31,7 @@ public abstract class AbstractID3v2TransformationHandler {
     *           The {@link DataBlockFactory} for creating transformed containers
     */
    public AbstractID3v2TransformationHandler(ID3v2TransformationType transformationType,
-      DataBlockFactory dataBlockFactory) {
+      ExtendedDataBlockFactory dataBlockFactory) {
       Reject.ifNull(transformationType, "transformationType");
       Reject.ifNull(dataBlockFactory, "dataBlockFactory");
 
@@ -65,8 +66,8 @@ public abstract class AbstractID3v2TransformationHandler {
 
       payload.setBytes(transformedPayloadBytes);
 
-      return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(), container.getParent(),
-         container.getOffset(), container.getHeaders(), payload, container.getFooters(), reader,
+      return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(),
+         container.getParent(), container.getOffset(), container.getHeaders(), payload, container.getFooters(), reader,
          container.getContainerContext());
    }
 
@@ -89,8 +90,8 @@ public abstract class AbstractID3v2TransformationHandler {
 
       payload.setBytes(untransformedPayloadBytes);
 
-      return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(), container.getParent(),
-         container.getOffset(), container.getHeaders(), payload, container.getFooters(), reader,
+      return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(),
+         container.getParent(), container.getOffset(), container.getHeaders(), payload, container.getFooters(), reader,
          container.getContainerContext());
    }
 
@@ -103,7 +104,7 @@ public abstract class AbstractID3v2TransformationHandler {
     *
     * @return the {@link DataBlockFactory} for creating transformed containers
     */
-   protected DataBlockFactory getDataBlockFactory() {
+   protected ExtendedDataBlockFactory getDataBlockFactory() {
 
       return dataBlockFactory;
    }
