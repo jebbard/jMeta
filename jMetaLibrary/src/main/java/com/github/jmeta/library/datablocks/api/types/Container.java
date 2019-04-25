@@ -9,6 +9,9 @@ package com.github.jmeta.library.datablocks.api.types;
 
 import java.util.List;
 
+import com.github.jmeta.library.datablocks.api.services.CountProvider;
+import com.github.jmeta.library.datablocks.api.services.SizeProvider;
+
 /**
  * An {@link Container} represents the integral parts of the so called container formats such as MP3, Ogg, TIFF and so
  * on. These parts are always called differently in any data format: Might it be <i>chunk</i>, <i>page</i>,
@@ -52,4 +55,5 @@ public interface Container extends DataBlock {
 
    void insertFooter(int index, Footer footer);
 
+   void initTopLevelContainerContext(SizeProvider sizeProvider, CountProvider countProvider);
 }

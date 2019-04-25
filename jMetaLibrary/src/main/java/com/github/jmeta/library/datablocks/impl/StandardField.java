@@ -51,34 +51,6 @@ public class StandardField<T> extends AbstractDataBlock implements Field<T> {
       return DataBlockDescription.UNDEFINED;
    }
 
-   // /**
-   // * Creates a new {@link StandardField}.
-   // *
-   // * @param fieldDesc
-   // * @param byteValue
-   // * @param reference
-   // * @param sequenceNumber
-   // * TODO
-   // * @param containerContext
-   // * TODO
-   // */
-   // public StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference,
-   // int sequenceNumber, ContainerContext containerContext, MediumDataProvider mediumDataProvider, DataBlock parent,
-   // DataBlockEventBus eventBus) {
-   // super(fieldDesc.getId(), sequenceNumber, reference, parent, mediumDataProvider, containerContext,
-   // DataBlockState.PERSISTED, eventBus);
-   // Reject.ifNull(fieldDesc, "fieldDesc");
-   //
-   // m_desc = fieldDesc;
-   // m_fieldConverter = (FieldConverter<T>) fieldDesc.getFieldProperties().getConverter();
-   // m_byteOrder = containerContext.getByteOrderOf(getId(), sequenceNumber);
-   // m_characterEncoding = containerContext.getCharacterEncodingOf(getId(), sequenceNumber);
-   //
-   // Reject.ifNull(byteValue, "byteValue");
-   //
-   // m_byteValue = byteValue;
-   // }
-
    /**
     * @see com.github.jmeta.library.datablocks.api.types.AbstractDataBlock#initContainerContext(com.github.jmeta.library.datablocks.api.types.ContainerContext)
     */

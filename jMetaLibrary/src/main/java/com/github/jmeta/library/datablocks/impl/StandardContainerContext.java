@@ -53,13 +53,12 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class StandardContainerContext implements ContainerContext, DataBlockEventListener {
 
-   private Container container;
+   private final Container container;
    private final SizeProvider customSizeProvider;
    private final CountProvider customCountProvider;
 
    private final DataFormatSpecification spec;
    private final ContainerContext parentContainerContext;
-   private final DataBlockEventBus eventBus;
 
    private final FieldFunctionStore<Long, SizeOf> sizes = new FieldFunctionStore<>(SizeOf.class);
    private final FieldFunctionStore<Long, SummedSizeOf> summedSizes = new FieldFunctionStore<>(SummedSizeOf.class);
@@ -126,6 +125,16 @@ public class StandardContainerContext implements ContainerContext, DataBlockEven
             throw new RuntimeException("Unexpected exception during context field conversion", e);
          }
       }
+
+      /**
+       * @see java.lang.Object#toString()
+       */
+      @Override
+      public String toString() {
+         return "FieldCrossReference [referencedBlock=" + referencedBlock + ", referencingField=" + referencingField
+            + ", referencingFieldFunction=" + referencingFieldFunction + ", value=" + getValue() + "]";
+      }
+
    }
 
    /**
@@ -220,6 +229,8 @@ public class StandardContainerContext implements ContainerContext, DataBlockEven
     * @param parentContainerContext
     *           The parent {@link ContainerContext}, might be null if this {@link ContainerContext} belongs to a
     *           top-level container
+    * @param container
+    *           TODO
     * @param customSizeProvider
     *           A custom {@link SizeProvider} implementation to be used or null if none
     * @param customCountProvider
@@ -228,17 +239,15 @@ public class StandardContainerContext implements ContainerContext, DataBlockEven
     *           The {@link DataBlockEventBus}, must not be null
     */
    public StandardContainerContext(DataFormatSpecification spec, ContainerContext parentContainerContext,
-      SizeProvider customSizeProvider, CountProvider customCountProvider, DataBlockEventBus eventBus) {
+      Container container, SizeProvider customSizeProvider, CountProvider customCountProvider) {
       Reject.ifNull(spec, "spec");
-      Reject.ifNull(eventBus, "eventBus");
+      Reject.ifNull(container, "container");
 
       this.spec = spec;
       this.parentContainerContext = parentContainerContext;
       this.customSizeProvider = customSizeProvider;
       this.customCountProvider = customCountProvider;
-      this.eventBus = eventBus;
-
-      this.eventBus.registerListener(this);
+      this.container = container;
    }
 
    /**
@@ -258,22 +267,21 @@ public class StandardContainerContext implements ContainerContext, DataBlockEven
    }
 
    /**
+    * @see com.github.jmeta.library.datablocks.api.types.ContainerContext#createChildContainerContext(com.github.jmeta.library.datablocks.api.types.Container)
+    */
+   @Override
+   public ContainerContext createChildContainerContext(Container childContainer) {
+      Reject.ifNull(childContainer, "childContainer");
+
+      return new StandardContainerContext(spec, this, childContainer, customSizeProvider, customCountProvider);
+   }
+
+   /**
     * @see com.github.jmeta.library.datablocks.api.types.ContainerContext#getContainer()
     */
    @Override
    public Container getContainer() {
       return container;
-   }
-
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.ContainerContext#initContainer(com.github.jmeta.library.datablocks.api.types.Container)
-    */
-   @Override
-   public void initContainer(Container container) {
-      Reject.ifNull(container, "container");
-      Reject.ifFalse(this.container == null, "initContainer must only be called once");
-
-      this.container = container;
    }
 
    /**

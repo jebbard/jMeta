@@ -38,18 +38,19 @@ public interface ContainerContext {
    ContainerContext getParentContainerContext();
 
    /**
+    * Creates a new {@link ContainerContext} based on this {@link ContainerContext} and the provided child
+    * {@link Container}.
+    *
+    * @param childContainer
+    *           The child {@link Container}, must not be null
+    * @return A child {@link ContainerContext} for the given child {@link Container}
+    */
+   ContainerContext createChildContainerContext(Container childContainer);
+
+   /**
     * @return the {@link Container} this {@link ContainerContext} belongs to
     */
    Container getContainer();
-
-   /**
-    * Initializes the {@link Container} this {@link ContainerContext} belongs to. This method must only be called once
-    * after creating the {@link ContainerContext}.
-    *
-    * @param container
-    *           The {@link Container} this context belongs to, must not be null
-    */
-   void initContainer(Container container);
 
    /**
     * Adds all {@link FieldFunction}s of the given field to this {@link ContainerContext}. The concrete values can be

@@ -12,17 +12,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.github.jmeta.library.datablocks.api.services.CountProvider;
+import com.github.jmeta.library.datablocks.api.services.SizeProvider;
 import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
-import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
-import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
-import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
+import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
-import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
@@ -34,55 +33,10 @@ public class StandardContainer extends AbstractDataBlock implements Container {
     * Creates a new {@link StandardContainer}.
     *
     * @param id
-    * @param parent
-    * @param reference
-    * @param headers
-    * @param payload
-    * @param footers
-    * @param mediumDataProvider
-    * @param containerContext
-    *           TODO
-    * @param sequenceNumber
-    *           TODO
+    * @param spec
     */
-   public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers,
-      Payload payload, List<Footer> footers, MediumDataProvider mediumDataProvider, ContainerContext containerContext,
-      int sequenceNumber, DataBlockEventBus eventBus) {
-      this(id, parent, reference, mediumDataProvider, containerContext, sequenceNumber, eventBus);
-
-      Reject.ifNull(footers, "footers");
-      Reject.ifNull(payload, "payload");
-      Reject.ifNull(headers, "headers");
-
-      for (int i = 0; i < headers.size(); ++i) {
-         insertHeader(i, headers.get(i));
-      }
-
-      for (int i = 0; i < footers.size(); ++i) {
-         insertFooter(i, footers.get(i));
-      }
-
-      setPayload(payload);
-   }
-
-   /**
-    * Creates a new {@link StandardContainer}.
-    *
-    * @param id
-    * @param parent
-    * @param reference
-    * @param mediumDataProvider
-    * @param sequenceNumber
-    *           TODO
-    * @param eventBus
-    *           TODO
-    * @param parentContainerContext
-    */
-   public StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference,
-      MediumDataProvider mediumDataProvider, ContainerContext containerContext, int sequenceNumber,
-      DataBlockEventBus eventBus) {
-      super(id, sequenceNumber, reference, parent, mediumDataProvider, containerContext, DataBlockState.PERSISTED,
-         eventBus);
+   public StandardContainer(DataBlockId id, DataFormatSpecification spec) {
+      super(id, spec);
    }
 
    /**
@@ -173,6 +127,24 @@ public class StandardContainer extends AbstractDataBlock implements Container {
       totalSize += m_payload.getSize();
 
       return totalSize;
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.Container#initTopLevelContainerContext(com.github.jmeta.library.datablocks.api.services.SizeProvider,
+    *      com.github.jmeta.library.datablocks.api.services.CountProvider)
+    */
+   @Override
+   public void initTopLevelContainerContext(SizeProvider sizeProvider, CountProvider countProvider) {
+      initContainerContext(new StandardContainerContext(getSpec(), null, this, sizeProvider, countProvider));
+   }
+
+   /**
+    * @see com.github.jmeta.library.datablocks.api.types.AbstractDataBlock#initParent(com.github.jmeta.library.datablocks.api.types.DataBlock)
+    */
+   @Override
+   public void initParent(DataBlock parent) {
+      super.initParent(parent);
+      initContainerContext(parent.getContainerContext().createChildContainerContext(this));
    }
 
    private final List<Header> m_headers = new ArrayList<>();

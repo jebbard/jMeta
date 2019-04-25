@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
+import com.github.jmeta.library.datablocks.api.types.AbstractDataBlock;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
@@ -58,8 +59,39 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
       List<Header> headers, Payload payload, List<Footer> footers, DataBlockReader reader,
       ContainerContext containerContext) {
 
-      return new StandardContainer(id, parent, offset, headers, payload, footers, mediumDataProvider, containerContext,
-         sequenceNumber, eventBus);
+      StandardContainer container = new StandardContainer(id, spec);
+
+      initDataBlock(container, offset, sequenceNumber, parent, containerContext);
+
+      for (int i = 0; i < headers.size(); i++) {
+         container.insertHeader(i, headers.get(i));
+      }
+
+      container.setPayload(payload);
+
+      for (int i = 0; i < footers.size(); i++) {
+         container.insertFooter(i, footers.get(i));
+      }
+
+      return container;
+   }
+
+   /**
+    * @param dataBlock
+    * @param offset
+    * @param sequenceNumber
+    * @param parent
+    * @param containerContext
+    */
+   private void initDataBlock(AbstractDataBlock dataBlock, MediumOffset offset, int sequenceNumber, DataBlock parent,
+      ContainerContext containerContext) {
+      dataBlock.initContainerContext(containerContext);
+
+      if (parent != null) {
+         dataBlock.initParent(parent);
+      }
+
+      dataBlock.attachToMedium(offset, sequenceNumber, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
    }
 
    /**
@@ -72,7 +104,12 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
    @Override
    public Container createPersistedContainerWithoutChildren(DataBlockId id, int sequenceNumber, DataBlock parent,
       MediumOffset offset, DataBlockReader reader, ContainerContext containerContext) {
-      return new StandardContainer(id, parent, offset, mediumDataProvider, containerContext, sequenceNumber, eventBus);
+
+      StandardContainer container = new StandardContainer(id, spec);
+
+      initDataBlock(container, offset, sequenceNumber, parent, containerContext);
+
+      return container;
    }
 
    /**
@@ -113,12 +150,8 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
       StandardField<T> field = new StandardField<>(id, spec);
 
-      if (parent != null) {
-         field.initParent(parent);
-      }
+      initDataBlock(field, offset, sequenceNumber, parent, containerContext);
 
-      field.attachToMedium(offset, sequenceNumber, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
-      field.initContainerContext(containerContext);
       field.setBinaryValue(fieldBytes);
 
       return field;
@@ -143,15 +176,13 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
       if (desc.getPhysicalType() == PhysicalDataBlockType.CONTAINER_BASED_PAYLOAD) {
          ContainerBasedLazyPayload containerBasedLazyPayload = new ContainerBasedLazyPayload(id, spec, reader);
-         containerBasedLazyPayload.initContainerContext(containerContext);
-         containerBasedLazyPayload.attachToMedium(offset, 0, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
+         initDataBlock(containerBasedLazyPayload, offset, 0, null, containerContext);
          containerBasedLazyPayload.initSize(totalSize);
 
          return containerBasedLazyPayload;
       } else {
          FieldBasedLazyPayload fieldBasedLazyPayload = new FieldBasedLazyPayload(id, spec, reader);
-         fieldBasedLazyPayload.initContainerContext(containerContext);
-         fieldBasedLazyPayload.attachToMedium(offset, 0, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
+         initDataBlock(fieldBasedLazyPayload, offset, 0, null, containerContext);
          fieldBasedLazyPayload.initSize(totalSize);
 
          return fieldBasedLazyPayload;
@@ -171,8 +202,7 @@ public class StandardDataBlockFactory implements ExtendedDataBlockFactory {
 
       StandardHeaderOrFooter headerOrFooter = new StandardHeaderOrFooter(id, spec, fieldSequenceClass == Footer.class);
 
-      headerOrFooter.initContainerContext(containerContext);
-      headerOrFooter.attachToMedium(reference, sequenceNumber, mediumDataProvider, eventBus, DataBlockState.PERSISTED);
+      initDataBlock(headerOrFooter, reference, sequenceNumber, null, containerContext);
       headerOrFooter.setFields(fields);
 
       return (T) headerOrFooter;

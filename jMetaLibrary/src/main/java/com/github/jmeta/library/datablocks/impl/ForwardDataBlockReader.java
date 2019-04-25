@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -58,16 +59,20 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
 
       getMediumDataProvider().bufferBeforeRead(currentOffset, remainingDirectParentByteCount);
 
-      ContainerContext newContainerContext = new StandardContainerContext(getSpecification(), containerContext,
-         getCustomSizeProvider(), getCustomCountProvider(), getEventBus());
-
       DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,
-         0, newContainerContext);
+         0, parent != null ? parent.getContainerContext() : null);
 
-      Container createdContainer = getDataBlockFactory().createPersistedContainerWithoutChildren(concreteContainerId,
-         sequenceNumber, parent, currentOffset, this, newContainerContext);
+      StandardContainer createdContainer = new StandardContainer(concreteContainerId, getSpecification());
 
-      newContainerContext.initContainer(createdContainer);
+      createdContainer.initSequenceNumber(sequenceNumber);
+
+      if (parent == null) {
+         createdContainer.initTopLevelContainerContext(getCustomSizeProvider(), getCustomCountProvider());
+      } else {
+         createdContainer.initParent(parent);
+      }
+
+      ContainerContext newContainerContext = createdContainer.getContainerContext();
 
       DataBlockDescription containerDesc = getSpecification().getDataBlockDescription(concreteContainerId);
 
@@ -141,6 +146,9 @@ public class ForwardDataBlockReader extends AbstractDataBlockReader {
 
          footers.addAll(nextFooters);
       }
+
+      createdContainer.attachToMedium(currentOffset, sequenceNumber, getMediumDataProvider(), getEventBus(),
+         DataBlockState.PERSISTED);
 
       return createdContainer;
    }

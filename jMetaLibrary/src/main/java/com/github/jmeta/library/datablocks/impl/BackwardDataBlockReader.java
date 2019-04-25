@@ -15,6 +15,7 @@ import java.util.List;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerContext;
+import com.github.jmeta.library.datablocks.api.types.DataBlockState;
 import com.github.jmeta.library.datablocks.api.types.Footer;
 import com.github.jmeta.library.datablocks.api.types.Header;
 import com.github.jmeta.library.datablocks.api.types.Payload;
@@ -74,11 +75,20 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
       Reject.ifNull(id, "id");
       Reject.ifNull(currentOffset, "currentOffset");
 
-      ContainerContext newContainerContext = new StandardContainerContext(getSpecification(), containerContext,
-         getCustomSizeProvider(), getCustomCountProvider(), getEventBus());
-
       DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,
-         0, newContainerContext);
+         0, containerContext);
+
+      StandardContainer createdContainer = new StandardContainer(concreteContainerId, getSpecification());
+
+      if (parent == null) {
+         createdContainer.initTopLevelContainerContext(getCustomSizeProvider(), getCustomCountProvider());
+      } else {
+         createdContainer.initParent(parent);
+      }
+
+      ContainerContext newContainerContext = createdContainer.getContainerContext();
+
+      createdContainer.initSequenceNumber(sequenceNumber);
 
       DataBlockDescription containerDesc = getSpecification().getDataBlockDescription(concreteContainerId);
 
@@ -101,6 +111,10 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
          List<Footer> nextFooters = readHeadersOrFootersWithId(Footer.class, nextReference, footerDesc.getId(),
             newContainerContext);
 
+         for (int j = 0; j < nextFooters.size(); j++) {
+            createdContainer.insertFooter(j, nextFooters.get(j));
+         }
+
          footers.addAll(0, nextFooters);
       }
 
@@ -109,6 +123,8 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
 
       Payload payload = readPayload(nextReference, payloadDesc.getId(), concreteContainerId,
          remainingDirectParentByteCount, newContainerContext);
+
+      createdContainer.setPayload(payload);
 
       // Read headers
       nextReference = nextReference.advance(-payload.getSize());
@@ -128,17 +144,17 @@ public class BackwardDataBlockReader extends AbstractDataBlockReader {
          List<Header> nextHeaders = readHeadersOrFootersWithId(Header.class, nextReference, headerDesc.getId(),
             newContainerContext);
 
+         for (int j = 0; j < nextHeaders.size(); j++) {
+            createdContainer.insertHeader(j, nextHeaders.get(j));
+         }
+
          headers.addAll(0, nextHeaders);
       }
 
-      // Create container
-      // IMPORTANT: The containers StandardMediumReference MUST NOT be set to the original passed
-      // StandardMediumReference because that one points to the containers back!
-      final Container container = getDataBlockFactory().createPersistedContainer(concreteContainerId, sequenceNumber,
-         parent, nextReference, headers, payload, footers, this, newContainerContext);
-      newContainerContext.initContainer(container);
+      createdContainer.attachToMedium(nextReference, sequenceNumber, getMediumDataProvider(), getEventBus(),
+         DataBlockState.PERSISTED);
 
-      return container;
+      return createdContainer;
    }
 
    /**

@@ -38,6 +38,24 @@ public abstract class AbstractDataBlock implements DataBlock, DataBlockEventList
    private final DataBlockId m_id;
    private final DataFormatSpecification spec;
 
+   /**
+    * Returns the attribute {@link #eventBus}.
+    *
+    * @return the attribute {@link #eventBus}
+    */
+   public DataBlockEventBus getEventBus() {
+      return eventBus;
+   }
+
+   /**
+    * Returns the attribute {@link #spec}.
+    *
+    * @return the attribute {@link #spec}
+    */
+   public DataFormatSpecification getSpec() {
+      return spec;
+   }
+
    public AbstractDataBlock(DataBlockId id, DataFormatSpecification spec) {
       Reject.ifNull(spec, "spec");
       Reject.ifNull(id, "id");
@@ -50,6 +68,10 @@ public abstract class AbstractDataBlock implements DataBlock, DataBlockEventList
       Reject.ifNull(containerContext, "containerContext");
 
       this.containerContext = containerContext;
+   }
+
+   public void initSequenceNumber(int sequenceNumber) {
+      this.sequenceNumber = sequenceNumber;
    }
 
    public void attachToMedium(MediumOffset offset, int sequenceNumber, MediumDataProvider mediumDataProvider,
@@ -65,6 +87,7 @@ public abstract class AbstractDataBlock implements DataBlock, DataBlockEventList
       m_mediumReference = offset;
       this.sequenceNumber = sequenceNumber;
       state = attachedState;
+      getEventBus().registerListener((DataBlockEventListener) containerContext);
 
       this.eventBus.registerListener(this);
    }
@@ -210,6 +233,7 @@ public abstract class AbstractDataBlock implements DataBlock, DataBlockEventList
       Reject.ifFalse(getParent() == null, "getParent() == null");
 
       m_parent = parent;
+      initContainerContext(parent.getContainerContext());
    }
 
    /**
