@@ -12,46 +12,43 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 /**
- * {@link ExpectedFailedFieldConversionData} is used for storing expected {@link Charset} and {@link ByteOrder} for a
- * failed field conversion.
+ * {@link ExpectedFailedFieldConversionData} is used for storing expected
+ * {@link Charset} and {@link ByteOrder} for a failed field conversion.
  */
 public class ExpectedFailedFieldConversionData {
 
-   /**
-    * Creates a new {@link ExpectedFailedFieldConversionData}.
-    * 
-    * @param characterEncoding
-    *           The expected {@link Charset}.
-    * @param byteOrder
-    *           The expected {@link ByteOrder}.
-    */
-   public ExpectedFailedFieldConversionData(Charset characterEncoding,
-      ByteOrder byteOrder) {
-      m_characterEncoding = characterEncoding;
-      m_byteOrder = byteOrder;
-   }
+	private final Charset m_characterEncoding;
 
-   /**
-    * Returns the expected {@link Charset}.
-    * 
-    * @return the expected {@link Charset}.
-    */
-   public Charset getCharacterEncoding() {
+	private final ByteOrder m_byteOrder;
 
-      return m_characterEncoding;
-   }
+	/**
+	 * Creates a new {@link ExpectedFailedFieldConversionData}.
+	 * 
+	 * @param characterEncoding The expected {@link Charset}.
+	 * @param byteOrder         The expected {@link ByteOrder}.
+	 */
+	public ExpectedFailedFieldConversionData(Charset characterEncoding, ByteOrder byteOrder) {
+		m_characterEncoding = characterEncoding;
+		m_byteOrder = byteOrder;
+	}
 
-   /**
-    * Returns the expected {@link ByteOrder}.
-    *
-    * @return the expected {@link ByteOrder}.
-    */
-   public ByteOrder getByteOrder() {
+	/**
+	 * Returns the expected {@link ByteOrder}.
+	 *
+	 * @return the expected {@link ByteOrder}.
+	 */
+	public ByteOrder getByteOrder() {
 
-      return m_byteOrder;
-   }
+		return m_byteOrder;
+	}
 
-   private final Charset m_characterEncoding;
+	/**
+	 * Returns the expected {@link Charset}.
+	 * 
+	 * @return the expected {@link Charset}.
+	 */
+	public Charset getCharacterEncoding() {
 
-   private final ByteOrder m_byteOrder;
+		return m_characterEncoding;
+	}
 }

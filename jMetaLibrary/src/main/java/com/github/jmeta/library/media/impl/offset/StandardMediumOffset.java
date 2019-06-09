@@ -13,181 +13,182 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link StandardMediumOffset} is the default implementation of {@link MediumOffset}.
+ * {@link StandardMediumOffset} is the default implementation of
+ * {@link MediumOffset}.
  */
 public class StandardMediumOffset implements MediumOffset {
 
-   private final Medium<?> medium;
+	private final Medium<?> medium;
 
-   private long absoluteMediumOffset;
+	private long absoluteMediumOffset;
 
-   private MediumOffsetFactory factory;
+	private MediumOffsetFactory factory;
 
-   /**
-    * Creates a new {@link StandardMediumOffset}.
-    * 
-    * @param medium
-    *           The {@link Medium} to refer to.
-    * @param absoluteMediumOffset
-    *           The absolute offset in the {@link Medium}, relative to its starting point which is offset 0. Must not be
-    *           smaller than 0.
-    */
-   public StandardMediumOffset(Medium<?> medium, long absoluteMediumOffset) {
+	/**
+	 * Creates a new {@link StandardMediumOffset}.
+	 * 
+	 * @param medium               The {@link Medium} to refer to.
+	 * @param absoluteMediumOffset The absolute offset in the {@link Medium},
+	 *                             relative to its starting point which is offset 0.
+	 *                             Must not be smaller than 0.
+	 */
+	public StandardMediumOffset(Medium<?> medium, long absoluteMediumOffset) {
 
-      Reject.ifNull(medium, "medium");
+		Reject.ifNull(medium, "medium");
 
-      this.medium = medium;
-      setAbsoluteMediumOffset(absoluteMediumOffset);
-   }
+		this.medium = medium;
+		setAbsoluteMediumOffset(absoluteMediumOffset);
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.api.types.MediumOffset#advance(long)
-    */
-   @Override
-   public MediumOffset advance(long count) {
+	/**
+	 * @see com.github.jmeta.library.media.api.types.MediumOffset#advance(long)
+	 */
+	@Override
+	public MediumOffset advance(long count) {
 
-      Reject.ifFalse(getAbsoluteMediumOffset() >= -count, "getAbsoluteMediumOffset() >= -count");
+		Reject.ifFalse(getAbsoluteMediumOffset() >= -count, "getAbsoluteMediumOffset() >= -count");
 
-      long advancedMediumOffset = getAbsoluteMediumOffset() + count;
+		long advancedMediumOffset = getAbsoluteMediumOffset() + count;
 
-      if (this.factory != null) {
-         return factory.createMediumOffset(advancedMediumOffset);
-      }
+		if (factory != null) {
+			return factory.createMediumOffset(advancedMediumOffset);
+		}
 
-      return new StandardMediumOffset(getMedium(), advancedMediumOffset);
-   }
+		return new StandardMediumOffset(getMedium(), advancedMediumOffset);
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.api.types.MediumOffset#before(com.github.jmeta.library.media.api.types.MediumOffset)
-    */
-   @Override
-   public boolean before(MediumOffset other) {
+	/**
+	 * @see com.github.jmeta.library.media.api.types.MediumOffset#before(com.github.jmeta.library.media.api.types.MediumOffset)
+	 */
+	@Override
+	public boolean before(MediumOffset other) {
 
-      Reject.ifNull(other, "other");
-      Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
+		Reject.ifNull(other, "other");
+		Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
 
-      return getAbsoluteMediumOffset() < other.getAbsoluteMediumOffset();
-   }
+		return getAbsoluteMediumOffset() < other.getAbsoluteMediumOffset();
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.api.types.MediumOffset#behindOrEqual(com.github.jmeta.library.media.api.types.MediumOffset)
-    */
-   @Override
-   public boolean behindOrEqual(MediumOffset other) {
+	/**
+	 * @see com.github.jmeta.library.media.api.types.MediumOffset#behindOrEqual(com.github.jmeta.library.media.api.types.MediumOffset)
+	 */
+	@Override
+	public boolean behindOrEqual(MediumOffset other) {
 
-      Reject.ifNull(other, "other");
-      Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
+		Reject.ifNull(other, "other");
+		Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
 
-      return getAbsoluteMediumOffset() >= other.getAbsoluteMediumOffset();
-   }
+		return getAbsoluteMediumOffset() >= other.getAbsoluteMediumOffset();
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.api.types.MediumOffset#distanceTo(com.github.jmeta.library.media.api.types.MediumOffset)
-    */
-   @Override
-   public long distanceTo(MediumOffset other) {
+	/**
+	 * @see com.github.jmeta.library.media.api.types.MediumOffset#distanceTo(com.github.jmeta.library.media.api.types.MediumOffset)
+	 */
+	@Override
+	public long distanceTo(MediumOffset other) {
 
-      Reject.ifNull(other, "other");
-      Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
+		Reject.ifNull(other, "other");
+		Reject.ifFalse(getMedium().equals(other.getMedium()), "getMedium().equals(other.getMedium())");
 
-      return getAbsoluteMediumOffset() - other.getAbsoluteMediumOffset();
-   }
+		return getAbsoluteMediumOffset() - other.getAbsoluteMediumOffset();
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.api.types.MediumOffset#getAbsoluteMediumOffset()
-    */
-   @Override
-   public long getAbsoluteMediumOffset() {
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
 
-      return absoluteMediumOffset;
-   }
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		MediumOffset other = (MediumOffset) obj;
+		if (absoluteMediumOffset != other.getAbsoluteMediumOffset()) {
+			return false;
+		}
+		if (medium == null) {
+			if (other.getMedium() != null) {
+				return false;
+			}
+		} else if (!medium.equals(other.getMedium())) {
+			return false;
+		}
+		return true;
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.api.types.MediumOffset#getMedium()
-    */
-   @Override
-   public Medium<?> getMedium() {
+	/**
+	 * @see com.github.jmeta.library.media.api.types.MediumOffset#getAbsoluteMediumOffset()
+	 */
+	@Override
+	public long getAbsoluteMediumOffset() {
 
-      return medium;
-   }
+		return absoluteMediumOffset;
+	}
 
-   /**
-    * @see java.lang.Object#equals(java.lang.Object)
-    */
-   @Override
-   public boolean equals(Object obj) {
+	/**
+	 * @see com.github.jmeta.library.media.api.types.MediumOffset#getMedium()
+	 */
+	@Override
+	public Medium<?> getMedium() {
 
-      if (this == obj) {
-         return true;
-      }
-      if (obj == null) {
-         return false;
-      }
-      if (getClass() != obj.getClass()) {
-         return false;
-      }
-      MediumOffset other = (MediumOffset) obj;
-      if (absoluteMediumOffset != other.getAbsoluteMediumOffset()) {
-         return false;
-      }
-      if (medium == null) {
-         if (other.getMedium() != null) {
-            return false;
-         }
-      } else if (!medium.equals(other.getMedium())) {
-         return false;
-      }
-      return true;
-   }
+		return medium;
+	}
 
-   /**
-    * @see java.lang.Object#hashCode()
-    */
-   @Override
-   public int hashCode() {
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
 
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + (int) (absoluteMediumOffset ^ (absoluteMediumOffset >>> 32));
-      result = prime * result + ((medium == null) ? 0 : medium.hashCode());
-      return result;
-   }
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + (int) (absoluteMediumOffset ^ (absoluteMediumOffset >>> 32));
+		result = (prime * result) + ((medium == null) ? 0 : medium.hashCode());
+		return result;
+	}
 
-   /**
-    * @see java.lang.Object#toString()
-    */
-   @Override
-   public String toString() {
+	/**
+	 * Sets a new absolute medium offset for this {@link StandardMediumOffset}.
+	 * 
+	 * @param absoluteMediumOffset The absolute offset in the {@link Medium},
+	 *                             relative to its starting point which is offset 0.
+	 *                             Must not be smaller than 0.
+	 */
+	void setAbsoluteMediumOffset(long absoluteMediumOffset) {
 
-      return "StandardMediumReference [absoluteMediumOffset=" + absoluteMediumOffset + " ("
-         + Long.toHexString(absoluteMediumOffset).toUpperCase() + " HEX), medium=" + medium + "]";
-   }
+		Reject.ifNegative(absoluteMediumOffset, "absoluteMediumOffset");
 
-   /**
-    * Sets the {@link MediumOffsetFactory} this {@link MediumOffset} belongs to. Whenever the {@link #advance(long)}
-    * method is called, the advanced {@link MediumOffset} instance is added to this {@link MediumOffsetFactory}.
-    * 
-    * @param factory
-    *           The {@link MediumOffsetFactory} to add this {@link MediumOffset} to.
-    */
-   void setMediumReferenceRepository(MediumOffsetFactory factory) {
+		this.absoluteMediumOffset = absoluteMediumOffset;
+	}
 
-      Reject.ifNull(factory, "factory");
+	/**
+	 * Sets the {@link MediumOffsetFactory} this {@link MediumOffset} belongs to.
+	 * Whenever the {@link #advance(long)} method is called, the advanced
+	 * {@link MediumOffset} instance is added to this {@link MediumOffsetFactory}.
+	 * 
+	 * @param factory The {@link MediumOffsetFactory} to add this
+	 *                {@link MediumOffset} to.
+	 */
+	void setMediumReferenceRepository(MediumOffsetFactory factory) {
 
-      this.factory = factory;
-   }
+		Reject.ifNull(factory, "factory");
 
-   /**
-    * Sets a new absolute medium offset for this {@link StandardMediumOffset}.
-    * 
-    * @param absoluteMediumOffset
-    *           The absolute offset in the {@link Medium}, relative to its starting point which is offset 0. Must not be
-    *           smaller than 0.
-    */
-   void setAbsoluteMediumOffset(long absoluteMediumOffset) {
+		this.factory = factory;
+	}
 
-      Reject.ifNegative(absoluteMediumOffset, "absoluteMediumOffset");
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
 
-      this.absoluteMediumOffset = absoluteMediumOffset;
-   }
+		return "StandardMediumReference [absoluteMediumOffset=" + absoluteMediumOffset + " ("
+			+ Long.toHexString(absoluteMediumOffset).toUpperCase() + " HEX), medium=" + medium + "]";
+	}
 }

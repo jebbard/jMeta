@@ -16,9 +16,10 @@ import java.util.List;
  */
 public interface ExtensionManager {
 
-   /**
-    * @return all currently available {@link Extension}s. None of the extensions returned will be null. If there are no
-    *         extensions available, an empty list is returned.
-    */
-   public List<Extension> getAllExtensions();
+	/**
+	 * @return all currently available {@link Extension}s. None of the extensions
+	 *         returned will be null. If there are no extensions available, an empty
+	 *         list is returned.
+	 */
+	List<Extension> getAllExtensions();
 }

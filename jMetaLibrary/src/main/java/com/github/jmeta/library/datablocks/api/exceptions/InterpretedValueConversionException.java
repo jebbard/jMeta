@@ -19,66 +19,65 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
  */
 public class InterpretedValueConversionException extends Exception {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   /**
-    * Creates a new {@link InterpretedValueConversionException}.
-    * 
-    * @param message
-    * @param cause
-    * @param fieldDesc
-    * @param interpretedValue
-    * @param byteOrder
-    * @param characterEncoding
-    */
-   public InterpretedValueConversionException(String message, Throwable cause,
-      DataBlockDescription fieldDesc, Object interpretedValue,
-      ByteOrder byteOrder, Charset characterEncoding) {
-      super(message, cause);
+	private final DataBlockDescription m_fieldDescription;
 
-      m_interpretedValue = interpretedValue;
-      m_characterEncoding = characterEncoding;
-      m_byteOrder = byteOrder;
-      m_fieldDescription = fieldDesc;
-   }
+	private final Object m_interpretedValue;
 
-   /**
-    * @return the {@link DataBlockDescription}
-    */
-   public DataBlockDescription getFieldDescription() {
+	private final Charset m_characterEncoding;
 
-      return m_fieldDescription;
-   }
+	private final ByteOrder m_byteOrder;
 
-   /**
-    * @return the interpreted value
-    */
-   public Object getInterpretedValue() {
+	/**
+	 * Creates a new {@link InterpretedValueConversionException}.
+	 * 
+	 * @param message
+	 * @param cause
+	 * @param fieldDesc
+	 * @param interpretedValue
+	 * @param byteOrder
+	 * @param characterEncoding
+	 */
+	public InterpretedValueConversionException(String message, Throwable cause, DataBlockDescription fieldDesc,
+		Object interpretedValue, ByteOrder byteOrder, Charset characterEncoding) {
+		super(message, cause);
 
-      return m_interpretedValue;
-   }
+		m_interpretedValue = interpretedValue;
+		m_characterEncoding = characterEncoding;
+		m_byteOrder = byteOrder;
+		m_fieldDescription = fieldDesc;
+	}
 
-   /**
-    * @return the {@link Charset}
-    */
-   public Charset getCharacterEncoding() {
+	/**
+	 * @return the {@link ByteOrder}
+	 */
+	public ByteOrder getByteOrder() {
 
-      return m_characterEncoding;
-   }
+		return m_byteOrder;
+	}
 
-   /**
-    * @return the {@link ByteOrder}
-    */
-   public ByteOrder getByteOrder() {
+	/**
+	 * @return the {@link Charset}
+	 */
+	public Charset getCharacterEncoding() {
 
-      return m_byteOrder;
-   }
+		return m_characterEncoding;
+	}
 
-   private final DataBlockDescription m_fieldDescription;
+	/**
+	 * @return the {@link DataBlockDescription}
+	 */
+	public DataBlockDescription getFieldDescription() {
 
-   private final Object m_interpretedValue;
+		return m_fieldDescription;
+	}
 
-   private final Charset m_characterEncoding;
+	/**
+	 * @return the interpreted value
+	 */
+	public Object getInterpretedValue() {
 
-   private final ByteOrder m_byteOrder;
+		return m_interpretedValue;
+	}
 }

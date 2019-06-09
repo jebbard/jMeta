@@ -17,36 +17,42 @@ import java.util.List;
  */
 public class Flags6ByteTest extends Flags5ByteTest {
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.Flags2ByteTest#getByteLength()
-    */
-   @Override
-   protected int getByteLength() {
-      return 6;
-   }
+	private final static String FURIOUS_ANGER_FLAG = "FurtosdaAnger";
 
-   /**
-    * Returns the flag mapping to use for both {@link FlagSpecification}s.
-    *
-    * @return The flag mapping to use for both {@link FlagSpecification}s.
-    */
-   @Override
-   protected List<FlagDescription> getFlagDescriptions() {
-      if (m_enhancedDescriptions.isEmpty()) {
-         m_enhancedDescriptions.addAll(super.getFlagDescriptions());
+	private final static String OTHERWORLD = "otherworld";
 
-         m_enhancedDescriptions.add(new FlagDescription(RESERVED_6_FLAG, new BitAddress(5, 0), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(OTHERWORLD, new BitAddress(5, 2), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(FURIOUS_ANGER_FLAG, new BitAddress(5, 4), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(QUADSYNCHRONISATION_FLAG, new BitAddress(5, 6), "", 1, null));
-      }
+	private final static String RESERVED_6_FLAG = "Reserved 6";
+	private final static String QUADSYNCHRONISATION_FLAG = "Quad synchronsisation";
+	private final List<FlagDescription> m_enhancedDescriptions = new ArrayList<>();
 
-      return m_enhancedDescriptions;
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.Flags2ByteTest#getByteLength()
+	 */
+	@Override
+	protected int getByteLength() {
+		return 6;
+	}
 
-   private final List<FlagDescription> m_enhancedDescriptions = new ArrayList<>();
-   private final static String FURIOUS_ANGER_FLAG = "FurtosdaAnger";
-   private final static String OTHERWORLD = "otherworld";
-   private final static String RESERVED_6_FLAG = "Reserved 6";
-   private final static String QUADSYNCHRONISATION_FLAG = "Quad synchronsisation";
+	/**
+	 * Returns the flag mapping to use for both {@link FlagSpecification}s.
+	 *
+	 * @return The flag mapping to use for both {@link FlagSpecification}s.
+	 */
+	@Override
+	protected List<FlagDescription> getFlagDescriptions() {
+		if (m_enhancedDescriptions.isEmpty()) {
+			m_enhancedDescriptions.addAll(super.getFlagDescriptions());
+
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags6ByteTest.RESERVED_6_FLAG, new BitAddress(5, 0), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags6ByteTest.OTHERWORLD, new BitAddress(5, 2), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags6ByteTest.FURIOUS_ANGER_FLAG, new BitAddress(5, 4), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags6ByteTest.QUADSYNCHRONISATION_FLAG, new BitAddress(5, 6), "", 1, null));
+		}
+
+		return m_enhancedDescriptions;
+	}
 }

@@ -17,5 +17,5 @@ import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
  */
 public interface DataFormatSpecificationBuilderFactory {
 
-   public DataFormatSpecificationBuilder createDataFormatSpecificationBuilder(ContainerDataFormat dataFormat);
+	DataFormatSpecificationBuilder createDataFormatSpecificationBuilder(ContainerDataFormat dataFormat);
 }

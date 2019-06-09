@@ -12,16 +12,15 @@ package com.github.jmeta.library.dataformats.api.services.builder;
 /**
  * {@link HeaderBuilder} allows to add fields to a header data block
  *
- * @param <P>
- *           The concrete parent builder interface
+ * @param <P> The concrete parent builder interface
  */
 public interface HeaderBuilder<P>
-   extends FieldSequenceBuilder<HeaderBuilder<P>>, DynamicOccurrenceBuilder<HeaderBuilder<P>> {
+	extends FieldSequenceBuilder<HeaderBuilder<P>>, DynamicOccurrenceBuilder<HeaderBuilder<P>> {
 
-   /**
-    * Finishes the builder
-    * 
-    * @return The parent builder
-    */
-   P finishHeader();
+	/**
+	 * Finishes the builder
+	 * 
+	 * @return The parent builder
+	 */
+	P finishHeader();
 }

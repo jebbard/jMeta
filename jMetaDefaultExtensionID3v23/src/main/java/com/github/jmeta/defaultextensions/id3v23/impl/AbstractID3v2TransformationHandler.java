@@ -11,101 +11,102 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link AbstractID3v2TransformationHandler} is the base class for all possible ID3v2 tag or frame transformations.
+ * {@link AbstractID3v2TransformationHandler} is the base class for all possible
+ * ID3v2 tag or frame transformations.
  */
 // TODO: Proper testing required
 public abstract class AbstractID3v2TransformationHandler {
 
-   private static final int MAX_ID3V2_PAYLOAD_SIZE = (1 << 28) - 1;
+	private static final int MAX_ID3V2_PAYLOAD_SIZE = (1 << 28) - 1;
 
-   private final ID3v2TransformationType transformationType;
+	private final ID3v2TransformationType transformationType;
 
-   private final ExtendedDataBlockFactory dataBlockFactory;
+	private final ExtendedDataBlockFactory dataBlockFactory;
 
-   /**
-    * Creates a new {@link AbstractID3v2TransformationHandler}.
-    *
-    * @param transformationType
-    *           The {@link ID3v2TransformationType} identifying the type of transformation
-    * @param dataBlockFactory
-    *           The {@link DataBlockFactory} for creating transformed containers
-    */
-   public AbstractID3v2TransformationHandler(ID3v2TransformationType transformationType,
-      ExtendedDataBlockFactory dataBlockFactory) {
-      Reject.ifNull(transformationType, "transformationType");
-      Reject.ifNull(dataBlockFactory, "dataBlockFactory");
+	/**
+	 * Creates a new {@link AbstractID3v2TransformationHandler}.
+	 *
+	 * @param transformationType The {@link ID3v2TransformationType} identifying the
+	 *                           type of transformation
+	 * @param dataBlockFactory   The {@link DataBlockFactory} for creating
+	 *                           transformed containers
+	 */
+	public AbstractID3v2TransformationHandler(ID3v2TransformationType transformationType,
+		ExtendedDataBlockFactory dataBlockFactory) {
+		Reject.ifNull(transformationType, "transformationType");
+		Reject.ifNull(dataBlockFactory, "dataBlockFactory");
 
-      this.transformationType = transformationType;
-      this.dataBlockFactory = dataBlockFactory;
-   }
+		this.transformationType = transformationType;
+		this.dataBlockFactory = dataBlockFactory;
+	}
 
-   public ID3v2TransformationType getTransformationType() {
+	/**
+	 * Returns the {@link DataBlockFactory} for creating transformed containers
+	 *
+	 * @return the {@link DataBlockFactory} for creating transformed containers
+	 */
+	protected ExtendedDataBlockFactory getDataBlockFactory() {
 
-      return transformationType;
-   }
+		return dataBlockFactory;
+	}
 
-   public abstract boolean requiresTransform(Container container);
+	public ID3v2TransformationType getTransformationType() {
 
-   public abstract boolean requiresUntransform(Container container);
+		return transformationType;
+	}
 
-   public Container transform(Container container, DataBlockReader reader) {
-      Reject.ifNull(container, "container");
-      Reject.ifFalse(requiresTransform(container), "requiresTransform(container)");
+	public abstract boolean requiresTransform(Container container);
 
-      Payload payload = container.getPayload();
+	public abstract boolean requiresUntransform(Container container);
 
-      if (payload.getSize() > MAX_ID3V2_PAYLOAD_SIZE) {
-         throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
-      }
+	public Container transform(Container container, DataBlockReader reader) {
+		Reject.ifNull(container, "container");
+		Reject.ifFalse(requiresTransform(container), "requiresTransform(container)");
 
-      // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
-      int size = (int) payload.getSize();
+		Payload payload = container.getPayload();
 
-      ByteBuffer payloadBytes = payload.getBytes(container.getOffset(), size);
-      byte[][] transformedPayloadBytes = transformRawBytes(payloadBytes);
+		if (payload.getSize() > AbstractID3v2TransformationHandler.MAX_ID3V2_PAYLOAD_SIZE) {
+			throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
+		}
 
-      payload.setBytes(transformedPayloadBytes);
+		// Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
+		int size = (int) payload.getSize();
 
-      return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(),
-         container.getParent(), container.getOffset(), container.getHeaders(), payload, container.getFooters(), reader,
-         container.getContainerContext());
-   }
+		ByteBuffer payloadBytes = payload.getBytes(container.getOffset(), size);
+		byte[][] transformedPayloadBytes = transformRawBytes(payloadBytes);
 
-   public Container untransform(Container container, DataBlockReader reader) {
+		payload.setBytes(transformedPayloadBytes);
 
-      Reject.ifNull(container, "container");
-      Reject.ifFalse(requiresUntransform(container), "requiresUntransform(container)");
+		return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(),
+			container.getParent(), container.getOffset(), container.getHeaders(), payload, container.getFooters(),
+			reader, container.getContainerContext());
+	}
 
-      Payload payload = container.getPayload();
+	protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);
 
-      if (payload.getSize() > MAX_ID3V2_PAYLOAD_SIZE) {
-         throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
-      }
+	public Container untransform(Container container, DataBlockReader reader) {
 
-      // Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
-      int size = (int) payload.getSize();
+		Reject.ifNull(container, "container");
+		Reject.ifFalse(requiresUntransform(container), "requiresUntransform(container)");
 
-      ByteBuffer payloadBytes = payload.getBytes(container.getOffset(), size);
-      byte[][] untransformedPayloadBytes = untransformRawBytes(payloadBytes);
+		Payload payload = container.getPayload();
 
-      payload.setBytes(untransformedPayloadBytes);
+		if (payload.getSize() > AbstractID3v2TransformationHandler.MAX_ID3V2_PAYLOAD_SIZE) {
+			throw new IllegalStateException("The size of an ID3v2 container must not exceed 2^28-1 bytes");
+		}
 
-      return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(),
-         container.getParent(), container.getOffset(), container.getHeaders(), payload, container.getFooters(), reader,
-         container.getContainerContext());
-   }
+		// Intentional cast to int due to size limitation of ID3v2 containers to 2^28-1
+		int size = (int) payload.getSize();
 
-   protected abstract byte[][] transformRawBytes(ByteBuffer payloadBytes);
+		ByteBuffer payloadBytes = payload.getBytes(container.getOffset(), size);
+		byte[][] untransformedPayloadBytes = untransformRawBytes(payloadBytes);
 
-   protected abstract byte[][] untransformRawBytes(ByteBuffer payloadBytes);
+		payload.setBytes(untransformedPayloadBytes);
 
-   /**
-    * Returns the {@link DataBlockFactory} for creating transformed containers
-    *
-    * @return the {@link DataBlockFactory} for creating transformed containers
-    */
-   protected ExtendedDataBlockFactory getDataBlockFactory() {
+		return getDataBlockFactory().createPersistedContainer(container.getId(), container.getSequenceNumber(),
+			container.getParent(), container.getOffset(), container.getHeaders(), payload, container.getFooters(),
+			reader, container.getContainerContext());
+	}
 
-      return dataBlockFactory;
-   }
+	protected abstract byte[][] untransformRawBytes(ByteBuffer payloadBytes);
 }

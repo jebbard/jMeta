@@ -16,14 +16,15 @@ import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
  */
 public interface DataFormatRepository {
 
-   /**
-    * @return the supported {@link ContainerDataFormat}s
-    */
-   public Set<ContainerDataFormat> getSupportedDataFormats();
+	/**
+	 * @param dataFormat
+	 * @return the {@link DataFormatSpecification} for the given
+	 *         {@link ContainerDataFormat}
+	 */
+	DataFormatSpecification getDataFormatSpecification(ContainerDataFormat dataFormat);
 
-   /**
-    * @param dataFormat
-    * @return the {@link DataFormatSpecification} for the given {@link ContainerDataFormat}
-    */
-   public DataFormatSpecification getDataFormatSpecification(ContainerDataFormat dataFormat);
+	/**
+	 * @return the supported {@link ContainerDataFormat}s
+	 */
+	Set<ContainerDataFormat> getSupportedDataFormats();
 }

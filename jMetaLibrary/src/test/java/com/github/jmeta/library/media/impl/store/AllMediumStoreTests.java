@@ -13,12 +13,13 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * {@link AllMediumStoreTests} is used for running all test cases of the extension management component.
+ * {@link AllMediumStoreTests} is used for running all test cases of the
+ * extension management component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ ReadOnlyFileMediumStoreTest.class, ReadOnlyInMemoryMediumStoreTest.class,
-   ReadOnlyStreamMediumStoreTest.class, StreamMediumStoreTest.class, WritableFileMediumStoreTest.class,
-   WritableInMemoryMediumStoreTest.class, })
+	ReadOnlyStreamMediumStoreTest.class, StreamMediumStoreTest.class, WritableFileMediumStoreTest.class,
+	WritableInMemoryMediumStoreTest.class, })
 public class AllMediumStoreTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

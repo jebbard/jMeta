@@ -20,34 +20,34 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
  */
 public class BinaryFieldConverter extends AbstractBaseFieldConverter<byte[]> {
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
-    *      java.nio.charset.Charset)
-    */
-   @Override
-   protected byte[] convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) {
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      java.nio.ByteOrder, java.nio.charset.Charset)
+	 */
+	@Override
+	protected byte[] convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+		Charset characterEncoding) {
 
-      binaryValue.mark();
+		binaryValue.mark();
 
-      byte[] bytes = new byte[binaryValue.remaining()];
+		byte[] bytes = new byte[binaryValue.remaining()];
 
-      binaryValue.get(bytes);
+		binaryValue.get(bytes);
 
-      binaryValue.reset();
+		binaryValue.reset();
 
-      return bytes;
-   }
+		return bytes;
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
-    *      java.nio.charset.Charset)
-    */
-   @Override
-   protected ByteBuffer convertInterpretedToBinary(byte[] interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding) {
-      return ByteBuffer.wrap(interpretedValue);
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      java.nio.ByteOrder, java.nio.charset.Charset)
+	 */
+	@Override
+	protected ByteBuffer convertInterpretedToBinary(byte[] interpretedValue, DataBlockDescription desc,
+		ByteOrder byteOrder, Charset characterEncoding) {
+		return ByteBuffer.wrap(interpretedValue);
+	}
 }

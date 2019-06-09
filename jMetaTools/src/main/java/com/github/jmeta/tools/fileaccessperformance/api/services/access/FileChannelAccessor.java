@@ -17,71 +17,69 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * {@link FileChannelAccessor} implements a performance test for {@link FileChannel}.
+ * {@link FileChannelAccessor} implements a performance test for
+ * {@link FileChannel}.
  */
 public class FileChannelAccessor extends AbstractFileAccessor {
 
-   /**
-    * Creates a new {@link FileChannelAccessor}.
-    * 
-    * @param file
-    *           The {@link File} to be tested
-    * @param bytesToWrite
-    *           The byte array with the bytes to write.
-    * @param bytesToRead
-    *           The number of bytes to read.
-    * @param bytesAtEnd
-    *           The number of bytes to preserve at the end of file.
-    * @param deleteFileAfterClose
-    *           Whether to delete the file after closing or not.
-    * @throws IOException
-    *            whenever an I/O operation failed.
-    */
-   public FileChannelAccessor(File file, byte[] bytesToWrite, int bytesToRead,
-      int bytesAtEnd, boolean deleteFileAfterClose) throws IOException {
-      super(file, bytesToWrite, bytesToRead, bytesAtEnd, deleteFileAfterClose);
+	private RandomAccessFile m_raf;
 
-      m_raf = new RandomAccessFile(file, "rw");
-   }
+	/**
+	 * Creates a new {@link FileChannelAccessor}.
+	 * 
+	 * @param file                 The {@link File} to be tested
+	 * @param bytesToWrite         The byte array with the bytes to write.
+	 * @param bytesToRead          The number of bytes to read.
+	 * @param bytesAtEnd           The number of bytes to preserve at the end of
+	 *                             file.
+	 * @param deleteFileAfterClose Whether to delete the file after closing or not.
+	 * @throws IOException whenever an I/O operation failed.
+	 */
+	public FileChannelAccessor(File file, byte[] bytesToWrite, int bytesToRead, int bytesAtEnd,
+		boolean deleteFileAfterClose) throws IOException {
+		super(file, bytesToWrite, bytesToRead, bytesAtEnd, deleteFileAfterClose);
 
-   /**
-    * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#close()
-    */
-   @Override
-   protected void doClose() throws IOException {
+		m_raf = new RandomAccessFile(file, "rw");
+	}
 
-      m_raf.close();
-   }
+	/**
+	 * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#close()
+	 */
+	@Override
+	protected void doClose() throws IOException {
 
-   /**
-    * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#read(long, int)
-    */
-   @Override
-   protected byte[] read(long offset, int length) throws IOException {
+		m_raf.close();
+	}
 
-      ByteBuffer dataBuffer = ByteBuffer.allocate(length);
+	/**
+	 * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#read(long,
+	 *      int)
+	 */
+	@Override
+	protected byte[] read(long offset, int length) throws IOException {
 
-      final FileChannel channel = m_raf.getChannel();
+		ByteBuffer dataBuffer = ByteBuffer.allocate(length);
 
-      channel.position(offset);
-      channel.read(dataBuffer);
+		final FileChannel channel = m_raf.getChannel();
 
-      dataBuffer.flip();
+		channel.position(offset);
+		channel.read(dataBuffer);
 
-      return dataBuffer.array();
-   }
+		dataBuffer.flip();
 
-   /**
-    * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#write(long, byte[])
-    */
-   @Override
-   protected void write(long offset, byte[] bytesToWrite) throws IOException {
+		return dataBuffer.array();
+	}
 
-      final FileChannel channel = m_raf.getChannel();
+	/**
+	 * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#write(long,
+	 *      byte[])
+	 */
+	@Override
+	protected void write(long offset, byte[] bytesToWrite) throws IOException {
 
-      channel.position(offset);
-      channel.write(ByteBuffer.wrap(bytesToWrite));
-   }
+		final FileChannel channel = m_raf.getChannel();
 
-   private RandomAccessFile m_raf;
+		channel.position(offset);
+		channel.write(ByteBuffer.wrap(bytesToWrite));
+	}
 }

@@ -16,10 +16,10 @@ import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService
  */
 public class APEv2DataBlocksService extends AbstractDataBlockService {
 
-   /**
-    * Creates a new {@link APEv2DataBlocksService}.
-    */
-   public APEv2DataBlocksService() {
-      super(APEv2Extension.APEv2);
-   }
+	/**
+	 * Creates a new {@link APEv2DataBlocksService}.
+	 */
+	public APEv2DataBlocksService() {
+		super(APEv2Extension.APEv2);
+	}
 }

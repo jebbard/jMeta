@@ -18,24 +18,23 @@ import com.github.jmeta.utility.logging.api.services.LoggingConstants;
  */
 public class LogChecker {
 
-   /**
-    * Performs standard checks on a JMeta log file.
-    *
-    * @param logFile
-    *           The log file to check.
-    */
-   public void logCheck(File logFile) {
+	/**
+	 * Performs standard checks on a JMeta log file.
+	 *
+	 * @param logFile The log file to check.
+	 */
+	public void logCheck(File logFile) {
 
-      LogUnitTest lut = new LogUnitTest();
+		LogUnitTest lut = new LogUnitTest();
 
-      lut.load(logFile);
+		lut.load(logFile);
 
-      lut.assertContainsNot(LoggingConstants.PREFIX_CRITICAL_ERROR);
-      lut.assertContainsNot(LoggingConstants.PREFIX_CHECKED_EXCEPTION);
-      lut.assertContainsNot(LoggingConstants.PREFIX_RUNTIME_EXCEPTION);
-      lut.assertContainsNot(LoggingConstants.PREFIX_THROWABLE);
-      lut.assertContainsNot(LoggingConstants.PREFIX_TASK_FAILED);
-      lut.assertContainsNot(LoggingConstants.CACHE_MISS);
-      lut.assertContainsNot(Level.SEVERE.toString());
-   }
+		lut.assertContainsNot(LoggingConstants.PREFIX_CRITICAL_ERROR);
+		lut.assertContainsNot(LoggingConstants.PREFIX_CHECKED_EXCEPTION);
+		lut.assertContainsNot(LoggingConstants.PREFIX_RUNTIME_EXCEPTION);
+		lut.assertContainsNot(LoggingConstants.PREFIX_THROWABLE);
+		lut.assertContainsNot(LoggingConstants.PREFIX_TASK_FAILED);
+		lut.assertContainsNot(LoggingConstants.CACHE_MISS);
+		lut.assertContainsNot(Level.SEVERE.toString());
+	}
 }

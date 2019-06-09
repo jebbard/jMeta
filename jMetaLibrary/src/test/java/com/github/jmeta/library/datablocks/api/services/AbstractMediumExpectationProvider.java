@@ -25,181 +25,187 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * {@link AbstractMediumExpectationProvider} provides expected test data for a single top-level data block of a single
- * {@link ContainerDataFormat} for testing {@link DataBlockAccessor} instances.
+ * {@link AbstractMediumExpectationProvider} provides expected test data for a
+ * single top-level data block of a single {@link ContainerDataFormat} for
+ * testing {@link DataBlockAccessor} instances.
  */
 public abstract class AbstractMediumExpectationProvider {
 
-   /**
-    * This wild card expression in an expected value should be interpreted as "any value".
-    */
-   public static String ANY_WILDCARD = "*";
+	/**
+	 * This wild card expression in an expected value should be interpreted as "any
+	 * value".
+	 */
+	public static String ANY_WILDCARD = "*";
 
-   private DataFormatRepository dataFormatRepository;
+	private DataFormatRepository dataFormatRepository;
 
-   /**
-    * Creates a new {@link AbstractMediumExpectationProvider}.
-    * 
-    * @param dataFormatRepository
-    *           The {@link DataFormatRepository}.
-    * @param testFile
-    *           The test data file.
-    */
-   public AbstractMediumExpectationProvider(DataFormatRepository dataFormatRepository, Path testFile) {
+	private final Path file;
 
-      Reject.ifNull(testFile, "testFile");
-      Reject.ifNull(dataFormatRepository, "dataFormatRepository");
-      Reject.ifFalse(Files.isRegularFile(testFile), "Files.isRegularFile(testFile)");
+	private final RandomAccessFile raf;
 
-      this.dataFormatRepository = dataFormatRepository;
+	/**
+	 * Creates a new {@link AbstractMediumExpectationProvider}.
+	 * 
+	 * @param dataFormatRepository The {@link DataFormatRepository}.
+	 * @param testFile             The test data file.
+	 */
+	public AbstractMediumExpectationProvider(DataFormatRepository dataFormatRepository, Path testFile) {
 
-      Path tempCopyFile = testFile.getParent().resolve(testFile.getFileName() + "_TEMP");
+		Reject.ifNull(testFile, "testFile");
+		Reject.ifNull(dataFormatRepository, "dataFormatRepository");
+		Reject.ifFalse(Files.isRegularFile(testFile), "Files.isRegularFile(testFile)");
 
-      try {
-         Files.copy(testFile, tempCopyFile, StandardCopyOption.REPLACE_EXISTING);
+		this.dataFormatRepository = dataFormatRepository;
 
-         raf = new RandomAccessFile(tempCopyFile.toFile(), "r");
-         file = tempCopyFile;
-      } catch (IOException e) {
-         throw new InvalidTestDataException("Could not create or open copy of test file <"
-            + testFile.toAbsolutePath().toString() + "> in destination file <" + tempCopyFile + ">.", e);
-      }
-   }
+		Path tempCopyFile = testFile.getParent().resolve(testFile.getFileName() + "_TEMP");
 
-   /**
-    * Returns the expected interpreted field value for the given field {@link DataBlockInstanceId}. If there is no data
-    * for the given {@link DataBlockInstanceId}, null is returned.
-    *
-    * @param fieldInstanceId
-    *           The field {@link DataBlockInstanceId}.
-    * @return The field's expected interpreted value or null if there is no entry for the given
-    *         {@link DataBlockInstanceId}.
-    */
-   public abstract Object getExpectedFieldInterpretedValue(DataBlockInstanceId fieldInstanceId);
+		try {
+			Files.copy(testFile, tempCopyFile, StandardCopyOption.REPLACE_EXISTING);
 
-   /**
-    * Returns a {@link List} of {@link DataBlockInstanceId} that represents the expected children of the given parent
-    * {@link DataBlockInstanceId} of the given {@link PhysicalDataBlockType} in their expected order.
-    *
-    * @param parentInstanceId
-    *           The parent {@link DataBlockInstanceId}.
-    * @param blockType
-    *           The {@link PhysicalDataBlockType} of the children to query.
-    * @return a {@link List} of {@link DataBlockInstanceId} that represents the expected children of the given parent
-    *         {@link DataBlockInstanceId} of the given {@link PhysicalDataBlockType} in their expected order.
-    */
-   public abstract List<DataBlockInstanceId> getExpectedChildBlocksOfType(DataBlockInstanceId parentInstanceId,
-      PhysicalDataBlockType blockType);
+			raf = new RandomAccessFile(tempCopyFile.toFile(), "r");
+			file = tempCopyFile;
+		} catch (IOException e) {
+			throw new InvalidTestDataException("Could not create or open copy of test file <"
+				+ testFile.toAbsolutePath().toString() + "> in destination file <" + tempCopyFile + ">.", e);
+		}
+	}
 
-   /**
-    * Returns the expected block size for the given {@link DataBlockInstanceId}.
-    *
-    * @param instanceId
-    *           The {@link DataBlockInstanceId}.
-    * @return the expected block size for the given {@link DataBlockInstanceId}.
-    */
-   public abstract long getExpectedDataBlockSize(DataBlockInstanceId instanceId);
+	/**
+	 * Cleans this {@link AbstractMediumExpectationProvider} up. Should be called
+	 * whenever the user is finished with this instance, e.g. in tear down of a
+	 * jUnit test case.
+	 */
+	public void cleanUp() {
 
-   /**
-    * Returns the field {@link DataBlockInstanceId}s, for which a failing conversion from binary to interpreted value is
-    * expected.
-    * 
-    * @param fieldInstance
-    *           The field's {@link DataBlockInstanceId}.
-    *
-    * @return the field {@link DataBlockInstanceId}s, for which a failing conversion from binary to interpreted value is
-    *         expected.
-    */
-   public abstract ExpectedFailedFieldConversionData getExpectedFailingFieldConversions(
-      DataBlockInstanceId fieldInstance);
+		if (raf != null) {
+			try {
+				raf.close();
+			} catch (IOException e) {
+				throw new InvalidTestDataException("Could not close file <" + file.toAbsolutePath().toString() + ">.",
+					e);
+			}
+		}
 
-   /**
-    * Returns a list of expected top-level container {@link DataBlockInstanceId}s.
-    *
-    * @return a list of expected top-level container {@link DataBlockInstanceId}s.
-    */
-   public abstract List<DataBlockInstanceId> getExpectedTopLevelContainers();
+		String message = "Could not delete file <" + file.toAbsolutePath().toString() + ">.";
+		try {
+			if (!Files.deleteIfExists(file)) {
+				throw new InvalidTestDataException(message, null);
+			}
+		} catch (IOException e) {
+			throw new InvalidTestDataException(message, null);
+		}
+	}
 
-   /**
-    * Returns a list of expected top-level container {@link DataBlockInstanceId}s when reading from back to front.
-    *
-    * @return a list of expected top-level container {@link DataBlockInstanceId}s when reading from back to front.
-    */
-   public abstract List<DataBlockInstanceId> getExpectedTopLevelContainersReverse();
+	/**
+	 * Returns the {@link DataFormatSpecification} corresponding to the given
+	 * {@link ContainerDataFormat}.
+	 * 
+	 * @param format The {@link ContainerDataFormat}
+	 *
+	 * @return the {@link DataFormatSpecification} corresponding to the given
+	 *         {@link ContainerDataFormat}.
+	 */
+	protected DataFormatSpecification getDataFormatSpecification(ContainerDataFormat format) {
 
-   /**
-    * Returns the expected bytes stored at the given absolute offset with given size.
-    * 
-    * @param absoluteOffset
-    *           The absolute medium offset.
-    * @param size
-    *           The number of expected bytes to return.
-    *
-    * @return the expected data block bytes for the given {@link DataBlockInstanceId} at the given absolute offset with
-    *         given size.
-    */
-   public ByteBuffer getExpectedBytes(long absoluteOffset, int size) {
+		return dataFormatRepository.getDataFormatSpecification(format);
+	}
 
-      ByteBuffer result = ByteBuffer.allocate(size);
+	/**
+	 * Returns the expected bytes stored at the given absolute offset with given
+	 * size.
+	 * 
+	 * @param absoluteOffset The absolute medium offset.
+	 * @param size           The number of expected bytes to return.
+	 *
+	 * @return the expected data block bytes for the given
+	 *         {@link DataBlockInstanceId} at the given absolute offset with given
+	 *         size.
+	 */
+	public ByteBuffer getExpectedBytes(long absoluteOffset, int size) {
 
-      try {
-         raf.getChannel().read(result, absoluteOffset);
-      } catch (IOException e) {
-         throw new InvalidTestDataException("Could not read <" + size + "> expected block " + "bytes from file <"
-            + file.toAbsolutePath().toString() + "> at offset <" + absoluteOffset + ">.", e);
-      }
+		ByteBuffer result = ByteBuffer.allocate(size);
 
-      result.rewind();
+		try {
+			raf.getChannel().read(result, absoluteOffset);
+		} catch (IOException e) {
+			throw new InvalidTestDataException("Could not read <" + size + "> expected block " + "bytes from file <"
+				+ file.toAbsolutePath().toString() + "> at offset <" + absoluteOffset + ">.", e);
+		}
 
-      return result;
-   }
+		result.rewind();
 
-   /**
-    * Cleans this {@link AbstractMediumExpectationProvider} up. Should be called whenever the user is finished with this
-    * instance, e.g. in tear down of a jUnit test case.
-    */
-   public void cleanUp() {
+		return result;
+	}
 
-      if (raf != null)
-         try {
-            raf.close();
-         } catch (IOException e) {
-            throw new InvalidTestDataException("Could not close file <" + file.toAbsolutePath().toString() + ">.", e);
-         }
+	/**
+	 * Returns a {@link List} of {@link DataBlockInstanceId} that represents the
+	 * expected children of the given parent {@link DataBlockInstanceId} of the
+	 * given {@link PhysicalDataBlockType} in their expected order.
+	 *
+	 * @param parentInstanceId The parent {@link DataBlockInstanceId}.
+	 * @param blockType        The {@link PhysicalDataBlockType} of the children to
+	 *                         query.
+	 * @return a {@link List} of {@link DataBlockInstanceId} that represents the
+	 *         expected children of the given parent {@link DataBlockInstanceId} of
+	 *         the given {@link PhysicalDataBlockType} in their expected order.
+	 */
+	public abstract List<DataBlockInstanceId> getExpectedChildBlocksOfType(DataBlockInstanceId parentInstanceId,
+		PhysicalDataBlockType blockType);
 
-      String message = "Could not delete file <" + file.toAbsolutePath().toString() + ">.";
-      try {
-         if (!Files.deleteIfExists(file))
-            throw new InvalidTestDataException(message, null);
-      } catch (IOException e) {
-         throw new InvalidTestDataException(message, null);
-      }
-   }
+	/**
+	 * Returns the expected block size for the given {@link DataBlockInstanceId}.
+	 *
+	 * @param instanceId The {@link DataBlockInstanceId}.
+	 * @return the expected block size for the given {@link DataBlockInstanceId}.
+	 */
+	public abstract long getExpectedDataBlockSize(DataBlockInstanceId instanceId);
 
-   /**
-    * Returns the {@link DataFormatSpecification} corresponding to the given {@link ContainerDataFormat}.
-    * 
-    * @param format
-    *           The {@link ContainerDataFormat}
-    *
-    * @return the {@link DataFormatSpecification} corresponding to the given {@link ContainerDataFormat}.
-    */
-   protected DataFormatSpecification getDataFormatSpecification(ContainerDataFormat format) {
+	/**
+	 * Returns the field {@link DataBlockInstanceId}s, for which a failing
+	 * conversion from binary to interpreted value is expected.
+	 * 
+	 * @param fieldInstance The field's {@link DataBlockInstanceId}.
+	 *
+	 * @return the field {@link DataBlockInstanceId}s, for which a failing
+	 *         conversion from binary to interpreted value is expected.
+	 */
+	public abstract ExpectedFailedFieldConversionData getExpectedFailingFieldConversions(
+		DataBlockInstanceId fieldInstance);
 
-      return dataFormatRepository.getDataFormatSpecification(format);
-   }
+	/**
+	 * Returns the expected interpreted field value for the given field
+	 * {@link DataBlockInstanceId}. If there is no data for the given
+	 * {@link DataBlockInstanceId}, null is returned.
+	 *
+	 * @param fieldInstanceId The field {@link DataBlockInstanceId}.
+	 * @return The field's expected interpreted value or null if there is no entry
+	 *         for the given {@link DataBlockInstanceId}.
+	 */
+	public abstract Object getExpectedFieldInterpretedValue(DataBlockInstanceId fieldInstanceId);
 
-   /**
-    * Returns the overall supported data formats.
-    * 
-    * @return the overall supported data formats.
-    */
-   protected Set<ContainerDataFormat> getSupportedDataFormats() {
+	/**
+	 * Returns a list of expected top-level container {@link DataBlockInstanceId}s.
+	 *
+	 * @return a list of expected top-level container {@link DataBlockInstanceId}s.
+	 */
+	public abstract List<DataBlockInstanceId> getExpectedTopLevelContainers();
 
-      return dataFormatRepository.getSupportedDataFormats();
-   }
+	/**
+	 * Returns a list of expected top-level container {@link DataBlockInstanceId}s
+	 * when reading from back to front.
+	 *
+	 * @return a list of expected top-level container {@link DataBlockInstanceId}s
+	 *         when reading from back to front.
+	 */
+	public abstract List<DataBlockInstanceId> getExpectedTopLevelContainersReverse();
 
-   private final Path file;
+	/**
+	 * Returns the overall supported data formats.
+	 * 
+	 * @return the overall supported data formats.
+	 */
+	protected Set<ContainerDataFormat> getSupportedDataFormats() {
 
-   private final RandomAccessFile raf;
+		return dataFormatRepository.getSupportedDataFormats();
+	}
 }

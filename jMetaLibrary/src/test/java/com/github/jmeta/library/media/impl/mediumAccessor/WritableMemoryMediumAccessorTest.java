@@ -17,57 +17,57 @@ import com.github.jmeta.library.media.api.types.InMemoryMedium;
  */
 public class WritableMemoryMediumAccessorTest extends AbstractWritableRandomAccessMediumAccessorTest {
 
-   private byte[] memory;
+	private byte[] memory;
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
-    */
-   @Override
-   protected InMemoryMedium getExpectedMedium() {
-      return new InMemoryMedium(memory, null, false);
-   }
+	/**
+	 * @see AbstractMediumAccessorTest#getImplementationToTest()
+	 */
+	@Override
+	protected MediumAccessor<?> createImplementationToTest() {
+		return new InMemoryMediumAccessor(getExpectedMedium());
+	}
 
-   /**
-    * @see AbstractMediumAccessorTest#getReadTestDataToUse()
-    */
-   @Override
-   protected List<ReadTestData> getReadTestDataToUse() {
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
+	 */
+	@Override
+	protected InMemoryMedium getExpectedMedium() {
+		return new InMemoryMedium(memory, null, false);
+	}
 
-      List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
+	/**
+	 * @see AbstractMediumAccessorTest#getReadTestDataToUse()
+	 */
+	@Override
+	protected List<ReadTestData> getReadTestDataToUse() {
 
-      readOffsetsAndSizes.add(new ReadTestData(16, 7));
-      readOffsetsAndSizes.add(new ReadTestData(93, 157));
-      readOffsetsAndSizes.add(new ReadTestData(610, 133));
-      readOffsetsAndSizes.add(new ReadTestData(0, 17));
-      readOffsetsAndSizes.add(new ReadTestData(211, 45));
+		List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
 
-      return readOffsetsAndSizes;
-   }
+		readOffsetsAndSizes.add(new ReadTestData(16, 7));
+		readOffsetsAndSizes.add(new ReadTestData(93, 157));
+		readOffsetsAndSizes.add(new ReadTestData(610, 133));
+		readOffsetsAndSizes.add(new ReadTestData(0, 17));
+		readOffsetsAndSizes.add(new ReadTestData(211, 45));
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
-    */
-   @Override
-   protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(550, getExpectedMediumContent().length - 550);
-   }
+		return readOffsetsAndSizes;
+	}
 
-   /**
-    * @see AbstractMediumAccessorTest#getImplementationToTest()
-    */
-   @Override
-   protected MediumAccessor<?> createImplementationToTest() {
-      return new InMemoryMediumAccessor(getExpectedMedium());
-   }
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
+	 */
+	@Override
+	protected ReadTestData getReadTestDataUntilEndOfMedium() {
+		return new ReadTestData(550, AbstractMediumAccessorTest.getExpectedMediumContent().length - 550);
+	}
 
-   /**
-    * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
-    */
-   @Override
-   protected void prepareMediumData(byte[] testFileContents) {
+	/**
+	 * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
+	 */
+	@Override
+	protected void prepareMediumData(byte[] testFileContents) {
 
-      memory = new byte[testFileContents.length];
+		memory = new byte[testFileContents.length];
 
-      System.arraycopy(testFileContents, 0, memory, 0, testFileContents.length);
-   }
+		System.arraycopy(testFileContents, 0, memory, 0, testFileContents.length);
+	}
 }

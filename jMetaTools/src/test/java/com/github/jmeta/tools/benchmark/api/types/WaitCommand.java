@@ -5,36 +5,35 @@ package com.github.jmeta.tools.benchmark.api.types;
  */
 public class WaitCommand implements MeasuredCommand {
 
-   /**
-    * Creates a new {@link WaitCommand}.
-    * 
-    * @param waitTimeMillis
-    *           The wait time in milliseconds
-    */
-   public WaitCommand(long waitTimeMillis) {
-      super();
-      this.waitTimeMillis = waitTimeMillis;
-   }
+	private final long waitTimeMillis;
 
-   /**
-    * @see com.github.jmeta.tools.benchmark.api.types.MeasuredCommand#getUniqueName()
-    */
-   @Override
-   public String getUniqueName() {
-      return "WaitCommand " + waitTimeMillis + "[" + hashCode() + "]";
-   }
+	/**
+	 * Creates a new {@link WaitCommand}.
+	 * 
+	 * @param waitTimeMillis The wait time in milliseconds
+	 */
+	public WaitCommand(long waitTimeMillis) {
+		super();
+		this.waitTimeMillis = waitTimeMillis;
+	}
 
-   /**
-    * @see com.github.jmeta.tools.benchmark.api.types.Command#execute()
-    */
-   @Override
-   public void execute() {
-      try {
-         Thread.sleep(waitTimeMillis);
-      } catch (InterruptedException e) {
-         throw new RuntimeException("Couldn't sleep", e);
-      }
-   }
+	/**
+	 * @see com.github.jmeta.tools.benchmark.api.types.Command#execute()
+	 */
+	@Override
+	public void execute() {
+		try {
+			Thread.sleep(waitTimeMillis);
+		} catch (InterruptedException e) {
+			throw new RuntimeException("Couldn't sleep", e);
+		}
+	}
 
-   private final long waitTimeMillis;
+	/**
+	 * @see com.github.jmeta.tools.benchmark.api.types.MeasuredCommand#getUniqueName()
+	 */
+	@Override
+	public String getUniqueName() {
+		return "WaitCommand " + waitTimeMillis + "[" + hashCode() + "]";
+	}
 }

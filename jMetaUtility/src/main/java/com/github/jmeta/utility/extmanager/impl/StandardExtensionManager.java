@@ -18,28 +18,29 @@ import com.github.jmeta.utility.extmanager.api.services.Extension;
 import com.github.jmeta.utility.extmanager.api.services.ExtensionManager;
 
 /**
- * {@link StandardExtensionManager} is the default implementation of {@link ExtensionManager}.
+ * {@link StandardExtensionManager} is the default implementation of
+ * {@link ExtensionManager}.
  */
 public class StandardExtensionManager implements ExtensionManager {
 
-   private final List<Extension> allExtensionsFound = new ArrayList<>();
+	private final List<Extension> allExtensionsFound = new ArrayList<>();
 
-   /**
-    * Creates a new {@link StandardExtensionManager}. Caches all {@link Extension}s to be returned by
-    * {@link #getAllExtensions()}.
-    */
-   public StandardExtensionManager() {
-      Iterator<Extension> extensions = ServiceLoader.load(Extension.class).iterator();
+	/**
+	 * Creates a new {@link StandardExtensionManager}. Caches all {@link Extension}s
+	 * to be returned by {@link #getAllExtensions()}.
+	 */
+	public StandardExtensionManager() {
+		Iterator<Extension> extensions = ServiceLoader.load(Extension.class).iterator();
 
-      extensions.forEachRemaining((ext) -> allExtensionsFound.add(ext));
-   }
+		extensions.forEachRemaining((ext) -> allExtensionsFound.add(ext));
+	}
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.api.services.ExtensionManager#getAllExtensions()
-    */
-   @Override
-   public List<Extension> getAllExtensions() {
-      return allExtensionsFound;
-   }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.api.services.ExtensionManager#getAllExtensions()
+	 */
+	@Override
+	public List<Extension> getAllExtensions() {
+		return allExtensionsFound;
+	}
 
 }

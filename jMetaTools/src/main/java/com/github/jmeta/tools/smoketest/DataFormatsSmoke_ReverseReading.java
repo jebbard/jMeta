@@ -32,143 +32,146 @@ import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 
 /**
- * {@link DataFormatsSmoke_ReverseReading} is a very basic smoke test for testing the jMeta library with specific data
- * formats, but in reverse reading mode.
+ * {@link DataFormatsSmoke_ReverseReading} is a very basic smoke test for
+ * testing the jMeta library with specific data formats, but in reverse reading
+ * mode.
  */
 public class DataFormatsSmoke_ReverseReading {
 
-   /**
-    * Program entry point.
-    *
-    * @param args
-    *           No arguments
-    */
-   public static void main(String[] args) {
+	private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<>();
 
-      System.out.println("###################### Starting Data Format [REVERSE] smoke-Test ##################");
+	static {
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"),
+			ID3v23Extension.ID3v23);
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/Lyrics3v2.txt"),
+			Lyrics3v2Extension.LYRICS3v2);
+		DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
+	}
 
-      SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss z");
-      System.out.println(DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+	/**
+	 * Program entry point.
+	 *
+	 * @param args No arguments
+	 */
+	public static void main(String[] args) {
 
-      DataFormatsSmoke_ReverseReading dataFormatSmokeTest = new DataFormatsSmoke_ReverseReading();
+		System.out.println("###################### Starting Data Format [REVERSE] smoke-Test ##################");
 
-      dataFormatSmokeTest.runSmokeTest();
+		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss z");
+		System.out.println(DATE_FORMAT.format(new Date(System.currentTimeMillis())));
 
-      System.out.println("###################### Shutting Down Data Format [REVERSE] smoke-Test ##################");
-   }
+		DataFormatsSmoke_ReverseReading dataFormatSmokeTest = new DataFormatsSmoke_ReverseReading();
 
-   private void runSmokeTest() {
+		dataFormatSmokeTest.runSmokeTest();
 
-      m_context = LibraryJMeta.getLibrary();
+		System.out.println("###################### Shutting Down Data Format [REVERSE] smoke-Test ##################");
+	}
 
-      configureDataFormats();
-      readAllTopLevelDataBlocks();
-   }
+	private LibraryJMeta m_context;
 
-   private void readAllTopLevelDataBlocks() {
+	private void configureDataFormats() {
 
-      DataBlockAccessor accessor = m_context.getDataBlockAccessor();
+		DataFormatRepository repo = m_context.getDataFormatRepository();
 
-      for (Iterator<File> iterator = TEST_DATA_FORMATS.keySet().iterator(); iterator.hasNext();) {
-         File currentFile = iterator.next();
+		int index = 0;
 
-         final AbstractMedium<Path> medium = new FileMedium(currentFile.toPath(), true);
+		for (Iterator<ContainerDataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
+			ContainerDataFormat dataFormat = iterator.next();
 
-         System.out.println("***********************************************************************");
-         System.out.println("All data blocks in the AbstractMedium: " + medium);
-         System.out.println("***********************************************************************");
+			System.out.println("TEST Data format " + index + ": " + dataFormat);
 
-         printContainers(accessor.getReverseContainerIterator(medium, false), Integer.valueOf(1));
-      }
-   }
+			index++;
+		}
+	}
 
-   private void configureDataFormats() {
+	private void printContainers(ContainerIterator containerIterator, Integer level) {
 
-      DataFormatRepository repo = m_context.getDataFormatRepository();
+		String prependWith = "";
 
-      int index = 0;
+		for (int i = 0; i < level; i++) {
+			prependWith += "\t";
+		}
 
-      for (Iterator<ContainerDataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
-         ContainerDataFormat dataFormat = iterator.next();
+		while (containerIterator.hasNext()) {
+			Container nextBlock = containerIterator.next();
 
-         System.out.println("TEST Data format " + index + ": " + dataFormat);
+			System.out.println(prependWith + "Read Container: " + nextBlock.toString());
 
-         index++;
-      }
-   }
+			for (int i = 0; i < nextBlock.getHeaders().size(); i++) {
+				Header header = nextBlock.getHeaders().get(i);
+				System.out.println(prependWith + "\tHeader: " + header);
+				printFields(header.getFields(), level + 2);
+			}
 
-   private void printContainers(ContainerIterator containerIterator, Integer level) {
+			for (int i = 0; i < nextBlock.getFooters().size(); i++) {
+				Footer footer = nextBlock.getFooters().get(i);
+				System.out.println(prependWith + "\tFooter: " + footer);
+				printFields(footer.getFields(), level + 2);
+			}
 
-      String prependWith = "";
+			final Payload payload = nextBlock.getPayload();
 
-      for (int i = 0; i < level; i++) {
-         prependWith += "\t";
-      }
+			System.out.println(prependWith + "\tPayload: " + payload);
 
-      while (containerIterator.hasNext()) {
-         Container nextBlock = containerIterator.next();
+			if (payload instanceof ContainerBasedPayload) {
+				printContainers(((ContainerBasedPayload) payload).getContainerIterator(), level + 2);
+			} else {
+				printFields(((FieldBasedPayload) payload).getFields(), level + 2);
+			}
+		}
+	}
 
-         System.out.println(prependWith + "Read Container: " + nextBlock.toString());
+	private void printFields(List<Field<?>> fieldList, Integer level) {
 
-         for (int i = 0; i < nextBlock.getHeaders().size(); i++) {
-            Header header = nextBlock.getHeaders().get(i);
-            System.out.println(prependWith + "\tHeader: " + header);
-            printFields(header.getFields(), level + 2);
-         }
+		String prependWith = "";
 
-         for (int i = 0; i < nextBlock.getFooters().size(); i++) {
-            Footer footer = nextBlock.getFooters().get(i);
-            System.out.println(prependWith + "\tFooter: " + footer);
-            printFields(footer.getFields(), level + 2);
-         }
+		for (int i = 0; i < level; i++) {
+			prependWith += "\t";
+		}
 
-         final Payload payload = nextBlock.getPayload();
+		final Iterator<Field<?>> fieldIterator = fieldList.iterator();
+		while (fieldIterator.hasNext()) {
+			final Field<?> nextField = fieldIterator.next();
 
-         System.out.println(prependWith + "\tPayload: " + payload);
+			// Ensure that the conversion has been done
+			try {
+				nextField.getInterpretedValue();
+			} catch (BinaryValueConversionException e) {
+				e.printStackTrace();
+			}
 
-         if (payload instanceof ContainerBasedPayload) {
-            printContainers(((ContainerBasedPayload) payload).getContainerIterator(), level + 2);
-         } else {
-            printFields(((FieldBasedPayload) payload).getFields(), level + 2);
-         }
-      }
-   }
+			System.out.println(prependWith + "Read Field: " + nextField);
+		}
+	}
 
-   private void printFields(List<Field<?>> fieldList, Integer level) {
+	private void readAllTopLevelDataBlocks() {
 
-      String prependWith = "";
+		DataBlockAccessor accessor = m_context.getDataBlockAccessor();
 
-      for (int i = 0; i < level; i++) {
-         prependWith += "\t";
-      }
+		for (Iterator<File> iterator = DataFormatsSmoke_ReverseReading.TEST_DATA_FORMATS.keySet().iterator(); iterator
+			.hasNext();) {
+			File currentFile = iterator.next();
 
-      final Iterator<Field<?>> fieldIterator = fieldList.iterator();
-      while (fieldIterator.hasNext()) {
-         final Field<?> nextField = fieldIterator.next();
+			final AbstractMedium<Path> medium = new FileMedium(currentFile.toPath(), true);
 
-         // Ensure that the conversion has been done
-         try {
-            nextField.getInterpretedValue();
-         } catch (BinaryValueConversionException e) {
-            e.printStackTrace();
-         }
+			System.out.println("***********************************************************************");
+			System.out.println("All data blocks in the AbstractMedium: " + medium);
+			System.out.println("***********************************************************************");
 
-         System.out.println(prependWith + "Read Field: " + nextField);
-      }
-   }
+			printContainers(accessor.getReverseContainerIterator(medium, false), Integer.valueOf(1));
+		}
+	}
 
-   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<>();
+	private void runSmokeTest() {
 
-   static {
-      TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"), ID3v23Extension.ID3v23);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/Lyrics3v2.txt"), Lyrics3v2Extension.LYRICS3v2);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
-   }
+		m_context = LibraryJMeta.getLibrary();
 
-   private LibraryJMeta m_context;
+		configureDataFormats();
+		readAllTopLevelDataBlocks();
+	}
 }

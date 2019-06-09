@@ -14,11 +14,11 @@ package com.github.jmeta.utility.extmanager.impl.testextensions;
  */
 public class ExtensionTwoServiceProviderTwo implements TestExtensionServiceTwo {
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.impl.testextensions.TestExtensionServiceTwo#otherMethod(long)
-    */
-   @Override
-   public int otherMethod(long x) {
-      return 0;
-   }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.impl.testextensions.TestExtensionServiceTwo#otherMethod(long)
+	 */
+	@Override
+	public int otherMethod(long x) {
+		return 0;
+	}
 }

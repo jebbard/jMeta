@@ -18,84 +18,80 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
 /**
- * {@link MappedByteBufferAccessor} measures performance for {@link MappedByteBuffer} based I/O.
+ * {@link MappedByteBufferAccessor} measures performance for
+ * {@link MappedByteBuffer} based I/O.
  */
 public class MappedByteBufferAccessor extends AbstractFileAccessor {
 
-   /**
-    * Creates a new {@link MappedByteBufferAccessor}.
-    * 
-    * @param file
-    *           The {@link File} to be tested
-    * @param bytesToWrite
-    *           The byte array with the bytes to write.
-    * @param bytesToRead
-    *           The number of bytes to read.
-    * @param bytesAtEnd
-    *           The number of bytes to preserve at the end of file.
-    * @param deleteFileAfterClose
-    *           Whether to delete the file after closing or not.
-    * @throws IOException
-    *            whenever an I/O operation failed.
-    */
-   public MappedByteBufferAccessor(File file, byte[] bytesToWrite,
-      int bytesToRead, int bytesAtEnd, boolean deleteFileAfterClose)
-         throws IOException {
-      super(file, bytesToWrite, bytesToRead, bytesAtEnd, deleteFileAfterClose);
+	private MappedByteBuffer m_mappedBuffer;
 
-      m_randomAccessFile = new RandomAccessFile(file, "rw");
-      m_channel = m_randomAccessFile.getChannel();
-      m_mappedBuffer = m_channel.map(MapMode.READ_WRITE, 0,
-         file.length() + bytesToWrite.length);
-   }
+	private FileChannel m_channel;
 
-   /**
-    * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#close()
-    */
-   @Override
-   protected void doClose() throws IOException {
+	private RandomAccessFile m_randomAccessFile;
 
-      m_mappedBuffer = null;
+	/**
+	 * Creates a new {@link MappedByteBufferAccessor}.
+	 * 
+	 * @param file                 The {@link File} to be tested
+	 * @param bytesToWrite         The byte array with the bytes to write.
+	 * @param bytesToRead          The number of bytes to read.
+	 * @param bytesAtEnd           The number of bytes to preserve at the end of
+	 *                             file.
+	 * @param deleteFileAfterClose Whether to delete the file after closing or not.
+	 * @throws IOException whenever an I/O operation failed.
+	 */
+	public MappedByteBufferAccessor(File file, byte[] bytesToWrite, int bytesToRead, int bytesAtEnd,
+		boolean deleteFileAfterClose) throws IOException {
+		super(file, bytesToWrite, bytesToRead, bytesAtEnd, deleteFileAfterClose);
 
-      m_channel.close();
-      m_randomAccessFile.close();
+		m_randomAccessFile = new RandomAccessFile(file, "rw");
+		m_channel = m_randomAccessFile.getChannel();
+		m_mappedBuffer = m_channel.map(MapMode.READ_WRITE, 0, file.length() + bytesToWrite.length);
+	}
 
-      m_channel = null;
-      m_randomAccessFile = null;
+	/**
+	 * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#close()
+	 */
+	@Override
+	protected void doClose() throws IOException {
 
-      // Run GC to be able to delete the file later
-      System.gc();
-   }
+		m_mappedBuffer = null;
 
-   /**
-    * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#read(long, int)
-    */
-   @Override
-   protected byte[] read(long offset, int length) throws IOException {
+		m_channel.close();
+		m_randomAccessFile.close();
 
-      byte[] returnedBytes = new byte[length];
+		m_channel = null;
+		m_randomAccessFile = null;
 
-      m_mappedBuffer.position((int) offset);
+		// Run GC to be able to delete the file later
+		System.gc();
+	}
 
-      m_mappedBuffer.get(returnedBytes);
+	/**
+	 * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#read(long,
+	 *      int)
+	 */
+	@Override
+	protected byte[] read(long offset, int length) throws IOException {
 
-      return returnedBytes;
-   }
+		byte[] returnedBytes = new byte[length];
 
-   /**
-    * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#write(long, byte[])
-    */
-   @Override
-   protected void write(long offset, byte[] bytesToWrite) throws IOException {
+		m_mappedBuffer.position((int) offset);
 
-      m_mappedBuffer.position((int) offset);
+		m_mappedBuffer.get(returnedBytes);
 
-      m_mappedBuffer.put(bytesToWrite);
-   }
+		return returnedBytes;
+	}
 
-   private MappedByteBuffer m_mappedBuffer;
+	/**
+	 * @see com.github.jmeta.tools.fileaccessperformance.api.services.access.AbstractFileAccessor#write(long,
+	 *      byte[])
+	 */
+	@Override
+	protected void write(long offset, byte[] bytesToWrite) throws IOException {
 
-   private FileChannel m_channel;
+		m_mappedBuffer.position((int) offset);
 
-   private RandomAccessFile m_randomAccessFile;
+		m_mappedBuffer.put(bytesToWrite);
+	}
 }

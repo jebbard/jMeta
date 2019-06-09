@@ -23,95 +23,95 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link FieldBasedLazyPayload} is the default implementation of {@link FieldBasedPayload}. It lazily reads fields when
- * first requested.
+ * {@link FieldBasedLazyPayload} is the default implementation of
+ * {@link FieldBasedPayload}. It lazily reads fields when first requested.
  */
 public class FieldBasedLazyPayload extends AbstractDataBlock implements FieldBasedPayload {
 
-   private long totalSize;
-   private DataBlockReader reader;
+	private long totalSize;
+	private DataBlockReader reader;
 
-   private List<Field<?>> fields;
+	private List<Field<?>> fields;
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Payload#initSize(long)
-    */
-   @Override
-   public void initSize(long totalSize) {
-      // The size of the payload is still unknown - There is no other way than to read
-      // its children and sum up their sizes
-      if (totalSize == DataBlockDescription.UNDEFINED) {
-         long summedUpTotalSize = 0;
-         List<Field<?>> fields = getFields();
+	/**
+	 * Creates a new {@link FieldBasedLazyPayload}.
+	 *
+	 * @param id
+	 * @param spec
+	 */
+	public FieldBasedLazyPayload(DataBlockId id, DataFormatSpecification spec) {
+		super(id, spec);
+	}
 
-         for (int i = 0; i < fields.size(); ++i) {
-            Field<?> field = fields.get(i);
+	public FieldBasedLazyPayload(DataBlockId id, DataFormatSpecification spec, DataBlockReader reader) {
+		super(id, spec);
+		this.reader = reader;
+	}
 
-            summedUpTotalSize += field.getSize();
-         }
+	private void addField(Field<?> field) {
 
-         this.totalSize = summedUpTotalSize;
-      }
+		Reject.ifNull(field, "field");
 
-      else {
-         this.totalSize = totalSize;
-      }
-   }
+		field.initParent(this);
 
-   /**
-    * Creates a new {@link FieldBasedLazyPayload}.
-    *
-    * @param id
-    * @param spec
-    */
-   public FieldBasedLazyPayload(DataBlockId id, DataFormatSpecification spec) {
-      super(id, spec);
-   }
+		fields.add(field);
+	}
 
-   public FieldBasedLazyPayload(DataBlockId id, DataFormatSpecification spec, DataBlockReader reader) {
-      super(id, spec);
-      this.reader = reader;
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.FieldSequence#getFields()
+	 */
+	@Override
+	public List<Field<?>> getFields() {
+		if (fields == null) {
+			fields = new ArrayList<>();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
-    */
-   @Override
-   public long getSize() {
-      return totalSize;
-   }
+			MediumOffset fieldReference = getOffset();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.FieldSequence#getFields()
-    */
-   @Override
-   public List<Field<?>> getFields() {
-      if (fields == null) {
-         fields = new ArrayList<>();
+			if (totalSize > 0) {
+				List<Field<?>> readFields = reader.readFields(fieldReference, getId(), totalSize, this,
+					getContainerContext());
 
-         MediumOffset fieldReference = getOffset();
+				for (int i = 0; i < readFields.size(); ++i) {
+					Field<?> field = readFields.get(i);
 
-         if (totalSize > 0) {
-            List<Field<?>> readFields = reader.readFields(fieldReference, getId(), totalSize, this,
-               getContainerContext());
+					addField(field);
+				}
+			}
+		}
 
-            for (int i = 0; i < readFields.size(); ++i) {
-               Field<?> field = readFields.get(i);
+		return fields;
+	}
 
-               addField(field);
-            }
-         }
-      }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
+	 */
+	@Override
+	public long getSize() {
+		return totalSize;
+	}
 
-      return fields;
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Payload#initSize(long)
+	 */
+	@Override
+	public void initSize(long totalSize) {
+		// The size of the payload is still unknown - There is no other way than to read
+		// its children and sum up their sizes
+		if (totalSize == DataBlockDescription.UNDEFINED) {
+			long summedUpTotalSize = 0;
+			List<Field<?>> fields = getFields();
 
-   private void addField(Field<?> field) {
+			for (int i = 0; i < fields.size(); ++i) {
+				Field<?> field = fields.get(i);
 
-      Reject.ifNull(field, "field");
+				summedUpTotalSize += field.getSize();
+			}
 
-      field.initParent(this);
+			this.totalSize = summedUpTotalSize;
+		}
 
-      fields.add(field);
-   }
+		else {
+			this.totalSize = totalSize;
+		}
+	}
 }

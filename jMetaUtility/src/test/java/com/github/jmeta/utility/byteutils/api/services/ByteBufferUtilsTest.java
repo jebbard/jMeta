@@ -19,146 +19,146 @@ import org.junit.Test;
  */
 public class ByteBufferUtilsTest {
 
-   private final static byte[] TEST_BYTES = { 0, 1, 2, 3, 4, 5, 7, 8, 9 };
+	private final static byte[] TEST_BYTES = { 0, 1, 2, 3, 4, 5, 7, 8, 9 };
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
-    */
-   @Test
-   public void asByteArrayCopy_forReadOnlyByteBuffer_returnsCopyOnly() {
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
+	 */
+	@Test
+	public void asByteArrayCopy_forBufferRemainingEqualToCapacity_returnsAllBytes() {
+		ByteBuffer testBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES);
 
-      ByteBuffer readOnlyBB = ByteBuffer.wrap(TEST_BYTES).asReadOnlyBuffer();
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(readOnlyBB);
+		Assert.assertArrayEquals(ByteBufferUtilsTest.TEST_BYTES, copiedBytes);
+	}
 
-      Assert.assertFalse(TEST_BYTES == copiedBytes);
-   }
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
+	 */
+	@Test
+	public void asByteArrayCopy_forBufferWithNonZeroPosition_returnsBytesBetweenPositionAndLimit() {
+		ByteBuffer testBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES);
+		testBB.position(3);
+		testBB.limit(5);
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
-    */
-   @Test
-   public void asByteArrayCopy_forWritableByteBuffer_returnsCopyOnly() {
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
 
-      ByteBuffer testBB = ByteBuffer.wrap(TEST_BYTES);
+		Assert.assertArrayEquals(new byte[] { 3, 4 }, copiedBytes);
+	}
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
+	 */
+	@Test
+	public void asByteArrayCopy_forBufferWithNonZeroPositionNonZeroOffset_returnsSizeBytesAtPositionPlusOffset() {
+		ByteBuffer testBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES);
+		testBB.position(1);
+		testBB.limit(7);
 
-      Assert.assertFalse(TEST_BYTES == copiedBytes);
-   }
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 2, 3);
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
-    */
-   @Test
-   public void asByteArrayCopy_forBufferRemainingEqualToCapacity_returnsAllBytes() {
-      ByteBuffer testBB = ByteBuffer.wrap(TEST_BYTES);
+		Assert.assertArrayEquals(new byte[] { 3, 4, 5 }, copiedBytes);
+	}
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
+	 */
+	@Test
+	public void asByteArrayCopy_forReadOnlyByteBuffer_returnsCopyOnly() {
 
-      Assert.assertArrayEquals(TEST_BYTES, copiedBytes);
-   }
+		ByteBuffer readOnlyBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES).asReadOnlyBuffer();
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
-    */
-   @Test
-   public void asByteArrayCopy_forBufferWithNonZeroPosition_returnsBytesBetweenPositionAndLimit() {
-      ByteBuffer testBB = ByteBuffer.wrap(TEST_BYTES);
-      testBB.position(3);
-      testBB.limit(5);
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(readOnlyBB);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
+		Assert.assertFalse(ByteBufferUtilsTest.TEST_BYTES == copiedBytes);
+	}
 
-      Assert.assertArrayEquals(new byte[] { 3, 4 }, copiedBytes);
-   }
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
+	 */
+	@Test
+	public void asByteArrayCopy_forWritableByteBuffer_returnsCopyOnly() {
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
-    */
-   @Test
-   public void asByteArrayCopy_forZeroRemainingBytes_returnsEmptyArray() {
-      ByteBuffer testBB = ByteBuffer.allocate(0);
+		ByteBuffer testBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
 
-      Assert.assertArrayEquals(new byte[] {}, copiedBytes);
+		Assert.assertFalse(ByteBufferUtilsTest.TEST_BYTES == copiedBytes);
+	}
 
-      testBB = ByteBuffer.wrap(TEST_BYTES);
-      testBB.position(3);
-      testBB.limit(3);
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
+	 */
+	@Test
+	public void asByteArrayCopy_forZeroRemainingBytes_returnsEmptyArray() {
+		ByteBuffer testBB = ByteBuffer.allocate(0);
 
-      copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
 
-      Assert.assertArrayEquals(new byte[] {}, copiedBytes);
-   }
+		Assert.assertArrayEquals(new byte[] {}, copiedBytes);
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(ByteBuffer, int, int)}.
-    */
-   @Test
-   public void asByteArrayCopySlice_forReadOnlyByteBuffer_returnsCopyOnly() {
+		testBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES);
+		testBB.position(3);
+		testBB.limit(3);
 
-      ByteBuffer readOnlyBB = ByteBuffer.wrap(TEST_BYTES).asReadOnlyBuffer();
+		copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(readOnlyBB, 0, 1);
+		Assert.assertArrayEquals(new byte[] {}, copiedBytes);
+	}
 
-      Assert.assertFalse(TEST_BYTES == copiedBytes);
-   }
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(ByteBuffer, int, int)}.
+	 */
+	@Test
+	public void asByteArrayCopySlice_forReadOnlyByteBuffer_returnsCopyOnly() {
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(ByteBuffer, int, int)}.
-    */
-   @Test
-   public void asByteArrayCopySlice_forWritableByteBuffer_returnsCopyOnly() {
+		ByteBuffer readOnlyBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES).asReadOnlyBuffer();
 
-      ByteBuffer testBB = ByteBuffer.wrap(TEST_BYTES);
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(readOnlyBB, 0, 1);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 0, 4);
+		Assert.assertFalse(ByteBufferUtilsTest.TEST_BYTES == copiedBytes);
+	}
 
-      Assert.assertFalse(TEST_BYTES == copiedBytes);
-   }
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(ByteBuffer, int, int)}.
+	 */
+	@Test
+	public void asByteArrayCopySlice_forWritableByteBuffer_returnsCopyOnly() {
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(ByteBuffer, int, int)}.
-    */
-   @Test
-   public void asByteArrayCopySlice_forZeroRemainingBytes_returnsEmptyArray() {
-      ByteBuffer testBB = ByteBuffer.allocate(0);
+		ByteBuffer testBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 0, 0);
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 0, 4);
 
-      Assert.assertArrayEquals(new byte[] {}, copiedBytes);
+		Assert.assertFalse(ByteBufferUtilsTest.TEST_BYTES == copiedBytes);
+	}
 
-      testBB = ByteBuffer.wrap(TEST_BYTES);
-      testBB.position(3);
-      testBB.limit(3);
+	/**
+	 * Tests
+	 * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(ByteBuffer, int, int)}.
+	 */
+	@Test
+	public void asByteArrayCopySlice_forZeroRemainingBytes_returnsEmptyArray() {
+		ByteBuffer testBB = ByteBuffer.allocate(0);
 
-      copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 0, 0);
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 0, 0);
 
-      Assert.assertArrayEquals(new byte[] {}, copiedBytes);
-   }
+		Assert.assertArrayEquals(new byte[] {}, copiedBytes);
 
-   /**
-    * Tests
-    * {@link com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils#asByteArrayCopy(java.nio.ByteBuffer)}.
-    */
-   @Test
-   public void asByteArrayCopy_forBufferWithNonZeroPositionNonZeroOffset_returnsSizeBytesAtPositionPlusOffset() {
-      ByteBuffer testBB = ByteBuffer.wrap(TEST_BYTES);
-      testBB.position(1);
-      testBB.limit(7);
+		testBB = ByteBuffer.wrap(ByteBufferUtilsTest.TEST_BYTES);
+		testBB.position(3);
+		testBB.limit(3);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 2, 3);
+		copiedBytes = ByteBufferUtils.asByteArrayCopy(testBB, 0, 0);
 
-      Assert.assertArrayEquals(new byte[] { 3, 4, 5 }, copiedBytes);
-   }
+		Assert.assertArrayEquals(new byte[] {}, copiedBytes);
+	}
 }

@@ -14,12 +14,11 @@ package com.github.jmeta.utility.extmanager.impl.testextensions;
  */
 public interface TestExtensionServiceTwo {
 
-   /**
-    * An example method
-    * 
-    * @param x
-    *           an example parameter
-    * @return an example return value
-    */
-   public int otherMethod(long x);
+	/**
+	 * An example method
+	 * 
+	 * @param x an example parameter
+	 * @return an example return value
+	 */
+	int otherMethod(long x);
 }

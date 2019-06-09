@@ -25,40 +25,42 @@ import com.github.jmeta.utility.byteutils.api.services.ByteBufferUtils;
  */
 public class FlagsFieldConverter extends AbstractBaseFieldConverter<Flags> {
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
-    *      java.nio.charset.Charset)
-    */
-   @Override
-   protected Flags convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws BinaryValueConversionException {
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      java.nio.ByteOrder, java.nio.charset.Charset)
+	 */
+	@Override
+	protected Flags convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+		Charset characterEncoding) throws BinaryValueConversionException {
 
-      int staticFlagLength = desc.getFieldProperties().getFlagSpecification().getByteLength();
-      if (binaryValue.remaining() > staticFlagLength)
-         throw new BinaryValueConversionException("Flags fields may not be longer than " + staticFlagLength + " bytes.",
-            null, desc, binaryValue, byteOrder, characterEncoding);
+		int staticFlagLength = desc.getFieldProperties().getFlagSpecification().getByteLength();
+		if (binaryValue.remaining() > staticFlagLength) {
+			throw new BinaryValueConversionException(
+				"Flags fields may not be longer than " + staticFlagLength + " bytes.", null, desc, binaryValue,
+				byteOrder, characterEncoding);
+		}
 
-      FlagSpecification flagSpec = desc.getFieldProperties().getFlagSpecification();
+		FlagSpecification flagSpec = desc.getFieldProperties().getFlagSpecification();
 
-      final Flags flags = new Flags(flagSpec);
+		final Flags flags = new Flags(flagSpec);
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
 
-      flags.fromArray(copiedBytes);
+		flags.fromArray(copiedBytes);
 
-      return flags;
-   }
+		return flags;
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
-    *      java.nio.charset.Charset)
-    */
-   @Override
-   protected ByteBuffer convertInterpretedToBinary(Flags interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding) throws InterpretedValueConversionException {
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      java.nio.ByteOrder, java.nio.charset.Charset)
+	 */
+	@Override
+	protected ByteBuffer convertInterpretedToBinary(Flags interpretedValue, DataBlockDescription desc,
+		ByteOrder byteOrder, Charset characterEncoding) throws InterpretedValueConversionException {
 
-      return ByteBuffer.wrap(interpretedValue.asArray());
-   }
+		return ByteBuffer.wrap(interpretedValue.asArray());
+	}
 }

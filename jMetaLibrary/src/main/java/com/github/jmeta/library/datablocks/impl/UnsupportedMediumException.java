@@ -14,14 +14,14 @@ package com.github.jmeta.library.datablocks.impl;
  */
 public class UnsupportedMediumException extends RuntimeException {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   /**
-    * Creates a new {@link UnsupportedMediumException}.
-    * 
-    * @param message
-    */
-   public UnsupportedMediumException(String message) {
-      super(message);
-   }
+	/**
+	 * Creates a new {@link UnsupportedMediumException}.
+	 * 
+	 * @param message
+	 */
+	public UnsupportedMediumException(String message) {
+		super(message);
+	}
 }

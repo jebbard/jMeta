@@ -20,28 +20,27 @@ import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link DataBlockReader} tests the usability of the Audio Composition API when reading all attributes from an audio
- * file.
+ * {@link DataBlockReader} tests the usability of the Audio Composition API when
+ * reading all attributes from an audio file.
  */
 public class DataBlockReader {
 
-   /**
-    * Reads all attributes from a given file.
-    *
-    * @param file
-    *           The file to read all attributes from.
-    *
-    * @return A mapping of all tags and attributes belonging to each tag.
-    */
-   public Iterator<Container> getAllContainersFromFile(File file) {
+	private final LibraryJMeta m_context = LibraryJMeta.getLibrary();
 
-      Reject.ifNull(file, "file");
-      Reject.ifTrue(!file.exists(), "!file.exists()");
+	/**
+	 * Reads all attributes from a given file.
+	 *
+	 * @param file The file to read all attributes from.
+	 *
+	 * @return A mapping of all tags and attributes belonging to each tag.
+	 */
+	public Iterator<Container> getAllContainersFromFile(File file) {
 
-      DataBlockAccessor accessor = m_context.getDataBlockAccessor();
+		Reject.ifNull(file, "file");
+		Reject.ifTrue(!file.exists(), "!file.exists()");
 
-      return accessor.getContainerIterator(new FileMedium(file.toPath(), true), false);
-   }
+		DataBlockAccessor accessor = m_context.getDataBlockAccessor();
 
-   private final LibraryJMeta m_context = LibraryJMeta.getLibrary();
+		return accessor.getContainerIterator(new FileMedium(file.toPath(), true), false);
+	}
 }

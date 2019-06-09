@@ -21,101 +21,99 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
 import junit.framework.AssertionFailedError;
 
 /**
- * {@link LogUnitTest} provides methods to check a log file for specific contents.
+ * {@link LogUnitTest} provides methods to check a log file for specific
+ * contents.
  */
 public class LogUnitTest {
 
-   private File currentFile;
+	private File currentFile;
 
-   private String logFileContent;
+	private String logFileContent;
 
-   /**
-    * Loads a new log file to this {@link LogUnitTest}.
-    *
-    * @param logFile
-    *           The log file to load. Must exist.
-    */
-   public void load(File logFile) {
+	/**
+	 * Asserts that the currently loaded log file contains the specified pattern. As
+	 * a precondition, this class must be loaded already.
+	 *
+	 * @param pattern The regular expression search pattern.
+	 */
+	public void assertContains(String pattern) {
+		if (!contains(pattern)) {
+			throw new AssertionFailedError(
+				"Pattern <" + pattern + "> not found in log file <" + currentFile.getAbsolutePath() + ">.");
+		}
+	}
 
-      Reject.ifNull(logFile, "logFile");
-      Reject.ifFalse(logFile.exists(), "logFile.exists()");
-      Reject.ifFalse(logFile.isFile(), "logFile.isFile()");
+	/**
+	 * Asserts that the currently loaded log file does not contain the specified
+	 * pattern. As a precondition, this class must be loaded already.
+	 *
+	 * @param pattern The regular expression search pattern.
+	 */
+	public void assertContainsNot(String pattern) {
+		if (contains(pattern)) {
+			throw new AssertionFailedError(
+				"Pattern <" + pattern + "> found in log file <" + currentFile.getAbsolutePath() + ">.");
+		}
+	}
 
-      logFileContent = null;
+	/**
+	 * Checks whether the current log file contains the specified search pattern.
+	 *
+	 * @param pattern The search pattern.
+	 * @return true if the current log file contains the specified search pattern,
+	 *         false otherwise.
+	 */
+	private boolean contains(String pattern) {
 
-      try (BufferedReader binput = new BufferedReader(new FileReader(logFile))) {
+		Reject.ifNull(pattern, "pattern");
+		Reject.ifFalse(isLoaded(), "isLoaded()");
 
-         StringBuffer buffer = new StringBuffer((int) logFile.length());
+		Pattern regexPattern = Pattern.compile(Pattern.quote(pattern));
 
-         String readLine = null;
-         do {
-            readLine = binput.readLine();
+		return regexPattern.matcher(logFileContent).find();
+	}
 
-            if (readLine != null) {
-               buffer.append(readLine + LoggingConstants.LINE_SEPARATOR);
-            }
-         } while (readLine != null);
+	/**
+	 * Returns whether currently log file content is loaded.
+	 *
+	 * @return true if currently log file content is loaded, false otherwise.
+	 */
+	public boolean isLoaded() {
 
-         logFileContent = buffer.toString();
-      } catch (IOException e) {
-         throw new InvalidTestDataException("Could not read log file content due to exception", e);
-      }
+		return currentFile != null;
+	}
 
-      currentFile = logFile;
-   }
+	/**
+	 * Loads a new log file to this {@link LogUnitTest}.
+	 *
+	 * @param logFile The log file to load. Must exist.
+	 */
+	public void load(File logFile) {
 
-   /**
-    * Returns whether currently log file content is loaded.
-    *
-    * @return true if currently log file content is loaded, false otherwise.
-    */
-   public boolean isLoaded() {
+		Reject.ifNull(logFile, "logFile");
+		Reject.ifFalse(logFile.exists(), "logFile.exists()");
+		Reject.ifFalse(logFile.isFile(), "logFile.isFile()");
 
-      return currentFile != null;
-   }
+		logFileContent = null;
 
-   /**
-    * Asserts that the currently loaded log file contains the specified pattern. As a precondition, this class must be
-    * loaded already.
-    *
-    * @param pattern
-    *           The regular expression search pattern.
-    */
-   public void assertContains(String pattern) {
-      if (!contains(pattern)) {
-         throw new AssertionFailedError(
-            "Pattern <" + pattern + "> not found in log file <" + currentFile.getAbsolutePath() + ">.");
-      }
-   }
+		try (BufferedReader binput = new BufferedReader(new FileReader(logFile))) {
 
-   /**
-    * Asserts that the currently loaded log file does not contain the specified pattern. As a precondition, this class
-    * must be loaded already.
-    *
-    * @param pattern
-    *           The regular expression search pattern.
-    */
-   public void assertContainsNot(String pattern) {
-      if (contains(pattern)) {
-         throw new AssertionFailedError(
-            "Pattern <" + pattern + "> found in log file <" + currentFile.getAbsolutePath() + ">.");
-      }
-   }
+			StringBuffer buffer = new StringBuffer((int) logFile.length());
 
-   /**
-    * Checks whether the current log file contains the specified search pattern.
-    *
-    * @param pattern
-    *           The search pattern.
-    * @return true if the current log file contains the specified search pattern, false otherwise.
-    */
-   private boolean contains(String pattern) {
+			String readLine = null;
+			do {
+				readLine = binput.readLine();
 
-      Reject.ifNull(pattern, "pattern");
-      Reject.ifFalse(isLoaded(), "isLoaded()");
+				if (readLine != null) {
+					buffer.append(readLine + LoggingConstants.LINE_SEPARATOR);
+				}
+			} while (readLine != null);
 
-      Pattern regexPattern = Pattern.compile(Pattern.quote(pattern));
+			logFileContent = buffer.toString();
+		} catch (IOException e) {
+			throw new InvalidTestDataException("Could not read log file content due to exception", e);
+		}
 
-      return regexPattern.matcher(logFileContent).find();
-   }
+		currentFile = logFile;
+	}
 }

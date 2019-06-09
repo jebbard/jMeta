@@ -18,7 +18,7 @@ import com.github.jmeta.tools.tagfinder.api.types.TagInfo;
  */
 public interface ITagSearcher {
 
-   public String getTagName();
+	TagInfo getTagInfo(RandomAccessFile file);
 
-   public TagInfo getTagInfo(RandomAccessFile file);
+	String getTagName();
 }

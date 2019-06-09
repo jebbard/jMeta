@@ -18,11 +18,12 @@ import com.github.jmeta.library.media.impl.mediumAccessor.AllMediumAccessorTests
 import com.github.jmeta.library.media.impl.store.AllMediumStoreTests;
 
 /**
- * {@link AllMediaTests} is used for running all test cases of the media component.
+ * {@link AllMediaTests} is used for running all test cases of the media
+ * component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ AllMediaAPITypesTests.class, AllMediumAccessorTests.class, AllMediumStoreTests.class,
-   AllServiceImplementationTests.class, })
+	AllServiceImplementationTests.class, })
 public class AllMediaTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

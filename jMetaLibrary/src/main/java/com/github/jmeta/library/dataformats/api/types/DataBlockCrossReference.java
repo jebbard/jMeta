@@ -27,7 +27,7 @@ public class DataBlockCrossReference {
 
 	/**
 	 * Creates a new {@link DataBlockCrossReference}.
-	 * 
+	 *
 	 * @param refId The reference's id, must be unique in the current build process
 	 */
 	public DataBlockCrossReference(String refId) {
@@ -60,7 +60,7 @@ public class DataBlockCrossReference {
 
 	/**
 	 * Resolves the referenced target {@link DataBlockId} once known.
-	 * 
+	 *
 	 * @param referencedId The referenced target {@link DataBlockId}, must not be
 	 *                     null.
 	 */

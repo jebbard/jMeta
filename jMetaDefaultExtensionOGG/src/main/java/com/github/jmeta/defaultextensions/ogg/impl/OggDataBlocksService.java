@@ -21,23 +21,23 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  */
 public class OggDataBlocksService extends AbstractDataBlockService {
 
-   /**
-    * Creates a new {@link OggDataBlocksService}.
-    */
-   public OggDataBlocksService() {
-      super(OggExtension.OGG);
-   }
+	/**
+	 * Creates a new {@link OggDataBlocksService}.
+	 */
+	public OggDataBlocksService() {
+		super(OggExtension.OGG);
+	}
 
-   @Override
-   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
-      DataBlockEventBus eventBus) {
+	@Override
+	public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+		DataBlockEventBus eventBus) {
 
-      DataBlockReader oggDataBlockReader = new ForwardDataBlockReader(spec, mediumStore, eventBus);
+		DataBlockReader oggDataBlockReader = new ForwardDataBlockReader(spec, mediumStore, eventBus);
 
-      OggPacketSizeAndCountProvider countAndSizeProvider = new OggPacketSizeAndCountProvider();
-      oggDataBlockReader.setCustomCountProvider(countAndSizeProvider);
-      oggDataBlockReader.setCustomSizeProvider(countAndSizeProvider);
+		OggPacketSizeAndCountProvider countAndSizeProvider = new OggPacketSizeAndCountProvider();
+		oggDataBlockReader.setCustomCountProvider(countAndSizeProvider);
+		oggDataBlockReader.setCustomSizeProvider(countAndSizeProvider);
 
-      return oggDataBlockReader;
-   }
+		return oggDataBlockReader;
+	}
 }

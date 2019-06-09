@@ -18,10 +18,11 @@ import com.github.jmeta.library.media.AllMediaTests;
 import com.github.jmeta.library.startup.AllStartupTests;
 
 /**
- * {@link AlljMetaLibraryTests} is used for running all test cases of the extension management component.
+ * {@link AlljMetaLibraryTests} is used for running all test cases of the
+ * extension management component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ AllStartupTests.class, AllMediaTests.class, AllDataFormatsTests.class, AllDataBlocksTests.class, })
 public class AlljMetaLibraryTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

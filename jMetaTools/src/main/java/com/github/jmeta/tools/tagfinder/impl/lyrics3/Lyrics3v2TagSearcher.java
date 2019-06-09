@@ -21,42 +21,43 @@ import com.github.jmeta.utility.charset.api.services.Charsets;
  */
 public class Lyrics3v2TagSearcher extends AbstractMagicKeyTagSearcher {
 
-   private static final byte[] LYRICS3V2_MAGIC_KEY = new byte[] { 'L', 'Y', 'R', 'I', 'C', 'S', '2', '0', '0' };
+	private static final byte[] LYRICS3V2_MAGIC_KEY = new byte[] { 'L', 'Y', 'R', 'I', 'C', 'S', '2', '0', '0' };
 
-   private static final int LYRICS3V2_TAG_SIZE_LENGTH = 6;
+	private static final int LYRICS3V2_TAG_SIZE_LENGTH = 6;
 
-   /**
-    * Creates a new {@link Lyrics3v2TagSearcher}.
-    */
-   public Lyrics3v2TagSearcher() {
-      super(LYRICS3V2_MAGIC_KEY, new long[] { -137 }, "Lyrics3v2");
-   }
+	/**
+	 * Creates a new {@link Lyrics3v2TagSearcher}.
+	 */
+	public Lyrics3v2TagSearcher() {
+		super(Lyrics3v2TagSearcher.LYRICS3V2_MAGIC_KEY, new long[] { -137 }, "Lyrics3v2");
+	}
 
-   /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile,
-    *      long)
-    */
-   @Override
-   protected int getTotalTagSize(RandomAccessFile file, long possibleOffset) throws IOException {
+	/**
+	 * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTagRelativeStartOffset(int)
+	 */
+	@Override
+	protected int getTagRelativeStartOffset(int tagSize) {
 
-      ByteBuffer bb = ByteBuffer.allocate(LYRICS3V2_TAG_SIZE_LENGTH);
+		return -tagSize + Lyrics3v2TagSearcher.LYRICS3V2_MAGIC_KEY.length;
+	}
 
-      file.getChannel().read(bb, possibleOffset - LYRICS3V2_TAG_SIZE_LENGTH);
+	/**
+	 * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTotalTagSize(java.io.RandomAccessFile,
+	 *      long)
+	 */
+	@Override
+	protected int getTotalTagSize(RandomAccessFile file, long possibleOffset) throws IOException {
 
-      byte[] bytes = bb.array();
+		ByteBuffer bb = ByteBuffer.allocate(Lyrics3v2TagSearcher.LYRICS3V2_TAG_SIZE_LENGTH);
 
-      final int payloadSize = Integer.parseInt(new String(bytes, Charsets.CHARSET_ASCII.name()));
+		file.getChannel().read(bb, possibleOffset - Lyrics3v2TagSearcher.LYRICS3V2_TAG_SIZE_LENGTH);
 
-      return payloadSize + LYRICS3V2_TAG_SIZE_LENGTH + LYRICS3V2_MAGIC_KEY.length;
-   }
+		byte[] bytes = bb.array();
 
-   /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getTagRelativeStartOffset(int)
-    */
-   @Override
-   protected int getTagRelativeStartOffset(int tagSize) {
+		final int payloadSize = Integer.parseInt(new String(bytes, Charsets.CHARSET_ASCII.name()));
 
-      return -tagSize + LYRICS3V2_MAGIC_KEY.length;
-   }
+		return payloadSize + Lyrics3v2TagSearcher.LYRICS3V2_TAG_SIZE_LENGTH
+			+ Lyrics3v2TagSearcher.LYRICS3V2_MAGIC_KEY.length;
+	}
 
 }

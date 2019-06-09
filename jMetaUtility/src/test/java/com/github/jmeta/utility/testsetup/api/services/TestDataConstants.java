@@ -14,6 +14,6 @@ package com.github.jmeta.utility.testsetup.api.services;
  */
 public interface TestDataConstants {
 
-   /** Default message if test data is illegally null. */
-   public static final String NULL_CHECK_FAILURE = "Test data must not be null";
+	/** Default message if test data is illegally null. */
+	String NULL_CHECK_FAILURE = "Test data must not be null";
 }

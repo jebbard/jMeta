@@ -14,60 +14,59 @@ package com.github.jmeta.tools.tagfinder.api.types;
  */
 public class TagInfo {
 
-   public TagInfo(long absoluteOffset, byte[] tagBytes, int tagSize,
-      String[] additionalTagProperties) {
-      super();
-      m_absoluteOffset = absoluteOffset;
-      m_tagBytes = tagBytes;
-      m_tagSize = tagSize;
-      m_additionalTagProperties = additionalTagProperties;
-   }
+	private final long m_absoluteOffset;
 
-   /**
-    * Returns absoluteOffset
-    *
-    * @return absoluteOffset
-    */
-   public long getAbsoluteOffset() {
+	private final byte[] m_tagBytes;
 
-      return m_absoluteOffset;
-   }
+	private final int m_tagSize;
 
-   /**
-    * Returns tagBytes
-    *
-    * @return tagBytes
-    */
-   public byte[] getTagBytes() {
+	private final String[] m_additionalTagProperties;
 
-      return m_tagBytes;
-   }
+	public TagInfo(long absoluteOffset, byte[] tagBytes, int tagSize, String[] additionalTagProperties) {
+		super();
+		m_absoluteOffset = absoluteOffset;
+		m_tagBytes = tagBytes;
+		m_tagSize = tagSize;
+		m_additionalTagProperties = additionalTagProperties;
+	}
 
-   /**
-    * Returns tagSize
-    *
-    * @return tagSize
-    */
-   public int getDeclaredTagSize() {
+	/**
+	 * Returns absoluteOffset
+	 *
+	 * @return absoluteOffset
+	 */
+	public long getAbsoluteOffset() {
 
-      return m_tagSize;
-   }
+		return m_absoluteOffset;
+	}
 
-   /**
-    * Returns additionalTagProperties
-    *
-    * @return additionalTagProperties
-    */
-   public String[] getAdditionalTagProperties() {
+	/**
+	 * Returns additionalTagProperties
+	 *
+	 * @return additionalTagProperties
+	 */
+	public String[] getAdditionalTagProperties() {
 
-      return m_additionalTagProperties;
-   }
+		return m_additionalTagProperties;
+	}
 
-   private final long m_absoluteOffset;
+	/**
+	 * Returns tagSize
+	 *
+	 * @return tagSize
+	 */
+	public int getDeclaredTagSize() {
 
-   private final byte[] m_tagBytes;
+		return m_tagSize;
+	}
 
-   private final int m_tagSize;
+	/**
+	 * Returns tagBytes
+	 *
+	 * @return tagBytes
+	 */
+	public byte[] getTagBytes() {
 
-   private final String[] m_additionalTagProperties;
+		return m_tagBytes;
+	}
 }

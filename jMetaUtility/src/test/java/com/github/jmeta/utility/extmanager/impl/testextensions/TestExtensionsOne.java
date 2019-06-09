@@ -21,36 +21,36 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  */
 public class TestExtensionsOne implements Extension {
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
-    */
-   @Override
-   public String getExtensionId() {
-      return "a";
-   }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
-    */
-   @Override
-   public ExtensionDescription getExtensionDescription() {
-      return new ExtensionDescription("Test", "Test", "version", LocalDateTime.now(), "My ext", "Copy", "License");
-   }
+		ArrayList<T> returnedProviders = new ArrayList<>();
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
-    */
-   @SuppressWarnings("unchecked")
-   @Override
-   public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
+		if (serviceInterface == TestExtensionServiceOne.class) {
+			returnedProviders.add((T) new ExtensionOneServiceProviderOne());
+			returnedProviders.add((T) new ExtensionOneServiceProviderTwo());
+		}
 
-      ArrayList<T> returnedProviders = new ArrayList<T>();
+		return returnedProviders;
+	}
 
-      if (serviceInterface == TestExtensionServiceOne.class) {
-         returnedProviders.add((T) new ExtensionOneServiceProviderOne());
-         returnedProviders.add((T) new ExtensionOneServiceProviderTwo());
-      }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
+	 */
+	@Override
+	public ExtensionDescription getExtensionDescription() {
+		return new ExtensionDescription("Test", "Test", "version", LocalDateTime.now(), "My ext", "Copy", "License");
+	}
 
-      return returnedProviders;
-   }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
+	 */
+	@Override
+	public String getExtensionId() {
+		return "a";
+	}
 }

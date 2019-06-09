@@ -23,25 +23,25 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
  */
 public interface FieldConverter<T> {
 
-   /**
-    * @param binaryValue
-    * @param desc
-    * @param byteOrder
-    * @param characterEncoding
-    * @return the interpreted value
-    * @throws BinaryValueConversionException
-    */
-   public T toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws BinaryValueConversionException;
+	/**
+	 * @param interpretedValue
+	 * @param desc
+	 * @param byteOrder
+	 * @param characterEncoding
+	 * @return the binary value
+	 * @throws InterpretedValueConversionException
+	 */
+	ByteBuffer toBinary(T interpretedValue, DataBlockDescription desc, ByteOrder byteOrder, Charset characterEncoding)
+		throws InterpretedValueConversionException;
 
-   /**
-    * @param interpretedValue
-    * @param desc
-    * @param byteOrder
-    * @param characterEncoding
-    * @return the binary value
-    * @throws InterpretedValueConversionException
-    */
-   public ByteBuffer toBinary(T interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws InterpretedValueConversionException;
+	/**
+	 * @param binaryValue
+	 * @param desc
+	 * @param byteOrder
+	 * @param characterEncoding
+	 * @return the interpreted value
+	 * @throws BinaryValueConversionException
+	 */
+	T toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder, Charset characterEncoding)
+		throws BinaryValueConversionException;
 }

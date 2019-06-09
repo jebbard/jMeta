@@ -22,187 +22,185 @@ import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
  */
 public class MediumActionTest {
 
-   private static final ByteBuffer DEFAULT_BYTES = ByteBuffer.wrap(new byte[] { 0, 1, 2, 3, 4 });
-   private static final FileMedium MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
+	private static final ByteBuffer DEFAULT_BYTES = ByteBuffer.wrap(new byte[] { 0, 1, 2, 3, 4 });
+	private static final FileMedium MEDIUM = new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
 
-   /**
-    * Tests the constructor and several getters, for an insert action.
-    */
-   @Test
-   public void constructor_forInsertAction_initializesFieldsCorrectly() {
+	/**
+	 * Compares a given created {@link MediumAction} with expectations.
+	 * 
+	 * @param newAction              The action to check
+	 * @param expectedActionType     The expected action type
+	 * @param expectedRegion         The expected region
+	 * @param expectedActionBytes    The expected action bytes
+	 * @param expectedSequenceNumber The expected sequence number
+	 */
+	private void assertNewActionMatchesExpectations(MediumAction newAction, MediumActionType expectedActionType,
+		MediumRegion expectedRegion, ByteBuffer expectedActionBytes, int expectedSequenceNumber) {
+		Assert.assertEquals(expectedActionType, newAction.getActionType());
+		Assert.assertEquals(expectedSequenceNumber, newAction.getScheduleSequenceNumber());
+		Assert.assertEquals(expectedActionBytes, newAction.getActionBytes());
+		Assert.assertEquals(expectedRegion, newAction.getRegion());
+		Assert.assertTrue(newAction.isPending());
+	}
 
-      MediumActionType expectedActionType = MediumActionType.INSERT;
-      int expectedSequenceNumber = 11;
-      ByteBuffer expectedActionBytes = DEFAULT_BYTES;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11),
-         expectedActionBytes.remaining());
+	/**
+	 * Tests the constructor and several getters, for a any action without bytes.
+	 */
+	@Test
+	public void constructor_forActionsWithoutBytes_initializesFieldsCorrectly() {
 
-      MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
-         expectedActionBytes);
+		MediumActionType expectedActionType = MediumActionType.TRUNCATE;
+		int expectedSequenceNumber = 11;
+		ByteBuffer expectedActionBytes = null;
+		MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 11), 1);
 
-      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
-         expectedSequenceNumber);
-   }
+		MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
+			expectedActionBytes);
 
-   /**
-    * Tests the constructor and several getters, for a replace action.
-    */
-   @Test
-   public void constructor_forReplaceAction_initializesFieldsCorrectly() {
+		assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+			expectedSequenceNumber);
+	}
 
-      MediumActionType expectedActionType = MediumActionType.REPLACE;
-      int expectedSequenceNumber = 11;
-      ByteBuffer expectedActionBytes = DEFAULT_BYTES;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11), 22);
+	/**
+	 * Tests the constructor and several getters, for an insert action.
+	 */
+	@Test
+	public void constructor_forInsertAction_initializesFieldsCorrectly() {
 
-      MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
-         expectedActionBytes);
+		MediumActionType expectedActionType = MediumActionType.INSERT;
+		int expectedSequenceNumber = 11;
+		ByteBuffer expectedActionBytes = MediumActionTest.DEFAULT_BYTES;
+		MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 11),
+			expectedActionBytes.remaining());
 
-      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
-         expectedSequenceNumber);
-   }
+		MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
+			expectedActionBytes);
 
-   /**
-    * Tests the constructor and several getters, for a any action with bytes that is not replace or insert action.
-    */
-   @Test
-   public void constructor_forWriteAction_initializesFieldsCorrectly() {
+		assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+			expectedSequenceNumber);
+	}
 
-      MediumActionType expectedActionType = MediumActionType.WRITE;
-      int expectedSequenceNumber = 11;
-      ByteBuffer expectedActionBytes = null;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11), 4);
+	/**
+	 * Tests the constructor and several getters, for a replace action.
+	 */
+	@Test
+	public void constructor_forReplaceAction_initializesFieldsCorrectly() {
 
-      MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
-         expectedActionBytes);
+		MediumActionType expectedActionType = MediumActionType.REPLACE;
+		int expectedSequenceNumber = 11;
+		ByteBuffer expectedActionBytes = MediumActionTest.DEFAULT_BYTES;
+		MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 11), 22);
 
-      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
-         expectedSequenceNumber);
-   }
+		MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
+			expectedActionBytes);
 
-   /**
-    * Tests the constructor and several getters, for a any action without bytes.
-    */
-   @Test
-   public void constructor_forActionsWithoutBytes_initializesFieldsCorrectly() {
+		assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+			expectedSequenceNumber);
+	}
 
-      MediumActionType expectedActionType = MediumActionType.TRUNCATE;
-      int expectedSequenceNumber = 11;
-      ByteBuffer expectedActionBytes = null;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 11), 1);
+	/**
+	 * Tests the constructor and several getters, for a any action with bytes that
+	 * is not replace or insert action.
+	 */
+	@Test
+	public void constructor_forWriteAction_initializesFieldsCorrectly() {
 
-      MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
-         expectedActionBytes);
+		MediumActionType expectedActionType = MediumActionType.WRITE;
+		int expectedSequenceNumber = 11;
+		ByteBuffer expectedActionBytes = null;
+		MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 11), 4);
 
-      assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
-         expectedSequenceNumber);
-   }
+		MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
+			expectedActionBytes);
 
-   /**
-    * Tests {@link MediumAction#setDone()}.
-    */
-   @Test
-   public void done_changesIsPending() {
+		assertNewActionMatchesExpectations(newAction, expectedActionType, expectedRegion, expectedActionBytes,
+			expectedSequenceNumber);
+	}
 
-      MediumActionType expectedActionType = MediumActionType.INSERT;
-      int expectedSequenceNumber = 0;
-      ByteBuffer expectedActionBytes = DEFAULT_BYTES;
-      MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MEDIUM, 0),
-         expectedActionBytes.remaining());
+	/**
+	 * Tests {@link MediumAction#setDone()}.
+	 */
+	@Test
+	public void done_changesIsPending() {
 
-      MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
-         expectedActionBytes);
+		MediumActionType expectedActionType = MediumActionType.INSERT;
+		int expectedSequenceNumber = 0;
+		ByteBuffer expectedActionBytes = MediumActionTest.DEFAULT_BYTES;
+		MediumRegion expectedRegion = new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0),
+			expectedActionBytes.remaining());
 
-      newAction.setDone();
+		MediumAction newAction = new MediumAction(expectedActionType, expectedRegion, expectedSequenceNumber,
+			expectedActionBytes);
 
-      Assert.assertFalse(newAction.isPending());
-   }
+		newAction.setDone();
 
-   /**
-    * Tests {@link MediumAction#getSizeDelta()}.
-    */
-   @Test
-   public void getSizeDelta_returnsCorrectValuesForSizeChangingTypes() {
+		Assert.assertFalse(newAction.isPending());
+	}
 
-      ByteBuffer expectedActionBytes = DEFAULT_BYTES;
-      MediumAction insertAction = new MediumAction(MediumActionType.INSERT,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), expectedActionBytes.remaining()), 0,
-         expectedActionBytes);
+	/**
+	 * Tests {@link MediumAction#getSizeDelta()}.
+	 */
+	@Test
+	public void getSizeDelta_returnsCorrectValuesForSizeChangingTypes() {
 
-      int expectedInsertDelta = expectedActionBytes.remaining();
+		ByteBuffer expectedActionBytes = MediumActionTest.DEFAULT_BYTES;
+		MediumAction insertAction = new MediumAction(MediumActionType.INSERT,
+			new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0), expectedActionBytes.remaining()), 0,
+			expectedActionBytes);
 
-      Assert.assertEquals(expectedInsertDelta, insertAction.getSizeDelta());
+		int expectedInsertDelta = expectedActionBytes.remaining();
 
-      int bytesToRemove = 99;
-      MediumAction removeAction = new MediumAction(MediumActionType.REMOVE,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesToRemove), 0, null);
+		Assert.assertEquals(expectedInsertDelta, insertAction.getSizeDelta());
 
-      int expectedRemoveDelta = -bytesToRemove;
+		int bytesToRemove = 99;
+		MediumAction removeAction = new MediumAction(MediumActionType.REMOVE,
+			new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0), bytesToRemove), 0, null);
 
-      Assert.assertEquals(expectedRemoveDelta, removeAction.getSizeDelta());
+		int expectedRemoveDelta = -bytesToRemove;
 
-      int bytesTruncated = 99999;
-      MediumAction truncateAction = new MediumAction(MediumActionType.TRUNCATE,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesTruncated), 0, null);
+		Assert.assertEquals(expectedRemoveDelta, removeAction.getSizeDelta());
 
-      int expectedTruncateDelta = -bytesTruncated;
+		int bytesTruncated = 99999;
+		MediumAction truncateAction = new MediumAction(MediumActionType.TRUNCATE,
+			new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0), bytesTruncated), 0, null);
 
-      Assert.assertEquals(expectedTruncateDelta, truncateAction.getSizeDelta());
+		int expectedTruncateDelta = -bytesTruncated;
 
-      int bytesToReplace1 = DEFAULT_BYTES.remaining() - 1;
-      MediumAction insertingReplaceAction = new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesToReplace1), 0, DEFAULT_BYTES);
+		Assert.assertEquals(expectedTruncateDelta, truncateAction.getSizeDelta());
 
-      int expectedReplaceDelta1 = 1;
+		int bytesToReplace1 = MediumActionTest.DEFAULT_BYTES.remaining() - 1;
+		MediumAction insertingReplaceAction = new MediumAction(MediumActionType.REPLACE,
+			new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0), bytesToReplace1), 0,
+			MediumActionTest.DEFAULT_BYTES);
 
-      Assert.assertEquals(expectedReplaceDelta1, insertingReplaceAction.getSizeDelta());
+		int expectedReplaceDelta1 = 1;
 
-      int bytesToReplace2 = DEFAULT_BYTES.remaining() + 10;
-      MediumAction removingReplaceAction = new MediumAction(MediumActionType.REPLACE,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), bytesToReplace2), 0, DEFAULT_BYTES);
+		Assert.assertEquals(expectedReplaceDelta1, insertingReplaceAction.getSizeDelta());
 
-      int expectedReplaceDelta2 = -10;
+		int bytesToReplace2 = MediumActionTest.DEFAULT_BYTES.remaining() + 10;
+		MediumAction removingReplaceAction = new MediumAction(MediumActionType.REPLACE,
+			new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0), bytesToReplace2), 0,
+			MediumActionTest.DEFAULT_BYTES);
 
-      Assert.assertEquals(expectedReplaceDelta2, removingReplaceAction.getSizeDelta());
-   }
+		int expectedReplaceDelta2 = -10;
 
-   /**
-    * Tests {@link MediumAction#getSizeDelta()}.
-    */
-   @Test
-   public void getSizeDelta_returnsZeroForNonSizeChangingTypes() {
+		Assert.assertEquals(expectedReplaceDelta2, removingReplaceAction.getSizeDelta());
+	}
 
-      MediumAction readAction = new MediumAction(MediumActionType.READ,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 20), 0, null);
+	/**
+	 * Tests {@link MediumAction#getSizeDelta()}.
+	 */
+	@Test
+	public void getSizeDelta_returnsZeroForNonSizeChangingTypes() {
 
-      Assert.assertEquals(0, readAction.getSizeDelta());
+		MediumAction readAction = new MediumAction(MediumActionType.READ,
+			new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0), 20), 0, null);
 
-      MediumAction writeAction = new MediumAction(MediumActionType.READ,
-         new MediumRegion(new StandardMediumOffset(MEDIUM, 0), 20), 0, null);
+		Assert.assertEquals(0, readAction.getSizeDelta());
 
-      Assert.assertEquals(0, writeAction.getSizeDelta());
-   }
+		MediumAction writeAction = new MediumAction(MediumActionType.READ,
+			new MediumRegion(new StandardMediumOffset(MediumActionTest.MEDIUM, 0), 20), 0, null);
 
-   /**
-    * Compares a given created {@link MediumAction} with expectations.
-    * 
-    * @param newAction
-    *           The action to check
-    * @param expectedActionType
-    *           The expected action type
-    * @param expectedRegion
-    *           The expected region
-    * @param expectedActionBytes
-    *           The expected action bytes
-    * @param expectedSequenceNumber
-    *           The expected sequence number
-    */
-   private void assertNewActionMatchesExpectations(MediumAction newAction, MediumActionType expectedActionType,
-      MediumRegion expectedRegion, ByteBuffer expectedActionBytes, int expectedSequenceNumber) {
-      Assert.assertEquals(expectedActionType, newAction.getActionType());
-      Assert.assertEquals(expectedSequenceNumber, newAction.getScheduleSequenceNumber());
-      Assert.assertEquals(expectedActionBytes, newAction.getActionBytes());
-      Assert.assertEquals(expectedRegion, newAction.getRegion());
-      Assert.assertTrue(newAction.isPending());
-   }
+		Assert.assertEquals(0, writeAction.getSizeDelta());
+	}
 }

@@ -21,38 +21,38 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  */
 public class TestExtensionsTwo implements Extension {
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
-    */
-   @Override
-   public String getExtensionId() {
-      return "b";
-   }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
-    */
-   @Override
-   public ExtensionDescription getExtensionDescription() {
-      return new ExtensionDescription("Test", "Test", "version", LocalDateTime.now(), "My ext", "Copy", "License");
-   }
+		ArrayList<T> returnedProviders = new ArrayList<>();
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
-    */
-   @SuppressWarnings("unchecked")
-   @Override
-   public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
+		if (serviceInterface == TestExtensionServiceOne.class) {
+			returnedProviders.add((T) new ExtensionTwoServiceProviderOne());
+		} else if (serviceInterface == TestExtensionServiceTwo.class) {
+			returnedProviders.add((T) new ExtensionTwoServiceProviderTwo());
+		}
 
-      ArrayList<T> returnedProviders = new ArrayList<T>();
+		return returnedProviders;
+	}
 
-      if (serviceInterface == TestExtensionServiceOne.class) {
-         returnedProviders.add((T) new ExtensionTwoServiceProviderOne());
-      } else if (serviceInterface == TestExtensionServiceTwo.class) {
-         returnedProviders.add((T) new ExtensionTwoServiceProviderTwo());
-      }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
+	 */
+	@Override
+	public ExtensionDescription getExtensionDescription() {
+		return new ExtensionDescription("Test", "Test", "version", LocalDateTime.now(), "My ext", "Copy", "License");
+	}
 
-      return returnedProviders;
-   }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
+	 */
+	@Override
+	public String getExtensionId() {
+		return "b";
+	}
 
 }

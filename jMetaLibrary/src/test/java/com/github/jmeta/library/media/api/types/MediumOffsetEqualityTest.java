@@ -17,113 +17,116 @@ import com.github.jmeta.library.media.impl.offset.StandardMediumOffset;
 import com.github.jmeta.utility.equalstest.api.services.AbstractEqualsTest;
 
 /**
- * {@link MediumOffsetEqualityTest} tests the {@link StandardMediumOffset} class (and its interface {@link MediumOffset}
- * for its implementation of {@link #equals(Object)} and {@link #hashCode()}.
+ * {@link MediumOffsetEqualityTest} tests the {@link StandardMediumOffset} class
+ * (and its interface {@link MediumOffset} for its implementation of
+ * {@link #equals(Object)} and {@link #hashCode()}.
  */
 public class MediumOffsetEqualityTest extends AbstractEqualsTest<MediumOffset> {
 
-   private static final byte[] BYTES = new byte[] { 1, 2, 3 };
+	private static final byte[] BYTES = new byte[] { 1, 2, 3 };
 
-   private static final ByteArrayInputStream STREAM_MEDIUM = new ByteArrayInputStream(BYTES);
+	private static final ByteArrayInputStream STREAM_MEDIUM = new ByteArrayInputStream(MediumOffsetEqualityTest.BYTES);
 
-   /**
-    * @see AbstractEqualsTest#getObjects()
-    */
-   @Override
-   protected List<MediumOffset> getObjects() {
+	/**
+	 * Creates the media different to what {@link #createMedia()} returns for
+	 * equality testing.
+	 *
+	 * @return The different media
+	 */
+	private List<Medium<?>> createDifferentMedia() {
 
-      return createMediumOffsets(createMedia(), 0);
-   }
+		List<Medium<?>> media = new ArrayList<>();
 
-   /**
-    * @see AbstractEqualsTest#getEqualObjects()
-    */
-   @Override
-   protected List<MediumOffset> getEqualObjects() {
+		media.add(new InMemoryMedium(new byte[] { 1 }, "Hallo4", true));
+		// We must create a new input stream here to achieve it is different
+		media.add(new InputStreamMedium(new ByteArrayInputStream(MediumOffsetEqualityTest.BYTES), "Hallo"));
+		media.add(new FileMedium(TestMedia.SECOND_TEST_FILE_PATH, false));
 
-      return createMediumOffsets(createMedia(), 0);
-   }
+		return media;
+	}
 
-   /**
-    * @see AbstractEqualsTest#getDifferentObjects()
-    */
-   @Override
-   protected List<MediumOffset> getDifferentObjects() {
+	/**
+	 * Creates the media for equality testing.
+	 *
+	 * @return the equal media
+	 */
+	private List<Medium<?>> createMedia() {
 
-      return createMediumOffsets(createDifferentMedia(), 88);
-   }
+		List<Medium<?>> media = new ArrayList<>();
 
-   /**
-    * @see AbstractEqualsTest#getThirdEqualObjects()
-    */
-   @Override
-   protected List<MediumOffset> getThirdEqualObjects() {
+		// We must actually pass the IDENTICAL byte arrays and streams, because
+		// they are compared bases on object identity
+		media.add(new InMemoryMedium(MediumOffsetEqualityTest.BYTES, "Hallo4", true));
+		media.add(new InputStreamMedium(MediumOffsetEqualityTest.STREAM_MEDIUM, "Hallo"));
+		media.add(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false));
 
-      return createMediumOffsets(createMedia(), 0);
-   }
+		return media;
+	}
 
-   /**
-    * Creates a {@link List} of {@link MediumOffset}s for the given {@link List} of {@link Medium} instances.
-    * 
-    * @param media
-    *           The media to use
-    * @param baseOffset
-    *           The base offset of the absolute medium offsets.
-    * 
-    * @return a {@link List} of {@link MediumOffset}s for the given {@link List} of {@link Medium} instances.
-    */
-   private List<MediumOffset> createMediumOffsets(List<Medium<?>> media, long baseOffset) {
+	/**
+	 * Creates a {@link List} of {@link MediumOffset}s for the given {@link List} of
+	 * {@link Medium} instances.
+	 *
+	 * @param media      The media to use
+	 * @param baseOffset The base offset of the absolute medium offsets.
+	 *
+	 * @return a {@link List} of {@link MediumOffset}s for the given {@link List} of
+	 *         {@link Medium} instances.
+	 */
+	private List<MediumOffset> createMediumOffsets(List<Medium<?>> media, long baseOffset) {
 
-      List<MediumOffset> mediumReferences = new ArrayList<>();
+		List<MediumOffset> mediumReferences = new ArrayList<>();
 
-      // Create the references different due to different media, other properties are the same
-      for (int i = 0; i < media.size(); ++i) {
-         Medium<?> medium = media.get(i);
+		// Create the references different due to different media, other properties are
+		// the same
+		for (int i = 0; i < media.size(); ++i) {
+			Medium<?> medium = media.get(i);
 
-         mediumReferences.add(new StandardMediumOffset(medium, i * 10));
-      }
+			mediumReferences.add(new StandardMediumOffset(medium, i * 10));
+		}
 
-      // Create some more references with equal medium, using the passed offset
-      for (int i = 0; i < 3; ++i) {
-         mediumReferences
-            .add(new StandardMediumOffset(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false), baseOffset + i * 10));
-      }
+		// Create some more references with equal medium, using the passed offset
+		for (int i = 0; i < 3; ++i) {
+			mediumReferences.add(
+				new StandardMediumOffset(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false), baseOffset + (i * 10)));
+		}
 
-      return mediumReferences;
-   }
+		return mediumReferences;
+	}
 
-   /**
-    * Creates the media for equality testing.
-    * 
-    * @return the equal media
-    */
-   private List<Medium<?>> createMedia() {
+	/**
+	 * @see AbstractEqualsTest#getDifferentObjects()
+	 */
+	@Override
+	protected List<MediumOffset> getDifferentObjects() {
 
-      List<Medium<?>> media = new ArrayList<>();
+		return createMediumOffsets(createDifferentMedia(), 88);
+	}
 
-      // We must actually pass the IDENTICAL byte arrays and streams, because
-      // they are compared bases on object identity
-      media.add(new InMemoryMedium(BYTES, "Hallo4", true));
-      media.add(new InputStreamMedium(STREAM_MEDIUM, "Hallo"));
-      media.add(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, false));
+	/**
+	 * @see AbstractEqualsTest#getEqualObjects()
+	 */
+	@Override
+	protected List<MediumOffset> getEqualObjects() {
 
-      return media;
-   }
+		return createMediumOffsets(createMedia(), 0);
+	}
 
-   /**
-    * Creates the media different to what {@link #createMedia()} returns for equality testing.
-    * 
-    * @return The different media
-    */
-   private List<Medium<?>> createDifferentMedia() {
+	/**
+	 * @see AbstractEqualsTest#getObjects()
+	 */
+	@Override
+	protected List<MediumOffset> getObjects() {
 
-      List<Medium<?>> media = new ArrayList<>();
+		return createMediumOffsets(createMedia(), 0);
+	}
 
-      media.add(new InMemoryMedium(new byte[] { 1 }, "Hallo4", true));
-      // We must create a new input stream here to achieve it is different
-      media.add(new InputStreamMedium(new ByteArrayInputStream(BYTES), "Hallo"));
-      media.add(new FileMedium(TestMedia.SECOND_TEST_FILE_PATH, false));
+	/**
+	 * @see AbstractEqualsTest#getThirdEqualObjects()
+	 */
+	@Override
+	protected List<MediumOffset> getThirdEqualObjects() {
 
-      return media;
-   }
+		return createMediumOffsets(createMedia(), 0);
+	}
 }

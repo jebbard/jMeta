@@ -32,7 +32,7 @@ public class BinaryValueConversionException extends Exception {
 
 	/**
 	 * Creates a new {@link BinaryValueConversionException}.
-	 * 
+	 *
 	 * @param message
 	 * @param cause
 	 * @param fieldDesc

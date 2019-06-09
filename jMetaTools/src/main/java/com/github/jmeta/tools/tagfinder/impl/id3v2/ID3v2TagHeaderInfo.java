@@ -14,59 +14,59 @@ package com.github.jmeta.tools.tagfinder.impl.id3v2;
  */
 public class ID3v2TagHeaderInfo {
 
-   private final short m_version;
+	private final short m_version;
 
-   private final int m_tagSize;
+	private final int m_tagSize;
 
-   private final byte m_flags;
+	private final byte m_flags;
 
-   private final byte[] m_id;
+	private final byte[] m_id;
 
-   public ID3v2TagHeaderInfo(byte[] id, short version, byte flags, int tagSize) {
-      super();
-      m_id = id;
-      m_version = version;
-      m_flags = flags;
-      m_tagSize = tagSize;
-   }
+	public ID3v2TagHeaderInfo(byte[] id, short version, byte flags, int tagSize) {
+		super();
+		m_id = id;
+		m_version = version;
+		m_flags = flags;
+		m_tagSize = tagSize;
+	}
 
-   /**
-    * Returns version
-    *
-    * @return version
-    */
-   public short getVersion() {
+	/**
+	 * Returns flags
+	 *
+	 * @return flags
+	 */
+	public byte getFlags() {
 
-      return m_version;
-   }
+		return m_flags;
+	}
 
-   /**
-    * Returns tagSize
-    *
-    * @return tagSize
-    */
-   public int getTagSize() {
+	/**
+	 * Returns id
+	 *
+	 * @return id
+	 */
+	public byte[] getId() {
 
-      return m_tagSize;
-   }
+		return m_id;
+	}
 
-   /**
-    * Returns flags
-    *
-    * @return flags
-    */
-   public byte getFlags() {
+	/**
+	 * Returns tagSize
+	 *
+	 * @return tagSize
+	 */
+	public int getTagSize() {
 
-      return m_flags;
-   }
+		return m_tagSize;
+	}
 
-   /**
-    * Returns id
-    *
-    * @return id
-    */
-   public byte[] getId() {
+	/**
+	 * Returns version
+	 *
+	 * @return version
+	 */
+	public short getVersion() {
 
-      return m_id;
-   }
+		return m_version;
+	}
 }

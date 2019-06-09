@@ -29,315 +29,322 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
  */
 public abstract class AbstractCsvReaderTest {
 
-   /**
-    * Sets up the test fixtures.
-    */
-   @Before
-   public void setUp() {
-      m_testlingFixedColumns = getTestlingWithFixedColumns();
-      m_testlingVariableColumns = new CsvReader();
+	private static final String UNEXPECTED_EXCEPTION = "Unexpected exception: ";
 
-      try {
-         m_correctFileToUse = getCorrectFileToUse();
-         m_incorrectFileToUse = getIncorrectFileToUse();
-      } catch (Exception e) {
-         throw new InvalidTestDataException("Could not load test data files due to exception", e);
-      }
+	private CsvReader m_testlingFixedColumns;
 
-      if (m_testlingFixedColumns == null || m_testlingVariableColumns == null || m_correctFileToUse == null
-         || m_incorrectFileToUse == null)
-         throw new InvalidTestDataException("Test data may not be null", null);
+	private AbstractCsvHandler<NamedReader> m_testlingVariableColumns;
 
-      m_testlingFixedColumns.setQuote(getQuoteToUse());
-      m_testlingFixedColumns.setSeparator(getSeparatorToUse());
-      m_testlingVariableColumns.setQuote(getQuoteToUse());
-      m_testlingVariableColumns.setSeparator(getSeparatorToUse());
-   }
+	private File m_correctFileToUse;
 
-   /**
-    * Tests {@link CsvReader#getQuote()} and {@link CsvReader#getSeparator()}.
-    */
-   @Test
-   public void test_getQuoteGetSeparator() {
-      checkGetQuoteGetSeparator(m_testlingFixedColumns);
-      checkGetQuoteGetSeparator(m_testlingVariableColumns);
-   }
+	private File m_incorrectFileToUse;
 
-   /**
-    * Tests {@link AbstractCsvHandler#isCsvLoaded()}, {@link AbstractCsvHandler#setNewResource(java.io.Closeable)},
-    * {@link AbstractCsvHandler#closeCurrentCsvResource()} and {@link AbstractCsvHandler#getCurrentCsvResource()}.
-    */
-   @Test
-   public void test_fileManagement() {
-      checkIsFileLoadedLoadNewFile(m_testlingFixedColumns);
-      checkIsFileLoadedLoadNewFile(m_testlingVariableColumns);
+	/**
+	 * Does the actual checking of
+	 * {@link AbstractCsvHandler#closeCurrentCsvResource()}.
+	 *
+	 * @param testling The {@link CsvReader} to use.
+	 */
+	private void checkCloseFile(AbstractCsvHandler<NamedReader> testling) {
+		try {
+			testling.closeCurrentCsvResource();
 
-      checkCloseFile(m_testlingFixedColumns);
-      checkCloseFile(m_testlingVariableColumns);
-   }
+			Assert.assertNull(testling.getCurrentCsvResource());
+			Assert.assertFalse(testling.isCsvLoaded());
+		} catch (IOException e) {
+			Assert.fail(AbstractCsvReaderTest.UNEXPECTED_EXCEPTION + e);
+		}
+	}
 
-   /**
-    * Tests {@link CsvReader#readNextRow} in positive case with removal of quotes in read columns.
-    */
-   @Test
-   public void test_readNextLine_positive_removeQuotes() {
-      try {
-         checkReadNextLine(m_testlingFixedColumns, m_correctFileToUse, false);
-      } catch (CsvRowFormatException e) {
-         Assert.fail(UNEXPECTED_EXCEPTION + e);
-      }
-   }
+	/**
+	 * Does the actual checking of {@link CsvReader#getQuote()} and
+	 * {@link CsvReader#getSeparator()}.
+	 *
+	 * @param testling The {@link CsvReader} to use.
+	 */
+	private void checkGetQuoteGetSeparator(AbstractCsvHandler<NamedReader> testling) {
+		Character quote = testling.getQuote();
+		Character separator = testling.getSeparator();
 
-   /**
-    * Tests {@link CsvReader#readNextRow} in positive case without removal of quotes in read columns.
-    */
-   @Test
-   public void test_readNextRow_positive_preserveQuotes() {
-      try {
-         checkReadNextLine(m_testlingFixedColumns, m_correctFileToUse, true);
-      } catch (CsvRowFormatException e) {
-         Assert.fail(UNEXPECTED_EXCEPTION + e);
-      }
-   }
+		Assert.assertNotNull(quote);
+		Assert.assertNotNull(separator);
 
-   /**
-    * Tests {@link CsvReader#readNextRow} in negative case with removal of quotes in read columns.
-    * 
-    * @throws CsvRowFormatException
-    *            As expected
-    */
-   @Test(expected = CsvRowFormatException.class)
-   public void test_readNextRow_negative_removeQuotes() throws CsvRowFormatException {
-      checkReadNextLine(m_testlingFixedColumns, m_incorrectFileToUse, false);
-   }
+		if (getQuoteToUse() != null) {
+			Assert.assertEquals(getQuoteToUse(), quote);
+		}
 
-   /**
-    * Tests {@link CsvReader#readNextRow} in negative case without removal of quotes in read columns.
-    * 
-    * @throws CsvRowFormatException
-    *            As expected
-    */
-   @Test(expected = CsvRowFormatException.class)
-   public void test_readNextLine_negative_preserveQuotes() throws CsvRowFormatException {
-      checkReadNextLine(m_testlingFixedColumns, m_incorrectFileToUse, true);
-   }
+		if (getSeparatorToUse() != null) {
+			Assert.assertEquals(getSeparatorToUse(), separator);
+		}
+	}
 
-   /**
-    * Returns a {@link CsvReader} instance created with fixed columns for test.
-    *
-    * @return a {@link CsvReader} instance created with fixed columns for test.
-    */
-   protected abstract CsvReader getTestlingWithFixedColumns();
+	/**
+	 * Does the actual checking of {@link AbstractCsvHandler#isCsvLoaded()} and
+	 * {@link AbstractCsvHandler#setNewResource(java.io.Closeable)}.
+	 *
+	 * @param testling The {@link CsvReader} to use.
+	 */
+	private void checkIsFileLoadedLoadNewFile(AbstractCsvHandler<NamedReader> testling) {
+		Assert.assertNull(testling.getCurrentCsvResource());
+		Assert.assertFalse(testling.isCsvLoaded());
 
-   /**
-    * Returns the separator character to be used in the test.
-    * 
-    * @return the separator character to be used in the test. Null for default.
-    */
-   protected abstract Character getSeparatorToUse();
+		checkLoadNewFile(testling, m_correctFileToUse);
 
-   /**
-    * Returns the quote character to be used in the test.
-    * 
-    * @return the quote character to be used in the test. Null for default.
-    */
-   protected abstract Character getQuoteToUse();
+		Assert.assertTrue(testling.isCsvLoaded());
 
-   /**
-    * Returns the correctly formatted csv file for positive test cases.
-    *
-    * @return the correctly formatted csv file for positive test cases.
-    * @throws Exception
-    *            in case of any problem during determination of the file
-    */
-   protected abstract File getCorrectFileToUse() throws Exception;
+		checkLoadNewFile(testling, m_incorrectFileToUse);
 
-   /**
-    * Returns the incorrectly formatted csv file for negative test cases.
-    *
-    * @return the incorrectly formatted csv file for negative test cases.
-    * @throws Exception
-    *            in case of any problem during determination of the file
-    */
-   protected abstract File getIncorrectFileToUse() throws Exception;
+		Assert.assertTrue(testling.isCsvLoaded());
+	}
 
-   /**
-    * Returns the expected data in the correct csv file returned by {@link #getCorrectFileToUse()}.
-    *
-    * @return the expected data in the correct csv file returned by {@link #getCorrectFileToUse()}.
-    */
-   protected abstract List<String[]> getExpectedDataInCorrectFile();
+	/**
+	 * Does the actual checking whether load new file works
+	 * 
+	 * @param testling The {@link CsvReader} to use.
+	 * @param file     The file to load.
+	 */
+	private void checkLoadNewFile(AbstractCsvHandler<NamedReader> testling, File file) {
+		try {
+			testling.setNewResource(NamedReader.createFromFile(file, Charsets.CHARSET_ASCII));
 
-   /**
-    * Does the actual checking of {@link AbstractCsvHandler#isCsvLoaded()} and
-    * {@link AbstractCsvHandler#setNewResource(java.io.Closeable)}.
-    *
-    * @param testling
-    *           The {@link CsvReader} to use.
-    */
-   private void checkIsFileLoadedLoadNewFile(AbstractCsvHandler<NamedReader> testling) {
-      Assert.assertNull(testling.getCurrentCsvResource());
-      Assert.assertFalse(testling.isCsvLoaded());
+			Assert.assertEquals(file.getAbsolutePath(), testling.getCurrentCsvResource().getName());
+		} catch (IOException e) {
+			Assert.fail(AbstractCsvReaderTest.UNEXPECTED_EXCEPTION + e);
+		}
+	}
 
-      checkLoadNewFile(testling, m_correctFileToUse);
+	/**
+	 * Checks the reading of each row of the given csv file.
+	 * 
+	 * @param testling       The {@link CsvReader} to use.
+	 * @param csvFile        The csv file.
+	 * @param preserveQuotes true if quotes should be preserved, false otherwise.
+	 *
+	 * @throws CsvRowFormatException If the format of a row in the csv file is
+	 *                               incorrect.
+	 */
+	private void checkReadNextLine(CsvReader testling, File csvFile, boolean preserveQuotes)
+		throws CsvRowFormatException {
+		checkLoadNewFile(testling, csvFile);
 
-      Assert.assertTrue(testling.isCsvLoaded());
+		Map<String, String> nextRow = null;
 
-      checkLoadNewFile(testling, m_incorrectFileToUse);
+		Set<String> expectedColumns = testling.getColumns();
 
-      Assert.assertTrue(testling.isCsvLoaded());
-   }
+		List<String[]> expectedLines = getExpectedDataInCorrectFile();
 
-   /**
-    * Does the actual checking of {@link AbstractCsvHandler#closeCurrentCsvResource()}.
-    *
-    * @param testling
-    *           The {@link CsvReader} to use.
-    */
-   private void checkCloseFile(AbstractCsvHandler<NamedReader> testling) {
-      try {
-         testling.closeCurrentCsvResource();
+		int rowIndex = 0;
+		try {
+			while ((nextRow = testling.readNextRow(preserveQuotes)) != null) {
+				int columnIndex = 0;
 
-         Assert.assertNull(testling.getCurrentCsvResource());
-         Assert.assertFalse(testling.isCsvLoaded());
-      } catch (IOException e) {
-         Assert.fail(UNEXPECTED_EXCEPTION + e);
-      }
-   }
+				// Fetch columns if they are determined first after the first call to
+				// readNextRow
+				if (expectedColumns.isEmpty()) {
+					expectedColumns = testling.getColumns();
+				}
 
-   /**
-    * Does the actual checking of {@link CsvReader#getQuote()} and {@link CsvReader#getSeparator()}.
-    *
-    * @param testling
-    *           The {@link CsvReader} to use.
-    */
-   private void checkGetQuoteGetSeparator(AbstractCsvHandler<NamedReader> testling) {
-      Character quote = testling.getQuote();
-      Character separator = testling.getSeparator();
+				String[] rowColumns = expectedLines.get(rowIndex);
 
-      Assert.assertNotNull(quote);
-      Assert.assertNotNull(separator);
+				if (rowColumns.length != expectedColumns.size()) {
+					throw new InvalidTestDataException("Number of the columns for the csv file " + csvFile
+						+ " does not match number of expected columns for row index " + rowIndex, null);
+				}
 
-      if (getQuoteToUse() != null)
-         Assert.assertEquals(getQuoteToUse(), quote);
+				Assert.assertEquals(rowColumns.length, nextRow.size());
 
-      if (getSeparatorToUse() != null)
-         Assert.assertEquals(getSeparatorToUse(), separator);
-   }
+				for (Iterator<String> columnIterator = expectedColumns.iterator(); columnIterator.hasNext();) {
+					String nextColumnName = columnIterator.next();
 
-   /**
-    * Does the actual checking whether load new file works
-    * 
-    * @param testling
-    *           The {@link CsvReader} to use.
-    * @param file
-    *           The file to load.
-    */
-   private void checkLoadNewFile(AbstractCsvHandler<NamedReader> testling, File file) {
-      try {
-         testling.setNewResource(NamedReader.createFromFile(file, Charsets.CHARSET_ASCII));
+					Assert.assertTrue(nextRow.containsKey(nextColumnName));
+					String actualColumnValue = nextRow.get(nextColumnName);
+					String expectedColumnValue = rowColumns[columnIndex];
 
-         Assert.assertEquals(file.getAbsolutePath(), testling.getCurrentCsvResource().getName());
-      } catch (IOException e) {
-         Assert.fail(UNEXPECTED_EXCEPTION + e);
-      }
-   }
+					String quoteAsString = testling.getQuote().toString();
 
-   /**
-    * Checks the reading of each row of the given csv file.
-    * 
-    * @param testling
-    *           The {@link CsvReader} to use.
-    * @param csvFile
-    *           The csv file.
-    * @param preserveQuotes
-    *           true if quotes should be preserved, false otherwise.
-    *
-    * @throws CsvRowFormatException
-    *            If the format of a row in the csv file is incorrect.
-    */
-   private void checkReadNextLine(CsvReader testling, File csvFile, boolean preserveQuotes)
-      throws CsvRowFormatException {
-      checkLoadNewFile(testling, csvFile);
+					if (!preserveQuotes) {
+						expectedColumnValue = expectedColumnValue.replace(quoteAsString, "");
 
-      Map<String, String> nextRow = null;
+						Assert.assertFalse(actualColumnValue.startsWith(quoteAsString));
+						Assert.assertFalse(actualColumnValue.endsWith(quoteAsString));
+					}
 
-      Set<String> expectedColumns = testling.getColumns();
+					else if (isQuotedColumn(rowIndex, columnIndex)) {
+						Assert.assertTrue(actualColumnValue.startsWith(quoteAsString));
+						Assert.assertTrue(actualColumnValue.endsWith(quoteAsString));
+					}
 
-      List<String[]> expectedLines = getExpectedDataInCorrectFile();
+					Assert.assertEquals(expectedColumnValue, actualColumnValue);
 
-      int rowIndex = 0;
-      try {
-         while ((nextRow = testling.readNextRow(preserveQuotes)) != null) {
-            int columnIndex = 0;
+					columnIndex++;
+				}
 
-            // Fetch columns if they are determined first after the first call to readNextRow
-            if (expectedColumns.isEmpty())
-               expectedColumns = testling.getColumns();
+				rowIndex++;
 
-            String[] rowColumns = expectedLines.get(rowIndex);
+				Assert.assertTrue(rowIndex <= expectedLines.size());
+			}
+		} catch (IOException e) {
+			Assert.fail(AbstractCsvReaderTest.UNEXPECTED_EXCEPTION + e);
+		}
 
-            if (rowColumns.length != expectedColumns.size())
-               throw new InvalidTestDataException("Number of the columns for the csv file " + csvFile
-                  + " does not match number of expected columns for row index " + rowIndex, null);
+		Assert.assertEquals(expectedLines.size(), rowIndex);
+	}
 
-            Assert.assertEquals(rowColumns.length, nextRow.size());
+	/**
+	 * Returns the correctly formatted csv file for positive test cases.
+	 *
+	 * @return the correctly formatted csv file for positive test cases.
+	 * @throws Exception in case of any problem during determination of the file
+	 */
+	protected abstract File getCorrectFileToUse() throws Exception;
 
-            for (Iterator<String> columnIterator = expectedColumns.iterator(); columnIterator.hasNext();) {
-               String nextColumnName = columnIterator.next();
+	/**
+	 * Returns the expected data in the correct csv file returned by
+	 * {@link #getCorrectFileToUse()}.
+	 *
+	 * @return the expected data in the correct csv file returned by
+	 *         {@link #getCorrectFileToUse()}.
+	 */
+	protected abstract List<String[]> getExpectedDataInCorrectFile();
 
-               Assert.assertTrue(nextRow.containsKey(nextColumnName));
-               String actualColumnValue = nextRow.get(nextColumnName);
-               String expectedColumnValue = rowColumns[columnIndex];
+	/**
+	 * Returns the incorrectly formatted csv file for negative test cases.
+	 *
+	 * @return the incorrectly formatted csv file for negative test cases.
+	 * @throws Exception in case of any problem during determination of the file
+	 */
+	protected abstract File getIncorrectFileToUse() throws Exception;
 
-               String quoteAsString = testling.getQuote().toString();
+	/**
+	 * Returns the quote character to be used in the test.
+	 * 
+	 * @return the quote character to be used in the test. Null for default.
+	 */
+	protected abstract Character getQuoteToUse();
 
-               if (!preserveQuotes) {
-                  expectedColumnValue = expectedColumnValue.replace(quoteAsString, "");
+	/**
+	 * Returns the separator character to be used in the test.
+	 * 
+	 * @return the separator character to be used in the test. Null for default.
+	 */
+	protected abstract Character getSeparatorToUse();
 
-                  Assert.assertFalse(actualColumnValue.startsWith(quoteAsString));
-                  Assert.assertFalse(actualColumnValue.endsWith(quoteAsString));
-               }
+	/**
+	 * Returns a {@link CsvReader} instance created with fixed columns for test.
+	 *
+	 * @return a {@link CsvReader} instance created with fixed columns for test.
+	 */
+	protected abstract CsvReader getTestlingWithFixedColumns();
 
-               else if (isQuotedColumn(rowIndex, columnIndex)) {
-                  Assert.assertTrue(actualColumnValue.startsWith(quoteAsString));
-                  Assert.assertTrue(actualColumnValue.endsWith(quoteAsString));
-               }
+	/**
+	 * Determines whether the given csv element in the expected data is quoted or
+	 * not.
+	 *
+	 * @param rowIndex    The zero-based index of the row in the csv file.
+	 * @param columnIndex The zero-based index of the column in the csv file.
+	 * @return true if it is expected to be quoted, false otherwise.
+	 */
+	private boolean isQuotedColumn(int rowIndex, int columnIndex) {
+		String[] expectedRowContents = getExpectedDataInCorrectFile().get(rowIndex);
+		String quoteToUse = getTestlingWithFixedColumns().getQuote().toString();
+		return expectedRowContents[columnIndex].startsWith(quoteToUse);
+	}
 
-               Assert.assertEquals(expectedColumnValue, actualColumnValue);
+	/**
+	 * Sets up the test fixtures.
+	 */
+	@Before
+	public void setUp() {
+		m_testlingFixedColumns = getTestlingWithFixedColumns();
+		m_testlingVariableColumns = new CsvReader();
 
-               columnIndex++;
-            }
+		try {
+			m_correctFileToUse = getCorrectFileToUse();
+			m_incorrectFileToUse = getIncorrectFileToUse();
+		} catch (Exception e) {
+			throw new InvalidTestDataException("Could not load test data files due to exception", e);
+		}
 
-            rowIndex++;
+		if ((m_testlingFixedColumns == null) || (m_testlingVariableColumns == null) || (m_correctFileToUse == null)
+			|| (m_incorrectFileToUse == null)) {
+			throw new InvalidTestDataException("Test data may not be null", null);
+		}
 
-            Assert.assertTrue(rowIndex <= expectedLines.size());
-         }
-      } catch (IOException e) {
-         Assert.fail(UNEXPECTED_EXCEPTION + e);
-      }
+		m_testlingFixedColumns.setQuote(getQuoteToUse());
+		m_testlingFixedColumns.setSeparator(getSeparatorToUse());
+		m_testlingVariableColumns.setQuote(getQuoteToUse());
+		m_testlingVariableColumns.setSeparator(getSeparatorToUse());
+	}
 
-      Assert.assertEquals(expectedLines.size(), rowIndex);
-   }
+	/**
+	 * Tests {@link AbstractCsvHandler#isCsvLoaded()},
+	 * {@link AbstractCsvHandler#setNewResource(java.io.Closeable)},
+	 * {@link AbstractCsvHandler#closeCurrentCsvResource()} and
+	 * {@link AbstractCsvHandler#getCurrentCsvResource()}.
+	 */
+	@Test
+	public void test_fileManagement() {
+		checkIsFileLoadedLoadNewFile(m_testlingFixedColumns);
+		checkIsFileLoadedLoadNewFile(m_testlingVariableColumns);
 
-   /**
-    * Determines whether the given csv element in the expected data is quoted or not.
-    *
-    * @param rowIndex
-    *           The zero-based index of the row in the csv file.
-    * @param columnIndex
-    *           The zero-based index of the column in the csv file.
-    * @return true if it is expected to be quoted, false otherwise.
-    */
-   private boolean isQuotedColumn(int rowIndex, int columnIndex) {
-      String[] expectedRowContents = getExpectedDataInCorrectFile().get(rowIndex);
-      String quoteToUse = getTestlingWithFixedColumns().getQuote().toString();
-      return expectedRowContents[columnIndex].startsWith(quoteToUse);
-   }
+		checkCloseFile(m_testlingFixedColumns);
+		checkCloseFile(m_testlingVariableColumns);
+	}
 
-   private static final String UNEXPECTED_EXCEPTION = "Unexpected exception: ";
-   private CsvReader m_testlingFixedColumns;
-   private AbstractCsvHandler<NamedReader> m_testlingVariableColumns;
-   private File m_correctFileToUse;
-   private File m_incorrectFileToUse;
+	/**
+	 * Tests {@link CsvReader#getQuote()} and {@link CsvReader#getSeparator()}.
+	 */
+	@Test
+	public void test_getQuoteGetSeparator() {
+		checkGetQuoteGetSeparator(m_testlingFixedColumns);
+		checkGetQuoteGetSeparator(m_testlingVariableColumns);
+	}
+
+	/**
+	 * Tests {@link CsvReader#readNextRow} in negative case without removal of
+	 * quotes in read columns.
+	 * 
+	 * @throws CsvRowFormatException As expected
+	 */
+	@Test(expected = CsvRowFormatException.class)
+	public void test_readNextLine_negative_preserveQuotes() throws CsvRowFormatException {
+		checkReadNextLine(m_testlingFixedColumns, m_incorrectFileToUse, true);
+	}
+
+	/**
+	 * Tests {@link CsvReader#readNextRow} in positive case with removal of quotes
+	 * in read columns.
+	 */
+	@Test
+	public void test_readNextLine_positive_removeQuotes() {
+		try {
+			checkReadNextLine(m_testlingFixedColumns, m_correctFileToUse, false);
+		} catch (CsvRowFormatException e) {
+			Assert.fail(AbstractCsvReaderTest.UNEXPECTED_EXCEPTION + e);
+		}
+	}
+
+	/**
+	 * Tests {@link CsvReader#readNextRow} in negative case with removal of quotes
+	 * in read columns.
+	 * 
+	 * @throws CsvRowFormatException As expected
+	 */
+	@Test(expected = CsvRowFormatException.class)
+	public void test_readNextRow_negative_removeQuotes() throws CsvRowFormatException {
+		checkReadNextLine(m_testlingFixedColumns, m_incorrectFileToUse, false);
+	}
+
+	/**
+	 * Tests {@link CsvReader#readNextRow} in positive case without removal of
+	 * quotes in read columns.
+	 */
+	@Test
+	public void test_readNextRow_positive_preserveQuotes() {
+		try {
+			checkReadNextLine(m_testlingFixedColumns, m_correctFileToUse, true);
+		} catch (CsvRowFormatException e) {
+			Assert.fail(AbstractCsvReaderTest.UNEXPECTED_EXCEPTION + e);
+		}
+	}
 }

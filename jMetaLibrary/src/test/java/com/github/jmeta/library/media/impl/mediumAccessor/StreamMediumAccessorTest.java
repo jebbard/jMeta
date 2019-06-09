@@ -7,8 +7,6 @@
 
 package com.github.jmeta.library.media.impl.mediumAccessor;
 
-import static com.github.jmeta.library.media.api.helper.TestMedia.at;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -27,85 +25,86 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
  */
 public class StreamMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 
-   private InputStream testStream;
+	private InputStream testStream;
 
-   /**
-    * Tests {@link MediumAccessor#setCurrentPosition(MediumOffset)} and {@link MediumAccessor#getCurrentPosition()}.
-    */
-   @Test
-   public void setCurrentPosition_onStreamMedium_doesNotChangeCurrentPosition() {
+	/**
+	 * @see AbstractMediumAccessorTest#getImplementationToTest()
+	 */
+	@Override
+	protected MediumAccessor<?> createImplementationToTest() {
+		return new InputStreamMediumAccessor(getExpectedMedium());
+	}
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
+	 */
+	@Override
+	protected InputStreamMedium getExpectedMedium() {
+		return new InputStreamMedium(testStream, "My_Stream");
+	}
 
-      mediumAccessor.open();
+	/**
+	 * @see AbstractMediumAccessorTest#getReadTestDataToUse()
+	 */
+	@Override
+	protected List<ReadTestData> getReadTestDataToUse() {
 
-      int newOffsetOne = 20;
-      MediumOffset changeReferenceOne = at(mediumAccessor.getMedium(), newOffsetOne);
+		List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
 
-      mediumAccessor.setCurrentPosition(changeReferenceOne);
+		readOffsetsAndSizes.add(new ReadTestData(5, 7, 0));
+		readOffsetsAndSizes.add(new ReadTestData(1, 157, 7));
+		readOffsetsAndSizes.add(new ReadTestData(100, 133, 164));
+		readOffsetsAndSizes.add(new ReadTestData(0, 17, 297));
+		readOffsetsAndSizes.add(new ReadTestData(88, 45, 314));
 
-      Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
+		return readOffsetsAndSizes;
+	}
 
-      int newOffsetTwo = 10;
-      MediumOffset changeReferenceTwo = at(mediumAccessor.getMedium(), newOffsetTwo);
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
+	 */
+	@Override
+	protected ReadTestData getReadTestDataUntilEndOfMedium() {
+		return new ReadTestData(0, AbstractMediumAccessorTest.getExpectedMediumContent().length);
+	}
 
-      mediumAccessor.setCurrentPosition(changeReferenceTwo);
+	/**
+	 * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
+	 */
+	@Override
+	protected void prepareMediumData(byte[] testFileContents) {
 
-      Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
-   }
+		try {
+			testStream = new FileInputStream(TestMedia.FIRST_TEST_FILE_PATH.toFile());
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Could not find test file. Make sure it exists" + "on the hard drive: "
+				+ TestMedia.FIRST_TEST_FILE_PATH.toAbsolutePath().toString(), e);
+		}
+	}
 
-   /**
-    * @see AbstractMediumAccessorTest#getReadTestDataToUse()
-    */
-   @Override
-   protected List<ReadTestData> getReadTestDataToUse() {
+	/**
+	 * Tests {@link MediumAccessor#setCurrentPosition(MediumOffset)} and
+	 * {@link MediumAccessor#getCurrentPosition()}.
+	 */
+	@Test
+	public void setCurrentPosition_onStreamMedium_doesNotChangeCurrentPosition() {
 
-      List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      readOffsetsAndSizes.add(new ReadTestData(5, 7, 0));
-      readOffsetsAndSizes.add(new ReadTestData(1, 157, 7));
-      readOffsetsAndSizes.add(new ReadTestData(100, 133, 164));
-      readOffsetsAndSizes.add(new ReadTestData(0, 17, 297));
-      readOffsetsAndSizes.add(new ReadTestData(88, 45, 314));
+		mediumAccessor.open();
 
-      return readOffsetsAndSizes;
-   }
+		int newOffsetOne = 20;
+		MediumOffset changeReferenceOne = TestMedia.at(mediumAccessor.getMedium(), newOffsetOne);
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
-    */
-   @Override
-   protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(0, getExpectedMediumContent().length);
-   }
+		mediumAccessor.setCurrentPosition(changeReferenceOne);
 
-   /**
-    * @see AbstractMediumAccessorTest#getImplementationToTest()
-    */
-   @Override
-   protected MediumAccessor<?> createImplementationToTest() {
-      return new InputStreamMediumAccessor(getExpectedMedium());
-   }
+		Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
-    */
-   @Override
-   protected InputStreamMedium getExpectedMedium() {
-      return new InputStreamMedium(testStream, "My_Stream");
-   }
+		int newOffsetTwo = 10;
+		MediumOffset changeReferenceTwo = TestMedia.at(mediumAccessor.getMedium(), newOffsetTwo);
 
-   /**
-    * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
-    */
-   @Override
-   protected void prepareMediumData(byte[] testFileContents) {
+		mediumAccessor.setCurrentPosition(changeReferenceTwo);
 
-      try {
-         testStream = new FileInputStream(TestMedia.FIRST_TEST_FILE_PATH.toFile());
-      } catch (FileNotFoundException e) {
-         throw new RuntimeException("Could not find test file. Make sure it exists" + "on the hard drive: "
-            + TestMedia.FIRST_TEST_FILE_PATH.toAbsolutePath().toString(), e);
-      }
-   }
+		Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
+	}
 }

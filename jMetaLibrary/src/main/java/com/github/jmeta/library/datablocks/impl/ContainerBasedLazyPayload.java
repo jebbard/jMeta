@@ -19,66 +19,67 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 
 /**
- * {@link ContainerBasedLazyPayload} is the default implementation of {@link ContainerBasedPayload}. It lazily reads
- * child containers by providing a corresponding iterator when first requested.
+ * {@link ContainerBasedLazyPayload} is the default implementation of
+ * {@link ContainerBasedPayload}. It lazily reads child containers by providing
+ * a corresponding iterator when first requested.
  */
 public class ContainerBasedLazyPayload extends AbstractDataBlock implements ContainerBasedPayload {
 
-   private long totalSize;
-   private DataBlockReader reader;
+	private long totalSize;
+	private DataBlockReader reader;
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Payload#initSize(long)
-    */
-   @Override
-   public void initSize(long totalSize) {
-      this.totalSize = totalSize;
+	/**
+	 * Creates a new {@link ContainerBasedLazyPayload}.
+	 *
+	 * @param id
+	 * @param spec
+	 */
+	public ContainerBasedLazyPayload(DataBlockId id, DataFormatSpecification spec) {
+		super(id, spec);
+	}
 
-      // The size of the payload is still unknown - There is no other way than to read
-      // its children and sum up their sizes...
-      if (totalSize == DataBlockDescription.UNDEFINED) {
-         long summedUpTotalSize = 0;
+	public ContainerBasedLazyPayload(DataBlockId id, DataFormatSpecification spec, DataBlockReader reader) {
+		super(id, spec);
+		this.reader = reader;
+	}
 
-         ContainerIterator containerIter = getContainerIterator();
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload#getContainerIterator()
+	 */
+	@Override
+	public ContainerIterator getContainerIterator() {
+		return new PayloadContainerIterator(this, reader, getOffset());
+	}
 
-         while (containerIter.hasNext()) {
-            Container container = containerIter.next();
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
+	 */
+	@Override
+	public long getSize() {
+		return totalSize;
+	}
 
-            summedUpTotalSize += container.getSize();
-         }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Payload#initSize(long)
+	 */
+	@Override
+	public void initSize(long totalSize) {
+		this.totalSize = totalSize;
 
-         this.totalSize = summedUpTotalSize;
-      }
-   }
+		// The size of the payload is still unknown - There is no other way than to read
+		// its children and sum up their sizes...
+		if (totalSize == DataBlockDescription.UNDEFINED) {
+			long summedUpTotalSize = 0;
 
-   /**
-    * Creates a new {@link ContainerBasedLazyPayload}.
-    *
-    * @param id
-    * @param spec
-    */
-   public ContainerBasedLazyPayload(DataBlockId id, DataFormatSpecification spec) {
-      super(id, spec);
-   }
+			ContainerIterator containerIter = getContainerIterator();
 
-   public ContainerBasedLazyPayload(DataBlockId id, DataFormatSpecification spec, DataBlockReader reader) {
-      super(id, spec);
-      this.reader = reader;
-   }
+			while (containerIter.hasNext()) {
+				Container container = containerIter.next();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
-    */
-   @Override
-   public long getSize() {
-      return totalSize;
-   }
+				summedUpTotalSize += container.getSize();
+			}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload#getContainerIterator()
-    */
-   @Override
-   public ContainerIterator getContainerIterator() {
-      return new PayloadContainerIterator(this, reader, getOffset());
-   }
+			this.totalSize = summedUpTotalSize;
+		}
+	}
 }

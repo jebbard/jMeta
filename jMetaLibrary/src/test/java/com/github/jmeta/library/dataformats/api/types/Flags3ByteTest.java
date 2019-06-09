@@ -17,36 +17,42 @@ import java.util.List;
  */
 public class Flags3ByteTest extends Flags2ByteTest {
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.Flags2ByteTest#getByteLength()
-    */
-   @Override
-   protected int getByteLength() {
-      return 3;
-   }
+	private final static String REDO_FLAG = "Redo possible";
 
-   /**
-    * Returns the flag mapping to use for both {@link FlagSpecification}s.
-    *
-    * @return The flag mapping to use for both {@link FlagSpecification}s.
-    */
-   @Override
-   protected List<FlagDescription> getFlagDescriptions() {
-      if (m_enhancedDescriptions.isEmpty()) {
-         m_enhancedDescriptions.addAll(super.getFlagDescriptions());
+	private final static String RESERVED_3_FLAG = "Reserved 3";
 
-         m_enhancedDescriptions.add(new FlagDescription(RESERVED_3_FLAG, new BitAddress(2, 0), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(REDO_FLAG, new BitAddress(2, 1), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(STAFFED_FLAG, new BitAddress(2, 2), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(SYNCHRONISATION_FLAG, new BitAddress(2, 3), "", 1, null));
-      }
+	private final static String STAFFED_FLAG = "Staffed";
+	private final static String SYNCHRONISATION_FLAG = "Synchronsisation";
+	private final List<FlagDescription> m_enhancedDescriptions = new ArrayList<>();
 
-      return m_enhancedDescriptions;
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.Flags2ByteTest#getByteLength()
+	 */
+	@Override
+	protected int getByteLength() {
+		return 3;
+	}
 
-   private final List<FlagDescription> m_enhancedDescriptions = new ArrayList<>();
-   private final static String REDO_FLAG = "Redo possible";
-   private final static String RESERVED_3_FLAG = "Reserved 3";
-   private final static String STAFFED_FLAG = "Staffed";
-   private final static String SYNCHRONISATION_FLAG = "Synchronsisation";
+	/**
+	 * Returns the flag mapping to use for both {@link FlagSpecification}s.
+	 *
+	 * @return The flag mapping to use for both {@link FlagSpecification}s.
+	 */
+	@Override
+	protected List<FlagDescription> getFlagDescriptions() {
+		if (m_enhancedDescriptions.isEmpty()) {
+			m_enhancedDescriptions.addAll(super.getFlagDescriptions());
+
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags3ByteTest.RESERVED_3_FLAG, new BitAddress(2, 0), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags3ByteTest.REDO_FLAG, new BitAddress(2, 1), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags3ByteTest.STAFFED_FLAG, new BitAddress(2, 2), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags3ByteTest.SYNCHRONISATION_FLAG, new BitAddress(2, 3), "", 1, null));
+		}
+
+		return m_enhancedDescriptions;
+	}
 }

@@ -83,7 +83,7 @@ public interface DataFormatSpecificationBuilder
 	/**
 	 * Allows builders in the hierarchy to obtain a {@link DataBlockDescription}
 	 * already added for the given {@link DataBlockId}.
-	 * 
+	 *
 	 * @param dataBlockId The {@link DataBlockId} to request, must not be null
 	 * @return The {@link DataBlockDescription} for the given {@link DataBlockId} or
 	 *         null if there is none for the given id
@@ -94,10 +94,10 @@ public interface DataFormatSpecificationBuilder
 	 * Allows builders in the hierarchy to add a new {@link DataBlockDescription} to
 	 * the root builder. Should not be called by end-users which is highlighted by
 	 * having a return type of void.
-	 * 
+	 *
 	 * Note that this method REPLACES any previously added
 	 * {@link DataBlockDescription} for the same {@link DataBlockId}.
-	 * 
+	 *
 	 * @param newDescription           The new {@link DataBlockDescription} to add
 	 * @param isTopLevel               true if this is a top-level
 	 *                                 {@link DataBlockDescription}, false otherwise
@@ -111,7 +111,7 @@ public interface DataFormatSpecificationBuilder
 	 * Allows builders in the hierarchy to remove an existing
 	 * {@link DataBlockDescription} from the root builder. Should not be called by
 	 * end-users which is highlighted by having a return type of void.
-	 * 
+	 *
 	 * @param dataBlockId The {@link DataBlockId} to remove, must not be null
 	 */
 	void removeDataBlockDescription(DataBlockId dataBlockId);
@@ -119,7 +119,7 @@ public interface DataFormatSpecificationBuilder
 	/**
 	 * Sets all supported byte orders for the {@link DataFormatSpecification}, where
 	 * the first parameter is mandatory and is the default {@link ByteOrder}
-	 * 
+	 *
 	 * @param defaultByteOrder           The default {@link ByteOrder} used whenever
 	 *                                   no other byte order can be determined
 	 * @param furtherSupportedByteOrders Any additionally supported
@@ -131,7 +131,7 @@ public interface DataFormatSpecificationBuilder
 	/**
 	 * Sets all supported charsets for the {@link DataFormatSpecification}, where
 	 * the first parameter is mandatory and is the default {@link Charset}
-	 * 
+	 *
 	 * @param defaultCharset           The default {@link Charset} used whenever no
 	 *                                 other byte order can be determined
 	 * @param furtherSupportedCharsets Any additionally supported {@link Charset}s

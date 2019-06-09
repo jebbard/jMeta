@@ -113,7 +113,7 @@ public class TagFinder {
 
 	/**
 	 * Creates a new {@link TagFinder}.
-	 * 
+	 *
 	 * @param rootFolders     The root folders to search
 	 * @param fileExtensions  The file extensions to accept
 	 * @param targetTagFolder The target folder to store found tags

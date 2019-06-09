@@ -74,7 +74,7 @@ public class MediumCacheTest {
 
 	/**
 	 * Creates a cached {@link MediumRegion} filled with a default fill byte
-	 * 
+	 *
 	 * @param offset The start offset to use
 	 * @param size   The size to use
 	 * @return The created {@link MediumRegion}
@@ -86,7 +86,7 @@ public class MediumCacheTest {
 
 	/**
 	 * Creates an uncached {@link MediumRegion} of the given size
-	 * 
+	 *
 	 * @param offset The start offset to use
 	 * @param size   The size to use
 	 * @return The created {@link MediumRegion}
@@ -97,7 +97,7 @@ public class MediumCacheTest {
 
 	/**
 	 * Returns the total size of a list of {@link MediumRegion}s.
-	 * 
+	 *
 	 * @param regionList The region list
 	 * @return The summed size of all regions in the list.
 	 */
@@ -564,7 +564,7 @@ public class MediumCacheTest {
 
 	/**
 	 * Verifies that all invariants of the {@link MediumCache} class are fulfilled.
-	 * 
+	 *
 	 * @param cache The {@link MediumCache} instance to check.
 	 */
 	private void assertCacheInvariantsAreFulfilled(MediumCache cache) {
@@ -589,7 +589,7 @@ public class MediumCacheTest {
 
 	/**
 	 * Verifies that the given {@link MediumCache} instance is indeed empty.
-	 * 
+	 *
 	 * @param cache The cache instance to check.
 	 */
 	private void assertCacheIsEmpty(MediumCache cache) {
@@ -698,7 +698,7 @@ public class MediumCacheTest {
 	 * content: (1) Three consecutive regions of different sizes starting at an
 	 * offset &gt; 0, (2) A gap of {@value #DEFAULT_CACHE_FIRST_GAP_SIZE} bytes, (3)
 	 * Two consecutive regions, (4) A gap of 1 byte, (5) A last region
-	 * 
+	 *
 	 * @return The default {@link MediumCache} pre-filled and with unlimited sizes
 	 */
 	private TestCacheBuilder createDefaultLayoutHavingSubsequentAndScatteredRegions() {
@@ -891,7 +891,7 @@ public class MediumCacheTest {
 	/**
 	 * Returns the first consecutive sequence of {@link MediumRegion}s in the
 	 * default {@link TestCacheBuilder}.
-	 * 
+	 *
 	 * @param cacheLayout The {@link TestCacheBuilder} to use containing details
 	 *                    about the cache structure
 	 * @return the first consecutive sequence of {@link MediumRegion}s in the
@@ -1367,7 +1367,7 @@ public class MediumCacheTest {
 	 * Firstly, after the call, the cache invariants must still be in place. Second,
 	 * the expected regions and nothing else must be present, and third, the cache
 	 * size must have changed correspondingly.
-	 * 
+	 *
 	 * @param cache                The test object
 	 * @param regionToAdd          The region to add to the cache
 	 * @param expectedCacheBuilder A {@link TestCacheBuilder} containing the cache
@@ -1394,7 +1394,7 @@ public class MediumCacheTest {
 	/**
 	 * Tests {@link MediumCache#getRegionsInRange(MediumOffset, int)} for a range
 	 * that exactly fully covers a list of expected {@link MediumRegion}s.
-	 * 
+	 *
 	 * @param cacheLayout        The {@link TestCacheBuilder} to use containing
 	 *                           details about the cache structure
 	 * @param maxCacheRegionSize Allows to pass in a custom maximum cache region
@@ -1416,7 +1416,7 @@ public class MediumCacheTest {
 	/**
 	 * Tests {@link MediumCache#getRegionsInRange(MediumOffset, int)} for a range
 	 * that exactly fully covers a list of expected {@link MediumRegion}s.
-	 * 
+	 *
 	 * @param cacheBuilder                   The {@link TestCacheBuilder} to use
 	 *                                       containing details about the cache
 	 *                                       structure
