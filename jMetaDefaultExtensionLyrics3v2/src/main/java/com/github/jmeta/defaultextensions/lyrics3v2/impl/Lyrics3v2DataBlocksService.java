@@ -20,16 +20,16 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  */
 public class Lyrics3v2DataBlocksService extends AbstractDataBlockService {
 
-   /**
-    * Creates a new {@link Lyrics3v2DataBlocksService}.
-    */
-   public Lyrics3v2DataBlocksService() {
-      super(Lyrics3v2Extension.LYRICS3v2);
-   }
+	/**
+	 * Creates a new {@link Lyrics3v2DataBlocksService}.
+	 */
+	public Lyrics3v2DataBlocksService() {
+		super(Lyrics3v2Extension.LYRICS3v2);
+	}
 
-   @Override
-   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
-      DataBlockEventBus eventBus) {
-      return new Lyrics3v2ForwardDataBlockReader(spec, mediumStore, eventBus);
-   }
+	@Override
+	public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+		DataBlockEventBus eventBus) {
+		return new Lyrics3v2ForwardDataBlockReader(spec, mediumStore, eventBus);
+	}
 }

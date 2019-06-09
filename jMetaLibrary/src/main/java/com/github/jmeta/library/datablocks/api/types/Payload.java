@@ -8,13 +8,15 @@
 package com.github.jmeta.library.datablocks.api.types;
 
 /**
- * The {@link Payload} is the part of the data of a {@link Container} that holds the information valuable for the user,
- * while {@link Header}s usually only store technical and version metadata information mainly required for parsing.
+ * The {@link Payload} is the part of the data of a {@link Container} that holds
+ * the information valuable for the user, while {@link Header}s usually only
+ * store technical and version metadata information mainly required for parsing.
  *
- * The {@link Payload} might consist either of {@link Field}s or of child {@link Container}s, never both. See the
- * corresponding sub-interfaces for details.
+ * The {@link Payload} might consist either of {@link Field}s or of child
+ * {@link Container}s, never both. See the corresponding sub-interfaces for
+ * details.
  */
 public interface Payload extends DataBlock {
 
-   public void initSize(long totalSize);
+	void initSize(long totalSize);
 }

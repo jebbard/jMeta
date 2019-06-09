@@ -34,74 +34,77 @@ import com.github.jmeta.utility.logging.api.services.LoggingConstants;
  */
 public class StandardDataFormatRepository implements DataFormatRepository {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataFormatRepository.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataFormatRepository.class);
 
-   /**
-    * Creates a new {@link StandardDataFormatRepository}. No parameters must be added as this class may be dynamically
-    * instantiated by reflection by a component loader.
-    */
-   public StandardDataFormatRepository() {
-      extManager = ComponentRegistry.lookupService(ExtensionManager.class);
+	private final Map<ContainerDataFormat, DataFormatSpecification> m_dataFormatMap = new HashMap<>();
 
-      String validatingExtensions = "Validating registered data format extensions" + LoggingConstants.SUFFIX_TASK;
+	private final ExtensionManager extManager;
 
-      LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
+	/**
+	 * Creates a new {@link StandardDataFormatRepository}. No parameters must be
+	 * added as this class may be dynamically instantiated by reflection by a
+	 * component loader.
+	 */
+	public StandardDataFormatRepository() {
+		extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
-      List<Extension> availableExtensions = extManager.getAllExtensions();
+		String validatingExtensions = "Validating registered data format extensions" + LoggingConstants.SUFFIX_TASK;
 
-      for (Extension iExtension2 : availableExtensions) {
+		StandardDataFormatRepository.LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
-         List<DataFormatSpecification> dataFormatSpecificationsInExtension = iExtension2
-            .getAllServiceProviders(DataFormatSpecification.class);
+		List<Extension> availableExtensions = extManager.getAllExtensions();
 
-         for (DataFormatSpecification dataFormatSpec : dataFormatSpecificationsInExtension) {
-            final ContainerDataFormat extensionDataFormat = dataFormatSpec.getDataFormat();
+		for (Extension iExtension2 : availableExtensions) {
 
-            if (extensionDataFormat == null) {
-               final String message = "The extension " + dataFormatSpec + " must not return null for its data format.";
-               LOGGER.error(
-                  LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR + validatingExtensions);
-               LOGGER.error(message);
-               throw new InvalidExtensionException(message, iExtension2);
-            }
+			List<DataFormatSpecification> dataFormatSpecificationsInExtension = iExtension2
+				.getAllServiceProviders(DataFormatSpecification.class);
 
-            if (m_dataFormatMap.containsKey(extensionDataFormat)) {
-               LOGGER.warn(
-                  "The custom data formats extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
-                  iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
-            }
+			for (DataFormatSpecification dataFormatSpec : dataFormatSpecificationsInExtension) {
+				final ContainerDataFormat extensionDataFormat = dataFormatSpec.getDataFormat();
 
-            else {
-               m_dataFormatMap.put(extensionDataFormat, dataFormatSpec);
-            }
-         }
-      }
+				if (extensionDataFormat == null) {
+					final String message = "The extension " + dataFormatSpec
+						+ " must not return null for its data format.";
+					StandardDataFormatRepository.LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED
+						+ LoggingConstants.PREFIX_CRITICAL_ERROR + validatingExtensions);
+					StandardDataFormatRepository.LOGGER.error(message);
+					throw new InvalidExtensionException(message, iExtension2);
+				}
 
-      LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
-   }
+				if (m_dataFormatMap.containsKey(extensionDataFormat)) {
+					StandardDataFormatRepository.LOGGER.warn(
+						"The custom data formats extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
+						iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
+				}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.types.ContainerDataFormat)
-    */
-   @Override
-   public DataFormatSpecification getDataFormatSpecification(ContainerDataFormat dataFormat) {
+				else {
+					m_dataFormatMap.put(extensionDataFormat, dataFormatSpec);
+				}
+			}
+		}
 
-      Reject.ifNull(dataFormat, "dataFormat");
-      Reject.ifFalse(getSupportedDataFormats().contains(dataFormat), "getSupportedDataFormats().contains(dataFormat)");
+		StandardDataFormatRepository.LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
+	}
 
-      return m_dataFormatMap.get(dataFormat);
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getDataFormatSpecification(com.github.jmeta.library.dataformats.api.types.ContainerDataFormat)
+	 */
+	@Override
+	public DataFormatSpecification getDataFormatSpecification(ContainerDataFormat dataFormat) {
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getSupportedDataFormats()
-    */
-   @Override
-   public Set<ContainerDataFormat> getSupportedDataFormats() {
+		Reject.ifNull(dataFormat, "dataFormat");
+		Reject.ifFalse(getSupportedDataFormats().contains(dataFormat),
+			"getSupportedDataFormats().contains(dataFormat)");
 
-      return Collections.unmodifiableSet(m_dataFormatMap.keySet());
-   }
+		return m_dataFormatMap.get(dataFormat);
+	}
 
-   private final Map<ContainerDataFormat, DataFormatSpecification> m_dataFormatMap = new HashMap<>();
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatRepository#getSupportedDataFormats()
+	 */
+	@Override
+	public Set<ContainerDataFormat> getSupportedDataFormats() {
 
-   private final ExtensionManager extManager;
+		return Collections.unmodifiableSet(m_dataFormatMap.keySet());
+	}
 }

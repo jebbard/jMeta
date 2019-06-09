@@ -39,7 +39,7 @@ public class StandardFlagSpecificationBuilder<P extends DataBlockDescriptionBuil
 
 	/**
 	 * Creates a new {@link StandardFlagSpecificationBuilder}.
-	 * 
+	 *
 	 * @param parentBuilder  The parent {@link DataFormatBuilder}
 	 * @param flagByteLength The byte length of the flags
 	 * @param flagByteOrder  The byte order of the flag bytes

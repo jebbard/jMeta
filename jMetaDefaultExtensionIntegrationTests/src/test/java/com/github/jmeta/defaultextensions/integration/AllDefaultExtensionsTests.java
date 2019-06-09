@@ -21,12 +21,13 @@ import com.github.jmeta.defaultextensions.mp3.impl.AllMP3ExtensionTests;
 import com.github.jmeta.defaultextensions.ogg.impl.AllOggExtensionTests;
 
 /**
- * {@link AllDefaultExtensionsTests} is used for running all test cases of the extension management component.
+ * {@link AllDefaultExtensionsTests} is used for running all test cases of the
+ * extension management component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ MultiFile_01_TypicalMP3Test.class, AllAPEv2ExtensionTests.class, AllID3v1ExtensionTests.class,
-   AllID3v23ExtensionTests.class, AllLyrics3v2ExtensionTests.class, AllMP3ExtensionTests.class,
-   AllOggExtensionTests.class })
+	AllID3v23ExtensionTests.class, AllLyrics3v2ExtensionTests.class, AllMP3ExtensionTests.class,
+	AllOggExtensionTests.class })
 public class AllDefaultExtensionsTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

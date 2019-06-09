@@ -8,10 +8,9 @@
  */
 package com.github.jmeta.library.media.impl.offset;
 
-import static org.hamcrest.CoreMatchers.is;
-
 import java.nio.file.Paths;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,332 +21,333 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
- * {@link StandardMediumOffsetTest} tests the {@link StandardMediumOffset} class and its interface
- * {@link MediumOffset}.
+ * {@link StandardMediumOffsetTest} tests the {@link StandardMediumOffset} class
+ * and its interface {@link MediumOffset}.
  */
 public class StandardMediumOffsetTest {
 
-   private Medium<?> dummyMedium = (Medium<?>) new InMemoryMedium(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }, "the dummy",
-   false);
+	private Medium<?> dummyMedium = new InMemoryMedium(
+		new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }, "the dummy", false);
 
-   /**
-    * Tests {@link MediumOffset#advance}.
-    */
-   @Test
-   public void advance_byPositiveDistance_offsetCorrectlyAdvanced() {
+	/**
+	 * Tests {@link MediumOffset#advance}.
+	 */
+	@Test
+	public void advance_byNegativeCountSmallerOrEqualToOffset_offsetIsCorrectlyAdvanced() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 0);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 5);
 
-      long[] positiveAdvanceDistances = new long[] { 1, 99, 199, 1029674, 8, };
+		long[] negativeAdvanceDistances = new long[] { -1, -5, };
 
-      long offsetBefore = referenceToTest.getAbsoluteMediumOffset();
+		long offsetBefore = referenceToTest.getAbsoluteMediumOffset();
 
-      for (int i = 0; i < positiveAdvanceDistances.length; i++) {
-         long advance = positiveAdvanceDistances[i];
+		for (int i = 0; i < negativeAdvanceDistances.length; i++) {
+			long advance = negativeAdvanceDistances[i];
 
-         MediumOffset advancedReference = referenceToTest.advance(advance);
+			MediumOffset advancedReference = referenceToTest.advance(advance);
 
-         // Old reference is unchanged
-         Assert.assertThat(referenceToTest.getAbsoluteMediumOffset(), is(offsetBefore));
+			// Old reference is unchanged
+			Assert.assertThat(referenceToTest.getAbsoluteMediumOffset(), CoreMatchers.is(offsetBefore));
 
-         // New reference has been advanced by the given count
-         long diffDistance = advancedReference.getAbsoluteMediumOffset() - referenceToTest.getAbsoluteMediumOffset();
+			// New reference has been advanced by the given count
+			long diffDistance = advancedReference.getAbsoluteMediumOffset() - referenceToTest.getAbsoluteMediumOffset();
 
-         Assert.assertThat(advance, is(diffDistance));
-      }
-   }
+			Assert.assertThat(advance, CoreMatchers.is(diffDistance));
+		}
+	}
 
-   /**
-    * Tests {@link MediumOffset#advance}.
-    */
-   @Test
-   public void advance_byNegativeCountSmallerOrEqualToOffset_offsetIsCorrectlyAdvanced() {
+	/**
+	 * Tests {@link MediumOffset#advance}.
+	 */
+	@Test
+	public void advance_byPositiveDistance_offsetCorrectlyAdvanced() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 5);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 0);
 
-      long[] negativeAdvanceDistances = new long[] { -1, -5, };
+		long[] positiveAdvanceDistances = new long[] { 1, 99, 199, 1029674, 8, };
 
-      long offsetBefore = referenceToTest.getAbsoluteMediumOffset();
+		long offsetBefore = referenceToTest.getAbsoluteMediumOffset();
 
-      for (int i = 0; i < negativeAdvanceDistances.length; i++) {
-         long advance = negativeAdvanceDistances[i];
+		for (int i = 0; i < positiveAdvanceDistances.length; i++) {
+			long advance = positiveAdvanceDistances[i];
 
-         MediumOffset advancedReference = referenceToTest.advance(advance);
+			MediumOffset advancedReference = referenceToTest.advance(advance);
 
-         // Old reference is unchanged
-         Assert.assertThat(referenceToTest.getAbsoluteMediumOffset(), is(offsetBefore));
+			// Old reference is unchanged
+			Assert.assertThat(referenceToTest.getAbsoluteMediumOffset(), CoreMatchers.is(offsetBefore));
 
-         // New reference has been advanced by the given count
-         long diffDistance = advancedReference.getAbsoluteMediumOffset() - referenceToTest.getAbsoluteMediumOffset();
+			// New reference has been advanced by the given count
+			long diffDistance = advancedReference.getAbsoluteMediumOffset() - referenceToTest.getAbsoluteMediumOffset();
 
-         Assert.assertThat(advance, is(diffDistance));
-      }
-   }
+			Assert.assertThat(advance, CoreMatchers.is(diffDistance));
+		}
+	}
 
-   /**
-    * Tests {@link MediumOffset#advance}.
-    */
-   @Test
-   public void advance_byZero_offsetNotAdvanced() {
+	/**
+	 * Tests {@link MediumOffset#advance}.
+	 */
+	@Test
+	public void advance_byZero_offsetNotAdvanced() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 5);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 5);
 
-      long offsetBefore = referenceToTest.getAbsoluteMediumOffset();
+		long offsetBefore = referenceToTest.getAbsoluteMediumOffset();
 
-      MediumOffset advancedReference = referenceToTest.advance(0);
+		MediumOffset advancedReference = referenceToTest.advance(0);
 
-      // Old reference is unchanged
-      Assert.assertThat(referenceToTest.getAbsoluteMediumOffset(), is(offsetBefore));
+		// Old reference is unchanged
+		Assert.assertThat(referenceToTest.getAbsoluteMediumOffset(), CoreMatchers.is(offsetBefore));
 
-      // New reference has been advanced by the given count
-      Assert.assertThat(advancedReference.getAbsoluteMediumOffset(), is(referenceToTest.getAbsoluteMediumOffset()));
-   }
+		// New reference has been advanced by the given count
+		Assert.assertThat(advancedReference.getAbsoluteMediumOffset(),
+			CoreMatchers.is(referenceToTest.getAbsoluteMediumOffset()));
+	}
 
-   /**
-    * Tests {@link MediumOffset#advance}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void advance_forNegativeCountBiggerThanOffset_throwsException() {
+	/**
+	 * Tests {@link MediumOffset#advance}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void advance_forNegativeCountBiggerThanOffset_throwsException() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
 
-      referenceToTest.advance(-5);
-   }
+		referenceToTest.advance(-5);
+	}
 
-   /**
-    * Tests {@link MediumOffset#before(MediumOffset)}.
-    */
-   @Test
-   public void before_forSameOffset_returnsFalse() {
+	/**
+	 * Tests {@link MediumOffset#before(MediumOffset)}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void before_forDifferentMedium_throwsException() {
 
-      long[] testOffsets = new long[] { 3, 99, 199, 1029674, 8, };
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
+		final MediumOffset referenceForOtherMedium = new StandardMediumOffset(new FileMedium(Paths.get("other"), false),
+			5);
 
-      for (int i = 0; i < testOffsets.length; i++) {
-         long offset = testOffsets[i];
+		referenceToTest.before(referenceForOtherMedium);
+	}
 
-         MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
+	/**
+	 * Tests {@link MediumOffset#before(MediumOffset)}.
+	 */
+	@Test
+	public void before_forReferenceWithHigherOffset_returnsFalse() {
 
-         Assert.assertThat(referenceToTest.before(referenceToTest), is(false));
-      }
-   }
+		final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
 
-   /**
-    * Tests {@link MediumOffset#before(MediumOffset)}.
-    */
-   @Test
-   public void before_forReferenceWithLowerOffset_returnsTrue() {
+		long[] offsetsBehindRelativeReference = new long[] { 6, 10, 99999 };
 
-      final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
+		for (int i = 0; i < offsetsBehindRelativeReference.length; i++) {
+			long offset = offsetsBehindRelativeReference[i];
 
-      long[] offsetsBeforeRelativeReference = new long[] { 0, 2, 4 };
+			MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
 
-      for (int i = 0; i < offsetsBeforeRelativeReference.length; i++) {
-         long offset = offsetsBeforeRelativeReference[i];
+			Assert.assertThat(referenceToTest.before(relativeReference), CoreMatchers.is(false));
+		}
+	}
 
-         MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
+	/**
+	 * Tests {@link MediumOffset#before(MediumOffset)}.
+	 */
+	@Test
+	public void before_forReferenceWithLowerOffset_returnsTrue() {
 
-         Assert.assertThat(referenceToTest.before(relativeReference), is(true));
-      }
-   }
+		final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
 
-   /**
-    * Tests {@link MediumOffset#before(MediumOffset)}.
-    */
-   @Test
-   public void before_forReferenceWithHigherOffset_returnsFalse() {
+		long[] offsetsBeforeRelativeReference = new long[] { 0, 2, 4 };
 
-      final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
+		for (int i = 0; i < offsetsBeforeRelativeReference.length; i++) {
+			long offset = offsetsBeforeRelativeReference[i];
 
-      long[] offsetsBehindRelativeReference = new long[] { 6, 10, 99999 };
+			MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
 
-      for (int i = 0; i < offsetsBehindRelativeReference.length; i++) {
-         long offset = offsetsBehindRelativeReference[i];
+			Assert.assertThat(referenceToTest.before(relativeReference), CoreMatchers.is(true));
+		}
+	}
 
-         MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
+	/**
+	 * Tests {@link MediumOffset#before(MediumOffset)}.
+	 */
+	@Test
+	public void before_forSameOffset_returnsFalse() {
 
-         Assert.assertThat(referenceToTest.before(relativeReference), is(false));
-      }
-   }
+		long[] testOffsets = new long[] { 3, 99, 199, 1029674, 8, };
 
-   /**
-    * Tests {@link MediumOffset#before(MediumOffset)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void before_forDifferentMedium_throwsException() {
+		for (int i = 0; i < testOffsets.length; i++) {
+			long offset = testOffsets[i];
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
-      final MediumOffset referenceForOtherMedium = new StandardMediumOffset(
-         new FileMedium(Paths.get("other"), false), 5);
+			MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
 
-      referenceToTest.before(referenceForOtherMedium);
-   }
+			Assert.assertThat(referenceToTest.before(referenceToTest), CoreMatchers.is(false));
+		}
+	}
 
-   /**
-    * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
-    */
-   @Test
-   public void behindOrEqual_forSameReference_returnsTrue() {
+	/**
+	 * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void behindOrEqual_forDifferentMedium_throwsException() {
 
-      long[] testOffsets = new long[] { 3, 99, 199, 1029674, 8, };
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
+		final MediumOffset referenceForOtherMedium = new StandardMediumOffset(new FileMedium(Paths.get("other"), false),
+			5);
 
-      for (int i = 0; i < testOffsets.length; i++) {
-         long offset = testOffsets[i];
+		referenceToTest.behindOrEqual(referenceForOtherMedium);
+	}
 
-         MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
+	/**
+	 * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
+	 */
+	@Test
+	public void behindOrEqual_forReferenceWithHigherOffset_returnsTrue() {
 
-         Assert.assertThat(referenceToTest.behindOrEqual(referenceToTest), is(true));
-      }
-   }
+		final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
 
-   /**
-    * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
-    */
-   @Test
-   public void behindOrEqual_forReferenceWithLowerOffset_returnsFalse() {
+		long[] offsetsBehindRelativeReference = new long[] { 6, 10, 99999 };
 
-      final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
+		for (int i = 0; i < offsetsBehindRelativeReference.length; i++) {
+			long offset = offsetsBehindRelativeReference[i];
 
-      long[] offsetsBeforeRelativeReference = new long[] { 0, 2, 4 };
+			MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
 
-      for (int i = 0; i < offsetsBeforeRelativeReference.length; i++) {
-         long offset = offsetsBeforeRelativeReference[i];
+			Assert.assertThat(referenceToTest.behindOrEqual(relativeReference), CoreMatchers.is(true));
+		}
+	}
 
-         MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
+	/**
+	 * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
+	 */
+	@Test
+	public void behindOrEqual_forReferenceWithLowerOffset_returnsFalse() {
 
-         Assert.assertThat(referenceToTest.behindOrEqual(relativeReference), is(false));
-      }
-   }
+		final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
 
-   /**
-    * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
-    */
-   @Test
-   public void behindOrEqual_forReferenceWithHigherOffset_returnsTrue() {
+		long[] offsetsBeforeRelativeReference = new long[] { 0, 2, 4 };
 
-      final MediumOffset relativeReference = new StandardMediumOffset(dummyMedium, 5);
+		for (int i = 0; i < offsetsBeforeRelativeReference.length; i++) {
+			long offset = offsetsBeforeRelativeReference[i];
 
-      long[] offsetsBehindRelativeReference = new long[] { 6, 10, 99999 };
+			MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
 
-      for (int i = 0; i < offsetsBehindRelativeReference.length; i++) {
-         long offset = offsetsBehindRelativeReference[i];
+			Assert.assertThat(referenceToTest.behindOrEqual(relativeReference), CoreMatchers.is(false));
+		}
+	}
 
-         MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
+	/**
+	 * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
+	 */
+	@Test
+	public void behindOrEqual_forSameReference_returnsTrue() {
 
-         Assert.assertThat(referenceToTest.behindOrEqual(relativeReference), is(true));
-      }
-   }
+		long[] testOffsets = new long[] { 3, 99, 199, 1029674, 8, };
 
-   /**
-    * Tests {@link MediumOffset#behindOrEqual(MediumOffset)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void behindOrEqual_forDifferentMedium_throwsException() {
+		for (int i = 0; i < testOffsets.length; i++) {
+			long offset = testOffsets[i];
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
-      final MediumOffset referenceForOtherMedium = new StandardMediumOffset(
-         new FileMedium(Paths.get("other"), false), 5);
+			MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, offset);
 
-      referenceToTest.behindOrEqual(referenceForOtherMedium);
-   }
+			Assert.assertThat(referenceToTest.behindOrEqual(referenceToTest), CoreMatchers.is(true));
+		}
+	}
 
-   /**
-    * Tests {@link MediumOffset#before(MediumOffset)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void constructor_forNegativeOffset_throwsException() {
+	/**
+	 * Tests {@link MediumOffset#before(MediumOffset)}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void constructor_forNegativeOffset_throwsException() {
 
-      new StandardMediumOffset(dummyMedium, -1);
-   }
+		new StandardMediumOffset(dummyMedium, -1);
+	}
 
-   /**
-    * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
-    */
-   @Test
-   public void distanceTo_forSameReference_returnsZero() {
+	/**
+	 * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void distanceTo_forDifferentMedium_throwsException() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
+		final MediumOffset referenceForOtherMedium = new StandardMediumOffset(new FileMedium(Paths.get("other"), false),
+			5);
 
-      Assert.assertThat(referenceToTest.distanceTo(referenceToTest), is(0L));
-   }
+		referenceToTest.distanceTo(referenceForOtherMedium);
+	}
 
-   /**
-    * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
-    */
-   @Test
-   public void distanceTo_forReferencesBehind_returnsCorrectPositiveDistance() {
+	/**
+	 * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
+	 */
+	@Test
+	public void distanceTo_forReferencesBefore_returnsCorrectNegativeDistance() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 2);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 2);
 
-      long[] positiveOffsetsBehind = new long[] { 3, 99, 199, 1029674, 8, };
+		long[] positiveOffsetsBehind = new long[] { 3, 99, 199, 1029674, 8, };
 
-      for (int i = 0; i < positiveOffsetsBehind.length; i++) {
-         long offset = positiveOffsetsBehind[i];
+		for (int i = 0; i < positiveOffsetsBehind.length; i++) {
+			long offset = positiveOffsetsBehind[i];
 
-         MediumOffset advancedReference = new StandardMediumOffset(dummyMedium, offset);
+			MediumOffset advancedReference = new StandardMediumOffset(dummyMedium, offset);
 
-         long differenceTo = referenceToTest.getAbsoluteMediumOffset() - offset;
+			long differenceTo = referenceToTest.getAbsoluteMediumOffset() - offset;
 
-         Assert.assertThat(referenceToTest.distanceTo(advancedReference), is(differenceTo));
-      }
-   }
+			Assert.assertThat(advancedReference.distanceTo(referenceToTest), CoreMatchers.is(-differenceTo));
+		}
+	}
 
-   /**
-    * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
-    */
-   @Test
-   public void distanceTo_forReferencesBefore_returnsCorrectNegativeDistance() {
+	/**
+	 * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
+	 */
+	@Test
+	public void distanceTo_forReferencesBehind_returnsCorrectPositiveDistance() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 2);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 2);
 
-      long[] positiveOffsetsBehind = new long[] { 3, 99, 199, 1029674, 8, };
+		long[] positiveOffsetsBehind = new long[] { 3, 99, 199, 1029674, 8, };
 
-      for (int i = 0; i < positiveOffsetsBehind.length; i++) {
-         long offset = positiveOffsetsBehind[i];
+		for (int i = 0; i < positiveOffsetsBehind.length; i++) {
+			long offset = positiveOffsetsBehind[i];
 
-         MediumOffset advancedReference = new StandardMediumOffset(dummyMedium, offset);
+			MediumOffset advancedReference = new StandardMediumOffset(dummyMedium, offset);
 
-         long differenceTo = referenceToTest.getAbsoluteMediumOffset() - offset;
+			long differenceTo = referenceToTest.getAbsoluteMediumOffset() - offset;
 
-         Assert.assertThat(advancedReference.distanceTo(referenceToTest), is(-differenceTo));
-      }
-   }
+			Assert.assertThat(referenceToTest.distanceTo(advancedReference), CoreMatchers.is(differenceTo));
+		}
+	}
 
-   /**
-    * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void distanceTo_forDifferentMedium_throwsException() {
+	/**
+	 * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
+	 */
+	@Test
+	public void distanceTo_forSameReference_returnsZero() {
 
-      final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
-      final MediumOffset referenceForOtherMedium = new StandardMediumOffset(
-         new FileMedium(Paths.get("other"), false), 5);
+		final MediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
 
-      referenceToTest.distanceTo(referenceForOtherMedium);
-   }
+		Assert.assertThat(referenceToTest.distanceTo(referenceToTest), CoreMatchers.is(0L));
+	}
 
-   /**
-    * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
-    */
-   @Test
-   public void setAbsoluteMediumOffset_forPositiveOffset_changesOffsetToNewValue() {
+	/**
+	 * Tests {@link MediumOffset#before(MediumOffset)}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void setAbsoluteMediumOffset_forNegativeOffset_throwsException() {
 
-      StandardMediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
+		StandardMediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
 
-      referenceToTest.setAbsoluteMediumOffset(0);
-      Assert.assertEquals(0, referenceToTest.getAbsoluteMediumOffset());
+		referenceToTest.setAbsoluteMediumOffset(-11);
+	}
 
-      referenceToTest.setAbsoluteMediumOffset(32);
-      Assert.assertEquals(32, referenceToTest.getAbsoluteMediumOffset());
-   }
+	/**
+	 * Tests {@link MediumOffset#distanceTo(MediumOffset)}.
+	 */
+	@Test
+	public void setAbsoluteMediumOffset_forPositiveOffset_changesOffsetToNewValue() {
 
-   /**
-    * Tests {@link MediumOffset#before(MediumOffset)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void setAbsoluteMediumOffset_forNegativeOffset_throwsException() {
+		StandardMediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
 
-      StandardMediumOffset referenceToTest = new StandardMediumOffset(dummyMedium, 4);
+		referenceToTest.setAbsoluteMediumOffset(0);
+		Assert.assertEquals(0, referenceToTest.getAbsoluteMediumOffset());
 
-      referenceToTest.setAbsoluteMediumOffset(-11);
-   }
+		referenceToTest.setAbsoluteMediumOffset(32);
+		Assert.assertEquals(32, referenceToTest.getAbsoluteMediumOffset());
+	}
 }

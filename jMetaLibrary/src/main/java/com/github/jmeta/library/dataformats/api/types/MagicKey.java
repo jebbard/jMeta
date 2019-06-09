@@ -33,7 +33,7 @@ public class MagicKey {
 	/**
 	 * Creates a new {@link MagicKey}. Use this constructor if the magic key has no
 	 * human-readable string representation but only covers full bytes.
-	 * 
+	 *
 	 * @param magicKeyBytes The magic key's bytes indicating presence of a container
 	 *                      if found or not found, depending on the concrete
 	 *                      subclass; the string representation of the magic key is
@@ -52,7 +52,7 @@ public class MagicKey {
 	 * Creates a new {@link MagicKey}. Use this constructor if the magic key has no
 	 * human-readable string representation and an odd length, i.e. only covers
 	 * bytes partially.
-	 * 
+	 *
 	 * @param magicKeyBytes The magic key's bytes indicating presence of a container
 	 *                      if found or not found, depending on the concrete
 	 *                      subclass; the string representation of the magic key is
@@ -81,7 +81,7 @@ public class MagicKey {
 	/**
 	 * Creates a new {@link MagicKey}. Use this constructor if the magic key has a
 	 * human-readable ASCII string representation and only covers full bytes.
-	 * 
+	 *
 	 * @param asciiKey    A string containing only 7 bit standard ASCII characters
 	 *                    which is the human-readable magic key
 	 * @param fieldId     The id of the field this magic key corresponds to
@@ -139,7 +139,7 @@ public class MagicKey {
 	 * Indicates whether the bytes of this magic key are present at the beginning of
 	 * the given bytes or not. The bytes are NOT scanned for the magic key. Either
 	 * the magic key is found at the beginning of the bytes, or not.
-	 * 
+	 *
 	 * @param readBytes The bytes to look for the magic key
 	 * @return true if the magic key's presence is indicated by the given bytes,
 	 *         false otherwise

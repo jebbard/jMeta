@@ -21,7 +21,7 @@ public class InvalidExtensionException extends RuntimeException {
 
 	/**
 	 * Creates a new {@link InvalidExtensionException}.
-	 * 
+	 *
 	 * @param message   the exception message
 	 * @param extension the extension
 	 */

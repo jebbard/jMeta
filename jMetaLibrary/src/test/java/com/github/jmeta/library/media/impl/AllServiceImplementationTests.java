@@ -18,11 +18,12 @@ import com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerTest
 import com.github.jmeta.library.media.impl.offset.MediumOffsetFactoryTest;
 
 /**
- * {@link AllServiceImplementationTests} is used for running all test cases of the media component.
+ * {@link AllServiceImplementationTests} is used for running all test cases of
+ * the media component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ MediumOffsetFactoryTest.class, MediumChangeManagerTest.class,
-   MediumChangeManagerCreateFlushPlanTest.class, MediumCacheTest.class, StandardMediaAPITest.class, })
+	MediumChangeManagerCreateFlushPlanTest.class, MediumCacheTest.class, StandardMediaAPITest.class, })
 public class AllServiceImplementationTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

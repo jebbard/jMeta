@@ -24,62 +24,70 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class Lyrics3v2StringSizeIntegerConverter extends SignedNumericFieldConverter {
 
-   private static final int DECIMAL_RADIX = 10;
+	private static final int DECIMAL_RADIX = 10;
 
-   private static final int MAX_LYRICS3v2_SIZE_FIELD_LENGTH = 6;
+	private static final int MAX_LYRICS3v2_SIZE_FIELD_LENGTH = 6;
 
-   private static final int MAX_SIZE = DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX * DECIMAL_RADIX
-      * DECIMAL_RADIX - 1;
+	private static final int MAX_SIZE = (Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX
+		* Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX * Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX
+		* Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX * Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX
+		* Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX) - 1;
 
-   // TODO primeRefactor005: Finalize and document this method
-   @Override
-   public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws BinaryValueConversionException {
+	@Override
+	public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+		Charset characterEncoding) throws InterpretedValueConversionException {
 
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(binaryValue, "binaryValue");
+		Reject.ifNull(characterEncoding, "characterEncoding");
+		Reject.ifNull(byteOrder, "byteOrder");
+		Reject.ifNull(desc, "desc");
+		Reject.ifNull(interpretedValue, "interpretedValue");
 
-      if (binaryValue.remaining() > MAX_LYRICS3v2_SIZE_FIELD_LENGTH)
-         throw new BinaryValueConversionException(
-            "Total size of binary value containing Lyrics3v2 size information must not be bigger than 6 bytes", null,
-            desc, binaryValue, byteOrder, characterEncoding);
+		if (interpretedValue > Lyrics3v2StringSizeIntegerConverter.MAX_SIZE) {
+			throw new InterpretedValueConversionException(
+				"Lyrics3v2 size fields may not be larger than " + Lyrics3v2StringSizeIntegerConverter.MAX_SIZE, null,
+				desc, interpretedValue, byteOrder, characterEncoding);
+		}
 
-      int totalSize = 0;
-      int digitMultiplier = 1;
+		// TODO primeRefactor004: implement
 
-      for (int i = binaryValue.remaining() - 1; i >= 0; --i) {
-         int nextDigit = Character.digit(binaryValue.get(binaryValue.position() + i), DECIMAL_RADIX);
+		return super.toBinary(interpretedValue, desc, byteOrder, characterEncoding);
+	}
 
-         if (nextDigit == -1)
-            throw new BinaryValueConversionException("Size field's value <" + binaryValue + "> may contain digits only",
-               null, desc, binaryValue, byteOrder, characterEncoding);
+	// TODO primeRefactor005: Finalize and document this method
+	@Override
+	public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+		Charset characterEncoding) throws BinaryValueConversionException {
 
-         totalSize += nextDigit * digitMultiplier;
+		Reject.ifNull(characterEncoding, "characterEncoding");
+		Reject.ifNull(byteOrder, "byteOrder");
+		Reject.ifNull(desc, "desc");
+		Reject.ifNull(binaryValue, "binaryValue");
 
-         digitMultiplier *= DECIMAL_RADIX;
-      }
+		if (binaryValue.remaining() > Lyrics3v2StringSizeIntegerConverter.MAX_LYRICS3v2_SIZE_FIELD_LENGTH) {
+			throw new BinaryValueConversionException(
+				"Total size of binary value containing Lyrics3v2 size information must not be bigger than 6 bytes",
+				null, desc, binaryValue, byteOrder, characterEncoding);
+		}
 
-      return Long.valueOf(totalSize);
-   }
+		int totalSize = 0;
+		int digitMultiplier = 1;
 
-   @Override
-   public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws InterpretedValueConversionException {
+		for (int i = binaryValue.remaining() - 1; i >= 0; --i) {
+			int nextDigit = Character.digit(binaryValue.get(binaryValue.position() + i),
+				Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX);
 
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(interpretedValue, "interpretedValue");
+			if (nextDigit == -1) {
+				throw new BinaryValueConversionException(
+					"Size field's value <" + binaryValue + "> may contain digits only", null, desc, binaryValue,
+					byteOrder, characterEncoding);
+			}
 
-      if (interpretedValue > MAX_SIZE)
-         throw new InterpretedValueConversionException("Lyrics3v2 size fields may not be larger than " + MAX_SIZE, null,
-            desc, interpretedValue, byteOrder, characterEncoding);
+			totalSize += nextDigit * digitMultiplier;
 
-      // TODO primeRefactor004: implement
+			digitMultiplier *= Lyrics3v2StringSizeIntegerConverter.DECIMAL_RADIX;
+		}
 
-      return super.toBinary(interpretedValue, desc, byteOrder, characterEncoding);
-   }
+		return Long.valueOf(totalSize);
+	}
 
 }

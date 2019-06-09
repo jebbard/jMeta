@@ -35,149 +35,153 @@ import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 
 /**
- * {@link DataFormatsSmoke} is a very basic smoke test for testing the jMeta library with specific data formats.
+ * {@link DataFormatsSmoke} is a very basic smoke test for testing the jMeta
+ * library with specific data formats.
  */
 public class DataFormatsSmoke {
 
-   private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<>();
+	private final static Map<File, ContainerDataFormat> TEST_DATA_FORMATS = new LinkedHashMap<>();
 
-   static {
-      TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"), ID3v23Extension.ID3v23);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_01.txt"), OggExtension.OGG);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_FILE_02.txt"), OggExtension.OGG);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_02.txt"), OggExtension.OGG);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_03.txt"), OggExtension.OGG);
-      TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_04.txt"), OggExtension.OGG);
-   }
+	static {
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v1.txt"), ID3v1Extension.ID3v1);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/ID3v23.txt"), ID3v23Extension.ID3v23);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_01.txt"), MP3Extension.MP3);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_02.txt"), MP3Extension.MP3);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/MP3_03.txt"), MP3Extension.MP3);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/APEv2.txt"), APEv2Extension.APEv2);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_01.txt"), OggExtension.OGG);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_FILE_02.txt"), OggExtension.OGG);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_02.txt"), OggExtension.OGG);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_03.txt"), OggExtension.OGG);
+		DataFormatsSmoke.TEST_DATA_FORMATS.put(new File("./data/smoke/OGG_04.txt"), OggExtension.OGG);
+	}
 
-   private static Logger PRIVATE_LOGGER = Logger.getGlobal();
+	private static Logger PRIVATE_LOGGER = Logger.getGlobal();
 
-   private LibraryJMeta m_context;
+	/**
+	 * Program entry point.
+	 *
+	 * @param args No arguments
+	 */
+	public static void main(String[] args) {
+		DataFormatsSmoke.PRIVATE_LOGGER.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
+		DataFormatsSmoke.PRIVATE_LOGGER.setUseParentHandlers(false);
 
-   /**
-    * Program entry point.
-    *
-    * @param args
-    *           No arguments
-    */
-   public static void main(String[] args) {
-      PRIVATE_LOGGER.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
-      PRIVATE_LOGGER.setUseParentHandlers(false);
+		DataFormatsSmoke.PRIVATE_LOGGER
+			.info("###################### Starting Data Format smoke-Test ##################");
 
-      PRIVATE_LOGGER.info("###################### Starting Data Format smoke-Test ##################");
+		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss z");
+		DataFormatsSmoke.PRIVATE_LOGGER.info(DATE_FORMAT.format(new Date(System.currentTimeMillis())));
 
-      SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss z");
-      PRIVATE_LOGGER.info(DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+		DataFormatsSmoke dataFormatSmokeTest = new DataFormatsSmoke();
 
-      DataFormatsSmoke dataFormatSmokeTest = new DataFormatsSmoke();
+		dataFormatSmokeTest.runSmokeTest();
 
-      dataFormatSmokeTest.runSmokeTest();
+		DataFormatsSmoke.PRIVATE_LOGGER
+			.info("###################### Shutting Down Data Format smoke-Test ##################");
+	}
 
-      PRIVATE_LOGGER.info("###################### Shutting Down Data Format smoke-Test ##################");
-   }
+	private LibraryJMeta m_context;
 
-   private void runSmokeTest() {
+	private void configureDataFormats() {
 
-      m_context = LibraryJMeta.getLibrary();
+		DataFormatRepository repo = m_context.getDataFormatRepository();
 
-      configureDataFormats();
-      readAllTopLevelDataBlocks();
-   }
+		int index = 0;
 
-   private void readAllTopLevelDataBlocks() {
+		for (Iterator<ContainerDataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
+			ContainerDataFormat dataFormat = iterator.next();
 
-      DataBlockAccessor accessor = m_context.getDataBlockAccessor();
+			DataFormatsSmoke.PRIVATE_LOGGER.info("TEST Data format " + index + ": " + dataFormat);
 
-      for (Iterator<File> iterator = TEST_DATA_FORMATS.keySet().iterator(); iterator.hasNext();) {
-         File currentFile = iterator.next();
+			index++;
+		}
+	}
 
-         final AbstractMedium<Path> medium = new FileMedium(currentFile.toPath(), true);
+	private void printContainers(ContainerIterator containerIterator, Integer level) {
 
-         PRIVATE_LOGGER.info("***********************************************************************");
-         PRIVATE_LOGGER.info("All data blocks in the AbstractMedium: " + medium);
-         PRIVATE_LOGGER.info("***********************************************************************");
+		String prependWith = "";
 
-         printContainers(accessor.getContainerIterator(medium, false), Integer.valueOf(1));
-      }
-   }
+		for (int i = 0; i < level; i++) {
+			prependWith += "\t";
+		}
 
-   private void configureDataFormats() {
+		while (containerIterator.hasNext()) {
+			Container nextBlock = containerIterator.next();
 
-      DataFormatRepository repo = m_context.getDataFormatRepository();
+			DataFormatsSmoke.PRIVATE_LOGGER.info(prependWith + "Read Container: " + nextBlock.toString());
 
-      int index = 0;
+			for (int i = 0; i < nextBlock.getHeaders().size(); i++) {
+				Header header = nextBlock.getHeaders().get(i);
+				DataFormatsSmoke.PRIVATE_LOGGER.info(prependWith + "\tHeader: " + header);
+				printFields(header.getFields(), level + 2);
+			}
 
-      for (Iterator<ContainerDataFormat> iterator = repo.getSupportedDataFormats().iterator(); iterator.hasNext();) {
-         ContainerDataFormat dataFormat = iterator.next();
+			for (int i = 0; i < nextBlock.getFooters().size(); i++) {
+				Footer footer = nextBlock.getFooters().get(i);
+				DataFormatsSmoke.PRIVATE_LOGGER.info(prependWith + "\tFooter: " + footer);
+				printFields(footer.getFields(), level + 2);
+			}
 
-         PRIVATE_LOGGER.info("TEST Data format " + index + ": " + dataFormat);
+			final Payload payload = nextBlock.getPayload();
 
-         index++;
-      }
-   }
+			DataFormatsSmoke.PRIVATE_LOGGER.info(prependWith + "\tPayload: " + payload);
 
-   private void printContainers(ContainerIterator containerIterator, Integer level) {
+			if (payload instanceof ContainerBasedPayload) {
+				printContainers(((ContainerBasedPayload) payload).getContainerIterator(), level + 2);
+			} else {
+				printFields(((FieldBasedPayload) payload).getFields(), level + 2);
+			}
+		}
+	}
 
-      String prependWith = "";
+	private void printFields(List<Field<?>> fieldList, Integer level) {
 
-      for (int i = 0; i < level; i++) {
-         prependWith += "\t";
-      }
+		String prependWith = "";
 
-      while (containerIterator.hasNext()) {
-         Container nextBlock = containerIterator.next();
+		for (int i = 0; i < level; i++) {
+			prependWith += "\t";
+		}
 
-         PRIVATE_LOGGER.info(prependWith + "Read Container: " + nextBlock.toString());
+		final Iterator<Field<?>> fieldIterator = fieldList.iterator();
+		while (fieldIterator.hasNext()) {
+			final Field<?> nextField = fieldIterator.next();
 
-         for (int i = 0; i < nextBlock.getHeaders().size(); i++) {
-            Header header = nextBlock.getHeaders().get(i);
-            PRIVATE_LOGGER.info(prependWith + "\tHeader: " + header);
-            printFields(header.getFields(), level + 2);
-         }
+			// Ensure that the conversion has been done
+			try {
+				nextField.getInterpretedValue();
+			} catch (BinaryValueConversionException e) {
+				e.printStackTrace();
+			}
 
-         for (int i = 0; i < nextBlock.getFooters().size(); i++) {
-            Footer footer = nextBlock.getFooters().get(i);
-            PRIVATE_LOGGER.info(prependWith + "\tFooter: " + footer);
-            printFields(footer.getFields(), level + 2);
-         }
+			DataFormatsSmoke.PRIVATE_LOGGER.info(prependWith + "Read Field: " + nextField);
+		}
+	}
 
-         final Payload payload = nextBlock.getPayload();
+	private void readAllTopLevelDataBlocks() {
 
-         PRIVATE_LOGGER.info(prependWith + "\tPayload: " + payload);
+		DataBlockAccessor accessor = m_context.getDataBlockAccessor();
 
-         if (payload instanceof ContainerBasedPayload) {
-            printContainers(((ContainerBasedPayload) payload).getContainerIterator(), level + 2);
-         } else {
-            printFields(((FieldBasedPayload) payload).getFields(), level + 2);
-         }
-      }
-   }
+		for (Iterator<File> iterator = DataFormatsSmoke.TEST_DATA_FORMATS.keySet().iterator(); iterator.hasNext();) {
+			File currentFile = iterator.next();
 
-   private void printFields(List<Field<?>> fieldList, Integer level) {
+			final AbstractMedium<Path> medium = new FileMedium(currentFile.toPath(), true);
 
-      String prependWith = "";
+			DataFormatsSmoke.PRIVATE_LOGGER
+				.info("***********************************************************************");
+			DataFormatsSmoke.PRIVATE_LOGGER.info("All data blocks in the AbstractMedium: " + medium);
+			DataFormatsSmoke.PRIVATE_LOGGER
+				.info("***********************************************************************");
 
-      for (int i = 0; i < level; i++) {
-         prependWith += "\t";
-      }
+			printContainers(accessor.getContainerIterator(medium, false), Integer.valueOf(1));
+		}
+	}
 
-      final Iterator<Field<?>> fieldIterator = fieldList.iterator();
-      while (fieldIterator.hasNext()) {
-         final Field<?> nextField = fieldIterator.next();
+	private void runSmokeTest() {
 
-         // Ensure that the conversion has been done
-         try {
-            nextField.getInterpretedValue();
-         } catch (BinaryValueConversionException e) {
-            e.printStackTrace();
-         }
+		m_context = LibraryJMeta.getLibrary();
 
-         PRIVATE_LOGGER.info(prependWith + "Read Field: " + nextField);
-      }
-   }
+		configureDataFormats();
+		readAllTopLevelDataBlocks();
+	}
 }

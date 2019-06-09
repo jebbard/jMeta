@@ -27,112 +27,110 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class SyncSafeIntegerConverter extends SignedNumericFieldConverter {
 
-   private static final int FROM_CONVERSION_MASK = 0x7F000000;
+	private static final int FROM_CONVERSION_MASK = 0x7F000000;
 
-   private static final int TO_CONVERSION_MASK = 0x7F;
+	private static final int TO_CONVERSION_MASK = 0x7F;
 
-   private static final int MAX_SYNC_SAFE_INTEGER = 2 >> 28;
+	private static final int MAX_SYNC_SAFE_INTEGER = 2 >> 28;
 
-   @Override
-   public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws BinaryValueConversionException {
+	public static void main(String[] args) {
+		System.out.println("SyncSafe integer converter");
+		System.out.print("Enter normal integer: ");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(binaryValue, "binaryValue");
-      if (binaryValue.remaining() != Integer.SIZE / Byte.SIZE) {
-         throw new BinaryValueConversionException(
-            "ID3v23 size fields must have integer (" + Integer.SIZE / Byte.SIZE + " bytes) size", null, desc,
-            binaryValue, byteOrder, characterEncoding);
-      }
+		try {
+			String intString = reader.readLine();
 
-      byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
+			int normalInt = Integer.parseInt(intString);
+			int syncSafe = new SyncSafeIntegerConverter().intToSynchSafe(normalInt);
 
-      int size = ByteBuffer.wrap(copiedBytes).getInt();
+			System.out.println("Sync safe version of " + normalInt + " is = " + syncSafe + "d = "
+				+ Integer.toHexString(syncSafe) + "h");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-      return Long.valueOf(synchSafeToInt(size));
-   }
+	/**
+	 * Converts a usual integer to a synchsafe integer.
+	 *
+	 * @param usualInteger The usual integer to convert.
+	 * @return A synchsafe representation of the given integer.
+	 */
+	private int intToSynchSafe(int usualInteger) {
 
-   public static void main(String[] args) {
-      System.out.println("SyncSafe integer converter");
-      System.out.print("Enter normal integer: ");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		int synchSafeInteger = 0;
+		int shiftedInteger = usualInteger;
+		int mask = SyncSafeIntegerConverter.TO_CONVERSION_MASK;
 
-      try {
-         String intString = reader.readLine();
+		for (int i = 0; i < (Integer.SIZE / Byte.SIZE); ++i) {
+			synchSafeInteger += shiftedInteger & mask;
+			shiftedInteger <<= 1;
+			mask <<= Byte.SIZE;
+		}
 
-         int normalInt = Integer.parseInt(intString);
-         int syncSafe = new SyncSafeIntegerConverter().intToSynchSafe(normalInt);
+		return synchSafeInteger;
+	}
 
-         System.out.println(
-            "Sync safe version of " + normalInt + " is = " + syncSafe + "d = " + Integer.toHexString(syncSafe) + "h");
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
+	/**
+	 * Converts a synchsafe integer to a usual integer.
+	 *
+	 * @param synchSafeInteger The synchsafe integer to convert.
+	 * @return The usual integer.
+	 */
+	private int synchSafeToInt(int synchSafeInteger) {
 
-   @Override
-   public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws InterpretedValueConversionException {
+		int usualInteger = 0;
+		int mask = SyncSafeIntegerConverter.FROM_CONVERSION_MASK;
 
-      Reject.ifNull(characterEncoding, "characterEncoding");
-      Reject.ifNull(byteOrder, "byteOrder");
-      Reject.ifNull(desc, "desc");
-      Reject.ifNull(interpretedValue, "interpretedValue");
+		for (int i = 0; i < (Integer.SIZE / Byte.SIZE); ++i) {
+			usualInteger >>= 1;
+			usualInteger |= synchSafeInteger & mask;
+			mask >>= Byte.SIZE;
+		}
 
-      if (interpretedValue > MAX_SYNC_SAFE_INTEGER) {
-         throw new InterpretedValueConversionException(
-            "ID3v23 sync-safe integers may not be larger than " + MAX_SYNC_SAFE_INTEGER, null, desc, interpretedValue,
-            byteOrder, characterEncoding);
-      }
+		return usualInteger;
+	}
 
-      long converted = intToSynchSafe(interpretedValue.intValue());
+	@Override
+	public ByteBuffer toBinary(Long interpretedValue, DataBlockDescription desc, ByteOrder byteOrder,
+		Charset characterEncoding) throws InterpretedValueConversionException {
 
-      return super.toBinary(converted, desc, byteOrder, characterEncoding);
-   }
+		Reject.ifNull(characterEncoding, "characterEncoding");
+		Reject.ifNull(byteOrder, "byteOrder");
+		Reject.ifNull(desc, "desc");
+		Reject.ifNull(interpretedValue, "interpretedValue");
 
-   /**
-    * Converts a usual integer to a synchsafe integer.
-    *
-    * @param usualInteger
-    *           The usual integer to convert.
-    * @return A synchsafe representation of the given integer.
-    */
-   private int intToSynchSafe(int usualInteger) {
+		if (interpretedValue > SyncSafeIntegerConverter.MAX_SYNC_SAFE_INTEGER) {
+			throw new InterpretedValueConversionException(
+				"ID3v23 sync-safe integers may not be larger than " + SyncSafeIntegerConverter.MAX_SYNC_SAFE_INTEGER,
+				null, desc, interpretedValue, byteOrder, characterEncoding);
+		}
 
-      int synchSafeInteger = 0;
-      int shiftedInteger = usualInteger;
-      int mask = TO_CONVERSION_MASK;
+		long converted = intToSynchSafe(interpretedValue.intValue());
 
-      for (int i = 0; i < Integer.SIZE / Byte.SIZE; ++i) {
-         synchSafeInteger += shiftedInteger & mask;
-         shiftedInteger <<= 1;
-         mask <<= Byte.SIZE;
-      }
+		return super.toBinary(converted, desc, byteOrder, characterEncoding);
+	}
 
-      return synchSafeInteger;
-   }
+	@Override
+	public Long toInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+		Charset characterEncoding) throws BinaryValueConversionException {
 
-   /**
-    * Converts a synchsafe integer to a usual integer.
-    *
-    * @param synchSafeInteger
-    *           The synchsafe integer to convert.
-    * @return The usual integer.
-    */
-   private int synchSafeToInt(int synchSafeInteger) {
+		Reject.ifNull(characterEncoding, "characterEncoding");
+		Reject.ifNull(byteOrder, "byteOrder");
+		Reject.ifNull(desc, "desc");
+		Reject.ifNull(binaryValue, "binaryValue");
+		if (binaryValue.remaining() != (Integer.SIZE / Byte.SIZE)) {
+			throw new BinaryValueConversionException(
+				"ID3v23 size fields must have integer (" + (Integer.SIZE / Byte.SIZE) + " bytes) size", null, desc,
+				binaryValue, byteOrder, characterEncoding);
+		}
 
-      int usualInteger = 0;
-      int mask = FROM_CONVERSION_MASK;
+		byte[] copiedBytes = ByteBufferUtils.asByteArrayCopy(binaryValue);
 
-      for (int i = 0; i < Integer.SIZE / Byte.SIZE; ++i) {
-         usualInteger >>= 1;
-         usualInteger |= synchSafeInteger & mask;
-         mask >>= Byte.SIZE;
-      }
+		int size = ByteBuffer.wrap(copiedBytes).getInt();
 
-      return usualInteger;
-   }
+		return Long.valueOf(synchSafeToInt(size));
+	}
 
 }

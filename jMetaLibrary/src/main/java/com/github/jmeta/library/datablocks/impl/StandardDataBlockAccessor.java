@@ -36,96 +36,98 @@ import com.github.jmeta.utility.logging.api.services.LoggingConstants;
  */
 public class StandardDataBlockAccessor implements DataBlockAccessor {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
 
-   private final DataFormatRepository m_repository;
+	private final DataFormatRepository m_repository;
 
-   /**
-    * Creates a new {@link StandardDataBlockAccessor}.
-    */
-   public StandardDataBlockAccessor() {
+	private final MediaAPI m_mediumFactory;
 
-      extManager = ComponentRegistry.lookupService(ExtensionManager.class);
+	private final Map<ContainerDataFormat, DataBlockService> dataBlockServices = new HashMap<>();
 
-      m_repository = ComponentRegistry.lookupService(DataFormatRepository.class);
+	private final ExtensionManager extManager;
 
-      m_mediumFactory = ComponentRegistry.lookupService(MediaAPI.class);
+	/**
+	 * Creates a new {@link StandardDataBlockAccessor}.
+	 */
+	public StandardDataBlockAccessor() {
 
-      List<Extension> extBundles = extManager.getAllExtensions();
+		extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
-      String validatingExtensions = "Validating registered data blocks extensions" + LoggingConstants.SUFFIX_TASK;
+		m_repository = ComponentRegistry.lookupService(DataFormatRepository.class);
 
-      LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
+		m_mediumFactory = ComponentRegistry.lookupService(MediaAPI.class);
 
-      for (Extension iExtension2 : extBundles) {
-         List<DataBlockService> bundleDataBlocksExtensions = iExtension2.getAllServiceProviders(DataBlockService.class);
+		List<Extension> extBundles = extManager.getAllExtensions();
 
-         for (DataBlockService dataBlocksExtension : bundleDataBlocksExtensions) {
-            final ContainerDataFormat extensionDataFormat = dataBlocksExtension.getDataFormat();
+		String validatingExtensions = "Validating registered data blocks extensions" + LoggingConstants.SUFFIX_TASK;
 
-            if (extensionDataFormat == null) {
-               final String message = "The extension " + dataBlocksExtension
-                  + " must not return null for its data format.";
-               LOGGER.error(
-                  LoggingConstants.PREFIX_TASK_FAILED + LoggingConstants.PREFIX_CRITICAL_ERROR + validatingExtensions);
-               LOGGER.error(message);
-               throw new InvalidExtensionException(message, iExtension2);
-            }
+		StandardDataBlockAccessor.LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
-            final DataFormatSpecification spec = m_repository.getDataFormatSpecification(extensionDataFormat);
+		for (Extension iExtension2 : extBundles) {
+			List<DataBlockService> bundleDataBlocksExtensions = iExtension2
+				.getAllServiceProviders(DataBlockService.class);
 
-            if (spec == null) {
-               throw new InvalidExtensionException(
-                  "The extension " + iExtension2.getExtensionId() + " for data format " + extensionDataFormat
-                     + " must have a corresponding registered data format specification for the format.",
-                  iExtension2);
-            }
+			for (DataBlockService dataBlocksExtension : bundleDataBlocksExtensions) {
+				final ContainerDataFormat extensionDataFormat = dataBlocksExtension.getDataFormat();
 
-            if (dataBlockServices.containsKey(extensionDataFormat)) {
-               LOGGER.warn(
-                  "The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
-                  iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
-            }
+				if (extensionDataFormat == null) {
+					final String message = "The extension " + dataBlocksExtension
+						+ " must not return null for its data format.";
+					StandardDataBlockAccessor.LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED
+						+ LoggingConstants.PREFIX_CRITICAL_ERROR + validatingExtensions);
+					StandardDataBlockAccessor.LOGGER.error(message);
+					throw new InvalidExtensionException(message, iExtension2);
+				}
 
-            else {
-               dataBlockServices.put(extensionDataFormat, dataBlocksExtension);
-            }
-         }
-      }
+				final DataFormatSpecification spec = m_repository.getDataFormatSpecification(extensionDataFormat);
 
-      LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
-   }
+				if (spec == null) {
+					throw new InvalidExtensionException(
+						"The extension " + iExtension2.getExtensionId() + " for data format " + extensionDataFormat
+							+ " must have a corresponding registered data format specification for the format.",
+						iExtension2);
+				}
 
-   /**
-    * @see DataBlockAccessor#getContainerIterator
-    */
-   @Override
-   public TopLevelContainerIterator getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
+				if (dataBlockServices.containsKey(extensionDataFormat)) {
+					StandardDataBlockAccessor.LOGGER.warn(
+						"The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
+						iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
+				}
 
-      Reject.ifNull(medium, "medium");
+				else {
+					dataBlockServices.put(extensionDataFormat, dataBlocksExtension);
+				}
+			}
+		}
 
-      MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
-      mediumStore.open();
+		StandardDataBlockAccessor.LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
+	}
 
-      return new StandardTopLevelContainerIterator(mediumStore, true, new HashSet<>(dataBlockServices.values()));
-   }
+	/**
+	 * @see DataBlockAccessor#getContainerIterator
+	 */
+	@Override
+	public TopLevelContainerIterator getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
 
-   @Override
-   public TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
-      Reject.ifNull(medium, "medium");
+		Reject.ifNull(medium, "medium");
 
-      if (!medium.isRandomAccess()) {
-         throw new UnsupportedMediumException("Medium " + medium + " must be a random access medium.");
-      }
+		MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
+		mediumStore.open();
 
-      MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
-      mediumStore.open();
+		return new StandardTopLevelContainerIterator(mediumStore, true, new HashSet<>(dataBlockServices.values()));
+	}
 
-      return new StandardTopLevelContainerIterator(mediumStore, false, new HashSet<>(dataBlockServices.values()));
-   }
+	@Override
+	public TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
+		Reject.ifNull(medium, "medium");
 
-   private final MediaAPI m_mediumFactory;
-   private final Map<ContainerDataFormat, DataBlockService> dataBlockServices = new HashMap<>();
+		if (!medium.isRandomAccess()) {
+			throw new UnsupportedMediumException("Medium " + medium + " must be a random access medium.");
+		}
 
-   private final ExtensionManager extManager;
+		MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
+		mediumStore.open();
+
+		return new StandardTopLevelContainerIterator(mediumStore, false, new HashSet<>(dataBlockServices.values()));
+	}
 }

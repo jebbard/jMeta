@@ -21,77 +21,81 @@ import com.github.jmeta.utility.logchecker.api.services.LogChecker;
 import junit.framework.AssertionFailedError;
 
 /**
- * {@link JMetaTestBasics} provides static methods to be used by most of the jMeta integration test cases for
- * cross-functional purposes. It is the basic test framework of jMeta integration testing.
+ * {@link JMetaTestBasics} provides static methods to be used by most of the
+ * jMeta integration test cases for cross-functional purposes. It is the basic
+ * test framework of jMeta integration testing.
  *
- * It basically does what the productive library does: Load the extensions, instantiate component registry and
- * initialize all components.
+ * It basically does what the productive library does: Load the extensions,
+ * instantiate component registry and initialize all components.
  */
 public class JMetaTestBasics {
 
-   /**
-    * The default path where test case log files are stored - ATTENTION: Must be the same as configured in
-    * log4j2-test.xml
-    */
-   public static final File DEFAULT_UNITTEST_LOG_PATH = new File(new File(new File("."), "logs"), "unitTest");
+	/**
+	 * The default path where test case log files are stored - ATTENTION: Must be
+	 * the same as configured in log4j2-test.xml
+	 */
+	public static final File DEFAULT_UNITTEST_LOG_PATH = new File(new File(new File("."), "logs"), "unitTest");
 
-   /**
-    * The default log file - ATTENTION: Must be the same as configured in log4j2-test.xml
-    */
-   public static final File DEFAULT_UNITTEST_LOG_FILE = new File(DEFAULT_UNITTEST_LOG_PATH, "jMeta.log");
+	/**
+	 * The default log file - ATTENTION: Must be the same as configured in
+	 * log4j2-test.xml
+	 */
+	public static final File DEFAULT_UNITTEST_LOG_FILE = new File(JMetaTestBasics.DEFAULT_UNITTEST_LOG_PATH,
+		"jMeta.log");
 
-   /**
-    * The default path where log files with errors are copied to.
-    */
-   private static final File FAILED_LOG_CHECK_PATH = new File(DEFAULT_UNITTEST_LOG_PATH, "failedLogChecks");
+	/**
+	 * The default path where log files with errors are copied to.
+	 */
+	private static final File FAILED_LOG_CHECK_PATH = new File(JMetaTestBasics.DEFAULT_UNITTEST_LOG_PATH,
+		"failedLogChecks");
 
-   private static final LogChecker LOG_CHECKER = new LogChecker();
+	private static final LogChecker LOG_CHECKER = new LogChecker();
 
-   /**
-    * Does an additional, generic log check after test case execution. If the log check fails, the method copies the log
-    * file with the failures inside, so that the user may check it after the test run.
-    * 
-    * @param logFile
-    *           The log file to check
-    */
-   public static void performGeneralLogCheck(File logFile) {
+	/**
+	 * Method for truncating the whole contents of the given log file to ensure no
+	 * output from previous test cases is contained.
+	 * 
+	 * @param logFile The log file to truncate.
+	 */
+	public static void emptyLogFile(File logFile) {
+		try (RandomAccessFile raf = new RandomAccessFile(logFile, "rw")) {
+			raf.getChannel().truncate(0);
+		} catch (IOException e) {
+			throw new RuntimeException("Exception during log file truncation", e);
+		}
+	}
 
-      try {
-         LOG_CHECKER.logCheck(logFile);
-      } catch (AssertionFailedError e1) {
-         // Copy failed log file into separate directory
-         File failed = new File(FAILED_LOG_CHECK_PATH, logFile.getName() + "_" + System.currentTimeMillis());
+	/**
+	 * Does an additional, generic log check after test case execution. If the log
+	 * check fails, the method copies the log file with the failures inside, so that
+	 * the user may check it after the test run.
+	 * 
+	 * @param logFile The log file to check
+	 */
+	public static void performGeneralLogCheck(File logFile) {
 
-         try {
-            Files.copy(logFile.toPath(), failed.toPath(), StandardCopyOption.REPLACE_EXISTING);
-         } catch (IOException e) {
-            throw new RuntimeException("Exception during log file copying", e);
-         }
+		try {
+			JMetaTestBasics.LOG_CHECKER.logCheck(logFile);
+		} catch (AssertionFailedError e1) {
+			// Copy failed log file into separate directory
+			File failed = new File(JMetaTestBasics.FAILED_LOG_CHECK_PATH,
+				logFile.getName() + "_" + System.currentTimeMillis());
 
-         throw e1;
-      }
-   }
+			try {
+				Files.copy(logFile.toPath(), failed.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				throw new RuntimeException("Exception during log file copying", e);
+			}
 
-   /**
-    * Method for truncating the whole contents of the given log file to ensure no output from previous test cases is
-    * contained.
-    * 
-    * @param logFile
-    *           The log file to truncate.
-    */
-   public static void emptyLogFile(File logFile) {
-      try (RandomAccessFile raf = new RandomAccessFile(logFile, "rw")) {
-         raf.getChannel().truncate(0);
-      } catch (IOException e) {
-         throw new RuntimeException("Exception during log file truncation", e);
-      }
-   }
+			throw e1;
+		}
+	}
 
-   /**
-    * Initially loads the extensions into the {@link ExtensionManager} from the central test extension point
-    * configuration file.
-    */
-   public static void setupExtensions() {
-      ComponentRegistry.lookupService(ExtensionManager.class);
-   }
+	/**
+	 * Initially loads the extensions into the {@link ExtensionManager} from the
+	 * central test extension point configuration file.
+	 */
+	public static void setupExtensions() {
+		ComponentRegistry.lookupService(ExtensionManager.class);
+	}
 }

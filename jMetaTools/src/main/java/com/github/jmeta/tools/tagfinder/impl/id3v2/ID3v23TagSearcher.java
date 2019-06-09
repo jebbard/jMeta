@@ -18,100 +18,101 @@ import java.util.List;
  */
 public class ID3v23TagSearcher extends AbstractID3v2TagSearcher {
 
-   private static final int ID3V23_FLAGS_LENGTH = 2;
+	private static final int ID3V23_FLAGS_LENGTH = 2;
 
-   private static final int ID3V23_ID_LENGTH = 4;
+	private static final int ID3V23_ID_LENGTH = 4;
 
-   protected static final int MASK_THIRD_BIT = 32;
+	protected static final int MASK_THIRD_BIT = 32;
 
-   protected static final int MASK_SECOND_BIT = 64;
+	protected static final int MASK_SECOND_BIT = 64;
 
-   protected static final int MASK_FIRST_BIT = 128;
+	protected static final int MASK_FIRST_BIT = 128;
 
-   protected static final int MASK_FOURTH_BIT = 16;
+	protected static final int MASK_FOURTH_BIT = 16;
 
-   public ID3v23TagSearcher(byte[] magicKey, long[] possibleOffsets, String tagName) {
-      super(magicKey, possibleOffsets, tagName);
-   }
+	/**
+	 * Creates a new {@link ID3v22TagSearcher}.
+	 */
+	public ID3v23TagSearcher() {
+		super(new byte[] { 'I', 'D', '3', 3, 0 }, new long[] { 0 }, "ID3v2.3");
+	}
 
-   /**
-    * Creates a new {@link ID3v22TagSearcher}.
-    */
-   public ID3v23TagSearcher() {
-      super(new byte[] { 'I', 'D', '3', 3, 0 }, new long[] { 0 }, "ID3v2.3");
-   }
+	public ID3v23TagSearcher(byte[] magicKey, long[] possibleOffsets, String tagName) {
+		super(magicKey, possibleOffsets, tagName);
+	}
 
-   /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getAdditionalInfo(java.nio.ByteBuffer)
-    */
-   @Override
-   protected String[] getAdditionalInfo(ByteBuffer tagBytes) {
+	/**
+	 * @see com.github.jmeta.tools.tagfinder.api.services.AbstractMagicKeyTagSearcher#getAdditionalInfo(java.nio.ByteBuffer)
+	 */
+	@Override
+	protected String[] getAdditionalInfo(ByteBuffer tagBytes) {
 
-      ID3v2TagHeaderInfo info = getTagHeaderInfo(tagBytes);
+		ID3v2TagHeaderInfo info = getTagHeaderInfo(tagBytes);
 
-      final boolean isUnsynchronised = (info.getFlags() & MASK_FIRST_BIT) != 0;
-      final boolean hasExtendedHeader = (info.getFlags() & MASK_SECOND_BIT) != 0;
-      final boolean isExperimental = (info.getFlags() & MASK_THIRD_BIT) != 0;
+		final boolean isUnsynchronised = (info.getFlags() & ID3v23TagSearcher.MASK_FIRST_BIT) != 0;
+		final boolean hasExtendedHeader = (info.getFlags() & ID3v23TagSearcher.MASK_SECOND_BIT) != 0;
+		final boolean isExperimental = (info.getFlags() & ID3v23TagSearcher.MASK_THIRD_BIT) != 0;
 
-      List<String> additionInfoList = new ArrayList<String>(4);
+		List<String> additionInfoList = new ArrayList<>(4);
 
-      additionInfoList.add("Is unsynchronized: " + isUnsynchronised);
-      additionInfoList.add("Has extended header: " + hasExtendedHeader);
-      additionInfoList.add("Is experimental: " + isExperimental);
+		additionInfoList.add("Is unsynchronized: " + isUnsynchronised);
+		additionInfoList.add("Has extended header: " + hasExtendedHeader);
+		additionInfoList.add("Is experimental: " + isExperimental);
 
-      // Read each frame of the tag, if thats easy (no ext header and not unsynchr.)
-      if (!isUnsynchronised && !hasExtendedHeader) {
-         tagBytes.position(ID3V2_TAG_HEADER_SIZE);
+		// Read each frame of the tag, if thats easy (no ext header and not unsynchr.)
+		if (!isUnsynchronised && !hasExtendedHeader) {
+			tagBytes.position(AbstractID3v2TagSearcher.ID3V2_TAG_HEADER_SIZE);
 
-         while (tagBytes.hasRemaining()) {
-            tagBytes.mark();
+			while (tagBytes.hasRemaining()) {
+				tagBytes.mark();
 
-            byte nextByte = tagBytes.get();
+				byte nextByte = tagBytes.get();
 
-            // Padding is encountered
-            if (nextByte == 0)
-               break;
+				// Padding is encountered
+				if (nextByte == 0) {
+					break;
+				}
 
-            // "unread" the previously read byte
-            tagBytes.reset();
+				// "unread" the previously read byte
+				tagBytes.reset();
 
-            ID3v2FrameInfo frameInfo = getFrameInfo(tagBytes);
+				ID3v2FrameInfo frameInfo = getFrameInfo(tagBytes);
 
-            tagBytes.position(tagBytes.position() + frameInfo.getSize());
+				tagBytes.position(tagBytes.position() + frameInfo.getSize());
 
-            additionInfoList.add(frameInfo.toString() + getFlagSummary(frameInfo));
-         }
-      }
+				additionInfoList.add(frameInfo.toString() + getFlagSummary(frameInfo));
+			}
+		}
 
-      String[] returnedArray = new String[additionInfoList.size()];
+		String[] returnedArray = new String[additionInfoList.size()];
 
-      return additionInfoList.toArray(returnedArray);
-   }
+		return additionInfoList.toArray(returnedArray);
+	}
 
-   protected String getFlagSummary(ID3v2FrameInfo frameInfo) {
+	protected String getFlagSummary(ID3v2FrameInfo frameInfo) {
 
-      final boolean isTagAlterPreservation = (frameInfo.getFlags()[0] & MASK_FIRST_BIT) != 0;
-      final boolean isFileAlterPreservation = (frameInfo.getFlags()[0] & MASK_SECOND_BIT) != 0;
-      final boolean isReadOnly = (frameInfo.getFlags()[0] & MASK_THIRD_BIT) != 0;
-      final boolean isCompressed = (frameInfo.getFlags()[1] & MASK_FIRST_BIT) != 0;
-      final boolean isEncrypted = (frameInfo.getFlags()[1] & MASK_SECOND_BIT) != 0;
-      final boolean isGrouped = (frameInfo.getFlags()[1] & MASK_THIRD_BIT) != 0;
+		final boolean isTagAlterPreservation = (frameInfo.getFlags()[0] & ID3v23TagSearcher.MASK_FIRST_BIT) != 0;
+		final boolean isFileAlterPreservation = (frameInfo.getFlags()[0] & ID3v23TagSearcher.MASK_SECOND_BIT) != 0;
+		final boolean isReadOnly = (frameInfo.getFlags()[0] & ID3v23TagSearcher.MASK_THIRD_BIT) != 0;
+		final boolean isCompressed = (frameInfo.getFlags()[1] & ID3v23TagSearcher.MASK_FIRST_BIT) != 0;
+		final boolean isEncrypted = (frameInfo.getFlags()[1] & ID3v23TagSearcher.MASK_SECOND_BIT) != 0;
+		final boolean isGrouped = (frameInfo.getFlags()[1] & ID3v23TagSearcher.MASK_THIRD_BIT) != 0;
 
-      return ", Flags: (tag alter preservation = " + isTagAlterPreservation + "; file alter preservation = "
-         + isFileAlterPreservation + "; read-only = " + isReadOnly + "; compressed = " + isCompressed + "; encrypted = "
-         + isEncrypted + "; grouped = " + isGrouped + ")";
-   }
+		return ", Flags: (tag alter preservation = " + isTagAlterPreservation + "; file alter preservation = "
+			+ isFileAlterPreservation + "; read-only = " + isReadOnly + "; compressed = " + isCompressed
+			+ "; encrypted = " + isEncrypted + "; grouped = " + isGrouped + ")";
+	}
 
-   private ID3v2FrameInfo getFrameInfo(ByteBuffer tagBytes) {
+	private ID3v2FrameInfo getFrameInfo(ByteBuffer tagBytes) {
 
-      byte[] idBytes = new byte[ID3V23_ID_LENGTH];
-      byte[] flags = new byte[ID3V23_FLAGS_LENGTH];
+		byte[] idBytes = new byte[ID3v23TagSearcher.ID3V23_ID_LENGTH];
+		byte[] flags = new byte[ID3v23TagSearcher.ID3V23_FLAGS_LENGTH];
 
-      tagBytes.get(idBytes);
-      int size = tagBytes.getInt();
-      tagBytes.get(flags);
+		tagBytes.get(idBytes);
+		int size = tagBytes.getInt();
+		tagBytes.get(flags);
 
-      return new ID3v2FrameInfo(idBytes, size, flags);
-   }
+		return new ID3v2FrameInfo(idBytes, size, flags);
+	}
 
 }

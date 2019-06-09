@@ -20,32 +20,31 @@ import java.util.logging.LogRecord;
  */
 public class TagFinderFormatter extends Formatter {
 
-   private static final String LINE_SEPARATOR = System
-      .getProperty("line.separator");
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-   private static final SimpleDateFormat SDF = new SimpleDateFormat(
-      "yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
-   /**
-    * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
-    */
-   @Override
-   public String format(LogRecord record) {
+	/**
+	 * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
+	 */
+	@Override
+	public String format(LogRecord record) {
 
-      StringBuffer logString = new StringBuffer();
+		StringBuffer logString = new StringBuffer();
 
-      logString.append(record.getLevel().getName());
-      logString.append(": ");
-      logString.append(SDF.format(new Date(record.getMillis())));
-      logString.append("   ");
+		logString.append(record.getLevel().getName());
+		logString.append(": ");
+		logString.append(TagFinderFormatter.SDF.format(new Date(record.getMillis())));
+		logString.append("   ");
 
-      final String message = record.getMessage();
+		final String message = record.getMessage();
 
-      if (!message.equals(LINE_SEPARATOR))
-         logString.append(message);
+		if (!message.equals(TagFinderFormatter.LINE_SEPARATOR)) {
+			logString.append(message);
+		}
 
-      logString.append(LINE_SEPARATOR);
+		logString.append(TagFinderFormatter.LINE_SEPARATOR);
 
-      return logString.toString();
-   }
+		return logString.toString();
+	}
 }

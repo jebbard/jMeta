@@ -23,12 +23,13 @@ import com.github.jmeta.utility.extmanager.impl.StandardExtensionManagerTest;
 import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeHelperTest;
 
 /**
- * {@link AlljMetaUtilityTests} is used for running all test cases of the extension management component.
+ * {@link AlljMetaUtilityTests} is used for running all test cases of the
+ * extension management component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ StandardExtensionManagerTest.class, ByteArrayUtilsTest.class, NumericDataTypeHelperTest.class,
-   TwelveColumnCsvFileTest.class, NineColumnCsvFileTest.class, TwoColumnCsvFileTest.class, OneColumnCsvFileTest.class,
-   EmptyCsvFileTest.class, ByteBufferUtilsTest.class })
+	TwelveColumnCsvFileTest.class, NineColumnCsvFileTest.class, TwoColumnCsvFileTest.class, OneColumnCsvFileTest.class,
+	EmptyCsvFileTest.class, ByteBufferUtilsTest.class })
 public class AlljMetaUtilityTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

@@ -18,144 +18,144 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * Represents a read-only streaming media {@link MediumAccessor} that may block when reading.
+ * Represents a read-only streaming media {@link MediumAccessor} that may block
+ * when reading.
  */
 public class InputStreamMediumAccessor extends AbstractMediumAccessor<InputStreamMedium> {
 
-   private PushbackInputStream inputStream;
+	private PushbackInputStream inputStream;
 
-   /**
-    * Creates a new {@link InputStreamMediumAccessor}.
-    * 
-    * @param medium
-    *           The {@link InputStreamMedium} this class works on
-    */
-   public InputStreamMediumAccessor(InputStreamMedium medium) {
-      super(medium);
-   }
+	/**
+	 * Creates a new {@link InputStreamMediumAccessor}.
+	 * 
+	 * @param medium The {@link InputStreamMedium} this class works on
+	 */
+	public InputStreamMediumAccessor(InputStreamMedium medium) {
+		super(medium);
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium()
-    */
-   @Override
-   public boolean isAtEndOfMedium() {
-      Reject.ifFalse(isOpened(), "isOpened()");
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#isAtEndOfMedium()
+	 */
+	@Override
+	public boolean isAtEndOfMedium() {
+		Reject.ifFalse(isOpened(), "isOpened()");
 
-      int size = 1;
+		int size = 1;
 
-      byte[] byteBuffer = new byte[size];
+		byte[] byteBuffer = new byte[size];
 
-      int returnCode = 0;
+		int returnCode = 0;
 
-      try {
-         int bytesRead = 0;
+		try {
+			int bytesRead = 0;
 
-         while (bytesRead < size) {
-            returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
+			while (bytesRead < size) {
+				returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
 
-            if (returnCode == -1) {
-               throw new EndOfMediumException(getCurrentPosition(), size, bytesRead, ByteBuffer.allocate(0));
-            }
+				if (returnCode == -1) {
+					throw new EndOfMediumException(getCurrentPosition(), size, bytesRead, ByteBuffer.allocate(0));
+				}
 
-            bytesRead += returnCode;
-         }
-      } catch (EndOfMediumException e) {
-         return true;
-      } catch (IOException e) {
-         throw new MediumAccessException("IOException when trying to determine end of medium", e);
-      }
+				bytesRead += returnCode;
+			}
+		} catch (EndOfMediumException e) {
+			return true;
+		} catch (IOException e) {
+			throw new MediumAccessException("IOException when trying to determine end of medium", e);
+		}
 
-      finally {
-         try {
-            // Only if previously a byte has been read, i.e. EOM was not reached: Unread it
-            if (returnCode != -1) {
-               inputStream.unread(byteBuffer[0]);
-            }
-         } catch (IOException e) {
-            throw new MediumAccessException("IOException when calling PushbackInputStream.unread()", e);
-         }
-      }
+		finally {
+			try {
+				// Only if previously a byte has been read, i.e. EOM was not reached: Unread it
+				if (returnCode != -1) {
+					inputStream.unread(byteBuffer[0]);
+				}
+			} catch (IOException e) {
+				throw new MediumAccessException("IOException when calling PushbackInputStream.unread()", e);
+			}
+		}
 
-      return false;
-   }
+		return false;
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificOpen()
-    */
-   @Override
-   protected void mediumSpecificOpen() throws IOException {
-      inputStream = new PushbackInputStream(getMedium().getWrappedMedium());
-   }
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificClose()
+	 */
+	@Override
+	protected void mediumSpecificClose() throws IOException {
+		inputStream.close();
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificClose()
-    */
-   @Override
-   protected void mediumSpecificClose() throws IOException {
-      inputStream.close();
-   }
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificOpen()
+	 */
+	@Override
+	protected void mediumSpecificOpen() throws IOException {
+		inputStream = new PushbackInputStream(getMedium().getWrappedMedium());
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(int)
-    */
-   @Override
-   protected ByteBuffer mediumSpecificRead(int numberOfBytes) throws IOException, EndOfMediumException {
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificRead(int)
+	 */
+	@Override
+	protected ByteBuffer mediumSpecificRead(int numberOfBytes) throws IOException, EndOfMediumException {
 
-      ByteBuffer buffer = ByteBuffer.allocate(numberOfBytes);
+		ByteBuffer buffer = ByteBuffer.allocate(numberOfBytes);
 
-      buffer.mark();
+		buffer.mark();
 
-      try {
-         int bytesRead = 0;
-         int size = buffer.remaining();
-         int initialPosition = buffer.position();
+		try {
+			int bytesRead = 0;
+			int size = buffer.remaining();
+			int initialPosition = buffer.position();
 
-         byte[] byteBuffer = new byte[size];
+			byte[] byteBuffer = new byte[size];
 
-         MediumOffset currentPosition = getCurrentPosition();
-         while (bytesRead < size) {
-            int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
+			MediumOffset currentPosition = getCurrentPosition();
+			while (bytesRead < size) {
+				int returnCode = inputStream.read(byteBuffer, bytesRead, size - bytesRead);
 
-            if (returnCode == -1) {
-               buffer.limit(initialPosition + bytesRead);
-               updateCurrentPosition(currentPosition.advance(bytesRead));
-               throw new EndOfMediumException(currentPosition, size, bytesRead, buffer);
-            }
+				if (returnCode == -1) {
+					buffer.limit(initialPosition + bytesRead);
+					updateCurrentPosition(currentPosition.advance(bytesRead));
+					throw new EndOfMediumException(currentPosition, size, bytesRead, buffer);
+				}
 
-            bytesRead += returnCode;
+				bytesRead += returnCode;
 
-            buffer.put(byteBuffer, buffer.position(), bytesRead);
-         }
+				buffer.put(byteBuffer, buffer.position(), bytesRead);
+			}
 
-         updateCurrentPosition(currentPosition.advance(bytesRead));
+			updateCurrentPosition(currentPosition.advance(bytesRead));
 
-         return buffer;
-      } finally {
-         buffer.reset();
-      }
-   }
+			return buffer;
+		} finally {
+			buffer.reset();
+		}
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(ByteBuffer)
-    */
-   @Override
-   protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
-      // do nothing as this is a read-only class
-   }
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.MediumOffset)
+	 */
+	@Override
+	protected void mediumSpecificSetCurrentPosition(MediumOffset position) throws IOException {
+		// Does nothing
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificTruncate()
-    */
-   @Override
-   protected void mediumSpecificTruncate() {
-      // Not implemented
-   }
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificTruncate()
+	 */
+	@Override
+	protected void mediumSpecificTruncate() {
+		// Not implemented
+	}
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificSetCurrentPosition(com.github.jmeta.library.media.api.types.MediumOffset)
-    */
-   @Override
-   protected void mediumSpecificSetCurrentPosition(MediumOffset position) throws IOException {
-      // Does nothing
-   }
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessor#mediumSpecificWrite(ByteBuffer)
+	 */
+	@Override
+	protected void mediumSpecificWrite(ByteBuffer buffer) throws IOException {
+		// do nothing as this is a read-only class
+	}
 }

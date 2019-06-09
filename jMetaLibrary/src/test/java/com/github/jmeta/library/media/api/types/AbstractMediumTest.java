@@ -12,131 +12,130 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * {@link AbstractMediumTest} tests the {@link Medium} interface. It basically only checks that the constructors are
- * passing input parameters properly.
- * 
- * @param <T>
- *           The type of wrapped medium.
+ * {@link AbstractMediumTest} tests the {@link Medium} interface. It basically
+ * only checks that the constructors are passing input parameters properly.
+ *
+ * @param <T> The type of wrapped medium.
  */
 public abstract class AbstractMediumTest<T> {
 
-   /**
-    * Tests {@link Medium#toString}.
-    */
-   @Test
-   public void toString_doesNotReturnNull_forMedium() {
+	/**
+	 * Tests {@link Medium#getCurrentLength}.
+	 */
+	@Test
+	public void getCurrentLength_returnsExpectedValue_forMedium() {
 
-      Medium<T> medium = getMediumToTest();
+		Medium<T> medium = getMediumToTest();
+		long expectedLength = getExpectedLength();
 
-      Assert.assertNotNull(medium.toString());
-   }
+		Assert.assertEquals(expectedLength, medium.getCurrentLength());
+	}
 
-   /**
-    * Tests {@link Medium#isReadOnly}.
-    */
-   @Test
-   public void isReadOnly_returnsExpectedValue_forMedium() {
+	/**
+	 * Returns the expected external name.
+	 * 
+	 * @return the expected external name.
+	 */
+	protected abstract String getExpectedExternalName();
 
-      Medium<T> medium = getMediumToTest();
-      boolean expectedReadOnly = isExpectedAsReadOnly();
+	/**
+	 * Returns the expected {@link Medium} length.
+	 * 
+	 * @return the expected {@link Medium} length.
+	 */
+	protected abstract long getExpectedLength();
 
-      Assert.assertEquals(expectedReadOnly, medium.isReadOnly());
-   }
+	/**
+	 * Returns the expected wrapped medium.
+	 * 
+	 * @return the expected wrapped medium.
+	 */
+	protected abstract T getExpectedWrappedMedium();
 
-   /**
-    * Tests {@link Medium#isRandomAccess}.
-    */
-   @Test
-   public void isRandomAccess_returnsExpectedValue_forMedium() {
+	/**
+	 * Tests {@link Medium#getName()}.
+	 */
+	@Test
+	public void getExternalName_returnsExpectedValue_forMedium() {
 
-      Medium<T> medium = getMediumToTest();
-      boolean expectedRandomAccess = isExpectedAsRandomAccess();
+		Medium<T> medium = getMediumToTest();
+		String expectedExternalName = getExpectedExternalName();
 
-      Assert.assertEquals(expectedRandomAccess, medium.isRandomAccess());
-   }
+		Assert.assertEquals(expectedExternalName, medium.getName());
+	}
 
-   /**
-    * Tests {@link Medium#getName()}.
-    */
-   @Test
-   public void getExternalName_returnsExpectedValue_forMedium() {
+	/**
+	 * Returns the {@link Medium} to test.
+	 * 
+	 * @return the {@link Medium} to test.
+	 */
+	protected abstract Medium<T> getMediumToTest();
 
-      Medium<T> medium = getMediumToTest();
-      String expectedExternalName = getExpectedExternalName();
+	/**
+	 * Tests {@link Medium#getWrappedMedium}.
+	 */
+	@Test
+	public void getWrappedMedium_returnsExpectedValue_forMedium() {
 
-      Assert.assertEquals(expectedExternalName, medium.getName());
-   }
+		Medium<T> medium = getMediumToTest();
+		T expectedWrappedMedium = getExpectedWrappedMedium();
 
-   /**
-    * Tests {@link Medium#getCurrentLength}.
-    */
-   @Test
-   public void getCurrentLength_returnsExpectedValue_forMedium() {
+		Assert.assertEquals(expectedWrappedMedium, medium.getWrappedMedium());
+	}
 
-      Medium<T> medium = getMediumToTest();
-      long expectedLength = getExpectedLength();
+	/**
+	 * Returns whether the {@link Medium} is expected to be existing or not.
+	 * 
+	 * @return whether the {@link Medium} is expected to be existing or not.
+	 */
+	protected abstract boolean isExpectedAsExisting();
 
-      Assert.assertEquals(expectedLength, medium.getCurrentLength());
-   }
+	/**
+	 * Returns whether the {@link Medium} is expected to be random-access or not.
+	 * 
+	 * @return whether the {@link Medium} is expected to be random-access or not.
+	 */
+	protected abstract boolean isExpectedAsRandomAccess();
 
-   /**
-    * Tests {@link Medium#getWrappedMedium}.
-    */
-   @Test
-   public void getWrappedMedium_returnsExpectedValue_forMedium() {
+	/**
+	 * Returns whether the {@link Medium} is expected to be read-only or not.
+	 * 
+	 * @return whether the {@link Medium} is expected to be read-only or not.
+	 */
+	protected abstract boolean isExpectedAsReadOnly();
 
-      Medium<T> medium = getMediumToTest();
-      T expectedWrappedMedium = getExpectedWrappedMedium();
+	/**
+	 * Tests {@link Medium#isRandomAccess}.
+	 */
+	@Test
+	public void isRandomAccess_returnsExpectedValue_forMedium() {
 
-      Assert.assertEquals(expectedWrappedMedium, medium.getWrappedMedium());
-   }
+		Medium<T> medium = getMediumToTest();
+		boolean expectedRandomAccess = isExpectedAsRandomAccess();
 
-   /**
-    * Returns the {@link Medium} to test.
-    * 
-    * @return the {@link Medium} to test.
-    */
-   protected abstract Medium<T> getMediumToTest();
+		Assert.assertEquals(expectedRandomAccess, medium.isRandomAccess());
+	}
 
-   /**
-    * Returns whether the {@link Medium} is expected to be read-only or not.
-    * 
-    * @return whether the {@link Medium} is expected to be read-only or not.
-    */
-   protected abstract boolean isExpectedAsReadOnly();
+	/**
+	 * Tests {@link Medium#isReadOnly}.
+	 */
+	@Test
+	public void isReadOnly_returnsExpectedValue_forMedium() {
 
-   /**
-    * Returns whether the {@link Medium} is expected to be random-access or not.
-    * 
-    * @return whether the {@link Medium} is expected to be random-access or not.
-    */
-   protected abstract boolean isExpectedAsRandomAccess();
+		Medium<T> medium = getMediumToTest();
+		boolean expectedReadOnly = isExpectedAsReadOnly();
 
-   /**
-    * Returns the expected wrapped medium.
-    * 
-    * @return the expected wrapped medium.
-    */
-   protected abstract T getExpectedWrappedMedium();
+		Assert.assertEquals(expectedReadOnly, medium.isReadOnly());
+	}
 
-   /**
-    * Returns the expected external name.
-    * 
-    * @return the expected external name.
-    */
-   protected abstract String getExpectedExternalName();
+	/**
+	 * Tests {@link Medium#toString}.
+	 */
+	@Test
+	public void toString_doesNotReturnNull_forMedium() {
 
-   /**
-    * Returns whether the {@link Medium} is expected to be existing or not.
-    * 
-    * @return whether the {@link Medium} is expected to be existing or not.
-    */
-   protected abstract boolean isExpectedAsExisting();
+		Medium<T> medium = getMediumToTest();
 
-   /**
-    * Returns the expected {@link Medium} length.
-    * 
-    * @return the expected {@link Medium} length.
-    */
-   protected abstract long getExpectedLength();
+		Assert.assertNotNull(medium.toString());
+	}
 }

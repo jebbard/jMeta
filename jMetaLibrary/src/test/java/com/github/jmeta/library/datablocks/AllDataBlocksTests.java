@@ -15,10 +15,11 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.github.jmeta.library.datablocks.impl.FieldTerminationFinderTest;
 
 /**
- * {@link AllDataBlocksTests} is used for running all test cases of the extension management component.
+ * {@link AllDataBlocksTests} is used for running all test cases of the
+ * extension management component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ FieldTerminationFinderTest.class, })
 public class AllDataBlocksTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

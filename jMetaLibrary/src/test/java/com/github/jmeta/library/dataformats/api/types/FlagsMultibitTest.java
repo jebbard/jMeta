@@ -24,210 +24,213 @@ import org.junit.Test;
  */
 public class FlagsMultibitTest extends FlagsTest {
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.FlagsTest#getLittleEndianFlagSpecification()
-    */
-   @Override
-   protected FlagSpecification getLittleEndianFlagSpecification() {
-      return new FlagSpecification(FLAG_DESCRIPTIONS, BYTE_LENGTH, ByteOrder.LITTLE_ENDIAN, new byte[BYTE_LENGTH]);
-   }
+	private static final int BYTE_LENGTH = 4;
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.FlagsTest#getBigEndianFlagSpecification()
-    */
-   @Override
-   protected FlagSpecification getBigEndianFlagSpecification() {
-      return new FlagSpecification(FLAG_DESCRIPTIONS, BYTE_LENGTH, ByteOrder.BIG_ENDIAN, new byte[BYTE_LENGTH]);
-   }
+	private static List<FlagDescription> FLAG_DESCRIPTIONS = new ArrayList<>();
 
-   /**
-    * Tests {@link Flags#getFlagIntegerValue(String)}.
-    */
-   @Test
-   public void test_getFlagIntValue() {
-      Flags flagsLE = new Flags(getLittleEndianFlagSpecification());
+	static {
+		FlagsMultibitTest.FLAG_DESCRIPTIONS.add(new FlagDescription("SingleBitty1", new BitAddress(0, 0), "", 1, null));
+		FlagsMultibitTest.FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty1", new BitAddress(0, 1), "", 2, null));
+		FlagsMultibitTest.FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty2", new BitAddress(0, 3), "", 3, null));
+		FlagsMultibitTest.FLAG_DESCRIPTIONS.add(new FlagDescription("SingleBitty2", new BitAddress(0, 6), "", 1, null));
+		FlagsMultibitTest.FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty3", new BitAddress(0, 7), "", 5, null));
+		FlagsMultibitTest.FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty4", new BitAddress(1, 4), "", 14, null));
+		FlagsMultibitTest.FLAG_DESCRIPTIONS.add(new FlagDescription("SingleBitty3", new BitAddress(3, 2), "", 1, null));
+	}
 
-      checkGetFlagIntValue(flagsLE, EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN);
+	private static Map<Integer, List<Integer>> EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN = new HashMap<>();
 
-      Flags flagsBE = new Flags(getBigEndianFlagSpecification());
+	static {
+		List<Integer> expectedFlagValues0 = new ArrayList<>();
 
-      checkGetFlagIntValue(flagsBE, EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN);
-   }
+		for (int i = 0; i < FlagsMultibitTest.FLAG_DESCRIPTIONS.size(); ++i) {
+			expectedFlagValues0.add(0);
+		}
 
-   /**
-    * Checks the method {@link Flags#getFlagIntegerValue(String)}.
-    *
-    * @param flags
-    *           The flags to test.
-    * @param expectedValuesMap
-    *           The map of expected values.
-    */
-   private void checkGetFlagIntValue(Flags flags, Map<Integer, List<Integer>> expectedValuesMap) {
-      for (Iterator<Integer> iterator = expectedValuesMap.keySet().iterator(); iterator.hasNext();) {
-         int intValueOfWholeFlags = iterator.next();
-         List<Integer> expectedFlagValues = expectedValuesMap.get(intValueOfWholeFlags);
+		FlagsMultibitTest.EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(0, expectedFlagValues0);
 
-         flags.fromInt(intValueOfWholeFlags);
+		List<Integer> expectedFlagValues4456789 = new ArrayList<>();
 
-         for (int i = 0; i < expectedFlagValues.size(); ++i) {
-            int expectedFlagIntValue = expectedFlagValues.get(i);
+		/*
+		 * Binary representation of 4456789: 00000000010001000000000101010101 || | || |
+		 * | 76 5 43 2 1 System.out.println(Integer.toBinaryString(4456789));
+		 */
 
-            int actualFlagIntValue = flags.getFlagIntegerValue(FLAG_DESCRIPTIONS.get(i).getFlagName());
+		expectedFlagValues4456789.add(1);
+		expectedFlagValues4456789.add(2);
+		expectedFlagValues4456789.add(2);
+		expectedFlagValues4456789.add(1);
+		expectedFlagValues4456789.add(2);
+		expectedFlagValues4456789.add(1088);
+		expectedFlagValues4456789.add(0);
 
-            Assert.assertEquals(expectedFlagIntValue, actualFlagIntValue);
-         }
+		FlagsMultibitTest.EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(4456789, expectedFlagValues4456789);
 
-         Assert.assertEquals(intValueOfWholeFlags, flags.asInt());
-      }
-   }
+		List<Integer> expectedFlagValues1178869702 = new ArrayList<>();
 
-   private static final int BYTE_LENGTH = 4;
+		/*
+		 * Binary representation of 1178869702: 01000110010001000001111111000110 || | ||
+		 * | | 76 5 43 2 1 System.out.println(Integer.toBinaryString(1178869702));
+		 */
 
-   private static List<FlagDescription> FLAG_DESCRIPTIONS = new ArrayList<>();
+		expectedFlagValues1178869702.add(0);
+		expectedFlagValues1178869702.add(3);
+		expectedFlagValues1178869702.add(0);
+		expectedFlagValues1178869702.add(1);
+		expectedFlagValues1178869702.add(31);
+		expectedFlagValues1178869702.add(1 + 64 + 1024 + 8192);
+		expectedFlagValues1178869702.add(1);
 
-   static {
-      FLAG_DESCRIPTIONS.add(new FlagDescription("SingleBitty1", new BitAddress(0, 0), "", 1, null));
-      FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty1", new BitAddress(0, 1), "", 2, null));
-      FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty2", new BitAddress(0, 3), "", 3, null));
-      FLAG_DESCRIPTIONS.add(new FlagDescription("SingleBitty2", new BitAddress(0, 6), "", 1, null));
-      FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty3", new BitAddress(0, 7), "", 5, null));
-      FLAG_DESCRIPTIONS.add(new FlagDescription("MultiBitty4", new BitAddress(1, 4), "", 14, null));
-      FLAG_DESCRIPTIONS.add(new FlagDescription("SingleBitty3", new BitAddress(3, 2), "", 1, null));
-   }
+		FlagsMultibitTest.EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(1178869702, expectedFlagValues1178869702);
 
-   private static Map<Integer, List<Integer>> EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN = new HashMap<>();
+		List<Integer> expectedFlagValuesMinus1 = new ArrayList<>();
 
-   static {
-      List<Integer> expectedFlagValues0 = new ArrayList<>();
+		/*
+		 * Binary representation of -1: 11111111111111111111111111111111 || | || | | 76
+		 * 5 43 2 1 System.out.println(Integer.toBinaryString(-1));
+		 */
 
-      for (int i = 0; i < FLAG_DESCRIPTIONS.size(); ++i)
-         expectedFlagValues0.add(0);
+		expectedFlagValuesMinus1.add(1);
+		expectedFlagValuesMinus1.add(3);
+		expectedFlagValuesMinus1.add(7);
+		expectedFlagValuesMinus1.add(1);
+		expectedFlagValuesMinus1.add(31);
+		expectedFlagValuesMinus1.add(16383);
+		expectedFlagValuesMinus1.add(1);
 
-      EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(0, expectedFlagValues0);
+		FlagsMultibitTest.EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(-1, expectedFlagValuesMinus1);
+	}
 
-      List<Integer> expectedFlagValues4456789 = new ArrayList<>();
+	private static Map<Integer, List<Integer>> EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN = new HashMap<>();
 
-      /*
-       * Binary representation of 4456789: 00000000010001000000000101010101 || | || | | 76 5 43 2 1
-       * System.out.println(Integer.toBinaryString(4456789));
-       */
+	static {
+		// TODO test with big endian
+		// List<Integer> expectedFlagValues0 = new ArrayList<Integer>();
+		//
+		// for (int i = 0; i < FLAG_DESCRIPTIONS.size(); ++i)
+		// expectedFlagValues0.add(0);
+		//
+		// EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(0, expectedFlagValues0);
+		//
+		// List<Integer> expectedFlagValues4456789 = new ArrayList<Integer>();
+		//
+		// /* Binary representation of 4456789:
+		// 00000000010001000000000101010101
+		// || | || | |
+		// 76 5 43 2 1
+		//
+		// System.out.println(Integer.toBinaryString(4456789));
+		// */
+		//
+		// expectedFlagValues4456789.add(1);
+		// expectedFlagValues4456789.add(2);
+		// expectedFlagValues4456789.add(2);
+		// expectedFlagValues4456789.add(1);
+		// expectedFlagValues4456789.add(2);
+		// expectedFlagValues4456789.add(1088);
+		// expectedFlagValues4456789.add(0);
+		//
+		// EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(4456789, expectedFlagValues4456789);
+		//
+		// List<Integer> expectedFlagValues1178869702 = new ArrayList<Integer>();
+		//
+		// /* Binary representation of 1178869702:
+		// 01000110010001000001111111000110
+		//
+		// || | || | |
+		// 76 5 43 2 1
+		//
+		// System.out.println(Integer.toBinaryString(1178869702));
+		// */
+		//
+		// expectedFlagValues1178869702.add(0);
+		// expectedFlagValues1178869702.add(3);
+		// expectedFlagValues1178869702.add(0);
+		// expectedFlagValues1178869702.add(1);
+		// expectedFlagValues1178869702.add(31);
+		// expectedFlagValues1178869702.add(1+64+1024+8192);
+		// expectedFlagValues1178869702.add(1);
+		//
+		// EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(1178869702,
+		// expectedFlagValues1178869702);
+		//
+		// List<Integer> expectedFlagValuesMinus1 = new ArrayList<Integer>();
+		//
+		// /* Binary representation of -1:
+		// 11111111111111111111111111111111
+		//
+		// || | || | |
+		// 76 5 43 2 1
+		//
+		// System.out.println(Integer.toBinaryString(-1));
+		// */
+		//
+		// expectedFlagValuesMinus1.add(1);
+		// expectedFlagValuesMinus1.add(3);
+		// expectedFlagValuesMinus1.add(7);
+		// expectedFlagValuesMinus1.add(1);
+		// expectedFlagValuesMinus1.add(31);
+		// expectedFlagValuesMinus1.add(16383);
+		// expectedFlagValuesMinus1.add(1);
+		//
+		// EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(-1, expectedFlagValuesMinus1);
+	}
 
-      expectedFlagValues4456789.add(1);
-      expectedFlagValues4456789.add(2);
-      expectedFlagValues4456789.add(2);
-      expectedFlagValues4456789.add(1);
-      expectedFlagValues4456789.add(2);
-      expectedFlagValues4456789.add(1088);
-      expectedFlagValues4456789.add(0);
+	/**
+	 * Checks the method {@link Flags#getFlagIntegerValue(String)}.
+	 *
+	 * @param flags             The flags to test.
+	 * @param expectedValuesMap The map of expected values.
+	 */
+	private void checkGetFlagIntValue(Flags flags, Map<Integer, List<Integer>> expectedValuesMap) {
+		for (Iterator<Integer> iterator = expectedValuesMap.keySet().iterator(); iterator.hasNext();) {
+			int intValueOfWholeFlags = iterator.next();
+			List<Integer> expectedFlagValues = expectedValuesMap.get(intValueOfWholeFlags);
 
-      EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(4456789, expectedFlagValues4456789);
+			flags.fromInt(intValueOfWholeFlags);
 
-      List<Integer> expectedFlagValues1178869702 = new ArrayList<>();
+			for (int i = 0; i < expectedFlagValues.size(); ++i) {
+				int expectedFlagIntValue = expectedFlagValues.get(i);
 
-      /*
-       * Binary representation of 1178869702: 01000110010001000001111111000110 || | || | | 76 5 43 2 1
-       * System.out.println(Integer.toBinaryString(1178869702));
-       */
+				int actualFlagIntValue = flags
+					.getFlagIntegerValue(FlagsMultibitTest.FLAG_DESCRIPTIONS.get(i).getFlagName());
 
-      expectedFlagValues1178869702.add(0);
-      expectedFlagValues1178869702.add(3);
-      expectedFlagValues1178869702.add(0);
-      expectedFlagValues1178869702.add(1);
-      expectedFlagValues1178869702.add(31);
-      expectedFlagValues1178869702.add(1 + 64 + 1024 + 8192);
-      expectedFlagValues1178869702.add(1);
+				Assert.assertEquals(expectedFlagIntValue, actualFlagIntValue);
+			}
 
-      EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(1178869702, expectedFlagValues1178869702);
+			Assert.assertEquals(intValueOfWholeFlags, flags.asInt());
+		}
+	}
 
-      List<Integer> expectedFlagValuesMinus1 = new ArrayList<>();
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.FlagsTest#getBigEndianFlagSpecification()
+	 */
+	@Override
+	protected FlagSpecification getBigEndianFlagSpecification() {
+		return new FlagSpecification(FlagsMultibitTest.FLAG_DESCRIPTIONS, FlagsMultibitTest.BYTE_LENGTH,
+			ByteOrder.BIG_ENDIAN, new byte[FlagsMultibitTest.BYTE_LENGTH]);
+	}
 
-      /*
-       * Binary representation of -1: 11111111111111111111111111111111 || | || | | 76 5 43 2 1
-       * System.out.println(Integer.toBinaryString(-1));
-       */
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.FlagsTest#getLittleEndianFlagSpecification()
+	 */
+	@Override
+	protected FlagSpecification getLittleEndianFlagSpecification() {
+		return new FlagSpecification(FlagsMultibitTest.FLAG_DESCRIPTIONS, FlagsMultibitTest.BYTE_LENGTH,
+			ByteOrder.LITTLE_ENDIAN, new byte[FlagsMultibitTest.BYTE_LENGTH]);
+	}
 
-      expectedFlagValuesMinus1.add(1);
-      expectedFlagValuesMinus1.add(3);
-      expectedFlagValuesMinus1.add(7);
-      expectedFlagValuesMinus1.add(1);
-      expectedFlagValuesMinus1.add(31);
-      expectedFlagValuesMinus1.add(16383);
-      expectedFlagValuesMinus1.add(1);
+	/**
+	 * Tests {@link Flags#getFlagIntegerValue(String)}.
+	 */
+	@Test
+	public void test_getFlagIntValue() {
+		Flags flagsLE = new Flags(getLittleEndianFlagSpecification());
 
-      EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN.put(-1, expectedFlagValuesMinus1);
-   }
+		checkGetFlagIntValue(flagsLE, FlagsMultibitTest.EXPECTED_FLAG_INT_VALUES_LITTLE_ENDIAN);
 
-   private static Map<Integer, List<Integer>> EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN = new HashMap<>();
+		Flags flagsBE = new Flags(getBigEndianFlagSpecification());
 
-   static {
-      // TODO test with big endian
-      // List<Integer> expectedFlagValues0 = new ArrayList<Integer>();
-      //
-      // for (int i = 0; i < FLAG_DESCRIPTIONS.size(); ++i)
-      // expectedFlagValues0.add(0);
-      //
-      // EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(0, expectedFlagValues0);
-      //
-      // List<Integer> expectedFlagValues4456789 = new ArrayList<Integer>();
-      //
-      // /* Binary representation of 4456789:
-      // 00000000010001000000000101010101
-      // || | || | |
-      // 76 5 43 2 1
-      //
-      // System.out.println(Integer.toBinaryString(4456789));
-      // */
-      //
-      // expectedFlagValues4456789.add(1);
-      // expectedFlagValues4456789.add(2);
-      // expectedFlagValues4456789.add(2);
-      // expectedFlagValues4456789.add(1);
-      // expectedFlagValues4456789.add(2);
-      // expectedFlagValues4456789.add(1088);
-      // expectedFlagValues4456789.add(0);
-      //
-      // EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(4456789, expectedFlagValues4456789);
-      //
-      // List<Integer> expectedFlagValues1178869702 = new ArrayList<Integer>();
-      //
-      // /* Binary representation of 1178869702:
-      // 01000110010001000001111111000110
-      //
-      // || | || | |
-      // 76 5 43 2 1
-      //
-      // System.out.println(Integer.toBinaryString(1178869702));
-      // */
-      //
-      // expectedFlagValues1178869702.add(0);
-      // expectedFlagValues1178869702.add(3);
-      // expectedFlagValues1178869702.add(0);
-      // expectedFlagValues1178869702.add(1);
-      // expectedFlagValues1178869702.add(31);
-      // expectedFlagValues1178869702.add(1+64+1024+8192);
-      // expectedFlagValues1178869702.add(1);
-      //
-      // EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(1178869702, expectedFlagValues1178869702);
-      //
-      // List<Integer> expectedFlagValuesMinus1 = new ArrayList<Integer>();
-      //
-      // /* Binary representation of -1:
-      // 11111111111111111111111111111111
-      //
-      // || | || | |
-      // 76 5 43 2 1
-      //
-      // System.out.println(Integer.toBinaryString(-1));
-      // */
-      //
-      // expectedFlagValuesMinus1.add(1);
-      // expectedFlagValuesMinus1.add(3);
-      // expectedFlagValuesMinus1.add(7);
-      // expectedFlagValuesMinus1.add(1);
-      // expectedFlagValuesMinus1.add(31);
-      // expectedFlagValuesMinus1.add(16383);
-      // expectedFlagValuesMinus1.add(1);
-      //
-      // EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN.put(-1, expectedFlagValuesMinus1);
-   }
+		checkGetFlagIntValue(flagsBE, FlagsMultibitTest.EXPECTED_FLAG_INT_VALUES_BIG_ENDIAN);
+	}
 }

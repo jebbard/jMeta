@@ -16,84 +16,93 @@ import com.github.jmeta.library.media.api.types.MediumActionType;
 import com.github.jmeta.library.media.api.types.MediumRegion;
 
 /**
- * {@link MediumChangeManagerTestData} represents both test input data as well as test expectations for checking
- * {@link MediumChangeManager}s schedule methods. Every {@link MediumChangeManagerTestData} instance is associated with
- * one newly created {@link MediumAction} instance.
+ * {@link MediumChangeManagerTestData} represents both test input data as well
+ * as test expectations for checking {@link MediumChangeManager}s schedule
+ * methods. Every {@link MediumChangeManagerTestData} instance is associated
+ * with one newly created {@link MediumAction} instance.
  */
 public class MediumChangeManagerTestData {
 
-   private final ByteBuffer actionBytesToUse;
+	private final ByteBuffer actionBytesToUse;
 
-   private final MediumRegion regionToUse;
+	private final MediumRegion regionToUse;
 
-   private final MediumActionType typeToUse;
+	private final MediumActionType typeToUse;
 
-   /**
-    * Creates a new {@link MediumChangeManagerTestData}.
-    * 
-    * @param testling
-    *           The {@link MediumChangeManager} to test.
-    * @param typeToUse
-    *           Represents the {@link MediumActionType} which is used to determine which schedule method to call from
-    *           {@link MediumChangeManager}. Furthermore, it represents the {@link MediumActionType} expected for the
-    *           new {@link MediumAction} returned by the checked schedule method.
-    * @param regionToUse
-    *           Represents the {@link MediumRegion} which is used when calling the schedule method of
-    *           {@link MediumChangeManager}. Furthermore, it represents the {@link MediumRegion} expected for the new
-    *           {@link MediumAction} returned by the checked schedule method.
-    * @param actionBytesToUse
-    *           Represents the action bytes which are used when calling the schedule method of
-    *           {@link MediumChangeManager}. Furthermore, it represents the action bytes expected for the new
-    *           {@link MediumAction} returned by the checked schedule method.
-    */
-   public MediumChangeManagerTestData(MediumChangeManager testling, MediumActionType typeToUse,
-      MediumRegion regionToUse, ByteBuffer actionBytesToUse) {
-      this.actionBytesToUse = actionBytesToUse;
-      this.regionToUse = regionToUse;
-      this.typeToUse = typeToUse;
-   }
+	/**
+	 * Creates a new {@link MediumChangeManagerTestData}.
+	 * 
+	 * @param testling         The {@link MediumChangeManager} to test.
+	 * @param typeToUse        Represents the {@link MediumActionType} which is used
+	 *                         to determine which schedule method to call from
+	 *                         {@link MediumChangeManager}. Furthermore, it
+	 *                         represents the {@link MediumActionType} expected for
+	 *                         the new {@link MediumAction} returned by the checked
+	 *                         schedule method.
+	 * @param regionToUse      Represents the {@link MediumRegion} which is used
+	 *                         when calling the schedule method of
+	 *                         {@link MediumChangeManager}. Furthermore, it
+	 *                         represents the {@link MediumRegion} expected for the
+	 *                         new {@link MediumAction} returned by the checked
+	 *                         schedule method.
+	 * @param actionBytesToUse Represents the action bytes which are used when
+	 *                         calling the schedule method of
+	 *                         {@link MediumChangeManager}. Furthermore, it
+	 *                         represents the action bytes expected for the new
+	 *                         {@link MediumAction} returned by the checked schedule
+	 *                         method.
+	 */
+	public MediumChangeManagerTestData(MediumChangeManager testling, MediumActionType typeToUse,
+		MediumRegion regionToUse, ByteBuffer actionBytesToUse) {
+		this.actionBytesToUse = actionBytesToUse;
+		this.regionToUse = regionToUse;
+		this.typeToUse = typeToUse;
+	}
 
-   /**
-    * Represents the {@link MediumActionType} which is used to determine which schedule method to call from
-    * {@link MediumChangeManager}. Furthermore, it represents the {@link MediumActionType} expected for the new
-    * {@link MediumAction} returned by the checked schedule method.
-    * 
-    * @return see method description
-    */
-   public MediumActionType getTypeToUse() {
+	/**
+	 * Represents the action bytes which are used when calling the schedule method
+	 * of {@link MediumChangeManager}. Furthermore, it represents the action bytes
+	 * expected for the new {@link MediumAction} returned by the checked schedule
+	 * method.
+	 * 
+	 * @return see method description
+	 */
+	public ByteBuffer getActionBytesToUse() {
+		return actionBytesToUse;
+	}
 
-      return typeToUse;
-   }
+	/**
+	 * Represents the {@link MediumRegion} which is used when calling the schedule
+	 * method of {@link MediumChangeManager}. Furthermore, it represents the
+	 * {@link MediumRegion} expected for the new {@link MediumAction} returned by
+	 * the checked schedule method.
+	 * 
+	 * @return see method description
+	 */
+	public MediumRegion getRegionToUse() {
 
-   /**
-    * Represents the {@link MediumRegion} which is used when calling the schedule method of {@link MediumChangeManager}.
-    * Furthermore, it represents the {@link MediumRegion} expected for the new {@link MediumAction} returned by the
-    * checked schedule method.
-    * 
-    * @return see method description
-    */
-   public MediumRegion getRegionToUse() {
+		return regionToUse;
+	}
 
-      return regionToUse;
-   }
+	/**
+	 * Represents the {@link MediumActionType} which is used to determine which
+	 * schedule method to call from {@link MediumChangeManager}. Furthermore, it
+	 * represents the {@link MediumActionType} expected for the new
+	 * {@link MediumAction} returned by the checked schedule method.
+	 * 
+	 * @return see method description
+	 */
+	public MediumActionType getTypeToUse() {
 
-   /**
-    * Represents the action bytes which are used when calling the schedule method of {@link MediumChangeManager}.
-    * Furthermore, it represents the action bytes expected for the new {@link MediumAction} returned by the checked
-    * schedule method.
-    * 
-    * @return see method description
-    */
-   public ByteBuffer getActionBytesToUse() {
-      return actionBytesToUse;
-   }
+		return typeToUse;
+	}
 
-   /**
-    * @see java.lang.Object#toString()
-    */
-   @Override
-   public String toString() {
-      return "MediumChangeManagerTestData [typeToUse=" + typeToUse + ", regionToUse=" + regionToUse
-         + ", actionBytesToUse=" + actionBytesToUse + "]";
-   }
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "MediumChangeManagerTestData [typeToUse=" + typeToUse + ", regionToUse=" + regionToUse
+			+ ", actionBytesToUse=" + actionBytesToUse + "]";
+	}
 }

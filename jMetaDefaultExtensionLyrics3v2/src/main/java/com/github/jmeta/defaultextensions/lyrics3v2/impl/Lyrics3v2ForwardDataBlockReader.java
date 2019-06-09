@@ -26,36 +26,35 @@ import com.github.jmeta.library.media.api.types.MediumOffset;
  */
 public class Lyrics3v2ForwardDataBlockReader extends ForwardDataBlockReader {
 
-   /**
-    * Creates a new {@link Lyrics3v2ForwardDataBlockReader}.
-    *
-    * @param spec
-    * @param mediumStore
-    *           TODO
-    */
-   public Lyrics3v2ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
-      DataBlockEventBus eventBus) {
-      super(spec, mediumStore, eventBus);
-   }
+	/**
+	 * Creates a new {@link Lyrics3v2ForwardDataBlockReader}.
+	 *
+	 * @param spec
+	 * @param mediumStore TODO
+	 */
+	public Lyrics3v2ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+		DataBlockEventBus eventBus) {
+		super(spec, mediumStore, eventBus);
+	}
 
-   @Override
-   public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount) {
+	@Override
+	public boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
+		long remainingDirectParentByteCount) {
 
-      if (parent == null) {
-         return super.hasContainerWithId(reference, id, parent, remainingDirectParentByteCount);
-      }
+		if (parent == null) {
+			return super.hasContainerWithId(reference, id, parent, remainingDirectParentByteCount);
+		}
 
-      MagicKey lyrics3v2FooterMagicKey = getSpecification().getDataBlockDescription(Lyrics3v2Extension.REF_TAG.getId())
-         .getFooterMagicKeys().get(0);
+		MagicKey lyrics3v2FooterMagicKey = getSpecification()
+			.getDataBlockDescription(Lyrics3v2Extension.REF_TAG.getId()).getFooterMagicKeys().get(0);
 
-      final ByteBuffer readBytes = readBytes(reference.advance(6), lyrics3v2FooterMagicKey.getByteLength());
+		final ByteBuffer readBytes = readBytes(reference.advance(6), lyrics3v2FooterMagicKey.getByteLength());
 
-      if (lyrics3v2FooterMagicKey.isPresentIn(readBytes)) {
-         return false;
-      }
+		if (lyrics3v2FooterMagicKey.isPresentIn(readBytes)) {
+			return false;
+		}
 
-      return true;
-   }
+		return true;
+	}
 
 }

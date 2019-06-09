@@ -29,127 +29,126 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class StandardContainer extends AbstractDataBlock implements Container {
 
-   /**
-    * Creates a new {@link StandardContainer}.
-    *
-    * @param id
-    * @param spec
-    */
-   public StandardContainer(DataBlockId id, DataFormatSpecification spec) {
-      super(id, spec);
-   }
+	private final List<Header> m_headers = new ArrayList<>();
 
-   /**
-    * @param footer
-    */
-   @Override
-   public void insertFooter(int index, Footer footer) {
+	private final List<Footer> m_footers = new ArrayList<>();
 
-      Reject.ifNull(footer, "footer");
-      Reject.ifNotInInterval(index, 0, m_footers.size(), "index");
+	private Payload m_payload;
 
-      footer.initParent(this);
+	/**
+	 * Creates a new {@link StandardContainer}.
+	 *
+	 * @param id
+	 * @param spec
+	 */
+	public StandardContainer(DataBlockId id, DataFormatSpecification spec) {
+		super(id, spec);
+	}
 
-      m_footers.add(index, footer);
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Container#getFooters()
+	 */
+	@Override
+	public List<Footer> getFooters() {
 
-   /**
-    * @param index
-    *           TODO
-    * @param header
-    */
-   @Override
-   public void insertHeader(int index, Header header) {
-      Reject.ifNull(header, "header");
-      Reject.ifNotInInterval(index, 0, m_headers.size(), "index");
+		return Collections.unmodifiableList(m_footers);
+	}
 
-      header.initParent(this);
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Container#getHeaders()
+	 */
+	@Override
+	public List<Header> getHeaders() {
 
-      m_headers.add(index, header);
-   }
+		return Collections.unmodifiableList(m_headers);
+	}
 
-   @Override
-   public void setPayload(Payload payload) {
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Container#getPayload()
+	 */
+	@Override
+	public Payload getPayload() {
 
-      Reject.ifNull(payload, "payload");
+		return m_payload;
+	}
 
-      m_payload = payload;
-      m_payload.initParent(this);
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
+	 */
+	@Override
+	public long getSize() {
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Container#getHeaders()
-    */
-   @Override
-   public List<Header> getHeaders() {
+		long totalSize = 0;
 
-      return Collections.unmodifiableList(m_headers);
-   }
+		for (Iterator<Header> fieldIterator = m_headers.iterator(); fieldIterator.hasNext();) {
+			Header header = fieldIterator.next();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Container#getFooters()
-    */
-   @Override
-   public List<Footer> getFooters() {
+			totalSize += header.getSize();
+		}
 
-      return Collections.unmodifiableList(m_footers);
-   }
+		for (Iterator<Footer> fieldIterator = m_footers.iterator(); fieldIterator.hasNext();) {
+			Footer footer = fieldIterator.next();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Container#getPayload()
-    */
-   @Override
-   public Payload getPayload() {
+			totalSize += footer.getSize();
+		}
 
-      return m_payload;
-   }
+		totalSize += m_payload.getSize();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
-    */
-   @Override
-   public long getSize() {
+		return totalSize;
+	}
 
-      long totalSize = 0;
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.AbstractDataBlock#initParent(com.github.jmeta.library.datablocks.api.types.DataBlock)
+	 */
+	@Override
+	public void initParent(DataBlock parent) {
+		super.initParent(parent);
+		initContainerContext(parent.getContainerContext().createChildContainerContext(this));
+	}
 
-      for (Iterator<Header> fieldIterator = m_headers.iterator(); fieldIterator.hasNext();) {
-         Header header = fieldIterator.next();
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Container#initTopLevelContainerContext(com.github.jmeta.library.datablocks.api.services.SizeProvider,
+	 *      com.github.jmeta.library.datablocks.api.services.CountProvider)
+	 */
+	@Override
+	public void initTopLevelContainerContext(SizeProvider sizeProvider, CountProvider countProvider) {
+		initContainerContext(new StandardContainerContext(getSpec(), null, this, sizeProvider, countProvider));
+	}
 
-         totalSize += header.getSize();
-      }
+	/**
+	 * @param footer
+	 */
+	@Override
+	public void insertFooter(int index, Footer footer) {
 
-      for (Iterator<Footer> fieldIterator = m_footers.iterator(); fieldIterator.hasNext();) {
-         Footer footer = fieldIterator.next();
+		Reject.ifNull(footer, "footer");
+		Reject.ifNotInInterval(index, 0, m_footers.size(), "index");
 
-         totalSize += footer.getSize();
-      }
+		footer.initParent(this);
 
-      totalSize += m_payload.getSize();
+		m_footers.add(index, footer);
+	}
 
-      return totalSize;
-   }
+	/**
+	 * @param index  TODO
+	 * @param header
+	 */
+	@Override
+	public void insertHeader(int index, Header header) {
+		Reject.ifNull(header, "header");
+		Reject.ifNotInInterval(index, 0, m_headers.size(), "index");
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Container#initTopLevelContainerContext(com.github.jmeta.library.datablocks.api.services.SizeProvider,
-    *      com.github.jmeta.library.datablocks.api.services.CountProvider)
-    */
-   @Override
-   public void initTopLevelContainerContext(SizeProvider sizeProvider, CountProvider countProvider) {
-      initContainerContext(new StandardContainerContext(getSpec(), null, this, sizeProvider, countProvider));
-   }
+		header.initParent(this);
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.AbstractDataBlock#initParent(com.github.jmeta.library.datablocks.api.types.DataBlock)
-    */
-   @Override
-   public void initParent(DataBlock parent) {
-      super.initParent(parent);
-      initContainerContext(parent.getContainerContext().createChildContainerContext(this));
-   }
+		m_headers.add(index, header);
+	}
 
-   private final List<Header> m_headers = new ArrayList<>();
+	@Override
+	public void setPayload(Payload payload) {
 
-   private final List<Footer> m_footers = new ArrayList<>();
+		Reject.ifNull(payload, "payload");
 
-   private Payload m_payload;
+		m_payload = payload;
+		m_payload.initParent(this);
+	}
 }

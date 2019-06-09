@@ -30,195 +30,196 @@ import com.github.jmeta.library.dataformats.impl.builder.StandardFieldBasedPaylo
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link TopLevelContainerSequenceBuilder} builds a {@link DataFormatSpecification}.
+ * {@link TopLevelContainerSequenceBuilder} builds a
+ * {@link DataFormatSpecification}.
  */
 public class TopLevelContainerSequenceBuilder implements DataFormatSpecificationBuilder {
 
-   private final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
-   private final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
-   private final List<DataBlockDescription> topLevelDescriptions = new ArrayList<>();
-   private final ContainerDataFormat dataFormat;
-   private DataBlockDescription defaultNestedContainerDesc;
-   private final List<ByteOrder> supportedByteOrders = new ArrayList<>();
-   private final List<Charset> supportedCharacterEncodings = new ArrayList<>();
+	private final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
+	private final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
+	private final List<DataBlockDescription> topLevelDescriptions = new ArrayList<>();
+	private final ContainerDataFormat dataFormat;
+	private DataBlockDescription defaultNestedContainerDesc;
+	private final List<ByteOrder> supportedByteOrders = new ArrayList<>();
+	private final List<Charset> supportedCharacterEncodings = new ArrayList<>();
 
-   /**
-    * Creates a new {@link TopLevelContainerSequenceBuilder}.
-    * 
-    * @param dataFormat
-    *           The {@link ContainerDataFormat} for which to build the {@link DataFormatSpecification}.
-    */
-   public TopLevelContainerSequenceBuilder(ContainerDataFormat dataFormat) {
-      Reject.ifNull(dataFormat, "dataFormat");
+	/**
+	 * Creates a new {@link TopLevelContainerSequenceBuilder}.
+	 * 
+	 * @param dataFormat The {@link ContainerDataFormat} for which to build the
+	 *                   {@link DataFormatSpecification}.
+	 */
+	public TopLevelContainerSequenceBuilder(ContainerDataFormat dataFormat) {
+		Reject.ifNull(dataFormat, "dataFormat");
 
-      this.dataFormat = dataFormat;
-   }
+		this.dataFormat = dataFormat;
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#build()
-    */
-   @Override
-   public DataFormatSpecification build() {
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#addChildDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
+	 */
+	@Override
+	public void addChildDescription(DataBlockDescription childDesc) {
+		// Nothing to be done here
+	}
 
-      if (topLevelDescriptions.isEmpty()) {
-         throw new IllegalStateException(
-            "No top-level container defined for this data format - did you remember to call finishContainer?");
-      }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addContainerWithContainerBasedPayload(java.lang.String,
+	 *      java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ContainerBuilder<DataFormatSpecificationBuilder, ContainerBasedPayloadBuilder<DataFormatSpecificationBuilder>> addContainerWithContainerBasedPayload(
+		String localId, String name, String description) {
+		return new StandardContainerBasedPayloadContainerBuilder<>(this, localId, name, description, false);
+	}
 
-      if (overallDescriptions.isEmpty()) {
-         throw new IllegalStateException(
-            "No data blocks defined for this data format - did you remember to call finish*?");
-      }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addContainerWithFieldBasedPayload(java.lang.String,
+	 *      java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ContainerBuilder<DataFormatSpecificationBuilder, FieldBasedPayloadBuilder<DataFormatSpecificationBuilder>> addContainerWithFieldBasedPayload(
+		String localId, String name, String description) {
+		return new StandardFieldBasedPayloadContainerBuilder<>(this, localId, name, description, false);
+	}
 
-      return new StandardDataFormatSpecification(dataFormat, overallDescriptions, topLevelDescriptions,
-         genericDescriptions.keySet(), supportedByteOrders, supportedCharacterEncodings,
-         defaultNestedContainerDesc == null ? null : defaultNestedContainerDesc.getId());
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addGenericContainerWithContainerBasedPayload(java.lang.String,
+	 *      java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ContainerBuilder<DataFormatSpecificationBuilder, ContainerBasedPayloadBuilder<DataFormatSpecificationBuilder>> addGenericContainerWithContainerBasedPayload(
+		String localId, String name, String description) {
+		return new StandardContainerBasedPayloadContainerBuilder<>(this, localId, name, description, true);
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#putDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
-    *      boolean, boolean)
-    */
-   @Override
-   public void putDataBlockDescription(DataBlockDescription newDescription, boolean isTopLevel,
-      boolean isDefaultNestedContainer) {
-      Reject.ifNull(newDescription, "newDescription");
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addGenericContainerWithFieldBasedPayload(java.lang.String,
+	 *      java.lang.String, java.lang.String)
+	 */
+	@Override
+	public ContainerBuilder<DataFormatSpecificationBuilder, FieldBasedPayloadBuilder<DataFormatSpecificationBuilder>> addGenericContainerWithFieldBasedPayload(
+		String localId, String name, String description) {
+		return new StandardFieldBasedPayloadContainerBuilder<>(this, localId, name, description, true);
+	}
 
-      overallDescriptions.put(newDescription.getId(), newDescription);
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#build()
+	 */
+	@Override
+	public DataFormatSpecification build() {
 
-      if (newDescription.isGeneric()) {
-         genericDescriptions.put(newDescription.getId(), newDescription);
-      }
+		if (topLevelDescriptions.isEmpty()) {
+			throw new IllegalStateException(
+				"No top-level container defined for this data format - did you remember to call finishContainer?");
+		}
 
-      if (isTopLevel) {
-         topLevelDescriptions.add(newDescription);
-      }
+		if (overallDescriptions.isEmpty()) {
+			throw new IllegalStateException(
+				"No data blocks defined for this data format - did you remember to call finish*?");
+		}
 
-      if (isDefaultNestedContainer) {
-         if (this.defaultNestedContainerDesc != null) {
-            throw new IllegalArgumentException(
-               "Already have a default nested container, you may only define one default nested container. Already set default nested container: "
-                  + this.defaultNestedContainerDesc);
-         }
+		return new StandardDataFormatSpecification(dataFormat, overallDescriptions, topLevelDescriptions,
+			genericDescriptions.keySet(), supportedByteOrders, supportedCharacterEncodings,
+			defaultNestedContainerDesc == null ? null : defaultNestedContainerDesc.getId());
+	}
 
-         this.defaultNestedContainerDesc = newDescription;
-      }
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#getDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+	 */
+	@Override
+	public DataBlockDescription getDataBlockDescription(DataBlockId dataBlockId) {
+		Reject.ifNull(dataBlockId, "dataBlockId");
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#withByteOrders(java.nio.ByteOrder,
-    *      java.nio.ByteOrder[])
-    */
-   @Override
-   public DataFormatSpecificationBuilder withByteOrders(ByteOrder defaultByteOrder,
-      ByteOrder... furtherSupportedByteOrders) {
-      supportedByteOrders.add(defaultByteOrder);
-      supportedByteOrders.addAll(Arrays.asList(furtherSupportedByteOrders));
-      return this;
-   }
+		if (!overallDescriptions.containsKey(dataBlockId)) {
+			return null;
+		}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#withCharsets(java.nio.charset.Charset,
-    *      java.nio.charset.Charset[])
-    */
-   @Override
-   public DataFormatSpecificationBuilder withCharsets(Charset defaultCharset, Charset... furtherSupportedCharsets) {
-      supportedCharacterEncodings.add(defaultCharset);
-      supportedCharacterEncodings.addAll(Arrays.asList(furtherSupportedCharsets));
-      return this;
-   }
+		return overallDescriptions.get(dataBlockId);
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getGlobalId()
-    */
-   @Override
-   public String getGlobalId() {
-      return null;
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getDataFormat()
+	 */
+	@Override
+	public ContainerDataFormat getDataFormat() {
+		return dataFormat;
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#addChildDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
-    */
-   @Override
-   public void addChildDescription(DataBlockDescription childDesc) {
-      // Nothing to be done here
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getGlobalId()
+	 */
+	@Override
+	public String getGlobalId() {
+		return null;
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getDataFormat()
-    */
-   @Override
-   public ContainerDataFormat getDataFormat() {
-      return this.dataFormat;
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getRootBuilder()
+	 */
+	@Override
+	public DataFormatSpecificationBuilder getRootBuilder() {
+		return this;
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getRootBuilder()
-    */
-   @Override
-   public DataFormatSpecificationBuilder getRootBuilder() {
-      return this;
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#putDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      boolean, boolean)
+	 */
+	@Override
+	public void putDataBlockDescription(DataBlockDescription newDescription, boolean isTopLevel,
+		boolean isDefaultNestedContainer) {
+		Reject.ifNull(newDescription, "newDescription");
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addContainerWithFieldBasedPayload(java.lang.String,
-    *      java.lang.String, java.lang.String)
-    */
-   @Override
-   public ContainerBuilder<DataFormatSpecificationBuilder, FieldBasedPayloadBuilder<DataFormatSpecificationBuilder>> addContainerWithFieldBasedPayload(
-      String localId, String name, String description) {
-      return new StandardFieldBasedPayloadContainerBuilder<>(this, localId, name, description, false);
-   }
+		overallDescriptions.put(newDescription.getId(), newDescription);
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addContainerWithContainerBasedPayload(java.lang.String,
-    *      java.lang.String, java.lang.String)
-    */
-   @Override
-   public ContainerBuilder<DataFormatSpecificationBuilder, ContainerBasedPayloadBuilder<DataFormatSpecificationBuilder>> addContainerWithContainerBasedPayload(
-      String localId, String name, String description) {
-      return new StandardContainerBasedPayloadContainerBuilder<>(this, localId, name, description, false);
-   }
+		if (newDescription.isGeneric()) {
+			genericDescriptions.put(newDescription.getId(), newDescription);
+		}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addGenericContainerWithFieldBasedPayload(java.lang.String,
-    *      java.lang.String, java.lang.String)
-    */
-   @Override
-   public ContainerBuilder<DataFormatSpecificationBuilder, FieldBasedPayloadBuilder<DataFormatSpecificationBuilder>> addGenericContainerWithFieldBasedPayload(
-      String localId, String name, String description) {
-      return new StandardFieldBasedPayloadContainerBuilder<>(this, localId, name, description, true);
-   }
+		if (isTopLevel) {
+			topLevelDescriptions.add(newDescription);
+		}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.builder.ContainerSequenceBuilder#addGenericContainerWithContainerBasedPayload(java.lang.String,
-    *      java.lang.String, java.lang.String)
-    */
-   @Override
-   public ContainerBuilder<DataFormatSpecificationBuilder, ContainerBasedPayloadBuilder<DataFormatSpecificationBuilder>> addGenericContainerWithContainerBasedPayload(
-      String localId, String name, String description) {
-      return new StandardContainerBasedPayloadContainerBuilder<>(this, localId, name, description, true);
-   }
+		if (isDefaultNestedContainer) {
+			if (defaultNestedContainerDesc != null) {
+				throw new IllegalArgumentException(
+					"Already have a default nested container, you may only define one default nested container. Already set default nested container: "
+						+ defaultNestedContainerDesc);
+			}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#getDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockId)
-    */
-   @Override
-   public DataBlockDescription getDataBlockDescription(DataBlockId dataBlockId) {
-      Reject.ifNull(dataBlockId, "dataBlockId");
+			defaultNestedContainerDesc = newDescription;
+		}
+	}
 
-      if (!overallDescriptions.containsKey(dataBlockId)) {
-         return null;
-      }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#removeDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockId)
+	 */
+	@Override
+	public void removeDataBlockDescription(DataBlockId dataBlockId) {
+		overallDescriptions.remove(dataBlockId);
+	}
 
-      return overallDescriptions.get(dataBlockId);
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#withByteOrders(java.nio.ByteOrder,
+	 *      java.nio.ByteOrder[])
+	 */
+	@Override
+	public DataFormatSpecificationBuilder withByteOrders(ByteOrder defaultByteOrder,
+		ByteOrder... furtherSupportedByteOrders) {
+		supportedByteOrders.add(defaultByteOrder);
+		supportedByteOrders.addAll(Arrays.asList(furtherSupportedByteOrders));
+		return this;
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#removeDataBlockDescription(com.github.jmeta.library.dataformats.api.types.DataBlockId)
-    */
-   @Override
-   public void removeDataBlockDescription(DataBlockId dataBlockId) {
-      overallDescriptions.remove(dataBlockId);
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.DataFormatSpecificationBuilder#withCharsets(java.nio.charset.Charset,
+	 *      java.nio.charset.Charset[])
+	 */
+	@Override
+	public DataFormatSpecificationBuilder withCharsets(Charset defaultCharset, Charset... furtherSupportedCharsets) {
+		supportedCharacterEncodings.add(defaultCharset);
+		supportedCharacterEncodings.addAll(Arrays.asList(furtherSupportedCharsets));
+		return this;
+	}
 }

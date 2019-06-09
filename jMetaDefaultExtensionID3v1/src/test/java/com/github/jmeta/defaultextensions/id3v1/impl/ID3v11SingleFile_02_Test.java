@@ -18,16 +18,16 @@ import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
  */
 public class ID3v11SingleFile_02_Test extends AbstractDataBlockAccessorTest {
 
-   /**
-    * Creates a new {@link ID3v11SingleFile_02_Test}.
-    */
-   public ID3v11SingleFile_02_Test() {
-      super(THE_FILE, THE_CSV_FILE, new Integer[] { 4 });
-   }
+	private final static Path THE_FILE = TestResourceHelper.resourceToFile(ID3v11SingleFile_02_Test.class,
+		"ID3v11_FILE_02.txt");
 
-   private final static Path THE_FILE = TestResourceHelper.resourceToFile(ID3v11SingleFile_02_Test.class,
-      "ID3v11_FILE_02.txt");
+	private final static Path THE_CSV_FILE = TestResourceHelper.resourceToFile(ID3v11SingleFile_02_Test.class,
+		"Expected_ID3v11_FILE_02.csv");
 
-   private final static Path THE_CSV_FILE = TestResourceHelper.resourceToFile(ID3v11SingleFile_02_Test.class,
-      "Expected_ID3v11_FILE_02.csv");
+	/**
+	 * Creates a new {@link ID3v11SingleFile_02_Test}.
+	 */
+	public ID3v11SingleFile_02_Test() {
+		super(ID3v11SingleFile_02_Test.THE_FILE, ID3v11SingleFile_02_Test.THE_CSV_FILE, new Integer[] { 4 });
+	}
 }

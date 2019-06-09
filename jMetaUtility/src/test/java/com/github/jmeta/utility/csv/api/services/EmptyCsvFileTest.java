@@ -15,77 +15,84 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * {@link EmptyCsvFileTest} tests the {@link CsvReader} class with an empty CSV file.
+ * {@link EmptyCsvFileTest} tests the {@link CsvReader} class with an empty CSV
+ * file.
  *
  * Furthermore, some of the lines contain empty last columns.
  */
 public class EmptyCsvFileTest extends AbstractCsvReaderTest {
 
-   /**
-    * @see AbstractCsvReaderTest#getTestlingWithFixedColumns()
-    */
-   @Override
-   protected CsvReader getTestlingWithFixedColumns() {
-      if (m_csvReader == null) {
-         Set<String> columns = new LinkedHashSet<>();
-         columns.add("col1");
-         m_csvReader = new CsvReader(columns);
-      }
+	private File m_theCorrectFile;
 
-      return m_csvReader;
-   }
+	private File m_theInCorrectFile;
 
-   /**
-    * @see AbstractCsvReaderTest#getSeparatorToUse()
-    */
-   @Override
-   protected Character getSeparatorToUse() {
-      return '+';
-   }
+	private List<String[]> m_expectedDataCorrectFile;
 
-   /**
-    * @see AbstractCsvReaderTest#getQuoteToUse()
-    */
-   @Override
-   protected Character getQuoteToUse() {
-      return '"';
-   }
+	private CsvReader m_csvReader;
 
-   /**
-    * @see AbstractCsvReaderTest#getCorrectFileToUse()
-    */
-   @Override
-   protected File getCorrectFileToUse() throws Exception {
-      if (m_theCorrectFile == null)
-         m_theCorrectFile = new File(EmptyCsvFileTest.class.getResource("Empty.csv").toURI());
+	/**
+	 * @see AbstractCsvReaderTest#getCorrectFileToUse()
+	 */
+	@Override
+	protected File getCorrectFileToUse() throws Exception {
+		if (m_theCorrectFile == null) {
+			m_theCorrectFile = new File(EmptyCsvFileTest.class.getResource("Empty.csv").toURI());
+		}
 
-      return m_theCorrectFile;
-   }
+		return m_theCorrectFile;
+	}
 
-   /**
-    * @see AbstractCsvReaderTest#getIncorrectFileToUse()
-    */
-   @Override
-   protected File getIncorrectFileToUse() throws Exception {
-      if (m_theInCorrectFile == null)
-         m_theInCorrectFile = new File(EmptyCsvFileTest.class.getResource("EmptyIncorrect.csv").toURI());
+	/**
+	 * @see AbstractCsvReaderTest#getExpectedDataInCorrectFile()
+	 */
+	@Override
+	protected List<String[]> getExpectedDataInCorrectFile() {
+		if (m_expectedDataCorrectFile == null) {
+			m_expectedDataCorrectFile = new ArrayList<>();
+		}
 
-      return m_theInCorrectFile;
-   }
+		return m_expectedDataCorrectFile;
+	}
 
-   /**
-    * @see AbstractCsvReaderTest#getExpectedDataInCorrectFile()
-    */
-   @Override
-   protected List<String[]> getExpectedDataInCorrectFile() {
-      if (m_expectedDataCorrectFile == null)
-         m_expectedDataCorrectFile = new ArrayList<>();
+	/**
+	 * @see AbstractCsvReaderTest#getIncorrectFileToUse()
+	 */
+	@Override
+	protected File getIncorrectFileToUse() throws Exception {
+		if (m_theInCorrectFile == null) {
+			m_theInCorrectFile = new File(EmptyCsvFileTest.class.getResource("EmptyIncorrect.csv").toURI());
+		}
 
-      return m_expectedDataCorrectFile;
-   }
+		return m_theInCorrectFile;
+	}
 
-   private File m_theCorrectFile;
-   private File m_theInCorrectFile;
-   private List<String[]> m_expectedDataCorrectFile;
-   private CsvReader m_csvReader;
+	/**
+	 * @see AbstractCsvReaderTest#getQuoteToUse()
+	 */
+	@Override
+	protected Character getQuoteToUse() {
+		return '"';
+	}
+
+	/**
+	 * @see AbstractCsvReaderTest#getSeparatorToUse()
+	 */
+	@Override
+	protected Character getSeparatorToUse() {
+		return '+';
+	}
+
+	/**
+	 * @see AbstractCsvReaderTest#getTestlingWithFixedColumns()
+	 */
+	@Override
+	protected CsvReader getTestlingWithFixedColumns() {
+		if (m_csvReader == null) {
+			Set<String> columns = new LinkedHashSet<>();
+			columns.add("col1");
+			m_csvReader = new CsvReader(columns);
+		}
+
+		return m_csvReader;
+	}
 }

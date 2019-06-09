@@ -11,24 +11,26 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  */
 public interface DataBlockService {
 
-   /**
-    * @return the {@link ContainerDataFormat}
-    */
-   public ContainerDataFormat getDataFormat();
+	/**
+	 * @param spec
+	 * @param mediumStore TODO
+	 * @param eventBus    TODO
+	 * @return null to indicate usage of the default {@link DataBlockReader}
+	 */
+	DataBlockReader createBackwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+		DataBlockEventBus eventBus);
 
-   /**
-    * @param spec
-    * @param mediumStore TODO
-    * @param eventBus TODO
-    * @return null to indicate usage of the default {@link DataBlockReader}
-    */
-   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus);
+	/**
+	 * @param spec
+	 * @param mediumStore TODO
+	 * @param eventBus    TODO
+	 * @return null to indicate usage of the default {@link DataBlockReader}
+	 */
+	DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+		DataBlockEventBus eventBus);
 
-   /**
-    * @param spec
-    * @param mediumStore TODO
-    * @param eventBus TODO
-    * @return null to indicate usage of the default {@link DataBlockReader}
-    */
-   public DataBlockReader createBackwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus);
+	/**
+	 * @return the {@link ContainerDataFormat}
+	 */
+	ContainerDataFormat getDataFormat();
 }

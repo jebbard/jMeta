@@ -18,16 +18,16 @@ import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
  */
 public class OggSingleFile_02_Test extends AbstractDataBlockAccessorTest {
 
-   /**
-    * Creates a new {@link OggSingleFile_02_Test}.
-    */
-   public OggSingleFile_02_Test() {
-      super(THE_FILE, THE_CSV_FILE, new Integer[] { 4 });
-   }
+	private final static Path THE_FILE = TestResourceHelper.resourceToFile(OggSingleFile_02_Test.class,
+		"OGG_FILE_02.txt");
 
-   private final static Path THE_FILE = TestResourceHelper.resourceToFile(OggSingleFile_02_Test.class,
-      "OGG_FILE_02.txt");
+	private final static Path THE_CSV_FILE = TestResourceHelper.resourceToFile(OggSingleFile_02_Test.class,
+		"Expected_OGG_FILE_02.csv");
 
-   private final static Path THE_CSV_FILE = TestResourceHelper.resourceToFile(OggSingleFile_02_Test.class,
-      "Expected_OGG_FILE_02.csv");
+	/**
+	 * Creates a new {@link OggSingleFile_02_Test}.
+	 */
+	public OggSingleFile_02_Test() {
+		super(OggSingleFile_02_Test.THE_FILE, OggSingleFile_02_Test.THE_CSV_FILE, new Integer[] { 4 });
+	}
 }

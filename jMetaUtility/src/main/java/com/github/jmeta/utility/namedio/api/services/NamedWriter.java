@@ -20,58 +20,55 @@ import java.nio.charset.Charset;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link NamedWriter} class is a {@link BufferedWriter} that adds some meta data to a given arbitrary, wrapped
- * {@link Writer}. This is mainly useful for identification purposes, because you sometimes want to know the destination
+ * {@link NamedWriter} class is a {@link BufferedWriter} that adds some meta
+ * data to a given arbitrary, wrapped {@link Writer}. This is mainly useful for
+ * identification purposes, because you sometimes want to know the destination
  * of a given {@link Writer} (file, URL etc.).
  */
 public class NamedWriter extends BufferedWriter {
 
-   private final String name;
+	/**
+	 * Creates a new {@link NamedWriter} instance using a given existing file. The
+	 * wrapped {@link Writer} is created as a {@link OutputStreamWriter} with the
+	 * given charset.
+	 * 
+	 * @param file    The given {@link File}. Must be a file.
+	 * @param charset The {@link Charset} to use.
+	 * @param append  true to append to the {@link Writer}, false otherwise.
+	 * @return The {@link NamedWriter}.
+	 * @throws IOException if creation of the wrapped {@link Writer} fails.
+	 */
+	@SuppressWarnings("resource")
+	public static NamedWriter createFromFile(File file, Charset charset, boolean append) throws IOException {
+		Reject.ifNull(file, "file");
+		Reject.ifNull(charset, "charset");
+		Reject.ifFalse(file.isFile(), "file.isFile()");
 
-   /**
-    * Creates a new {@link NamedWriter}.
-    * 
-    * @param in
-    *           The wrapped {@link Writer}.
-    * @param name
-    *           Name of the wrapped {@link Writer}, arbitrary, but non-null. Should be used for identification purposes.
-    */
-   public NamedWriter(Writer in, String name) {
-      super(in);
+		return new NamedWriter(new OutputStreamWriter(new FileOutputStream(file, append), charset),
+			file.getCanonicalPath());
+	}
 
-      Reject.ifNull(name, "name");
+	private final String name;
 
-      this.name = name;
-   }
+	/**
+	 * Creates a new {@link NamedWriter}.
+	 * 
+	 * @param in   The wrapped {@link Writer}.
+	 * @param name Name of the wrapped {@link Writer}, arbitrary, but non-null.
+	 *             Should be used for identification purposes.
+	 */
+	public NamedWriter(Writer in, String name) {
+		super(in);
 
-   /**
-    * Creates a new {@link NamedWriter} instance using a given existing file. The wrapped {@link Writer} is created as a
-    * {@link OutputStreamWriter} with the given charset.
-    * 
-    * @param file
-    *           The given {@link File}. Must be a file.
-    * @param charset
-    *           The {@link Charset} to use.
-    * @param append
-    *           true to append to the {@link Writer}, false otherwise.
-    * @return The {@link NamedWriter}.
-    * @throws IOException
-    *            if creation of the wrapped {@link Writer} fails.
-    */
-   @SuppressWarnings("resource")
-   public static NamedWriter createFromFile(File file, Charset charset, boolean append) throws IOException {
-      Reject.ifNull(file, "file");
-      Reject.ifNull(charset, "charset");
-      Reject.ifFalse(file.isFile(), "file.isFile()");
+		Reject.ifNull(name, "name");
 
-      return new NamedWriter(new OutputStreamWriter(new FileOutputStream(file, append), charset),
-         file.getCanonicalPath());
-   }
+		this.name = name;
+	}
 
-   /**
-    * @return the name of the wrapped {@link Writer}.
-    */
-   public String getName() {
-      return name;
-   }
+	/**
+	 * @return the name of the wrapped {@link Writer}.
+	 */
+	public String getName() {
+		return name;
+	}
 }

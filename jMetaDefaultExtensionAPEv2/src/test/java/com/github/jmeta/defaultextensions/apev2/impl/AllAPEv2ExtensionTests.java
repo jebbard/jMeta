@@ -13,10 +13,11 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * {@link AllAPEv2ExtensionTests} is used for running all test cases of the extension management component.
+ * {@link AllAPEv2ExtensionTests} is used for running all test cases of the
+ * extension management component.
  */
 @RunWith(Suite.class)
 @SuiteClasses({ APEv2SingleFile_01_Test.class, })
 public class AllAPEv2ExtensionTests {
-   // Nothing necessary here
+	// Nothing necessary here
 }

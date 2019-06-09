@@ -17,36 +17,42 @@ import java.util.List;
  */
 public class Flags5ByteTest extends Flags4ByteTest {
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.Flags2ByteTest#getByteLength()
-    */
-   @Override
-   protected int getByteLength() {
-      return 5;
-   }
+	private final static String TRISYNCHRONISATION_FLAG = "Tri synchronsisation";
 
-   /**
-    * Returns the flag mapping to use for both {@link FlagSpecification}s.
-    *
-    * @return The flag mapping to use for both {@link FlagSpecification}s.
-    */
-   @Override
-   protected List<FlagDescription> getFlagDescriptions() {
-      if (m_enhancedDescriptions.isEmpty()) {
-         m_enhancedDescriptions.addAll(super.getFlagDescriptions());
+	private final static String NO_FLAG_YET = "no flag yet";
 
-         m_enhancedDescriptions.add(new FlagDescription(RESERVED_5_FLAG, new BitAddress(4, 2), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(NO_FLAG_YET, new BitAddress(4, 3), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(ANGER_FLAG, new BitAddress(4, 6), "", 1, null));
-         m_enhancedDescriptions.add(new FlagDescription(TRISYNCHRONISATION_FLAG, new BitAddress(4, 7), "", 1, null));
-      }
+	private final static String ANGER_FLAG = "Anger";
+	private final static String RESERVED_5_FLAG = "Reserved 5";
+	private final List<FlagDescription> m_enhancedDescriptions = new ArrayList<>();
 
-      return m_enhancedDescriptions;
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.Flags2ByteTest#getByteLength()
+	 */
+	@Override
+	protected int getByteLength() {
+		return 5;
+	}
 
-   private final List<FlagDescription> m_enhancedDescriptions = new ArrayList<>();
-   private final static String TRISYNCHRONISATION_FLAG = "Tri synchronsisation";
-   private final static String NO_FLAG_YET = "no flag yet";
-   private final static String ANGER_FLAG = "Anger";
-   private final static String RESERVED_5_FLAG = "Reserved 5";
+	/**
+	 * Returns the flag mapping to use for both {@link FlagSpecification}s.
+	 *
+	 * @return The flag mapping to use for both {@link FlagSpecification}s.
+	 */
+	@Override
+	protected List<FlagDescription> getFlagDescriptions() {
+		if (m_enhancedDescriptions.isEmpty()) {
+			m_enhancedDescriptions.addAll(super.getFlagDescriptions());
+
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags5ByteTest.RESERVED_5_FLAG, new BitAddress(4, 2), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags5ByteTest.NO_FLAG_YET, new BitAddress(4, 3), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags5ByteTest.ANGER_FLAG, new BitAddress(4, 6), "", 1, null));
+			m_enhancedDescriptions
+				.add(new FlagDescription(Flags5ByteTest.TRISYNCHRONISATION_FLAG, new BitAddress(4, 7), "", 1, null));
+		}
+
+		return m_enhancedDescriptions;
+	}
 }

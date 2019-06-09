@@ -1,7 +1,5 @@
 package com.github.jmeta.tools.benchmark.api.services;
 
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -9,10 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.jmeta.tools.benchmark.api.services.AbstractTimeProvider;
-import com.github.jmeta.tools.benchmark.api.services.MeasurementSession;
-import com.github.jmeta.tools.benchmark.api.services.SystemMillisTimeProvider;
-import com.github.jmeta.tools.benchmark.api.services.SystemNanosTimeProvider;
 import com.github.jmeta.tools.benchmark.api.types.MeasuredCommand;
 import com.github.jmeta.tools.benchmark.api.types.MeasuredCommandExecution;
 import com.github.jmeta.tools.benchmark.api.types.MeasurementResult;
@@ -23,125 +17,128 @@ import com.github.jmeta.tools.benchmark.api.types.WaitCommand;
  */
 public class MeasurementSessionTest {
 
-   /**
-    * Tests {@link MeasurementSession#runMeasurement(MeasuredCommand[], int)}.
-    */
-   @Test
-   public void test_runMeasurement() {
-      long[] waitTimes = new long[] { 100, 101, 200, 103, };
+	private final static List<AbstractTimeProvider> TIME_PROVIDERS = new ArrayList<>();
 
-      MeasuredCommand[] waitCommands = new MeasuredCommand[waitTimes.length];
+	static {
+		MeasurementSessionTest.TIME_PROVIDERS.add(new SystemMillisTimeProvider());
+		MeasurementSessionTest.TIME_PROVIDERS.add(new SystemNanosTimeProvider());
+	}
 
-      long waitSum = 0;
+	/**
+	 * Tests {@link MeasurementSession#runMeasurement(MeasuredCommand[], int)}.
+	 */
+	@Test
+	public void test_runMeasurement() {
+		long[] waitTimes = new long[] { 100, 101, 200, 103, };
 
-      for (int i = 0; i < waitTimes.length; i++) {
-         waitCommands[i] = new WaitCommand(waitTimes[i]);
-         waitSum += waitTimes[i];
-      }
+		MeasuredCommand[] waitCommands = new MeasuredCommand[waitTimes.length];
 
-      for (int i = 0; i < TIME_PROVIDERS.size(); ++i) {
-         AbstractTimeProvider provider = TIME_PROVIDERS.get(i);
+		long waitSum = 0;
 
-         MeasurementSession session = new MeasurementSession(provider, "Hallo");
+		for (int i = 0; i < waitTimes.length; i++) {
+			waitCommands[i] = new WaitCommand(waitTimes[i]);
+			waitSum += waitTimes[i];
+		}
 
-         Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
+		for (int i = 0; i < MeasurementSessionTest.TIME_PROVIDERS.size(); ++i) {
+			AbstractTimeProvider provider = MeasurementSessionTest.TIME_PROVIDERS.get(i);
 
-         long startTime = provider.getUnit().convert(System.nanoTime(), TimeUnit.NANOSECONDS);
+			MeasurementSession session = new MeasurementSession(provider, "Hallo");
 
-         final int repeats = 3;
+			Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
 
-         MeasurementResult result = session.runMeasurement(waitCommands, repeats);
+			long startTime = provider.getUnit().convert(System.nanoTime(), TimeUnit.NANOSECONDS);
 
-         Assert.assertNotNull(result);
-         Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
+			final int repeats = 3;
 
-         Assert.assertEquals(session.getSessionId(), result.getMeasurementSessionId());
-         Assert.assertTrue(startTime <= result.getMeasurementStartTime());
-         Assert.assertTrue(result.getMeasurementStopTime() > result.getMeasurementStartTime());
-         Assert.assertTrue(result.getMeasurementStopTime() - result.getMeasurementStartTime() >= waitSum);
+			MeasurementResult result = session.runMeasurement(waitCommands, repeats);
 
-         List<MeasuredCommandExecution> execs = result.getCommandExecutions();
+			Assert.assertNotNull(result);
+			Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
 
-         Assert.assertEquals(waitCommands.length, result.getCommandCount());
-         Assert.assertEquals(repeats, result.getRepeatCount());
-         Assert.assertEquals(repeats * waitCommands.length, execs.size());
+			Assert.assertEquals(session.getSessionId(), result.getMeasurementSessionId());
+			Assert.assertTrue(startTime <= result.getMeasurementStartTime());
+			Assert.assertTrue(result.getMeasurementStopTime() > result.getMeasurementStartTime());
+			Assert.assertTrue((result.getMeasurementStopTime() - result.getMeasurementStartTime()) >= waitSum);
 
-         // Check individual commands
-         for (int k = 0; k < waitCommands.length; k++)
-            for (int j = 0; j < repeats; j++) {
-               MeasuredCommandExecution exec = execs.get(k * repeats + j);
+			List<MeasuredCommandExecution> execs = result.getCommandExecutions();
 
-               Assert.assertNotNull(exec);
-               Assert.assertFalse(exec.getStartTime() == -1);
-               Assert.assertFalse(exec.getStopTime() == -1);
-               Assert.assertTrue(exec.getStopTime() > exec.getStartTime());
+			Assert.assertEquals(waitCommands.length, result.getCommandCount());
+			Assert.assertEquals(repeats, result.getRepeatCount());
+			Assert.assertEquals(repeats * waitCommands.length, execs.size());
+
+			// Check individual commands
+			for (int k = 0; k < waitCommands.length; k++) {
+				for (int j = 0; j < repeats; j++) {
+					MeasuredCommandExecution exec = execs.get((k * repeats) + j);
+
+					Assert.assertNotNull(exec);
+					Assert.assertFalse(exec.getStartTime() == -1);
+					Assert.assertFalse(exec.getStopTime() == -1);
+					Assert.assertTrue(exec.getStopTime() > exec.getStartTime());
 //               Assert.assertTrue("Actual waited time: " + Long.toString(exec.getStopTime() - exec.getStartTime()) + ", wait time was: " + waitTimes[k], exec.getStopTime() - exec.getStartTime() >= waitTimes[k]);
-               Assert.assertEquals(waitCommands[k], exec.getExecutedCommand());
-               Assert.assertNull(exec.getThrowed());
-            }
-      }
-   }
+					Assert.assertEquals(waitCommands[k], exec.getExecutedCommand());
+					Assert.assertNull(exec.getThrowed());
+				}
+			}
+		}
+	}
 
-   /**
-    * Tests the methods {@link MeasurementSession#startMeasurement()} and {@link MeasurementSession#stopMeasurement()}.
-    */
-   @Test
-   public void testStartStopMeasurement() {
-      for (int i = 0; i < TIME_PROVIDERS.size(); ++i) {
-         AbstractTimeProvider provider = TIME_PROVIDERS.get(i);
+	/**
+	 * Tests the methods {@link MeasurementSession#getMachineInfo()},
+	 * {@link MeasurementSession#getSessionId()} and
+	 * {@link MeasurementSession#getTimeProvider()}.
+	 */
+	@Test
+	public void testGetters() {
+		for (int i = 0; i < MeasurementSessionTest.TIME_PROVIDERS.size(); ++i) {
+			AbstractTimeProvider provider = MeasurementSessionTest.TIME_PROVIDERS.get(i);
 
-         MeasurementSession session = new MeasurementSession(provider, "Hallo");
+			MeasurementSession session = new MeasurementSession(provider, "Hallo");
 
-         Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
+			Assert.assertEquals("Hallo", session.getMachineInfo());
+			Assert.assertFalse(session.getSessionId() == 0);
+			Assert.assertEquals(provider, session.getTimeProvider());
+		}
+	}
 
-         long startTime = session.startMeasurement();
-         Assert.assertFalse(startTime <= 0);
-         Assert.assertFalse(session.getStartTime() == MeasurementSession.NO_MEASUREMENT);
-         Assert.assertEquals(session.getStartTime(), startTime);
+	/**
+	 * Tests the methods {@link MeasurementSession#startMeasurement()} and
+	 * {@link MeasurementSession#stopMeasurement()}.
+	 */
+	@Test
+	public void testStartStopMeasurement() {
+		for (int i = 0; i < MeasurementSessionTest.TIME_PROVIDERS.size(); ++i) {
+			AbstractTimeProvider provider = MeasurementSessionTest.TIME_PROVIDERS.get(i);
 
-         try {
-            final int waitTime = 500;
-            Thread.sleep(waitTime);
+			MeasurementSession session = new MeasurementSession(provider, "Hallo");
 
-            MeasurementResult result = session.stopMeasurement();
+			Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
 
-            Assert.assertNotNull(result);
-            Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
+			long startTime = session.startMeasurement();
+			Assert.assertFalse(startTime <= 0);
+			Assert.assertFalse(session.getStartTime() == MeasurementSession.NO_MEASUREMENT);
+			Assert.assertEquals(session.getStartTime(), startTime);
 
-            Assert.assertEquals(0, result.getCommandCount());
-            Assert.assertEquals(0, result.getRepeatCount());
-            Assert.assertTrue(result.getCommandExecutions().isEmpty());
-            Assert.assertEquals(session.getSessionId(), result.getMeasurementSessionId());
-            Assert.assertEquals(startTime, result.getMeasurementStartTime());
-            Assert.assertTrue(result.getMeasurementStopTime() > result.getMeasurementStartTime());
-            Assert.assertTrue(result.getMeasurementStopTime() - result.getMeasurementStartTime() >= waitTime);
-         } catch (InterruptedException e) {
-            fail("Unexpected exception: " + e);
-         }
-      }
-   }
+			try {
+				final int waitTime = 500;
+				Thread.sleep(waitTime);
 
-   /**
-    * Tests the methods {@link MeasurementSession#getMachineInfo()}, {@link MeasurementSession#getSessionId()} and
-    * {@link MeasurementSession#getTimeProvider()}.
-    */
-   @Test
-   public void testGetters() {
-      for (int i = 0; i < TIME_PROVIDERS.size(); ++i) {
-         AbstractTimeProvider provider = TIME_PROVIDERS.get(i);
+				MeasurementResult result = session.stopMeasurement();
 
-         MeasurementSession session = new MeasurementSession(provider, "Hallo");
+				Assert.assertNotNull(result);
+				Assert.assertEquals(MeasurementSession.NO_MEASUREMENT, session.getStartTime());
 
-         Assert.assertEquals("Hallo", session.getMachineInfo());
-         Assert.assertFalse(session.getSessionId() == 0);
-         Assert.assertEquals(provider, session.getTimeProvider());
-      }
-   }
-
-   private final static List<AbstractTimeProvider> TIME_PROVIDERS = new ArrayList<>();
-
-   static {
-      TIME_PROVIDERS.add(new SystemMillisTimeProvider());
-      TIME_PROVIDERS.add(new SystemNanosTimeProvider());
-   }
+				Assert.assertEquals(0, result.getCommandCount());
+				Assert.assertEquals(0, result.getRepeatCount());
+				Assert.assertTrue(result.getCommandExecutions().isEmpty());
+				Assert.assertEquals(session.getSessionId(), result.getMeasurementSessionId());
+				Assert.assertEquals(startTime, result.getMeasurementStartTime());
+				Assert.assertTrue(result.getMeasurementStopTime() > result.getMeasurementStartTime());
+				Assert.assertTrue((result.getMeasurementStopTime() - result.getMeasurementStartTime()) >= waitTime);
+			} catch (InterruptedException e) {
+				Assert.fail("Unexpected exception: " + e);
+			}
+		}
+	}
 }

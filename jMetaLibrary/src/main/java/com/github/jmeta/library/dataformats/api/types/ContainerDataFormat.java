@@ -16,11 +16,11 @@ import java.util.Set;
  */
 public class ContainerDataFormat extends AbstractDataFormat {
 
-   /**
-    * Creates a new {@link ContainerDataFormat}.
-    */
-   public ContainerDataFormat(String id, Set<String> fileExtensions, Set<String> mimeTypes,
-      List<String> specificationLinks, String author, Date revisionDate) {
-      super(id, fileExtensions, mimeTypes, specificationLinks, author, revisionDate);
-   }
+	/**
+	 * Creates a new {@link ContainerDataFormat}.
+	 */
+	public ContainerDataFormat(String id, Set<String> fileExtensions, Set<String> mimeTypes,
+		List<String> specificationLinks, String author, Date revisionDate) {
+		super(id, fileExtensions, mimeTypes, specificationLinks, author, revisionDate);
+	}
 }

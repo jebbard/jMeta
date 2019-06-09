@@ -12,20 +12,20 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  */
 public class ID3v23DataBlocksService extends AbstractDataBlockService {
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#createForwardDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification,
-    *      MediumStore, DataBlockEventBus)
-    */
-   @Override
-   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
-      DataBlockEventBus eventBus) {
-      return new ID3v23DataBlockReader(spec, mediumStore, eventBus);
-   }
+	/**
+	 * Creates a new {@link ID3v23DataBlocksService}.
+	 */
+	public ID3v23DataBlocksService() {
+		super(ID3v23Extension.ID3v23);
+	}
 
-   /**
-    * Creates a new {@link ID3v23DataBlocksService}.
-    */
-   public ID3v23DataBlocksService() {
-      super(ID3v23Extension.ID3v23);
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService#createForwardDataBlockReader(com.github.jmeta.library.dataformats.api.services.DataFormatSpecification,
+	 *      MediumStore, DataBlockEventBus)
+	 */
+	@Override
+	public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+		DataBlockEventBus eventBus) {
+		return new ID3v23DataBlockReader(spec, mediumStore, eventBus);
+	}
 }

@@ -2,72 +2,71 @@ package com.github.jmeta.tools.tagfinder.impl.ape;
 
 public class APETagHeaderInfo {
 
-   public APETagHeaderInfo(long preample, int version, int tagSize,
-      int itemCount, byte[] flags) {
-      m_preample = preample;
-      m_version = version;
-      m_tagSize = tagSize;
-      m_itemCount = itemCount;
-      m_flags = flags;
-   }
+	private final long m_preample;
 
-   /**
-    * Returns preample
-    *
-    * @return preample
-    */
-   public long getPreample() {
+	private final int m_version;
 
-      return m_preample;
-   }
+	private final int m_tagSize;
 
-   /**
-    * Returns version
-    *
-    * @return version
-    */
-   public int getVersion() {
+	private final int m_itemCount;
 
-      return m_version;
-   }
+	private final byte[] m_flags;
 
-   /**
-    * Returns tagSize
-    *
-    * @return tagSize
-    */
-   public int getTagSize() {
+	public APETagHeaderInfo(long preample, int version, int tagSize, int itemCount, byte[] flags) {
+		m_preample = preample;
+		m_version = version;
+		m_tagSize = tagSize;
+		m_itemCount = itemCount;
+		m_flags = flags;
+	}
 
-      return m_tagSize;
-   }
+	/**
+	 * Returns flags
+	 *
+	 * @return flags
+	 */
+	public byte[] getFlags() {
 
-   /**
-    * Returns itemCount
-    *
-    * @return itemCount
-    */
-   public int getItemCount() {
+		return m_flags;
+	}
 
-      return m_itemCount;
-   }
+	/**
+	 * Returns itemCount
+	 *
+	 * @return itemCount
+	 */
+	public int getItemCount() {
 
-   /**
-    * Returns flags
-    *
-    * @return flags
-    */
-   public byte[] getFlags() {
+		return m_itemCount;
+	}
 
-      return m_flags;
-   }
+	/**
+	 * Returns preample
+	 *
+	 * @return preample
+	 */
+	public long getPreample() {
 
-   private final long m_preample;
+		return m_preample;
+	}
 
-   private final int m_version;
+	/**
+	 * Returns tagSize
+	 *
+	 * @return tagSize
+	 */
+	public int getTagSize() {
 
-   private final int m_tagSize;
+		return m_tagSize;
+	}
 
-   private final int m_itemCount;
+	/**
+	 * Returns version
+	 *
+	 * @return version
+	 */
+	public int getVersion() {
 
-   private final byte[] m_flags;
+		return m_version;
+	}
 }

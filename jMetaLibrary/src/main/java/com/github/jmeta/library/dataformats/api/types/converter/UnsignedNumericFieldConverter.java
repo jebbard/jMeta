@@ -23,83 +23,81 @@ import com.github.jmeta.utility.numericutils.api.services.NumericDataTypeUtil;
  */
 public class UnsignedNumericFieldConverter extends AbstractBaseFieldConverter<Long> {
 
-   private static final int MAX_LONG_BYTE_SIZE = Long.SIZE / Byte.SIZE;
+	private static final int MAX_LONG_BYTE_SIZE = Long.SIZE / Byte.SIZE;
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
-    *      java.nio.charset.Charset)
-    */
-   @Override
-   protected Long convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
-      Charset characterEncoding) throws BinaryValueConversionException {
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertBinaryToInterpreted(java.nio.ByteBuffer,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      java.nio.ByteOrder, java.nio.charset.Charset)
+	 */
+	@Override
+	protected Long convertBinaryToInterpreted(ByteBuffer binaryValue, DataBlockDescription desc, ByteOrder byteOrder,
+		Charset characterEncoding) throws BinaryValueConversionException {
 
-      long fieldByteCount = binaryValue.remaining();
+		long fieldByteCount = binaryValue.remaining();
 
-      if (fieldByteCount > MAX_LONG_BYTE_SIZE)
-         throw new BinaryValueConversionException(
-            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE + " bytes.", null, desc, binaryValue,
-            byteOrder, characterEncoding);
+		if (fieldByteCount > UnsignedNumericFieldConverter.MAX_LONG_BYTE_SIZE) {
+			throw new BinaryValueConversionException(
+				"Numeric fields may not be longer than " + UnsignedNumericFieldConverter.MAX_LONG_BYTE_SIZE + " bytes.",
+				null, desc, binaryValue, byteOrder, characterEncoding);
+		}
 
-      ByteBuffer copiedBuffer = binaryValue.asReadOnlyBuffer();
+		ByteBuffer copiedBuffer = binaryValue.asReadOnlyBuffer();
 
-      copiedBuffer.order(byteOrder);
+		copiedBuffer.order(byteOrder);
 
-      if (fieldByteCount == 1)
-         return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.get());
+		if (fieldByteCount == 1) {
+			return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.get());
+		} else if (fieldByteCount == 2) {
+			return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.getShort());
+		} else if (fieldByteCount <= 4) {
+			return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.getInt());
+		} else if (fieldByteCount <= UnsignedNumericFieldConverter.MAX_LONG_BYTE_SIZE) {
+			final long longValue = copiedBuffer.getLong();
 
-      else if (fieldByteCount == 2)
-         return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.getShort());
+			if (longValue < 0) {
+				throw new BinaryValueConversionException(
+					"Negative long values currently cannot be represented as unsigned. Value: " + longValue + ".", null,
+					desc, copiedBuffer, byteOrder, characterEncoding);
+			}
 
-      else if (fieldByteCount <= 4)
-         return (long) NumericDataTypeUtil.unsignedValue(copiedBuffer.getInt());
+			return longValue;
+		}
 
-      else if (fieldByteCount <= MAX_LONG_BYTE_SIZE) {
-         final long longValue = copiedBuffer.getLong();
+		return null;
+	}
 
-         if (longValue < 0)
-            throw new BinaryValueConversionException(
-               "Negative long values currently cannot be represented as unsigned. Value: " + longValue + ".", null,
-               desc, copiedBuffer, byteOrder, characterEncoding);
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      java.nio.ByteOrder, java.nio.charset.Charset)
+	 */
+	@Override
+	protected ByteBuffer convertInterpretedToBinary(Long interpretedValue, DataBlockDescription desc,
+		ByteOrder byteOrder, Charset characterEncoding) throws InterpretedValueConversionException {
 
-         return longValue;
-      }
+		long fieldByteCount = desc.getMaximumByteLength();
 
-      return null;
-   }
+		if (fieldByteCount > UnsignedNumericFieldConverter.MAX_LONG_BYTE_SIZE) {
+			throw new InterpretedValueConversionException(
+				"Numeric fields may not be longer than " + UnsignedNumericFieldConverter.MAX_LONG_BYTE_SIZE + " bytes.",
+				null, desc, interpretedValue, byteOrder, characterEncoding);
+		}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.converter.AbstractBaseFieldConverter#convertInterpretedToBinary(java.lang.Object,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockDescription, java.nio.ByteOrder,
-    *      java.nio.charset.Charset)
-    */
-   @Override
-   protected ByteBuffer convertInterpretedToBinary(Long interpretedValue, DataBlockDescription desc,
-      ByteOrder byteOrder, Charset characterEncoding) throws InterpretedValueConversionException {
+		ByteBuffer buffer = ByteBuffer.wrap(new byte[(int) fieldByteCount]);
 
-      long fieldByteCount = desc.getMaximumByteLength();
+		if (fieldByteCount == 1) {
+			buffer.put(interpretedValue.byteValue());
+		} else if (fieldByteCount == 2) {
+			buffer.putShort(interpretedValue.shortValue());
+		} else if (fieldByteCount <= 4) {
+			buffer.putInt(interpretedValue.intValue());
+		} else if (fieldByteCount <= UnsignedNumericFieldConverter.MAX_LONG_BYTE_SIZE) {
+			buffer.putLong(interpretedValue);
+		}
 
-      if (fieldByteCount > MAX_LONG_BYTE_SIZE)
-         throw new InterpretedValueConversionException(
-            "Numeric fields may not be longer than " + MAX_LONG_BYTE_SIZE + " bytes.", null, desc, interpretedValue,
-            byteOrder, characterEncoding);
+		buffer.rewind();
 
-      ByteBuffer buffer = ByteBuffer.wrap(new byte[(int) fieldByteCount]);
-
-      if (fieldByteCount == 1)
-         buffer.put(interpretedValue.byteValue());
-
-      else if (fieldByteCount == 2)
-         buffer.putShort(interpretedValue.shortValue());
-
-      else if (fieldByteCount <= 4)
-         buffer.putInt(interpretedValue.intValue());
-
-      else if (fieldByteCount <= MAX_LONG_BYTE_SIZE)
-         buffer.putLong(interpretedValue);
-
-      buffer.rewind();
-
-      return buffer;
-   }
+		return buffer;
+	}
 }

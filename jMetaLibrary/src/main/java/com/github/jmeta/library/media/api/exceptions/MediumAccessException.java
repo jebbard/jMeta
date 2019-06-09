@@ -15,17 +15,15 @@ import com.github.jmeta.utility.errors.api.services.JMetaRuntimeException;
  */
 public class MediumAccessException extends JMetaRuntimeException {
 
-   private static final long serialVersionUID = -1281570771668926850L;
+	private static final long serialVersionUID = -1281570771668926850L;
 
-   /**
-    * Creates a new {@link MediumAccessException}.
-    * 
-    * @param message
-    *           The message.
-    * @param cause
-    *           The cause.
-    */
-   public MediumAccessException(String message, Throwable cause) {
-      super(message, cause);
-   }
+	/**
+	 * Creates a new {@link MediumAccessException}.
+	 * 
+	 * @param message The message.
+	 * @param cause   The cause.
+	 */
+	public MediumAccessException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

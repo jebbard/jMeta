@@ -13,36 +13,37 @@ import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.MediumOffset;
 
 /**
- * Thrown whenever the {@link ContainerDataFormat} of a top-level {@link DataBlock} within a {@link AbstractMedium} is unknown.
- * I.e. whenever a {@link AbstractMedium} contains at least one top-level data block whose {@link ContainerDataFormat} could not
- * be identified, this exception is thrown.
+ * Thrown whenever the {@link ContainerDataFormat} of a top-level
+ * {@link DataBlock} within a {@link AbstractMedium} is unknown. I.e. whenever a
+ * {@link AbstractMedium} contains at least one top-level data block whose
+ * {@link ContainerDataFormat} could not be identified, this exception is
+ * thrown.
  */
 public class UnknownDataFormatException extends RuntimeException {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   /**
-    * Creates a new {@link UnknownDataFormatException}.
-    * 
-    * @param reference
-    * @param message
-    */
-   public UnknownDataFormatException(MediumOffset reference,
-      String message) {
-      super(message);
+	private final MediumOffset m_mediumReference;
 
-      m_mediumReference = reference;
-   }
+	/**
+	 * Creates a new {@link UnknownDataFormatException}.
+	 * 
+	 * @param reference
+	 * @param message
+	 */
+	public UnknownDataFormatException(MediumOffset reference, String message) {
+		super(message);
 
-   /**
-    * Returns medium
-    *
-    * @return medium
-    */
-   public MediumOffset getMediumReference() {
+		m_mediumReference = reference;
+	}
 
-      return m_mediumReference;
-   }
+	/**
+	 * Returns medium
+	 *
+	 * @return medium
+	 */
+	public MediumOffset getMediumReference() {
 
-   private final MediumOffset m_mediumReference;
+		return m_mediumReference;
+	}
 }

@@ -22,20 +22,20 @@ import com.github.jmeta.library.media.api.services.MediumStore;
  */
 public class MP3DataBlocksService extends AbstractDataBlockService {
 
-   /**
-    * Creates a new {@link MP3DataBlocksService}.
-    */
-   public MP3DataBlocksService() {
-      super(MP3Extension.MP3);
-   }
+	/**
+	 * Creates a new {@link MP3DataBlocksService}.
+	 */
+	public MP3DataBlocksService() {
+		super(MP3Extension.MP3);
+	}
 
-   @Override
-   public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
-      DataBlockEventBus eventBus) {
-      AbstractDataBlockReader mp3DataBlockReader = new ForwardDataBlockReader(spec, mediumStore, eventBus);
+	@Override
+	public DataBlockReader createForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore,
+		DataBlockEventBus eventBus) {
+		AbstractDataBlockReader mp3DataBlockReader = new ForwardDataBlockReader(spec, mediumStore, eventBus);
 
-      mp3DataBlockReader.setCustomSizeProvider(new MP3SizeProvider());
+		mp3DataBlockReader.setCustomSizeProvider(new MP3SizeProvider());
 
-      return mp3DataBlockReader;
-   }
+		return mp3DataBlockReader;
+	}
 }

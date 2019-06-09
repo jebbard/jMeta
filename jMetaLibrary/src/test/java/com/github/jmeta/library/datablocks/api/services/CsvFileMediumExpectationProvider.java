@@ -146,7 +146,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
 
 	/**
 	 * Creates a new {@link CsvFileMediumExpectationProvider}.
-	 * 
+	 *
 	 * @param repository          The {@link DataFormatRepository}.
 	 * @param testFile            The test file that is read. Necessary for reading
 	 *                            the expected bytes.
@@ -308,7 +308,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
 
 	/**
 	 * Processes csv data in the given rows.
-	 * 
+	 *
 	 * @param csvRows The {@link List} of csv rows.
 	 *
 	 * @throws InvalidTestDataCsvFormatException If test data in the csv file is
@@ -356,7 +356,7 @@ public class CsvFileMediumExpectationProvider extends AbstractMediumExpectationP
 	/**
 	 * Processes (i.e. reads, validates and optionally stores) the
 	 * {@link #COL_DATA_FORMAT} column of the csv file for the given row.
-	 * 
+	 *
 	 * @param row       The row in the csv file, column contents mapped to column
 	 *                  names.
 	 * @param rowPrefix A string prefix describing the current row for informational

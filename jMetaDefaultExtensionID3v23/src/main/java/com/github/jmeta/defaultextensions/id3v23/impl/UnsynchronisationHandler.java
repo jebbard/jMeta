@@ -30,115 +30,114 @@ import com.github.jmeta.utility.byteutils.api.services.ByteArrayUtils;
  */
 public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(UnsynchronisationHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UnsynchronisationHandler.class);
 
-   /**
-    * Creates a new {@link UnsynchronisationHandler}.
-    *
-    * @param dbFactory
-    *           The {@link DataBlockFactory}
-    */
-   public UnsynchronisationHandler(ExtendedDataBlockFactory dbFactory) {
-      super(ID3v2TransformationType.UNSYNCHRONIZATION, dbFactory);
-   }
+	/**
+	 * Creates a new {@link UnsynchronisationHandler}.
+	 *
+	 * @param dbFactory The {@link DataBlockFactory}
+	 */
+	public UnsynchronisationHandler(ExtendedDataBlockFactory dbFactory) {
+		super(ID3v2TransformationType.UNSYNCHRONIZATION, dbFactory);
+	}
 
-   /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
-    */
-   @Override
-   public boolean requiresTransform(Container container) {
+	/**
+	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
+	 */
+	@Override
+	public boolean requiresTransform(Container container) {
 
-      if (container.getHeaders().size() == 0) {
-         return false;
-      }
+		if (container.getHeaders().size() == 0) {
+			return false;
+		}
 
-      Header id3v2Header = container.getHeaders().get(0);
+		Header id3v2Header = container.getHeaders().get(0);
 
-      for (int i = 0; i < id3v2Header.getFields().size(); ++i) {
-         Field<?> field = id3v2Header.getFields().get(i);
+		for (int i = 0; i < id3v2Header.getFields().size(); ++i) {
+			Field<?> field = id3v2Header.getFields().get(i);
 
-         if (field.getId().equals(ID3v23Extension.REF_TAG_HEADER_FLAGS.getId())) {
-            try {
-               Flags flags = (Flags) field.getInterpretedValue();
+			if (field.getId().equals(ID3v23Extension.REF_TAG_HEADER_FLAGS.getId())) {
+				try {
+					Flags flags = (Flags) field.getInterpretedValue();
 
-               return flags.getFlag(ID3v23Extension.TAG_FLAGS_UNSYNCHRONIZATION);
-            } catch (BinaryValueConversionException e) {
-               LOGGER.warn(
-                  "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.",
-                  field.getId());
-               LOGGER.error("requiresTransform", e);
-               return false;
-            }
-         }
-      }
+					return flags.getFlag(ID3v23Extension.TAG_FLAGS_UNSYNCHRONIZATION);
+				} catch (BinaryValueConversionException e) {
+					UnsynchronisationHandler.LOGGER.warn(
+						"Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.",
+						field.getId());
+					UnsynchronisationHandler.LOGGER.error("requiresTransform", e);
+					return false;
+				}
+			}
+		}
 
-      return false;
-   }
+		return false;
+	}
 
-   /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
-    */
-   @Override
-   public boolean requiresUntransform(Container container) {
+	/**
+	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
+	 */
+	@Override
+	public boolean requiresUntransform(Container container) {
 
-      return requiresTransform(container);
-   }
+		return requiresTransform(container);
+	}
 
-   /**
-    * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
-    */
-   @Override
-   protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
+	/**
+	 * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
+	 */
+	@Override
+	protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
 
-      if (payloadBytes.remaining() < 1) {
-         return new byte[][] { payloadBytes.array() };
-      }
+		if (payloadBytes.remaining() < 1) {
+			return new byte[][] { payloadBytes.array() };
+		}
 
-      List<Byte> synchronisedByteList = new ArrayList<>(payloadBytes.remaining());
+		List<Byte> unsynchronisedByteList = new ArrayList<>(payloadBytes.remaining());
 
-      for (int i = payloadBytes.remaining() - 1; i > 0; i--) {
-         byte previousByte = payloadBytes.get(i - 1);
-         byte nextByte = payloadBytes.get(i);
+		for (int i = 0; i < (payloadBytes.remaining() - 1); i++) {
+			byte firstByte = payloadBytes.get(i);
+			byte secondByte = payloadBytes.get(i + 1);
 
-         if (previousByte == 0xFF && nextByte == 0x00) {
-            synchronisedByteList.add(previousByte);
-         } else {
-            synchronisedByteList.add(nextByte);
-         }
-      }
+			unsynchronisedByteList.add(firstByte);
 
-      synchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));
+			if ((firstByte == 0xFF) && ((secondByte >= 0xE0) || (secondByte == 0))) {
+				unsynchronisedByteList.add((byte) 0);
+			}
+		}
 
-      Collections.reverse(synchronisedByteList);
+		unsynchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));
 
-      return new byte[][] { ByteArrayUtils.toArray(synchronisedByteList) };
-   }
+		return new byte[][] { ByteArrayUtils.toArray(unsynchronisedByteList) };
+	}
 
-   /**
-    * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
-    */
-   @Override
-   protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
+	/**
+	 * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
+	 */
+	@Override
+	protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 
-      if (payloadBytes.remaining() < 1) {
-         return new byte[][] { payloadBytes.array() };
-      }
+		if (payloadBytes.remaining() < 1) {
+			return new byte[][] { payloadBytes.array() };
+		}
 
-      List<Byte> unsynchronisedByteList = new ArrayList<>(payloadBytes.remaining());
+		List<Byte> synchronisedByteList = new ArrayList<>(payloadBytes.remaining());
 
-      for (int i = 0; i < payloadBytes.remaining() - 1; i++) {
-         byte firstByte = payloadBytes.get(i);
-         byte secondByte = payloadBytes.get(i + 1);
+		for (int i = payloadBytes.remaining() - 1; i > 0; i--) {
+			byte previousByte = payloadBytes.get(i - 1);
+			byte nextByte = payloadBytes.get(i);
 
-         unsynchronisedByteList.add(firstByte);
+			if ((previousByte == 0xFF) && (nextByte == 0x00)) {
+				synchronisedByteList.add(previousByte);
+			} else {
+				synchronisedByteList.add(nextByte);
+			}
+		}
 
-         if (firstByte == 0xFF && (secondByte >= 0xE0 || secondByte == 0)) {
-            unsynchronisedByteList.add((byte) 0);
-         }
-      }
+		synchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));
 
-      unsynchronisedByteList.add(payloadBytes.get(payloadBytes.remaining() - 1));
+		Collections.reverse(synchronisedByteList);
 
-      return new byte[][] { ByteArrayUtils.toArray(unsynchronisedByteList) };
-   }
+		return new byte[][] { ByteArrayUtils.toArray(synchronisedByteList) };
+	}
 }

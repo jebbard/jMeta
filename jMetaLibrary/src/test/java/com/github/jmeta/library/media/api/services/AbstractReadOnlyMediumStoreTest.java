@@ -9,8 +9,6 @@
  */
 package com.github.jmeta.library.media.api.services;
 
-import static com.github.jmeta.library.media.api.helper.TestMedia.at;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -36,273 +34,279 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * {@link AbstractReadOnlyMediumStoreTest} contains negative tests for {@link MediumStore} write methods on read-only
- * {@link Medium} instances.
- * 
- * In addition it contains all general method tests for {@link MediumStore#open()}, {@link MediumStore#close()},
- * {@link MediumStore#getMedium()} and {@link MediumStore#createMediumOffset(long)}.
- * 
+ * {@link AbstractReadOnlyMediumStoreTest} contains negative tests for
+ * {@link MediumStore} write methods on read-only {@link Medium} instances.
+ *
+ * In addition it contains all general method tests for
+ * {@link MediumStore#open()}, {@link MediumStore#close()},
+ * {@link MediumStore#getMedium()} and
+ * {@link MediumStore#createMediumOffset(long)}.
+ *
  * The reason for separating this class from others:
  * <ul>
- * <li>Read-only media only behave different than writable media for the write methods</li>
- * <li>In addition, putting the general test cases at the top of the class hierarchy the other test class(es) would lead
- * to a lot of duplicate test cases executed, here they are just run once per medium type</li>
+ * <li>Read-only media only behave different than writable media for the write
+ * methods</li>
+ * <li>In addition, putting the general test cases at the top of the class
+ * hierarchy the other test class(es) would lead to a lot of duplicate test
+ * cases executed, here they are just run once per medium type</li>
  * </ul>
- * 
- * The media used for testing all must contain {@link TestMedia#FIRST_TEST_FILE_CONTENT}, a String fully containing
- * only human-readable standard ASCII characters. This guarantees that 1 bytes = 1 character. Furthermore, all bytes
- * inserted must also be standard human-readable ASCII characters with this property.
  *
- * @param <T>
- *           The type of {@link Medium} to test
+ * The media used for testing all must contain
+ * {@link TestMedia#FIRST_TEST_FILE_CONTENT}, a String fully containing only
+ * human-readable standard ASCII characters. This guarantees that 1 bytes = 1
+ * character. Furthermore, all bytes inserted must also be standard
+ * human-readable ASCII characters with this property.
+ *
+ * @param <T> The type of {@link Medium} to test
  */
 public abstract class AbstractReadOnlyMediumStoreTest<T extends Medium<?>> {
 
-   protected MediumStore mediumStoreUnderTest;
-   protected T currentMedium;
+	/**
+	 * Validates all test files needed in this test class
+	 */
+	@BeforeClass
+	public static void validateTestFiles() {
+		TestMedia.validateTestFiles();
+	}
 
-   /**
-    * Validates all test files needed in this test class
-    */
-   @BeforeClass
-   public static void validateTestFiles() {
-      TestMedia.validateTestFiles();
-   }
+	protected MediumStore mediumStoreUnderTest;
 
-   /**
-    * Closes the {@link MediumStore} under test, if necessary.
-    */
-   @After
-   public void tearDown() {
-      if (mediumStoreUnderTest != null && mediumStoreUnderTest.isOpened()) {
-         mediumStoreUnderTest.close();
-      }
-   }
+	protected T currentMedium;
 
-   /**
-    * Tests {@link MediumStore#close()}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void open_onOpenedMediumStore_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+	/**
+	 * Tests {@link MediumStore#close()}.
+	 */
+	@Test(expected = MediumStoreClosedException.class)
+	public void close_onClosedMediumStore_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.open();
-      mediumStoreUnderTest.open();
-   }
+		mediumStoreUnderTest.open();
 
-   /**
-    * Tests {@link MediumStore#close()}.
-    */
-   @Test
-   public void close_onOpenedMediumStore_closesStore() {
-      mediumStoreUnderTest = createMediumStore();
+		mediumStoreUnderTest.close();
+		mediumStoreUnderTest.close();
+	}
 
-      mediumStoreUnderTest.open();
+	/**
+	 * Tests {@link MediumStore#close()}.
+	 */
+	@Test
+	public void close_onOpenedMediumStore_closesStore() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.close();
+		mediumStoreUnderTest.open();
 
-      Assert.assertFalse(mediumStoreUnderTest.isOpened());
-   }
+		mediumStoreUnderTest.close();
 
-   /**
-    * Tests {@link MediumStore#close()}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void close_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+		Assert.assertFalse(mediumStoreUnderTest.isOpened());
+	}
 
-      mediumStoreUnderTest.open();
+	/**
+	 * Creates a {@link Medium} for testing.
+	 * 
+	 * @return a {@link Medium} for testing
+	 * 
+	 * @throws IOException In case of any errors creating the {@link Medium}
+	 */
+	protected abstract T createMedium() throws IOException;
 
-      mediumStoreUnderTest.close();
-      mediumStoreUnderTest.close();
-   }
+	/**
+	 * Creates a test class implementation specific {@link MediumAccessor} to use
+	 * for testing.
+	 * 
+	 * @param mediumToUse The {@link Medium} to use for the {@link MediumStore}.
+	 * @return a {@link MediumAccessor} to use based on a given {@link Medium}.
+	 */
+	protected abstract MediumAccessor<T> createMediumAccessor(T mediumToUse);
 
-   /**
-    * Tests {@link MediumStore#isOpened()}.
-    */
-   @Test
-   public void isOpened_onNewMediumStore_returnsFalse() {
-      mediumStoreUnderTest = createMediumStore();
+	/**
+	 * Tests {@link MediumStore#createMediumOffset(long)}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void createMediumReference_forInvalidOffset_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-      Assert.assertFalse(mediumStoreUnderTest.isOpened());
-   }
+		mediumStoreUnderTest.open();
 
-   /**
-    * Tests {@link MediumStore#isOpened()} and {@link MediumStore#open()}.
-    */
-   @Test
-   public void isOpened_onOpenedMediumStore_returnsTrue() {
-      mediumStoreUnderTest = createMediumStore();
+		mediumStoreUnderTest.createMediumOffset(-10);
+	}
 
-      mediumStoreUnderTest.open();
+	/**
+	 * Tests {@link MediumStore#createMediumOffset(long)}.
+	 */
+	@Test(expected = MediumStoreClosedException.class)
+	public void createMediumReference_onClosedMediumStore_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-      Assert.assertTrue(mediumStoreUnderTest.isOpened());
-   }
+		mediumStoreUnderTest.createMediumOffset(10);
+	}
 
-   /**
-    * Tests {@link MediumStore#getMedium()}.
-    */
-   @Test
-   public void getMedium_onOpenedMediumStore_returnsExpectedMedium() {
-      mediumStoreUnderTest = createMediumStore();
+	/**
+	 * Tests {@link MediumStore#createMediumOffset(long)}.
+	 */
+	@Test
+	public void createMediumReference_onOpenedMediumStore_returnsExpectedReference() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.open();
+		mediumStoreUnderTest.open();
 
-      Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
-   }
+		int offset = 10;
+		MediumOffset actualReference = mediumStoreUnderTest.createMediumOffset(offset);
 
-   /**
-    * Tests {@link MediumStore#getMedium()}.
-    */
-   @Test
-   public void getMedium_onClosedMediumStore_returnsExpectedMedium() {
-      mediumStoreUnderTest = createMediumStore();
+		Assert.assertEquals(TestMedia.at(currentMedium, offset), actualReference);
+	}
 
-      Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
-   }
+	/**
+	 * Creates a {@link MediumStore} based on a default {@link Medium}.
+	 * 
+	 * @return a {@link MediumStore} based on a default {@link Medium}
+	 */
+	protected MediumStore createMediumStore() {
+		try {
+			currentMedium = createMedium();
 
-   /**
-    * Tests {@link MediumStore#createMediumOffset(long)}.
-    */
-   @Test
-   public void createMediumReference_onOpenedMediumStore_returnsExpectedReference() {
-      mediumStoreUnderTest = createMediumStore();
+			return createMediumStoreToTest(currentMedium);
+		} catch (IOException e) {
+			throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
+		}
+	}
 
-      mediumStoreUnderTest.open();
+	/**
+	 * Creates a {@link MediumStore} to test based on a given {@link Medium}.
+	 * 
+	 * @param mediumToUse The {@link Medium} to use for the {@link MediumStore}.
+	 * @return a {@link MediumStore} to test based on a given {@link Medium}.
+	 */
+	protected MediumStore createMediumStoreToTest(T mediumToUse) {
+		MediumOffsetFactory mediumReferenceFactory = new MediumOffsetFactory(mediumToUse);
+		return new StandardMediumStore<>(createMediumAccessor(mediumToUse), new MediumCache(mediumToUse),
+			mediumReferenceFactory, new MediumChangeManager(mediumReferenceFactory));
+	}
 
-      int offset = 10;
-      MediumOffset actualReference = mediumStoreUnderTest.createMediumOffset(offset);
+	/**
+	 * Tests {@link MediumStore#flush()}.
+	 */
+	@Test(expected = ReadOnlyMediumException.class)
+	public void flush_onReadOnlyMedium_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-      Assert.assertEquals(at(currentMedium, offset), actualReference);
-   }
+		mediumStoreUnderTest.open();
 
-   /**
-    * Tests {@link MediumStore#createMediumOffset(long)}.
-    */
-   @Test(expected = MediumStoreClosedException.class)
-   public void createMediumReference_onClosedMediumStore_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+		mediumStoreUnderTest.flush();
+	}
 
-      mediumStoreUnderTest.createMediumOffset(10);
-   }
+	/**
+	 * Tests {@link MediumStore#getMedium()}.
+	 */
+	@Test
+	public void getMedium_onClosedMediumStore_returnsExpectedMedium() {
+		mediumStoreUnderTest = createMediumStore();
 
-   /**
-    * Tests {@link MediumStore#createMediumOffset(long)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void createMediumReference_forInvalidOffset_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+		Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
+	}
 
-      mediumStoreUnderTest.open();
+	/**
+	 * Tests {@link MediumStore#getMedium()}.
+	 */
+	@Test
+	public void getMedium_onOpenedMediumStore_returnsExpectedMedium() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.createMediumOffset(-10);
-   }
+		mediumStoreUnderTest.open();
 
-   /**
-    * Tests {@link MediumStore#replaceData(MediumOffset, int, java.nio.ByteBuffer)}.
-    */
-   @Test(expected = ReadOnlyMediumException.class)
-   public void replaceData_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+		Assert.assertEquals(currentMedium, mediumStoreUnderTest.getMedium());
+	}
 
-      mediumStoreUnderTest.open();
+	/**
+	 * Tests {@link MediumStore#insertData(MediumOffset, ByteBuffer)}.
+	 */
+	@Test(expected = ReadOnlyMediumException.class)
+	public void insertData_onReadOnlyMedium_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.replaceData(at(currentMedium, 10), 20, ByteBuffer.allocate(10));
-   }
+		mediumStoreUnderTest.open();
 
-   /**
-    * Tests {@link MediumStore#removeData(MediumOffset, int)}.
-    */
-   @Test(expected = ReadOnlyMediumException.class)
-   public void removeData_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+		mediumStoreUnderTest.insertData(TestMedia.at(currentMedium, 10), ByteBuffer.allocate(10));
+	}
 
-      mediumStoreUnderTest.open();
+	/**
+	 * Tests {@link MediumStore#isOpened()}.
+	 */
+	@Test
+	public void isOpened_onNewMediumStore_returnsFalse() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.removeData(at(currentMedium, 10), 20);
-   }
+		Assert.assertFalse(mediumStoreUnderTest.isOpened());
+	}
 
-   /**
-    * Tests {@link MediumStore#insertData(MediumOffset, ByteBuffer)}.
-    */
-   @Test(expected = ReadOnlyMediumException.class)
-   public void insertData_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+	/**
+	 * Tests {@link MediumStore#isOpened()} and {@link MediumStore#open()}.
+	 */
+	@Test
+	public void isOpened_onOpenedMediumStore_returnsTrue() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.open();
+		mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.insertData(at(currentMedium, 10), ByteBuffer.allocate(10));
-   }
+		Assert.assertTrue(mediumStoreUnderTest.isOpened());
+	}
 
-   /**
-    * Tests {@link MediumStore#undo(com.github.jmeta.library.media.api.types.MediumAction)}.
-    */
-   @Test(expected = ReadOnlyMediumException.class)
-   public void undo_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+	/**
+	 * Tests {@link MediumStore#close()}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void open_onOpenedMediumStore_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-      mediumStoreUnderTest.open();
+		mediumStoreUnderTest.open();
+		mediumStoreUnderTest.open();
+	}
 
-      mediumStoreUnderTest
-         .undo(new MediumAction(MediumActionType.REMOVE, new MediumRegion(at(currentMedium, 10), 20), 0, null));
-   }
+	/**
+	 * Tests {@link MediumStore#removeData(MediumOffset, int)}.
+	 */
+	@Test(expected = ReadOnlyMediumException.class)
+	public void removeData_onReadOnlyMedium_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-   /**
-    * Tests {@link MediumStore#flush()}.
-    */
-   @Test(expected = ReadOnlyMediumException.class)
-   public void flush_onReadOnlyMedium_throwsException() {
-      mediumStoreUnderTest = createMediumStore();
+		mediumStoreUnderTest.open();
 
-      mediumStoreUnderTest.open();
+		mediumStoreUnderTest.removeData(TestMedia.at(currentMedium, 10), 20);
+	}
 
-      mediumStoreUnderTest.flush();
-   }
+	/**
+	 * Tests
+	 * {@link MediumStore#replaceData(MediumOffset, int, java.nio.ByteBuffer)}.
+	 */
+	@Test(expected = ReadOnlyMediumException.class)
+	public void replaceData_onReadOnlyMedium_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-   /**
-    * Creates a {@link Medium} for testing.
-    * 
-    * @return a {@link Medium} for testing
-    * 
-    * @throws IOException
-    *            In case of any errors creating the {@link Medium}
-    */
-   protected abstract T createMedium() throws IOException;
+		mediumStoreUnderTest.open();
 
-   /**
-    * Creates a test class implementation specific {@link MediumAccessor} to use for testing.
-    * 
-    * @param mediumToUse
-    *           The {@link Medium} to use for the {@link MediumStore}.
-    * @return a {@link MediumAccessor} to use based on a given {@link Medium}.
-    */
-   protected abstract MediumAccessor<T> createMediumAccessor(T mediumToUse);
+		mediumStoreUnderTest.replaceData(TestMedia.at(currentMedium, 10), 20, ByteBuffer.allocate(10));
+	}
 
-   /**
-    * Creates a {@link MediumStore} to test based on a given {@link Medium}.
-    * 
-    * @param mediumToUse
-    *           The {@link Medium} to use for the {@link MediumStore}.
-    * @return a {@link MediumStore} to test based on a given {@link Medium}.
-    */
-   protected MediumStore createMediumStoreToTest(T mediumToUse) {
-      MediumOffsetFactory mediumReferenceFactory = new MediumOffsetFactory(mediumToUse);
-      return new StandardMediumStore<>(createMediumAccessor(mediumToUse), new MediumCache(mediumToUse),
-         mediumReferenceFactory, new MediumChangeManager(mediumReferenceFactory));
-   }
+	/**
+	 * Closes the {@link MediumStore} under test, if necessary.
+	 */
+	@After
+	public void tearDown() {
+		if ((mediumStoreUnderTest != null) && mediumStoreUnderTest.isOpened()) {
+			mediumStoreUnderTest.close();
+		}
+	}
 
-   /**
-    * Creates a {@link MediumStore} based on a default {@link Medium}.
-    * 
-    * @return a {@link MediumStore} based on a default {@link Medium}
-    */
-   protected MediumStore createMediumStore() {
-      try {
-         currentMedium = createMedium();
+	/**
+	 * Tests
+	 * {@link MediumStore#undo(com.github.jmeta.library.media.api.types.MediumAction)}.
+	 */
+	@Test(expected = ReadOnlyMediumException.class)
+	public void undo_onReadOnlyMedium_throwsException() {
+		mediumStoreUnderTest = createMediumStore();
 
-         return createMediumStoreToTest(currentMedium);
-      } catch (IOException e) {
-         throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
-      }
-   }
+		mediumStoreUnderTest.open();
+
+		mediumStoreUnderTest.undo(
+			new MediumAction(MediumActionType.REMOVE, new MediumRegion(TestMedia.at(currentMedium, 10), 20), 0, null));
+	}
 }

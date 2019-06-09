@@ -14,8 +14,8 @@ package com.github.jmeta.utility.extmanager.impl.testextensions;
  */
 public interface TestExtensionServiceOne {
 
-   /**
-    * An example method
-    */
-   public void testMethod();
+	/**
+	 * An example method
+	 */
+	void testMethod();
 }

@@ -10,12 +10,13 @@
 package com.github.jmeta.tools.benchmark.api.types;
 
 /**
- * {@link Command} represents a command corresponding to the command pattern having an execute method.
+ * {@link Command} represents a command corresponding to the command pattern
+ * having an execute method.
  */
 public interface Command {
 
-   /**
-    * Executes the command.
-    */
-   public void execute();
+	/**
+	 * Executes the command.
+	 */
+	void execute();
 }
