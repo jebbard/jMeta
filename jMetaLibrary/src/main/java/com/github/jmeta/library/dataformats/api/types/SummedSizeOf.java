@@ -9,9 +9,6 @@
  */
 package com.github.jmeta.library.dataformats.api.types;
 
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_SUMMED_SIZE_DIFFERENT_PARENT;
-import static com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationException.VLD_FIELD_FUNC_SUMMED_SIZE_NON_SIBLING_CHILDREN;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -23,109 +20,112 @@ import com.github.jmeta.library.dataformats.api.exceptions.InvalidSpecificationE
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 
 /**
- * {@link SummedSizeOf} is a field function expressing that the field it refers to contains the summed size of two or
- * more consecutive other data blocks.
+ * {@link SummedSizeOf} is a field function expressing that the field it refers
+ * to contains the summed size of two or more consecutive other data blocks.
  */
 public class SummedSizeOf extends SizeOf {
 
-   /**
-    * Creates a new {@link SummedSizeOf} field function.
-    *
-    * @param referencedBlocks
-    *           The referenced {@link DataBlockCrossReference}s, must not be null and must at least contain one entry
-    */
-   public SummedSizeOf(DataBlockCrossReference... referencedBlocks) {
-      super(referencedBlocks);
-   }
+	/**
+	 * Creates a new {@link SummedSizeOf} field function.
+	 *
+	 * @param referencedBlocks The referenced {@link DataBlockCrossReference}s, must
+	 *                         not be null and must at least contain one entry
+	 */
+	public SummedSizeOf(DataBlockCrossReference... referencedBlocks) {
+		super(referencedBlocks);
+	}
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#withReplacedReferences(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
-    */
-   @Override
-   public AbstractFieldFunction<Long> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
-      return new SummedSizeOf(replacedReferences);
-   }
+	private void ensureAtMostOneTargetBlockHasNoSize(DataBlockDescription fieldDesc, DataFormatSpecification spec,
+		List<DataBlockId> targetDataBlockIds) {
+		Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = spec
+			.getAllFieldFunctionsByTargetId();
 
-   /**
-    * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#validate(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
-    *      com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
-    */
-   @Override
-   public void validate(DataBlockDescription fieldDesc, DataFormatSpecification spec) {
-      super.validate(fieldDesc, spec);
+		Set<DataBlockId> targetBlocksWithoutSize = new HashSet<>();
 
-      List<DataBlockId> targetDataBlockIds = getReferencedBlocks().stream().map(DataBlockCrossReference::getId)
-         .collect(Collectors.toList());
+		for (DataBlockId targetId : targetDataBlockIds) {
+			DataBlockDescription targetDescc = spec.getDataBlockDescription(targetId);
 
-      ensureAtMostOneTargetBlockHasNoSize(fieldDesc, spec, targetDataBlockIds);
-      ensureConsecutiveTargetBlocks(fieldDesc, spec, targetDataBlockIds);
-   }
+			boolean hasSuitableFieldFunction = fieldFunctionsByTargetId.containsKey(targetId)
+				&& fieldFunctionsByTargetId.get(targetId).stream().anyMatch(ff -> ff.getClass().equals(SizeOf.class));
 
-   private void ensureConsecutiveTargetBlocks(DataBlockDescription fieldDesc, DataFormatSpecification spec,
-      List<DataBlockId> targetDataBlockIds) {
+			if (!targetDescc.hasFixedSize() && !hasSuitableFieldFunction) {
+				targetBlocksWithoutSize.add(targetId);
+			}
+		}
 
-      List<DataBlockId> distinctParents = targetDataBlockIds.stream().map(targetId -> targetId.getParentId()).distinct()
-         .collect(Collectors.toList());
+		if (targetBlocksWithoutSize.size() > 1) {
+			throw new InvalidSpecificationException(InvalidSpecificationException.VLD_FIELD_FUNC_INVALID_SUMMED_SIZE,
+				fieldDesc, targetBlocksWithoutSize);
+		}
+	}
 
-      if (distinctParents.size() > 1) {
-         throw new InvalidSpecificationException(VLD_FIELD_FUNC_SUMMED_SIZE_DIFFERENT_PARENT, fieldDesc,
-            targetDataBlockIds, distinctParents);
-      }
+	private void ensureConsecutiveTargetBlocks(DataBlockDescription fieldDesc, DataFormatSpecification spec,
+		List<DataBlockId> targetDataBlockIds) {
 
-      DataBlockDescription parentDesc = spec.getDataBlockDescription(distinctParents.get(0));
+		List<DataBlockId> distinctParents = targetDataBlockIds.stream().map(targetId -> targetId.getParentId())
+			.distinct().collect(Collectors.toList());
 
-      Iterator<DataBlockId> targetIdIterator = targetDataBlockIds.iterator();
+		if (distinctParents.size() > 1) {
+			throw new InvalidSpecificationException(
+				InvalidSpecificationException.VLD_FIELD_FUNC_SUMMED_SIZE_DIFFERENT_PARENT, fieldDesc,
+				targetDataBlockIds, distinctParents);
+		}
 
-      List<DataBlockDescription> children = getChildrenStartingWithId(parentDesc, targetIdIterator.next());
+		DataBlockDescription parentDesc = spec.getDataBlockDescription(distinctParents.get(0));
 
-      Iterator<DataBlockDescription> childIterator = children.iterator();
+		Iterator<DataBlockId> targetIdIterator = targetDataBlockIds.iterator();
 
-      // Skip the first child itself
-      childIterator.next();
+		List<DataBlockDescription> children = getChildrenStartingWithId(parentDesc, targetIdIterator.next());
 
-      while (targetIdIterator.hasNext()) {
-         if (!childIterator.hasNext() || !childIterator.next().getId().equals(targetIdIterator.next())) {
-            throw new InvalidSpecificationException(VLD_FIELD_FUNC_SUMMED_SIZE_NON_SIBLING_CHILDREN, fieldDesc,
-               targetDataBlockIds, parentDesc.getId(),
-               children.stream().map(DataBlockDescription::getId).collect(Collectors.toList()));
-         }
-      }
-   }
+		Iterator<DataBlockDescription> childIterator = children.iterator();
 
-   private List<DataBlockDescription> getChildrenStartingWithId(DataBlockDescription parentDesc, DataBlockId firstId) {
-      List<DataBlockDescription> children = parentDesc.getOrderedChildren();
+		// Skip the first child itself
+		childIterator.next();
 
-      int childIndexWithId = children.stream().map(DataBlockDescription::getId).collect(Collectors.toList())
-         .indexOf(firstId);
+		while (targetIdIterator.hasNext()) {
+			if (!childIterator.hasNext() || !childIterator.next().getId().equals(targetIdIterator.next())) {
+				throw new InvalidSpecificationException(
+					InvalidSpecificationException.VLD_FIELD_FUNC_SUMMED_SIZE_NON_SIBLING_CHILDREN, fieldDesc,
+					targetDataBlockIds, parentDesc.getId(),
+					children.stream().map(DataBlockDescription::getId).collect(Collectors.toList()));
+			}
+		}
+	}
 
-      if (childIndexWithId == -1) {
-         throw new IllegalStateException(
-            "Child id of parent is not in list of child DataBlockDescription which must never happen");
-      }
+	private List<DataBlockDescription> getChildrenStartingWithId(DataBlockDescription parentDesc, DataBlockId firstId) {
+		List<DataBlockDescription> children = parentDesc.getOrderedChildren();
 
-      return children.subList(childIndexWithId, children.size());
-   }
+		int childIndexWithId = children.stream().map(DataBlockDescription::getId).collect(Collectors.toList())
+			.indexOf(firstId);
 
-   private void ensureAtMostOneTargetBlockHasNoSize(DataBlockDescription fieldDesc, DataFormatSpecification spec,
-      List<DataBlockId> targetDataBlockIds) {
-      Map<DataBlockId, List<AbstractFieldFunction<?>>> fieldFunctionsByTargetId = spec.getAllFieldFunctionsByTargetId();
+		if (childIndexWithId == -1) {
+			throw new IllegalStateException(
+				"Child id of parent is not in list of child DataBlockDescription which must never happen");
+		}
 
-      Set<DataBlockId> targetBlocksWithoutSize = new HashSet<>();
+		return children.subList(childIndexWithId, children.size());
+	}
 
-      for (DataBlockId targetId : targetDataBlockIds) {
-         DataBlockDescription targetDescc = spec.getDataBlockDescription(targetId);
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.AbstractFieldFunction#validate(com.github.jmeta.library.dataformats.api.types.DataBlockDescription,
+	 *      com.github.jmeta.library.dataformats.api.services.DataFormatSpecification)
+	 */
+	@Override
+	public void validate(DataBlockDescription fieldDesc, DataFormatSpecification spec) {
+		super.validate(fieldDesc, spec);
 
-         boolean hasSuitableFieldFunction = fieldFunctionsByTargetId.containsKey(targetId)
-            && fieldFunctionsByTargetId.get(targetId).stream().anyMatch(ff -> ff.getClass().equals(SizeOf.class));
+		List<DataBlockId> targetDataBlockIds = getReferencedBlocks().stream().map(DataBlockCrossReference::getId)
+			.collect(Collectors.toList());
 
-         if (!targetDescc.hasFixedSize() && !hasSuitableFieldFunction) {
-            targetBlocksWithoutSize.add(targetId);
-         }
-      }
+		ensureAtMostOneTargetBlockHasNoSize(fieldDesc, spec, targetDataBlockIds);
+		ensureConsecutiveTargetBlocks(fieldDesc, spec, targetDataBlockIds);
+	}
 
-      if (targetBlocksWithoutSize.size() > 1) {
-         throw new InvalidSpecificationException(InvalidSpecificationException.VLD_FIELD_FUNC_INVALID_SUMMED_SIZE,
-            fieldDesc, targetBlocksWithoutSize);
-      }
-   }
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.types.SizeOf#withReplacedReferences(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference[])
+	 */
+	@Override
+	public AbstractFieldFunction<Long> withReplacedReferences(DataBlockCrossReference... replacedReferences) {
+		return new SummedSizeOf(replacedReferences);
+	}
 }

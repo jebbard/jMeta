@@ -21,66 +21,68 @@ import com.github.jmeta.library.media.api.types.FileMedium;
  */
 public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 
-   /**
-    * Tests the creation and opening of a new {@link FileMediumAccessor} on an already locked medium.
-    */
-   @Test(expected = MediumAccessException.class)
-   public void createNewFileMediumAccessor_forAlreadyLockedMedium_throwsException() {
+	/**
+	 * @see AbstractMediumAccessorTest#getImplementationToTest()
+	 */
+	@Override
+	protected MediumAccessor<?> createImplementationToTest() {
+		return new FileMediumAccessor(getExpectedMedium());
+	}
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+	/**
+	 * Tests the creation and opening of a new {@link FileMediumAccessor} on an
+	 * already locked medium.
+	 */
+	@Test(expected = MediumAccessException.class)
+	public void createNewFileMediumAccessor_forAlreadyLockedMedium_throwsException() {
 
-      mediumAccessor.open();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      // Create second instance on the same medium
-      new FileMediumAccessor(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true)).open();
-   }
+		mediumAccessor.open();
 
-   /**
-    * @see AbstractMediumAccessorTest#getReadTestDataToUse()
-    */
-   @Override
-   protected List<ReadTestData> getReadTestDataToUse() {
+		// Create second instance on the same medium
+		new FileMediumAccessor(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true)).open();
+	}
 
-      List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
+	 */
+	@Override
+	protected FileMedium getExpectedMedium() {
+		return new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
+	}
 
-      readOffsetsAndSizes.add(new ReadTestData(16, 7));
-      readOffsetsAndSizes.add(new ReadTestData(93, 157));
-      readOffsetsAndSizes.add(new ReadTestData(610, 133));
-      readOffsetsAndSizes.add(new ReadTestData(0, 17));
-      readOffsetsAndSizes.add(new ReadTestData(211, 45));
+	/**
+	 * @see AbstractMediumAccessorTest#getReadTestDataToUse()
+	 */
+	@Override
+	protected List<ReadTestData> getReadTestDataToUse() {
 
-      return readOffsetsAndSizes;
-   }
+		List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
-    */
-   @Override
-   protected FileMedium getExpectedMedium() {
-      return new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
-   }
+		readOffsetsAndSizes.add(new ReadTestData(16, 7));
+		readOffsetsAndSizes.add(new ReadTestData(93, 157));
+		readOffsetsAndSizes.add(new ReadTestData(610, 133));
+		readOffsetsAndSizes.add(new ReadTestData(0, 17));
+		readOffsetsAndSizes.add(new ReadTestData(211, 45));
 
-   /**
-    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
-    */
-   @Override
-   protected ReadTestData getReadTestDataUntilEndOfMedium() {
-      return new ReadTestData(550, getExpectedMediumContent().length - 550);
-   }
+		return readOffsetsAndSizes;
+	}
 
-   /**
-    * @see AbstractMediumAccessorTest#getImplementationToTest()
-    */
-   @Override
-   protected MediumAccessor<?> createImplementationToTest() {
-      return new FileMediumAccessor(getExpectedMedium());
-   }
+	/**
+	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
+	 */
+	@Override
+	protected ReadTestData getReadTestDataUntilEndOfMedium() {
+		return new ReadTestData(550, AbstractMediumAccessorTest.getExpectedMediumContent().length - 550);
+	}
 
-   /**
-    * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
-    */
-   @Override
-   protected void prepareMediumData(byte[] testFileContents) {
-   }
+	/**
+	 * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
+	 */
+	@Override
+	protected void prepareMediumData(byte[] testFileContents) {
+		// Intentionally empty
+	}
 
 }

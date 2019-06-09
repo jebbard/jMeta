@@ -52,356 +52,356 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class TagFinder {
 
-   private final Map<String, Integer> m_foundTagCounts = new LinkedHashMap<String, Integer>();
+	private static final String COLUMN_SPACE = "    ";
 
-   private final File m_targetTagFolder;
+	private static final ITagSearcher[] TAG_SEARCH_LIST = new ITagSearcher[] { new ID3v1TagSearcher(),
+		new ID3v11TagSearcher(), new ID3v1EnhancedTagSearcher(), new APEv1TagSearcher(), new APEv2TagSearcher(),
+		new ID3v23TagSearcher(), new ID3v22TagSearcher(), new ID3v24TagSearcher(), new ID3v24TailTagSearcher(),
+		new Lyrics3v1TagSearcher(), new Lyrics3v2TagSearcher(), };
 
-   private long m_previousRunStartTime;
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-   private final Set<File> m_rootFolders;
+	private static final String FILE_EXTENSION_SEPARATOR = "\\.";
 
-   private String[] m_fileExtensions;
+	private static final String TAG_FINDER_LOG_MARK = "#############################################";
 
-   private static final String COLUMN_SPACE = "    ";
+	private static final String ARGUMENT_SEPARATOR = ";";
 
-   private static final ITagSearcher[] TAG_SEARCH_LIST = new ITagSearcher[] { new ID3v1TagSearcher(),
-   new ID3v11TagSearcher(), new ID3v1EnhancedTagSearcher(), new APEv1TagSearcher(), new APEv2TagSearcher(),
-   new ID3v23TagSearcher(), new ID3v22TagSearcher(), new ID3v24TagSearcher(), new ID3v24TailTagSearcher(),
-   new Lyrics3v1TagSearcher(), new Lyrics3v2TagSearcher(), };
+	private static final String ANY_WILDCARD = "?";
 
-   private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final int EXPECTED_ARG_COUNT = 3;
 
-   private static final String FILE_EXTENSION_SEPARATOR = "\\.";
+	private static final String PATH_SEPARATOR = System.getProperty("file.separator");
 
-   private static final String TAG_FINDER_LOG_MARK = "#############################################";
+	private static final int MILLIS_TO_HOURS = 3600000;
 
-   private static final String ARGUMENT_SEPARATOR = ";";
+	private static final int MILLIS_TO_MINUTES = 60000;
 
-   private static final String ANY_WILDCARD = "?";
+	private static final int MILLIS_TO_SECONDS = 1000;
 
-   private static final int EXPECTED_ARG_COUNT = 3;
+	/**
+	 * @param args the arguments
+	 */
+	public static void main(String[] args) {
 
-   private final Logger m_logger;
+		if (args.length != TagFinder.EXPECTED_ARG_COUNT) {
+			throw new IllegalArgumentException(
+				"Usage: TagFinder <list of semicolon separated root folders> <target tag folder> <list of semicolon separated file extensions>");
+		}
 
-   private static final String PATH_SEPARATOR = System.getProperty("file.separator");
+		String[] semicolonSeparatedFiles = args[0].split(TagFinder.ARGUMENT_SEPARATOR);
+		String targetTagFolder = args[1];
+		String[] semicolonSeparatedExtensions = args[2].split(TagFinder.ARGUMENT_SEPARATOR);
 
-   private static final int MILLIS_TO_HOURS = 3600000;
+		TagFinder finder = new TagFinder(semicolonSeparatedFiles, semicolonSeparatedExtensions,
+			new File(targetTagFolder));
 
-   private static final int MILLIS_TO_MINUTES = 60000;
+		finder.runTagFinding();
+	}
 
-   private static final int MILLIS_TO_SECONDS = 1000;
+	private final Map<String, Integer> m_foundTagCounts = new LinkedHashMap<>();
 
-   /**
-    * @param args
-    *           the arguments
-    */
-   public static void main(String[] args) {
+	private final File m_targetTagFolder;
 
-      if (args.length != EXPECTED_ARG_COUNT)
-         throw new IllegalArgumentException(
-            "Usage: TagFinder <list of semicolon separated root folders> <target tag folder> <list of semicolon separated file extensions>");
+	private long m_previousRunStartTime;
 
-      String[] semicolonSeparatedFiles = args[0].split(ARGUMENT_SEPARATOR);
-      String targetTagFolder = args[1];
-      String[] semicolonSeparatedExtensions = args[2].split(ARGUMENT_SEPARATOR);
+	private final Set<File> m_rootFolders;
 
-      TagFinder finder = new TagFinder(semicolonSeparatedFiles, semicolonSeparatedExtensions,
-         new File(targetTagFolder));
+	private String[] m_fileExtensions;
 
-      finder.runTagFinding();
-   }
+	private final Logger m_logger;
 
-   /**
-    * Creates a new {@link TagFinder}.
-    * 
-    * @param rootFolders
-    *           The root folders to search
-    * @param fileExtensions
-    *           The file extensions to accept
-    * @param targetTagFolder
-    *           The target folder to store found tags
-    */
-   public TagFinder(String[] rootFolders, String[] fileExtensions, File targetTagFolder) {
-      Reject.ifNull(fileExtensions, "fileExtensions");
-      Reject.ifNull(rootFolders, "rootFolder");
-      Reject.ifNull(targetTagFolder, "targetTagFolder");
-      Reject.ifFalse(targetTagFolder.exists(), "The given target folder " + targetTagFolder + " must exist!");
-      Reject.ifFalse(targetTagFolder.isDirectory(),
-         "The given target folder file " + targetTagFolder + " must be a directory!");
+	/**
+	 * Creates a new {@link TagFinder}.
+	 * 
+	 * @param rootFolders     The root folders to search
+	 * @param fileExtensions  The file extensions to accept
+	 * @param targetTagFolder The target folder to store found tags
+	 */
+	public TagFinder(String[] rootFolders, String[] fileExtensions, File targetTagFolder) {
+		Reject.ifNull(fileExtensions, "fileExtensions");
+		Reject.ifNull(rootFolders, "rootFolder");
+		Reject.ifNull(targetTagFolder, "targetTagFolder");
+		Reject.ifFalse(targetTagFolder.exists(), "The given target folder " + targetTagFolder + " must exist!");
+		Reject.ifFalse(targetTagFolder.isDirectory(),
+			"The given target folder file " + targetTagFolder + " must be a directory!");
 
-      m_logger = setupLogger(targetTagFolder);
+		m_logger = setupLogger(targetTagFolder);
 
-      Set<File> rootFolderSet = new HashSet<File>(rootFolders.length);
+		Set<File> rootFolderSet = new HashSet<>(rootFolders.length);
 
-      for (int i = 0; i < rootFolders.length; i++) {
-         File nextRootFolder = new File(rootFolders[i]);
-         Reject.ifFalse(nextRootFolder.exists(), "The given root folder " + nextRootFolder + " must exist!");
-         Reject.ifFalse(nextRootFolder.isDirectory(),
-            "The given root folder file " + nextRootFolder + " must be a directory!");
+		for (int i = 0; i < rootFolders.length; i++) {
+			File nextRootFolder = new File(rootFolders[i]);
+			Reject.ifFalse(nextRootFolder.exists(), "The given root folder " + nextRootFolder + " must exist!");
+			Reject.ifFalse(nextRootFolder.isDirectory(),
+				"The given root folder file " + nextRootFolder + " must be a directory!");
 
-         rootFolderSet.add(nextRootFolder);
-      }
+			rootFolderSet.add(nextRootFolder);
+		}
 
-      m_targetTagFolder = targetTagFolder;
-      m_rootFolders = rootFolderSet;
-      m_fileExtensions = fileExtensions;
+		m_targetTagFolder = targetTagFolder;
+		m_rootFolders = rootFolderSet;
+		m_fileExtensions = fileExtensions;
 
-      for (int i = 0; i < TAG_SEARCH_LIST.length; i++) {
-         m_foundTagCounts.put(TAG_SEARCH_LIST[i].getTagName(), Integer.valueOf(0));
-      }
-   }
+		for (int i = 0; i < TagFinder.TAG_SEARCH_LIST.length; i++) {
+			m_foundTagCounts.put(TagFinder.TAG_SEARCH_LIST[i].getTagName(), Integer.valueOf(0));
+		}
+	}
 
-   private Logger setupLogger(File targetTagFolder) {
+	private void addFilesInDirectory(File dir, List<File> fileList, Set<String> extensionList) {
 
-      Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+		Reject.ifFalse(dir.isDirectory(), "File " + dir + " must be a directory.");
 
-      try {
-         final Handler fileHandler = new FileHandler(
-            targetTagFolder.getAbsolutePath() + System.getProperty("file.separator") + "tagSearch_%g.log", false);
-         final Formatter formatter = new TagFinderFormatter();
-         final Handler sysOutHandler = new StreamHandler(System.out, formatter);
+		File[] files = dir.listFiles();
 
-         fileHandler.setFormatter(formatter);
+		for (int i = 0; i < files.length; i++) {
+			File nextFile = files[i];
 
-         logger.setUseParentHandlers(false);
-         logger.addHandler(sysOutHandler);
-         logger.addHandler(fileHandler);
-      } catch (Exception e) {
-         throw new RuntimeException("Could not initialize logger", e);
-      }
+			if (nextFile.isDirectory() && !nextFile.isHidden()) {
+				addFilesInDirectory(nextFile, fileList, extensionList);
+			}
 
-      return logger;
-   }
+			else {
+				if (extensionList.contains(TagFinder.ANY_WILDCARD)) {
+					fileList.add(nextFile);
+				} else {
+					String[] splittedBySeparator = nextFile.getName().split(TagFinder.FILE_EXTENSION_SEPARATOR);
 
-   /**
-    * Runs the finding routines for tags.
-    */
-   public void runTagFinding() {
+					if (splittedBySeparator.length == 0) {
+						continue;
+					}
 
-      m_previousRunStartTime = System.currentTimeMillis();
+					String extension = splittedBySeparator[splittedBySeparator.length - 1];
 
-      printIntroMessage(m_fileExtensions);
+					if (extensionList.contains(extension)) {
+						fileList.add(nextFile);
+					}
+				}
+			}
+		}
+	}
 
-      Set<String> extensionList = new HashSet<String>(Arrays.asList(m_fileExtensions));
+	private void addTagContentToFile(String tagName, TagInfo tagInfo, String originalFileId, String originalFileName) {
 
-      List<File> fileList = getFileList(m_rootFolders, extensionList);
+		final File tagFolder = new File(m_targetTagFolder + TagFinder.PATH_SEPARATOR + tagName);
+		File targetFilePath = new File(tagFolder, tagName + ".txt");
 
-      if (fileList.size() == 0)
-         m_logger.info("0 files found in root folder <" + m_rootFolders + ">. TagFinder stops without action.");
+		try {
+			if (!tagFolder.exists()) {
+				if (!tagFolder.mkdir()) {
+					throw new IOException("Folder creation of folder " + tagFolder.getAbsolutePath() + " failed");
+				}
+			}
+
+			boolean tagFileAlreadyExists = targetFilePath.exists();
+			if (!tagFileAlreadyExists) {
+				if (!targetFilePath.createNewFile()) {
+					throw new IOException("File creation of file " + targetFilePath.getAbsolutePath() + " failed");
+				}
+			}
+
+			try (BufferedOutputStream targetStream = new BufferedOutputStream(
+				new FileOutputStream(targetFilePath, tagFileAlreadyExists))) {
+				String fileString = "\n\n<<<<Copied from <" + originalFileId + " - " + originalFileName + ">>>>:\n";
+				targetStream.write(fileString.getBytes());
+				targetStream.write(tagInfo.getTagBytes());
+
+				m_logger.info(TagFinder.COLUMN_SPACE + "Successfully created copy of tag <" + tagName + "> in file: "
+					+ targetFilePath.getAbsolutePath());
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException("Unexpected IO exception: " + e, e);
+		}
+	}
+
+	private List<File> getFileList(Set<File> rootFolders, Set<String> extensionList) {
+
+		List<File> fileList = new ArrayList<>();
+
+		for (Iterator<File> iterator = rootFolders.iterator(); iterator.hasNext();) {
+			File nextRootFolder = iterator.next();
+
+			addFilesInDirectory(nextRootFolder, fileList, extensionList);
+		}
+
+		return fileList;
+	}
+
+	private int performTagSearch(File nextFile, String fileId) {
+
+		int totalTagCount = 0;
+
+		try (RandomAccessFile raf = new RandomAccessFile(nextFile, "r")) {
+
+			for (int i = 0; i < TagFinder.TAG_SEARCH_LIST.length; ++i) {
+				ITagSearcher tagSearcher = TagFinder.TAG_SEARCH_LIST[i];
+
+				final TagInfo tagInfo = tagSearcher.getTagInfo(raf);
+
+				if (tagInfo != null) {
+					final String[] additionalTagProperties = tagInfo.getAdditionalTagProperties();
+
+					m_logger.info(TagFinder.COLUMN_SPACE + "----------------- TAG found!!! -----------------");
+					m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "Tag type: <"
+						+ tagSearcher.getTagName() + ">");
+					m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE
+						+ "Tag absolute byte offset in file: <" + tagInfo.getAbsoluteOffset() + ">");
+					m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "Tag declared byte size: <"
+						+ tagInfo.getDeclaredTagSize() + ">");
 
-      int totalTagCount = printTagSearching(fileList);
+					if (additionalTagProperties.length > 0) {
+						m_logger.info(
+							TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "Tag additional information list: ");
+
+						for (int j = 0; j < additionalTagProperties.length; j++) {
+							m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + ""
+								+ additionalTagProperties[j]);
+						}
+					}
+
+					int tagCount = m_foundTagCounts.get(tagSearcher.getTagName());
+
+					m_foundTagCounts.put(tagSearcher.getTagName(), ++tagCount);
+
+					totalTagCount++;
+
+					addTagContentToFile(tagSearcher.getTagName(), tagInfo, fileId, nextFile.getAbsolutePath());
+				}
+			}
+		}
+
+		catch (IOException e) {
+			throw new IllegalStateException("IO Exception: ", e);
+		}
 
-      printOutroMessage(m_fileExtensions, fileList, totalTagCount);
-   }
+		return totalTagCount;
+	}
 
-   private List<File> getFileList(Set<File> rootFolders, Set<String> extensionList) {
+	private void printIntroMessage(String[] fileExtensions) {
 
-      List<File> fileList = new ArrayList<File>();
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+		m_logger.info(TagFinder.LINE_SEPARATOR);
+		m_logger.info(TagFinder.COLUMN_SPACE + "Starting TagFinder with root folder:");
+		m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "<" + m_rootFolders + ">");
+		m_logger.info(TagFinder.COLUMN_SPACE + "and target tag folder:");
+		m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "<" + m_targetTagFolder + ">");
+		m_logger.info(TagFinder.COLUMN_SPACE + "and file extensions: ");
+		m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "<" + Arrays.toString(fileExtensions) + ">.");
+		m_logger.info(TagFinder.LINE_SEPARATOR);
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+	}
 
-      for (Iterator<File> iterator = rootFolders.iterator(); iterator.hasNext();) {
-         File nextRootFolder = iterator.next();
+	private void printOutroMessage(String[] fileExtensions, List<File> fileList, int totalTagCount) {
 
-         addFilesInDirectory(nextRootFolder, fileList, extensionList);
-      }
+		m_logger.info(TagFinder.LINE_SEPARATOR);
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+		m_logger.info(TagFinder.COLUMN_SPACE + "Finished TagFinder with root folder:");
+		m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "<" + m_rootFolders + ">");
+		m_logger.info(TagFinder.COLUMN_SPACE + "and target tag folder:");
+		m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "<" + m_targetTagFolder + ">");
+		m_logger.info(TagFinder.COLUMN_SPACE + "and file extensions: ");
+		m_logger.info(TagFinder.COLUMN_SPACE + TagFinder.COLUMN_SPACE + "<" + Arrays.toString(fileExtensions) + ">.");
+		m_logger.info(TagFinder.LINE_SEPARATOR);
+		m_logger.info("Total number of tags found: " + totalTagCount);
+		m_logger.info("Total number of files scanned: " + fileList.size());
+		m_logger.info(TagFinder.LINE_SEPARATOR);
 
-      return fileList;
-   }
+		for (Iterator<String> iterator = m_foundTagCounts.keySet().iterator(); iterator.hasNext();) {
+			String nextKey = iterator.next();
+			Integer nextValue = m_foundTagCounts.get(nextKey);
 
-   private void addFilesInDirectory(File dir, List<File> fileList, Set<String> extensionList) {
+			m_logger.info(TagFinder.COLUMN_SPACE + "[TAG: " + nextKey + "] - " + nextValue);
+		}
 
-      Reject.ifFalse(dir.isDirectory(), "File " + dir + " must be a directory.");
+		long totalDuration = System.currentTimeMillis() - m_previousRunStartTime;
 
-      File[] files = dir.listFiles();
+		m_logger.info(TagFinder.LINE_SEPARATOR);
+		m_logger.info("Tag search took " + totalDuration + " milliseconds.");
 
-      for (int i = 0; i < files.length; i++) {
-         File nextFile = files[i];
+		long hours = totalDuration / TagFinder.MILLIS_TO_HOURS;
+		totalDuration = totalDuration % TagFinder.MILLIS_TO_HOURS;
+		long minutes = totalDuration / TagFinder.MILLIS_TO_MINUTES;
+		totalDuration = totalDuration % TagFinder.MILLIS_TO_MINUTES;
+		long seconds = totalDuration / TagFinder.MILLIS_TO_SECONDS;
+		totalDuration = totalDuration % TagFinder.MILLIS_TO_SECONDS;
+		long milliseconds = totalDuration;
 
-         if (nextFile.isDirectory() && !nextFile.isHidden()) {
-            addFilesInDirectory(nextFile, fileList, extensionList);
-         }
+		m_logger.info("Tag search took " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds and "
+			+ milliseconds + " milliseconds.");
+		m_logger.info(TagFinder.LINE_SEPARATOR);
 
-         else {
-            if (extensionList.contains(ANY_WILDCARD))
-               fileList.add(nextFile);
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+		m_logger.info(TagFinder.TAG_FINDER_LOG_MARK);
+	}
 
-            else {
-               String[] splittedBySeparator = nextFile.getName().split(FILE_EXTENSION_SEPARATOR);
+	private int printTagSearching(List<File> fileList) {
 
-               if (splittedBySeparator.length == 0)
-                  continue;
+		int totalTagCount = 0;
 
-               String extension = splittedBySeparator[splittedBySeparator.length - 1];
+		for (int i = 0; i < fileList.size(); ++i) {
+			File nextFile = fileList.get(i);
 
-               if (extensionList.contains(extension))
-                  fileList.add(nextFile);
-            }
-         }
-      }
-   }
+			DecimalFormat fileIdFormat = new DecimalFormat("000000000");
 
-   private int performTagSearch(File nextFile, String fileId) {
+			String fileId = fileIdFormat.format(i);
 
-      int totalTagCount = 0;
+			m_logger.info(TagFinder.LINE_SEPARATOR);
+			m_logger.info("****************************************************");
+			m_logger.info("Scanning file...");
+			m_logger.info(nextFile.getAbsolutePath());
+			m_logger.info("File Id: " + fileId);
+			m_logger.info(TagFinder.LINE_SEPARATOR);
 
-      try {
-         RandomAccessFile raf = new RandomAccessFile(nextFile, "r");
+			totalTagCount += performTagSearch(nextFile, fileId);
+		}
 
-         for (int i = 0; i < TAG_SEARCH_LIST.length; ++i) {
-            ITagSearcher tagSearcher = TAG_SEARCH_LIST[i];
+		return totalTagCount;
+	}
 
-            final TagInfo tagInfo = tagSearcher.getTagInfo(raf);
+	/**
+	 * Runs the finding routines for tags.
+	 */
+	public void runTagFinding() {
 
-            if (tagInfo != null) {
-               final String[] additionalTagProperties = tagInfo.getAdditionalTagProperties();
+		m_previousRunStartTime = System.currentTimeMillis();
 
-               m_logger.info(COLUMN_SPACE + "----------------- TAG found!!! -----------------");
-               m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "Tag type: <" + tagSearcher.getTagName() + ">");
-               m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "Tag absolute byte offset in file: <"
-                  + tagInfo.getAbsoluteOffset() + ">");
-               m_logger
-                  .info(COLUMN_SPACE + COLUMN_SPACE + "Tag declared byte size: <" + tagInfo.getDeclaredTagSize() + ">");
+		printIntroMessage(m_fileExtensions);
 
-               if (additionalTagProperties.length > 0) {
-                  m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "Tag additional information list: ");
+		Set<String> extensionList = new HashSet<>(Arrays.asList(m_fileExtensions));
 
-                  for (int j = 0; j < additionalTagProperties.length; j++) {
-                     m_logger.info(COLUMN_SPACE + COLUMN_SPACE + COLUMN_SPACE + "" + additionalTagProperties[j]);
-                  }
-               }
+		List<File> fileList = getFileList(m_rootFolders, extensionList);
 
-               int tagCount = m_foundTagCounts.get(tagSearcher.getTagName());
+		if (fileList.size() == 0) {
+			m_logger.info("0 files found in root folder <" + m_rootFolders + ">. TagFinder stops without action.");
+		}
 
-               m_foundTagCounts.put(tagSearcher.getTagName(), ++tagCount);
+		int totalTagCount = printTagSearching(fileList);
 
-               totalTagCount++;
+		printOutroMessage(m_fileExtensions, fileList, totalTagCount);
+	}
 
-               addTagContentToFile(tagSearcher.getTagName(), tagInfo, fileId, nextFile.getAbsolutePath());
-            }
-         }
+	private Logger setupLogger(File targetTagFolder) {
 
-         raf.close();
-      }
+		Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-      catch (IOException e) {
-         throw new IllegalStateException("IO Exception: ", e);
-      }
+		try {
+			final Handler fileHandler = new FileHandler(
+				targetTagFolder.getAbsolutePath() + System.getProperty("file.separator") + "tagSearch_%g.log", false);
+			final Formatter formatter = new TagFinderFormatter();
+			final Handler sysOutHandler = new StreamHandler(System.out, formatter);
 
-      return totalTagCount;
-   }
+			fileHandler.setFormatter(formatter);
 
-   private void printIntroMessage(String[] fileExtensions) {
+			logger.setUseParentHandlers(false);
+			logger.addHandler(sysOutHandler);
+			logger.addHandler(fileHandler);
+		} catch (Exception e) {
+			throw new RuntimeException("Could not initialize logger", e);
+		}
 
-      m_logger.info(TAG_FINDER_LOG_MARK);
-      m_logger.info(TAG_FINDER_LOG_MARK);
-      m_logger.info(LINE_SEPARATOR);
-      m_logger.info(COLUMN_SPACE + "Starting TagFinder with root folder:");
-      m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "<" + m_rootFolders + ">");
-      m_logger.info(COLUMN_SPACE + "and target tag folder:");
-      m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "<" + m_targetTagFolder + ">");
-      m_logger.info(COLUMN_SPACE + "and file extensions: ");
-      m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "<" + Arrays.toString(fileExtensions) + ">.");
-      m_logger.info(LINE_SEPARATOR);
-      m_logger.info(TAG_FINDER_LOG_MARK);
-      m_logger.info(TAG_FINDER_LOG_MARK);
-   }
-
-   private int printTagSearching(List<File> fileList) {
-
-      int totalTagCount = 0;
-
-      for (int i = 0; i < fileList.size(); ++i) {
-         File nextFile = fileList.get(i);
-
-         DecimalFormat fileIdFormat = new DecimalFormat("000000000");
-
-         String fileId = fileIdFormat.format(i);
-
-         m_logger.info(LINE_SEPARATOR);
-         m_logger.info("****************************************************");
-         m_logger.info("Scanning file...");
-         m_logger.info(nextFile.getAbsolutePath());
-         m_logger.info("File Id: " + fileId);
-         m_logger.info(LINE_SEPARATOR);
-
-         totalTagCount += performTagSearch(nextFile, fileId);
-      }
-
-      return totalTagCount;
-   }
-
-   private void printOutroMessage(String[] fileExtensions, List<File> fileList, int totalTagCount) {
-
-      m_logger.info(LINE_SEPARATOR);
-      m_logger.info(TAG_FINDER_LOG_MARK);
-      m_logger.info(TAG_FINDER_LOG_MARK);
-      m_logger.info(COLUMN_SPACE + "Finished TagFinder with root folder:");
-      m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "<" + m_rootFolders + ">");
-      m_logger.info(COLUMN_SPACE + "and target tag folder:");
-      m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "<" + m_targetTagFolder + ">");
-      m_logger.info(COLUMN_SPACE + "and file extensions: ");
-      m_logger.info(COLUMN_SPACE + COLUMN_SPACE + "<" + Arrays.toString(fileExtensions) + ">.");
-      m_logger.info(LINE_SEPARATOR);
-      m_logger.info("Total number of tags found: " + totalTagCount);
-      m_logger.info("Total number of files scanned: " + fileList.size());
-      m_logger.info(LINE_SEPARATOR);
-
-      for (Iterator<String> iterator = m_foundTagCounts.keySet().iterator(); iterator.hasNext();) {
-         String nextKey = iterator.next();
-         Integer nextValue = m_foundTagCounts.get(nextKey);
-
-         m_logger.info(COLUMN_SPACE + "[TAG: " + nextKey + "] - " + nextValue);
-      }
-
-      long totalDuration = System.currentTimeMillis() - m_previousRunStartTime;
-
-      m_logger.info(LINE_SEPARATOR);
-      m_logger.info("Tag search took " + totalDuration + " milliseconds.");
-
-      long hours = totalDuration / MILLIS_TO_HOURS;
-      totalDuration = totalDuration % MILLIS_TO_HOURS;
-      long minutes = totalDuration / MILLIS_TO_MINUTES;
-      totalDuration = totalDuration % MILLIS_TO_MINUTES;
-      long seconds = totalDuration / MILLIS_TO_SECONDS;
-      totalDuration = totalDuration % MILLIS_TO_SECONDS;
-      long milliseconds = totalDuration;
-
-      m_logger.info("Tag search took " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds and "
-         + milliseconds + " milliseconds.");
-      m_logger.info(LINE_SEPARATOR);
-
-      m_logger.info(TAG_FINDER_LOG_MARK);
-      m_logger.info(TAG_FINDER_LOG_MARK);
-   }
-
-   private void addTagContentToFile(String tagName, TagInfo tagInfo, String originalFileId, String originalFileName) {
-
-      final File tagFolder = new File(m_targetTagFolder + PATH_SEPARATOR + tagName);
-      File targetFilePath = new File(tagFolder, tagName + ".txt");
-
-      try {
-         if (!tagFolder.exists()) {
-            if (!tagFolder.mkdir())
-               throw new IOException("Folder creation of folder " + tagFolder.getAbsolutePath() + " failed");
-         }
-
-         boolean tagFileAlreadyExists = targetFilePath.exists();
-         if (!tagFileAlreadyExists) {
-            if (!targetFilePath.createNewFile())
-               throw new IOException("File creation of file " + targetFilePath.getAbsolutePath() + " failed");
-         }
-
-         final FileOutputStream fileOutputStream = new FileOutputStream(targetFilePath, tagFileAlreadyExists);
-         BufferedOutputStream targetStream = new BufferedOutputStream(fileOutputStream);
-
-         String fileString = "\n\n<<<<Copied from <" + originalFileId + " - " + originalFileName + ">>>>:\n";
-         targetStream.write(fileString.getBytes());
-         targetStream.write(tagInfo.getTagBytes());
-         targetStream.close();
-
-         m_logger.info(COLUMN_SPACE + "Successfully created copy of tag <" + tagName + "> in file: "
-            + targetFilePath.getAbsolutePath());
-      } catch (IOException e) {
-         throw new IllegalStateException("Unexpected IO exception: " + e, e);
-      }
-   }
+		return logger;
+	}
 }

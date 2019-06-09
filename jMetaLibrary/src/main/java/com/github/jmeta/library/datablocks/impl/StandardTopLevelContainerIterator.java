@@ -37,242 +37,250 @@ import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link StandardTopLevelContainerIterator} is used to read all top-level {@link Container}s present in a
- * {@link Medium}. It can be operated in two modes: Forward reading (the default mode) where the medium is iterated with
- * increasing offsets and backward reading for reading a medium (mainly: files or byte arrays) from back to front.
+ * {@link StandardTopLevelContainerIterator} is used to read all top-level
+ * {@link Container}s present in a {@link Medium}. It can be operated in two
+ * modes: Forward reading (the default mode) where the medium is iterated with
+ * increasing offsets and backward reading for reading a medium (mainly: files
+ * or byte arrays) from back to front.
  */
 public class StandardTopLevelContainerIterator implements TopLevelContainerIterator, DataBlockEventListener {
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.ContainerIterator#remove()
-    */
-   @Override
-   public void remove() {
-   }
+	private DataBlockEventBus eventBus = new DataBlockEventBus();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
-    */
-   @Override
-   public void dataBlockEventOccurred(DataBlockEvent event) {
-      // TODO implement
-   }
+	private MediumOffset currentOffset;
 
-   private DataBlockEventBus eventBus = new DataBlockEventBus();
-   private MediumOffset currentOffset;
+	private final boolean forwardRead;
+	private final MediumStore mediumStore;
 
-   private final boolean forwardRead;
+	private final List<ContainerDataFormat> dataFormatPrecedence = new ArrayList<>();
 
-   private final MediumStore mediumStore;
+	private final Map<ContainerDataFormat, DataBlockReader> readers = new LinkedHashMap<>();
 
-   private final List<ContainerDataFormat> dataFormatPrecedence = new ArrayList<>();
+	private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
 
-   private final Map<ContainerDataFormat, DataBlockReader> readers = new LinkedHashMap<>();
+	private final DataFormatRepository m_repository;
 
-   private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
+	/**
+	 * Creates a new {@link StandardTopLevelContainerIterator}.
+	 *
+	 * @param mediumStore       The {@link MediumStore} used to read from the
+	 *                          {@link Medium}, must not be null
+	 * @param forwardRead       true for forward reading, false for backward reading
+	 * @param dataBlockServices All {@link DataBlockReader}s per supported
+	 *                          {@link ContainerDataFormat}, must not be null
+	 */
+	public StandardTopLevelContainerIterator(MediumStore mediumStore, boolean forwardRead,
+		Set<DataBlockService> dataBlockServices) {
+		Reject.ifNull(mediumStore, "mediumStore");
+		Reject.ifNull(dataBlockServices, "dataBlockServices");
 
-   /**
-    * Creates a new {@link StandardTopLevelContainerIterator}.
-    *
-    * @param mediumStore
-    *           The {@link MediumStore} used to read from the {@link Medium}, must not be null
-    * @param forwardRead
-    *           true for forward reading, false for backward reading
-    * @param dataBlockServices
-    *           All {@link DataBlockReader}s per supported {@link ContainerDataFormat}, must not be null
-    */
-   public StandardTopLevelContainerIterator(MediumStore mediumStore, boolean forwardRead,
-      Set<DataBlockService> dataBlockServices) {
-      Reject.ifNull(mediumStore, "mediumStore");
-      Reject.ifNull(dataBlockServices, "dataBlockServices");
+		m_repository = ComponentRegistry.lookupService(DataFormatRepository.class);
 
-      m_repository = ComponentRegistry.lookupService(DataFormatRepository.class);
+		this.mediumStore = mediumStore;
+		this.forwardRead = forwardRead;
 
-      this.mediumStore = mediumStore;
-      this.forwardRead = forwardRead;
+		if (this.forwardRead) {
+			currentOffset = mediumStore.createMediumOffset(0);
+		} else {
+			currentOffset = mediumStore.createMediumOffset(mediumStore.getMedium().getCurrentLength());
+		}
 
-      if (this.forwardRead) {
-         currentOffset = mediumStore.createMediumOffset(0);
-      } else {
-         currentOffset = mediumStore.createMediumOffset(mediumStore.getMedium().getCurrentLength());
-      }
+		dataBlockServices.forEach(service -> addDataBlockService(service, forwardRead, mediumStore));
 
-      dataBlockServices.forEach(service -> addDataBlockService(service, forwardRead, mediumStore));
+		dataFormatPrecedence.addAll(new ArrayList<>(
+			dataBlockServices.stream().map(DataBlockService::getDataFormat).collect(Collectors.toSet())));
 
-      dataFormatPrecedence.addAll(
-         new ArrayList<>(dataBlockServices.stream().map(DataBlockService::getDataFormat).collect(Collectors.toSet())));
+		eventBus.registerListener(this);
+	}
 
-      eventBus.registerListener(this);
-   }
+	private void addDataBlockService(DataBlockService dataBlocksService, boolean forwardRead, MediumStore mediumStore) {
 
-   private final DataFormatRepository m_repository;
+		ContainerDataFormat format = dataBlocksService.getDataFormat();
+		final DataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
 
-   /**
-    * @see java.util.Iterator#hasNext()
-    */
-   @Override
-   public boolean hasNext() {
-      if (forwardRead) {
-         // NOTE: For streaming media, the offset parameter for MediumStore.isAtEndOfMedium is actually ignored, but
-         // the test is always done at the current stream position.
-         // Thus, if pre-buffering occurs for a streaming medium, the actual stream position might be already at EOM,
-         // but at this.currentOffset, there are still some cached bytes available waiting to be fetched.
-         boolean cachedBytesExist = mediumStore.getCachedByteCountAt(currentOffset) > 0;
+		if (forwardRead) {
+			DataBlockReader forwardReader = createForwardReader(dataBlocksService, spec, mediumStore);
 
-         if (cachedBytesExist) {
-            return true;
-         }
+			readers.put(format, forwardReader);
+		} else {
+			DataBlockReader backwardReader = createBackwardReader(dataBlocksService, spec, mediumStore);
 
-         return !mediumStore.isAtEndOfMedium(currentOffset);
-      } else {
-         return currentOffset.getAbsoluteMediumOffset() != 0;
-      }
-   }
+			readers.put(format, backwardReader);
+		}
+	}
 
-   /**
-    * @see java.util.Iterator#next()
-    */
-   @Override
-   public Container next() {
+	/**
+	 * @see java.io.Closeable#close()
+	 */
+	@Override
+	public void close() throws IOException {
+		mediumStore.close();
+	}
 
-      Reject.ifFalse(hasNext(), "hasNext()");
+	/**
+	 * @param dataBlocksExtensions
+	 * @param spec
+	 * @param mediumStore          TODO
+	 * @return
+	 */
+	private DataBlockReader createBackwardReader(DataBlockService dataBlocksExtensions,
+		final DataFormatSpecification spec, MediumStore mediumStore) {
+		DataBlockReader backwardReader = dataBlocksExtensions.createBackwardDataBlockReader(spec, mediumStore,
+			eventBus);
 
-      ContainerDataFormat dataFormat = identifyDataFormat(currentOffset);
+		// Set default data block reader
+		if (backwardReader == null) {
+			backwardReader = new BackwardDataBlockReader(spec,
+				createForwardReader(dataBlocksExtensions, spec, mediumStore), mediumStore, eventBus);
+		}
+		return backwardReader;
+	}
 
-      if (dataFormat == null) {
-         throw new UnknownDataFormatException(currentOffset,
-            "Could not identify data format of top-level block at " + currentOffset);
-      }
+	/**
+	 * @param dataBlocksExtensions
+	 * @param spec
+	 * @param mediumStore          TODO
+	 * @return
+	 */
+	private DataBlockReader createForwardReader(DataBlockService dataBlocksExtensions,
+		final DataFormatSpecification spec, MediumStore mediumStore) {
+		DataBlockReader forwardReader = dataBlocksExtensions.createForwardDataBlockReader(spec, mediumStore, eventBus);
 
-      DataBlockReader reader = readers.get(dataFormat);
+		// Set default data block reader
+		if (forwardReader == null) {
+			forwardReader = new ForwardDataBlockReader(spec, mediumStore, eventBus);
+		}
+		return forwardReader;
+	}
 
-      List<DataBlockDescription> containerDescs = reader.getSpecification().getTopLevelDataBlockDescriptions();
+	/**
+	 * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
+	 */
+	@Override
+	public void dataBlockEventOccurred(DataBlockEvent event) {
+		// TODO implement
+	}
 
-      for (int i = 0; i < containerDescs.size(); ++i) {
-         DataBlockDescription containerDesc = containerDescs.get(i);
+	/**
+	 * Subclasses need to provide the number of bytes to advance based on the given
+	 * {@link Container} instance. This number might be positive (for forward
+	 * reading) or negative (for backward reading).
+	 *
+	 * @param currentContainer
+	 * @return
+	 */
+	public long getBytesToAdvanceToNextContainer(Container currentContainer) {
+		if (forwardRead) {
+			return currentContainer.getSize();
+		} else {
+			return -currentContainer.getSize();
+		}
+	}
 
-         DataBlockId containerId = containerDesc.getId();
+	/**
+	 * @see java.util.Iterator#hasNext()
+	 */
+	@Override
+	public boolean hasNext() {
+		if (forwardRead) {
+			// NOTE: For streaming media, the offset parameter for
+			// MediumStore.isAtEndOfMedium is actually ignored, but
+			// the test is always done at the current stream position.
+			// Thus, if pre-buffering occurs for a streaming medium, the actual stream
+			// position might be already at EOM,
+			// but at this.currentOffset, there are still some cached bytes available
+			// waiting to be fetched.
+			boolean cachedBytesExist = mediumStore.getCachedByteCountAt(currentOffset) > 0;
 
-         int sequenceNumber = 0;
+			if (cachedBytesExist) {
+				return true;
+			}
 
-         if (nextSequenceNumber.containsKey(containerId)) {
-            sequenceNumber = nextSequenceNumber.get(containerId);
-         }
+			return !mediumStore.isAtEndOfMedium(currentOffset);
+		} else {
+			return currentOffset.getAbsoluteMediumOffset() != 0;
+		}
+	}
 
-         Container container = reader.readContainerWithId(currentOffset, containerId, null,
-            DataBlockDescription.UNDEFINED, sequenceNumber, null);
+	/**
+	 * Identifies the {@link ContainerDataFormat} present at the given
+	 * {@link MediumOffset}
+	 *
+	 * @param reference The {@link MediumOffset} to start scanning. For forward
+	 *                  reading, it is the start offset of an assumed container, for
+	 *                  backward reading, it is the end offset of an assumed
+	 *                  container.
+	 * @return The {@link ContainerDataFormat} identified or null if none could be
+	 *         identified
+	 */
+	private ContainerDataFormat identifyDataFormat(MediumOffset reference) {
 
-         nextSequenceNumber.put(containerId, sequenceNumber + 1);
+		if (dataFormatPrecedence.isEmpty()) {
+			return null;
+		}
 
-         if (container != null) {
-            currentOffset = currentOffset.advance(getBytesToAdvanceToNextContainer(container));
+		for (Iterator<ContainerDataFormat> iterator = dataFormatPrecedence.iterator(); iterator.hasNext();) {
+			ContainerDataFormat dataFormat = iterator.next();
+			DataBlockReader reader = readers.get(dataFormat);
 
-            return container;
-         }
-      }
+			if (reader.identifiesDataFormat(reference)) {
+				return dataFormat;
+			}
+		}
 
-      return null;
-   }
+		return null;
+	}
 
-   /**
-    * @see java.io.Closeable#close()
-    */
-   @Override
-   public void close() throws IOException {
-      mediumStore.close();
-   }
+	/**
+	 * @see java.util.Iterator#next()
+	 */
+	@Override
+	public Container next() {
 
-   /**
-    * Subclasses need to provide the number of bytes to advance based on the given {@link Container} instance. This
-    * number might be positive (for forward reading) or negative (for backward reading).
-    *
-    * @param currentContainer
-    * @return
-    */
-   public long getBytesToAdvanceToNextContainer(Container currentContainer) {
-      if (forwardRead) {
-         return currentContainer.getSize();
-      } else {
-         return -currentContainer.getSize();
-      }
-   }
+		Reject.ifFalse(hasNext(), "hasNext()");
 
-   /**
-    * Identifies the {@link ContainerDataFormat} present at the given {@link MediumOffset}
-    *
-    * @param reference
-    *           The {@link MediumOffset} to start scanning. For forward reading, it is the start offset of an assumed
-    *           container, for backward reading, it is the end offset of an assumed container.
-    * @return The {@link ContainerDataFormat} identified or null if none could be identified
-    */
-   private ContainerDataFormat identifyDataFormat(MediumOffset reference) {
+		ContainerDataFormat dataFormat = identifyDataFormat(currentOffset);
 
-      if (dataFormatPrecedence.isEmpty()) {
-         return null;
-      }
+		if (dataFormat == null) {
+			throw new UnknownDataFormatException(currentOffset,
+				"Could not identify data format of top-level block at " + currentOffset);
+		}
 
-      for (Iterator<ContainerDataFormat> iterator = dataFormatPrecedence.iterator(); iterator.hasNext();) {
-         ContainerDataFormat dataFormat = iterator.next();
-         DataBlockReader reader = readers.get(dataFormat);
+		DataBlockReader reader = readers.get(dataFormat);
 
-         if (reader.identifiesDataFormat(reference)) {
-            return dataFormat;
-         }
-      }
+		List<DataBlockDescription> containerDescs = reader.getSpecification().getTopLevelDataBlockDescriptions();
 
-      return null;
-   }
+		for (int i = 0; i < containerDescs.size(); ++i) {
+			DataBlockDescription containerDesc = containerDescs.get(i);
 
-   private void addDataBlockService(DataBlockService dataBlocksService, boolean forwardRead, MediumStore mediumStore) {
+			DataBlockId containerId = containerDesc.getId();
 
-      ContainerDataFormat format = dataBlocksService.getDataFormat();
-      final DataFormatSpecification spec = m_repository.getDataFormatSpecification(format);
+			int sequenceNumber = 0;
 
-      if (forwardRead) {
-         DataBlockReader forwardReader = createForwardReader(dataBlocksService, spec, mediumStore);
+			if (nextSequenceNumber.containsKey(containerId)) {
+				sequenceNumber = nextSequenceNumber.get(containerId);
+			}
 
-         readers.put(format, forwardReader);
-      } else {
-         DataBlockReader backwardReader = createBackwardReader(dataBlocksService, spec, mediumStore);
+			Container container = reader.readContainerWithId(currentOffset, containerId, null,
+				DataBlockDescription.UNDEFINED, sequenceNumber, null);
 
-         readers.put(format, backwardReader);
-      }
-   }
+			nextSequenceNumber.put(containerId, sequenceNumber + 1);
 
-   /**
-    * @param dataBlocksExtensions
-    * @param spec
-    * @param mediumStore
-    *           TODO
-    * @return
-    */
-   private DataBlockReader createBackwardReader(DataBlockService dataBlocksExtensions,
-      final DataFormatSpecification spec, MediumStore mediumStore) {
-      DataBlockReader backwardReader = dataBlocksExtensions.createBackwardDataBlockReader(spec, mediumStore, eventBus);
+			if (container != null) {
+				currentOffset = currentOffset.advance(getBytesToAdvanceToNextContainer(container));
 
-      // Set default data block reader
-      if (backwardReader == null) {
-         backwardReader = new BackwardDataBlockReader(spec,
-            createForwardReader(dataBlocksExtensions, spec, mediumStore), mediumStore, eventBus);
-      }
-      return backwardReader;
-   }
+				return container;
+			}
+		}
 
-   /**
-    * @param dataBlocksExtensions
-    * @param spec
-    * @param mediumStore
-    *           TODO
-    * @return
-    */
-   private DataBlockReader createForwardReader(DataBlockService dataBlocksExtensions,
-      final DataFormatSpecification spec, MediumStore mediumStore) {
-      DataBlockReader forwardReader = dataBlocksExtensions.createForwardDataBlockReader(spec, mediumStore, eventBus);
+		return null;
+	}
 
-      // Set default data block reader
-      if (forwardReader == null) {
-         forwardReader = new ForwardDataBlockReader(spec, mediumStore, eventBus);
-      }
-      return forwardReader;
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.services.ContainerIterator#remove()
+	 */
+	@Override
+	public void remove() {
+		// Intentionally empty
+	}
 }

@@ -20,65 +20,62 @@ import com.github.jmeta.library.dataformats.api.types.DataBlockDescription;
  */
 public class BinaryValueConversionException extends Exception {
 
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   /**
-    * Creates a new {@link BinaryValueConversionException}.
-    * 
-    * @param message
-    * @param cause
-    * @param fieldDesc
-    * @param binaryValue
-    * @param byteOrder
-    * @param characterEncoding
-    */
-   public BinaryValueConversionException(String message, Throwable cause, DataBlockDescription fieldDesc,
-      ByteBuffer binaryValue, ByteOrder byteOrder, Charset characterEncoding) {
-      super(message, cause);
+	private final DataBlockDescription m_fieldDescription;
 
-      m_binaryValue = binaryValue;
-      m_characterEncoding = characterEncoding;
-      m_byteOrder = byteOrder;
-      m_fieldDescription = fieldDesc;
-   }
+	private final ByteBuffer m_binaryValue;
 
-   /**
-    * @return the {@link DataBlockDescription}
-    */
-   public DataBlockDescription getFieldDescription() {
+	private final Charset m_characterEncoding;
 
-      return m_fieldDescription;
-   }
+	private final ByteOrder m_byteOrder;
 
-   /**
-    * @return the {@link BinaryValue}
-    */
-   public ByteBuffer getBinaryValue() {
+	/**
+	 * Creates a new {@link BinaryValueConversionException}.
+	 * 
+	 * @param message
+	 * @param cause
+	 * @param fieldDesc
+	 * @param binaryValue
+	 * @param byteOrder
+	 * @param characterEncoding
+	 */
+	public BinaryValueConversionException(String message, Throwable cause, DataBlockDescription fieldDesc,
+		ByteBuffer binaryValue, ByteOrder byteOrder, Charset characterEncoding) {
+		super(message, cause);
 
-      return m_binaryValue;
-   }
+		m_binaryValue = binaryValue;
+		m_characterEncoding = characterEncoding;
+		m_byteOrder = byteOrder;
+		m_fieldDescription = fieldDesc;
+	}
 
-   /**
-    * @return the {@link Charset}
-    */
-   public Charset getCharacterEncoding() {
+	public ByteBuffer getBinaryValue() {
 
-      return m_characterEncoding;
-   }
+		return m_binaryValue;
+	}
 
-   /**
-    * @return the {@link ByteOrder}
-    */
-   public ByteOrder getByteOrder() {
+	/**
+	 * @return the {@link ByteOrder}
+	 */
+	public ByteOrder getByteOrder() {
 
-      return m_byteOrder;
-   }
+		return m_byteOrder;
+	}
 
-   private final DataBlockDescription m_fieldDescription;
+	/**
+	 * @return the {@link Charset}
+	 */
+	public Charset getCharacterEncoding() {
 
-   private final ByteBuffer m_binaryValue;
+		return m_characterEncoding;
+	}
 
-   private final Charset m_characterEncoding;
+	/**
+	 * @return the {@link DataBlockDescription}
+	 */
+	public DataBlockDescription getFieldDescription() {
 
-   private final ByteOrder m_byteOrder;
+		return m_fieldDescription;
+	}
 }

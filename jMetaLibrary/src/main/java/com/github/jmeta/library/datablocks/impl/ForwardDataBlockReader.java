@@ -33,170 +33,170 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class ForwardDataBlockReader extends AbstractDataBlockReader {
 
-   /**
-    * Creates a new {@link ForwardDataBlockReader}.
-    *
-    * @param spec
-    *           The {@link DataFormatSpecification}, must not be null
-    * @param mediumStore
-    *           TODO
-    */
-   public ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus) {
-      super(spec, mediumStore, eventBus);
-   }
+	/**
+	 * Creates a new {@link ForwardDataBlockReader}.
+	 *
+	 * @param spec        The {@link DataFormatSpecification}, must not be null
+	 * @param mediumStore TODO
+	 */
+	public ForwardDataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus) {
+		super(spec, mediumStore, eventBus);
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.Payload, long, int,
-    *      com.github.jmeta.library.datablocks.impl.ContainerContext)
-    */
-   @Override
-   public Container readContainerWithId(MediumOffset currentOffset, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext) {
-      Reject.ifNull(id, "id");
-      Reject.ifNull(currentOffset, "currentOffset");
+	/**
+	 * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#getMagicKeys(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
+	 */
+	@Override
+	protected List<MagicKey> getMagicKeys(DataBlockDescription containerDesc) {
+		return containerDesc.getHeaderMagicKeys();
+	}
 
-      getMediumDataProvider().bufferBeforeRead(currentOffset, remainingDirectParentByteCount);
+	/**
+	 * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#hasEnoughBytesForMagicKey(com.github.jmeta.library.media.api.types.MediumOffset,
+	 *      com.github.jmeta.library.dataformats.api.types.MagicKey, long)
+	 */
+	@Override
+	protected boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey,
+		long remainingDirectParentByteCount) {
+		return (remainingDirectParentByteCount == DataBlockDescription.UNDEFINED)
+			|| (magicKey.getByteLength() <= remainingDirectParentByteCount);
+	}
 
-      DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id, remainingDirectParentByteCount,
-         0, parent != null ? parent.getContainerContext() : null);
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
+	 *      com.github.jmeta.library.datablocks.api.types.Payload, long, int,
+	 *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+	 */
+	@Override
+	public Container readContainerWithId(MediumOffset currentOffset, DataBlockId id, Payload parent,
+		long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext) {
+		Reject.ifNull(id, "id");
+		Reject.ifNull(currentOffset, "currentOffset");
 
-      StandardContainer createdContainer = new StandardContainer(concreteContainerId, getSpecification());
+		getMediumDataProvider().bufferBeforeRead(currentOffset, remainingDirectParentByteCount);
 
-      createdContainer.initSequenceNumber(sequenceNumber);
+		DataBlockId concreteContainerId = determineConcreteContainerId(currentOffset, id,
+			remainingDirectParentByteCount, 0, parent != null ? parent.getContainerContext() : null);
 
-      if (parent == null) {
-         createdContainer.initTopLevelContainerContext(getCustomSizeProvider(), getCustomCountProvider());
-      } else {
-         createdContainer.initParent(parent);
-      }
+		StandardContainer createdContainer = new StandardContainer(concreteContainerId, getSpecification());
 
-      ContainerContext newContainerContext = createdContainer.getContainerContext();
+		createdContainer.initSequenceNumber(sequenceNumber);
 
-      DataBlockDescription containerDesc = getSpecification().getDataBlockDescription(concreteContainerId);
+		if (parent == null) {
+			createdContainer.initTopLevelContainerContext(getCustomSizeProvider(), getCustomCountProvider());
+		} else {
+			createdContainer.initParent(parent);
+		}
 
-      // Read headers
-      MediumOffset nextReference = currentOffset;
+		ContainerContext newContainerContext = createdContainer.getContainerContext();
 
-      List<Header> headers = new ArrayList<>();
+		DataBlockDescription containerDesc = getSpecification().getDataBlockDescription(concreteContainerId);
 
-      List<DataBlockDescription> headerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
+		// Read headers
+		MediumOffset nextReference = currentOffset;
 
-      long overallHeaderSize = 0;
+		List<Header> headers = new ArrayList<>();
 
-      for (int i = 0; i < headerDescs.size(); ++i) {
-         DataBlockDescription headerDesc = headerDescs.get(i);
+		List<DataBlockDescription> headerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.HEADER);
 
-         List<Header> nextHeaders = readHeadersOrFootersWithId(Header.class, nextReference, headerDesc.getId(),
-            newContainerContext);
+		long overallHeaderSize = 0;
 
-         long totalHeaderSize = 0;
+		for (int i = 0; i < headerDescs.size(); ++i) {
+			DataBlockDescription headerDesc = headerDescs.get(i);
 
-         for (int j = 0; j < nextHeaders.size(); ++j) {
-            Header nextHeader = nextHeaders.get(j);
+			List<Header> nextHeaders = readHeadersOrFootersWithId(Header.class, nextReference, headerDesc.getId(),
+				newContainerContext);
 
-            totalHeaderSize += nextHeader.getSize();
-            createdContainer.insertHeader(createdContainer.getHeaders().size(), nextHeader);
-         }
+			long totalHeaderSize = 0;
 
-         overallHeaderSize += totalHeaderSize;
+			for (int j = 0; j < nextHeaders.size(); ++j) {
+				Header nextHeader = nextHeaders.get(j);
 
-         nextReference = nextReference.advance(totalHeaderSize);
+				totalHeaderSize += nextHeader.getSize();
+				createdContainer.insertHeader(createdContainer.getHeaders().size(), nextHeader);
+			}
 
-         headers.addAll(nextHeaders);
-      }
+			overallHeaderSize += totalHeaderSize;
 
-      // Read payload
-      DataBlockDescription payloadDesc = getPayloadDescription(containerDesc);
+			nextReference = nextReference.advance(totalHeaderSize);
 
-      long remainingPayloadByteCount = DataBlockDescription.UNDEFINED;
+			headers.addAll(nextHeaders);
+		}
 
-      if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED) {
-         remainingPayloadByteCount = remainingDirectParentByteCount - overallHeaderSize;
-      }
+		// Read payload
+		DataBlockDescription payloadDesc = getPayloadDescription(containerDesc);
 
-      Payload payload = readPayload(nextReference, payloadDesc.getId(), concreteContainerId, remainingPayloadByteCount,
-         newContainerContext);
+		long remainingPayloadByteCount = DataBlockDescription.UNDEFINED;
 
-      createdContainer.setPayload(payload);
+		if (remainingDirectParentByteCount != DataBlockDescription.UNDEFINED) {
+			remainingPayloadByteCount = remainingDirectParentByteCount - overallHeaderSize;
+		}
 
-      // Read footers
-      nextReference = nextReference.advance(payload.getSize());
+		Payload payload = readPayload(nextReference, payloadDesc.getId(), concreteContainerId,
+			remainingPayloadByteCount, newContainerContext);
 
-      List<Footer> footers = new ArrayList<>();
-      List<DataBlockDescription> footerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
+		createdContainer.setPayload(payload);
 
-      for (int i = 0; i < footerDescs.size(); ++i) {
-         DataBlockDescription footerDesc = footerDescs.get(i);
+		// Read footers
+		nextReference = nextReference.advance(payload.getSize());
 
-         List<Footer> nextFooters = readHeadersOrFootersWithId(Footer.class, nextReference, footerDesc.getId(),
-            newContainerContext);
+		List<Footer> footers = new ArrayList<>();
+		List<DataBlockDescription> footerDescs = containerDesc.getChildDescriptionsOfType(PhysicalDataBlockType.FOOTER);
 
-         long totalFooterSize = 0;
+		for (int i = 0; i < footerDescs.size(); ++i) {
+			DataBlockDescription footerDesc = footerDescs.get(i);
 
-         for (int j = 0; j < nextFooters.size(); ++j) {
-            Footer nextFooter = nextFooters.get(j);
+			List<Footer> nextFooters = readHeadersOrFootersWithId(Footer.class, nextReference, footerDesc.getId(),
+				newContainerContext);
 
-            totalFooterSize += nextFooter.getSize();
-            createdContainer.insertFooter(createdContainer.getFooters().size(), nextFooter);
-         }
+			long totalFooterSize = 0;
 
-         nextReference = nextReference.advance(totalFooterSize);
+			for (int j = 0; j < nextFooters.size(); ++j) {
+				Footer nextFooter = nextFooters.get(j);
 
-         footers.addAll(nextFooters);
-      }
+				totalFooterSize += nextFooter.getSize();
+				createdContainer.insertFooter(createdContainer.getFooters().size(), nextFooter);
+			}
 
-      createdContainer.attachToMedium(currentOffset, sequenceNumber, getMediumDataProvider(), getEventBus(),
-         DataBlockState.PERSISTED);
+			nextReference = nextReference.advance(totalFooterSize);
 
-      return createdContainer;
-   }
+			footers.addAll(nextFooters);
+		}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readPayload(MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId, DataBlockId, long, ContainerContext)
-    */
-   @Override
-   public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId,
-      long remainingDirectParentByteCount, ContainerContext containerContext) {
-      Reject.ifNull(id, "id");
-      Reject.ifNull(reference, "reference");
+		createdContainer.attachToMedium(currentOffset, sequenceNumber, getMediumDataProvider(), getEventBus(),
+			DataBlockState.PERSISTED);
 
-      DataBlockDescription payloadDesc = getSpecification().getDataBlockDescription(id);
+		return createdContainer;
+	}
 
-      long totalPayloadSize = containerContext.getSizeOf(payloadDesc.getId(), 0);
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.services.DataBlockReader#readPayload(MediumOffset,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockId, DataBlockId,
+	 *      long, ContainerContext)
+	 */
+	@Override
+	public Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId,
+		long remainingDirectParentByteCount, ContainerContext containerContext) {
+		Reject.ifNull(id, "id");
+		Reject.ifNull(reference, "reference");
 
-      if (totalPayloadSize == DataBlockDescription.UNDEFINED) {
-         totalPayloadSize = remainingDirectParentByteCount;
-      }
+		DataBlockDescription payloadDesc = getSpecification().getDataBlockDescription(id);
 
-      // If the medium is a stream-based medium, all the payload bytes must be cached first
-      if (!reference.getMedium().isRandomAccess() && totalPayloadSize != DataBlockDescription.UNDEFINED
-         && totalPayloadSize != 0) {
-         getMediumDataProvider().bufferBeforeRead(reference, totalPayloadSize);
-      }
+		long totalPayloadSize = containerContext.getSizeOf(payloadDesc.getId(), 0);
 
-      return getDataBlockFactory().createPersistedPayload(payloadDesc.getId(), reference, containerContext,
-         totalPayloadSize, this);
-   }
+		if (totalPayloadSize == DataBlockDescription.UNDEFINED) {
+			totalPayloadSize = remainingDirectParentByteCount;
+		}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#hasEnoughBytesForMagicKey(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.MagicKey, long)
-    */
-   @Override
-   protected boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey,
-      long remainingDirectParentByteCount) {
-      return remainingDirectParentByteCount == DataBlockDescription.UNDEFINED
-         || magicKey.getByteLength() <= remainingDirectParentByteCount;
-   }
+		// If the medium is a stream-based medium, all the payload bytes must be cached
+		// first
+		if (!reference.getMedium().isRandomAccess() && (totalPayloadSize != DataBlockDescription.UNDEFINED)
+			&& (totalPayloadSize != 0)) {
+			getMediumDataProvider().bufferBeforeRead(reference, totalPayloadSize);
+		}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#getMagicKeys(com.github.jmeta.library.dataformats.api.types.DataBlockDescription)
-    */
-   @Override
-   protected List<MagicKey> getMagicKeys(DataBlockDescription containerDesc) {
-      return containerDesc.getHeaderMagicKeys();
-   }
+		return getDataBlockFactory().createPersistedPayload(payloadDesc.getId(), reference, containerContext,
+			totalPayloadSize, this);
+	}
 }

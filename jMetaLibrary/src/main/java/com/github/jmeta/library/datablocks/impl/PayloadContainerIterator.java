@@ -27,163 +27,166 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class PayloadContainerIterator implements ContainerIterator {
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.ContainerIterator#remove()
-    */
-   @Override
-   public void remove() {
-   }
+	private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
 
-   private final Map<DataBlockId, Integer> nextSequenceNumber = new HashMap<>();
+	private final Payload m_parent;
 
-   /**
-    * Creates a new instance of {@link PayloadContainerIterator}.
-    *
-    * @param parent
-    * @param reader
-    * @param reference
-    * @param context
-    */
-   public PayloadContainerIterator(Payload parent, DataBlockReader reader, MediumOffset reference) {
-      Reject.ifNull(parent, "parent");
-      Reject.ifNull(reader, "reader");
-      Reject.ifNull(reference, "reference");
+	private long m_remainingParentSize;
 
-      m_parent = parent;
-      m_nextContainerReference = reference;
-      m_reader = reader;
-      m_remainingParentSize = m_parent.getSize();
+	private MediumOffset m_nextContainerReference;
 
-      DataBlockDescription parentDescription = m_reader.getSpecification().getDataBlockDescription(m_parent.getId());
+	private final DataBlockReader m_reader;
 
-      m_containerDescs = parentDescription.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
-   }
+	private List<DataBlockDescription> m_containerDescs;
 
-   /**
-    * @see java.util.Iterator#hasNext()
-    */
-   @Override
-   public boolean hasNext() {
+	/**
+	 * Creates a new instance of {@link PayloadContainerIterator}.
+	 *
+	 * @param parent
+	 * @param reader
+	 * @param reference
+	 */
+	public PayloadContainerIterator(Payload parent, DataBlockReader reader, MediumOffset reference) {
+		Reject.ifNull(parent, "parent");
+		Reject.ifNull(reader, "reader");
+		Reject.ifNull(reference, "reference");
 
-      // If the parent size is known: The already read containers reach to the end of the
-      // payload => no further children available
-      long remainingParentByteCount = DataBlockDescription.UNDEFINED;
+		m_parent = parent;
+		m_nextContainerReference = reference;
+		m_reader = reader;
+		m_remainingParentSize = m_parent.getSize();
 
-      if (m_parent.getSize() != DataBlockDescription.UNDEFINED) {
-         remainingParentByteCount = m_parent.getSize()
-            - (m_nextContainerReference.getAbsoluteMediumOffset() - m_parent.getOffset().getAbsoluteMediumOffset());
+		DataBlockDescription parentDescription = m_reader.getSpecification().getDataBlockDescription(m_parent.getId());
 
-         if (remainingParentByteCount <= 0) {
-            return false;
-         }
-      }
+		m_containerDescs = parentDescription.getChildDescriptionsOfType(PhysicalDataBlockType.CONTAINER);
+	}
 
-      List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
+	private List<DataBlockDescription> getNestedContainerDescsWithMagicKeys() {
+		return m_containerDescs.stream().filter((desc) -> !desc.getHeaderMagicKeys().isEmpty())
+			.collect(Collectors.toList());
+	}
 
-      // We need to evaluate whether there still is a container child
-      for (int i = 0; i < nestedContainerDescsWithMagicKeys.size(); ++i) {
-         DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
+	/**
+	 * @see java.util.Iterator#hasNext()
+	 */
+	@Override
+	public boolean hasNext() {
 
-         if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            remainingParentByteCount)) {
-            return true;
-         }
-      }
+		// If the parent size is known: The already read containers reach to the end of
+		// the
+		// payload => no further children available
+		long remainingParentByteCount = DataBlockDescription.UNDEFINED;
 
-      // If no nested container with magic key was found, we assume the default nested container
-      DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
-      if (containerDesc != null) {
-         return m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
-            remainingParentByteCount);
-      }
+		if (m_parent.getSize() != DataBlockDescription.UNDEFINED) {
+			remainingParentByteCount = m_parent.getSize()
+				- (m_nextContainerReference.getAbsoluteMediumOffset() - m_parent.getOffset().getAbsoluteMediumOffset());
 
-      // The payload has no container children at all OR no containers have been
-      // identified
-      return false;
-   }
+			if (remainingParentByteCount <= 0) {
+				return false;
+			}
+		}
 
-   private List<DataBlockDescription> getNestedContainerDescsWithMagicKeys() {
-      return m_containerDescs.stream().filter((desc) -> !desc.getHeaderMagicKeys().isEmpty())
-         .collect(Collectors.toList());
-   }
+		List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
 
-   /**
-    * @see java.util.Iterator#next()
-    */
-   @Override
-   public Container next() {
+		// We need to evaluate whether there still is a container child
+		for (int i = 0; i < nestedContainerDescsWithMagicKeys.size(); ++i) {
+			DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
-      Reject.ifFalse(hasNext(), "hasNext()");
+			if (m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
+				remainingParentByteCount)) {
+				return true;
+			}
+		}
 
-      List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
+		// If no nested container with magic key was found, we assume the default nested
+		// container
+		DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
+		if (containerDesc != null) {
+			return m_reader.hasContainerWithId(m_nextContainerReference, containerDesc.getId(), m_parent,
+				remainingParentByteCount);
+		}
 
-      for (int i = 0; i < nestedContainerDescsWithMagicKeys.size(); ++i) {
-         DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
+		// The payload has no container children at all OR no containers have been
+		// identified
+		return false;
+	}
 
-         DataBlockId containerId = containerDesc.getId();
+	/**
+	 * @see java.util.Iterator#next()
+	 */
+	@Override
+	public Container next() {
 
-         if (m_reader.hasContainerWithId(m_nextContainerReference, containerId, m_parent, m_remainingParentSize)) {
+		Reject.ifFalse(hasNext(), "hasNext()");
 
-            Container nextContainer = readNextContainer(containerId);
+		List<DataBlockDescription> nestedContainerDescsWithMagicKeys = getNestedContainerDescsWithMagicKeys();
 
-            if (nextContainer != null) {
-               return nextContainer;
-            }
-         }
-      }
+		for (int i = 0; i < nestedContainerDescsWithMagicKeys.size(); ++i) {
+			DataBlockDescription containerDesc = nestedContainerDescsWithMagicKeys.get(i);
 
-      // If no nested container with magic key was found, we assume the default nested container
-      DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
+			DataBlockId containerId = containerDesc.getId();
 
-      if (containerDesc != null) {
-         Container nextContainer = readNextContainer(containerDesc.getId());
+			if (m_reader.hasContainerWithId(m_nextContainerReference, containerId, m_parent, m_remainingParentSize)) {
 
-         if (nextContainer != null) {
-            return nextContainer;
-         }
-      }
+				Container nextContainer = readNextContainer(containerId);
 
-      throw new IllegalStateException(
-         "No child container found for payload " + m_parent + " at " + m_nextContainerReference);
-   }
+				if (nextContainer != null) {
+					return nextContainer;
+				}
+			}
+		}
 
-   /**
-    * @param containerId
-    */
-   private Container readNextContainer(DataBlockId containerId) {
-      int sequenceNumber = 0;
+		// If no nested container with magic key was found, we assume the default nested
+		// container
+		DataBlockDescription containerDesc = m_reader.getSpecification().getDefaultNestedContainerDescription();
 
-      if (nextSequenceNumber.containsKey(containerId)) {
-         sequenceNumber = nextSequenceNumber.get(containerId);
-      }
+		if (containerDesc != null) {
+			Container nextContainer = readNextContainer(containerDesc.getId());
 
-      Container container = m_reader.readContainerWithId(m_nextContainerReference, containerId, m_parent,
-         m_remainingParentSize, sequenceNumber, m_parent.getContainerContext());
+			if (nextContainer != null) {
+				return nextContainer;
+			}
+		}
 
-      nextSequenceNumber.put(containerId, sequenceNumber + 1);
+		throw new IllegalStateException(
+			"No child container found for payload " + m_parent + " at " + m_nextContainerReference);
+	}
 
-      if (container != null) {
-         updateProgress(container);
-      }
+	/**
+	 * @param containerId
+	 */
+	private Container readNextContainer(DataBlockId containerId) {
+		int sequenceNumber = 0;
 
-      return container;
-   }
+		if (nextSequenceNumber.containsKey(containerId)) {
+			sequenceNumber = nextSequenceNumber.get(containerId);
+		}
 
-   private void updateProgress(Container container) {
-      m_nextContainerReference = m_nextContainerReference.advance(container.getSize());
+		Container container = m_reader.readContainerWithId(m_nextContainerReference, containerId, m_parent,
+			m_remainingParentSize, sequenceNumber, m_parent.getContainerContext());
 
-      if (m_remainingParentSize != DataBlockDescription.UNDEFINED) {
-         m_remainingParentSize -= container.getSize();
-      }
-   }
+		nextSequenceNumber.put(containerId, sequenceNumber + 1);
 
-   private final Payload m_parent;
+		if (container != null) {
+			updateProgress(container);
+		}
 
-   private long m_remainingParentSize;
+		return container;
+	}
 
-   private MediumOffset m_nextContainerReference;
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.services.ContainerIterator#remove()
+	 */
+	@Override
+	public void remove() {
+		// Intentionally empty
+	}
 
-   private final DataBlockReader m_reader;
+	private void updateProgress(Container container) {
+		m_nextContainerReference = m_nextContainerReference.advance(container.getSize());
 
-   private List<DataBlockDescription> m_containerDescs;
+		if (m_remainingParentSize != DataBlockDescription.UNDEFINED) {
+			m_remainingParentSize -= container.getSize();
+		}
+	}
 }

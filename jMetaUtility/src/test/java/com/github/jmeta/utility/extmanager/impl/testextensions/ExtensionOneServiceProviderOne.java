@@ -14,10 +14,11 @@ package com.github.jmeta.utility.extmanager.impl.testextensions;
  */
 public class ExtensionOneServiceProviderOne implements TestExtensionServiceOne {
 
-   /**
-    * @see com.github.jmeta.utility.extmanager.impl.testextensions.TestExtensionServiceOne#testMethod()
-    */
-   @Override
-   public void testMethod() {
-   }
+	/**
+	 * @see com.github.jmeta.utility.extmanager.impl.testextensions.TestExtensionServiceOne#testMethod()
+	 */
+	@Override
+	public void testMethod() {
+		// Intentionally empty
+	}
 }

@@ -16,5 +16,5 @@ import java.io.Closeable;
  *
  */
 public interface TopLevelContainerIterator extends ContainerIterator, Closeable, AutoCloseable {
-
+	// Intentionally empty
 }

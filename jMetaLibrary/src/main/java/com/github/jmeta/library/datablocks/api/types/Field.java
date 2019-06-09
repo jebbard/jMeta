@@ -13,31 +13,21 @@ import com.github.jmeta.library.datablocks.api.exceptions.InterpretedValueConver
  */
 public interface Field<T> extends DataBlock {
 
-   /**
-    * Returns interpretedValue
-    *
-    * @return interpretedValue
-    * @throws BinaryValueConversionException
-    */
-   public T getInterpretedValue() throws BinaryValueConversionException;
+	/**
+	 * @return the binary value
+	 * @throws InterpretedValueConversionException
+	 */
+	ByteBuffer getBinaryValue() throws InterpretedValueConversionException;
 
-   /**
-    * @return the binary value
-    * @throws InterpretedValueConversionException
-    */
-   public ByteBuffer getBinaryValue() throws InterpretedValueConversionException;
+	/**
+	 * Returns interpretedValue
+	 *
+	 * @return interpretedValue
+	 * @throws BinaryValueConversionException
+	 */
+	T getInterpretedValue() throws BinaryValueConversionException;
 
-   /**
-    * Returns interpretedValue
-    *
-    * @return interpretedValue
-    * @throws BinaryValueConversionException
-    */
-   public void setInterpretedValue(T interpretedBalue);
+	void setBinaryValue(ByteBuffer binaryValue);
 
-   /**
-    * @return the binary value
-    * @throws InterpretedValueConversionException
-    */
-   public void setBinaryValue(ByteBuffer binaryValue);
+	void setInterpretedValue(T interpretedBalue);
 }

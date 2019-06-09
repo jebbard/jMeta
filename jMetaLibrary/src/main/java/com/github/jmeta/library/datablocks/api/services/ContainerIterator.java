@@ -14,15 +14,15 @@ import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.DataBlock;
 
 /**
- * An {@link Iterator} used for iterating over {@link DataBlock}s. This {@link Iterator} will throw an
- * {@link UnsupportedOperationException} when the #remove() method is called.
+ * An {@link Iterator} used for iterating over {@link DataBlock}s. This
+ * {@link Iterator} will throw an {@link UnsupportedOperationException} when the
+ * #remove() method is called.
  *
- * The #next() method might throw an {@link UnknownDataFormatException} which is a {@link RuntimeException}.
- *
- * @param <T>
+ * The #next() method might throw an {@link UnknownDataFormatException} which is
+ * a {@link RuntimeException}.
  */
 public interface ContainerIterator extends Iterator<Container> {
 
-   @Override
-   public void remove();
+	@Override
+	void remove();
 }

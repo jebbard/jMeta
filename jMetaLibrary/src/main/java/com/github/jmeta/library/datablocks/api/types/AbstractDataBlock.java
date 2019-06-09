@@ -26,239 +26,230 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public abstract class AbstractDataBlock implements DataBlock, DataBlockEventListener {
 
-   private int sequenceNumber;
-   private MediumDataProvider mediumDataProvider;
-   private DataBlockState state;
-   private DataBlockEventBus eventBus;
+	private int sequenceNumber;
+	private MediumDataProvider mediumDataProvider;
+	private DataBlockState state;
+	private DataBlockEventBus eventBus;
 
-   private ContainerContext containerContext;
+	private ContainerContext containerContext;
 
-   private DataBlock m_parent;
-   private MediumOffset m_mediumReference;
-   private final DataBlockId m_id;
-   private final DataFormatSpecification spec;
+	private DataBlock m_parent;
+	private MediumOffset m_mediumReference;
+	private final DataBlockId m_id;
+	private final DataFormatSpecification spec;
 
-   /**
-    * Returns the attribute {@link #eventBus}.
-    *
-    * @return the attribute {@link #eventBus}
-    */
-   public DataBlockEventBus getEventBus() {
-      return eventBus;
-   }
+	public AbstractDataBlock(DataBlockId id, DataFormatSpecification spec) {
+		Reject.ifNull(spec, "spec");
+		Reject.ifNull(id, "id");
 
-   /**
-    * Returns the attribute {@link #spec}.
-    *
-    * @return the attribute {@link #spec}
-    */
-   public DataFormatSpecification getSpec() {
-      return spec;
-   }
+		m_id = id;
+		this.spec = spec;
+	}
 
-   public AbstractDataBlock(DataBlockId id, DataFormatSpecification spec) {
-      Reject.ifNull(spec, "spec");
-      Reject.ifNull(id, "id");
+	/**
+	 * Creates a new {@link AbstractDataBlock}.
+	 *
+	 * @param id
+	 * @param sequenceNumber     TODO
+	 * @param offset
+	 * @param parent
+	 * @param mediumDataProvider
+	 * @param containerContext   TODO
+	 * @param state              TODO
+	 * @param eventBus           TODO
+	 */
+	public AbstractDataBlock(DataBlockId id, int sequenceNumber, MediumOffset offset, DataBlock parent,
+		MediumDataProvider mediumDataProvider, ContainerContext containerContext, DataBlockState state,
+		DataBlockEventBus eventBus) {
+		Reject.ifNull(id, "id");
+		Reject.ifNull(mediumDataProvider, "dataBlockReader");
+		Reject.ifNull(offset, "reference");
+		Reject.ifNull(state, "state");
+		Reject.ifNull(eventBus, "eventBus");
+		Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
-      m_id = id;
-      this.spec = spec;
-   }
+		m_id = id;
+		this.state = state;
+		this.eventBus = eventBus;
+		this.mediumDataProvider = mediumDataProvider;
+		m_mediumReference = offset;
+		this.sequenceNumber = sequenceNumber;
+		spec = null;
 
-   public void initContainerContext(ContainerContext containerContext) {
-      Reject.ifNull(containerContext, "containerContext");
+		this.containerContext = containerContext;
 
-      this.containerContext = containerContext;
-   }
+		this.eventBus.registerListener(this);
 
-   public void initSequenceNumber(int sequenceNumber) {
-      this.sequenceNumber = sequenceNumber;
-   }
+		if (parent != null) {
+			initParent(parent);
+		}
+	}
 
-   public void attachToMedium(MediumOffset offset, int sequenceNumber, MediumDataProvider mediumDataProvider,
-      DataBlockEventBus eventBus, DataBlockState attachedState) {
-      Reject.ifNull(mediumDataProvider, "dataBlockReader");
-      Reject.ifNull(offset, "reference");
-      Reject.ifNull(eventBus, "eventBus");
-      Reject.ifNull(attachedState, "attachedState");
-      Reject.ifNegative(sequenceNumber, "sequenceNumber");
+	public void attachToMedium(MediumOffset offset, int sequenceNumber, MediumDataProvider mediumDataProvider,
+		DataBlockEventBus eventBus, DataBlockState attachedState) {
+		Reject.ifNull(mediumDataProvider, "dataBlockReader");
+		Reject.ifNull(offset, "reference");
+		Reject.ifNull(eventBus, "eventBus");
+		Reject.ifNull(attachedState, "attachedState");
+		Reject.ifNegative(sequenceNumber, "sequenceNumber");
 
-      this.eventBus = eventBus;
-      this.mediumDataProvider = mediumDataProvider;
-      m_mediumReference = offset;
-      this.sequenceNumber = sequenceNumber;
-      state = attachedState;
-      getEventBus().registerListener((DataBlockEventListener) containerContext);
+		this.eventBus = eventBus;
+		this.mediumDataProvider = mediumDataProvider;
+		m_mediumReference = offset;
+		this.sequenceNumber = sequenceNumber;
+		state = attachedState;
+		getEventBus().registerListener((DataBlockEventListener) containerContext);
 
-      this.eventBus.registerListener(this);
-   }
+		this.eventBus.registerListener(this);
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
-    */
-   @Override
-   public void dataBlockEventOccurred(DataBlockEvent event) {
-      // TODO implement
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.impl.events.DataBlockEventListener#dataBlockEventOccurred(com.github.jmeta.library.datablocks.impl.events.DataBlockEvent)
+	 */
+	@Override
+	public void dataBlockEventOccurred(DataBlockEvent event) {
+		// TODO implement
+	}
 
-   /**
-    * Sets the attribute {@link #state}.
-    *
-    * @param new
-    *           vakue for attribute {@link #state state}.
-    */
-   protected void setState(DataBlockState state) {
-      Reject.ifNull(state, "state");
+	@Override
+	public ByteBuffer getBytes(MediumOffset offset, int size) {
+		Reject.ifNegative(size, "size");
+		Reject.ifNull(offset, "offset");
+		Reject.ifTrue(offset.before(getOffset()), "offset.before(getOffset())");
 
-      this.state = state;
-   }
+		if (getSize() != DataBlockDescription.UNDEFINED) {
+			Reject.ifFalse(
+				(offset.getAbsoluteMediumOffset() + size) <= (getOffset().getAbsoluteMediumOffset() + getSize()),
+				"offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize()");
+		}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getState()
-    */
-   @Override
-   public DataBlockState getState() {
-      return state;
-   }
+		return mediumDataProvider.getData(offset, size);
+	}
 
-   /**
-    * Creates a new {@link AbstractDataBlock}.
-    *
-    * @param id
-    * @param sequenceNumber
-    *           TODO
-    * @param offset
-    * @param parent
-    * @param mediumDataProvider
-    * @param containerContext
-    *           TODO
-    * @param state
-    *           TODO
-    * @param eventBus
-    *           TODO
-    */
-   public AbstractDataBlock(DataBlockId id, int sequenceNumber, MediumOffset offset, DataBlock parent,
-      MediumDataProvider mediumDataProvider, ContainerContext containerContext, DataBlockState state,
-      DataBlockEventBus eventBus) {
-      Reject.ifNull(id, "id");
-      Reject.ifNull(mediumDataProvider, "dataBlockReader");
-      Reject.ifNull(offset, "reference");
-      Reject.ifNull(state, "state");
-      Reject.ifNull(eventBus, "eventBus");
-      Reject.ifNegative(sequenceNumber, "sequenceNumber");
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Container#getContainerContext()
+	 */
+	@Override
+	public ContainerContext getContainerContext() {
+		return containerContext;
+	}
 
-      m_id = id;
-      this.state = state;
-      this.eventBus = eventBus;
-      this.mediumDataProvider = mediumDataProvider;
-      m_mediumReference = offset;
-      this.sequenceNumber = sequenceNumber;
-      spec = null;
+	/**
+	 * Returns the attribute {@link #eventBus}.
+	 *
+	 * @return the attribute {@link #eventBus}
+	 */
+	public DataBlockEventBus getEventBus() {
+		return eventBus;
+	}
 
-      this.containerContext = containerContext;
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getId()
+	 */
+	@Override
+	public DataBlockId getId() {
 
-      this.eventBus.registerListener(this);
+		return m_id;
+	}
 
-      if (parent != null) {
-         initParent(parent);
-      }
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getOffset()
+	 */
+	@Override
+	public MediumOffset getOffset() {
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Container#getContainerContext()
-    */
-   @Override
-   public ContainerContext getContainerContext() {
-      return containerContext;
-   }
+		return m_mediumReference;
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSequenceNumber()
-    */
-   @Override
-   public int getSequenceNumber() {
-      return sequenceNumber;
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getParent()
+	 */
+	@Override
+	public DataBlock getParent() {
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getBytes(long, int)
-    */
-   @Override
-   public ByteBuffer getBytes(MediumOffset offset, int size) {
-      Reject.ifNegative(size, "size");
-      Reject.ifNull(offset, "offset");
-      Reject.ifTrue(offset.before(getOffset()), "offset.before(getOffset())");
+		return m_parent;
+	}
 
-      if (getSize() != DataBlockDescription.UNDEFINED) {
-         Reject.ifFalse(offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize(),
-            "offset.getAbsoluteMediumOffset() + size <= getOffset().getAbsoluteMediumOffset() + getSize()");
-      }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSequenceNumber()
+	 */
+	@Override
+	public int getSequenceNumber() {
+		return sequenceNumber;
+	}
 
-      return mediumDataProvider.getData(offset, size);
-   }
+	/**
+	 * Returns the attribute {@link #spec}.
+	 *
+	 * @return the attribute {@link #spec}
+	 */
+	public DataFormatSpecification getSpec() {
+		return spec;
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getOffset()
-    */
-   @Override
-   public MediumOffset getOffset() {
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getState()
+	 */
+	@Override
+	public DataBlockState getState() {
+		return state;
+	}
 
-      return m_mediumReference;
-   }
+	public void initContainerContext(ContainerContext containerContext) {
+		Reject.ifNull(containerContext, "containerContext");
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getParent()
-    */
-   @Override
-   public DataBlock getParent() {
+		this.containerContext = containerContext;
+	}
 
-      return m_parent;
-   }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#initParent(com.github.jmeta.library.datablocks.api.types.DataBlock)
+	 */
+	@Override
+	public void initParent(DataBlock parent) {
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getId()
-    */
-   @Override
-   public DataBlockId getId() {
+		Reject.ifNull(parent, "parent");
+		Reject.ifFalse(getParent() == null, "getParent() == null");
 
-      return m_id;
-   }
+		m_parent = parent;
+		initContainerContext(parent.getContainerContext());
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#initParent(com.github.jmeta.library.datablocks.api.types.DataBlock)
-    */
-   @Override
-   public void initParent(DataBlock parent) {
+	public void initSequenceNumber(int sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
+	}
 
-      Reject.ifNull(parent, "parent");
-      Reject.ifFalse(getParent() == null, "getParent() == null");
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#setBytes(byte[][])
+	 */
+	@Override
+	public void setBytes(byte[][] bytes) {
 
-      m_parent = parent;
-      initContainerContext(parent.getContainerContext());
-   }
+		List<ByteBuffer> cache = new ArrayList<>(bytes.length);
 
-   /**
-    * @see java.lang.Object#toString()
-    */
-   @Override
-   public String toString() {
+		for (int i = 0; i < bytes.length; i++) {
+			cache.add(ByteBuffer.wrap(bytes[i]));
+		}
 
-      return getClass().getName() + "[id=" + getId() + ", parentId="
-         + (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getOffset() + ", totalSize="
-         + getSize() + "]";
-   }
+		// m_mediumReference.setCache(cache);
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#setBytes(byte[][])
-    */
-   @Override
-   public void setBytes(byte[][] bytes) {
+	/**
+	 * Sets the attribute {@link #state}.
+	 */
+	protected void setState(DataBlockState state) {
+		Reject.ifNull(state, "state");
 
-      List<ByteBuffer> cache = new ArrayList<>(bytes.length);
+		this.state = state;
+	}
 
-      for (int i = 0; i < bytes.length; i++) {
-         cache.add(ByteBuffer.wrap(bytes[i]));
-      }
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
 
-      // m_mediumReference.setCache(cache);
-   }
+		return getClass().getName() + "[id=" + getId() + ", parentId="
+			+ (getParent() == null ? getParent() : getParent().getId()) + ", medium=" + getOffset() + ", totalSize="
+			+ getSize() + "]";
+	}
 }

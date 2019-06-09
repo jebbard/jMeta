@@ -7,8 +7,6 @@
 
 package com.github.jmeta.library.media.impl.mediumAccessor;
 
-import static com.github.jmeta.library.media.api.helper.TestMedia.at;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -26,559 +24,573 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
 import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataException;
 
 /**
- * Tests the interface {@link MediumAccessor}. Basic idea is to work on the {@link TestMedia#FIRST_TEST_FILE_PATH}. Its
- * contents is just ASCII bytes that are read once at the beginning of test execution and determined as expected
+ * Tests the interface {@link MediumAccessor}. Basic idea is to work on the
+ * {@link TestMedia#FIRST_TEST_FILE_PATH}. Its contents is just ASCII bytes that
+ * are read once at the beginning of test execution and determined as expected
  * content. Then reading and writing is tested based on this.
  */
 public abstract class AbstractMediumAccessorTest {
 
-   /**
-    * {@link ReadTestData} summarizes offset and size of test data for tests of reading.
-    */
-   protected static class ReadTestData {
-
-      /**
-       * This constructor is used for testing random-access implementations, where the offset to read is actually
-       * relevant and the bytes read are expected at the same offset.
-       * 
-       * @param offsetToRead
-       *           The offset to read bytes from or null to indicate stream medium.
-       * @param sizeToRead
-       *           The number of bytes to read.
-       */
-      public ReadTestData(int offsetToRead, int sizeToRead) {
-         this(offsetToRead, sizeToRead, offsetToRead);
-      }
-
-      /**
-       * This constructor is used for testing stream implementations, where the offset to read is ignored and no matter
-       * what its value is, the bytes are read just sequentially. Thus, the offsetToRead might be arbitrary, while the
-       * expected byte offsets are different.
-       * 
-       * @param offsetToRead
-       *           The offset to read from
-       * @param sizeToRead
-       *           The size to read
-       * @param expectedBytesOffset
-       *           The expected read offset
-       */
-      public ReadTestData(int offsetToRead, int sizeToRead, Integer expectedBytesOffset) {
-         this.offsetToRead = offsetToRead;
-         this.sizeToRead = sizeToRead;
-         this.expectedBytesOffset = expectedBytesOffset;
-      }
-
-      private int offsetToRead;
-      private int sizeToRead;
-      private int expectedBytesOffset;
-   }
-
-   private MediumAccessor<?> mediumAccessor;
-
-   private static byte[] EXPECTED_FILE_CONTENTS;
-
-   /**
-    * Reads the contents of the {@link TestMedia#FIRST_TEST_FILE_PATH} into memory to make it available for expectation
-    * testing.
-    */
-   @BeforeClass
-   public static void determineExpectedFileContents() {
-      TestMedia.validateTestFiles();
-
-      EXPECTED_FILE_CONTENTS = TestMedia.FIRST_TEST_FILE_CONTENT.getBytes();
-   }
-
-   /**
-    * Sets up the test case.
-    */
-   @Before
-   public void setUp() {
-      prepareMediumData(getExpectedMediumContent());
-
-      mediumAccessor = createImplementationToTest();
-
-      if (mediumAccessor == null) {
-         throw new InvalidTestDataException("The tested MediumAccessor must not be null", null);
-      }
-
-      validateReadTestData(getReadTestDataUntilEndOfMedium());
-      getReadTestDataToUse().forEach((readTestData) -> validateReadTestData(readTestData));
-
-      validateTestMedium(mediumAccessor.getMedium());
-   }
-
-   /**
-    * Tears the test case down.
-    */
-   @After
-   public void tearDown() {
-
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
-
-      if (mediumAccessor.isOpened()) {
-         mediumAccessor.close();
-      }
-   }
-
-   /**
-    * Tests {@link MediumAccessor#close()}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void open_onOpenedMediumAccessor_throwsException() {
-
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
-
-      mediumAccessor.open();
-      mediumAccessor.open();
-   }
-
-   /**
-    * Tests {@link MediumAccessor#isOpened()}.
-    */
-   @Test
-   public void isOpened_forNewMediumAccessor_returnsFalse() {
+	/**
+	 * {@link ReadTestData} summarizes offset and size of test data for tests of
+	 * reading.
+	 */
+	protected static class ReadTestData {
+
+		private int offsetToRead;
+
+		private int sizeToRead;
+
+		private int expectedBytesOffset;
+
+		/**
+		 * This constructor is used for testing random-access implementations, where the
+		 * offset to read is actually relevant and the bytes read are expected at the
+		 * same offset.
+		 *
+		 * @param offsetToRead The offset to read bytes from or null to indicate stream
+		 *                     medium.
+		 * @param sizeToRead   The number of bytes to read.
+		 */
+		public ReadTestData(int offsetToRead, int sizeToRead) {
+			this(offsetToRead, sizeToRead, offsetToRead);
+		}
+
+		/**
+		 * This constructor is used for testing stream implementations, where the offset
+		 * to read is ignored and no matter what its value is, the bytes are read just
+		 * sequentially. Thus, the offsetToRead might be arbitrary, while the expected
+		 * byte offsets are different.
+		 *
+		 * @param offsetToRead        The offset to read from
+		 * @param sizeToRead          The size to read
+		 * @param expectedBytesOffset The expected read offset
+		 */
+		public ReadTestData(int offsetToRead, int sizeToRead, Integer expectedBytesOffset) {
+			this.offsetToRead = offsetToRead;
+			this.sizeToRead = sizeToRead;
+			this.expectedBytesOffset = expectedBytesOffset;
+		}
+	}
+
+	private static byte[] EXPECTED_FILE_CONTENTS;
+
+	/**
+	 * Reads the contents of the {@link TestMedia#FIRST_TEST_FILE_PATH} into memory
+	 * to make it available for expectation testing.
+	 */
+	@BeforeClass
+	public static void determineExpectedFileContents() {
+		TestMedia.validateTestFiles();
+
+		AbstractMediumAccessorTest.EXPECTED_FILE_CONTENTS = TestMedia.FIRST_TEST_FILE_CONTENT.getBytes();
+	}
+
+	/**
+	 * Returns the bytes expected in the {@link Medium} used for testing.
+	 *
+	 * @return the bytes expected in the {@link Medium} used for testing
+	 */
+	protected static byte[] getExpectedMediumContent() {
+		return AbstractMediumAccessorTest.EXPECTED_FILE_CONTENTS;
+	}
+
+	/**
+	 * Encapsulates test calls to {@link MediumAccessor#read(ByteBuffer)}, without
+	 * expecting an end of medium during read, i.e. if it occurs, a test failure is
+	 * generated.
+	 *
+	 * @param mediumAccessor The {@link MediumAccessor} to use.
+	 * @param readTestData   The {@link ReadTestData} to use.
+	 * @return The {@link ByteBuffer} of data read, returned by
+	 *         {@link MediumAccessor#read(ByteBuffer)}
+	 */
+	protected static ByteBuffer performReadNoEOMExpected(MediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
+		mediumAccessor.setCurrentPosition(TestMedia.at(mediumAccessor.getMedium(), readTestData.offsetToRead));
+
+		try {
+			ByteBuffer readContent = mediumAccessor.read(readTestData.sizeToRead);
+
+			return readContent;
+		}
+
+		catch (EndOfMediumException e) {
+			Assert.fail("Unexpected end of medium detected! Exception: " + e);
+		}
+
+		return null;
+	}
+
+	private MediumAccessor<?> mediumAccessor;
+
+	/**
+	 * Asserts whether the given bytes read previously in a test case at the given
+	 * zero based test file offset equal the test file contents at that offset.
+	 *
+	 * @param bytesRead  The bytes previously read
+	 * @param fileOffset The zero-based file offset expected to contain the bytes
+	 *                   matching the given bytes read
+	 */
+	protected void assertEqualsFileContent(ByteBuffer bytesRead, int fileOffset) {
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		bytesRead.mark();
 
-      Assert.assertFalse(mediumAccessor.isOpened());
-   }
+		int index = 0;
 
-   /**
-    * Tests {@link MediumAccessor#isOpened()} and {@link MediumAccessor#open()}.
-    */
-   @Test
-   public void isOpened_forOpenedMediumAccessor_returnsTrue() {
+		Assert.assertTrue(
+			(bytesRead.remaining() + fileOffset) <= AbstractMediumAccessorTest.getExpectedMediumContent().length);
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		while (bytesRead.hasRemaining()) {
+			Assert.assertEquals(AbstractMediumAccessorTest.getExpectedMediumContent()[fileOffset + index],
+				bytesRead.get());
 
-      mediumAccessor.open();
+			index++;
+		}
 
-      Assert.assertTrue(mediumAccessor.isOpened());
-   }
+		bytesRead.reset();
+	}
 
-   /**
-    * Tests {@link MediumAccessor#isOpened()} and {@link MediumAccessor#close()}.
-    */
-   @Test
-   public void close_onOpenedMediumAccessor_isOpenedReturnsFalse() {
+	/**
+	 * Tests {@link MediumAccessor#close()}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void close_onClosedMediumAccessor_throwsException() {
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      mediumAccessor.open();
+		mediumAccessor.open();
 
-      mediumAccessor.close();
+		mediumAccessor.close();
+		// Close twice
+		mediumAccessor.close();
+	}
 
-      Assert.assertFalse(mediumAccessor.isOpened());
-   }
+	/**
+	 * Tests {@link MediumAccessor#isOpened()} and {@link MediumAccessor#close()}.
+	 */
+	@Test
+	public void close_onOpenedMediumAccessor_isOpenedReturnsFalse() {
 
-   /**
-    * Tests {@link MediumAccessor#close()}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void close_onClosedMediumAccessor_throwsException() {
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		mediumAccessor.open();
 
-      mediumAccessor.open();
+		mediumAccessor.close();
 
-      mediumAccessor.close();
-      // Close twice
-      mediumAccessor.close();
-   }
+		Assert.assertFalse(mediumAccessor.isOpened());
+	}
 
-   /**
-    * Tests {@link MediumAccessor#getMedium()}.
-    */
-   @Test
-   public void getMedium_onOpenedMediumAccessor_returnsExpectedMedium() {
+	/**
+	 * Returns the concrete implementation of {@link MediumAccessor } to test. It is
+	 * used for reading and writing from a {@link MediumAccessor}.
+	 *
+	 * @return the concrete implementation of {@link MediumAccessor } to test.
+	 */
+	protected abstract MediumAccessor<?> createImplementationToTest();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+	/**
+	 * Tests {@link MediumAccessor#getCurrentPosition()}.
+	 */
+	@Test
+	public void getCurrentPosition_afterReadUntilEOM_changedByNumberOfReadBytesUntilEOM() {
 
-      mediumAccessor.open();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      Assert.assertEquals(getExpectedMedium(), mediumAccessor.getMedium());
-   }
+		mediumAccessor.open();
 
-   /**
-    * Tests {@link MediumAccessor#getMedium()}.
-    */
-   @Test
-   public void getMedium_onClosedMediumAccessor_returnsExpectedMedium() {
+		ReadTestData readTestData = getReadTestDataUntilEndOfMedium();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		int sizeToRead = readTestData.sizeToRead + 10;
 
-      mediumAccessor.open();
+		MediumOffset initialPosition = TestMedia.at(mediumAccessor.getMedium(), readTestData.offsetToRead);
 
-      mediumAccessor.close();
+		mediumAccessor.setCurrentPosition(initialPosition);
 
-      Assert.assertEquals(getExpectedMedium(), mediumAccessor.getMedium());
-   }
+		try {
+			mediumAccessor.read(sizeToRead);
 
-   /**
-    * Tests {@link MediumAccessor#getCurrentPosition()}.
-    */
-   @Test
-   public void getCurrentPosition_forNewlyOpenedMediumAccessor_returnsZero() {
+			Assert.fail("Expected end of medium exception, but it did not occur!");
+		}
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		catch (EndOfMediumException e) {
+			Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
+			Assert.assertEquals(initialPosition.advance(e.getByteCountActuallyRead()),
+				mediumAccessor.getCurrentPosition());
+		}
+	}
 
-      mediumAccessor.open();
+	/**
+	 * Tests {@link MediumAccessor#getCurrentPosition()}.
+	 */
+	@Test
+	public void getCurrentPosition_afterReadWithoutEOM_changedByNumberOfReadBytes() {
 
-      Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
-      Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
-   }
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-   /**
-    * Tests {@link MediumAccessor#getCurrentPosition()}.
-    */
-   @Test
-   public void getCurrentPosition_afterReadWithoutEOM_changedByNumberOfReadBytes() {
+		mediumAccessor.open();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		int sizeToRead = 10;
+		AbstractMediumAccessorTest.performReadNoEOMExpected(mediumAccessor, new ReadTestData(0, sizeToRead));
 
-      mediumAccessor.open();
+		Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
+		Assert.assertEquals(sizeToRead, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
+	}
 
-      int sizeToRead = 10;
-      performReadNoEOMExpected(mediumAccessor, new ReadTestData(0, sizeToRead));
+	/**
+	 * Tests {@link MediumAccessor#getCurrentPosition()}.
+	 */
+	@Test
+	public void getCurrentPosition_forNewlyOpenedMediumAccessor_returnsZero() {
 
-      Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
-      Assert.assertEquals(sizeToRead, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
-   }
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-   /**
-    * Tests {@link MediumAccessor#getCurrentPosition()}.
-    */
-   @Test
-   public void getCurrentPosition_afterReadUntilEOM_changedByNumberOfReadBytesUntilEOM() {
+		mediumAccessor.open();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
+		Assert.assertEquals(0, mediumAccessor.getCurrentPosition().getAbsoluteMediumOffset());
+	}
 
-      mediumAccessor.open();
+	/**
+	 * @return the {@link Medium} of the current {@link MediumAccessor} tested
+	 */
+	protected abstract Medium<?> getExpectedMedium();
 
-      ReadTestData readTestData = getReadTestDataUntilEndOfMedium();
+	/**
+	 * @return The concrete {@link MediumAccessor} currently tested.
+	 */
+	protected MediumAccessor<?> getImplementationToTest() {
+		return mediumAccessor;
+	}
 
-      int sizeToRead = readTestData.sizeToRead + 10;
+	/**
+	 * Tests {@link MediumAccessor#getMedium()}.
+	 */
+	@Test
+	public void getMedium_onClosedMediumAccessor_returnsExpectedMedium() {
 
-      MediumOffset initialPosition = at(mediumAccessor.getMedium(), readTestData.offsetToRead);
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      mediumAccessor.setCurrentPosition(initialPosition);
+		mediumAccessor.open();
 
-      try {
-         mediumAccessor.read(sizeToRead);
+		mediumAccessor.close();
 
-         Assert.fail("Expected end of medium exception, but it did not occur!");
-      }
+		Assert.assertEquals(getExpectedMedium(), mediumAccessor.getMedium());
+	}
 
-      catch (EndOfMediumException e) {
-         Assert.assertEquals(mediumAccessor.getMedium(), mediumAccessor.getCurrentPosition().getMedium());
-         Assert.assertEquals(initialPosition.advance(e.getByteCountActuallyRead()),
-            mediumAccessor.getCurrentPosition());
-      }
-   }
+	/**
+	 * Tests {@link MediumAccessor#getMedium()}.
+	 */
+	@Test
+	public void getMedium_onOpenedMediumAccessor_returnsExpectedMedium() {
 
-   /**
-    * Tests {@link MediumAccessor#read(ByteBuffer)}.
-    */
-   @Test
-   public void read_forAnyOffsetAndSize_returnsExpectedBytesAndLeavesLimitPositionOfBufferUnchanged() {
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      final List<ReadTestData> readTestData = getReadTestDataToUse();
+		mediumAccessor.open();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		Assert.assertEquals(getExpectedMedium(), mediumAccessor.getMedium());
+	}
 
-      mediumAccessor.open();
+	/**
+	 * Returns a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that
+	 * are checked using {@link MediumAccessor#read}. It is checked that the bytes
+	 * read from that offset match the expected bytes from the
+	 * {@link TestMedia#FIRST_TEST_FILE_PATH}. The given size to read is mapped to
+	 * the offset.
+	 *
+	 * @return a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that
+	 *         are checked using {@link MediumAccessor#read}.
+	 */
+	protected abstract List<ReadTestData> getReadTestDataToUse();
 
-      Medium<?> medium = mediumAccessor.getMedium();
+	/**
+	 * Returns a {@link ReadTestData} instance ranging from a specific offset until
+	 * exactly the last byte of the medium.
+	 *
+	 * @return a {@link ReadTestData} instance ranging from a specific offset until
+	 *         exactly the last byte of the medium.
+	 */
+	protected abstract ReadTestData getReadTestDataUntilEndOfMedium();
 
-      long mediumSizeBeforeRead = medium.getCurrentLength();
+	/**
+	 * Tests {@link MediumAccessor#isAtEndOfMedium()}.
+	 */
+	@Test
+	public void isAtEndOfMedium_ifAtEndOfMedium_doesNotAdvanceCurrentPosition() {
 
-      for (ReadTestData readTestDataRecord : readTestData) {
-         ByteBuffer readContent = performReadNoEOMExpected(mediumAccessor, readTestDataRecord);
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-         Assert.assertEquals(readTestDataRecord.sizeToRead, readContent.remaining());
+		mediumAccessor.open();
 
-         // Reads the correct contents
-         assertEqualsFileContent(readContent, readTestDataRecord.expectedBytesOffset);
-      }
+		ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
-      // Size did not change after read operations
-      Assert.assertEquals(mediumSizeBeforeRead, medium.getCurrentLength());
-   }
+		// The explicit read is only really necessary for stream media, see a similar
+		// test case without read for
+		// random-access media
+		AbstractMediumAccessorTest.performReadNoEOMExpected(mediumAccessor, readOverEndOfMedium);
 
-   /**
-    * Tests {@link MediumAccessor#read(ByteBuffer)}.
-    */
-   @Test
-   public void read_untilEndOfMedium_throwsEndOfMediumException() {
+		MediumOffset offsetBeforeIsAtEOM = mediumAccessor.getCurrentPosition();
 
-      ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
+		mediumAccessor.isAtEndOfMedium();
+		Assert.assertEquals(offsetBeforeIsAtEOM, mediumAccessor.getCurrentPosition());
+	}
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+	/**
+	 * Tests {@link MediumAccessor#isAtEndOfMedium()}.
+	 */
+	@Test
+	public void isAtEndOfMedium_ifAtEndOfMedium_returnsTrue() {
 
-      mediumAccessor.open();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      Medium<?> medium = mediumAccessor.getMedium();
+		mediumAccessor.open();
 
-      Integer readOffset = readOverEndOfMedium.offsetToRead;
-      int readSize = readOverEndOfMedium.sizeToRead + 20;
+		ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
-      MediumOffset readReference = at(medium, readOffset);
+		// The explicit read is only really necessary for stream media, see a similar
+		// test case without read for
+		// random-access media
+		AbstractMediumAccessorTest.performReadNoEOMExpected(mediumAccessor, readOverEndOfMedium);
 
-      mediumAccessor.setCurrentPosition(readReference);
+		// Each call is checked twice to ensure it is repeatable (especially for
+		// streams!)
+		Assert.assertEquals(true, mediumAccessor.isAtEndOfMedium());
+		Assert.assertEquals(true, mediumAccessor.isAtEndOfMedium());
+	}
 
-      try {
-         mediumAccessor.read(readSize);
+	/**
+	 * Tests {@link MediumAccessor#isAtEndOfMedium()}.
+	 */
+	@Test
+	public void isAtEndOfMedium_ifNotAtEndOfMedium_doesNotAdanceCurrentPosition() {
 
-         Assert.fail("Expected end of medium exception, but it did not occur!");
-      }
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      catch (EndOfMediumException e) {
-         Assert.assertEquals(readReference, e.getReadStartReference());
-         Assert.assertEquals(readSize, e.getByteCountTriedToRead());
-         Assert.assertEquals(getExpectedMediumContent().length - readOffset, e.getByteCountActuallyRead());
-      }
-   }
+		mediumAccessor.open();
 
-   /**
-    * Tests {@link MediumAccessor#read(ByteBuffer)}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void read_onClosedMediumAccessor_throwsException() {
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		MediumOffset offsetBeforeIsAtEOM = mediumAccessor.getCurrentPosition();
 
-      mediumAccessor.open();
+		mediumAccessor.isAtEndOfMedium();
+		Assert.assertEquals(offsetBeforeIsAtEOM, mediumAccessor.getCurrentPosition());
+	}
 
-      mediumAccessor.close();
+	/**
+	 * Tests {@link MediumAccessor#isAtEndOfMedium()}.
+	 */
+	@Test
+	public void isAtEndOfMedium_ifNotAtEndOfMedium_returnsFalse() {
 
-      performReadNoEOMExpected(mediumAccessor, new ReadTestData(0, 5));
-   }
+		ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
-   /**
-    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
-    */
-   @Test
-   public void isAtEndOfMedium_ifNotAtEndOfMedium_returnsFalse() {
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
+		mediumAccessor.open();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		Medium<?> medium = mediumAccessor.getMedium();
 
-      mediumAccessor.open();
+		int readOffset = readOverEndOfMedium.offsetToRead;
 
-      Medium<?> medium = mediumAccessor.getMedium();
+		MediumOffset readReferenceOne = TestMedia.at(medium, 0);
+		MediumOffset readReferenceTwo = TestMedia.at(medium, readOffset);
 
-      int readOffset = readOverEndOfMedium.offsetToRead;
+		// Each call is checked twice to ensure it is repeatable (especially for
+		// streams!)
+		mediumAccessor.setCurrentPosition(readReferenceOne);
+		Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
+		mediumAccessor.setCurrentPosition(readReferenceTwo);
+		Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
+		mediumAccessor.setCurrentPosition(readReferenceOne);
+		Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
+		mediumAccessor.setCurrentPosition(readReferenceTwo);
+		Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
+	}
 
-      MediumOffset readReferenceOne = at(medium, 0);
-      MediumOffset readReferenceTwo = at(medium, readOffset);
+	/**
+	 * Tests {@link MediumAccessor#isAtEndOfMedium()}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void isAtEndOfMedium_onClosedMediumAccessor_throwsException() {
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      // Each call is checked twice to ensure it is repeatable (especially for streams!)
-      mediumAccessor.setCurrentPosition(readReferenceOne);
-      Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
-      mediumAccessor.setCurrentPosition(readReferenceTwo);
-      Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
-      mediumAccessor.setCurrentPosition(readReferenceOne);
-      Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
-      mediumAccessor.setCurrentPosition(readReferenceTwo);
-      Assert.assertEquals(false, mediumAccessor.isAtEndOfMedium());
-   }
+		mediumAccessor.open();
 
-   /**
-    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
-    */
-   @Test
-   public void isAtEndOfMedium_ifNotAtEndOfMedium_doesNotAdanceCurrentPosition() {
+		mediumAccessor.close();
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		mediumAccessor.isAtEndOfMedium();
+	}
 
-      mediumAccessor.open();
+	/**
+	 * Tests {@link MediumAccessor#isOpened()}.
+	 */
+	@Test
+	public void isOpened_forNewMediumAccessor_returnsFalse() {
 
-      MediumOffset offsetBeforeIsAtEOM = mediumAccessor.getCurrentPosition();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      mediumAccessor.isAtEndOfMedium();
-      Assert.assertEquals(offsetBeforeIsAtEOM, mediumAccessor.getCurrentPosition());
-   }
+		Assert.assertFalse(mediumAccessor.isOpened());
+	}
 
-   /**
-    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
-    */
-   @Test
-   public void isAtEndOfMedium_ifAtEndOfMedium_returnsTrue() {
+	/**
+	 * Tests {@link MediumAccessor#isOpened()} and {@link MediumAccessor#open()}.
+	 */
+	@Test
+	public void isOpened_forOpenedMediumAccessor_returnsTrue() {
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      mediumAccessor.open();
+		mediumAccessor.open();
 
-      ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
+		Assert.assertTrue(mediumAccessor.isOpened());
+	}
 
-      // The explicit read is only really necessary for stream media, see a similar test case without read for
-      // random-access media
-      performReadNoEOMExpected(mediumAccessor, readOverEndOfMedium);
+	/**
+	 * Tests {@link MediumAccessor#close()}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void open_onOpenedMediumAccessor_throwsException() {
 
-      // Each call is checked twice to ensure it is repeatable (especially for streams!)
-      Assert.assertEquals(true, mediumAccessor.isAtEndOfMedium());
-      Assert.assertEquals(true, mediumAccessor.isAtEndOfMedium());
-   }
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-   /**
-    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
-    */
-   @Test
-   public void isAtEndOfMedium_ifAtEndOfMedium_doesNotAdvanceCurrentPosition() {
+		mediumAccessor.open();
+		mediumAccessor.open();
+	}
 
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+	/**
+	 * This method is called during {@link #setUp()} to prepare the medium data to
+	 * be tested in a sufficient way. E.g. in case of a file a prototypical test
+	 * file might first be copied before doing the tests.
+	 *
+	 * @param testFileContents The contents of the test file
+	 */
+	protected abstract void prepareMediumData(byte[] testFileContents);
 
-      mediumAccessor.open();
+	/**
+	 * Tests {@link MediumAccessor#read(int)}.
+	 */
+	@Test
+	public void read_forAnyOffsetAndSize_returnsExpectedBytesAndLeavesLimitPositionOfBufferUnchanged() {
 
-      ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
+		final List<ReadTestData> readTestData = getReadTestDataToUse();
 
-      // The explicit read is only really necessary for stream media, see a similar test case without read for
-      // random-access media
-      performReadNoEOMExpected(mediumAccessor, readOverEndOfMedium);
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-      MediumOffset offsetBeforeIsAtEOM = mediumAccessor.getCurrentPosition();
+		mediumAccessor.open();
 
-      mediumAccessor.isAtEndOfMedium();
-      Assert.assertEquals(offsetBeforeIsAtEOM, mediumAccessor.getCurrentPosition());
-   }
+		Medium<?> medium = mediumAccessor.getMedium();
 
-   /**
-    * Tests {@link MediumAccessor#isAtEndOfMedium()}.
-    */
-   @Test(expected = PreconditionUnfullfilledException.class)
-   public void isAtEndOfMedium_onClosedMediumAccessor_throwsException() {
-      MediumAccessor<?> mediumAccessor = getImplementationToTest();
+		long mediumSizeBeforeRead = medium.getCurrentLength();
 
-      mediumAccessor.open();
+		for (ReadTestData readTestDataRecord : readTestData) {
+			ByteBuffer readContent = AbstractMediumAccessorTest.performReadNoEOMExpected(mediumAccessor,
+				readTestDataRecord);
 
-      mediumAccessor.close();
+			Assert.assertEquals(readTestDataRecord.sizeToRead, readContent.remaining());
 
-      mediumAccessor.isAtEndOfMedium();
-   }
+			// Reads the correct contents
+			assertEqualsFileContent(readContent, readTestDataRecord.expectedBytesOffset);
+		}
 
-   /**
-    * Encapsulates test calls to {@link MediumAccessor#read(ByteBuffer)}, without expecting an end of medium during
-    * read, i.e. if it occurs, a test failure is generated.
-    * 
-    * @param mediumAccessor
-    *           The {@link MediumAccessor} to use.
-    * @param readTestData
-    *           The {@link ReadTestData} to use.
-    * @return The {@link ByteBuffer} of data read, returned by {@link MediumAccessor#read(ByteBuffer)}
-    */
-   protected static ByteBuffer performReadNoEOMExpected(MediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
-      mediumAccessor.setCurrentPosition(at(mediumAccessor.getMedium(), readTestData.offsetToRead));
+		// Size did not change after read operations
+		Assert.assertEquals(mediumSizeBeforeRead, medium.getCurrentLength());
+	}
 
-      try {
-         ByteBuffer readContent = mediumAccessor.read(readTestData.sizeToRead);
+	/**
+	 * Tests {@link MediumAccessor#read(int)}.
+	 */
+	@Test(expected = PreconditionUnfullfilledException.class)
+	public void read_onClosedMediumAccessor_throwsException() {
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-         return readContent;
-      }
+		mediumAccessor.open();
 
-      catch (EndOfMediumException e) {
-         Assert.fail("Unexpected end of medium detected! Exception: " + e);
-      }
+		mediumAccessor.close();
 
-      return null;
-   }
+		AbstractMediumAccessorTest.performReadNoEOMExpected(mediumAccessor, new ReadTestData(0, 5));
+	}
 
-   /**
-    * Returns the bytes expected in the {@link Medium} used for testing.
-    * 
-    * @return the bytes expected in the {@link Medium} used for testing
-    */
-   protected static byte[] getExpectedMediumContent() {
-      return EXPECTED_FILE_CONTENTS;
-   }
+	/**
+	 * Tests {@link MediumAccessor#read(int)}.
+	 */
+	@Test
+	public void read_untilEndOfMedium_throwsEndOfMediumException() {
 
-   /**
-    * @return The concrete {@link MediumAccessor} currently tested.
-    */
-   protected MediumAccessor<?> getImplementationToTest() {
-      return mediumAccessor;
-   }
+		ReadTestData readOverEndOfMedium = getReadTestDataUntilEndOfMedium();
 
-   /**
-    * Returns a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that are checked using
-    * {@link MediumAccessor#read}. It is checked that the bytes read from that offset match the expected bytes from the
-    * {@link TestMedia#FIRST_TEST_FILE_PATH}. The given size to read is mapped to the offset.
-    * 
-    * @return a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that are checked using
-    *         {@link MediumAccessor#read}.
-    */
-   protected abstract List<ReadTestData> getReadTestDataToUse();
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-   /**
-    * Returns a {@link ReadTestData} instance ranging from a specific offset until exactly the last byte of the medium.
-    * 
-    * @return a {@link ReadTestData} instance ranging from a specific offset until exactly the last byte of the medium.
-    */
-   protected abstract ReadTestData getReadTestDataUntilEndOfMedium();
+		mediumAccessor.open();
 
-   /**
-    * Returns the concrete implementation of {@link MediumAccessor } to test. It is used for reading and writing from a
-    * {@link MediumAccessor}.
-    * 
-    * @return the concrete implementation of {@link MediumAccessor } to test.
-    */
-   protected abstract MediumAccessor<?> createImplementationToTest();
+		Medium<?> medium = mediumAccessor.getMedium();
 
-   /**
-    * This method is called during {@link #setUp()} to prepare the medium data to be tested in a sufficient way. E.g. in
-    * case of a file a prototypical test file might first be copied before doing the tests.
-    * 
-    * @param testFileContents
-    *           The contents of the test file
-    */
-   protected abstract void prepareMediumData(byte[] testFileContents);
+		Integer readOffset = readOverEndOfMedium.offsetToRead;
+		int readSize = readOverEndOfMedium.sizeToRead + 20;
 
-   /**
-    * @return the {@link Medium} of the current {@link MediumAccessor} tested
-    */
-   protected abstract Medium<?> getExpectedMedium();
+		MediumOffset readReference = TestMedia.at(medium, readOffset);
 
-   /**
-    * Asserts whether the given bytes read previously in a test case at the given zero based test file offset equal the
-    * test file contents at that offset.
-    * 
-    * @param bytesRead
-    *           The bytes previously read
-    * @param fileOffset
-    *           The zero-based file offset expected to contain the bytes matching the given bytes read
-    */
-   protected void assertEqualsFileContent(ByteBuffer bytesRead, int fileOffset) {
+		mediumAccessor.setCurrentPosition(readReference);
 
-      bytesRead.mark();
+		try {
+			mediumAccessor.read(readSize);
 
-      int index = 0;
+			Assert.fail("Expected end of medium exception, but it did not occur!");
+		}
 
-      Assert.assertTrue(bytesRead.remaining() + fileOffset <= getExpectedMediumContent().length);
+		catch (EndOfMediumException e) {
+			Assert.assertEquals(readReference, e.getReadStartReference());
+			Assert.assertEquals(readSize, e.getByteCountTriedToRead());
+			Assert.assertEquals(AbstractMediumAccessorTest.getExpectedMediumContent().length - readOffset,
+				e.getByteCountActuallyRead());
+		}
+	}
 
-      while (bytesRead.hasRemaining()) {
-         Assert.assertEquals(getExpectedMediumContent()[fileOffset + index], bytesRead.get());
+	/**
+	 * Sets up the test case.
+	 */
+	@Before
+	public void setUp() {
+		prepareMediumData(AbstractMediumAccessorTest.getExpectedMediumContent());
 
-         index++;
-      }
+		mediumAccessor = createImplementationToTest();
 
-      bytesRead.reset();
-   }
+		if (mediumAccessor == null) {
+			throw new InvalidTestDataException("The tested MediumAccessor must not be null", null);
+		}
 
-   /**
-    * Checks the test {@link Medium} to fulfill any preconditions for the tests.
-    * 
-    * @param theMedium
-    *           The {@link Medium} to test.
-    */
-   protected abstract void validateTestMedium(Medium<?> theMedium);
+		validateReadTestData(getReadTestDataUntilEndOfMedium());
+		getReadTestDataToUse().forEach((readTestData) -> validateReadTestData(readTestData));
 
-   private void validateReadTestData(ReadTestData readTestData) {
-      if (readTestData == null) {
-         throw new InvalidTestDataException("read test data must not be null", null);
-      }
+		validateTestMedium(mediumAccessor.getMedium());
+	}
 
-      if (readTestData.offsetToRead > getExpectedMediumContent().length) {
-         throw new InvalidTestDataException("Read offset " + readTestData.offsetToRead
-            + " exceeds the actual length of the test medium " + getExpectedMediumContent().length, null);
-      }
-   }
+	/**
+	 * Tears the test case down.
+	 */
+	@After
+	public void tearDown() {
+
+		MediumAccessor<?> mediumAccessor = getImplementationToTest();
+
+		if (mediumAccessor.isOpened()) {
+			mediumAccessor.close();
+		}
+	}
+
+	private void validateReadTestData(ReadTestData readTestData) {
+		if (readTestData == null) {
+			throw new InvalidTestDataException("read test data must not be null", null);
+		}
+
+		if (readTestData.offsetToRead > AbstractMediumAccessorTest.getExpectedMediumContent().length) {
+			throw new InvalidTestDataException(
+				"Read offset " + readTestData.offsetToRead + " exceeds the actual length of the test medium "
+					+ AbstractMediumAccessorTest.getExpectedMediumContent().length,
+				null);
+		}
+	}
+
+	/**
+	 * Checks the test {@link Medium} to fulfill any preconditions for the tests.
+	 *
+	 * @param theMedium The {@link Medium} to test.
+	 */
+	protected abstract void validateTestMedium(Medium<?> theMedium);
 }

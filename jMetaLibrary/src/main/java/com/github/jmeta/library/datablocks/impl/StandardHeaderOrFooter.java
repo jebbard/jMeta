@@ -26,79 +26,75 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class StandardHeaderOrFooter extends AbstractDataBlock implements Header, Footer {
 
-   /**
-    * Creates a new {@link StandardHeaderOrFooter}.
-    *
-    * @param id
-    * @param spec
-    */
-   public StandardHeaderOrFooter(DataBlockId id, DataFormatSpecification spec, boolean isFooter) {
-      super(id, spec);
+	private final List<Field<?>> m_fields = new ArrayList<>();
 
-      m_isFooter = isFooter;
-   }
+	/**
+	 * Creates a new {@link StandardHeaderOrFooter}.
+	 *
+	 * @param id
+	 * @param spec
+	 */
+	public StandardHeaderOrFooter(DataBlockId id, DataFormatSpecification spec) {
+		super(id, spec);
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.Header#getFields()
-    */
-   @Override
-   public List<Field<?>> getFields() {
+	private void addField(Field<?> field) {
 
-      return Collections.unmodifiableList(m_fields);
-   }
+		Reject.ifNull(field, "field");
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
-    */
-   @Override
-   public long getSize() {
+		if (field.getParent() == null) {
+			field.initParent(this);
+		}
 
-      if (m_fields.size() == 0) {
-         return DataBlockDescription.UNDEFINED;
-      }
+		m_fields.add(field);
+	}
 
-      long returnedSize = 0;
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.Header#getFields()
+	 */
+	@Override
+	public List<Field<?>> getFields() {
 
-      for (Iterator<Field<?>> fieldIterator = m_fields.iterator(); fieldIterator.hasNext();) {
-         Field<?> field = fieldIterator.next();
+		return Collections.unmodifiableList(m_fields);
+	}
 
-         // As soon as one child has unknown size, the whole header has unknown size
-         if (field.getSize() == DataBlockDescription.UNDEFINED) {
-            return DataBlockDescription.UNDEFINED;
-         }
+	/**
+	 * @see com.github.jmeta.library.datablocks.api.types.DataBlock#getSize()
+	 */
+	@Override
+	public long getSize() {
 
-         returnedSize += field.getSize();
-      }
+		if (m_fields.size() == 0) {
+			return DataBlockDescription.UNDEFINED;
+		}
 
-      return returnedSize;
-   }
+		long returnedSize = 0;
 
-   /**
-    * @param fields
-    */
-   public void setFields(List<Field<?>> fields) {
+		for (Iterator<Field<?>> fieldIterator = m_fields.iterator(); fieldIterator.hasNext();) {
+			Field<?> field = fieldIterator.next();
 
-      Reject.ifNull(fields, "fields");
+			// As soon as one child has unknown size, the whole header has unknown size
+			if (field.getSize() == DataBlockDescription.UNDEFINED) {
+				return DataBlockDescription.UNDEFINED;
+			}
 
-      m_fields.clear();
+			returnedSize += field.getSize();
+		}
 
-      for (int i = 0; i < fields.size(); ++i) {
-         addField(fields.get(i));
-      }
-   }
+		return returnedSize;
+	}
 
-   private void addField(Field<?> field) {
+	/**
+	 * @param fields
+	 */
+	public void setFields(List<Field<?>> fields) {
 
-      Reject.ifNull(field, "field");
+		Reject.ifNull(fields, "fields");
 
-      if (field.getParent() == null) {
-         field.initParent(this);
-      }
+		m_fields.clear();
 
-      m_fields.add(field);
-   }
-
-   private final List<Field<?>> m_fields = new ArrayList<>();
-
-   private final boolean m_isFooter;
+		for (int i = 0; i < fields.size(); ++i) {
+			addField(fields.get(i));
+		}
+	}
 }

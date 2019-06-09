@@ -22,7 +22,6 @@ import com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader;
 import com.github.jmeta.library.datablocks.impl.MediumDataProvider;
 import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
-import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
 import com.github.jmeta.library.dataformats.api.types.DataBlockId;
 import com.github.jmeta.library.media.api.services.MediumStore;
 import com.github.jmeta.library.media.api.types.MediumOffset;
@@ -34,73 +33,70 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class ID3v23DataBlockReader extends ForwardDataBlockReader {
 
-   private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> transformationsReadOrder = new LinkedHashMap<>();
+	private Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> transformationsReadOrder = new LinkedHashMap<>();
 
-   /**
-    * Creates a new {@link ID3v23DataBlockReader}.
-    *
-    * @param spec
-    * @param mediumStore
-    *           TODO
-    */
-   public ID3v23DataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus) {
-      super(spec, mediumStore, eventBus);
+	/**
+	 * Creates a new {@link ID3v23DataBlockReader}.
+	 *
+	 * @param spec
+	 * @param mediumStore TODO
+	 */
+	public ID3v23DataBlockReader(DataFormatSpecification spec, MediumStore mediumStore, DataBlockEventBus eventBus) {
+		super(spec, mediumStore, eventBus);
 
-      setCustomSizeProvider(new ID3v23ExtHeaderSizeProvider());
+		setCustomSizeProvider(new ID3v23ExtHeaderSizeProvider());
 
-      transformationsReadOrder.put(ID3v2TransformationType.UNSYNCHRONIZATION,
-         new UnsynchronisationHandler(getDataBlockFactory()));
-      transformationsReadOrder.put(ID3v2TransformationType.COMPRESSION, new CompressionHandler(getDataBlockFactory()));
-   }
+		transformationsReadOrder.put(ID3v2TransformationType.UNSYNCHRONIZATION,
+			new UnsynchronisationHandler(getDataBlockFactory()));
+		transformationsReadOrder.put(ID3v2TransformationType.COMPRESSION,
+			new CompressionHandler(getDataBlockFactory()));
+	}
 
-   /**
-    * @see com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
-    *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
-    *      com.github.jmeta.library.datablocks.api.types.Payload,
-    *      com.github.jmeta.library.datablocks.api.types.FieldFunctionStack, long)
-    */
-   @Override
-   public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
-      long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext) {
-      Container container = super.readContainerWithId(reference, id, parent, remainingDirectParentByteCount,
-         sequenceNumber, containerContext);
+	private Container applyTransformationsAfterRead(Container container, DataBlockReader reader) {
+		Container transformedContainer = container;
 
-      return applyTransformationsAfterRead(container, this);
-   }
+		Iterator<AbstractID3v2TransformationHandler> handlerIterator = transformationsReadOrder.values().iterator();
+		MediumDataProvider mediumDataProvider = getMediumDataProvider();
 
-   /**
-    * @see com.github.jmeta.library.datablocks.api.services.DataBlockAccessor#getTransformationHandlers(ContainerDataFormat)
-    */
-   public Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> getTransformationHandlers() {
+		while (handlerIterator.hasNext()) {
+			AbstractID3v2TransformationHandler transformationHandler = handlerIterator.next();
 
-      return Collections.unmodifiableMap(transformationsReadOrder);
-   }
+			if (transformationHandler.requiresUntransform(transformedContainer)) {
+				mediumDataProvider.bufferBeforeRead(transformedContainer.getOffset(), transformedContainer.getSize());
+				transformedContainer = transformationHandler.untransform(transformedContainer, reader);
+			}
+		}
 
-   public void removeEncryptionHandler() {
-      transformationsReadOrder.remove(ID3v2TransformationType.ENCRYPTION);
-   }
+		return transformedContainer;
+	}
 
-   public void setEncryptionHandler(AbstractID3v2TransformationHandler handler) {
-      Reject.ifNull(handler, "handler");
+	public Map<ID3v2TransformationType, AbstractID3v2TransformationHandler> getTransformationHandlers() {
 
-      transformationsReadOrder.put(ID3v2TransformationType.ENCRYPTION, handler);
-   }
+		return Collections.unmodifiableMap(transformationsReadOrder);
+	}
 
-   private Container applyTransformationsAfterRead(Container container, DataBlockReader reader) {
-      Container transformedContainer = container;
+	/**
+	 * @see com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader#readContainerWithId(com.github.jmeta.library.media.api.types.MediumOffset,
+	 *      com.github.jmeta.library.dataformats.api.types.DataBlockId,
+	 *      com.github.jmeta.library.datablocks.api.types.Payload, long, int,
+	 *      com.github.jmeta.library.datablocks.api.types.ContainerContext)
+	 */
+	@Override
+	public Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent,
+		long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext) {
+		Container container = super.readContainerWithId(reference, id, parent, remainingDirectParentByteCount,
+			sequenceNumber, containerContext);
 
-      Iterator<AbstractID3v2TransformationHandler> handlerIterator = transformationsReadOrder.values().iterator();
-      MediumDataProvider mediumDataProvider = getMediumDataProvider();
+		return applyTransformationsAfterRead(container, this);
+	}
 
-      while (handlerIterator.hasNext()) {
-         AbstractID3v2TransformationHandler transformationHandler = handlerIterator.next();
+	public void removeEncryptionHandler() {
+		transformationsReadOrder.remove(ID3v2TransformationType.ENCRYPTION);
+	}
 
-         if (transformationHandler.requiresUntransform(transformedContainer)) {
-            mediumDataProvider.bufferBeforeRead(transformedContainer.getOffset(), transformedContainer.getSize());
-            transformedContainer = transformationHandler.untransform(transformedContainer, reader);
-         }
-      }
+	public void setEncryptionHandler(AbstractID3v2TransformationHandler handler) {
+		Reject.ifNull(handler, "handler");
 
-      return transformedContainer;
-   }
+		transformationsReadOrder.put(ID3v2TransformationType.ENCRYPTION, handler);
+	}
 }

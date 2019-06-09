@@ -29,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.WindowConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -42,239 +43,237 @@ import com.github.jmeta.library.datablocks.api.types.Payload;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link DataBlockViewerMainDialog} is a dialog that is able to show all meta data in an audio file the user may
- * choose.
+ * {@link DataBlockViewerMainDialog} is a dialog that is able to show all meta
+ * data in an audio file the user may choose.
  */
 public class DataBlockViewerMainDialog extends JFrame {
 
-   /**
-    * Initializes and displays the window.
-    */
-   public void init() {
-
-      setLayout(new GridBagLayout());
-      JScrollPane scrollPane = new JScrollPane(m_metaDataTree);
-      add(m_metaDataLabel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-         new Insets(2, 2, 2, 2), 0, 0));
-      add(scrollPane, new GridBagConstraints(0, 1, 7, 1, 0, 1, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-         new Insets(2, 2, 2, 2), 0, 0));
-      add(m_fileLabel, new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-         new Insets(2, 2, 2, 2), 0, 0));
-      add(m_fileName, new GridBagConstraints(1, 2, 5, 1, 1, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-         new Insets(2, 2, 2, 2), 0, 0));
-      add(m_fileChooserButton, new GridBagConstraints(6, 2, 1, 1, 0, 0, GridBagConstraints.NORTH,
-         GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-      add(m_separator, new GridBagConstraints(0, 3, 7, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-         new Insets(10, 2, 10, 2), 0, 0));
-      add(m_readMetaDataButton, new GridBagConstraints(0, 4, 3, 1, 0, 0, GridBagConstraints.NORTH,
-         GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-      add(m_clearButton, new GridBagConstraints(4, 4, 1, 1, 1, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-         new Insets(2, 2, 2, 2), 0, 0));
-      add(m_closeButton, new GridBagConstraints(5, 4, 2, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
-         new Insets(2, 2, 2, 2), 0, 0));
-
-      m_closeButton.addActionListener(m_closeAction);
-      m_clearButton.addActionListener(m_clearAction);
-      m_readMetaDataButton.addActionListener(m_readAction);
-      m_fileChooserButton.addActionListener(m_chooseFileAction);
-
-      m_chooser.setCurrentDirectory(new File(MUSIC_PATH));
-
-      setDefaultCloseOperation(EXIT_ON_CLOSE);
-      setTitle("Datablock viewer");
-      setVisible(true);
-      setSize(new Dimension(400, 300));
-      setLocation(400, 300);
-
-      // Refresh main window to show all controls directly
-      validate();
-   }
-
-   private final Action m_closeAction = new AbstractAction() {
-
-      private static final long serialVersionUID = 1L;
-
-      /**
-       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-       */
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-
-         Reject.ifNull(arg0, "arg0");
-
-         System.exit(0);
-      }
-   };
-
-   private final Action m_clearAction = new AbstractAction() {
+	private static final String MUSIC_PATH = "C:\\";
 
-      private static final long serialVersionUID = 1L;
-
-      /**
-       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-       */
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
+	private static final long serialVersionUID = 1L;
 
-         Reject.ifNull(arg0, "arg0");
-
-         m_metaDataTree.removeAll();
-         m_metaDataTree.setModel(null);
-         m_metaDataTree.repaint();
-         m_fileName.setText("");
-      }
-   };
+	private final Action m_closeAction = new AbstractAction() {
 
-   private final Action m_chooseFileAction = new AbstractAction() {
+		private static final long serialVersionUID = 1L;
 
-      private static final long serialVersionUID = 1L;
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
 
-      /**
-       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-       */
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
+			Reject.ifNull(arg0, "arg0");
 
-         Reject.ifNull(arg0, "arg0");
+			System.exit(0);
+		}
+	};
 
-         if (m_chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            File chosenFile = m_chooser.getSelectedFile();
+	private final Action m_clearAction = new AbstractAction() {
 
-            m_fileName.setText(chosenFile.getAbsolutePath());
-         }
-      }
-   };
+		private static final long serialVersionUID = 1L;
 
-   private final Action m_readAction = new AbstractAction() {
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
 
-      private static final long serialVersionUID = 1L;
+			Reject.ifNull(arg0, "arg0");
 
-      /**
-       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-       */
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
+			m_metaDataTree.removeAll();
+			m_metaDataTree.setModel(null);
+			m_metaDataTree.repaint();
+			m_fileName.setText("");
+		}
+	};
 
-         Reject.ifNull(arg0, "arg0");
+	private final Action m_chooseFileAction = new AbstractAction() {
 
-         File fileToRead = new File(m_fileName.getText());
+		private static final long serialVersionUID = 1L;
 
-         if (!fileToRead.exists()) {
-            JOptionPane.showMessageDialog(null, "The file : " + fileToRead.getAbsolutePath() + " does not exist.",
-               "File does not exist", JOptionPane.OK_OPTION);
-            return;
-         }
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
 
-         Iterator<Container> allAttributes = null;
+			Reject.ifNull(arg0, "arg0");
 
-         try {
-            allAttributes = m_reader.getAllContainersFromFile(fileToRead);
+			if (m_chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+				File chosenFile = m_chooser.getSelectedFile();
 
-            fillTree(allAttributes, fileToRead.getName());
-         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-               "Exception during reading the file : " + fileToRead.getAbsolutePath() + ": " + e,
-               "Problem while reading", JOptionPane.OK_OPTION);
-         }
-      }
-   };
+				m_fileName.setText(chosenFile.getAbsolutePath());
+			}
+		}
+	};
 
-   /**
-    * Fills the attribute tree with data.
-    *
-    * @param topLevelContainers
-    *           The attributes to fill.
-    * @param fileName
-    *           The file name.
-    */
-   private void fillTree(Iterator<Container> topLevelContainers, String fileName) {
+	private final Action m_readAction = new AbstractAction() {
 
-      DefaultMutableTreeNode root = new DefaultMutableTreeNode("All Meta Data in " + fileName);
+		private static final long serialVersionUID = 1L;
 
-      fillInContainer(topLevelContainers, root);
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
 
-      m_metaDataTree.setModel(new DefaultTreeModel(root));
-   }
+			Reject.ifNull(arg0, "arg0");
 
-   private void fillInContainer(Iterator<Container> containers, DefaultMutableTreeNode parent) {
+			File fileToRead = new File(m_fileName.getText());
 
-      while (containers.hasNext()) {
-         Container nextOne = containers.next();
+			if (!fileToRead.exists()) {
+				JOptionPane.showMessageDialog(null, "The file : " + fileToRead.getAbsolutePath() + " does not exist.",
+					"File does not exist", JOptionPane.OK_OPTION);
+				return;
+			}
 
-         DefaultMutableTreeNode tagNode = new DefaultMutableTreeNode(nextOne.getId());
+			Iterator<Container> allAttributes = null;
 
-         parent.add(tagNode);
+			try {
+				allAttributes = m_reader.getAllContainersFromFile(fileToRead);
 
-         fillInHeadersOrFooters(nextOne, nextOne.getHeaders(), tagNode);
+				fillTree(allAttributes, fileToRead.getName());
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null,
+					"Exception during reading the file : " + fileToRead.getAbsolutePath() + ": " + e,
+					"Problem while reading", JOptionPane.OK_OPTION);
+			}
+		}
+	};
 
-         Payload payload = nextOne.getPayload();
-         DefaultMutableTreeNode payloadNode = new DefaultMutableTreeNode(payload.getId());
+	private final DataBlockReader m_reader = new DataBlockReader();
 
-         parent.add(payloadNode);
+	private final JFileChooser m_chooser = new JFileChooser();
 
-         if (payload instanceof ContainerBasedPayload) {
-            fillInContainer(((ContainerBasedPayload) payload).getContainerIterator(), payloadNode);
-         } else {
-            fillInFields(payloadNode, ((FieldBasedPayload) payload).getFields());
-         }
+	private final JLabel m_metaDataLabel = new JLabel("DataBlock structure:");
 
-         fillInHeadersOrFooters(nextOne, nextOne.getFooters(), tagNode);
-      }
-   }
+	private final JLabel m_fileLabel = new JLabel("File:");
 
-   private void fillInFields(DefaultMutableTreeNode parent, List<Field<?>> fields) {
+	private final JTextField m_fileName = new JTextField();
 
-      for (int i = 0; i < fields.size(); ++i) {
-         Field<?> field = fields.get(i);
+	private final JButton m_fileChooserButton = new JButton("..");
 
-         DefaultMutableTreeNode fieldNode = new DefaultMutableTreeNode(field.getId());
+	private final JTree m_metaDataTree = new JTree(new Object[] { "< No file selected >" });
 
-         parent.add(fieldNode);
+	private final JButton m_readMetaDataButton = new JButton("Read DataBlocks");
 
-         try {
-            fieldNode.add(new DefaultMutableTreeNode(field.getInterpretedValue().toString()));
-         } catch (BinaryValueConversionException e) {
-         }
-      }
-   }
+	private final JButton m_clearButton = new JButton("Clear");
 
-   private void fillInHeadersOrFooters(Container container, List<? extends FieldSequence> headersOrFooters,
-      DefaultMutableTreeNode parent) {
+	private final JButton m_closeButton = new JButton("Close");
 
-      for (int i = 0; i < headersOrFooters.size(); ++i) {
-         FieldSequence headerOrFooter = headersOrFooters.get(i);
+	private final JSeparator m_separator = new JSeparator();
 
-         DefaultMutableTreeNode headerNode = new DefaultMutableTreeNode(headerOrFooter.getId());
+	private void fillInContainer(Iterator<Container> containers, DefaultMutableTreeNode parent) {
 
-         parent.add(headerNode);
+		while (containers.hasNext()) {
+			Container nextOne = containers.next();
 
-         fillInFields(headerNode, headerOrFooter.getFields());
-      }
-   }
+			DefaultMutableTreeNode tagNode = new DefaultMutableTreeNode(nextOne.getId());
 
-   private static final String MUSIC_PATH = "C:\\";
+			parent.add(tagNode);
 
-   private final DataBlockReader m_reader = new DataBlockReader();
+			fillInHeadersOrFooters(nextOne.getHeaders(), tagNode);
 
-   private final JFileChooser m_chooser = new JFileChooser();
+			Payload payload = nextOne.getPayload();
+			DefaultMutableTreeNode payloadNode = new DefaultMutableTreeNode(payload.getId());
 
-   private final JLabel m_metaDataLabel = new JLabel("DataBlock structure:");
+			parent.add(payloadNode);
 
-   private final JLabel m_fileLabel = new JLabel("File:");
+			if (payload instanceof ContainerBasedPayload) {
+				fillInContainer(((ContainerBasedPayload) payload).getContainerIterator(), payloadNode);
+			} else {
+				fillInFields(payloadNode, ((FieldBasedPayload) payload).getFields());
+			}
 
-   private final JTextField m_fileName = new JTextField();
+			fillInHeadersOrFooters(nextOne.getFooters(), tagNode);
+		}
+	}
 
-   private final JButton m_fileChooserButton = new JButton("..");
+	private void fillInFields(DefaultMutableTreeNode parent, List<Field<?>> fields) {
 
-   private final JTree m_metaDataTree = new JTree(new Object[] { "< No file selected >" });
+		for (int i = 0; i < fields.size(); ++i) {
+			Field<?> field = fields.get(i);
 
-   private final JButton m_readMetaDataButton = new JButton("Read DataBlocks");
+			DefaultMutableTreeNode fieldNode = new DefaultMutableTreeNode(field.getId());
 
-   private final JButton m_clearButton = new JButton("Clear");
+			parent.add(fieldNode);
 
-   private final JButton m_closeButton = new JButton("Close");
+			try {
+				fieldNode.add(new DefaultMutableTreeNode(field.getInterpretedValue().toString()));
+			} catch (BinaryValueConversionException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-   private final JSeparator m_separator = new JSeparator();
+	private void fillInHeadersOrFooters(List<? extends FieldSequence> headersOrFooters, DefaultMutableTreeNode parent) {
 
-   private static final long serialVersionUID = 1L;
+		for (int i = 0; i < headersOrFooters.size(); ++i) {
+			FieldSequence headerOrFooter = headersOrFooters.get(i);
+
+			DefaultMutableTreeNode headerNode = new DefaultMutableTreeNode(headerOrFooter.getId());
+
+			parent.add(headerNode);
+
+			fillInFields(headerNode, headerOrFooter.getFields());
+		}
+	}
+
+	/**
+	 * Fills the attribute tree with data.
+	 *
+	 * @param topLevelContainers The attributes to fill.
+	 * @param fileName           The file name.
+	 */
+	private void fillTree(Iterator<Container> topLevelContainers, String fileName) {
+
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("All Meta Data in " + fileName);
+
+		fillInContainer(topLevelContainers, root);
+
+		m_metaDataTree.setModel(new DefaultTreeModel(root));
+	}
+
+	/**
+	 * Initializes and displays the window.
+	 */
+	public void init() {
+
+		setLayout(new GridBagLayout());
+		JScrollPane scrollPane = new JScrollPane(m_metaDataTree);
+		add(m_metaDataLabel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(2, 2, 2, 2), 0, 0));
+		add(scrollPane, new GridBagConstraints(0, 1, 7, 1, 0, 1, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(2, 2, 2, 2), 0, 0));
+		add(m_fileLabel, new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(2, 2, 2, 2), 0, 0));
+		add(m_fileName, new GridBagConstraints(1, 2, 5, 1, 1, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(2, 2, 2, 2), 0, 0));
+		add(m_fileChooserButton, new GridBagConstraints(6, 2, 1, 1, 0, 0, GridBagConstraints.NORTH,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		add(m_separator, new GridBagConstraints(0, 3, 7, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(10, 2, 10, 2), 0, 0));
+		add(m_readMetaDataButton, new GridBagConstraints(0, 4, 3, 1, 0, 0, GridBagConstraints.NORTH,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		add(m_clearButton, new GridBagConstraints(4, 4, 1, 1, 1, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(2, 2, 2, 2), 0, 0));
+		add(m_closeButton, new GridBagConstraints(5, 4, 2, 1, 0, 0, GridBagConstraints.NORTH, GridBagConstraints.BOTH,
+			new Insets(2, 2, 2, 2), 0, 0));
+
+		m_closeButton.addActionListener(m_closeAction);
+		m_clearButton.addActionListener(m_clearAction);
+		m_readMetaDataButton.addActionListener(m_readAction);
+		m_fileChooserButton.addActionListener(m_chooseFileAction);
+
+		m_chooser.setCurrentDirectory(new File(DataBlockViewerMainDialog.MUSIC_PATH));
+
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setTitle("Datablock viewer");
+		setVisible(true);
+		setSize(new Dimension(400, 300));
+		setLocation(400, 300);
+
+		// Refresh main window to show all controls directly
+		validate();
+	}
 }

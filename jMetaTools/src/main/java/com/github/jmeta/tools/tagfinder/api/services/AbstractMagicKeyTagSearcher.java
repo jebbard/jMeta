@@ -22,113 +22,112 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public abstract class AbstractMagicKeyTagSearcher implements ITagSearcher {
 
-   public AbstractMagicKeyTagSearcher(byte[] magicKey, long[] possibleOffsets,
-      String tagName) {
-      Reject.ifNull(magicKey, "magicKey");
-      Reject.ifNull(possibleOffsets, "possibleOffsets");
+	private final byte[] m_magicKey;
 
-      m_magicKey = magicKey;
-      m_possibleOffsets = possibleOffsets;
-      setTagName(tagName);
-   }
+	private String m_tagName;
 
-   /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.ITagSearcher#getTagName()
-    */
-   public String getTagName() {
+	private final long[] m_possibleOffsets;
 
-      return m_tagName;
-   }
+	public AbstractMagicKeyTagSearcher(byte[] magicKey, long[] possibleOffsets, String tagName) {
+		Reject.ifNull(magicKey, "magicKey");
+		Reject.ifNull(possibleOffsets, "possibleOffsets");
 
-   /**
-    * @see com.github.jmeta.tools.tagfinder.api.services.ITagSearcher#getTagInfo(RandomAccessFile)
-    */
-   public TagInfo getTagInfo(RandomAccessFile file) {
+		m_magicKey = magicKey;
+		m_possibleOffsets = possibleOffsets;
+		setTagName(tagName);
+	}
 
-      Reject.ifNull(file, "file");
+	protected String[] getAdditionalInfo(ByteBuffer tagBytes) throws IOException {
+		Reject.ifNull(tagBytes, "tagBytes");
 
-      int byteCount = m_magicKey.length;
+		return new String[] {};
+	}
 
-      for (int i = 0; i < m_possibleOffsets.length; i++) {
-         long possibleOffset = m_possibleOffsets[i];
+	/**
+	 * @see com.github.jmeta.tools.tagfinder.api.services.ITagSearcher#getTagInfo(RandomAccessFile)
+	 */
+	@Override
+	public TagInfo getTagInfo(RandomAccessFile file) {
 
-         long fileSize;
+		Reject.ifNull(file, "file");
 
-         try {
-            fileSize = file.length();
+		int byteCount = m_magicKey.length;
 
-            if (possibleOffset < 0) {
-               possibleOffset = fileSize + possibleOffset;
-            }
+		for (int i = 0; i < m_possibleOffsets.length; i++) {
+			long possibleOffset = m_possibleOffsets[i];
 
-            // The offset is not within file range: No tag can be there
-            if (possibleOffset < 0 || fileSize < possibleOffset + byteCount)
-               continue;
+			long fileSize;
+			try {
 
-            byte[] readBytes = readTheDamnBytes(file, possibleOffset,
-               byteCount);
+				fileSize = file.length();
 
-            if (Arrays.equals(m_magicKey, readBytes)) {
-               int tagSize = getTotalTagSize(file, possibleOffset);
-               byte[] tagBytes = readTheDamnBytes(file,
-                  possibleOffset + getTagRelativeStartOffset(tagSize), tagSize);
+				if (possibleOffset < 0) {
+					possibleOffset = fileSize + possibleOffset;
+				}
 
-               ByteBuffer bb = ByteBuffer.wrap(tagBytes);
+				// The offset is not within file range: No tag can be there
+				if ((possibleOffset < 0) || (fileSize < (possibleOffset + byteCount))) {
+					continue;
+				}
 
-               String[] additionalTagInfo = getAdditionalInfo(bb);
+				byte[] readBytes = readTheDamnBytes(file, possibleOffset, byteCount);
 
-               return new TagInfo(possibleOffset, tagBytes, tagSize,
-                  additionalTagInfo);
-            }
-         }
+				if (Arrays.equals(m_magicKey, readBytes)) {
+					int tagSize = getTotalTagSize(file, possibleOffset);
+					byte[] tagBytes = readTheDamnBytes(file, possibleOffset + getTagRelativeStartOffset(tagSize),
+						tagSize);
 
-         catch (IOException e) {
-            throw new IllegalStateException("IO exception: " + e);
-         }
-      }
+					ByteBuffer bb = ByteBuffer.wrap(tagBytes);
 
-      return null;
-   }
+					String[] additionalTagInfo = getAdditionalInfo(bb);
 
-   protected String[] getAdditionalInfo(ByteBuffer tagBytes)
-      throws IOException {
+					return new TagInfo(possibleOffset, tagBytes, tagSize, additionalTagInfo);
+				}
+			}
 
-      return new String[] {};
-   }
+			catch (IOException e) {
+				throw new IllegalStateException("IO exception: " + e);
+			}
+		}
 
-   protected int getTagRelativeStartOffset(int tagSize) {
+		return null;
+	}
 
-      return 0;
-   }
+	/**
+	 * @see com.github.jmeta.tools.tagfinder.api.services.ITagSearcher#getTagName()
+	 */
+	@Override
+	public String getTagName() {
 
-   protected abstract int getTotalTagSize(RandomAccessFile file,
-      long possibleOffset) throws IOException;
+		return m_tagName;
+	}
 
-   private byte[] readTheDamnBytes(RandomAccessFile file, long offset,
-      int byteCount) throws IOException {
+	protected int getTagRelativeStartOffset(int tagSize) {
+		Reject.ifTrue(tagSize < 0, "tagSize < 0");
 
-      final byte[] returnedBytes = new byte[byteCount];
-      ByteBuffer readBytes = ByteBuffer.wrap(returnedBytes);
+		return 0;
+	}
 
-      int bytesRead = file.getChannel().read(readBytes, offset);
+	protected abstract int getTotalTagSize(RandomAccessFile file, long possibleOffset) throws IOException;
 
-      if (bytesRead == -1)
-         throw new IllegalStateException(
-            "Unexpected EOF in file " + file + " at offst " + offset);
+	private byte[] readTheDamnBytes(RandomAccessFile file, long offset, int byteCount) throws IOException {
 
-      return returnedBytes;
-   }
+		final byte[] returnedBytes = new byte[byteCount];
+		ByteBuffer readBytes = ByteBuffer.wrap(returnedBytes);
 
-   protected void setTagName(String name) {
+		int bytesRead = file.getChannel().read(readBytes, offset);
 
-      Reject.ifNull(name, "name");
+		if (bytesRead == -1) {
+			throw new IllegalStateException("Unexpected EOF in file " + file + " at offst " + offset);
+		}
 
-      m_tagName = name;
-   }
+		return returnedBytes;
+	}
 
-   private final byte[] m_magicKey;
+	protected void setTagName(String name) {
 
-   private String m_tagName;
+		Reject.ifNull(name, "name");
 
-   private final long[] m_possibleOffsets;
+		m_tagName = name;
+	}
 }

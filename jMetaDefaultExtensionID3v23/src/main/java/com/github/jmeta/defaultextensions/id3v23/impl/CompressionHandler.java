@@ -31,127 +31,127 @@ import com.github.jmeta.utility.dbc.api.services.Reject;
  */
 public class CompressionHandler extends AbstractID3v2TransformationHandler {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(CompressionHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CompressionHandler.class);
 
-   private static final int BLOCK_SIZE = 1024;
+	private static final int BLOCK_SIZE = 1024;
 
-   /**
-    * Creates a new {@link CompressionHandler}.
-    *
-    * @param dbFactory
-    *           The {@link DataBlockFactory}
-    */
-   public CompressionHandler(ExtendedDataBlockFactory dbFactory) {
-      super(ID3v2TransformationType.COMPRESSION, dbFactory);
-   }
+	/**
+	 * Creates a new {@link CompressionHandler}.
+	 *
+	 * @param dbFactory The {@link DataBlockFactory}
+	 */
+	public CompressionHandler(ExtendedDataBlockFactory dbFactory) {
+		super(ID3v2TransformationType.COMPRESSION, dbFactory);
+	}
 
-   /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
-    */
-   @Override
-   public boolean requiresTransform(Container container) {
-      Reject.ifNull(container, "container");
+	/**
+	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
+	 */
+	@Override
+	public boolean requiresTransform(Container container) {
+		Reject.ifNull(container, "container");
 
-      if (container.getHeaders().size() == 0) {
-         return false;
-      }
+		if (container.getHeaders().size() == 0) {
+			return false;
+		}
 
-      Header firstHeader = container.getHeaders().get(0);
+		Header firstHeader = container.getHeaders().get(0);
 
-      for (int i = 0; i < firstHeader.getFields().size(); ++i) {
-         Field<?> field = firstHeader.getFields().get(i);
+		for (int i = 0; i < firstHeader.getFields().size(); ++i) {
+			Field<?> field = firstHeader.getFields().get(i);
 
-         if (field.getId().equals(ID3v23Extension.REF_GENERIC_FRAME_HEADER_FLAGS.getId())) {
-            try {
-               Flags flags = (Flags) field.getInterpretedValue();
+			if (field.getId().equals(ID3v23Extension.REF_GENERIC_FRAME_HEADER_FLAGS.getId())) {
+				try {
+					Flags flags = (Flags) field.getInterpretedValue();
 
-               return flags.getFlag(ID3v23Extension.FRAME_FLAGS_COMPRESSION);
-            } catch (BinaryValueConversionException e) {
-               LOGGER.warn(
-                  "Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.",
-                  field.getId());
-               LOGGER.error("requiresTransform", e);
-               return false;
-            }
-         }
-      }
+					return flags.getFlag(ID3v23Extension.FRAME_FLAGS_COMPRESSION);
+				} catch (BinaryValueConversionException e) {
+					CompressionHandler.LOGGER.warn(
+						"Field conversion from binary to interpreted value failed for field id <%1$s>. Exception see below.",
+						field.getId());
+					CompressionHandler.LOGGER.error("requiresTransform", e);
+					return false;
+				}
+			}
+		}
 
-      return false;
-   }
+		return false;
+	}
 
-   /**
-    * @see com.github.jmeta.defaultextensions.id3v23.impl.TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
-    */
-   @Override
-   public boolean requiresUntransform(Container container) {
+	/**
+	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
+	 */
+	@Override
+	public boolean requiresUntransform(Container container) {
 
-      Reject.ifNull(container, "container");
+		Reject.ifNull(container, "container");
 
-      return requiresTransform(container);
-   }
+		return requiresTransform(container);
+	}
 
-   /**
-    * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
-    */
-   @Override
-   protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
+	/**
+	 * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
+	 */
+	@Override
+	protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
 
-      final Deflater compressor = new Deflater();
-      compressor.setInput(payloadBytes.array());
+		final Deflater compressor = new Deflater();
+		compressor.setInput(payloadBytes.array());
 
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.remaining());
-      byte[] buf = new byte[BLOCK_SIZE];
+		final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.remaining());
+		byte[] buf = new byte[CompressionHandler.BLOCK_SIZE];
 
-      try {
-         int count = 0;
+		try {
+			int count = 0;
 
-         while ((count = compressor.deflate(buf)) > 0) {
-            bos.write(buf, 0, count);
-         }
+			while ((count = compressor.deflate(buf)) > 0) {
+				bos.write(buf, 0, count);
+			}
 
-         if (!compressor.finished()) {
-            throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
-         }
-      } finally {
-         compressor.end();
-      }
+			if (!compressor.finished()) {
+				throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
+			}
+		} finally {
+			compressor.end();
+		}
 
-      return new byte[][] { bos.toByteArray() };
-   }
+		return new byte[][] { bos.toByteArray() };
+	}
 
-   /**
-    * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
-    */
-   @Override
-   protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
+	/**
+	 * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
+	 */
+	@Override
+	protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 
-      // The case where the output gets longer than Integer.MAX is not handled anywhere
-      // An OutOfMemoryError is expected whenever this happens during writing to the
-      // ByteArrayOutputStream. However, this should not happen as ID3v2 also has a
-      // decompressed size field of int size
-      final Inflater decompressor = new Inflater();
-      decompressor.setInput(payloadBytes.array());
+		// The case where the output gets longer than Integer.MAX is not handled
+		// anywhere
+		// An OutOfMemoryError is expected whenever this happens during writing to the
+		// ByteArrayOutputStream. However, this should not happen as ID3v2 also has a
+		// decompressed size field of int size
+		final Inflater decompressor = new Inflater();
+		decompressor.setInput(payloadBytes.array());
 
-      // This output stream will grow, if necessary
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.remaining());
-      byte[] buf = new byte[BLOCK_SIZE];
+		// This output stream will grow, if necessary
+		final ByteArrayOutputStream bos = new ByteArrayOutputStream(payloadBytes.remaining());
+		byte[] buf = new byte[CompressionHandler.BLOCK_SIZE];
 
-      try {
-         int count = 0;
+		try {
+			int count = 0;
 
-         while ((count = decompressor.inflate(buf)) > 0) {
-            bos.write(buf, 0, count);
-         }
+			while ((count = decompressor.inflate(buf)) > 0) {
+				bos.write(buf, 0, count);
+			}
 
-         if (!decompressor.finished()) {
-            throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
-         }
-      } catch (DataFormatException t) {
-         throw new RuntimeException(t);
-      } finally {
-         decompressor.end();
-      }
+			if (!decompressor.finished()) {
+				throw new RuntimeException("Bad zip data, size:" + payloadBytes.remaining());
+			}
+		} catch (DataFormatException t) {
+			throw new RuntimeException(t);
+		} finally {
+			decompressor.end();
+		}
 
-      return new byte[][] { bos.toByteArray() };
-   }
+		return new byte[][] { bos.toByteArray() };
+	}
 }
