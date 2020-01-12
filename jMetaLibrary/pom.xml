@@ -39,7 +39,7 @@
 	<!-- ========================== Reporting ========================== -->
 	<reporting>
 		<plugins>
-			<!-- TEST: For test result generation in sites -->
+			<!-- TEST: This is for test result generation in sites -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
