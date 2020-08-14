@@ -8,4 +8,4 @@ jMeta is an extensible Java library for reading and writing multimedia metadata 
 * APEv2
 * Lyrics3v2
 
-MPEG-4/JPEG 2000, RIFF, QuickTime and Matroska as well as ID3v2.4, VorbisComment, Lyrics3v1 and APEv1 support are in planning.
+MPEG-4/JPEG 2000, RIFF, QuickTime and Matroska as well as ID3v2.4, VorbisComment, Lyrics3v1 and APEv1 support is in planning stages.
