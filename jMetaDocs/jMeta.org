@@ -1,0 +1,2520 @@
+* jMeta
+** Effort
+
+#+BEGIN: clocktable :scope file :maxlevel 2
+#+CAPTION: Clock summary at [2019-02-06 Mi 19:16]
+| Headline                     | Time       |          |
+|------------------------------+------------+----------|
+| *Total time*                 | *24d 0:08* |          |
+|------------------------------+------------+----------|
+| jMeta                        | 24d 0:08   |          |
+| >   Scope                    |            | 2d 23:33 |
+| >   Dokumentation            |            | 3d 15:37 |
+| >   Mittelfristige...        |            | 1d 15:25 |
+| >   Komponente "Media"       |            | 10d 3:45 |
+| >   Komponente "Dataformats" |            | 4d 17:58 |
+| >   Komponente "DataBlocks"  |            | 9:49     |
+| >   Komponente "startup"     |            | 5:10     |
+| >   Komponente "Logging"     |            | 4:51     |
+#+END:
+
+
+*** Effort until 2015
+
+ Before "Stage 1" in 2011: Unknown effort
+
+ The total effort invested into jMeta/EasyTag before this planning file was created: 
+  - Metadata Compendium: 150 hours (= 18.75 PD)
+  - EasyTag Design Concept / Crosscutting: 185 hours (= 22 PD)
+  - DataBlocks component design & impl: 94.5 hours (= 16 PD)
+  - Media component design & impl: 164.25 hours (= 20.5 PD)
+  - ExtensionManagement component design & impl: 37.5 hours (= 4.75 PD)
+  - DataFormats component design & impl: 3 hours (= 0.5 PD)
+  - Tests & Bugfixing stage 1: 56.5 hours (= 7 PD)
+  - Tool TagFinder: 15.5 hours (= 2 PD)
+
+ In total: approx 87.5 PD (= 700 hours)
+
+ See:
+  - http://localhost:8888/svn/docs/orga/projects/jMetaArchive/Planung_EasyTag.xlsx
+  - http://localhost:8888/svn/docs/orga/projects/jMetaArchive/Schaetzung.xls
+
+**** Metadata Compendium
+
+** Scope 
+
+*** DONE Definieren - Wo soll es lang gehen mit EasyTag?
+     :CLOCK:    
+     CLOCK: [2016-03-20 So 14:26]--[2016-03-20 So 14:27] =>  0:01
+     CLOCK: [2016-03-15 Di 17:45]--[2016-03-15 Di 19:21] =>  1:36
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-11-05 So 14:53]
+     - State "IN PROGRESS" from "TODO"       [2016-03-15 Di 18:31]
+     - State "TODO"       from ""           [2016-03-13 So 15:29]
+     :END:      
+     :PROPERTIES:
+     :Effort:   40:00
+     :END:
+
+Zu beachtende Punkte:
+ - [X] Scope und Features der ersten veröffentlichten Version festlegen:
+   - [X] Lesen und Schreiben?
+   - [X] Welche Formate werden von v1.0 unterstützt?
+   - [X] Strukturierte Textformate (XML): Ja oder nein?
+   - [X] Streaming: Ja oder Nein?
+   - [X] Nur Grund-library oder format-spezifische?
+   - [X] Fehlertoleranz?
+   - [X] Lesen großer Datenblöcke
+ - [X] Grundlegende Architekturentscheidungen:
+   - [X] Caching: Ja oder nein
+   - [X] Nur binärer Datablock-Parser? Aufteilung in binär vs. Text?
+   - [X] Überlebt Component Registry?
+   - [X] Überlebt Plugin-Framework?
+   - [X] Überlebt eigenes Logging und eigene Konfiguration?
+ - [X] Endgültigen Namen festlegen: jMeta
+
+**** DONE Namensgebung:
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-03-20 So 14:27]
+      :END:      
+
+ - EasyTag: Ist bereits durch ein Tagging-Programm vergeben
+ - jEasyTag, EasyTagLib sind evtl. zu nah dran
+ - jEasyTagLib ist zu kompliziert
+ - jMeta ist zu generisch? Außerdem ist der Name auch schon durch eine andersartige Library vergeben...
+   - Aber: Das ist nur ein sehr unbedeutendes Tool zum Generieren von Meta-Tags
+ - TagLib ist bereits vergeben, jTagLib wieder sehr nahe dran
+
+
+Voting:
+
+| Name       | Punkte |
+|------------+--------|
+| jEasyTag   |      2 |
+| EasyTagLib |      1 |
+| jMeta      |      4 |
+| jTagLib    |      2 |
+|            |        |
+
+--> Endgültiger Name ist jMeta!
+
+**** DONE Unterstützte Formate fest definieren
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-03-15 Di 19:00]
+     :END:      
+
+**** DONE Prüfung und Dokumentation: SimpleComponentRegistry?
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-04-01 Fr 08:08]
+      :END:      
+      :CLOCK:    
+      CLOCK: [2016-03-25 Fr 06:54]--[2016-03-25 Fr 07:52] =>  0:58
+      CLOCK: [2016-03-24 Do 13:35]--[2016-03-24 Do 15:32] =>  1:57
+      CLOCK: [2016-03-24 Do 11:45]--[2016-03-24 Do 13:05] =>  1:20
+      CLOCK: [2016-03-24 Do 11:11]--[2016-03-24 Do 11:35] =>  0:24
+      CLOCK: [2016-03-20 So 21:17]--[2016-03-20 So 22:18] =>  1:01
+      CLOCK: [2016-03-20 So 18:50]--[2016-03-20 So 19:55] =>  1:05
+      CLOCK: [2016-03-20 So 14:27]--[2016-03-20 So 17:55] =>  3:28
+      :END:      
+
+Noch zu tun:
+ - [ ] In den jMeta-Code integrieren und alte ComponentRegistry entfernen
+ - [ ] In Java Utils Komplett-Build integrieren
+ - [ ] Code-Beispiel in Klassendoku aufnehmen
+ - [ ] Design-Konzept entsprechend anpassen
+**** DONE Bewertung Media: Aktueller Stand, Caching und Planung
+       DEADLINE: <2016-04-10 So>
+       :CLOCK:    
+       CLOCK: [2016-04-17 So 15:05]--[2016-04-17 So 16:32] =>  1:27
+       CLOCK: [2016-04-17 So 07:20]--[2016-04-17 So 07:33] =>  0:13
+       CLOCK: [2016-04-17 So 06:40]--[2016-04-17 So 07:04] =>  0:24
+       CLOCK: [2016-04-13 Mi 05:32]--[2016-04-13 Mi 07:00] =>  1:28
+       CLOCK: [2016-04-12 Di 19:19]--[2016-04-12 Di 20:00] =>  0:41
+       CLOCK: [2016-04-12 Di 18:26]--[2016-04-12 Di 19:19] =>  0:53
+       CLOCK: [2016-04-10 So 12:43]--[2016-04-10 So 15:33] =>  2:50
+       CLOCK: [2016-04-10 So 11:58]--[2016-04-10 So 12:10] =>  0:12
+       CLOCK: [2016-04-06 Mi 18:25]--[2016-04-06 Mi 19:32] =>  1:07
+       CLOCK: [2016-04-05 Di 17:45]--[2016-04-05 Di 18:55] =>  1:10
+       CLOCK: [2016-04-04 Mo 17:48]--[2016-04-04 Mo 19:15] =>  1:27
+       CLOCK: [2016-04-03 So 17:50]--[2016-04-03 So 18:58] =>  1:08
+       CLOCK: [2016-04-03 So 13:32]--[2016-04-03 So 15:40] =>  2:08
+       CLOCK: [2016-04-02 Sa 13:40]--[2016-04-02 Sa 16:00] =>  2:20
+       CLOCK: [2016-04-02 Sa 10:50]--[2016-04-02 Sa 12:55] =>  2:05
+       CLOCK: [2016-04-02 Sa 09:56]--[2016-04-02 Sa 10:40] =>  0:44
+       CLOCK: [2016-03-31 Do 17:59]--[2016-03-31 Do 19:03] =>  1:04
+       CLOCK: [2016-03-31 Do 17:27]--[2016-03-31 Do 17:59] =>  0:32
+       :END:      
+       :LOGBOOK:  
+       - State "DONE"       from "IN PROGRESS" [2016-04-17 So 16:32]
+       - State "IN PROGRESS" from "TODO"       [2016-03-31 Do 17:27]
+       - State "TODO"       from ""           [2016-03-15 Di 18:36]
+       :END:      
+
+  - [X] Discard: Was kann man wie löschen?
+  - [ ] Interne Datenstrukturen für das Caching
+  - [ ] Interne Datenstrukturen für MEdium References
+  - [ ] Interne Datenstrukturen für das zweistufige Schreiben
+  - [ ] Attribute des IMediumStore
+  - [ ] Umsetzung flush() inkl. nachfolgendes Lesen
+  - [ ] Verfügbare Konfigurationsparameter
+  - [ ] Schätzung aktualisieren
+**** DONE Schätzung Media
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-04-22 Fr 14:54]
+     :END:      
+     :CLOCK:    
+     CLOCK: [2016-04-18 Mo 19:39]--[2016-04-18 Mo 21:00] =>  1:21
+     CLOCK: [2016-04-17 So 16:32]--[2016-04-17 So 16:39] =>  0:07
+     :END:      
+
+
+**** DONE Warnungen im WKS größtenteils beseitigen
+     DEADLINE: <2016-04-05 Di>
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-04-24 So 07:00]
+     :END:      
+     :CLOCK:    
+     CLOCK: [2016-04-23 Sa 10:56]--[2016-04-23 Sa 12:45] =>  1:49
+     CLOCK: [2016-04-23 Sa 09:13]--[2016-04-23 Sa 10:17] =>  1:04
+     CLOCK: [2016-04-23 Sa 08:32]--[2016-04-23 Sa 09:13] =>  0:41
+     CLOCK: [2016-04-22 Fr 15:19]--[2016-04-22 Fr 16:28] =>  1:09
+     :END:      
+
+**** DONE Prüfung und Dokumentation: slf4j löst Logging ab?
+     DEADLINE: <2016-04-10 So>
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-06-18 Sa 13:29]
+     :END:      
+**** DONE Prüfung und Dokumentation: Alternative Konfiguration statt Config-Komponente?
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-05-16 Mo 08:18]
+     :END:      
+     :CLOCK:    
+     CLOCK: [2016-05-14 Sa 11:20]--[2016-05-14 Sa 12:01] =>  0:41
+     CLOCK: [2016-05-14 Sa 10:00]--[2016-05-14 Sa 10:47] =>  0:47
+     CLOCK: [2016-05-11 Mi 06:21]--[2016-05-11 Mi 07:16] =>  0:55
+     CLOCK: [2016-05-10 Di 18:52]--[2016-05-10 Di 21:12] =>  2:20
+     CLOCK: [2016-05-09 Mo 18:00]--[2016-05-09 Mo 19:01] =>  1:01
+     CLOCK: [2016-05-09 Mo 05:02]--[2016-05-09 Mo 06:13] =>  1:11
+     CLOCK: [2016-05-08 So 20:32]--[2016-05-08 So 21:14] =>  0:42
+     CLOCK: [2016-05-08 So 18:40]--[2016-05-08 So 19:33] =>  0:53
+     CLOCK: [2016-05-05 Do 08:08]--[2016-05-05 Do 08:51] =>  0:43
+     CLOCK: [2016-05-04 Mi 20:40]--[2016-05-04 Mi 22:52] =>  2:12
+     CLOCK: [2016-05-04 Mi 18:58]--[2016-05-04 Mi 19:29] =>  0:31
+     CLOCK: [2016-05-04 Mi 07:20]--[2016-05-04 Mi 07:30] =>  0:10
+     CLOCK: [2016-05-04 Mi 06:05]--[2016-05-04 Mi 07:05] =>  1:00
+     CLOCK: [2016-05-02 Mo 18:34]--[2016-05-02 Mo 19:10] =>  0:36
+     CLOCK: [2016-05-01 So 18:30]--[2016-05-01 So 19:52] =>  1:22
+     CLOCK: [2016-04-24 So 18:40]--[2016-04-24 So 19:44] =>  1:04
+     CLOCK: [2016-04-24 So 14:00]--[2016-04-24 So 14:42] =>  0:42
+     CLOCK: [2016-04-24 So 13:30]--[2016-04-24 So 13:41] =>  0:11
+     CLOCK: [2016-04-24 So 10:34]--[2016-04-24 So 13:12] =>  2:38
+     :END:      
+
+**** IN PROGRESS Prüfung und Dokumentation: Was sind die wirklichen Detailanforderungen und notwendigen Anpassungen an ExtensionManagement?
+     :CLOCK:    
+     CLOCK: [2016-05-01 So 19:52]--[2016-05-01 So 21:00] =>  1:08
+     :END:      
+
+**** DONE Eclipse Einstellungen und Builds
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-03-31 Do 13:27]
+     - State "IN PROGRESS" from "DONE"       [2016-03-31 Do 13:27]
+     - State "DONE"       from "IN PROGRESS" [2016-03-31 Do 13:24]
+     - State "IN PROGRESS" from "DONE"       [2016-03-31 Do 12:10]
+     - State "DONE"       from "IN PROGRESS" [2016-03-31 Do 12:10]
+     :END:      
+     :CLOCK:    
+     CLOCK: [2016-03-31 Do 10:50]--[2016-03-31 Do 13:27] =>  2:37
+     CLOCK: [2016-03-29 Di 22:40]--[2016-03-29 Di 23:05] =>  0:25
+     CLOCK: [2016-03-29 Di 21:33]--[2016-03-29 Di 22:00] =>  0:27
+     CLOCK: [2016-03-29 Di 14:40]--[2016-03-29 Di 14:41] =>  0:01
+     CLOCK: [2016-03-29 Di 08:16]--[2016-03-29 Di 14:37] =>  6:21
+     :END:      
+**** DONE Warum dauern die Extension Tests jMeta so lang?
+     :LOGBOOK:  
+     - State "DONE"       from "TODO"       [2016-03-31 Do 13:25]
+     :END:      
+
+**** DONE javadoc JAR erzeugen
+     :CLOCK:    
+     CLOCK: [2016-03-30 Mi 16:15]--[2016-03-30 Mi 16:25] =>  0:10
+     CLOCK: [2016-03-30 Mi 12:44]--[2016-03-30 Mi 13:35] =>  0:51
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-03-31 Do 12:10]
+     - State "IN PROGRESS" from "TODO"       [2016-03-30 Mi 12:44]
+     :END:      
+
+** Dokumentation
+
+*** Metadata Compendium fertigstellen
+
+**** DONE v1.0 veröffentlichen
+     :CLOCK:    
+     CLOCK: [2018-02-18 So 12:15]--[2018-02-18 So 12:50] =>  0:35
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2018-02-18 So 12:37]
+     - State "IN PROGRESS" from "TODO"       [2018-02-18 So 12:15]
+     :END:      
+**** DONE v0.9: In die Moderne bringen
+     :CLOCK:    
+     CLOCK: [2018-02-15 Do 21:30]--[2018-02-15 Do 22:10] =>  0:40
+     CLOCK: [2018-02-14 Mi 19:25]--[2018-02-14 Mi 20:32] =>  1:07
+     CLOCK: [2018-02-14 Mi 06:00]--[2018-02-14 Mi 06:36] =>  0:36
+     CLOCK: [2018-02-13 Di 20:41]--[2018-02-13 Di 21:39] =>  0:58
+     CLOCK: [2018-02-01 Do 20:41]--[2018-02-01 Do 21:46] =>  1:05
+     CLOCK: [2018-01-26 Fr 18:45]--[2018-01-26 Fr 19:08] =>  0:23
+     CLOCK: [2018-01-25 Do 12:11]--[2018-01-25 Do 12:35] =>  0:24
+     CLOCK: [2018-01-24 Mi 20:17]--[2018-01-24 Mi 20:34] =>  0:17
+     CLOCK: [2018-01-23 Di 19:41]--[2018-01-23 Di 20:05] =>  0:24
+     CLOCK: [2018-01-22 Mo 19:33]--[2018-01-22 Mo 20:16] =>  0:43
+     CLOCK: [2018-01-21 So 15:06]--[2018-01-21 So 15:30] =>  0:24
+     CLOCK: [2018-01-14 So 19:21]--[2018-01-14 So 19:49] =>  0:28
+     CLOCK: [2018-01-09 Di 19:48]--[2018-01-09 Di 20:29] =>  0:41
+     CLOCK: [2018-01-09 Di 18:20]--[2018-01-09 Di 19:00] =>  0:40
+     CLOCK: [2018-01-07 So 14:59]--[2018-01-07 So 15:40] =>  0:41
+     CLOCK: [2018-01-07 So 08:20]--[2018-01-07 So 09:50] =>  1:30
+     CLOCK: [2018-01-06 Sa 16:02]--[2018-01-06 Sa 16:42] =>  0:40
+     CLOCK: [2018-01-06 Sa 11:00]--[2018-01-06 Sa 12:29] =>  1:29
+     CLOCK: [2018-01-05 Fr 12:11]--[2018-01-05 Fr 12:16] =>  0:05
+     CLOCK: [2018-01-03 Mi 08:50]--[2018-01-03 Mi 09:55] =>  1:05
+     CLOCK: [2018-01-02 Di 16:15]--[2018-01-02 Di 17:05] =>  0:50
+     CLOCK: [2018-01-01 Mo 16:50]--[2018-01-01 Mo 18:00] =>  1:10
+     CLOCK: [2018-01-01 Mo 10:20]--[2018-01-01 Mo 10:38] =>  0:18
+     CLOCK: [2017-12-31 So 07:55]--[2017-12-31 So 09:50] =>  1:55
+     CLOCK: [2017-12-30 Sa 09:08]--[2017-12-30 Sa 11:20] =>  2:12
+     CLOCK: [2017-12-30 Sa 07:08]--[2017-12-30 Sa 07:57] =>  0:49
+     CLOCK: [2017-12-29 Fr 07:46]--[2017-12-29 Fr 09:12] =>  1:26
+     CLOCK: [2017-12-28 Do 15:30]--[2017-12-28 Do 16:07] =>  0:37
+     CLOCK: [2017-12-28 Do 13:03]--[2017-12-28 Do 14:07] =>  1:04
+     CLOCK: [2017-12-28 Do 11:30]--[2017-12-28 Do 12:45] =>  1:15
+     CLOCK: [2017-12-27 Mi 04:30]--[2017-12-27 Mi 06:00] =>  1:30
+     CLOCK: [2017-12-26 Di 10:50]--[2017-12-26 Di 11:38] =>  0:48
+    CLOCK: [2017-12-24 So 20:40]--[2017-12-24 So 21:40] =>  1:00
+    CLOCK: [2017-12-24 So 20:19]--[2017-12-24 So 20:34] =>  0:15
+     CLOCK: [2017-12-24 So 15:05]--[2017-12-24 So 15:41] =>  0:36
+     CLOCK: [2017-12-24 So 13:15]--[2017-12-24 So 14:40] =>  1:25
+     CLOCK: [2017-12-24 So 12:42]--[2017-12-24 So 13:05] =>  0:23
+     CLOCK: [2017-12-24 So 11:20]--[2017-12-24 So 12:31] =>  1:11
+     CLOCK: [2017-12-24 So 09:25]--[2017-12-24 So 10:10] =>  0:45
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2018-02-17 Sa 19:48]
+     - State "IN PROGRESS" from "TODO"       [2017-12-24 So 10:05]
+     :END:      
+*** Designkonzept
+
+**** DONE Describe Naming Conventions in total in DesignConcept
+     :CLOCK:    
+     CLOCK: [2017-10-25 Mi 12:10]--[2017-10-25 Mi 12:35] =>  0:25
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-10-28 Sa 09:06]
+     - State "IN PROGRESS" from "TODO"       [2017-10-25 Mi 12:13]
+     :END:      
+
+**** DONE Describe / Define Maven module and Project dependencies in DesignConcept
+     :CLOCK:    
+     CLOCK: [2017-10-29 So 07:15]--[2017-10-29 So 08:59] =>  1:44
+     CLOCK: [2017-10-29 So 06:35]--[2017-10-29 So 06:50] =>  0:15
+     CLOCK: [2017-10-28 Sa 09:06]--[2017-10-28 Sa 10:20] =>  1:14
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-10-29 So 08:59]
+     - State "IN PROGRESS" from "TODO"       [2017-10-28 Sa 09:06]
+     :END:      
+
+**** DONE Migration nach Emacs
+     :LOGBOOK:  
+     - State "DONE"       from "TODO"       [2016-03-31 Do 17:59]
+     :END:      
+    :PROPERTIES:
+    :Effort:   4:00
+    :END:
+
+**** DONE Designkonzept neu erstellen - PDF
+      :CLOCK:    
+      CLOCK: [2016-04-01 Fr 09:15]--[2016-04-01 Fr 11:08] =>  1:53
+      CLOCK: [2016-04-01 Fr 08:00]--[2016-04-01 Fr 08:45] =>  0:45
+      CLOCK: [2016-03-31 Do 19:03]--[2016-03-31 Do 20:09] =>  1:06
+      CLOCK: [2016-03-20 So 13:26]--[2016-03-20 So 14:26] =>  1:00
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-04-01 Fr 11:08]
+      - State "IN PROGRESS" from "TODO"       [2015-11-11 Mi 23:08]
+      - State "TODO"       from ""           [2015-11-11 Mi 23:08]
+      :END:      
+      :PROPERTIES:
+      :Effort:   8:00
+      :END:
+
+Todos:
+ - [X] Grafiken werden richtig dargestellt
+ - [X] Design-Konzept kann erzeugt werden
+ - [X] Utility-Migration abbilden (andere includes)
+ - [X] Schöne Design-Decisions
+ - [X] Korrekte Links auf Design Decisions
+
+**** DONE SimpleComponentRegistry in Doku nachziehen
+     DEADLINE: <2016-04-08 Fr>
+     :LOGBOOK:  
+     - State "DONE"       from "TODO"       [2016-05-10 Di 18:52]
+     :END:      
+
+**** DONE Design Concept deutlich vereinfachen (Struktur)
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-10-29 So 10:31]
+     :END:      
+     :CLOCK:    
+     CLOCK: [2017-10-29 So 08:59]--[2017-10-29 So 10:35] =>  1:36
+     :END:      
+**** DONE DesignConcept und Abbildungen mit in Build bauen
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 15:54]
+     :END:      
+     :CLOCK:    
+     CLOCK: [2017-12-13 Mi 15:00]--[2017-12-13 Mi 15:54] =>  0:54
+     CLOCK: [2017-11-28 Di 08:45]--[2017-11-28 Di 09:15] =>  0:30
+     :END:      
+
+**** DONE Übersetzung Design Doc
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 19:45]
+     :END:      
+    :CLOCK:    
+    CLOCK: [2017-12-13 Mi 19:25]--[2017-12-13 Mi 20:00] =>  0:35
+    CLOCK: [2017-12-13 Mi 15:54]--[2017-12-13 Mi 16:21] =>  0:27
+    CLOCK: [2017-11-30 Do 06:00]--[2017-11-30 Do 08:00] =>  2:00
+    CLOCK: [2017-11-28 Di 09:00]--[2017-11-28 Di 10:20] =>  1:20
+    CLOCK: [2017-11-24 Fr 09:00]--[2017-11-24 Fr 11:00] =>  2:00
+    CLOCK: [2017-11-07 Di 06:00]--[2017-11-07 Di 06:30] =>  0:30
+    CLOCK: [2017-09-23 Sa 13:10]--[2017-09-23 Sa 13:20] =>  0:10
+    CLOCK: [2017-08-25 Fr 08:07]--[2017-08-25 Fr 08:58] =>  0:51
+    CLOCK: [2017-05-28 So 15:00]--[2017-05-28 So 15:30] =>  0:30
+    CLOCK: [2017-05-28 So 08:38]--[2017-05-28 So 08:55] =>  0:17
+    CLOCK: [2017-05-22 Mo 21:17]--[2017-05-22 Mo 21:42] =>  0:25
+    CLOCK: [2017-05-22 Mo 19:27]--[2017-05-22 Mo 19:59] =>  0:32
+    CLOCK: [2017-05-21 So 11:16]--[2017-05-21 So 11:45] =>  0:29
+    CLOCK: [2017-05-21 So 10:00]--[2017-05-21 So 10:15] =>  0:15
+    CLOCK: [2017-05-18 Do 16:44]--[2017-05-18 Do 17:22] =>  0:38
+    CLOCK: [2017-04-19 Mi 16:44]--[2017-04-19 Mi 18:00] =>  1:16
+    CLOCK: [2016-11-28 Mo 18:37]--[2016-11-28 Mo 19:00] =>  0:23
+    CLOCK: [2016-11-26 Sa 10:38]--[2016-11-26 Sa 10:56] =>  0:18
+    CLOCK: [2016-11-24 Do 20:00]--[2016-11-24 Do 20:51] =>  0:51
+    CLOCK: [2016-11-24 Do 19:00]--[2016-11-24 Do 19:16] =>  0:16
+    CLOCK: [2016-11-23 Mi 21:35]--[2016-11-23 Mi 22:21] =>  0:46
+    CLOCK: [2016-11-22 Di 05:05]--[2016-11-22 Di 05:47] =>  0:42
+    CLOCK: [2016-11-20 So 09:41]--[2016-11-20 So 10:45] =>  1:04
+    CLOCK: [2016-11-13 So 20:54]--[2016-11-13 So 21:07] =>  0:13
+    CLOCK: [2016-11-13 So 17:06]--[2016-11-13 So 17:22] =>  0:16
+    CLOCK: [2016-11-13 So 09:05]--[2016-11-13 So 09:25] =>  0:20
+    CLOCK: [2016-11-12 Sa 10:25]--[2016-11-12 Sa 19:51] =>  9:26
+    CLOCK: [2016-11-12 Sa 08:39]--[2016-11-12 Sa 08:57] =>  0:18
+    CLOCK: [2016-11-11 Fr 21:28]--[2016-11-11 Fr 22:04] =>  0:36
+    CLOCK: [2016-11-10 Do 19:51]--[2016-11-10 Do 20:21] =>  0:30
+    CLOCK: [2016-11-08 Di 20:44]--[2016-11-08 Di 21:10] =>  0:26
+    CLOCK: [2016-11-08 Di 17:30]--[2016-11-08 Di 17:45] =>  0:15
+    :END:      
+
+Noch offen:
+ - [X] Abschnitt "Übergreifende Aspekte"
+ - [X] Abschnitt "Scope"
+ - [X] Abschnitt "Anforderungen"
+ - [X] Abschnitt "General Design Decisions"
+ - [X] Abschnitt "Fachliche Architektur" (teilweise)
+ - [X] Abschnitt "Utility Design"
+ - [X] Abschnitt "Technische Architektur" (teilweise)
+
+**** DONE Python PDF Crop mit in Doku-Projekt migrieren
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2018-02-17 Sa 19:48]
+     :END:      
+**** TODO Links zu DesignDecisions aus DesignDecisions
+     DEADLINE: <2016-04-08 Fr>
+
+*** Sonstige
+
+**** DONE Javadocs erneut erzeugen + Pre/Post raus
+     :CLOCK:    
+     CLOCK: [2017-12-13 Mi 07:43]--[2017-12-13 Mi 09:50] =>  2:07
+     CLOCK: [2017-11-05 So 15:16]--[2017-11-05 So 16:00] =>  0:44
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 12:52]
+     - State "IN PROGRESS" from "TODO"       [2017-11-05 So 15:16]
+     :END:
+
+**** DONE Paper für Flush-Algorithmus
+     :CLOCK:    
+     CLOCK: [2018-02-18 So 20:25]--[2018-02-18 So 20:33] =>  0:08
+     CLOCK: [2017-12-20 Mi 10:20]--[2017-12-20 Mi 14:20] =>  4:00
+     CLOCK: [2017-12-20 Mi 07:20]--[2017-12-20 Mi 09:12] =>  1:55
+     CLOCK: [2017-12-19 Di 14:00]--[2017-12-19 Di 16:34] =>  2:34
+     CLOCK: [2017-12-15 Fr 08:30]--[2017-12-15 Fr 09:30] =>  1:00
+     CLOCK: [2017-12-14 Do 16:14]--[2017-12-14 Do 16:45] =>  0:31
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2018-02-18 So 20:33]
+     - State "IN PROGRESS" from ""           [2017-12-14 Do 16:14]
+     :END:      
+
+** Infrastruktur-Verbesserungen
+
+*** DONE Umstieg STS 4 mit neuen Prefs 2019
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-06-09 So 20:44]
+    - State "IN PROGRESS" from "TODO"       [2019-06-09 So 20:07]
+    :END:
+    :CLOCK:
+    CLOCK: [2019-06-09 So 19:55]--[2019-06-09 So 20:50] =>  0:55
+    :END:
+*** DONE Umstieg auf Eclipse 2018-12
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-02-03 So 20:28]
+    - State "IN PROGRESS" from "TODO"       [2019-02-03 So 08:55]
+    :END:
+    :CLOCK:
+    CLOCK: [2019-02-03 So 08:45]--[2019-02-03 So 09:03] =>  0:18
+    :END:
+*** DONE Umstellen Versionierung auf Git
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-02-03 So 08:49]
+    - State "IN PROGRESS" from "TODO"       [2019-02-02 Sa 21:48]
+    :END:
+    :CLOCK:
+    CLOCK: [2019-02-03 So 08:00]--[2019-02-03 So 08:55] =>  0:55
+    CLOCK: [2019-02-02 Sa 22:50]--[2019-02-02 Sa 23:20] =>  0:30
+    CLOCK: [2019-02-02 Sa 21:45]--[2019-02-02 Sa 22:30] =>  0:45
+    CLOCK: [2019-02-02 Sa 15:45]--[2019-02-02 Sa 21:50] =>  6:05
+    :END:
+*** TODO Maven-Site deployen
+
+Relative Links von übergeordneter Site funzen nicht:
+https://maven.apache.org/plugins/maven-site-plugin/examples/multimodule.html
+
+Stattdessen muss man das Ding "deployen".
+
+Dies sollte in EasyTag_Docs erfolgen.
+*** TODO Umstieg auf junit 5
+*** TODO Consider using Weak/SoftReferences for MediumOffsetFactory
+*** TODO Build-Number für property project.build.buildNumber generieren
+
+z.B: über Jenkins und in Maven-Build reingeben, oder über das Maven Build Number Plugin
+*** DONE Alle Unittests auf Linux (Ubuntu 16.04) erfolgreich ausführen
+    :CLOCK:    
+    CLOCK: [2017-12-15 Fr 07:20]--[2017-12-15 Fr 08:15] =>  0:55
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-12-15 Fr 08:32]
+    - State "IN PROGRESS" from "TODO"       [2017-12-14 Do 16:14]
+    :END:      
+
+*** DONE Alle Tools in jMetaTools zum Laufen bringen + passende LaunchConfigurations
+    :LOGBOOK:  
+    - State "DONE"       from "TODO"       [2017-12-13 Mi 15:36]
+    :END:      
+
+*** DONE Umstieg auf UTF-8 für alle Source-Files!
+    :CLOCK:    
+    CLOCK: [2017-12-13 Mi 12:50]--[2017-12-13 Mi 15:00] =>  2:10
+    CLOCK: [2017-12-11 Mo 10:03]--[2017-12-11 Mo 10:16] =>  0:13
+    CLOCK: [2017-12-11 Mo 08:02]--[2017-12-11 Mo 09:40] =>  1:38
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 15:36]
+    - State "IN PROGRESS" from "TODO"       [2017-12-11 Mo 10:02]
+    :END:      
+*** DONE SonarLint,jdepend und findbugs (bzw. Ähnliches) in Build einbinden
+    :CLOCK:    
+    CLOCK: [2017-11-05 So 14:50]--[2017-11-05 So 15:15] =>  0:25
+    CLOCK: [2017-10-31 Di 09:25]--[2017-10-31 Di 09:45] =>  0:20
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-11-05 So 15:15]
+    - State "IN PROGRESS" from "TODO"       [2017-10-31 Di 09:33]
+    :END:      
+
+*** DONE Umstieg auf Eclipse Oxygen und Maven 3.5
+    :CLOCK:    
+    CLOCK: [2017-11-01 Mi 14:59]--[2017-11-01 Mi 15:33] =>  0:34
+    CLOCK: [2017-11-01 Mi 14:34]--[2017-11-01 Mi 14:42] =>  0:08
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-11-01 Mi 15:33]
+    - State "IN PROGRESS" from "TODO"       [2017-11-01 Mi 14:34]
+    :END:      
+
+*** DONE Umstieg auf Java 9
+    :CLOCK:    
+    CLOCK: [2017-11-01 Mi 15:33]--[2017-11-01 Mi 15:43] =>  0:10
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-11-01 Mi 15:43]
+    - State "IN PROGRESS" from "TODO"       [2017-11-01 Mi 15:33]
+    :END:      
+
+*** CANCELED Auslieferungsvariante mit und ohne logback und Konfiguration
+    :LOGBOOK:  
+    - State "CANCELED"   from "TODO"       [2017-12-13 Mi 12:53] \\
+      Nicht notwendig wegen Maven
+    :END:      
+*** CANCELED Analyse und Planung der Klassifizierung als Integrationstests und Unittests
+    :LOGBOOK:  
+    - State "CANCELED"   from "TODO"       [2017-11-01 Mi 14:29]
+    - State "TODO"       from ""           [2015-11-11 Mi 23:01]
+    :END:      
+    :PROPERTIES:
+    :Effort:   8:00
+    :END:
+*** CANCELED Einführung Integrationstests mit Maven
+    :LOGBOOK:  
+    - State "CANCELED"   from "DONE"       [2017-11-01 Mi 14:29]
+    - State "DONE"       from "TODO"       [2017-11-01 Mi 14:29]
+    - State "TODO"       from ""           [2015-11-11 Mi 23:02]
+    :END:      
+    :PROPERTIES:
+    :Effort:   4:00
+    :END:
+
+*** DONE EasyTag Build modernisieren
+     DEADLINE: <2016-04-08 Fr>
+     :CLOCK:    
+     CLOCK: [2017-10-19 Do 18:22]--[2017-10-19 Do 18:55] =>  0:33
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-10-19 Do 19:00]
+     - State "IN PROGRESS" from "TODO"       [2017-10-19 Do 18:22]
+     :END:      
+
+Nach Vorbild des JavaUtils Build
+
+*** DONE Auf neue Package Naming conventions umstellen
+   :CLOCK:    
+   CLOCK: [2017-10-22 So 08:09]--[2017-10-22 So 09:35] =>  1:26
+   CLOCK: [2017-10-21 Sa 18:26]--[2017-10-21 Sa 20:20] =>  1:54
+   CLOCK: [2017-10-21 Sa 17:35]--[2017-10-21 Sa 18:10] =>  0:35
+   CLOCK: [2017-10-21 Sa 08:35]--[2017-10-21 Sa 09:05] =>  0:30
+   CLOCK: [2017-10-20 Fr 05:20]--[2017-10-20 Fr 06:47] =>  1:27
+   CLOCK: [2017-10-19 Do 18:55]--[2017-10-19 Do 20:33] =>  1:38
+   :END:      
+   :LOGBOOK:  
+   - State "DONE"       from "IN PROGRESS" [2017-10-22 So 09:34]
+   - State "IN PROGRESS" from "TODO"       [2017-10-19 Do 19:00]
+   :END:      
+
+Nächste Schritte:
+ - [X] Common und COnfig nach jMetaUtility
+ - [X] Component Registry nach jMetaUtility
+ - [X] Alle anderen notwendigen Utilities nach jMetaUtility mit neuen, sinnvollen Package-Namen
+ - [X] Reste von BasicUtility zurück nach javaUtils
+ - [X] Maven POMs und Dependencies aufäumen
+ - [X] Maven group IDs etc. umbenennen
+ - [X] Projekte umbenennen
+
+*** DONE Restrukturierung Utility-Projekt
+   :LOGBOOK:  
+   - State "DONE"       from "TODO"       [2017-10-22 So 08:18]
+   :END:      
+
+Package-Namen, Klassenzugehörigkeit zu Utility
+
+*** DONE ExtensionManagement Redesign: Vereinfachung/Verbesserung
+    :CLOCK:    
+    CLOCK: [2017-10-16 Mo 06:18]--[2017-10-16 Mo 07:05] =>  0:47
+    CLOCK: [2017-10-16 Mo 06:05]--[2017-10-16 Mo 06:18] =>  0:13
+    CLOCK: [2017-10-15 So 18:30]--[2017-10-15 So 19:07] =>  0:37
+    CLOCK: [2017-10-15 So 16:41]--[2017-10-15 So 17:03] =>  0:22
+    CLOCK: [2017-10-15 So 15:00]--[2017-10-15 So 15:15] =>  0:15
+    CLOCK: [2017-10-15 So 10:39]--[2017-10-15 So 11:16] =>  0:37
+    CLOCK: [2017-10-15 So 09:06]--[2017-10-15 So 09:45] =>  0:39
+    CLOCK: [2017-09-23 Sa 08:30]--[2017-09-23 Sa 08:50] =>  0:20
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-10-16 Mo 07:02]
+    - State "IN PROGRESS" from "TODO"       [2017-09-23 Sa 08:38]
+    :END:      
+    :PROPERTIES:
+    :Effort:   16:00
+    :END:
+*** DONE ComponentRegistry auf ServiceLoader umstellen
+    :CLOCK:    
+    CLOCK: [2017-09-23 Sa 12:11]--[2017-09-23 Sa 12:59] =>  0:48
+    CLOCK: [2017-09-23 Sa 10:00]--[2017-09-23 Sa 10:18] =>  0:18
+    CLOCK: [2017-09-22 Fr 04:50]--[2017-09-22 Fr 07:06] =>  2:16
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-09-23 Sa 12:59]
+    - State "IN PROGRESS" from "TODO"       [2017-09-22 Fr 05:27]
+    :END:      
+*** DONE Umstellen auf Eclipse 4.4
+    :CLOCK:    
+    CLOCK: [2015-11-15 So 13:00]--[2015-11-15 So 13:34] =>  0:34
+    CLOCK: [2015-11-14 Sa 16:20]--[2015-11-14 Sa 17:25] =>  1:05
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2015-11-15 So 13:34]
+    - State "IN PROGRESS" from "DONE"       [2015-11-15 So 13:34]
+    - State "DONE"       from "IN PROGRESS" [2015-11-15 So 13:34]
+    - State "IN PROGRESS" from "TODO"       [2015-11-14 Sa 16:42]
+    :END:      
+
+*** DONE Bessere Maven-Integration in Eclipse nutzen
+    :CLOCK:    
+    CLOCK: [2015-11-15 So 13:34]--[2015-11-15 So 14:42] =>  1:08
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2015-11-15 So 14:42]
+    - State "IN PROGRESS" from "TODO"       [2015-11-15 So 13:34]
+    - State "TODO"       from ""           [2015-11-14 Sa 16:42]
+    :END:      
+
+*** DONE Umstieg auf Java 8
+    :CLOCK:    
+    CLOCK: [2015-11-16 Mo 18:42]--[2015-11-16 Mo 19:13] =>  0:31
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2015-12-20 So 10:16]
+    - State "IN PROGRESS" from "TODO"       [2015-11-16 Mo 18:42]
+    - State "TODO"       from ""           [2015-11-14 Sa 16:44]
+    :END:      
+
+*** DONE Nutzung von Emacs für Tex-Doku
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2015-12-20 So 10:16]
+     - State "IN PROGRESS" from "TODO"       [2015-11-14 Sa 16:57]
+     :END:      
+[2015-05-24 So]
+
+*** DONE Bessere Precondition-Check API
+    :CLOCK:    
+    CLOCK: [2017-09-19 Di 21:02]--[2017-09-19 Di 23:40] =>  2:38
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-09-20 Mi 18:07]
+    - State "IN PROGRESS" from "TODO"       [2017-09-19 Di 21:02]
+    :END:      
+*** DONE Abhängigkeitsstruktur der Maven-Projekte sauber ziehen
+     SCHEDULED: <2015-12-22 Di>
+     :CLOCK:    
+     CLOCK: [2015-11-29 So 09:20]--[2015-11-29 So 09:58] =>  0:38
+     CLOCK: [2015-11-19 Do 16:30]--[2015-11-19 Do 19:00] =>  2:30
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-03-13 So 15:28]
+     - State "IN PROGRESS" from "TODO"       [2015-11-19 Do 17:06]
+     - State "TODO"       from ""           [2015-11-15 So 13:45]
+     :END:      
+
+Ein Parent-POM, von dem alle Utility-Projekte ableiten, und eines für alle EasyTag-Projekte
+** Komponente "Media"
+
+*** Schätzung
+
+Ursprüngliche Summe der Erstschätzung: 170 h
+
+| Themengebiet              | Aktivität                                                              | Status | Implementierte               | Aufwand |   Tats. | Begründung Abweichung |
+|                           | <70>                                                                   |        | Designentscheidungen         |  gesch. | Aufwand | <20>                 |
+|                           |                                                                        |        |                              |     (h) |     (h) |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| Hilfskomponenten          | Design Configuration Helper                                            | DONE   | 089                          |       2 |       4 |                      |
+|                           | Implementierung und Test Configuration Helper                          | DONE   | 089                          |       4 |    13.5 | Mehr Features als ursprünglich gedacht |
+|                           | javadocs                                                               | DONE   |                              |       1 |       2 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| IMedium                   | Überprüfung und ggf. Anpassung inkl. Tests                             | DONE   | 025-028, 051, 052, 053       |    0.25 |    0.25 |                      |
+|                           | Konfiguration über IMedium ermöglichen                                 | DONE   | 091                          |    0.25 |    1.75 | Maven-Abhängigkeit fehlte, LongConfigParam fehlte, Tests aufwändiger zu schreiben als gedacht |
+|                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |     0.5 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| MediumReference           | Überprüfung und ggf. Anpassung, inkl. Tests                            | DONE   | 054-057                      |    0.25 |    0.25 |                      |
+|                           | Setter für Ändern der Position                                         | DONE   |                              |    0.25 |       0 |                      |
+|                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |       0 |                      |
+|                           | Ensure advance and calculateEndReference can be used with Factory      | DONE   |                              |       4 |     0.5 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| MediumRegion              | Umbenennen, EndReference durch size ersetzen, alle Tests bleiben lauffähig | DONE   | 076                          |     0.5 |    0.25 |                      |
+|                           | Neue Methode isCached inkl. Tests                                      | DONE   | 076                          |    0.25 |    0.25 |                      |
+|                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |    0.75 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| MediumAction              | Neue Klasse MediumAction inkl. Tests                                   | DONE   | 066, 082, 085, 087           |    0.75 |    0.75 |                      |
+|                           | javadocs                                                               | DONE   |                              |       1 |   0.125 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| MediumReferenceRepository | Evaluation WeakHashMap und WeakReferences                              | DONE   |                              |       4 |    2.75 |                      |
+|                           | Implementierung interne Datenstruktur und getAllReferences inkl. Tests | DONE   | 072-075                      |     0.5 |     0.5 |                      |
+|                           | Implementierung createMediumReference                                  | DONE   | 059, 072-075                 |       1 |    0.25 |                      |
+|                           | Implementierung getAllReferencesInRange inkl. Tests                    | DONE   | 075                          |    0.75 |     0.5 |                      |
+|                           | Implementierung updateReferences inkl. Tests                           | DONE   | 058, 075                     |       3 |     1.5 |                      |
+|                           | Implementierung clearAll inkl. Tests                                   | DONE   | 075                          |     0.5 |       0 |                      |
+|                           | javadocs                                                               | DONE   |                              |       2 |    0.75 |                      |
+|                           | Änderungen an updateReferences (DES 073) wegen Änderungen an replace   | DONE   |                              |       4 |    1.25 |                      |
+|                           | Langzeittest: Speicherausnutzung mit und ohne WeakReferences           | NO     |                              |       8 |         |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| MediumChangeManager       | Implementierung interne Datenstruktur und iterator inkl. Tests         | DONE   | 083, 084                     |     0.5 |     0.5 |                      |
+|                           | Implementierung scheduleInsert inkl. Tests                             | DONE   | 062, 063, 066, 084           |       2 |    3.75 | Siehe scheduleRemove |
+|                           | Implementierung scheduleRemove inkl. Tests                             | DONE   | 062, 065, 066, 084           |       2 |    8.25 | Aufwände und Komplexität vollkommen unterschätzt, Lücken in Spezifikation |
+|                           | Anforderungen DataBlocks an Media beim Schreiben                       | DONE   |                              |       4 |     3.5 |                      |
+|                           | Implementierung scheduleReplace inkl. Tests                            | DONE   | 062, 064, 066, 084           |       2 |       7 | Siehe scheduleRemove |
+|                           | Implementierung undo inkl. Tests                                       | DONE   | 036, 084                     |     0.5 |       3 |                      |
+|                           | Implementierung clearAll inkl. Tests                                   | DONE   | 084                          |     0.5 |    0.25 |                      |
+|                           | Implementierung createFlushPlan inkl. Tests                            | DONE   | 087, 090                     |      12 |    34.5 |                      |
+|                           | Mehrere überlagerte MediumActions unterstützen                         | DONE   |                              |       4 |     0.5 |                      |
+|                           | javadocs                                                               | DONE   |                              |       2 |    1.25 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| MediumCache               | Implementierung interne Datenstruktur und getAllCachedRegions inkl. Tests | DONE   | 077, 078                     |    1.25 |     1.5 |                      |
+|                           | Design-Update                                                          | DONE   |                              |       6 |       5 |                      |
+|                           | Implementierung clear inkl. Tests                                      | DONE   | 077                          |    0.25 |     1.5 |                      |
+|                           | Implementierung MediumRegion.split() inkl. Tests                       | DONE   |                              |       2 |    1.25 |                      |
+|                           | Implementierung getMaxRegionSize, getMaxCacheSize, getCurrentCacheSize inkl. Tests | DONE   | 077                          |     0.5 |    0.25 |                      |
+|                           | Implementierung getCachedByteCountAt inkl. Tests                       | DONE   | 077                          |       2 |       1 |                      |
+|                           | Implementierung getRegionsInRange                                      | DONE   | 077, 080, 081                |       8 |    6.75 |                      |
+|                           | Implementierung addRegion                                              | DONE   | 077, 079, 080, 081           |       8 |   16.75 |                      |
+|                           | javadocs                                                               | DONE   |                              |       2 |       1 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| IMediumAccessor           | Überprüfung aktueller Stand und ggf. Anpassung, inkl. Tests            | DONE   | 071                          |       2 |       1 |                      |
+|                           | Implementierung isOpened inkl. Tests                                   | DONE   |                              |     0.5 |       0 |                      |
+|                           | Prüfen und Refactoring aktueller Testcases                             | DONE   |                              |       6 |    5.75 |                      |
+|                           | Umbau auf FileChannel                                                  | DONE   |                              |       4 |     1.5 |                      |
+|                           | Evaluierung truncate bei Dateien                                       | DONE   | 071                          |       2 |       0 |                      |
+|                           | Implementierung truncate inkl. Tests                                   | DONE   | 071                          |       2 |       1 |                      |
+|                           | Implementierung skip inkl. Tests                                       | DONE   | 041, 071                     |       1 |       1 |                      |
+|                           | Locking überprüfen und ggf. anpassen                                   | DONE   | 029-031                      |       3 |       0 |                      |
+|                           | Refactoring existierender Code                                         | DONE   |                              |       4 |     3.5 |                      |
+|                           | Anpassung javadocs                                                     | DONE   |                              |       2 |       0 |                      |
+|                           | Refactoring Timeout Tests                                              | DONE   |                              |       4 |    0.75 |                      |
+|                           | Evaluierung alternative Varianten für timeout                          | DONE   |                              |       3 |         |                      |
+|                           | Überprüfung, ggf. Anpassung und Test der Timeouts bei InputStreams     | DONE   | 050, 091                     |       4 |         |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| IMediumStore              | Basisimplementierung Gerüst des Interfaces                             | DONE   | 032, 033, 039, 068           |     0.5 |       0 |                      |
+|                           | Explizites Dokumentieren der Performance-Nachteile von lesenden Byte-Streams | DONE   | 042                          |     0.5 |       0 |                      |
+|                           | Überprüfung discard inkl. Anpassung der Tests                          | DONE   | 040, 048                     |       3 |       0 |                      |
+|                           | Struktur der Tests                                                     | DONE   |                              |         |   12.75 |                      |
+|                           | Neue Exceptions                                                        | DONE   | 070                          |       2 |       0 |                      |
+|                           | Implementierung createMediumReference inkl. Tests                      | DONE   | 059, 068                     |       2 |       0 |                      |
+|                           | Implementierung close inkl. Tests                                      | DONE   | 067, 068                     |       2 |    1.25 |                      |
+|                           | Überprüfung isAtEndOfMedium inkl. Anpassung der Tests                  | DONE   | 068                          |     0.5 |    1.25 |                      |
+|                           | Implementierung cache und getCachedByteCountAt inkl. Anpassung der Tests | DONE   | 037, 038, 043, 046, 068      |       4 |       4 |                      |
+|                           | Implementierung getData inkl. Anpassung der Tests                      | DONE   | 045, 047, 048, 049, 050, 068 |       8 |      22 |                      |
+|                           | Sonderbehandlungen byte-Arrays                                         | DONE   | 027, 031, 044, 053           |       4 |       0 |                      |
+|                           | Implementierung insertData inkl. Tests                                 | DONE   | 033, 035, 062, 063, 066, 068 |       8 |     0.5 |                      |
+|                           | Implementierung removeData inkl. Tests                                 | DONE   | 033, 035, 062, 064, 066, 068 |       8 |       0 |                      |
+|                           | Implementierung replaceData inkl. Tests                                | DONE   | 033, 035, 062, 065, 066, 068 |       8 |       0 |                      |
+|                           | Implementierung undo inkl. Tests                                       | DONE   | 036, 068                     |       2 |       0 |                      |
+|                           | Implementierung flush inkl. Tests                                      | DONE   | 033, 034, 086-091            |      16 |    69.5 |                      |
+|                           | Anpassung javadocs                                                     | DONE   |                              |       4 |       0 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| IMediaAPI                 | Überprüfung aktueller Stand und ggf. Anpassung, inkl. Tests            | DONE   | 069                          |       1 |       0 |                      |
+|                           | Implementierung createMediumStore inkl. Tests                          | DONE   | 069, 070                     |       2 |       0 |                      |
+|                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |       0 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+| Anpassungen Caching       | Prüfung: Effizienteres split - nur referenz statt kopieren             | DONE   |                              |     0.5 |     0.5 |                      |
+|                           | MediumAccessor erzeugt selbst ByteBuffer                               | DONE   |                              |       1 |    1.75 |                      |
+|                           | Umbau InMemoryMediumAccessor komplett auf ByteBuffer                   | DONE   |                              |       1 |    2.25 |                      |
+|                           | Minimale/Standard Cache-Größe einbauen                                 | DONE   |                              |     0.5 |       0 |                      |
+|                           | Is Cached: Deaktivierbarkeit entfernen + Inmemory auch immer Cached    | DONE   |                              |       2 |    1.25 |                      |
+|                           | Is Cached: Testfälle ausdünnen                                         | DONE   |                              |       2 |     0.5 |                      |
+|                           | Anpassungen Design Doku                                                | DONE   |                              |       2 |    0.25 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+|                           |                                                                        |        | SUMME                        |  221.75 | 255.625 |                      |
+|---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
+#+TBLFM: $6=vsum(@4..@-1)::$5=vsum(@4..@-1)
+
+*** Implementierung
+
+**** DONE Allgemeine Planung
+     :CLOCK:    
+     CLOCK: [2017-09-09 Sa 11:30]--[2017-09-09 Sa 11:34] =>  0:04
+     CLOCK: [2016-05-16 Mo 08:15]--[2016-05-16 Mo 08:36] =>  0:21
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-11-05 So 08:32]
+     - State "IN PROGRESS" from "TODO"       [2016-05-16 Mo 08:35]
+     :END:      
+
+**** DONE Weitere Planung Komponente media
+     DEADLINE: <2015-12-27 So>
+     :LOGBOOK:  
+     - State "DONE"       from "TODO"       [2016-03-13 So 15:35]
+     :END:
+
+**** DONE IMedium
+     :LOGBOOK:  
+     - State "DONE"       from ""           [2017-09-19 Di 12:46]
+     :END:      
+
+***** DONE Überprüfung und ggf. Anpassung inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-16 Mo 08:36]--[2016-05-16 Mo 08:44] =>  0:08
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-16 Mo 08:44]
+      - State "IN PROGRESS" from "TODO"       [2016-05-16 Mo 08:36]
+      - State "TODO"       from ""           [2016-05-16 Mo 08:24]
+      :END:      
+      :PROPERTIES:
+      :Effort:   0:15
+      :END:
+
+***** DONE Konfiguration über IMedium ermöglichen
+      :CLOCK:    
+      CLOCK: [2016-05-16 Mo 08:44]--[2016-05-16 Mo 10:26] =>  1:42
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-16 Mo 10:26]
+      - State "IN PROGRESS" from "TODO"       [2016-05-16 Mo 08:44]
+      - State "TODO"       from ""           [2016-05-16 Mo 08:25]
+      :END:      
+      :PROPERTIES:
+      :Effort:   0:30
+      :END:
+
+***** DONE Anpassung javadocs IMedium
+      :CLOCK:    
+      CLOCK: [2016-05-16 Mo 10:26]--[2016-05-16 Mo 10:52] =>  0:26
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-16 Mo 10:53]
+      - State "IN PROGRESS" from "TODO"       [2016-05-16 Mo 10:26]
+      - State "TODO"       from ""           [2016-05-16 Mo 08:25]
+      :END:      
+      :PROPERTIES:
+      :Effort:   0:15
+      :END:
+
+**** DONE MediumReference
+     :LOGBOOK:  
+     - State "DONE"       from ""           [2017-09-19 Di 12:46]
+     :END:      
+
+***** DONE Überprüfung und ggf. Anpassung, inkl. Tests 
+      :CLOCK:    
+      CLOCK: [2016-05-18 Mi 21:31]--[2016-05-18 Mi 21:46] =>  0:15
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-18 Mi 21:45]
+      - State "IN PROGRESS" from "TODO"       [2016-05-18 Mi 21:31]
+      :END:      
+      :PROPERTIES:
+      :Effort:   0:15
+      :END:
+
+***** DONE Setter für Ändern der Position
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2016-05-18 Mi 21:44]
+      :END:      
+      :PROPERTIES:
+      :Effort:   0:15
+      :END:
+***** DONE Anpassung javadocs
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2016-05-18 Mi 21:44]
+      :END:      
+      :PROPERTIES:
+      :Effort:   0:30
+      :END:
+***** DONE Ensure advance and calculateEndReference can be used with Factory
+      :CLOCK:    
+      CLOCK: [2016-05-22 So 13:33]--[2016-05-22 So 13:57] =>  0:24
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-22 So 13:57]
+      - State "IN PROGRESS" from "TODO"       [2016-05-22 So 13:33]
+      :END:      
+**** DONE MediumRegion
+     :LOGBOOK:  
+     - State "DONE"       from ""           [2017-09-19 Di 12:46]
+     :END:      
+
+***** DONE Umbenennen, EndReference durch size ersetzen, alle Tests bleiben lauffähig
+      :CLOCK:    
+      CLOCK: [2016-05-19 Do 05:50]--[2016-05-19 Do 06:10] =>  0:20
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-19 Do 06:04]
+      - State "IN PROGRESS" from "TODO"       [2016-05-19 Do 06:00]
+      :END:      
+
+***** DONE Neue Methode isCached inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-20 Fr 06:24]--[2016-05-20 Fr 06:44] =>  0:20
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-20 Fr 06:44]
+      - State "IN PROGRESS" from "TODO"       [2016-05-20 Fr 06:24]
+      :END:      
+
+***** DONE Anpassung javadocs                                                    
+      :CLOCK:    
+      CLOCK: [2016-05-20 Fr 06:44]--[2016-05-20 Fr 07:18] =>  0:34
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-20 Fr 07:18]
+      - State "IN PROGRESS" from "TODO"       [2016-05-20 Fr 06:44]
+      :END:      
+
+**** DONE MediumAction
+     :LOGBOOK:  
+     - State "DONE"       from ""           [2017-09-19 Di 12:46]
+     :END:      
+
+***** DONE Neue Klasse MediumAction inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-20 Fr 16:33]--[2016-05-20 Fr 16:46] =>  0:13
+      CLOCK: [2016-05-20 Fr 07:18]--[2016-05-20 Fr 07:45] =>  0:27
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-20 Fr 16:46]
+      - State "IN PROGRESS" from "TODO"       [2016-05-20 Fr 07:18]
+      :END:      
+
+***** DONE javadocs
+      :CLOCK:    
+      CLOCK: [2016-05-20 Fr 16:46]--[2016-05-20 Fr 16:53] =>  0:07
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-20 Fr 16:54]
+      - State "IN PROGRESS" from "TODO"       [2016-05-20 Fr 16:46]
+      :END:      
+**** DONE MediumReferenceRepository
+     :LOGBOOK:  
+     - State "DONE"       from ""           [2017-09-19 Di 12:46]
+     :END:      
+
+***** DONE Evaluation WeakHashMap und WeakReferences
+      :CLOCK:    
+      CLOCK: [2016-05-16 Mo 21:35]--[2016-05-16 Mo 22:35] =>  1:00
+      CLOCK: [2016-05-16 Mo 15:55]--[2016-05-16 Mo 17:40] =>  1:45
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-16 Mo 21:44]
+      - State "IN PROGRESS" from "TODO"       [2016-05-16 Mo 15:45]
+      :END:      
+
+***** DONE Implementierung interne Datenstruktur und getAllReferences inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-20 Fr 16:53]--[2016-05-20 Fr 17:27] =>  0:34
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-20 Fr 17:27]
+      - State "IN PROGRESS" from "TODO"       [2016-05-20 Fr 16:53]
+      :END:      
+
+***** DONE Implementierung createMediumReference
+      :CLOCK:    
+      CLOCK: [2016-05-21 Sa 10:55]--[2016-05-21 Sa 11:04] =>  0:09
+      CLOCK: [2016-05-20 Fr 17:27]--[2016-05-20 Fr 17:28] =>  0:01
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-21 Sa 11:06]
+      - State "IN PROGRESS" from "TODO"       [2016-05-20 Fr 17:27]
+      :END:      
+
+***** DONE Implementierung getAllReferencesInRange inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-20 Fr 17:28]--[2016-05-20 Fr 17:50] =>  0:22
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-20 Fr 17:50]
+      - State "IN PROGRESS" from "TODO"       [2016-05-20 Fr 17:28]
+      :END:      
+
+***** DONE Implementierung clearAll inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-21 Sa 11:04]--[2016-05-21 Sa 11:07] =>  0:03
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-21 Sa 11:06]
+      - State "IN PROGRESS" from "TODO"       [2016-05-21 Sa 11:04]
+      :END:      
+
+***** DONE Implementierung updateReferences inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-22 So 12:50]--[2016-05-22 So 13:33] =>  0:43
+      CLOCK: [2016-05-22 So 08:05]--[2016-05-22 So 08:47] =>  0:42
+      CLOCK: [2016-05-21 Sa 11:07]--[2016-05-21 Sa 11:15] =>  0:08
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-22 So 13:33]
+      - State "IN PROGRESS" from "TODO"       [2016-05-21 Sa 11:07]
+      :END:
+
+***** DONE Änderungen an updateReferences (DES 073) wegen Änderungen an replace
+      :CLOCK:    
+      CLOCK: [2016-06-16 Do 18:00]--[2016-06-16 Do 18:35] =>  0:35
+      CLOCK: [2016-06-13 Mo 20:20]--[2016-06-13 Mo 20:58] =>  0:38
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-16 Do 18:35]
+      - State "IN PROGRESS" from "TODO"       [2016-06-13 Mo 20:20]
+      :END:      
+
+***** DONE javadocs
+      :CLOCK:    
+      CLOCK: [2016-05-22 So 13:57]--[2016-05-22 So 14:45] =>  0:48
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-22 So 14:45]
+      - State "IN PROGRESS" from "TODO"       [2016-05-22 So 13:57]
+      :END:      
+
+
+**** DONE MediumChangeManager
+     :LOGBOOK:  
+     - State "DONE"       from ""           [2017-09-19 Di 12:46]
+     :END:      
+
+***** DONE Implementierung interne Datenstruktur und iterator inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-22 So 18:10]--[2016-05-22 So 18:34] =>  0:24
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-24 Di 19:28]
+      - State "IN PROGRESS" from "TODO"       [2016-05-22 So 18:13]
+      :END:      
+
+***** DONE Implementierung scheduleInsert inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-27 Fr 08:38]--[2016-05-27 Fr 09:03] =>  0:25
+      CLOCK: [2016-05-24 Di 17:40]--[2016-05-24 Di 19:28] =>  1:48
+      CLOCK: [2016-05-23 Mo 20:12]--[2016-05-23 Mo 21:00] =>  0:48
+      CLOCK: [2016-05-23 Mo 18:18]--[2016-05-23 Mo 19:04] =>  0:46
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-27 Fr 09:02]
+      - State "IN PROGRESS" from "DONE"       [2016-05-27 Fr 08:38]
+      - State "DONE"       from "IN PROGRESS" [2016-05-24 Di 19:28]
+      - State "IN PROGRESS" from "TODO"       [2016-05-23 Mo 18:18]
+      :END:      
+
+***** DONE Anforderungen DataBlocks an Media beim Schreiben
+      :CLOCK:    
+      CLOCK: [2016-05-31 Di 17:04]--[2016-05-31 Di 18:04] =>  1:00
+      CLOCK: [2016-05-31 Di 17:03]--[2016-05-31 Di 17:04] =>  0:01
+      CLOCK: [2016-05-30 Mo 21:57]--[2016-05-30 Mo 22:04] =>  0:07
+      CLOCK: [2016-05-30 Mo 18:31]--[2016-05-30 Mo 19:30] =>  0:59
+      CLOCK: [2016-05-30 Mo 17:10]--[2016-05-30 Mo 18:31] =>  1:21
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-31 Di 20:18]
+      - State "IN PROGRESS" from "TODO"       [2016-05-30 Mo 18:10]
+      :END:      
+***** DONE Implementierung scheduleReplace inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-06-03 Fr 11:15]--[2016-06-03 Fr 11:52] =>  0:37
+      CLOCK: [2016-06-03 Fr 10:26]--[2016-06-03 Fr 11:10] =>  0:44
+      CLOCK: [2016-06-03 Fr 09:55]--[2016-06-03 Fr 10:25] =>  0:30
+      CLOCK: [2016-06-02 Do 18:27]--[2016-06-02 Do 19:15] =>  0:48
+      CLOCK: [2016-06-02 Do 12:03]--[2016-06-02 Do 13:55] =>  1:52
+      CLOCK: [2016-06-02 Do 11:07]--[2016-06-02 Do 11:50] =>  0:43
+      CLOCK: [2016-05-31 Di 20:19]--[2016-05-31 Di 22:07] =>  1:48
+      CLOCK: [2016-05-27 Fr 09:03]--[2016-05-27 Fr 09:07] =>  0:04
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-03 Fr 11:55]
+      - State "IN PROGRESS" from "TODO"       [2016-05-27 Fr 09:03]
+      :END:      
+
+***** DONE Implementierung scheduleRemove inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-05-27 Fr 07:48]--[2016-05-27 Fr 08:38] =>  0:50
+      CLOCK: [2016-05-26 Do 08:25]--[2016-05-26 Do 09:53] =>  1:28
+      CLOCK: [2016-05-25 Mi 16:29]--[2016-05-25 Mi 18:40] =>  2:11
+      CLOCK: [2016-05-25 Mi 06:35]--[2016-05-25 Mi 07:30] =>  0:55
+      CLOCK: [2016-05-24 Di 19:28]--[2016-05-24 Di 22:20] =>  2:52
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-05-27 Fr 08:38]
+      - State "IN PROGRESS" from "TODO"       [2016-05-24 Di 22:21]
+      - State "TODO"       from ""           [2016-05-24 Di 22:21]
+      - State "DONE"       from "IN PROGRESS" [2016-05-24 Di 22:19]
+      - State "IN PROGRESS" from "TODO"       [2016-05-24 Di 19:28]
+      :END:      
+
+****** TODO Implementierung undo inkl. Tests
+
+****** TODO Implementierung clearAll inkl. Tests
+
+****** TODO Implementierung createFlushPlan inkl. Tests
+
+****** TODO javadocs
+
+
+***** DONE Implementierung undo inkl. Tests
+      :CLOCK:    
+      CLOCK: [2016-06-04 Sa 08:41]--[2016-06-04 Sa 09:10] =>  0:29
+      CLOCK: [2016-06-03 Fr 18:01]--[2016-06-03 Fr 18:06] =>  0:05
+      CLOCK: [2016-06-03 Fr 16:40]--[2016-06-03 Fr 18:01] =>  1:21
+      CLOCK: [2016-06-03 Fr 16:09]--[2016-06-03 Fr 16:40] =>  0:31
+      CLOCK: [2016-06-03 Fr 11:50]--[2016-06-03 Fr 12:26] =>  0:36
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-04 Sa 09:11]
+      - State "IN PROGRESS" from "TODO"       [2016-06-03 Fr 11:56]
+      :END:      
+
+***** DONE Implementierung clearAll inkl. Tests
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-04 Sa 09:17]
+      - State "IN PROGRESS" from "TODO"       [2016-06-04 Sa 09:12]
+      :END:      
+      :CLOCK:    
+      CLOCK: [2016-06-04 Sa 09:12]--[2016-06-04 Sa 09:17] =>  0:05
+      CLOCK: [2016-06-04 Sa 09:10]--[2016-06-04 Sa 09:12] =>  0:02
+      :END:      
+***** DONE Implementierung createFlushPlan inkl. Tests
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-09 Sa 13:21]
+      :END:      
+      :CLOCK:    
+      CLOCK: [2016-11-26 Sa 10:34]--[2016-11-26 Sa 10:38] =>  0:04
+      CLOCK: [2016-11-26 Sa 09:20]--[2016-11-26 Sa 10:01] =>  0:41
+      CLOCK: [2016-11-26 Sa 08:04]--[2016-11-26 Sa 09:13] =>  1:09
+      CLOCK: [2016-11-24 Do 20:55]--[2016-11-24 Do 21:29] =>  0:34
+      CLOCK: [2016-11-20 So 09:27]--[2016-11-20 So 09:35] =>  0:08
+      CLOCK: [2016-11-19 Sa 10:28]--[2016-11-19 Sa 11:29] =>  1:01
+      CLOCK: [2016-11-19 Sa 09:25]--[2016-11-19 Sa 10:20] =>  0:55
+      CLOCK: [2016-11-13 So 16:15]--[2016-11-13 So 17:06] =>  0:51
+      CLOCK: [2016-11-13 So 14:56]--[2016-11-13 So 15:20] =>  0:24
+      CLOCK: [2016-11-13 So 08:41]--[2016-11-13 So 09:05] =>  0:24
+      CLOCK: [2016-11-12 Sa 19:01]--[2016-11-12 Sa 19:31] =>  0:30
+      CLOCK: [2016-11-12 Sa 08:27]--[2016-11-12 Sa 08:39] =>  0:12
+      CLOCK: [2016-11-11 Fr 20:10]--[2016-11-11 Fr 21:28] =>  1:18
+      CLOCK: [2016-11-10 Do 20:21]--[2016-11-10 Do 20:35] =>  0:14
+      CLOCK: [2016-11-08 Di 20:05]--[2016-11-08 Di 20:44] =>  0:39
+      CLOCK: [2016-11-08 Di 18:30]--[2016-11-08 Di 19:41] =>  1:11
+      CLOCK: [2016-11-08 Di 18:07]--[2016-11-08 Di 18:22] =>  0:15
+      CLOCK: [2016-11-08 Di 17:35]--[2016-11-08 Di 17:50] =>  0:15
+      CLOCK: [2016-11-07 Mo 17:02]--[2016-11-07 Mo 17:17] =>  0:15
+      CLOCK: [2016-11-06 So 16:15]--[2016-11-06 So 16:25] =>  0:10
+      CLOCK: [2016-11-06 So 13:19]--[2016-11-06 So 13:30] =>  0:11
+      CLOCK: [2016-11-06 So 12:26]--[2016-11-06 So 12:38] =>  0:12
+      CLOCK: [2016-11-06 So 12:05]--[2016-11-06 So 12:18] =>  0:13
+      CLOCK: [2016-11-06 So 11:09]--[2016-11-06 So 11:49] =>  0:40
+      CLOCK: [2016-11-02 Mi 19:45]--[2016-11-02 Mi 20:24] =>  0:39
+      CLOCK: [2016-10-24 Mo 18:42]--[2016-10-24 Mo 18:52] =>  0:10
+      CLOCK: [2016-10-18 Di 18:33]--[2016-10-18 Di 19:29] =>  0:56
+      CLOCK: [2016-10-18 Di 17:44]--[2016-10-18 Di 17:48] =>  0:04
+      CLOCK: [2016-10-17 Mo 19:20]--[2016-10-17 Mo 20:00] =>  0:40
+      CLOCK: [2016-10-17 Mo 18:55]--[2016-10-17 Mo 19:05] =>  0:10
+      CLOCK: [2016-10-17 Mo 18:30]--[2016-10-17 Mo 18:42] =>  0:12
+      CLOCK: [2016-10-16 So 14:57]--[2016-10-16 So 16:19] =>  1:22
+      CLOCK: [2016-10-16 So 08:35]--[2016-10-16 So 10:29] =>  1:54
+      CLOCK: [2016-10-15 Sa 17:01]--[2016-10-15 Sa 17:17] =>  0:16
+      CLOCK: [2016-10-13 Do 19:10]--[2016-10-13 Do 19:39] =>  0:29
+      CLOCK: [2016-10-11 Di 05:00]--[2016-10-11 Di 06:06] =>  1:06
+      CLOCK: [2016-10-10 Mo 19:20]--[2016-10-10 Mo 21:20] =>  2:00
+      CLOCK: [2016-10-09 So 19:21]--[2016-10-09 So 20:36] =>  1:15
+      CLOCK: [2016-10-09 So 12:35]--[2016-10-09 So 13:15] =>  0:40
+      CLOCK: [2016-10-06 Do 21:19]--[2016-10-06 Do 22:00] =>  0:41
+      CLOCK: [2016-10-06 Do 18:53]--[2016-10-06 Do 21:19] =>  2:26
+      CLOCK: [2016-10-04 Di 21:15]--[2016-10-04 Di 22:08] =>  0:53
+      CLOCK: [2016-08-28 So 18:45]--[2016-08-28 So 18:53] =>  0:08
+      CLOCK: [2016-08-23 Di 20:20]--[2016-08-23 Di 20:23] =>  0:03
+      CLOCK: [2016-08-22 Mo 21:32]--[2016-08-22 Mo 21:56] =>  0:24
+      CLOCK: [2016-08-17 Mi 05:39]--[2016-08-17 Mi 06:41] =>  1:02
+      CLOCK: [2016-07-25 Mo 06:12]--[2016-07-25 Mo 07:15] =>  1:03
+      CLOCK: [2016-06-18 Sa 13:00]--[2016-06-18 Sa 14:30] =>  1:30
+      CLOCK: [2016-06-12 So 19:00]--[2016-06-12 So 19:45] =>  0:45
+      CLOCK: [2016-06-06 Mo 21:16]--[2016-06-06 Mo 22:03] =>  0:47
+      CLOCK: [2016-06-06 Mo 19:40]--[2016-06-06 Mo 19:44] =>  0:04
+      CLOCK: [2016-06-06 Mo 19:13]--[2016-06-06 Mo 19:24] =>  0:11
+      CLOCK: [2016-06-04 Sa 09:17]--[2016-06-04 Sa 09:32] =>  0:15
+      :END:
+***** DONE javadocs
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-04 Sa 20:42]
+      :END:      
+      :CLOCK:    
+      CLOCK: [2016-06-04 Sa 19:36]--[2016-06-04 Sa 20:43] =>  1:07
+      CLOCK: [2016-06-04 Sa 09:32]--[2016-06-04 Sa 09:35] =>  0:03
+      :END:
+***** DONE Mehrere überlagerte MediumActions unterstützen
+      :CLOCK:    
+      CLOCK: [2016-06-04 Sa 21:40]--[2016-06-04 Sa 22:10] =>  0:30
+      CLOCK: [2016-06-04 Sa 20:43]--[2016-06-04 Sa 20:44] =>  0:01
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-04 Sa 22:09]
+      - State "IN PROGRESS" from "TODO"       [2016-06-04 Sa 20:43]
+      :END:      
+
+**** DONE MediumCache
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-10-03 Di 22:16]
+     - State "IN PROGRESS" from ""           [2017-09-19 Di 12:46]
+     :END:      
+***** DONE Design-Update
+      :CLOCK:    
+      CLOCK: [2017-09-09 Sa 08:34]--[2017-09-09 Sa 13:30] =>  4:56
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-09 Sa 13:30]
+      - State "IN PROGRESS" from ""           [2017-09-09 Sa 11:34]
+      :END:      
+***** DONE Implementierung interne Datenstruktur und getAllCachedRegions inkl. Tests
+      :CLOCK:    
+      CLOCK: [2017-09-09 Sa 17:58]--[2017-09-09 Sa 19:25] =>  1:27
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-10 So 08:25]
+      - State "IN PROGRESS" from "DONE"       [2017-09-10 So 08:24]
+      - State "DONE"       from "IN PROGRESS" [2017-09-10 So 06:54]
+      - State "IN PROGRESS" from "TODO"       [2017-09-09 Sa 17:58]
+      :END:      
+***** DONE Implementierung MediumRegion.split() inkl. Tests                    
+      :CLOCK:    
+      CLOCK: [2017-09-10 So 06:50]--[2017-09-10 So 08:05] =>  1:15
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-10 So 07:51]
+      - State "IN PROGRESS" from "TODO"       [2017-09-10 So 06:54]
+      :END:      
+***** DONE Implementierung clear inkl. Tests
+      :CLOCK:    
+      CLOCK: [2017-09-10 So 08:27]--[2017-09-10 So 10:00] =>  1:33
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-10 So 09:54]
+      - State "IN PROGRESS" from "TODO"       [2017-09-10 So 08:27]
+      :END:      
+***** DONE Umstellung MediumCacheRegionTest auf neue Systematik
+      :CLOCK:    
+      CLOCK: [2015-11-11 Mi 22:25]--[2015-11-11 Mi 23:23] =>  0:58
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2015-11-11 Mi 23:23]
+      - State "IN PROGRESS" from "TODO"       [2015-11-11 Mi 22:25]
+      - State "TODO"       from ""           [2015-11-11 Mi 22:25]
+      :END:      
+      :PROPERTIES:
+      :Effort:   4:00
+      :END:
+***** DONE Implementierung getMaxRegionSize, getMaxCacheSize, getCurrentCacheSize inkl. Tests
+      :CLOCK:    
+      CLOCK: [2017-09-19 Di 13:20]--[2017-09-19 Di 13:35] =>  0:15
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-19 Di 13:28]
+      - State "IN PROGRESS" from "TODO"       [2017-09-19 Di 13:20]
+      :END:      
+***** DONE Implementierung getCachedByteCountAt inkl. Tests
+      :CLOCK:    
+      CLOCK: [2017-09-19 Di 15:45]--[2017-09-19 Di 16:45] =>  1:00
+      CLOCK: [2017-09-19 Di 13:35]--[2017-09-19 Di 14:19] =>  0:44
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-19 Di 16:41]
+      - State "IN PROGRESS" from "TODO"       [2017-09-19 Di 13:33]
+      :END:      
+***** DONE Implementierung getRegionsInRange
+      :CLOCK:    
+      CLOCK: [2017-09-26 Di 07:35]--[2017-09-26 Di 08:15] =>  0:40
+      CLOCK: [2017-09-26 Di 06:25]--[2017-09-26 Di 07:00] =>  0:35
+      CLOCK: [2017-09-25 Mo 06:07]--[2017-09-25 Mo 07:03] =>  0:56
+      CLOCK: [2017-09-24 So 19:26]--[2017-09-24 So 20:00] =>  0:34
+      CLOCK: [2017-09-24 So 18:54]--[2017-09-24 So 19:25] =>  0:31
+      CLOCK: [2017-09-24 So 16:27]--[2017-09-24 So 16:55] =>  0:28
+      CLOCK: [2017-09-24 So 14:50]--[2017-09-24 So 16:13] =>  1:23
+      CLOCK: [2017-09-24 So 08:45]--[2017-09-24 So 08:55] =>  0:10
+      CLOCK: [2017-09-24 So 08:15]--[2017-09-24 So 08:45] =>  0:30
+      CLOCK: [2017-09-24 So 07:08]--[2017-09-24 So 07:39] =>  0:31
+      CLOCK: [2017-09-19 Di 16:45]--[2017-09-19 Di 17:15] =>  0:30
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-09-26 Di 08:10]
+      - State "IN PROGRESS" from "TODO"       [2017-09-19 Di 16:45]
+      :END:      
+***** DONE Implementierung addRegion inkl. Tests
+      :CLOCK:    
+      CLOCK: [2017-10-03 Di 11:20]--[2017-10-03 Di 11:47] =>  0:27
+      CLOCK: [2017-10-03 Di 08:55]--[2017-10-03 Di 10:00] =>  1:05
+      CLOCK: [2017-10-03 Di 08:35]--[2017-10-03 Di 08:55] =>  0:20
+      CLOCK: [2017-10-02 Mo 09:01]--[2017-10-02 Mo 09:40] =>  0:39
+      CLOCK: [2017-10-02 Mo 07:21]--[2017-10-02 Mo 08:56] =>  1:35
+      CLOCK: [2017-10-01 So 19:33]--[2017-10-01 So 20:08] =>  0:35
+      CLOCK: [2017-10-01 So 18:57]--[2017-10-01 So 19:05] =>  0:08
+      CLOCK: [2017-10-01 So 17:32]--[2017-10-01 So 17:45] =>  0:13
+      CLOCK: [2017-10-01 So 16:30]--[2017-10-01 So 17:25] =>  0:55
+      CLOCK: [2017-10-01 So 14:30]--[2017-10-01 So 16:25] =>  1:55
+      CLOCK: [2017-10-01 So 11:40]--[2017-10-01 So 13:32] =>  1:52
+      CLOCK: [2017-10-01 So 08:20]--[2017-10-01 So 09:59] =>  1:39
+      CLOCK: [2017-09-30 Sa 19:01]--[2017-09-30 Sa 19:40] =>  0:39
+      CLOCK: [2017-09-30 Sa 18:42]--[2017-09-30 Sa 18:47] =>  0:05
+      CLOCK: [2017-09-30 Sa 08:52]--[2017-09-30 Sa 09:21] =>  0:29
+      CLOCK: [2017-09-30 Sa 07:34]--[2017-09-30 Sa 08:20] =>  0:46
+      CLOCK: [2017-09-29 Fr 19:07]--[2017-09-29 Fr 19:45] =>  0:38
+      CLOCK: [2017-09-29 Fr 07:13]--[2017-09-29 Fr 08:04] =>  0:51
+      CLOCK: [2017-09-27 Mi 08:09]--[2017-09-27 Mi 08:33] =>  0:24
+      CLOCK: [2017-09-27 Mi 06:20]--[2017-09-27 Mi 07:26] =>  1:06
+      CLOCK: [2017-09-26 Di 20:36]--[2017-09-26 Di 21:00] =>  0:24
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-03 Di 11:48]
+      - State "IN PROGRESS" from "TODO"       [2017-09-26 Di 20:36]
+      :END:      
+***** DONE javadocs
+      :CLOCK:    
+      CLOCK: [2017-10-03 Di 22:09]--[2017-10-03 Di 22:15] =>  0:06
+      CLOCK: [2017-10-03 Di 21:48]--[2017-10-03 Di 22:05] =>  0:17
+      CLOCK: [2017-10-03 Di 21:45]--[2017-10-03 Di 21:48] =>  0:03
+      CLOCK: [2017-10-03 Di 21:00]--[2017-10-03 Di 21:14] =>  0:14
+      CLOCK: [2017-10-03 Di 11:47]--[2017-10-03 Di 12:00] =>  0:13
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-03 Di 22:15]
+      - State "IN PROGRESS" from "TODO"       [2017-10-03 Di 11:47]
+      :END:      
+**** DONE IMediumAccessor
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-10-16 Mo 06:17]
+     :END:      
+
+***** DONE Überprüfung, ggf. Anpassung und Test der Timeouts bei InputStreams
+      :CLOCK:    
+      CLOCK: [2017-10-04 Mi 06:30]--[2017-10-04 Mi 07:10] =>  0:40
+      CLOCK: [2016-05-16 Mo 10:521]--[2016-05-16 Mo 11:13] =>  0:21
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-04 Mi 17:54]
+      - State "IN PROGRESS" from "TODO"       [2016-05-16 Mo 10:52]
+      :END:      
+
+***** DONE Prüfen und Refactoring aktueller Testcases                         
+      :CLOCK:    
+      CLOCK: [2017-10-08 So 16:15]--[2017-10-08 So 16:19] =>  0:04
+      CLOCK: [2017-10-08 So 14:30]--[2017-10-08 So 15:25] =>  0:55
+      CLOCK: [2017-10-08 So 09:05]--[2017-10-08 So 10:18] =>  1:13
+      CLOCK: [2017-10-08 So 08:05]--[2017-10-08 So 08:44] =>  0:39
+      CLOCK: [2017-10-07 Sa 20:15]--[2017-10-07 Sa 20:20] =>  0:05
+      CLOCK: [2017-10-07 Sa 19:38]--[2017-10-07 Sa 20:02] =>  0:24
+      CLOCK: [2017-10-07 Sa 07:51]--[2017-10-07 Sa 09:13] =>  1:22
+      CLOCK: [2017-10-04 Mi 17:55]--[2017-10-04 Mi 18:50] =>  0:55
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-08 So 16:19]
+      - State "IN PROGRESS" from "TODO"       [2017-10-04 Mi 17:55]
+      :END:      
+
+***** DONE Umbau auf FileChannel und Path
+      :CLOCK:    
+      CLOCK: [2017-10-08 So 19:20]--[2017-10-08 So 19:50] =>  0:30
+      CLOCK: [2017-10-08 So 18:55]--[2017-10-08 So 19:07] =>  0:12
+      CLOCK: [2017-10-08 So 18:04]--[2017-10-08 So 18:48] =>  0:44
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-08 So 19:44]
+      - State "IN PROGRESS" from "TODO"       [2017-10-08 So 18:04]
+      - State "TODO"       from "DONE"       [2017-10-08 So 16:19]
+      - State "DONE"       from ""           [2017-10-08 So 16:19]
+      :END:      
+***** DONE Implementierung isOpened inkl. Tests                               
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2017-10-13 Fr 06:18]
+      :END:      
+***** DONE Evaluierung truncate bei Dateien                                   
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-13 Fr 07:15]
+      :END:      
+***** DONE Implementierung truncate inkl. Tests                               
+      :CLOCK:    
+      CLOCK: [2017-10-13 Fr 06:15]--[2017-10-13 Fr 07:15] =>  1:00
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2017-10-13 Fr 07:15]
+      - State "IN PROGRESS" from "TODO"       [2017-10-13 Fr 06:19]
+      :END:      
+***** DONE Implementierung skip inkl. Tests                                   
+      :CLOCK:    
+      CLOCK: [2017-10-13 Fr 20:00]--[2017-10-13 Fr 21:00] =>  1:00
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-13 Fr 20:54]
+      - State "IN PROGRESS" from "TODO"       [2017-10-13 Fr 20:01]
+      :END:      
+
+***** DONE Refactoring existierender Code
+      :CLOCK:    
+      CLOCK: [2017-10-14 Sa 16:11]--[2017-10-14 Sa 16:55] =>  0:44
+      CLOCK: [2017-10-14 Sa 10:36]--[2017-10-14 Sa 10:47] =>  0:11
+      CLOCK: [2017-10-14 Sa 09:25]--[2017-10-14 Sa 10:35] =>  1:10
+      CLOCK: [2017-10-14 Sa 08:20]--[2017-10-14 Sa 09:18] =>  0:58
+      CLOCK: [2017-10-14 Sa 07:20]--[2017-10-14 Sa 07:40] =>  0:20
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-14 Sa 16:48]
+      - State "IN PROGRESS" from "TODO"       [2017-10-14 Sa 07:34]
+      - State "TODO"       from ""           [2017-10-08 So 16:19]
+      :END:      
+***** DONE Locking überprüfen und ggf. anpassen                               
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2017-10-14 Sa 16:48]
+      :END:      
+***** DONE Anpassung javadocs                                                 
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2017-10-14 Sa 16:48]
+      :END:      
+
+***** DONE Refactoring Timeout Tests
+      :CLOCK:    
+      CLOCK: [2017-10-14 Sa 17:35]--[2017-10-14 Sa 17:55] =>  0:20
+      CLOCK: [2017-10-14 Sa 16:55]--[2017-10-14 Sa 17:01] =>  0:06
+      CLOCK: [2017-10-09 Mo 19:32]--[2017-10-09 Mo 19:52] =>  0:20
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-10-14 Sa 17:39]
+      - State "IN PROGRESS" from "TODO"       [2017-10-09 Mo 19:32]
+      - State "TODO"       from ""           [2017-10-08 So 16:19]
+      :END:      
+***** DONE Evaluierung alternative Varianten für timeout                      
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2017-10-14 Sa 16:49]
+      :END:      
+***** DONE Überprüfung, ggf. Anpassung und Test der Timeouts bei InputStreams 
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2017-10-14 Sa 16:49]
+      :END:      
+
+**** DONE IMediumStore
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 11:19]
+     :END:      
+
+***** DONE Struktur der Tests
+      :CLOCK:    
+      CLOCK: [2017-10-31 Di 18:29]--[2017-10-31 Di 19:05] =>  0:36
+      CLOCK: [2017-10-31 Di 16:41]--[2017-10-31 Di 17:09] =>  0:28
+      CLOCK: [2017-10-31 Di 13:30]--[2017-10-31 Di 16:31] =>  3:01
+      CLOCK: [2017-10-31 Di 09:45]--[2017-10-31 Di 10:24] =>  0:39
+      CLOCK: [2017-10-28 Sa 08:15]--[2017-10-28 Sa 09:06] =>  0:51
+      CLOCK: [2017-10-25 Mi 11:30]--[2017-10-25 Mi 12:11] =>  0:41
+      CLOCK: [2017-10-24 Di 19:24]--[2017-10-24 Di 19:44] =>  0:20
+      CLOCK: [2017-10-22 So 18:05]--[2017-10-22 So 20:00] =>  1:55
+      CLOCK: [2017-10-19 Do 11:30]--[2017-10-19 Do 12:25] =>  0:55
+      CLOCK: [2017-10-19 Do 06:35]--[2017-10-19 Do 07:07] =>  0:32
+      CLOCK: [2017-10-18 Mi 06:39]--[2017-10-18 Mi 08:07] =>  1:28
+      CLOCK: [2017-10-17 Di 06:00]--[2017-10-17 Di 06:07] =>  0:07
+      CLOCK: [2017-10-16 Mo 11:59]--[2017-10-16 Mo 12:33] =>  0:34
+      CLOCK: [2017-10-16 Mo 06:00]--[2017-10-16 Mo 06:35] =>  0:35
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-11-01 Mi 08:00]
+      - State "IN PROGRESS" from "TODO"       [2017-10-16 Mo 06:18]
+      :END:      
+
+***** DONE Implementierung close inkl. Tests
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-11-01 Mi 09:15]
+      :END:      
+      :CLOCK:    
+      CLOCK: [2017-11-01 Mi 07:55]--[2017-11-01 Mi 09:15] =>  1:20
+      :END:      
+
+***** DONE Überprüfung isAtEndOfMedium inkl. Anpassung der Tests
+      :CLOCK:    
+      CLOCK: [2017-11-03 Fr 12:08]--[2017-11-03 Fr 12:17] =>  0:09
+      CLOCK: [2017-11-03 Fr 06:43]--[2017-11-03 Fr 07:45] =>  1:02
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-11-03 Fr 12:17]
+      - State "IN PROGRESS" from ""           [2017-11-03 Fr 06:43]
+      :END:      
+
+***** DONE Implementierung cache und getCachedByteCountAt inkl.
+      :CLOCK:    
+      CLOCK: [2017-11-05 So 08:20]--[2017-11-05 So 11:10] =>  2:50
+      CLOCK: [2017-11-04 Sa 07:37]--[2017-11-04 Sa 08:21] =>  0:44
+      CLOCK: [2017-11-03 Fr 12:17]--[2017-11-03 Fr 12:51] =>  0:34
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-11-05 So 11:06]
+      - State "IN PROGRESS" from ""           [2017-11-03 Fr 12:17]
+      :END:      
+
+***** DONE Implementierung getData inkl. Anpassung der Tests
+      :CLOCK:    
+      CLOCK: [2017-11-17 Fr 19:34]--[2017-11-17 Fr 20:50] =>  1:16
+      CLOCK: [2017-11-17 Fr 18:24]--[2017-11-17 Fr 19:25] =>  1:01
+      CLOCK: [2017-11-17 Fr 17:05]--[2017-11-17 Fr 17:10] =>  0:05
+      CLOCK: [2017-11-17 Fr 11:20]--[2017-11-17 Fr 13:02] =>  1:42
+      CLOCK: [2017-11-16 Do 07:47]--[2017-11-16 Do 07:48] =>  0:01
+      CLOCK: [2017-11-16 Do 07:02]--[2017-11-16 Do 07:16] =>  0:14
+      CLOCK: [2017-11-16 Do 05:09]--[2017-11-16 Do 06:15] =>  1:06
+      CLOCK: [2017-11-15 Mi 20:46]--[2017-11-15 Mi 22:09] =>  1:23
+      CLOCK: [2017-11-15 Mi 20:29]--[2017-11-15 Mi 20:40] =>  0:11
+      CLOCK: [2017-11-15 Mi 19:33]--[2017-11-15 Mi 20:28] =>  0:55
+      CLOCK: [2017-11-15 Mi 17:45]--[2017-11-15 Mi 19:21] =>  1:36
+      CLOCK: [2017-11-14 Di 20:04]--[2017-11-14 Di 20:15] =>  0:11
+      CLOCK: [2017-11-12 So 18:35]--[2017-11-12 So 19:30] =>  0:55
+      CLOCK: [2017-11-12 So 14:30]--[2017-11-12 So 18:00] =>  3:30
+      CLOCK: [2017-11-10 Fr 12:05]--[2017-11-10 Fr 12:53] =>  0:48
+      CLOCK: [2017-11-10 Fr 07:49]--[2017-11-10 Fr 08:54] =>  1:05
+      CLOCK: [2017-11-10 Fr 06:20]--[2017-11-10 Fr 07:30] =>  1:10
+      CLOCK: [2017-11-09 Do 06:55]--[2017-11-09 Do 07:35] =>  0:40
+      CLOCK: [2017-11-08 Mi 11:57]--[2017-11-08 Mi 12:38] =>  0:41
+      CLOCK: [2017-11-08 Mi 06:15]--[2017-11-08 Mi 07:43] =>  1:28
+      CLOCK: [2017-11-07 Di 12:00]--[2017-11-07 Di 12:45] =>  0:45
+      CLOCK: [2017-11-07 Di 06:25]--[2017-11-07 Di 07:44] =>  1:19
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-11-17 Fr 20:47]
+      - State "IN PROGRESS" from ""           [2017-11-07 Di 06:28]
+      :END:      
+
+***** DONE Implementierung insertData inkl. Tests
+      :CLOCK:    
+      CLOCK: [2017-11-18 Sa 10:13]--[2017-11-18 Sa 10:47] =>  0:34
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-11-18 Sa 10:47]
+      - State "IN PROGRESS" from ""           [2017-11-18 Sa 10:13]
+      :END:      
+
+***** DONE Implementierung removeData inkl. Tests
+      :LOGBOOK:  
+      - State "DONE"       from ""           [2017-11-18 Sa 10:47]
+      :END:      
+
+***** DONE Implementierung replaceData inkl. Tests
+      :LOGBOOK:  
+      - State "DONE"       from ""           [2017-11-18 Sa 10:47]
+      :END:      
+
+***** DONE Implementierung undo inkl. Tests
+      :LOGBOOK:  
+      - State "DONE"       from ""           [2017-11-18 Sa 10:47]
+      :END:      
+
+***** DONE Implementierung flush inkl. Tests
+      :CLOCK:    
+      CLOCK: [2017-12-13 Mi 10:10]--[2017-12-13 Mi 11:20] =>  1:10
+      CLOCK: [2017-12-13 Mi 07:00]--[2017-12-13 Mi 07:43] =>  0:43
+      CLOCK: [2017-12-12 Di 20:20]--[2017-12-12 Di 21:15] =>  0:55
+      CLOCK: [2017-12-12 Di 11:05]--[2017-12-12 Di 15:05] =>  4:00
+      CLOCK: [2017-12-12 Di 08:54]--[2017-12-12 Di 09:12] =>  0:18
+      CLOCK: [2017-12-11 Mo 14:53]--[2017-12-11 Mo 15:03] =>  0:10
+      CLOCK: [2017-12-10 So 09:25]--[2017-12-10 So 10:30] =>  1:05
+      CLOCK: [2017-12-09 Sa 07:45]--[2017-12-09 Sa 09:45] =>  2:00
+      CLOCK: [2017-12-08 Fr 16:10]--[2017-12-08 Fr 18:57] =>  2:47
+      CLOCK: [2017-12-08 Fr 14:40]--[2017-12-08 Fr 14:57] =>  0:17
+      CLOCK: [2017-12-08 Fr 13:30]--[2017-12-08 Fr 14:29] =>  0:59
+      CLOCK: [2017-12-08 Fr 11:45]--[2017-12-08 Fr 13:30] =>  1:45
+      CLOCK: [2017-12-08 Fr 10:04]--[2017-12-08 Fr 11:39] =>  1:35
+      CLOCK: [2017-12-08 Fr 07:10]--[2017-12-08 Fr 09:57] =>  2:47
+      CLOCK: [2017-12-07 Do 14:26]--[2017-12-07 Do 17:22] =>  2:56
+      CLOCK: [2017-12-03 So 17:55]--[2017-12-03 So 18:09] =>  0:14
+      CLOCK: [2017-12-03 So 10:25]--[2017-12-03 So 10:57] =>  0:32
+      CLOCK: [2017-12-03 So 08:15]--[2017-12-03 So 10:10] =>  1:55
+      CLOCK: [2017-12-02 Sa 17:59]--[2017-12-02 Sa 23:37] =>  5:38
+      CLOCK: [2017-12-02 Sa 17:00]--[2017-12-02 Sa 17:35] =>  0:35
+      CLOCK: [2017-12-02 Sa 07:50]--[2017-12-02 Sa 09:50] =>  2:00
+      CLOCK: [2017-12-01 Fr 10:35]--[2017-12-01 Fr 12:55] =>  2:20
+      CLOCK: [2017-11-30 Do 08:00]--[2017-11-30 Do 08:05] =>  0:05
+      CLOCK: [2017-11-30 Do 06:35]--[2017-11-30 Do 07:40] =>  1:05
+      CLOCK: [2017-11-28 Di 18:30]--[2017-11-28 Di 18:57] =>  0:27
+      CLOCK: [2017-11-28 Di 12:29]--[2017-11-28 Di 13:35] =>  1:06
+      CLOCK: [2017-11-28 Di 05:21]--[2017-11-28 Di 07:38] =>  2:17
+      CLOCK: [2017-11-27 Mo 20:25]--[2017-11-27 Mo 21:00] =>  0:35
+      CLOCK: [2017-11-26 So 19:25]--[2017-11-26 So 19:30] =>  0:05
+      CLOCK: [2017-11-26 So 14:25]--[2017-11-26 So 18:21] =>  3:56
+      CLOCK: [2017-11-26 So 11:14]--[2017-11-26 So 14:25] =>  3:11
+      CLOCK: [2017-11-26 So 09:45]--[2017-11-26 So 11:05] =>  1:20
+      CLOCK: [2017-11-26 So 07:24]--[2017-11-26 So 08:44] =>  1:20
+      CLOCK: [2017-11-26 So 06:25]--[2017-11-26 So 07:00] =>  0:35
+      CLOCK: [2017-11-25 Sa 19:17]--[2017-11-25 Sa 20:16] =>  0:59
+      CLOCK: [2017-11-25 Sa 08:25]--[2017-11-25 Sa 10:20] =>  1:55
+      CLOCK: [2017-11-24 Fr 11:49]--[2017-11-24 Fr 12:50] =>  1:01
+      CLOCK: [2017-11-24 Fr 11:45]--[2017-11-24 Fr 11:48] =>  0:03
+      CLOCK: [2017-11-22 Mi 12:06]--[2017-11-22 Mi 13:27] =>  1:21
+      CLOCK: [2017-11-22 Mi 06:00]--[2017-11-22 Mi 07:35] =>  1:35
+      CLOCK: [2017-11-21 Di 17:25]--[2017-11-21 Di 18:05] =>  0:40
+      CLOCK: [2017-11-21 Di 16:35]--[2017-11-21 Di 17:25] =>  0:50
+      CLOCK: [2017-11-21 Di 06:25]--[2017-11-21 Di 08:11] =>  1:46
+      CLOCK: [2017-11-20 Mo 17:50]--[2017-11-20 Mo 17:55] =>  0:05
+      CLOCK: [2017-11-19 So 19:25]--[2017-11-19 So 19:50] =>  0:25
+      CLOCK: [2017-11-19 So 17:18]--[2017-11-19 So 19:25] =>  2:07
+      CLOCK: [2017-11-19 So 11:00]--[2017-11-19 So 12:20] =>  1:20
+      CLOCK: [2017-11-19 So 10:05]--[2017-11-19 So 10:25] =>  0:20
+      CLOCK: [2017-11-19 So 08:15]--[2017-11-19 So 09:29] =>  1:14
+      CLOCK: [2017-11-19 So 07:10]--[2017-11-19 So 07:37] =>  0:27
+      CLOCK: [2017-11-18 Sa 10:50]--[2017-11-18 Sa 11:10] =>  0:20
+      CLOCK: [2017-11-18 Sa 09:55]--[2017-11-18 Sa 10:15] =>  0:20
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 11:19]
+      - State "IN PROGRESS" from ""           [2017-11-18 Sa 10:13]
+      :END:      
+
+***** DONE Add log output to flush / schedule / createMediumOffset
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2017-12-14 Do 13:50]
+      :END:      
+
+**** DONE Anpassungen für optimales Lesen
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2018-05-11 Fr 11:16]
+     - State "IN PROGRESS" from "TODO"       [2018-05-06 So 08:46]
+     :END:      
+
+***** DONE Minimale/Standard Cache-Größe einbauen
+      :LOGBOOK:  
+      - State "DONE"       from ""           [2018-05-11 Fr 11:16]
+      :END:      
+
+***** DONE Umbau InMemoryMediumAccessor komplett auf ByteBuffer
+      :CLOCK:    
+      CLOCK: [2018-05-11 Fr 09:20]--[2018-05-11 Fr 11:16] =>  1:56
+      CLOCK: [2018-05-06 So 18:10]--[2018-05-06 So 18:17] =>  0:07
+      CLOCK: [2018-05-06 So 17:55]--[2018-05-06 So 17:59] =>  0:04
+      CLOCK: [2018-05-06 So 17:50]--[2018-05-06 So 17:51] =>  0:01
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-11 Fr 11:16]
+      - State "IN PROGRESS" from ""           [2018-05-06 So 17:50]
+      :END:      
+
+***** DONE MediumAccessor erzeugt selbst ByteBuffer
+      :CLOCK:    
+      CLOCK: [2018-05-08 Di 08:32]--[2018-05-08 Di 09:35] =>  1:03
+      CLOCK: [2018-05-08 Di 05:40]--[2018-05-08 Di 06:25] =>  0:45
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-11 Fr 11:16]
+      - State "IN PROGRESS" from ""           [2018-05-08 Di 06:10]
+      :END:      
+
+***** DONE Prüfung: Effizienteres split - nur referenz statt kopieren
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-06 So 17:45]
+      - State "IN PROGRESS" from ""           [2018-05-06 So 17:45]
+      :END:      
+     :CLOCK:    
+     CLOCK: [2018-05-06 So 17:40]--[2018-05-06 So 17:45] =>  0:05
+     CLOCK: [2018-05-06 So 08:55]--[2018-05-06 So 09:15] =>  0:20
+     CLOCK: [2018-05-06 So 08:40]--[2018-05-06 So 08:45] =>  0:05
+     :END:      
+
+***** DONE Is Cached: Deaktivierbarkeit entfernen + Inmemory auch immer Cached
+      :CLOCK:    
+      CLOCK: [2018-05-06 So 18:35]--[2018-05-06 So 19:47] =>  1:12
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-06 So 21:33]
+      - State "IN PROGRESS" from ""           [2018-05-06 So 18:57]
+      :END:      
+
+***** DONE Is Cached: Testfälle ausdünnen
+      :CLOCK:    
+      CLOCK: [2018-05-06 So 21:08]--[2018-05-06 So 21:35] =>  0:27
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-06 So 21:33]
+      - State "IN PROGRESS" from ""           [2018-05-06 So 21:08]
+      :END:      
+
+***** DONE Anpassungen Design Doku
+      :CLOCK:    
+      CLOCK: [2018-05-11 Fr 11:16]--[2018-05-11 Fr 11:30] =>  0:14
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-11 Fr 11:26]
+      - State "IN PROGRESS" from ""           [2018-05-11 Fr 11:16]
+      :END:      
+
+** Komponente "Dataformats"
+
+*** IN PROGRESS Verbesserungsideen 
+   :CLOCK:    
+   CLOCK: [2018-05-12 Sa 08:05]--[2018-05-12 Sa 08:16] =>  0:11
+   CLOCK: [2018-05-11 Fr 11:47]--[2018-05-11 Fr 12:19] =>  0:32
+   CLOCK: [2018-03-19 Mo 21:23]--[2018-03-19 Mo 22:00] =>  0:37
+   CLOCK: [2018-03-18 So 17:40]--[2018-03-18 So 17:53] =>  0:13
+   CLOCK: [2018-03-11 So 19:17]--[2018-03-11 So 19:42] =>  0:25
+   CLOCK: [2018-03-11 So 12:55]--[2018-03-11 So 13:10] =>  0:15
+   CLOCK: [2018-03-11 So 10:44]--[2018-03-11 So 10:45] =>  0:01
+   CLOCK: [2018-03-04 So 18:13]--[2018-03-04 So 18:19] =>  0:06
+   CLOCK: [2018-03-04 So 15:50]--[2018-03-04 So 16:06] =>  0:16
+   CLOCK: [2018-03-03 Sa 18:00]--[2018-03-03 Sa 19:02] =>  1:02
+   CLOCK: [2018-03-03 Sa 13:45]--[2018-03-03 Sa 13:49] =>  0:04
+   CLOCK: [2018-03-03 Sa 13:20]--[2018-03-03 Sa 14:10] =>  0:50
+   CLOCK: [2018-03-01 Do 04:20]--[2018-03-01 Do 06:05] =>  1:45
+   CLOCK: [2018-02-28 Mi 19:55]--[2018-02-28 Mi 21:40] =>  1:45
+   CLOCK: [2018-02-28 Mi 06:15]--[2018-02-28 Mi 06:41] =>  0:26
+   CLOCK: [2018-02-27 Di 20:55]--[2018-02-27 Di 21:18] =>  0:23
+   CLOCK: [2018-02-25 So 19:15]--[2018-02-25 So 20:51] =>  1:36
+   CLOCK: [2017-12-19 Di 13:15]--[2017-12-19 Di 14:05] =>  0:50
+   CLOCK: [2017-11-09 Do 07:30]--[2017-11-09 Do 07:55] =>  0:25
+   CLOCK: [2017-11-07 Di 05:00]--[2017-11-07 Di 06:10] =>  1:10
+   CLOCK: [2017-11-05 So 08:10]--[2017-11-05 So 08:32] =>  0:22
+   CLOCK: [2017-11-04 Sa 06:55]--[2017-11-04 Sa 07:37] =>  0:42
+   :END:      
+   :LOGBOOK:  
+   - State "IN PROGRESS" from ""           [2017-11-04 Sa 07:32]
+   :END:      
+
+Zu prüfen:
+
+ - Id Hierarchie und Instance IDs
+ - FieldFunctions
+ - Umgang mit Flags / FlagSpec
+
+Folgende:
+
+1.) Vereinfachung Umgang mit generischen Containern und IDs
+
+ - Prüfung: Generischer Datenblock muss mindestens ein generisches Pattern enthalten {$FRAME}
+ - Dazu wird jedem konkreten Datenblock eine generische Basis-ID statisch zugeordnet (max. eine)
+ - 
+
+2.) String list field type nötig für ID3v24
+
+3.) DataBlockDescriptionBuilder
+
+5.) Felder: Sind nicht mehr generisch, speichern nicht mehr den "Interpreted Value", sondern bieten nur eine generische convert-Methode mit Übergabe des passenden FieldConverter<T>
+
+*** Schätzung
+
+| Themengebiet         | Aktivität                                          | Status    | Implementierte       | Aufwand |   Tats. | Begründung Abweichung |
+|                      | <50>                                               |           | Designentscheidungen |  gesch. | Aufwand | <15>            |
+|                      |                                                    |           |                      |     (h) |     (h) |                 |
+|----------------------+----------------------------------------------------+-----------+----------------------+---------+---------+-----------------|
+| Konzeptvereinfachung | Design Verbesserungsideen                          | IN PROGR. |                      |      30 |         |                 |
+|                      | ContainerDataFormat einführen                      | DONE      |                      |       1 |    0.25 |                 |
+|                      | FieldBased / ContainerBasedPayload                 | DONE      | 123                  |      10 |       4 |                 |
+|                      | BinaryValue entfernen                              | DONE      |                      |       3 |    3.75 |                 |
+|                      | Transformation Handler nur in ID3v23 extension     | DONE      |                      |       2 |     2.5 |                 |
+|                      | MagicKeys split up                                 | DONE      | 134 - 143            |       8 |   16.25 |                 |
+|                      | LocationProperties restlos entfernen               | DONE      |                      |       1 |       1 |                 |
+|                      | Prüfung min/max length/occurrences auf Plausi      | DONE      | 147, 148             |       1 |     0.5 |                 |
+|                      | Auto-Derive byte offset in container               | DONE      |                      |       1 |    0.25 |                 |
+|                      | Vereinfachung Umgang mit generischen Containern und IDs |           |                      |       2 |         |                 |
+|                      | Design DataFormats                                 |           |                      |      48 |         |                 |
+|----------------------+----------------------------------------------------+-----------+----------------------+---------+---------+-----------------|
+|----------------------+----------------------------------------------------+-----------+----------------------+---------+---------+-----------------|
+|                      |                                                    |           | SUMME                |     107 |    28.5 |                 |
+|----------------------+----------------------------------------------------+-----------+----------------------+---------+---------+-----------------|
+#+TBLFM: $6=vsum(@4..@-1)::$5=vsum(@4..@-1)
+
+
+*** Implementierung
+
+**** Konzeptvereinfachung
+
+***** DONE FieldBased / ContainerBasedPayload
+      :CLOCK:    
+      CLOCK: [2018-03-03 Sa 08:38]--[2018-03-03 Sa 10:30] =>  1:52
+      CLOCK: [2018-03-02 Fr 04:54]--[2018-03-02 Fr 06:30] =>  1:36
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-03-03 Sa 10:20]
+      - State "IN PROGRESS" from ""           [2018-03-02 Fr 04:54]
+      :END:      
+
+Implementierungstaktik:
+ 1. Neue Typen FIELD_BASED_PAYLOAD und CONTAINER_BASED_PAYLOAD in PhysicalBlockType einführen
+ 2. Neue Interfaces extends Payload einführen mit den jeweiligen Methoden
+ 3. LazyPayload durch Kopie in zwei deutlich schönere Klassen aufteilen
+ 4. Tests laufen sicherlich noch
+ 5. DataBlockFactory anpassen: Entweder das eine oder das andere erzeugen
+ 6. PAYLOAD entfernen
+ 7. An allen Stellen durch die entsprechend im FIXME angegebene Ersetzung entfernen
+ 8. Alle Tests ausführen und fixen
+
+***** DONE ChildOrder entfernen
+      :CLOCK:    
+      CLOCK: [2018-03-03 Sa 12:10]--[2018-03-03 Sa 12:40] =>  0:30
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-03-03 Sa 13:45]
+      - State "IN PROGRESS" from ""           [2018-03-03 Sa 12:11]
+      :END:
+
+***** DONE ContainerDataFormat
+      :CLOCK:    
+      CLOCK: [2018-03-04 So 16:06]--[2018-03-04 So 16:19] =>  0:13
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-03-04 So 16:19]
+      - State "IN PROGRESS" from "TODO"       [2018-03-04 So 16:06]
+      :END:  
+
+***** DONE BinaryValue entfernen
+      :CLOCK:    
+      CLOCK: [2018-03-06 Di 06:35]--[2018-03-06 Di 06:55] =>  0:20
+      CLOCK: [2018-03-05 Mo 20:27]--[2018-03-05 Mo 21:04] =>  0:37
+      CLOCK: [2018-03-05 Mo 05:55]--[2018-03-05 Mo 06:40] =>  0:45
+      CLOCK: [2018-03-04 So 18:19]--[2018-03-04 So 20:20] =>  2:01
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-03-06 Di 06:42]
+      - State "IN PROGRESS" from "DONE"       [2018-03-06 Di 06:41]
+      - State "DONE"       from "IN PROGRESS" [2018-03-05 Mo 21:04]
+      - State "IN PROGRESS" from "TODO"       [2018-03-04 So 18:19]
+      :END:
+
+***** DONE MagicKeys split up
+      :CLOCK:    
+      CLOCK: [2018-05-06 So 07:20]--[2018-05-06 So 07:39] =>  0:19
+      CLOCK: [2018-05-05 Sa 15:40]--[2018-05-05 Sa 17:21] =>  1:41
+      CLOCK: [2018-05-03 Do 07:15]--[2018-05-03 Do 07:55] =>  0:40
+      CLOCK: [2018-05-02 Mi 20:15]--[2018-05-02 Mi 21:05] =>  0:50
+      CLOCK: [2018-05-02 Mi 17:25]--[2018-05-02 Mi 18:45] =>  1:20
+      CLOCK: [2018-04-22 So 21:36]--[2018-04-22 So 21:49] =>  0:13
+      CLOCK: [2018-04-22 So 20:20]--[2018-04-22 So 20:57] =>  0:37
+      CLOCK: [2018-04-21 Sa 06:40]--[2018-04-21 Sa 07:55] =>  1:15
+      CLOCK: [2018-04-20 Fr 20:10]--[2018-04-20 Fr 20:35] =>  0:25
+      CLOCK: [2018-04-20 Fr 17:33]--[2018-04-20 Fr 18:13] =>  0:40
+      CLOCK: [2018-04-20 Fr 16:00]--[2018-04-20 Fr 17:30] =>  1:30
+      CLOCK: [2018-04-15 So 09:50]--[2018-04-15 So 12:20] =>  2:30
+      CLOCK: [2018-04-15 So 08:51]--[2018-04-15 So 09:37] =>  0:46
+      CLOCK: [2018-04-15 So 07:50]--[2018-04-15 So 08:45] =>  0:55
+      CLOCK: [2018-03-21 Mi 19:10]--[2018-03-21 Mi 21:20] =>  2:10
+      CLOCK: [2018-03-21 Mi 18:35]--[2018-03-21 Mi 19:04] =>  0:29
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-06 So 08:46]
+      - State "IN PROGRESS" from "DONE"       [2018-05-06 So 07:24]
+      - State "DONE"       from "IN PROGRESS" [2018-05-05 Sa 17:04]
+      - State "IN PROGRESS" from "TODO"       [2018-03-21 Mi 18:35]
+      - State "TODO"       from ""           [2018-03-19 Mo 22:06]
+      :END:      
+
+Schritte:
+ 1. [X] Lyrics3v2: Überschreiben der Implementierung, um Payload-Länge ohne "Exclusion Key" ermitteln zu können (hasContainerWithId überschreiben) - hasContainerWithId überschreiben
+ 2. [X] Default nested container einführen
+ 3. [X] Logik umbauen top-level: Wenn kein Container anhand Magic key gefunden, dann vermute die Präsenz des Default Containers
+ 4. [X] Magic Key Klassen aufräumen: Exclusion Keys wegschmeißen
+ 5. [X] ID3v1: Überschreiben der Parser-Impl für Rückwärts-Lesen + Rausnehmen von "Offset for Backward Reading"
+ 6. [X] TopLevelContainerIterator und TopLevelReverseContainerIterator vereinfachen und von gemeinsamer Basis ableiten
+ 7. [X] Magic Keys direkt von Feldern ableiten
+ 8. [X] Unknown Container analog Unknown Field nötig (?)
+
+***** DONE Transformation Handler -> ID3v23
+      :CLOCK:    
+      CLOCK: [2018-03-18 So 07:50]--[2018-03-18 So 09:25] =>  1:35
+      CLOCK: [2018-03-11 So 19:42]--[2018-03-11 So 20:30] =>  0:48
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-11 Fr 12:19]
+      - State "IN PROGRESS" from "DONE"       [2018-04-22 So 20:33]
+      - State "DONE"       from "IN PROGRESS" [2018-03-18 So 09:15]
+      - State "IN PROGRESS" from "TODO"       [2018-03-11 So 19:42]
+      :END:
+***** DONE LocationProperties restlos entfernen
+      :CLOCK:    
+      CLOCK: [2018-05-11 Fr 15:49]--[2018-05-11 Fr 16:43] =>  0:54
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-11 Fr 16:43]
+      - State "IN PROGRESS" from ""           [2018-05-11 Fr 15:49]
+      :END:      
+
+***** DONE Prüfung min/max length/occurrences auf Plausi
+      :CLOCK:    
+      CLOCK: [2018-05-12 Sa 06:40]--[2018-05-12 Sa 07:10] =>  0:30
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-12 Sa 07:05]
+      - State "IN PROGRESS" from ""           [2018-05-12 Sa 06:45]
+      :END:      
+
+***** DONE Auto-Derive byte offset in container
+      :CLOCK:    
+      CLOCK: [2018-05-12 Sa 07:10]--[2018-05-12 Sa 07:29] =>  0:19
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2018-05-12 Sa 07:29]
+      - State "IN PROGRESS" from "TODO"       [2018-05-12 Sa 07:10]
+      :END:      
+
+***** IN PROGRESS Vereinfachung Umgang mit generischen Containern und IDs
+      :CLOCK:    
+      CLOCK: [2018-05-12 Sa 08:16]--[2018-05-12 Sa 08:56] =>  0:40
+      :END:      
+      :LOGBOOK:  
+      - State "IN PROGRESS" from "TODO"       [2018-05-12 Sa 08:16]
+      :END:
+
+***** IN PROGRESS DataBlockDescriptionBuilder
+      :CLOCK:    
+      CLOCK: [2018-09-21 Fr 21:02]--[2018-09-21 Fr 22:19] =>  1:17
+      CLOCK: [2018-09-21 Fr 13:45]--[2018-09-21 Fr 14:45] =>  1:00
+      CLOCK: [2018-09-20 Do 19:25]--[2018-09-20 Do 19:37] =>  0:12
+      CLOCK: [2018-09-20 Do 17:12]--[2018-09-20 Do 18:02] =>  0:50
+      CLOCK: [2018-09-20 Do 13:30]--[2018-09-20 Do 16:20] =>  2:50
+      CLOCK: [2018-06-14 Do 06:05]--[2018-06-14 Do 06:38] =>  0:33
+      CLOCK: [2018-06-12 Di 06:19]--[2018-06-12 Di 06:33] =>  0:14
+      CLOCK: [2018-06-11 Mo 18:35]--[2018-06-11 Mo 18:45] =>  0:10
+      CLOCK: [2018-06-11 Mo 06:09]--[2018-06-11 Mo 06:29] =>  0:20
+      CLOCK: [2018-06-10 So 19:15]--[2018-06-10 So 19:53] =>  0:38
+      CLOCK: [2018-06-10 So 13:55]--[2018-06-10 So 14:22] =>  0:27
+      CLOCK: [2018-06-10 So 10:31]--[2018-06-10 So 12:00] =>  1:29
+      CLOCK: [2018-06-10 So 08:11]--[2018-06-10 So 08:45] =>  0:34
+      CLOCK: [2018-06-10 So 07:10]--[2018-06-10 So 07:55] =>  0:45
+      CLOCK: [2018-06-10 So 06:10]--[2018-06-10 So 06:16] =>  0:06
+      CLOCK: [2018-06-06 Mi 07:00]--[2018-06-06 Mi 07:25] =>  0:25
+      CLOCK: [2018-06-05 Di 05:55]--[2018-06-05 Di 06:29] =>  0:34
+      CLOCK: [2018-06-04 Mo 20:21]--[2018-06-04 Mo 21:01] =>  0:40
+      CLOCK: [2018-06-04 Mo 06:11]--[2018-06-04 Mo 08:02] =>  1:51
+      CLOCK: [2018-06-04 Mo 05:45]--[2018-06-04 Mo 06:00] =>  0:15
+      CLOCK: [2018-06-03 So 20:32]--[2018-06-03 So 20:52] =>  0:20
+      CLOCK: [2018-06-03 So 15:35]--[2018-06-03 So 16:35] =>  1:00
+      CLOCK: [2018-06-03 So 14:45]--[2018-06-03 So 15:20] =>  0:35
+      CLOCK: [2018-06-03 So 12:55]--[2018-06-03 So 13:45] =>  0:50
+      CLOCK: [2018-06-03 So 10:44]--[2018-06-03 So 11:55] =>  1:11
+      CLOCK: [2018-06-03 So 10:00]--[2018-06-03 So 10:27] =>  0:27
+      CLOCK: [2018-06-03 So 07:25]--[2018-06-03 So 09:18] =>  1:53
+      CLOCK: [2018-06-03 So 06:20]--[2018-06-03 So 07:11] =>  0:51
+      CLOCK: [2018-06-02 Sa 18:55]--[2018-06-02 Sa 20:10] =>  1:15
+      CLOCK: [2018-06-02 Sa 10:20]--[2018-06-02 Sa 11:24] =>  1:04
+      CLOCK: [2018-06-02 Sa 07:15]--[2018-06-02 Sa 09:12] =>  1:57
+      CLOCK: [2018-06-01 Fr 21:50]--[2018-06-01 Fr 22:20] =>  0:30
+      CLOCK: [2018-06-01 Fr 20:38]--[2018-06-01 Fr 21:30] =>  0:52
+      CLOCK: [2018-06-01 Fr 09:46]--[2018-06-01 Fr 10:03] =>  0:17
+      CLOCK: [2018-05-29 Di 07:45]--[2018-05-29 Di 07:59] =>  0:14
+      CLOCK: [2018-05-29 Di 06:30]--[2018-05-29 Di 07:08] =>  0:38
+      CLOCK: [2018-05-28 Mo 20:20]--[2018-05-28 Mo 21:20] =>  1:00
+      CLOCK: [2018-05-28 Mo 18:47]--[2018-05-28 Mo 19:23] =>  0:36
+      CLOCK: [2018-05-28 Mo 06:05]--[2018-05-28 Mo 06:30] =>  0:25
+      CLOCK: [2018-05-27 So 20:20]--[2018-05-27 So 21:00] =>  0:40
+      CLOCK: [2018-05-27 So 19:10]--[2018-05-27 So 19:25] =>  0:15
+      CLOCK: [2018-05-27 So 12:40]--[2018-05-27 So 14:05] =>  1:25
+      CLOCK: [2018-05-27 So 11:59]--[2018-05-27 So 12:20] =>  0:21
+      CLOCK: [2018-05-27 So 09:50]--[2018-05-27 So 10:49] =>  0:59
+      CLOCK: [2018-05-27 So 07:15]--[2018-05-27 So 08:40] =>  1:25
+      CLOCK: [2018-05-23 Mi 18:35]--[2018-05-23 Mi 22:11] =>  3:36
+      CLOCK: [2018-05-22 Di 06:45]--[2018-05-22 Di 07:56] =>  1:11
+      CLOCK: [2018-05-21 Mo 20:20]--[2018-05-21 Mo 21:35] =>  1:15
+      CLOCK: [2018-05-21 Mo 16:30]--[2018-05-21 Mo 16:41] =>  0:11
+      CLOCK: [2018-05-21 Mo 16:18]--[2018-05-21 Mo 16:24] =>  0:06
+      CLOCK: [2018-05-21 Mo 15:15]--[2018-05-21 Mo 16:05] =>  0:50
+      CLOCK: [2018-05-21 Mo 11:12]--[2018-05-21 Mo 12:00] =>  0:48
+      CLOCK: [2018-05-21 Mo 09:58]--[2018-05-21 Mo 10:45] =>  0:47
+      CLOCK: [2018-05-21 Mo 07:45]--[2018-05-21 Mo 08:10] =>  0:25
+      CLOCK: [2018-05-20 So 09:00]--[2018-05-20 So 09:02] =>  0:02
+      CLOCK: [2018-05-19 Sa 07:40]--[2018-05-19 Sa 09:04] =>  1:24
+      CLOCK: [2018-05-18 Fr 19:32]--[2018-05-18 Fr 19:40] =>  0:08
+      CLOCK: [2018-05-18 Fr 18:34]--[2018-05-18 Fr 19:00] =>  0:26
+      CLOCK: [2018-05-17 Do 06:59]--[2018-05-17 Do 07:29] =>  0:30
+      CLOCK: [2018-05-16 Mi 21:24]--[2018-05-16 Mi 21:30] =>  0:06
+      CLOCK: [2018-05-16 Mi 20:40]--[2018-05-16 Mi 20:58] =>  0:18
+      CLOCK: [2018-05-16 Mi 20:09]--[2018-05-16 Mi 20:40] =>  0:31
+      CLOCK: [2018-05-16 Mi 19:32]--[2018-05-16 Mi 20:00] =>  0:28
+      CLOCK: [2018-05-15 Di 06:35]--[2018-05-15 Di 07:06] =>  0:31
+      CLOCK: [2018-05-14 Mo 20:13]--[2018-05-14 Mo 22:20] =>  2:07
+      CLOCK: [2018-05-14 Mo 19:36]--[2018-05-14 Mo 19:59] =>  0:23
+      CLOCK: [2018-05-14 Mo 19:05]--[2018-05-14 Mo 19:29] =>  0:24
+      CLOCK: [2018-05-13 So 18:10]--[2018-05-13 So 19:00] =>  0:50
+      CLOCK: [2018-05-13 So 14:24]--[2018-05-13 So 15:29] =>  1:05
+      CLOCK: [2018-05-13 So 12:15]--[2018-05-13 So 13:28] =>  1:13
+      CLOCK: [2018-05-13 So 12:00]--[2018-05-13 So 12:05] =>  0:05
+      CLOCK: [2018-05-13 So 08:55]--[2018-05-13 So 09:25] =>  0:30
+      CLOCK: [2018-05-12 Sa 17:10]--[2018-05-12 Sa 17:49] =>  0:39
+      CLOCK: [2018-05-12 Sa 12:10]--[2018-05-12 Sa 12:12] =>  0:02
+      CLOCK: [2018-05-12 Sa 09:55]--[2018-05-12 Sa 11:55] =>  2:00
+      CLOCK: [2018-05-12 Sa 08:56]--[2018-05-12 Sa 09:24] =>  0:28
+      :END:      
+      :LOGBOOK:  
+      - State "IN PROGRESS" from ""           [2018-05-12 Sa 08:56]
+      :END:      
+      :PROPERTIES:
+      :ORDERED:  t
+      :END:
+
+ - [X] Prüfen: isGeneric als Feld in DataBlockDescription?
+ - [X] Prüfen: Mergen von DataBlockDescription und FieldProperties?
+ - [X] Prüfen: DataBlockDescription - Setter reinnehmen?
+ - [X] TopLevel: createGeneric*Container umsetzen
+ - [X] TopLevel* Interface rausziehen
+ - [X] TopLevel* liefert direkt Ergebnis
+ - [X] byte orders und charsets mit builder hinzufügen
+ - [X] DescriptionCOllector: getAllDescriptions() rausnehmen, d.h. MagicKey-Sonderfall bei MP3 loswerden
+ - [X] Plausi-Check: Exception werfen, wenn builder noch net fertig bestückt (finish nicht aufgerufen)
+ - [X] Prüfen: Child descriptions direkt in DBDesc + getChildDescOf type als direkte Funktion?
+ - [X] Validierung: Plausi von DataBlockDescriptions (Standalone)
+ - [X] Clone umsetzen
+ - [X] Nicht mehr lauffähigen Testfall wieder lauffähig machen
+ - [X] Dokumentation Builder (Design Docs)
+ - [X] Magic-Key-Sonderfall bei MP3 endlich loswerden...
+ - [X] Dokumentation Builder (Javadocs)
+ - [X] FieldConverter nach DataFormats
+ - [X] Größen: Undefiniert
+ - [X] InvalidSpecificationException überall einsetzen
+ - [X] Vater-Größen von Kindern automatisch ableiten + Längenprüfung
+ - [X] Finalisierung DataBlockDescription & FieldProperties (Refactoring)
+ - [X] Finalisierung DataBlockDescription & FieldProperties (Doku)
+ - [X] Extensions: IDs nicht duplizieren, sondern via Konstanten die local ids definieren
+ - [ ] Validierung: SIZE_OF checken?
+
+***** IN PROGRESS Design DataFormats
+      :CLOCK:    
+      CLOCK: [2018-05-12 Sa 07:29]--[2018-05-12 Sa 07:44] =>  0:15
+      CLOCK: [2018-05-11 Fr 14:12]--[2018-05-11 Fr 15:49] =>  1:37
+      CLOCK: [2018-05-11 Fr 12:40]--[2018-05-11 Fr 13:47] =>  1:07
+      CLOCK: [2018-04-14 Sa 13:35]--[2018-04-14 Sa 15:15] =>  1:40
+      CLOCK: [2018-04-14 Sa 18:46]--[2018-04-14 Sa 20:30] =>  1:44
+      CLOCK: [2018-03-18 So 17:30]--[2018-03-18 So 17:40] =>  0:10
+      CLOCK: [2018-03-18 So 12:15]--[2018-03-18 So 13:05] =>  0:50
+      CLOCK: [2018-03-11 So 09:00]--[2018-03-11 So 10:44] =>  1:44
+      CLOCK: [2018-03-06 Di 17:35]--[2018-03-06 Di 20:01] =>  2:26
+      :END:      
+      :LOGBOOK:  
+      - State "IN PROGRESS" from ""           [2018-03-06 Di 17:43]
+      :END:
+** Komponente "DataBlocks"
+*** Schätzung
+**** Lesen
+
+  | Themengebiet    | Aktivität                                          | Status | Implementierte       | Aufwand |   Tats. | Begründung Abweichung |
+  |                 | <50>                                               |        | Designentscheidungen |  gesch. | Aufwand | <15>            |
+  |                 |                                                    |        |                      |     (h) |     (h) |                 |
+  |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
+  | Vorwärts-Lesen  | Überprüfung Vorwärts-Lesen                         |        |                      |       6 |    3.25 |                 |
+  |                 | Design Vorwärts-Lesen                              |        |                      |      12 |   20.25 |                 |
+  |                 | Testfälle Streaming Media                          |        |                      |       4 |     3.5 |                 |
+  |                 | Implementierungsanpassungen Vorwärts-Lesen         |        |                      |         |      44 |                 |
+  |                 | Weitere Anpassungen (Design + Impl) nach Schreiben |        |                      |      16 |         |                 |
+  |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
+  | Rückwärts-Lesen |                                                    |        |                      |       8 |     4.5 |                 |
+  |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
+  |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
+  |                 |                                                    |        | SUMME                |      46 |     71. |                 |
+  |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
+  #+TBLFM: $6=vsum(@4..@-1)::$5=vsum(@4..@-1)
+
+**** Schreiben
+
+| Themengebiet         | Aktivität                                                              | Status    | Aufwand |   Tats. | Implementierte       | Begründung Abweichung |
+|                      | <70>                                                                   |           |  gesch. | Aufwand | Designentscheidungen | <20>                 |
+|                      |                                                                        |           |     (h) |     (h) |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+| Vor-Restrukturierung | Lebensyzklus DataBlockReader und Factory umstellen (1 Reader pro Medium, 1 Factory pro Reader) | DONE      |       4 |    1.25 |                      |                      |
+|                      | DataBlockEvent(Bus, Listener) inkl. javadocs                           | DONE      |     0.5 |     0.5 |                      |                      |
+|                      | DataBlockState einführen, auch in Factory                              | DONE      |     0.5 |    0.25 |                      |                      |
+|                      | Methoden DataBlockFactory                                              | IN PROGR. |       1 |         |                      |                      |
+|                      | Validierung gegen Spec in Factory                                      |           |     0.5 |         |                      |                      |
+|                      | Bus Lebenszyklus und alle registrieren sich                            |           |     0.5 |         |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+| FieldFunctions       | ContainerContext: INSERTED, REMOVED, MODIFIED (target block)           |           |       1 |         |                      |                      |
+|                      | ContainerContext: MODIFIED (field func. ByteOrder / CharEnc)           |           |       4 |         |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+| Einfügen             | Basistestfälle                                                         |           |     0.5 |         |                      |                      |
+|                      | insertContainer                                                        |           |       2 |         |                      |                      |
+|                      | insertHeader                                                           |           |       2 |         |                      |                      |
+|                      | insertFooter                                                           |           |       2 |         |                      |                      |
+|                      | insertField                                                            |           |       2 |         |                      |                      |
+|                      | setPayload                                                             |           |       2 |         |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+| Löschen              | removeContainer                                                        |           |       2 |         |                      |                      |
+|                      | removeFooter                                                           |           |       2 |         |                      |                      |
+|                      | removeHeader                                                           |           |       2 |         |                      |                      |
+|                      | removeField                                                            |           |       2 |         |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+| Modifizieren         | setBytes (Field)                                                       |           |       1 |         |                      |                      |
+|                      | setInterpretedValue (Field)                                            |           |       1 |         |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+| Flush & Undo         | writeAllChanges                                                        |           |       4 |         |                      |                      |
+|                      | reset                                                                  |           |       1 |         |                      |                      |
+|                      | resetAllChanges                                                        |           |       4 |         |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+| Sonstiges            | Alle javadocs anpassen                                                 |           |       3 |         |                      |                      |
+|                      | Design Docs anpassen                                                   |           |       2 |         |                      |                      |
+|                      | Aufräumen                                                              |           |       3 |         |                      |                      |
+|----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
+|                      |                                                                        |           |    49.5 |         |                      |                      |
+#+TBLFM: $4=vsum(@I$4..@-I$4)
+
+
+*** DONE Überprüfung Vorwärts-Lesen
+    :CLOCK:    
+    CLOCK: [2019-01-30 Mi 21:00]--[2019-01-30 Mi 21:25] =>  0:25
+    CLOCK: [2019-01-30 Mi 20:30]--[2019-01-30 Mi 20:55] =>  0:25
+    CLOCK: [2019-01-30 Mi 07:37]--[2019-01-30 Mi 08:10] =>  0:33
+    CLOCK: [2019-01-30 Mi 06:10]--[2019-01-30 Mi 07:11] =>  1:01
+    CLOCK: [2019-01-28 Mo 20:30]--[2019-01-28 Mo 21:21] =>  0:51
+    CLOCK: [2017-12-12 Di 07:20]--[2017-12-12 Di 08:54] =>  1:34
+    CLOCK: [2017-12-11 Mo 07:20]--[2017-12-11 Mo 08:00] =>  0:40
+    CLOCK: [2017-12-09 Sa 10:00]--[2017-12-09 Sa 10:48] =>  0:48
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2019-02-04 Mo 19:25]
+    - State "IN PROGRESS" from ""           [2017-12-12 Di 07:24]
+    :END:      
+
+Macht Caching in Media-Komponente jetzt insgesamt Sinn oder nicht?
+ -> Geht so: Caching ist immer entweder aktiv (min. Cache-Größe > 0) oder es ist eh ein Byte-Array
+
+Ziele:
+ - Doku des Lese-Vorgehens
+ - Lese-Vorgehen sinnvoll auf Media-Komponente abgestimmt
+ - Komplexitätsverringerung, insb. Code-Vereinfachung und Verkürzung
+ - Basis für schreibende Zugriffe legen
+
+Vorgehen:
+ - Code-Review inkl. Klassendiagramm
+ - Ideen-Skizze nach Review überarbeiten
+ - Basierend auf existierender Doku das Design-Konzept für das Vorwärts-Lesen basierend auf einfachen Designentscheidungen Schritt für Schritt aufbauen
+ - Schätzung für Implementierungsanpassungen
+ - Danach Design für Rückwärts-Lesen
+
+Idee Vorwärts-Lesen:
+ 1. Bestimme Block-Typ:
+    a. Maximale Header-Größe aus allen unterstützten Datenformaten lesen und entsprechend viele Bytes cachen
+    b. Falls End-Of-Medium: Datenformat ausschließen
+    c. Identifikation des Datenformats anhand Magic Key
+ 2. Nur Streaming-Media:
+    a. Bei Aufruf von "next()": Fülle Payload-Bytes in den Cache durch expliziten Aufruf von "cache()": Tut nichts bei Byte-Array, bei Datei und Stream liest es bis zur maximalen Cache-Größe alles rein
+ 3. Lazy Payload:
+    a. Nur bei Random-Access-Medien
+    b. Daten werden erst gelesen, wenn zum ersten Mal auf die Inhalte zugegriffen wird über getData()
+    c. Resultiert evtl. in einer InvalidMediumOffsetException falls keine Daten mehr vorhanden sind
+ 4. Lazy Field:
+    a. Ab einer bestimmten Mindestgröße werden auch Felder mit bekannter Größe erst in den Speicher gelesen, wenn explizit angefragt
+    b. Nur bei Random-Access-Medien?
+ 5. Felder lesen im Detail: TODO
+ 6. Offene Punkte:
+    a. Feldkonvertierung wie?
+    b. Brauch man den ganzen "Listener"-Scheiß noch?
+    c. Der FieldFunctionStack: Muss das wirklich sein?
+    d. Identifikationshilfen zum Datenformat nutzen? (z.B. Dateiendung, Infos des Streams etc.)
+    e. Eingriffs-/Konfigurationsmöglichkeiten Anwender?
+    f. Eingriffs-/Konfigurationsmöglichkeiten Extension?
+
+Rückwärts-Lesen?
+
+*** DONE Design-Vorwärts-Lesen
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-03-26 Di 06:23]
+    - State "IN PROGRESS" from "TODO"       [2019-02-04 Mo 19:25]
+    :END:
+    :CLOCK:
+    CLOCK: [2019-03-22 Fr 09:20]--[2019-03-22 Fr 09:40] =>  0:20
+    CLOCK: [2019-03-21 Do 21:35]--[2019-03-21 Do 23:51] =>  2:16
+    CLOCK: [2019-03-21 Do 21:10]--[2019-03-21 Do 22:01] =>  0:51
+    CLOCK: [2019-03-21 Do 16:50]--[2019-03-21 Do 17:50] =>  1:00
+    CLOCK: [2019-03-10 So 14:00]--[2019-03-10 So 15:01] =>  1:01
+    CLOCK: [2019-03-08 Fr 21:25]--[2019-03-08 Fr 22:14] =>  0:49
+    CLOCK: [2019-02-25 Mo 19:05]--[2019-02-25 Mo 21:54] =>  2:49
+    CLOCK: [2019-02-20 Mi 21:47]--[2019-02-20 Mi 22:50] =>  1:03
+    CLOCK: [2019-02-17 So 19:19]--[2019-02-17 So 22:30] =>  3:11
+    CLOCK: [2019-02-13 Mi 05:52]--[2019-02-13 Mi 06:23] =>  0:31
+    CLOCK: [2019-02-12 Di 22:33]--[2019-02-12 Di 23:05] =>  0:32
+    CLOCK: [2019-02-12 Di 21:00]--[2019-02-12 Di 21:45] =>  0:45
+    CLOCK: [2019-02-12 Di 19:45]--[2019-02-12 Di 20:00] =>  0:15
+    CLOCK: [2019-02-11 Mo 19:45]--[2019-02-11 Mo 20:01] =>  0:16
+    CLOCK: [2019-02-11 Mo 19:20]--[2019-02-11 Mo 19:43] =>  0:23
+    CLOCK: [2019-02-11 Mo 06:05]--[2019-02-11 Mo 06:42] =>  0:37
+    CLOCK: [2019-02-05 Di 06:50]--[2019-02-05 Di 07:46] =>  0:56
+    CLOCK: [2019-02-04 Mo 22:09]--[2019-02-04 Mo 22:30] =>  0:21
+    CLOCK: [2019-02-04 Mo 21:03]--[2019-02-04 Mo 21:50] =>  0:47
+    CLOCK: [2019-02-04 Mo 19:57]--[2019-02-04 Mo 20:32] =>  0:35
+    CLOCK: [2019-02-04 Mo 19:00]--[2019-02-04 Mo 19:53] =>  0:53
+    :END:
+
+*** DONE Implementierungsanpassungen Vorwärts-Lesen
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-03-26 Di 06:23]
+    - State "IN PROGRESS" from "TODO"       [2019-02-11 Mo 20:19]
+    :END:
+    :CLOCK:
+    CLOCK: [2019-02-19 Di 06:20]--[2019-02-19 Di 06:55] =>  0:35
+    CLOCK: [2019-02-18 Mo 20:30]--[2019-02-18 Mo 22:50] =>  2:20
+    CLOCK: [2019-02-18 Mo 18:59]--[2019-02-18 Mo 19:25] =>  0:26
+    CLOCK: [2019-02-18 Mo 18:04]--[2019-02-18 Mo 18:34] =>  0:30
+    CLOCK: [2019-02-18 Mo 17:47]--[2019-02-18 Mo 17:52] =>  0:05
+    CLOCK: [2019-02-18 Mo 05:25]--[2019-02-18 Mo 06:35] =>  1:10
+    CLOCK: [2019-02-28 Do 07:08]--[2019-02-28 Do 07:29] =>  0:21
+    CLOCK: [2019-02-28 Do 06:00]--[2019-02-28 Do 07:05] =>  1:05
+    CLOCK: [2019-02-27 Mi 20:57]--[2019-02-27 Mi 21:58] =>  1:01
+    CLOCK: [2019-02-25 Mo 22:04]--[2019-02-26 Di 00:05] =>  2:01
+    CLOCK: [2019-02-17 So 08:02]--[2019-02-17 So 09:18] =>  1:16
+    CLOCK: [2019-02-17 So 06:59]--[2019-02-17 So 07:10] =>  0:11
+    CLOCK: [2019-02-16 Sa 10:20]--[2019-02-16 Sa 11:48] =>  1:28
+    CLOCK: [2019-02-14 Do 05:33]--[2019-02-14 Do 06:17] =>  0:44
+    CLOCK: [2019-02-16 Sa 07:31]--[2019-02-16 Sa 08:48] =>  1:17
+    CLOCK: [2019-02-16 Sa 07:22]--[2019-02-16 Sa 07:30] =>  0:08
+    CLOCK: [2019-02-15 Fr 20:30]--[2019-02-15 Fr 20:50] =>  0:20
+    CLOCK: [2019-02-14 Do 20:22]--[2019-02-14 Do 20:40] =>  0:18
+    CLOCK: [2019-02-13 Mi 22:14]--[2019-02-13 Mi 22:26] =>  0:12
+    CLOCK: [2019-02-13 Mi 20:28]--[2019-02-13 Mi 20:40] =>  0:12
+    :END:
+**** DONE FieldFunctionStack aufräumen
+     :LOGBOOK:
+     - State "DONE"       from "IN PROGRESS" [2019-03-21 Do 21:10]
+     :END:
+     :CLOCK:
+     CLOCK: [2019-03-21 Do 20:13]--[2019-03-21 Do 21:10] =>  0:57
+     CLOCK: [2019-03-21 Do 11:28]--[2019-03-21 Do 11:41] =>  0:13
+     CLOCK: [2019-03-20 Mi 08:58]--[2019-03-20 Mi 09:32] =>  0:34
+     CLOCK: [2019-03-20 Mi 07:30]--[2019-03-20 Mi 08:35] =>  1:05
+     CLOCK: [2019-03-19 Di 18:36]--[2019-03-19 Di 19:35] =>  0:59
+     CLOCK: [2019-03-17 So 12:21]--[2019-03-17 So 12:56] =>  0:35
+     CLOCK: [2019-03-14 Do 20:50]--[2019-03-14 Do 21:49] =>  0:59
+     CLOCK: [2019-03-13 Mi 23:00]--[2019-03-14 Do 00:15] =>  1:15
+     CLOCK: [2019-03-12 Di 21:10]--[2019-03-12 Di 22:20] =>  1:10
+     CLOCK: [2019-03-12 Di 20:25]--[2019-03-12 Di 20:50] =>  0:25
+     CLOCK: [2019-03-11 Mo 20:40]--[2019-03-11 Mo 21:04] =>  0:24
+     CLOCK: [2019-03-10 So 20:35]--[2019-03-10 So 21:00] =>  0:25
+     CLOCK: [2019-03-08 Fr 06:05]--[2019-03-08 Fr 07:00] =>  0:55
+     CLOCK: [2019-03-07 Do 22:15]--[2019-03-07 Do 23:15] =>  1:00
+     CLOCK: [2019-03-06 Mi 22:13]--[2019-03-06 Mi 22:20] =>  0:07
+     CLOCK: [2019-03-06 Mi 20:15]--[2019-03-06 Mi 22:03] =>  1:48
+     CLOCK: [2019-03-06 Mi 07:55]--[2019-03-06 Mi 08:11] =>  0:16
+     CLOCK: [2019-03-06 Mi 07:20]--[2019-03-06 Mi 07:46] =>  0:26
+     CLOCK: [2019-03-06 Mi 06:41]--[2019-03-06 Mi 07:21] =>  0:40
+     CLOCK: [2019-03-05 Di 21:52]--[2019-03-05 Di 22:59] =>  1:07
+     CLOCK: [2019-03-05 Di 20:50]--[2019-03-05 Di 21:20] =>  0:30
+     CLOCK: [2019-03-03 So 22:56]--[2019-03-03 So 23:55] =>  0:59
+     CLOCK: [2019-03-03 So 20:15]--[2019-03-03 So 22:42] =>  2:27
+     CLOCK: [2019-03-03 So 16:38]--[2019-03-03 So 17:25] =>  0:47
+     CLOCK: [2019-03-02 Sa 21:11]--[2019-03-02 Sa 22:10] =>  0:59
+     CLOCK: [2019-03-02 Sa 19:33]--[2019-03-02 Sa 20:00] =>  0:27
+     CLOCK: [2019-03-02 Sa 13:50]--[2019-03-02 Sa 14:50] =>  1:00
+     CLOCK: [2019-03-02 Sa 13:25]--[2019-03-02 Sa 13:40] =>  0:15
+     CLOCK: [2019-02-28 Do 22:55]--[2019-02-28 Do 23:55] =>  1:00
+     CLOCK: [2019-02-28 Do 21:00]--[2019-02-28 Do 22:15] =>  1:15
+     CLOCK: [2019-02-28 Do 20:46]--[2019-02-28 Do 20:48] =>  0:02
+     CLOCK: [2019-02-28 Do 18:45]--[2019-02-28 Do 19:25] =>  0:40
+     CLOCK: [2019-02-28 Do 17:40]--[2019-02-28 Do 18:25] =>  0:45
+     CLOCK: [2019-02-20 Mi 21:24]--[2019-02-20 Mi 21:47] =>  0:23
+     CLOCK: [2019-02-20 Mi 20:46]--[2019-02-20 Mi 21:15] =>  0:29
+     CLOCK: [2019-02-20 Mi 05:52]--[2019-02-20 Mi 07:15] =>  1:23
+     :END:
+
+Nächste Schritte:
+  - [X] MetadataCompendium: Flags genau darstellen (bildlich, Position und Typ des Flags)
+  - [X] Expected_ID3v23_FILE_06_ExtendedHeader.csv fertig: Nur noch erwartete Flag-Bytes fehlen
+  - [X] ID3v23_FILE_06_ExtendedHeader.txt fertig: Tag-Flags (ext header presnt) und Flag-Bytes in extended header (0x61, 0x61) fehlen
+  - [X] SyncSafeIntegerConverter: Mini Programm in Main, dass die interaktive Konvertierung erlaubt
+  - [X] Ext header mit dyn. Länge
+  - [X] ID_OF als FieldFunction ersetzen durch isId()
+  - [X] Aufräumen und dokumentieren AbstractFieldFunction
+  - [X] Aufräumen und dokumentieren ContainerContext
+  - [X] Aufräumen und dokumentieren CustomCount/SizeProvide
+  - [X] APE is optional fixen
+  - [X] Verwendung von ByteOrders und Charsets überprüfenr
+  - [X] AbstractChecksumOf einführen mit CRCOf als Subklasse; nutzen in MP3 und ID3v2.3 ext header
+  - [X] Validieren von CustomSizeOf
+
+*** DONE Testfälle Streaming Media
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-02-20 Mi 21:47]
+    - State "IN PROGRESS" from "TODO"       [2019-02-11 Mo 19:44]
+    :END:
+    :CLOCK:
+    CLOCK: [2019-02-11 Mo 20:50]--[2019-02-11 Mo 21:26] =>  0:36
+    CLOCK: [2019-02-11 Mo 20:19]--[2019-02-11 Mo 20:23] =>  0:04
+    CLOCK: [2019-02-08 Fr 22:00]--[2019-02-08 Fr 22:06] =>  0:06
+    CLOCK: [2019-02-08 Fr 20:37]--[2019-02-08 Fr 20:50] =>  0:13
+    CLOCK: [2019-02-07 Do 21:55]--[2019-02-07 Do 23:05] =>  1:10
+    CLOCK: [2019-02-07 Do 20:00]--[2019-02-07 Do 20:38] =>  0:38
+    CLOCK: [2019-02-06 Mi 20:35]--[2019-02-06 Mi 20:53] =>  0:18
+    CLOCK: [2019-02-06 Mi 19:10]--[2019-02-06 Mi 19:38] =>  0:28
+      :END:
+
+*** DONE Design + Impl Rückwärts-Lesen
+    :CLOCK:
+    CLOCK: [2019-03-26 Di 21:30]--[2019-03-26 Di 22:20] =>  0:50
+    CLOCK: [2019-03-24 So 19:58]--[2019-03-24 So 22:10] =>  2:12
+    CLOCK: [2019-03-24 So 15:52]--[2019-03-24 So 15:58] =>  0:06
+    CLOCK: [2019-03-24 So 15:10]--[2019-03-24 So 15:39] =>  0:29
+    CLOCK: [2019-03-23 Sa 23:09]--[2019-03-23 Sa 23:56] =>  0:47
+    CLOCK: [2019-03-23 Sa 22:50]--[2019-03-23 Sa 23:08] =>  0:18
+    :END:
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-03-26 Di 22:01]
+    - State "IN PROGRESS" from "TODO"       [2019-03-23 Sa 23:08]
+    - State "TODO"       from              [2019-03-22 Fr 09:31]
+    :END:
+
+Idee:
+ - StandardDataBlockReader -> ForwardDataBlockReader
+ - Neue Klasse BackwardDataBlockReader
+ - Unterschiede werden in readContainerWithId implementiert
+
+Nächste Schritte:
+ - [X] Statische Footer-Länge
+ - [X] Statische Header-Länge
+ - [X] Design-Doku
+ - [X] Javadocs + Aufräumen
+
+*** DONE Design Schreiben
+    :LOGBOOK:
+    - State "DONE"       from "IN PROGRESS" [2019-04-17 Mi 06:57]
+    - State "IN PROGRESS" from "TODO"       [2019-03-23 Sa 23:08]
+    :END:
+    :CLOCK:
+    CLOCK: [2019-04-17 Mi 06:52]--[2019-04-17 Mi 07:01] =>  0:09
+    CLOCK: [2019-04-16 Di 20:47]--[2019-04-16 Di 22:18] =>  1:31
+    CLOCK: [2019-04-16 Di 19:47]--[2019-04-16 Di 20:36] =>  0:49
+    CLOCK: [2019-04-16 Di 09:35]--[2019-04-16 Di 09:44] =>  0:09
+    CLOCK: [2019-04-15 Mo 20:55]--[2019-04-15 Mo 23:17] =>  2:22
+    CLOCK: [2019-04-15 Mo 13:15]--[2019-04-15 Mo 13:23] =>  0:08
+    CLOCK: [2019-04-14 So 21:46]--[2019-04-14 So 21:50] =>  0:04
+    CLOCK: [2019-04-14 So 14:45]--[2019-04-14 So 14:55] =>  0:10
+    CLOCK: [2019-04-14 So 11:44]--[2019-04-14 So 12:15] =>  0:31
+    CLOCK: [2019-04-14 So 07:24]--[2019-04-14 So 09:18] =>  1:54
+    CLOCK: [2019-04-12 Fr 06:43]--[2019-04-12 Fr 06:50] =>  0:07
+    CLOCK: [2019-04-11 Do 21:35]--[2019-04-11 Do 23:20] =>  1:45
+    CLOCK: [2019-04-10 Mi 22:27]--[2019-04-10 Mi 22:49] =>  0:22
+    CLOCK: [2019-04-10 Mi 21:00]--[2019-04-10 Mi 21:56] =>  0:56
+    CLOCK: [2019-04-07 So 20:34]--[2019-04-07 So 20:48] =>  0:14
+    CLOCK: [2019-04-06 Sa 21:41]--[2019-04-06 Sa 21:53] =>  0:12
+    CLOCK: [2019-04-06 Sa 13:30]--[2019-04-06 Sa 14:44] =>  1:14
+    CLOCK: [2019-04-05 Fr 07:10]--[2019-04-05 Fr 07:50] =>  0:40
+    CLOCK: [2019-04-03 Mi 03:50]--[2019-04-03 Mi 07:08] =>  3:18
+    CLOCK: [2019-03-29 Fr 06:00]--[2019-03-29 Fr 07:11] =>  1:11
+    CLOCK: [2019-03-23 Sa 21:30]--[2019-03-23 Sa 23:09] =>  1:39
+    :END:
+
+*** IN PROGRESS Schreiben implementieren
+    :LOGBOOK:
+    - State "IN PROGRESS" from "TODO"       [2019-04-17 Mi 07:01]
+    :END:
+
+**** IN PROGRESS Vor-Restrukturierung
+     :LOGBOOK:
+     - State "IN PROGRESS" from "TODO"       [2019-04-17 Mi 07:01]
+     :END:
+     :CLOCK:
+     CLOCK: [2019-04-25 Do 11:51]--[2019-04-25 Do 12:01] =>  0:10
+     CLOCK: [2019-04-25 Do 10:38]--[2019-04-25 Do 11:31] =>  0:53
+     CLOCK: [2019-04-25 Do 06:55]--[2019-04-25 Do 07:45] =>  0:50
+     CLOCK: [2019-04-24 Mi 06:25]--[2019-04-24 Mi 07:30] =>  1:05
+     CLOCK: [2019-04-23 Di 20:48]--[2019-04-23 Di 21:04] =>  0:16
+     CLOCK: [2019-04-23 Di 10:40]--[2019-04-23 Di 11:18] =>  0:38
+     CLOCK: [2019-04-22 Mo 21:26]--[2019-04-22 Mo 22:00] =>  0:34
+     CLOCK: [2019-04-22 Mo 21:05]--[2019-04-22 Mo 21:15] =>  0:10
+     CLOCK: [2019-04-22 Mo 20:35]--[2019-04-22 Mo 20:57] =>  0:22
+     CLOCK: [2019-04-19 Fr 06:41]--[2019-04-19 Fr 07:14] =>  0:33
+     CLOCK: [2019-04-22 Mo 19:30]--[2019-04-22 Mo 19:50] =>  0:20
+     CLOCK: [2019-04-18 Do 22:05]--[2019-04-18 Do 22:38] =>  0:33
+     CLOCK: [2019-04-18 Do 21:53]--[2019-04-18 Do 22:07] =>  0:14
+     CLOCK: [2019-04-17 Mi 22:02]--[2019-04-17 Mi 22:04] =>  0:02
+     CLOCK: [2019-04-17 Mi 21:56]--[2019-04-17 Mi 22:02] =>  0:06
+     CLOCK: [2019-04-17 Mi 08:03]--[2019-04-17 Mi 08:21] =>  0:18
+     CLOCK: [2019-04-17 Mi 07:01]--[2019-04-17 Mi 07:43] =>  0:42
+     :END:
+
+ - [X] Lebensyzklus DataBlockReader und Factory umstellen
+ - [X] DataBlockState einführen, auch in Factory         
+ - [X] DataBlockEvent(Bus, Listener) inkl. javadocs      
+ - [ ] Methoden DataBlockFactory                         
+ - [ ] Validierung gegen Spec in Factory                 
+ - [ ] Bus Lebenszyklus und alle registrieren sich       
+
+*** IN PROGRESS Weitere Themen Vorwärts-Lesen
+    :LOGBOOK:
+    - State "IN PROGRESS" from              [2019-03-26 Di 06:21]
+    :END:
+
+Themen:
+ - [X] LazyFields ?
+ - [ ] Unknown Fields ?
+ - [ ] Generelle Fehlerbehandlungsstrategie beim Lesen
+ - [ ] Design Docs lese-API
+ - [ ] Feldkonvertierung
+ - [ ] Umgang mit Parent Datenblöcken?
+   - Kann man Parents eliminieren (aktuell braucht man die nicht wirklich)
+ - [ ] Umgang mit generischen Blöcken?
+   - Idee: Base id des generischen Blocks in dataBlockId bei Erzeugung speichern
+   - Problem: Was macht man für einen völlig neuen und unbekannten Container-Block?
+ - [ ] DataBlockReader-Subklassen eliminieren? -> ContainerReader Interface als Ersatz für das Ableiten von DataBlockReader, wird implementiert von ID3v1 und Lyrics3v2 sowie ID3v2.4 (für Rückwärtslesen - damit die Optionalität und dynamische Länge des extended header berücksichtigt werden kann)
+
+** Komponente "startup"
+*** DONE jMeta Startup: Logging, Design Decisions, test case
+    :CLOCK:    
+    CLOCK: [2017-12-14 Do 05:30]--[2017-12-14 Do 10:40] =>  5:10
+    :END:      
+    :LOGBOOK:  
+    - State "DONE"       from "IN PROGRESS" [2017-12-14 Do 13:50]
+    - State "IN PROGRESS" from "TODO"       [2017-12-14 Do 05:42]
+    :END:      
+
+** Komponente "Logging"
+
+*** DONE Schätzung
+     :CLOCK:    
+     CLOCK: [2016-06-18 Sa 13:25]--[2016-06-18 Sa 13:35] =>  0:10
+     :END:      
+     :LOGBOOK:  
+     - State "DONE"       from "IN PROGRESS" [2016-06-25 Sa 12:21]
+     - State "IN PROGRESS" from ""           [2016-06-18 Sa 13:28]
+     :END:      
+
+| Themengebiet            | Aktivität                                                              | Status | Implementierte       | Aufwand |   Tats. | Begründung Abweichung |
+|                         | <70>                                                                   |        | Designentscheidungen |  gesch. | Aufwand | <20>                 |
+|                         |                                                                        |        |                      |     (h) |     (h) |                      |
+|-------------------------+------------------------------------------------------------------------+--------+----------------------+---------+---------+----------------------|
+| Schätzung Logging       | Schätzung erstellen                                                    | DONE   |                      |     0.5 |    0.25 |                      |
+|-------------------------+------------------------------------------------------------------------+--------+----------------------+---------+---------+----------------------|
+| Design Logging          | Aktuelle Designentscheidungen prüfen                                   | DONE   |                      |     0.5 |       0 |                      |
+|                         | Allgemeine Regeln wann was auf welchem Detailgrad geloggt wird         | DONE   |                      |     0.5 |     0.5 |                      |
+|                         | Evaluierung slf4j                                                      | DONE   |                      |       2 |    1.25 |                      |
+|-------------------------+------------------------------------------------------------------------+--------+----------------------+---------+---------+----------------------|
+| Implementierung Logging | ILogging an allen Stellen durch slf4j ersetzen                         | DONE   |                      |       4 |       3 |                      |
+|                         | Logback und slf4j mit Buildprozess aufsetzen                           | DONE   |                      |     0.5 |       0 |                      |
+|                         | ILogging entfernen                                                     | DONE   |                      |     0.5 |       0 |                      |
+|                         | Auslieferungsvariante mit und ohne logback und Konfiguration           |        |                      |       2 |         |                      |
+|                         |                                                                        |        |                      |         |         |                      |
+
+Gesamtaufwand: 5h
+
+
+*** Implementierung
+
+**** Design
+
+***** DONE Aktuelle Designentscheidungen prüfen
+      :CLOCK:    
+      CLOCK: [2016-06-18 Sa 13:35]--[2016-06-18 Sa 14:05] =>  0:30
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-18 Sa 14:03]
+      - State "IN PROGRESS" from "TODO"       [2016-06-18 Sa 13:35]
+      :END:      
+
+***** DONE Allgemeine Regeln wann was auf welchem Detailgrad geloggt wird
+      :LOGBOOK:  
+      - State "DONE"       from "TODO"       [2016-06-18 Sa 14:03]
+      :END:      
+
+***** DONE Evaluierung slf4j
+      :CLOCK:    
+      CLOCK: [2016-06-19 So 14:44]--[2016-06-19 So 16:00] =>  1:16
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-20 Mo 18:00]
+      - State "IN PROGRESS" from "TODO"       [2016-06-19 So 14:44]
+      :END:      
+**** Implementierung
+***** DONE ILogging an allen Stellen durch slf4j ersetzen
+      :CLOCK:    
+      CLOCK: [2016-06-25 Sa 12:05]--[2016-06-25 Sa 12:20] =>  0:15
+      CLOCK: [2016-06-25 Sa 11:58]--[2016-06-25 Sa 12:05] =>  0:07
+      CLOCK: [2016-06-25 Sa 10:55]--[2016-06-25 Sa 11:50] =>  0:55
+      CLOCK: [2016-06-25 Sa 10:36]--[2016-06-25 Sa 10:55] =>  0:19
+      CLOCK: [2016-06-23 Do 20:05]--[2016-06-23 Do 20:15] =>  0:10
+      CLOCK: [2016-06-22 Mi 20:14]--[2016-06-22 Mi 20:15] =>  0:01
+      CLOCK: [2016-06-20 Mo 18:34]--[2016-06-20 Mo 19:38] =>  1:04
+      CLOCK: [2016-06-20 Mo 18:30]--[2016-06-20 Mo 18:34] =>  0:04
+      :END:      
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2016-06-25 Sa 12:20]
+      - State "IN PROGRESS" from "DONE"       [2016-06-25 Sa 12:04]
+      - State "DONE"       from "IN PROGRESS" [2016-06-25 Sa 12:02]
+      - State "IN PROGRESS" from "TODO"       [2016-06-20 Mo 18:33]
+      :END:      
+
+***** DONE Logback und slf4j mit Buildprozess aufsetzen
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-12-14 Do 16:14]
+      - State "IN PROGRESS" from "DONE"       [2017-12-14 Do 16:13]
+      - State "DONE"       from "TODO"       [2016-06-25 Sa 12:02]
+      :END:      
+
+***** DONE ILogging entfernen
+      :LOGBOOK:  
+      - State "DONE"       from "IN PROGRESS" [2017-12-14 Do 13:49]
+      - State "IN PROGRESS" from "DONE"       [2017-12-14 Do 13:49]
+      - State "DONE"       from "TODO"       [2016-06-25 Sa 12:02]
+      :END:
