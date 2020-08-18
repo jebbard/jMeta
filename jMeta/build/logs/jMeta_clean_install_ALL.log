@@ -30,6 +30,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.SimpleLoggerFactory]
 [INFO] --------------------------------[ pom ]---------------------------------
 [INFO] 
 [INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ jmetaparent ---
+[INFO] Deleting C:\Programmieren\08_GitProjekte\jMeta\jMeta\target
 [INFO] 
 [INFO] --- jacoco-maven-plugin:0.8.5:prepare-agent (default-prepare-agent) @ jmetaparent ---
 [INFO] argLine set to -javaagent:C:\\Users\\User\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.5\\org.jacoco.agent-0.8.5-runtime.jar=destfile=C:\\Programmieren\\08_GitProjekte\\jMeta\\jMeta\\target\\jacoco.exec
@@ -83,23 +84,23 @@ SLF4J: Actual binding is of type [org.slf4j.impl.SimpleLoggerFactory]
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.utility.byteutils.api.services.ByteArrayUtilsTest
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.306 sec
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.255 sec
 Running com.github.jmeta.utility.byteutils.api.services.ByteBufferUtilsTest
-Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 sec
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 sec
 Running com.github.jmeta.utility.csv.api.services.EmptyCsvFileTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.052 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.058 sec
 Running com.github.jmeta.utility.csv.api.services.NineColumnCsvFileTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.047 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.03 sec
 Running com.github.jmeta.utility.csv.api.services.OneColumnCsvFileTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 sec
 Running com.github.jmeta.utility.csv.api.services.TwelveColumnCsvFileTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.04 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 sec
 Running com.github.jmeta.utility.csv.api.services.TwoColumnCsvFileTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.034 sec
 Running com.github.jmeta.utility.extmanager.impl.StandardExtensionManagerTest
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.062 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.057 sec
 Running com.github.jmeta.utility.numericutils.api.services.NumericDataTypeHelperTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 sec
 
 Results :
 
@@ -166,83 +167,83 @@ Tests run: 50, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.library.datablocks.impl.FieldTerminationFinderTest
-Tests run: 180, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.668 sec
+Tests run: 180, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.578 sec
 Running com.github.jmeta.library.dataformats.api.types.BitAddressEqualityTest
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 sec
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags1ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.347 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.173 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags2ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags3ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.018 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags4ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags5ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.01 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags6ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags7ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 sec
 Running com.github.jmeta.library.dataformats.api.types.Flags8ByteTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.02 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 sec
 Running com.github.jmeta.library.dataformats.api.types.FlagsMultibitTest
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.04 sec
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 sec
 Running com.github.jmeta.library.dataformats.api.types.FlagSpecificationTest
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 sec
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 sec
 Running com.github.jmeta.library.media.api.types.FileMediumTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 sec
 Running com.github.jmeta.library.media.api.types.InMemoryMediumTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 sec
 Running com.github.jmeta.library.media.api.types.InputStreamMediumTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.01 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
 Running com.github.jmeta.library.media.api.types.MediumActionEqualityTest
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 sec
 Running com.github.jmeta.library.media.api.types.MediumActionTest
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 sec
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 sec
 Running com.github.jmeta.library.media.api.types.MediumEqualityTest
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.034 sec
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 sec
 Running com.github.jmeta.library.media.api.types.MediumOffsetEqualityTest
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 sec
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.047 sec
 Running com.github.jmeta.library.media.api.types.MediumRegionTest
-Tests run: 56, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.039 sec
+Tests run: 56, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.069 sec
 Running com.github.jmeta.library.media.impl.cache.MediumCacheTest
-Tests run: 58, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.218 sec
+Tests run: 58, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.154 sec
 Running com.github.jmeta.library.media.impl.changeManager.MediumActionComparatorTest
 Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 sec
 Running com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerCreateFlushPlanTest
-Tests run: 43, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.36 sec
+Tests run: 43, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.386 sec
 Running com.github.jmeta.library.media.impl.changeManager.MediumChangeManagerTest
-Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.166 sec
+Tests run: 46, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.132 sec
 Running com.github.jmeta.library.media.impl.mediumAccessor.ReadOnlyFileMediumAccessorTest
-Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.067 sec
+Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 sec
 Running com.github.jmeta.library.media.impl.mediumAccessor.ReadOnlyMemoryMediumAccessorTest
-Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 sec
+Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 sec
 Running com.github.jmeta.library.media.impl.mediumAccessor.StreamMediumAccessorTest
-Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.054 sec
+Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 sec
 Running com.github.jmeta.library.media.impl.mediumAccessor.WritableFileMediumAccessorTest
-Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.132 sec
+Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 sec
 Running com.github.jmeta.library.media.impl.mediumAccessor.WritableMemoryMediumAccessorTest
-Tests run: 37, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 sec
+Tests run: 37, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 sec
 Running com.github.jmeta.library.media.impl.offset.MediumOffsetFactoryTest
-Tests run: 24, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 sec
+Tests run: 24, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 sec
 Running com.github.jmeta.library.media.impl.offset.StandardMediumOffsetTest
-Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.02 sec
+Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 sec
 Running com.github.jmeta.library.media.impl.StandardMediaAPITest
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 sec
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.059 sec
 Running com.github.jmeta.library.media.impl.store.ReadOnlyFileMediumStoreTest
-Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 sec
+Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 sec
 Running com.github.jmeta.library.media.impl.store.ReadOnlyInMemoryMediumStoreTest
-Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.02 sec
+Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 sec
 Running com.github.jmeta.library.media.impl.store.ReadOnlyStreamMediumStoreTest
-Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 sec
+Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 sec
 Running com.github.jmeta.library.media.impl.store.StreamMediumStoreTest
-Tests run: 43, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.617 sec
+Tests run: 43, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.344 sec
 Running com.github.jmeta.library.media.impl.store.WritableFileMediumStoreTest
-Tests run: 100, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.777 sec
+Tests run: 100, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.816 sec
 Running com.github.jmeta.library.media.impl.store.WritableInMemoryMediumStoreTest
-Tests run: 83, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.537 sec
+Tests run: 83, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.201 sec
 Running com.github.jmeta.library.startup.api.services.LibraryJMetaTest
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.405 sec
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.275 sec
 
 Results :
 
@@ -309,15 +310,15 @@ Tests run: 965, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.defaultextensions.id3v1.impl.ID3v11SingleFile_01_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.256 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.487 sec
 Running com.github.jmeta.defaultextensions.id3v1.impl.ID3v11SingleFile_02_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.574 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.558 sec
 Running com.github.jmeta.defaultextensions.id3v1.impl.ID3v1SingleFile_01_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.391 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.43 sec
 Running com.github.jmeta.defaultextensions.id3v1.impl.ID3v1SingleFile_02_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.333 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.405 sec
 Running com.github.jmeta.defaultextensions.id3v1.impl.ID3v1SingleFile_03_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.316 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.273 sec
 
 Results :
 
@@ -383,15 +384,15 @@ Tests run: 80, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.defaultextensions.id3v23.impl.ID3v23SingleFile_01_PaddingUTF16TextFrameTest
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.913 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.411 sec
 Running com.github.jmeta.defaultextensions.id3v23.impl.ID3v23SingleFile_02_SinglePaddingByteTest
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.594 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.77 sec
 Running com.github.jmeta.defaultextensions.id3v23.impl.ID3v23SingleFile_03_NoPaddingTest
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.536 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.599 sec
 Running com.github.jmeta.defaultextensions.id3v23.impl.ID3v23SingleFile_05_UnknownFrameTest
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.717 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.752 sec
 Running com.github.jmeta.defaultextensions.id3v23.impl.ID3v23SingleFile_06_ExtendedHeaderTest
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.527 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.562 sec
 
 Results :
 
@@ -458,7 +459,7 @@ Tests run: 80, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.defaultextensions.lyrics3v2.impl.Lyrics3v2SingleFile_01Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.917 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.677 sec
 
 Results :
 
@@ -524,7 +525,7 @@ Tests run: 16, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.defaultextensions.apev2.impl.APEv2SingleFile_01_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.191 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.589 sec
 
 Results :
 
@@ -590,9 +591,9 @@ Tests run: 16, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.defaultextensions.ogg.impl.OggSingleFile_01_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.14 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.485 sec
 Running com.github.jmeta.defaultextensions.ogg.impl.OggSingleFile_02_Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.114 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.274 sec
 
 Results :
 
@@ -658,7 +659,7 @@ Tests run: 32, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.defaultextensions.mp3.impl.MP3SingleFile_01Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.497 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.092 sec
 
 Results :
 
@@ -725,7 +726,7 @@ Tests run: 16, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.defaultextensions.integration.impl.MultiFile_01_TypicalMP3Test
-Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.186 sec
+Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.95 sec
 
 Results :
 
@@ -788,9 +789,9 @@ Tests run: 16, Failures: 0, Errors: 0, Skipped: 0
  T E S T S
 -------------------------------------------------------
 Running com.github.jmeta.tools.benchmark.api.services.MeasurementDurationTest
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.356 sec
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.373 sec
 Running com.github.jmeta.tools.benchmark.api.services.MeasurementSessionTest
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.081 sec
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.058 sec
 
 Results :
 
@@ -831,7 +832,6 @@ Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
 [INFO] --------------------------------[ pom ]---------------------------------
 [INFO] 
 [INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ jmetadocs ---
-[INFO] Deleting C:\Programmieren\08_GitProjekte\jMeta\jMetaDocs\target
 [INFO] 
 [INFO] --- jacoco-maven-plugin:0.8.5:prepare-agent (default-prepare-agent) @ jmetadocs ---
 [INFO] argLine set to -javaagent:C:\\Users\\User\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.5\\org.jacoco.agent-0.8.5-runtime.jar=destfile=C:\\Programmieren\\08_GitProjekte\\jMeta\\jMetaDocs\\target\\jacoco.exec
@@ -856,21 +856,21 @@ Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for jMetaParent 0.1:
 [INFO] 
-[INFO] jMetaParent ........................................ SUCCESS [  2.646 s]
-[INFO] jMetaUtility ....................................... SUCCESS [ 10.199 s]
-[INFO] jMetaLibrary ....................................... SUCCESS [ 30.938 s]
-[INFO] jMetaDefaultExtensionID3v1 ......................... SUCCESS [  7.865 s]
-[INFO] jMetaDefaultExtensionID3v23 ........................ SUCCESS [  9.132 s]
-[INFO] jMetaDefaultExtensionLyrics3v2 ..................... SUCCESS [  6.249 s]
-[INFO] jMetaDefaultExtensionAPEv2 ......................... SUCCESS [  6.085 s]
-[INFO] jMetaDefaultExtensionOGG ........................... SUCCESS [ 13.915 s]
-[INFO] jMetaDefaultExtensionMP3 ........................... SUCCESS [  6.927 s]
-[INFO] jmetaDefaultExtensionIntegrationTests .............. SUCCESS [  7.491 s]
-[INFO] jMetaTools ......................................... SUCCESS [  7.455 s]
-[INFO] jMetaDocs .......................................... SUCCESS [  0.955 s]
+[INFO] jMetaParent ........................................ SUCCESS [  2.488 s]
+[INFO] jMetaUtility ....................................... SUCCESS [  8.011 s]
+[INFO] jMetaLibrary ....................................... SUCCESS [ 25.970 s]
+[INFO] jMetaDefaultExtensionID3v1 ......................... SUCCESS [  7.439 s]
+[INFO] jMetaDefaultExtensionID3v23 ........................ SUCCESS [ 10.065 s]
+[INFO] jMetaDefaultExtensionLyrics3v2 ..................... SUCCESS [  6.721 s]
+[INFO] jMetaDefaultExtensionAPEv2 ......................... SUCCESS [  6.396 s]
+[INFO] jMetaDefaultExtensionOGG ........................... SUCCESS [  8.513 s]
+[INFO] jMetaDefaultExtensionMP3 ........................... SUCCESS [  6.788 s]
+[INFO] jmetaDefaultExtensionIntegrationTests .............. SUCCESS [ 12.013 s]
+[INFO] jMetaTools ......................................... SUCCESS [  8.105 s]
+[INFO] jMetaDocs .......................................... SUCCESS [  0.954 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  01:50 min
-[INFO] Finished at: 2020-08-18T22:23:38+02:00
+[INFO] Total time:  01:43 min
+[INFO] Finished at: 2020-08-18T22:26:59+02:00
 [INFO] ------------------------------------------------------------------------
