@@ -1,0 +1,929 @@
+%===============================================================================================
+%		\COMPdataPartManagement{} Design
+%===============================================================================================
+
+\section{\COMPdataPartManagement{} Design}
+\label{sec:COMPdataPartManagementImplementationDesign}
+
+This chapter describes the most important features of the \COMPdataPartManagement{} component in a brief way. Generally, all details and most recent state can be found in the javadoc of the component's classes.
+
+Each \TERMdataBlock{} has an id that uniquely identifies it globally.
+
+%-----------------------------------------------------------------------------------------------
+%		Designentscheidungen \COMPdataPartManagement{}
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Designentscheidungen \COMPdataPartManagement{}}
+\label{sec:InterfaceDesignCOMPdataPartManagementDES}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Design Decision: Use Lazy Loading to Deal with Large Data}
+\label{sec:LazyLoading}
+
+\begin{itemize}
+	\item \textbf{Problem:} As per requirement, \LibName{} needs to be able to deal with data block sizes up to $2^{63}-1$ bytes. This equals 9 million terabytes of memory. Not even one data block of such sizes can be held totally in todays usual main memory sizes, and currently in 2011, a few terabyte sized external hard disks slowly become the standard. Although data blocks of such large sizes are unrealistic today, it is never a good idea to store or cache the contents of bigger data blocks within main memory. An approach is necessary to load data only when explicitly required.
+	\item \textbf{Decision:} Lazy loading is a good approach to tackle the problem. Fortunately, a lot of data formats are so well-designed to support such approaches by specifying well-defined headers with a dedicated size field that must precede each data block. Only the header bytes are loaded into memory which is sufficient to know about the dimensions of the rest of the block. This allows jumping to the next block without even reading the current one. It also allows, of course, to read the inner block data. If the \ACTORuser{} insists to read its raw bytes, he can do this on his own risk, maybe causing an out-of-memory condition. However, he is not forced to read all the raw bytes at once, but he can read it part-wise. On a higher-level, a data block can be read logically by accessing its child blocks. And again, in most cases for this child blocks, the same ``header first'' approach is applicable to avoid reading whole data blocks. This approach does not forbid to read all bytes of a whole block. E.g. it makes no sense to read two byte sized fields only on demand. Rather, they are immediately loaded into memory at once, together with a lot of other fields. This is more efficient compared to accessing the \TERMmedium{} for fine-grained data again and again. The approach should be applied to payload data blocks, i.e. lazy payload on the one hand and fields, i.e. lazy fields on the other hand side. Headers and footers are expected to never be that large. Payload store the interesting data. For data formats such as Matroska, arbitrary payload sizes are possible. The majority of such payload blocks might be covered by a single field with large size. This implies the need for lazy fields.
+	\item \textbf{Alternatives:} An alternative would be to support only data up to, say $2^{31}-1$ bytes, i.e. up to 2,15 gigabytes. Often, this size is nowadays exceeded by big multimedia files such as high-definition video files. Even then, again, the question arises how to deal with large data, as not every current work station has main memory sizes above 3 GB. An approach to load everything into memory, even if it is not required, would cause out-of-memory conditions for a lot of \LibName{} potential users, without a possibility for them to avoid this.
+	\item \textbf{Risks:} How small the amount of data might be we cache, there is always a risk of getting totally out-of-synch with the \TERMmedium{} contents. Even shortly after reading a header from the medium, the data block might already have been deleted on the medium. This must be hindered by other approaches, see \SectionLink{sec:LockmediumsifPossible}. In the very far future, $2^{63}-1$ might not be a sufficient size anymore, but it seems that this limit would last a long time from now.\footnote{However: Remember what Bill Gates claimed once...}
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Design Decision: Reloading Data Intelligently}
+\label{sec:ReloadingPolicy}
+
+\begin{itemize}
+	\item \textbf{Problem:} We discussed the caching strategy in \SectionLink{sec:CachincPolicy}. A remaining question for read operation: When and where does \LibName{} reload data from the \TERMmedium{}? The general easy answer is: Whenever the \ACTORuser{} calls an operation that reads from the \TERMmedium{}, data is read from the \TERMmedium{}. The complex thing is to minimize the number of read calls to the \TERMmedium{} by reading as much data as possible once. How could this be done?
+	\item \textbf{Decision:} Depending on the kind of read operation, a specific algorithm determines the number of bytes requested to read them all at once. Following interesting cases and solutions exist:
+	
+\begin{enumerate}
+	\item Reading top-level blocks where the data format is not known in advance. This case is handled by determining the longest minimum size of a header, of all data formats supported by \LibName{}. This byte count is read, then it can be determined whether those bytes belong to anything known by \LibName{}. If so, the bytes form the temporary cache are further converted to data blocks, especially fields.
+	\item Reading data from the payload of a container. Here, the total payload size of the container \emph{must} be known in advance. However, this alone is not sufficient. The payload might be large, thus it is not a good idea trying to temporarily cache every payload completely at once. The payload must be loaded and interpreted part-wise. In that case, reloading needs to take place continuously after a maybe constant amount of bytes processed.
+	\item In the two preceding cases, a special problem might occur: A field is not yet or only partly in the cache. When talking about headers, this exactly happens when the header has a dynamic size between a given minimum and maximum. The cache only covers the minimum header size. If the header, in total, turns out to be bigger than that, bytes must be reloaded to cover the whole header. Likewise, when partly reading payload, either as fields or as containers, the bytes of a field to be created next might not be in the cache currently, put differently: The cache must be replaced by the next piece of the payload when it comes to read that field.
+	\item Last and most important case: It is a requirement that the \ACTORuser{} can directly retrieve the raw bytes of any data block (see \SectionLink{sec:UseCaseReadSurroundingData}). As defined in \SectionLink{sec:CachincPolicy}, for random-access media, \LibName{} does not cache raw byte data for the long term, and large blocks not as a whole. This has the positive side effect that it helps avoiding out-of-memory conditions, as it does not read large payload data at once. Unless the \ACTORuser{} requests it. For stream based media, raw data is read in total and cached in the data blocks due to that requirement. The solution for random-access media is to just store a reference to the \TERMmedium{} offset the data block starts at. This of course has the risk of a wrong offset whenever the \TERMmedium{} changes afterwards, including changes by \LibName{} itself. The only solution for this is: Whenever the \ACTORuser{} requires a raw byte read, \LibName{} detects if the \TERMmedium{} has already changed meanwhile in front of the data block offset, reacting with an error in this case. The \ACTORuser{} then needs to re-read the data block again.
+\end{enumerate}
+	\item \textbf{Alternatives:} Reading small parts instead of bigger blocks is slower as it causes more media accesses. Reading byte blocks of any size at once quickly leads to out-of-memory exceptions. This should only be done if the \ACTORuser{} explicitly requests it. Fortunately, the design of data formats supports this approach, as sizes are stored as parsing metadata, allowing to know the size of a byte block without actually reading it.
+	\item \textbf{Risks:} The implementation is more complex, but more right.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+%		Design Decision: Block Structure as Laid Out By Domain Model
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Design Decision: Block Structure as Laid Out By Domain Model}
+\label{sec:BlockStruct}
+
+\begin{itemize}
+	\item \textbf{Problem:} The main issue when introducing data blocks is: How are concrete data blocks in a concrete \TERMmedium{} generally organized? What is a \ACTORuser{}-friendly way to access a \TERMmedium{}? How does the user access the data block hierarchy? Is it possible for the \ACTORuser{} to read the same kinds of data (i.e. audio data payload) absolutely the same way using \LibName{}? What navigation is necessary to read or write a specific data block?
+	\item \textbf{Decision:} The domain model as described in \SectionLink{sec:DomainModelForDigitalMetadata} already gives the structure of data blocks in a medium. We show a schematic figure for an MP3 file to illustrate this. Each rectangle within the medium is a data block:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_1_DataBlockStructure.pdf}
+	\caption{Structure of \TERMdataBlock{}s in a concrete example}
+	\label{fig:V_1_DataBlockStructure}
+\end{figure}
+}
+The example shows five levels of data blocks, it might be also more or less. It can be seen as an example of the object hierarchy at runtime. At the same time it shows that each block is an instance of a class in the domain model: Container, Header (which is the same class for headers and footers), Payload, Field (which are the leafs of the data block hierarchy), Tag and Attribute. Note that some of the data blocks in the example are displayed as both a Tag and a Container, both an Attribute and a Container or both a Field and an Attribute. This shall illustrate the following:
+\begin{itemize}
+	\item Attributes and Tags are only special containers, i.e. specializations of the Container class
+	\item There is a difference between physical and logical block structure. Physically, a data block is a container, while logically it turns out to be a Tag with maybe additional information. Another example is ID3v1. Physically, the Attributes are Fields and no Containers.
+\end{itemize}
+The design model of \COMPdataPartManagement{} is heavily based on the domain model. It is a \ACTORuser{}-friendly way to access a \TERMmedium{}, as it bases on general terms known to the \ACTORuser{}. Using this approach, it is not generally possible to read the same kinds of data the same way. Knowledge of each data format \emph{is still} necessary to be able to read the interesting data of an RIFF chunk, or the interesting data of an MP3 frame. I.e. the \ACTORuser{} must know on which level the payload is. Going to the RIFF and MP3 examples: For RIFF, the interesting data for RIFF WAVE is in the \texttt{wavl} chunks on level 3, while for MP3 it is on level 2. This is due to the root chunk of RIFF that is missing for MP3. Note that a higher layer above \LibName{} can tackle this problem with a high-level function such as ``\texttt{getNextPayloadPortion()}''.
+
+See also \SectionLink{sec:BlockStructureIssues} below for details.
+	\item \textbf{Alternatives:} Two alternatives are described in the subsections \SectionLink{sec:AntiPattern1FlatHierarchy} and \SectionLink{sec:AntiPattern2VirtualContainer}.
+	\item \textbf{Risks:} The general structure as introduced by the domain model might not always fit to any supported data format or for future formats. Currently, it looks like it would be appropriate for any format, except TIFF could be a potential problem. Furthermore the acceptance of the library might suffer on the fact there is no general way to get the payload data for all different formats the same way as mentioned under ``Decision''. This should indeed be handled by an on-top comfort layer.
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\paragraph{Block Structure Premises}
+\label{sec:BlockStructureIssues}
+
+First of all, two premises are introduced for :
+\begin{itemize}
+	\item \textbf{Rule 1}: When looking at a medium that contains data of multiple supported data formats, there must be at least \texttt{N} different data blocks if the medium contains \texttt{N} different supported data formats. This is inferred from the domain model that allows a data block to have exactly one data format only. Due to the hierarchical nature of data blocks, it is of course nevertheless possible that a parent data block has a different data format than a child block, which \emph{does not mean} the overall parent data block has multiple data formats.
+	\item \textbf{Rule 2}: On the most fine-grained level, the user wants access to all fields that a supported data format defines in its specification, e.g. header flags, size fields and so on.
+\end{itemize}
+
+%***********************************************************************************************
+
+\paragraph{Typical Block Structure}
+\label{sec:TypicalBlockStructure}
+
+A very basic approach of different data formats is that they subdivide data into the following parts:
+\begin{itemize}
+	\item \emph{Header}: The header has two basic functions: Identification and provide parsing information. The header identifies the file or data block as having a specific data format, e.g. as MP3 frame or Ogg page. The parsing information describes the payload. It usually contains the size of the payload, optionally some flags that describe specific properties of the payload and other descriptive information. The header is usually of fixed size which allows implementations to read it at once.
+	\item \emph{Payload}: The payload is the usually dynamically sized content. It is interesting to the end-user as it contains the the media data or the user-centered metadata.
+	\item \emph{Footer}: Some data formats define optional footers that most of the time contain the same information as the header. Footers allow ``parsing from the back''.
+\end{itemize}
+
+This basic structure is not only applied to the top-level blocks of a data format, but also child blocks use this structure. Is is especially true for container formats where each container part usually has a header and payload part.
+
+%***********************************************************************************************
+
+\paragraph{Typical Block Hierarchies}
+\label{sec:TypicalBlockHierarchies}
+
+The reference examples for all supported data formats presented in \SectionLink{sec:ReferenceExamples} reveal some general block hierarchies typical for various data formats. These block hierarchy types are shown in the following figure:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_IV/IV_2_TypicalBlockStructure.pdf}
+	\caption{Visualization of typical block hierarchies of various data formats}
+	\label{fig:IV_2_TypicalBlockStructure}
+\end{figure}
+
+The block hierarchy types depicted show the fact that the user cannot expect the interesting payload data at the same level of access for every data format.
+
+Here a description of these block hierarchy types:
+\begin{itemize}
+	\item \emph{Parent Container}: The top-level of the data format blocks starts with a header that usually identifies the data format. The upcoming payload consists of the various container parts. It may be followed by a footer. The parent container itself can structure-wise not be considered as a container part, as its header has very specific contents that is not present in the headers of the individual container parts.
+	\item \emph{Top-level Container Parts}: The top-level of the data format blocks is basically a stream of container parts that is not surrounded by a parent container. Each container part header contains enough information to identify the exact data format.
+\end{itemize}
+
+The following table shows concrete examples with corresponding explanations:
+
+\begin{longtable}{|p{0.2\textwidth}|p{0.2\textwidth}|p{0.6\textwidth}|}
+	\hline
+	Supported Data Format & Block Hierarchy Type & Details \\
+	\endhead
+	\hline
+	Matroska & Parent Container & Matroska starts with the EBML header followed by the container parts (payload). The EBML header is an element, but it does not wrap the payload, it just precedes it.
+	\hline
+	TIFF & Parent Container & TIFF has a very specific header followed by a fractured payload.
+	\hline
+	Generic XML, XHTML, XMP, RDF/XML and RDFa & Parent Container & An XML document starts with the XML header and an optional DTD. Beginning with the document root, the hierarchy of container parts follows. Therefore the whole document's structure is different from the structure of a single container part.
+	\hline
+	ID3v1 and ID3v1.1 & Parent Container & ID3v1 is very simple but it can be said that its overall tag structure is not identical to the (unstructured) fields.
+	\hline
+	ID3v2.3 and ID3v2.4 & Parent Container & The overall ID3v2 tag structure is different from the frame (=container part) structure.
+	\hline
+	APEv1 and APEv2 & Parent Container & The items do not have the same structure as the overall APE tag.
+	\hline
+	Lyrics3v2 & Parent Container & The fields do not have the same structure as the overall Lyrics3v2 tag.
+	\hline
+	VorbisComment & Parent Container & The user comments do not have the same structure as the overall VorbisComment.
+	\hline
+	QuickTime & Top-level Container Parts & A QuickTime file consists of a sequence of atoms. In theory, the moov atom could be considered as the header which would make QuickTime a Parent Container. However, the moov atom can appear anywhere on top-level which makes it impossible to treat it as a header.
+	\hline
+	MP3 & Top-level Container Parts & An MP3 file or stream consists of sequential MP3 frames. Each frame can perfectly identify the overall data format.
+	\hline
+	RIFF and AIFF & Top-level Container Parts & A RIFF or AIFF file consists of the root chunk which has the same structure as any container part. One could of course interpret the root chunk as the parent container, too.
+	\hline
+	Ogg & Top-level Container Parts & An Ogg bitstream is a quite sequential stream of Ogg pages. Each page identifies the data format.
+	\hline
+	\caption{Examples for Block Hierarchy Types}
+	\label{tab:ExamplesforBlockHierarchyTypes}
+\end{longtable}
+
+%-----------------------------------------------------------------------------------------------
+
+\paragraph{Anti-Pattern 1: Flat Hierarchy}
+\label{sec:AntiPattern1FlatHierarchy}
+
+A first way how the block structure should \emph{not} look like: It shows a possible block structure of the first reference example (see \SectionLink{sec:Example1MP3FileWithID3v23AndID3v11}):
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_IV/IV_2_FlatHierarchy.pdf}
+	\caption{Visualization of a flat hierarchy using reference example 1}
+	\label{fig:IV_2_FlatHierarchy}
+\end{figure}
+
+There is no hierarchy at all, only all of the finest level fields present in the medium are represented as data blocks. The figure also shows the access to each block using an iterator pattern. On each call to \texttt{next} on the data block iterator, the user will get the next block \textbf{on field level}. There would not even be a real need to introduce the terms child block or hierarchy.
+
+First of all, this makes the API less complex due to less classes and methods and no hierarchical thinking, and it makes reading blocks a straight forward thing. Why is that a bad idea? Because the user gets too much at once on a too detailed level. If he wants to navigate to e.g. the Lyrics3v2 tag in the example, he would need to read and skip each and every field before that. This is inefficient as it both requires a lot of memory, hard-disk accesses and therefore time to perform this. Furthermore, the library does not support the \ACTORuser{} in terms of where headers of data blocks end and where the payload starts. The structure is not really understandable at all.
+
+%-----------------------------------------------------------------------------------------------
+
+\paragraph{Anti-Pattern 2: Virtual Container}
+\label{sec:AntiPattern2VirtualContainer}
+
+The second anti-pattern tries to unite the two typical block hierarchies into one data block hierarchy. We called them \emph{parent container} and \emph{top-level container parts} in \SectionLink{sec:TypicalBlockHierarchies}. It introduces a top-level container even for the ``top-level container parts'' hierarchy type:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_IV/IV_2_UniformHierarchy.pdf}
+	\caption{Visualization of a uniform hierarchy using reference example 1}
+	\label{fig:IV_2_UniformHierarchy}
+\end{figure}
+
+Nothing is shown in the figure about how the blocks are further detailed into child blocks as this is not the topic here. Even if not given in detail, this approach is already superior to the anti-pattern 1 as the user can easily navigate to the Lyrics3v2 tag by just calling next two times instead of one hundred times. The implementation might use the size fields to skip data without reading it which is therefore a lot more efficient.
+
+What is the problem with that approach? If the user first calls next, he gets the MP3 part of the file. He \emph{can} go to the sub-blocks and read them one after another. He might also immediately call next again on top-level to go to the ID3v2.3 tag. What happens then? The implementations needs to iterate through all the child MP3 frames, because \emph{there is no} physical top-level MP3 block that contains an overall size that allows skipping. Alternatively the implementation could use special knowledge about ID3v2.3, so it starts reading from the back of the file trying to find the tag ID. This is largely format dependent and does not foster a generic implementation for all data formats. The consequence of this example block structure is a more complex implementation in combination with a performance loss.
+
+Note that the approach would work fine for most of the parent container formats alone, as they have a header with a size field.
+
+%-----------------------------------------------------------------------------------------------
+%		Interface Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Interface Layer Design}
+\label{sec:InterfaceDesignCOMPdataPartManagement}
+
+The following figure shows the static class diagram of the component \COMPdataPartManagement{}. The dynamics are shown in \SectionLink{sec:ImplementationDesignCOMPdataPartManagement}:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_3_InterfaceCOMPdataPartManagement.pdf}
+	\caption{Interface class diagram of the component \COMPdataPartManagement{}}
+	\label{fig:V_3_InterfaceCOMPdataPartManagement}
+\end{figure}
+
+The design is oriented on the domain model.
+
+%-----------------------------------------------------------------------------------------------
+%		Export Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Export Layer Design}
+\label{sec:ExportDesignCOMPdataPartManagement}
+
+There is no export layer for the \COMPdataPartManagement{} component.
+
+%-----------------------------------------------------------------------------------------------
+%		Implementation Layer Design
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Implementation Layer Design}
+\label{sec:ImplementationDesignCOMPdataPartManagement}
+
+The following figure shows the static class diagram of the component \COMPdataPartManagement{}. The dynamics are shown in \SectionLink{sec:ImplementationDesignCOMPdataPartManagement}:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_3_ImplementationCOMPdataPartManagement.pdf}
+	\caption{Implementation class diagram of the component \COMPdataPartManagement{}}
+	\label{fig:V_3_ImplementationCOMPdataPartManagement}
+\end{figure}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Field Concept}
+\label{sec:FieldConcept}
+
+Fields are the leaf nodes of the data block hierarchy. Every data block must consist of fields at the lowest level. While other kinds of data blocks carry raw, uninterpreted bytes, fields combine meaning with their \emph{binary value}. Either they contain binary payload, e.g. encoded media data, or they store a binary representation of a human-readable value, called the field's \emph{interpreted value}. Interpreted values can e.g. be numbers or strings. Fields often store parsing information that is vital for parsing the rest of the data correctly. For this to work, their interpreted value must be calculated. It could e.g. store the number of bytes to follow in the current container.
+
+According to the domain model presented in \SectionLink{sec:DomainModelForDigitalMetadata}, there are three types of data blocks that consist of fields:
+\begin{itemize}
+	\item Headers
+	\item Footers
+	\item Payload
+\end{itemize}
+
+A field itself is represented as an instance of the \IFField{} interface.
+
+Here, the basic concept is given of how fields are used and implemented.
+
+%***********************************************************************************************
+
+\paragraph{Requirements for Fields}
+\label{sec:RequirementsForFields}
+
+\newcommand{\REQUfieldQueryFields}{\texttt{FIELD\_REQU\_1}}
+\newcommand{\REQUfieldInterpValueString}{\texttt{FIELD\_REQU\_2}}
+\newcommand{\REQUfieldInterpValueTyped}{\texttt{FIELD\_REQU\_3}}
+\newcommand{\REQUfieldBinaryValue}{\texttt{FIELD\_REQU\_4}}
+\newcommand{\REQUfieldEfficientReading}{\texttt{FIELD\_REQU\_6}}
+\newcommand{\REQUfieldLargeFields}{\texttt{FIELD\_REQU\_5}}
+\newcommand{\REQUfieldCustomConversions}{\texttt{FIELD\_REQU\_6}}
+
+The following requirements for fields exist:
+\begin{itemize}
+	\item \REQUfieldQueryFields{}: The user can query all fields from a header, footer or payload in their storage order in the same way.
+	\item \REQUfieldInterpValueString{}: The user can get a string representation of the field's interpreted value for display purposes (e.g. in dialogs).
+	\item \REQUfieldInterpValueTyped{}: The user can get the field's interpreted value as a typed version. As some fields contain parsing information, it is necessary to convert the field's byte value to e.g. a numeric representation to be able to use it further. Of course, also the \LibName{} implementation must be able to obtain a typed interpreted values in case of a field that stores parsing information. This requirement includes the possibility to compare two field's interpreted values using \texttt{equals()}.
+	\item \REQUfieldBinaryValue{}: The user must be able to retrieve the binary value of a field.
+	\item \REQUfieldEfficientReading{}: \LibName{} must read fields efficiently which basically means it must minimize accesses to the potentially slow external medium when reading fields.
+	\item \REQUfieldLargeFields{}: \LibName{} must be able to deal with large fields, i.e. fields too big to be loaded into memory in total. This requirement is treated in \SectionLink{sec:HandlingLargePayload}.
+	\item \REQUfieldCustomConversions{}: It must be possible for \LibName{} extenders to easily define custom field conversion rules, as specific data formats might define very specific encoding rules for binary field values.
+\end{itemize}
+
+%***********************************************************************************************
+
+\paragraph{Field Types}
+\label{sec:FieldTypes}
+
+Corresponding to different interpreted value types, there are multiple \emph{field types} in \LibName{}. Each single field has exactly one field type.
+
+A field type represents the following:
+\begin{itemize}
+	\item The data type for the field's interpreted value
+	\item The value range for the field's interpreted value
+	\item The conversion rules for transforming a binary value into an interpreted value
+\end{itemize}
+
+The following table shows the standard field types:
+
+\begin{longtable}{|p{0.2\textwidth}|p{0.5\textwidth}|p{0.3\textwidth}|}
+	\hline
+	Field Type & Description & Data Type \\
+	\endhead
+	\hline
+	Binary & Fields that just store binary data, e.g. encoded audio data. & \CLASSbinaryValue{}\footnote{This is a custom type that wraps one or multiple \texttt{byte[]} arrays. See \SectionLink{sec:ReturningBinaryandInterpretedValue}.} \\
+	\hline
+	String & Fields that store a string that is encoded in a standardized text encoding. & \texttt{java.lang.String} \\
+	\hline
+	Numeric & Fields that store a number that is encoded in a specific standardized byte order. & \texttt{java.lang.Long} \\
+	\hline
+	Flags & Fields that store flags, i.e. bit-based indicators. & \CLASSFlags{}\footnote{This is a custom type that allows for retrieval of single, named flags.}\\
+	\hline
+	Enumerated & Fields that have a strictly fixed, limited number of possible interpreted values that are directly mapped to exactly one corresponding binary value. & \texttt{java.lang.Object} \\
+	\hline
+	Any & Fields that may have any interpreted value type, without restrictions. & \texttt{java.lang.Object} \\
+	\hline
+\end{longtable}
+
+Every of these types has its standardized conversion rules.
+
+%***********************************************************************************************
+
+\paragraph{Standard and Custom Conversions}
+\label{sec:FieldConversion}
+
+Field conversion converts the binary value of a field to the corresponding interpreted value and vice versa. The former is done after reading, the latter before writing.
+
+The rules for these conversions are partly standardized and therefore handled by the custom conversions for the field types presented in \SectionLink{sec:FieldTypes}. Examples are strings encoded in ASCII or Unicode as well es integers in big endian byte order. The following table lists the conversions for the standard field types:
+
+\begin{longtable}{|p{0.3\textwidth}|p{0.7\textwidth}|}
+	\hline
+	Standard Field Type & Conversion Approach\\
+	\endhead
+	\hline
+	Binary & No conversion required, only wrapped into class \CLASSbinaryValue{}. The interpreted value of a binary field always equals its binary value.\\
+	\hline
+	String & Conversion according to the charset defined for the string.\footnote{The charset is either the data format's default charset, or defined by another field using a field function (see \SectionLink{sec:FieldFunctions}), or could even be fixedly defined by the data format for that single field.}\\
+	\hline
+	Numeric & Conversion according to the byte order defined for the number.\footnote{The byte order is either the data format's default byte order, or defined by another field using a field function (see \SectionLink{sec:FieldFunctions}), or could even be fixedly defined by the data format for that single field.}\\
+	\hline
+	Flags & Calling a conversion function of the \CLASSFlags{} class. Basically, every bit or set of bits in a byte is interpreted as a flag.\footnote{This is specified by a \CLASSflagSpecification{} associated with the field in its data format specification.}\\
+	\hline
+	Enumerated & Based on a fixed length conversion table, that simply maps a single interpreted value to the corresponding single binary value. This is done bijective meaning no interpreted value and no byte value may occur twice in that table.\\
+	\hline
+	Any & No conversion rules defined. User defined conversion rules are required.\\
+	\hline
+\end{longtable}
+
+Some data formats define their own encoding mechanisms. Examples are the ID3v2 sync-safe integers or the EBML vints. Therefore it must be possible to provide custom field conversions. The handling of both standard and custom conversions is treated in \SectionLink{sec:MeetingREQUfieldCustomConversions}.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldQueryFields{}}
+\label{sec:MeetingREQUfieldQueryFields}
+
+The user interface for querying fields must be the same, no matter if the parent data block is a header, a footer or payload. Therefore a common base interface \IFFieldSequence{} is defined. This interface contains all methods that deal with fields.
+
+When reading fields, two different approaches can be distinguished: Reading all fields at once which returns a list, or reading fields consecutively using an iterator.
+
+The following table lists the pros and cons of both approaches:
+
+\begin{longtable}{|p{0.2\textwidth}|p{0.4\textwidth}|p{0.4\textwidth}|}
+	\hline
+	Criterion & List approach & Iterator approach\\
+	\endhead
+	\hline
+	Memory Footprint & All fields at once in memory, may lead to out-of-memory condition for a lot of non-lazy fields. Fields can be cached. & When used correctly, only one field is in memory, while recent fields are soon garbage collected. For every new call to query fields, a new iterator instance is created.\\
+	\hline
+	Code complexity & All code is in the \IFDataFormatReader{}, the code is largely stateless as all fields are read with one call. & At least one additional class with complex interdependencies. It needs to keep track of current iteration cycle which makes it very stateful. More methods in \IFDataFormatReader{} need to be public, as the iterator class needs to call them.\\
+	\hline
+	Exception handling & Cannot throw exception for reading a single in-between field, while additionally providing the possibility to read fields behind, too. & Can throw exception for single field reading, using checked exception. This enables reading further fields. Needs an additional non-standard iterator class, then.\\
+	\hline
+	Ease of use & Number of fields known in advance. & Number of fields unknown in advance. Data block iterators can be reused better.\\
+	\hline
+	Continuity of design & List approach does not correspond to iterator approach for containers. Corresponds to list approach for headers and footers. & Iterator approach corresponds to container iterator approach. Does not correspond to list approach for headers and footers.\\
+	\hline
+\end{longtable}
+
+This table at first sight does not provide a clear winning approach. However, due to the code complexity which is much higher with the iterator approach, the list approach wins. The memory footprint issue is a weak advantage of the iterator approach. The list approach will only fail with an out-of-memory condition in the following case: A header, footer or payload data block has a lot of fields, several ten thousands of them. These fields must be small enough to not be lazy fields, but not too small, i.e. several thousands of bytes. In that case, the fields would cover 
+maybe up to 500 megabytes. Such a case is extremely unlikely. More likely are cases with a few small fields, or a few fields with one or two large ones, that are lazy and therefore not kept in memory.
+
+The list approach wins. The problem with exception handling in that case is treated in \SectionLink{sec:FieldConversionErrorHandling}.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldInterpValueString{}}
+\label{sec:MeetingREQUfieldInterpValueString}
+
+\REQUfieldInterpValueString{} is met by adding the method \METHgetStringValue{} to \IFField{}. An \IFField{} implementation returns an appropriate string representation of the field's interpreted value.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldInterpValueTyped{} Part 1}
+\label{sec:MeetingREQUfieldInterpValueTyped1}
+
+The types of interpreted values to be returned is listed in \SectionLink{sec:FieldTypes}. The solution for this requirement is to return an interpreted value as \texttt{Object}. There is no other reasonable way than that to provide for arbitrary interpreted value types. The \IFField{} interface is a generic interface parameterized with the type of interpreted value it returns. For reading fields, this does not provide any further advantage, as the user must cast in any case. For writing fields, the user is type-safe when using \IFField{} for every custom field type.
+
+The cast of the field's interpreted value after reading a field is unavoidable to be able to provide a generic interface. Whenever the user needs to display or print a field's interpreted value, he should use the string representation of the field as mentioned in \SectionLink{sec:MeetingREQUfieldInterpValueString}. In case he needs the value type, he must cast to the actual type. As the user must be concrete in this situation, he must actually \emph{know} the type of field by consulting the data format's specification.
+
+For all field types except enumerated fields and any-typed fields, the type of interpreted value is fixed. It is guaranteed that the type of interpreted value for a numeric field is always \texttt{java.lang.Long}, for a string field is always \texttt{java.lang.String} and so on. For every numeric field smaller than 9 bytes, a \texttt{java.lang.Long} interpreted value is returned. There are no int or short interpreted field values, even if the binary field value is only capable of holding less than 8 bytes. For writing fields, this has the consequence that the user might specify a number that is too large to be stored. This issue is treated in terms of field conversion errors as described in \SectionLink{sec:FieldConversionErrors}.
+
+The type of the interpreted value for an enumerated field is arbitrary. During load time of the specification, it must be possible to create an interpreted value for the enumeration table from a stored string representation, i.e. the type of interpreted value needs to have a constructor with a single string argument.
+
+For any-typed fields, there are no constraints for their interpreted value types.
+
+%***********************************************************************************************
+
+\paragraph{Field Function Stack: Keeping Track of Parsing Information}
+\label{sec:FieldFunctionStack}
+
+\LibName{} uses the concept of field functions as described in \SectionLink{sec:FieldFunctions}.
+
+Whenever a field with a field function is read, the field's information must be stored during a single read call as long as its parsing information could be needed. For this, a stack approach is appropriate. The stack stores the field functions and associated values during a single read call. Upcoming operations can access the stack to be able to parse raw bytes.
+
+The class \CLASSfieldFunctionStack{} realizes such a stack.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldInterpValueTyped{} Part 2}
+\label{sec:MeetingREQUfieldInterpValueTyped2}
+
+When reading data blocks, the class \CLASSfieldFunctionStack{} is used to type-safely return the interpreted value of a field function. This is possible due to the strict definition of field functions and the types they expect. For this to work, each field function type parametrizes its associated type with a generic argument. The \CLASSfieldFunctionStack{} provides a generic method parametrized with the type of interpreted value. Whenever the \CLASSfieldFunctionStack{} is accessed for querying an interpreted value, a concrete field function type is used, matching the method's generic argument and returning the requested interpreted value without casting\footnote{Of course, the correctness of the data format specification must be ensured for this to work. Each field with a field function must also define the exact required field type.}.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldBinaryValue{}}
+\label{sec:MeetingREQUfieldBinaryValue}
+
+One might think \REQUfieldBinaryValue{} is implicitly met, as every data block must implement the method \METHgetBytes{} that returns the data block's bytes at a specific position and with specific length. However, there must be an additional method \METHgetBinaryValue{}, because the 
+\METHgetBytes{} method has no notion of throwing a checked conversion exception as required by \SectionLink{sec:FieldConversionErrorHandling}. The method returns an instance of \CLASSbinaryValue{} that encapsulates the handling of large, i.e. long sized data. It internally stores a two dimensional byte array which represents the data. Each \IFfield{} instance contains such an instance.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldEfficientReading{}}
+\label{sec:MeetingREQUfieldEfficientReading}
+
+Optimal behavior when accessing a medium is described in \SectionLink{sec:MeetingOptimizeMediumAccess}. The problems when dealing with large data are described in \SectionLink{sec:MeetingHandlingLargePayload}.
+
+As described there, for fields, there are two cases that must be considered for optimum behavior:
+\begin{itemize}
+	\item We do not want to have additional read operations for each single small field (i.e. fields having only about 1 to 100 bytes).
+	\item There might be large fields too. While this is not very likely for header or footer fields, payload fields might easily store multiple gigabytes.
+\end{itemize}
+
+When reading fields, a maximum block-size called \CONSTfieldBlockSize{} is defined. This is the maximum number of field bytes that is read in a single read call. This helps to achieve a small memory footprint, because only up to \CONSTfieldBlockSize{} bytes are in memory for a given payload instead of all payload bytes. This is especially important for large payload blocks.
+
+Here is the algorithm for reading fields of a payload block-wise:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_3_BlockWiseFieldReading.pdf}
+	\caption{Algorithm describing the block-wise field reading}
+	\label{fig:V_3_BlockWiseFieldReading}
+\end{figure}
+
+This algorithm is implemented in the method \METHreadField{}.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldLargeFields{}}
+\label{sec:MeetingREQUfieldLargeFields}
+
+The design decision \SectionLink{sec:LazyLoading} states that \emph{lazy fields} are used to avoid out-of-memory conditions. A lazy field postpones the actual reading of data to the point in time where the user requests it. Reading raw bytes from a lazy field can be done piece-wise as stated in \SectionLink{sec:MeetingREQUfieldBinaryValue}.
+
+For any of the field types flags, string, numeric or enumerated, field lengths bigger than Integer.MAX\_SIZE are not reasonable. This is already prohibited by the programming language of choice. Therefore these fields, whenever conversion shows a too large field size, throw an \CLASSfieldSizeOutOfRangeException{}.
+
+For binary values, longer sizes than Integer.MAX\_SIZE \emph{are} reasonable. For this purpose, the \CLASSbinaryValue{} class encapsulates the handling of large, i.e. long sized data. It internally stores a two dimensional byte array which represents the data. 
+
+A lazy field wraps exactly one other field, delegating access to this wrapped field. It converts the field as soon as its interpreted value is requested.
+
+The decision whether a ``normal'' or a lazy field is created is made in the algorithm described in \SectionLink{sec:MeetingREQUfieldEfficientReading}. Whenever a field's size is bigger than \CONSTfieldBlockSize{}, the field is considered a lazy field.
+
+%***********************************************************************************************
+
+\paragraph{Terminated Fields}
+\label{sec:TerminatedFieldsandLargePayload}
+
+Terminated fields impose some practical problems when parsing them, especially if they are bigger than \CONSTfieldBlockSize{}. Their size is not known in advance. Instead, a series of termination bytes must be searched for. Therefore reading and testing of every byte of the field is required.\footnote{The solution \emph{cannot} be based on strategies such as reading backwards, because the support of streaming media requires strictly sequential reading. Furthermore, no special cases such as ``single terminated child in parent who's size is known'' are identified and treated. These approaches would only increase complexity without adding to overall efficiency.}
+
+As soon as the termination bytes are found or the parent's end is reached, the field size is known. Furthermore, because all of the bytes have been read already, the whole field should be already in memory. Here, it must be avoided for large fields\footnote{I.e. fields who's size is bigger than \CONSTfieldBlockSize{}} to read all of the field bytes at once into main memory. Instead, also a block-wise reading approach is necessary. Up to \CONSTfieldBlockSize{} are read and searched for the termination bytes. If no termination bytes are found, the next bytes of the parent's payload are read and so on. If no termination bytes occurred up to the end of the parent's payload bytes, the fields is considered to span over the whole rest of its parent.
+
+This block-wise reading is a temporary loading approach that cannot use caching. That means the already read bytes are discarded immediately after processing. Therefore upcoming reads of large terminated fields need to do another medium access to get the field into memory again.
+
+Another issue when reading terminated fields concerns the actual character encoding and corresponding termination bytes of a string field. If a string field is terminated, it is expected to have a corresponding termination character rather than termination bytes. If e.g. a terminated string field uses UTF-16 encoding, the termination character is thus two bytes long. This approach requires that termination bytes are searched for only at offsets that are multiples of the character byte length (a.k.a. code points).
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUfieldCustomConversions{}}
+\label{sec:MeetingREQUfieldCustomConversions1}
+
+The standard field conversions can provide the following features:
+\begin{itemize}
+	\item String fields: Converting a virtually arbitrary number of bytes to strings, with arbitrary character encodings registered in the system.
+	\item Numeric fields: Converting up to 8 bytes to numbers, with byte order little endian or big endian.
+	\item Flags Fields: Converting a virtually arbitrary number of bytes to a \CLASSflags{} instance, including multi-bit flags.
+	\item Enumerated Fields: Converting a fixed set of byte arrays to their corresponding interpreted value according to a conversion table.
+	\item Binary Fields: Holding binary data up to $2^{63}-1$ bytes. This is even longer than standard C/C++ and Java arrays.
+\end{itemize}
+
+Despite this very powerful and manifold possibilities, there are limitations that must be covered by custom conversions:
+\begin{itemize}
+	\item Numeric data types larger than 8 bytes are required (e.g. Java's BigDecimal).
+	\item Conversions to numbers that are not encoded as little or big endian, e.g. ``ASCII'' numbers, middle endian or mixed endian.
+	\item Serializing and deserializing of arbitrary data bytes from and to bytes.
+\end{itemize}
+
+Each conversion is handled by a stateless \IFfieldConverter{} implementation. Whenever conversions from bytes to any of the standard field types are necessary, a standard \IFfieldConverter{} implementation is used. If this is not sufficient, the standard converters can be overridden with custom ones, e.g. for the custom conversion of a numeric field to ID3v23's sync-safe integer.
+
+For the use cases mentioned above, this is not always sufficient. For these cases, the field type ANY is available. Without an additional custom conversion, an instance of an any \IFfield{} is useless. The combination of the any field type with a custom conversion could e.g. implement a field that must be converted from bytes to \texttt{BigDecimal}.
+
+The implementation of the field custom conversions is quite efficient: There is only one \IFField{} implementation for \emph{every} field type. This implementation is private, so the \LibName{} user must use the \IFdataBlockFactory{} to create one. For every field type except ANY, there is a standard \IFfieldConverter{} implementation that is stateless. Specific \IFdataBlockFactory{} implementations can define custom \IFfieldConverter{}s per field id to be converted.
+
+%***********************************************************************************************
+
+\paragraph{Field Conversion Errors}
+\label{sec:FieldConversionErrors}
+
+A field conversion might fail due to several reasons. Here, an approach is discussed that deals with field conversion errors. The following table lists the errors that might occur during converting fields:
+
+\begin{longtable}{|p{0.1\textwidth}|p{0.3\textwidth}|p{0.3\textwidth}|p{0.15\textwidth}|p{0.15\textwidth}|}
+	\hline
+	Field Type & Conversion Error & Reasons & Category & Occurrence\\
+	\endhead
+	\hline
+	Binary & No errors possible, as no conversion takes place. & \-- & \-- & \--\\
+	\hline
+	String & The binary value to convert is larger than Integer.MAX\_VALUE. However, a String's maximum length is Integer.MAX\_VALUE. & A string exceeding the limit of Integer.MAX\_VALUE was encoded. Another reason might be that the encoder has erroneously not written termination bytes in a large payload block to an otherwise much shorter string. The third reason occurs for a string field without a static size, but where another SIZE\_OF field must refer to its size. Either the SIZE\_OF field did not occur and the remaining parent byte count is bigger than Integer.MAX\_VALUE, or its given size is bigger than Integer.MAX\_VALUE. The fourth reason is a specification error, if the static size is specified to be bigger than Integer.MAX\_VALUE.& Encoding error or specification error & Extremely rare\\
+	\hline
+	String & The character encoding used for converting the string to binary representation or vice versa is unknown. & A character encoding has been determined for the field value that is not available in the system. It is however not possible that the runtime determines such a character encoding. The data format specification must define all possible character encodings. If one of these is not registered in the current system, this is a specification error. & Specification error & Extremely rare\\
+	\hline
+	Numeric & The length of the binary value to convert is longer than 8 which is the size of long in bytes. & The first possible reason is an incorrect static length in the data format specification. If the specified static length is smaller than 9 but the piece of data is wrongly encoded, the runtime will only read up to the static byte size. The second reason can occur for a numeric field without a static size, but with termination. Its termination might be missing or lead to a binary value longer than 8. The third reason can also occur for a numeric field without a static size, but where another SIZE\_OF field must refer to its size. Either the SIZE\_OF field did not occur and the remaining parent byte count is larger than Integer.MAX\_VALUE, or its given size is bigger than Integer.MAX\_VALUE. & Encoding or specification error & Sporadically\\
+	\hline
+	Numeric & The length of the long value converted to bytes is longer than the specified static field size. E.g. a value of 1000000 was given while the binary value can only hold one byte. & The user has given a wrong value for writing. & User input error & Sporadically\\
+	\hline
+	Flags & The binary value to convert does not equal the flag specification's byte value length. This includes the case that the binary value to convert is larger than Integer.MAX\_VALUE because only byte sizes up to Integer.MAX\_VALUE are allowed. & Can only be a specification error, because flags fields must have a static field size and the runtime interpretes only the specified static field size as belonging to the field. This static field size must match the flag specification's byte value length. The static field size may not be bigger than Integer.MAX\_VALUE.& Specification error & Sporadically\\
+	\hline
+	Enumerated & The binary value to convert is larger than Integer.MAX\_VALUE. However, the maximum byte length of an enumerated value is Integer.MAX\_VALUE. & Can only be a specification error, because enumerated fields must have a static field size and the runtime interpretes only the specified static field size as belonging to the field. & Specification error & Sporadically\\
+	\hline
+	Enumerated & The binary value to convert is not contained in the table of enumerated values for the field. & The data was wrongly encoded, or a data format extension was used that \LibName{} is not aware of. & Encoding error & Sporadically\\
+	\hline
+	Enumerated & The interpreted value to convert is not contained in the table of enumerated values for the field. & The user has given a wrong value for writing. & User input error & Sporadically\\
+	\hline
+	Any & No custom \IFfieldConverter{} was found for a given field id of type ANY. & The extension defining the ANY field fails to provide an \IFfieldConverter{} for the given field id. & Other errors & Sporadically\\
+	\hline
+	Any & The \IFfieldConverter{} could not convert the binary or interpreted value because of an arbitrary reason. & Other errors & Sporadically\\
+	\hline
+\end{longtable}
+
+%***********************************************************************************************
+
+\paragraph{Field Conversion Error Handling}
+\label{sec:FieldConversionErrorHandling}
+
+Before asking \emph{how} the identified error categories are handled, we define \emph{when} they are handled. The easy part of the answer is ``as early as possible''. All specification errors need to be detected and reported as a runtime error during load time of \LibName{}. For all identified specification errors, the \LibName{} code may assume that pure specification errors cannot occur anymore during field conversions. User input errors should be raised in the method the user calls passing the incorrect values. All other errors, especially encoding errors, can only be detected before the conversion itself.
+
+How to deal with errors? Three different approaches exist:
+\begin{enumerate}
+	\item A runtime exception is thrown. The field reading process is therefore immediately terminated. The user has no possibility to read or write further fields. In case of reading, only if he catches the exception and the exception stores the field or its binary value, he has the chance to further process the erroneous binary value.
+	\item A checked exception is thrown. The field reading process is free to proceed with the next field. The checked exception might store the field's erroneous value for display or correction purposes.
+	\item \LibName{} ignores the error silently, maybe with a logging warning. It automatically corrects the error. The error correction is case-dependent. E.g. for a failing binary to string conversion due to unknown character encoding, it might convert the binary value with a default system encoding instead. For a failing binary to enumerated conversion, it might convert the binary value to a specified ``unknown'' enumerated value.
+\end{enumerate}
+
+The third approach is the least transparent one. It must be well documented, otherwise users wonder what is going on inside. The runtime exception approach is limiting the users possibilities. He cannot skip over the erroneous fields and read fields behind it. However, it does not influence the implementation design of field reading as much as a checked exception, because no exception specification is required. Nevertheless, this reasoning leads to the decision that field conversion errors need to be handed to the user as checked exceptions. The checked exception contains an error message, as well as the binary or interpreted value tried to convert, this may even be a representation as field instance, that only contains one of these values.
+
+How to combine the checked exception approach with fields returned as list as presented in \SectionLink{sec:MeetingREQUfieldQueryFields}? The problem is that the methods returning the field lists cannot throw the checked exception, because this would prohibit getting further fields behind the erroneous one. The solution is to postpone exception throwing, by doing field conversion as soon as the interpreted or binary value is queried. Therefore the \IFfield{} methods \METHgetInterpretedValue{} and \METHgetBinaryValue{} need to throw the conversion exceptions. This approach requires to pass the character encoding and byte order of the interpreted field value to a corresponding initialization method and store it in its instance rather than passing it to a conversion method.
+
+When internally evaluating the interpreted values of fields for e.g. determining the size of a follow-up field with field functions, the runtime needs to deal with the checked exceptions, too. What does it mean if such exceptions occur there? The runtime should not terminate execution with a runtime exception. It should instead reset the value tried to obtain from the interpreted value to a default value and log the conversion error. This is safe as further reading can handle default values and the field reading is not aborted. If the user himself calls \METHgetInterpretedValue{} on the field, he will recognize the error, too. Additionally, using \COMPvalidation{}, the error will also show itself directly to the user.
+
+%***********************************************************************************************
+
+\paragraph{Field Lifecycle}
+\label{sec:FieldLifecycle}
+
+The life-cycle of a field object is shown in the following figure:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_1_FieldLifeCycles.pdf}
+	\caption{The lifecycle of a field when reading and writing.}
+	\label{fig:V_1_FieldLifeCycles}
+\end{figure}
+
+It must be distinguished between reading and writing of fields.
+
+Furthermore, the life-cycle for lazy fields is a special case, because these fields postpone the actual conversion. This is shown in the following figure:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.00\textwidth]{Figures/Part_V/V_1_LazyFieldLifeCycle.pdf}
+	\caption{The lifecycle of a lazy field.}
+	\label{fig:V_1_LazyFieldLifeCycle}
+\end{figure}
+
+Lazy fields cannot be written.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Reading Data Blocks}
+\label{sec:ReadingDataBlocks}
+
+%***********************************************************************************************
+
+\paragraph{Determine the Data Block Size}
+\label{sec:DetermineDataBlockSize}
+
+A data block may have static size which means its size is well known and defined as static byte count in the data format's specification. This usually applies to headers, footers or fields. A more complex case are data blocks with dynamic size, i.e. whose size is not known until parsing time. In most data formats, payload data blocks are able to have a dynamic size.
+
+In the dynamic case, the data block's size can be determined at run-time. At first, one cane identify two types of data blocks whose size must be determined at runtime, while for all the other types, their sizes are derived: Fields and Payload. As fields are the leaves of the data block hierarchy and built up headers and footers as well as - finally - payload, the sum of the field sizes gives the total size of its parent, may it be a header, footer, or payload parent. 
+
+Nevertheless, it is not sufficient to determine field's sizes only. For payload it could be argued that payload is the size of its child containers or its child fields. However, if one wants to support a lazy loading approach, i.e. not going into the leaves if not really necessary, then the payload size must be determined to be able to skip over a (potentially large) container without reading its guts. Usually, data formats have a fairly well support for that by specifying the size of the payload in one or another way. See the following table with details of the payload size approaches of different data formats:
+
+\begin{longtable}{|p{0.2\textwidth}|p{0.2\textwidth}|p{0.6\textwidth}|}
+	\hline
+	Data Format & Container & Approach\\
+	\endhead
+	\hline
+   ID3v1 and ID3v1.1 & Tag & Static size of payload \\
+	\hline
+   ID3v2.2, ID3v2.3, ID3v2.4 & Tag & Tag header contains size of payload. \\
+	\hline
+   ID3v2.2, ID3v2.3, ID3v2.4 & Frame & Frame header contains size of payload. \\
+	\hline
+   APEv1 & Tag & Tag footer contains size of payload. \\
+	\hline
+   APEv2 & Tag & Tag header contains size of payload plus footer (if present), tag footer contains size of payload plus header (if present). \\
+	\hline
+   Lyrics3v2 & Tag & Tag footer contains size of payload plus header. \\
+	\hline
+   RIFF & Chunk & Chunk header contains size of payload. \\
+	\hline
+   Matroska & Element & Element header contains size of payload. The size may also be given as ``Unknown''. \\
+	\hline
+   QuickTime & Atom & Atom header contains size of the whole atom. \\
+	\hline
+   MP3 & Frame & The MP3 frame header contains several fields, from which - with a non-trivial formula and table-based decisions - the frame payload size can be calculated. \\
+	\hline
+   VorbisComment & Tag & There is no length given at all, instead, the \emph{count} of user comments is given. \\
+	\hline
+   VorbisComment & Vorbis user comment & Vorbis user comment header contains size of payload. \\
+	\hline
+   TIFF & File & There is no length given at all, instead, the \emph{count} of IFDs is given. \\
+	\hline
+   Ogg & Ogg page & Instead of a direct length, a list of lacing values giving the sizes of all segments that form the page is given, whose sum is then the total page size. \\
+	\hline
+   IcyTag & Tag & Length of tag divided by 16, excluding length field, is given. \\
+\end{longtable}
+
+The table shows clearly that there are a lot of different approaches: A lot of data formats prefer to store the size directly, most of these do it exclusive, i.e. without the sizes of the size field or headers or footers included, but only the bare payload size. Some data formats require special calculations to determine the payload size, others simply don't give a size at all, but e.g. a count of children only.
+
+These diverse approaches seem to require special implementations for each format rather than a common algorithm. However, a common approach is presented here that can tackle at least the approaches presented above.
+
+The algorithm to determine the size of a field:
+\begin{itemize}
+	\item If the field has static size, the static size is the field's size.
+	\item Otherwise if the field is terminated, its termination bytes must be searched. See \SectionLink{sec:TerminatedFieldsandLargePayload} for details. The size of the field is the difference between the offset after its termination bytes and the field's starting offset, i.e. including the termination bytes.
+	\item Otherwise if the field's size is specified by another field's value, i.e. the field function stack stores a size (see \SectionLink{sec:FieldFunctionStack}), the field's size is the value stored in the stack.
+	\item Otherwise if the remaining number of bytes up to the end of the field's parent is known, the field is assumed tot reach up to the end of its parent.
+	\item Otherwise the field size is set to be unknown.
+	\item Special data formats may override this behavior with their own algorithm.
+\end{itemize}
+
+An unknown field size is currently treated as an error, as nothing behind the field can be read or identified.
+
+The algorithm to determine the size of payload:
+\begin{itemize}
+	\item If the payload has static size, the static size is the payload's size.
+	\item Otherwise if the payload's size is specified by another payload's value, i.e. the field function stack stores a size (see \SectionLink{sec:FieldFunctionStack}), the payload's size is determined based on the value stored in the stack. This may require more calculations. If the SIZE\_OF function affects not only the payload, but additional other data blocks (mostly the header(s) and / or footer(s) of the same container), the size value given is interpreted as the sum of all these data blocks. Therefore the number of occurrences and sizes of the other affected blocks is tried to be determined. If that was successful, the payload's size is the given size minus the sum of the sizes of all the occurrences of the other affected blocks. If one of these other sizes could still not be determined, the payload's size is still assumed to be unknown.
+	\item Otherwise if the remaining number of bytes up to the end of the payload's parent is known, the payload is assumed to reach up to the end of its parent.
+	\item Otherwise the payload size is set to be unknown.
+	\item Special data formats may override this behavior with their own algorithm.
+\end{itemize}
+
+An unknown payload size is more acceptable than an unknown field size. This is because firstly, some data formats such as Matroska allow a size value of ``unknown'', which means ``virtually endless'', and some other data formats such as VorbisComment simply only give a count of children rather than a size. In such cases, the children \emph{must} be read to be able to determine the payload's size.
+
+%***********************************************************************************************
+
+\paragraph{Identifying the Data Format of Top-Level Containers}
+\label{sec:IdentifyingTheDataFormatOfContainers}
+
+A medium on top-level must, by definition, consist of container data blocks, these are called \emph{top-level containers}. A medium might well consist of top-level containers from various different data formats. Thus it is necessary to first identify the data format of the first or next top-level container, as it cannot be known in advance. When trying to identify the data format of the next data block on top-level, the following approach is used to minimize medium access. All headers of all supported data formats are considered. For every such header, its maximum size is taken. If the header has a static size, its maximum size equals its minimum size. It is not allowed for headers to have no maximum size defined. From all the maximum sizes of every considered header, the biggest one is taken as the number of bytes to be read next.
+
+So now we have the maximum possible header size that can occur in the medium at the current position. These size is read. It might occur during reading that the end of the medium is hit, as it has not the number of bytes left we wanted to read. This case allows us to eliminate all these data format headers whose minimum header size is longer than the actually read bytes up to end of medium. From the remaining headers, the bytes read are matched against the magic keys of each corresponding container for that header. The first match wins. If a match occurs, the data format of the next portion of bytes in the medium has been successfully identified. The header bytes are already loaded at least partly into memory, and maybe even more upcoming bytes. If no header remains after end of medium condition or no one was identified by its magic key, the data format of that byte portion is considered to be unknown.
+
+The data format identification process is shown in the following figure:
+
+\OpenIssue{Add figure}{Add figure for data format identification}
+
+%***********************************************************************************************
+
+\paragraph{Identifying the Type of Child Containers}
+\label{sec:IdentifyingTheDataFormatOfContainers}
+
+The payload of a top-level container may again consist of several containers, whose payload in turn can consist of containers and so on up to arbitrary depth. These containers are called \emph{child containers}. Their data format must be the same as their parents'.\footnote{Embedding other data format data blocks is nevertheless supported by \LibName{}. The raw bytes of such a data block can be read and accessed as a separate memory based medium, searching for top-level containers of supported data blocks.} The range of possible containers can be determined by querying all child containers defined for the specific payload block. It might be that a payload block has a generic container child.
+
+As for top-level containers, for all possible child containers, the maximum header size is determined and read into memory. The same handling of end of medium conditions applies. If the read bytes match with one of the container candidates' magic keys, the child container is identified. If no child container has been identified, the payload might as well consist of fields. If there is no child field specified, the container payload is considered as unknown field, a plain block of non-interpretable bytes.
+
+The child container identification process is shown in the following figure:
+
+\OpenIssue{Add figure}{Add figure for child container identification}
+
+%***********************************************************************************************
+
+\paragraph{Dealing with Encoding Errors}
+\label{sec:DealingwithEncodingErrors}
+
+Encoding software, including \LibName{} itself, might encode data in a way that \LibName{} cannot read correctly again. These errors originate from several reasons:
+\begin{itemize}
+	\item The encoder has a bug. This might be reinterpreted to ``the encoder intentionally does not fully comply with the format's specification.''
+	\item The encoder implements proprietary data format extensions not convered in the original data format specification. In an ideal world, it should always be possible to detect such extensions before facing parsing problems.
+	\item The encoded data was arbitrarily manipulated after encoding.
+\end{itemize}
+
+If an unknown data format extension can be detected using the standard version number of the format, the data format is considered as unknown. For all other cases, the following sections apply.
+
+The \IFDataFormatSpecification{} of a data format strictly defines its data block properties (see \SectionLink{sec:InterfaceDesignCOMPdataFormatManagement}). The following table lists the errors that can occur during reading:
+
+\begin{longtable}{|p{0.2\textwidth}|p{0.4\textwidth}|p{0.4\textwidth}|}
+	\hline
+	Reading Error & Description & Example\\
+	\endhead
+	\hline
+   Wrong enumerated field value & A binary field value does not match any of its specified enumerated values. & A field contains the character encoding of upcoming fields. Its binary value is unknown, there is no matching character encoding specified.\\
+	\hline
+   Wrong field value for fixed field & A field value does not equal its specified fixed value. & A reserved field must have a value of 0.\\
+	\hline
+   Missing mandatory fields & There are too few mandatory fields within a given payload, header  or footer block. & A payload block contains two fixed size fields and a terminated field as last one. However, its size is so small to contain the first field only.\\
+	\hline
+   Unexpected bytes & A payload, header or footer block contains additional bytes up to its end. & A payload block contains two fixed size fields and a terminated field as last one. However, after the termination bytes of the last field, there are still bytes remaining up to its end.\\
+	\hline
+   Size exceeds medium & A size specified in a field exceeds the overall medium size. & A header contains the size of a payload block in one of its fields. It contains a size that is larger than the overall file size.\\
+	\hline
+   Size exceeds parent size & The size of a child payload block is bigger than the parent's size. & A header contains the size of a payload block in one of its fields. It contains a size that is larger than the size of the parent block.\\
+	\hline
+   Size exceeds data type length & A dynamically determined field size exceeds the size of a data type used. &  A header contains the size of a payload block in one of its fields. It stores the size of a string field, but contains a size that is larger than Integer.MAX\_VALUE.\\
+	\hline
+   Wrong field count & The number of fields specified is wrong. & A header contains the number of upcoming header fields in one of its fields. It contains a number that is larger than the actual count of fields up to the end of the header.\\
+\end{longtable}
+
+The size misinterpretations may occur if random data is parsed.
+
+\OpenIssue{Treat encoding error handling}{Some are handled as runtime exceptions, others are handled as validation errors (after being corrected / ignored), others as conversion errors.}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Caching, Reloading and Locking Concept}
+\label{sec:CachingReloadingConcept}
+
+\newcommand{\REQUcrlOptMediumAccess}{\texttt{REQU\_CRL\_OPT\_MEDIUM\_ACCESS - Optimize medium access}}
+\newcommand{\REQUcrlLargeData}{\texttt{REQU\_CRL\_LARGE\_DATA - Handling large data}}
+\newcommand{\REQUcrlRawByteRetrieval}{\texttt{REQU\_CRL\_RAW\_BYTE\_RETRIEVAL - Raw Byte Retrieval}}
+\newcommand{\REQUcrlThreadSafety}{\texttt{REQU\_CRL\_THREAD\_SAFETY - Thread-Safety}}
+\newcommand{\REQUcrlAvoidInconsistencies}{\texttt{REQU\_CRL\_AVOID\_INCONSISTENCIES - Avoid Inconsistencies}}
+
+The design decision for caching is stated in \SectionLink{sec:CachincPolicy}, the one for reloading in \SectionLink{sec:ReloadingPolicy} and the locking design decision is presented in \SectionLink{sec:LockmediumsifPossible}. This section details the corresponding design.
+
+At first it must be emphasized that caching and reloading is something accomplished by a cooperation of \COMPmedia{} and \COMPdataBlocks{}. \COMPdataBlocks{} does the actual cache management while \COMPmedia{} provides the primitives for the task as well as the locking mechanism.
+
+The following requirements must be fulfilled:
+\begin{enumerate}
+	\item \REQUcrlOptMediumAccess{}: To optimize performance, physical \TERMmedium{} accesses need to be minimized.
+	\item \REQUcrlLargeData{}: Potentially large data sizes must be handled. \LibName{} must not load a large number of bytes into memory at once and willingly cause an out-of-memory condition, unless the \ACTORuser{} requests it (see requirement \#2).
+	\item \REQUcrlRawByteRetrieval{}: The \ACTORuser{} must be able to retrieve the raw bytes that make up a \TERMdataBlock{} at any time.
+	\item \REQUcrlThreadSafety{}: If \LibName{} is used by multiple threads, two threads may not access the same \TERMmedium{} at the same time.
+	\item \REQUcrlAvoidInconsistencies{}: All measures must be taken to avoid that other processes change the \TERMmedium{} currently accessed by \LibName{}. If a change nevertheless has happened, the write operation must not change anything but react with an error.
+\end{enumerate}
+
+We now discuss necessary measures for each requirement. Then an overall solution design is presented for these topics.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUcrlOptMediumAccess{}}
+\label{sec:MeetingOptimizeMediumAccess}
+
+How to minimize medium access? The probably most inefficient way would be to read byte by byte from the medium, accessing it for reading the smallest unit that can be read at once. Instead, portions of data need to be identified that are predestined to be read at once. A data block is a good starting point. What types of data blocks are candidates for this?
+\begin{itemize}
+	\item Often headers and footers have a static size for optimized parsing. The basic idea is to read the static header size at once, first look if the data really belongs to a known data format, and if so, getting all necessary parsing information from the header for reading the payload. This is true for top-level headers as well as for headers of lower order, embedded in containers.
+	\item Fields are usually small enough to be read at once into memory, if their size is known in advance. For terminated fields, this is not possible. The field bytes in that case must be read up to the termination bytes.
+	\item Payload size of a container is often known in advance, by reading the header before.
+\end{itemize}
+
+Two constraints must be considered here:
+\begin{itemize}
+	\item The lazy loading approach has been given as a design decision in \SectionLink{sec:LazyLoading} already. The vision is to first read in the building plan of a container data block, by reading its headers or footers. These most of the time wear all relevant information about the payload, which is just its size. Knowing its size, it is easy to go to the next container and read it. It is not necessary to read the payload of the first container to get to the next one, not until the user requests it. This lazy approach safes processing time and memory, of course. It is a positive constraint in a sense that payload is never read until the user requests it, which definitely safes premature medium accesses. There are some exceptions from that rule: 
+\begin{enumerate}
+	\item There are a few data formats such as XML that do not store the size of the payload. I.e. there is usually no size attribute in an XML tag that states how much bytes are in there. XML is just a character based format intended to be human readable, yet not as easy readable for computers. Here the same approach goes as for terminated fields, as XML tags are terminated.
+	\item Stream-based media. As the bytes can only be read once from a stream-based medium, all the bytes of payload need to be read when they arrive, which means reading the payload cannot be postponed to a later point in time.
+\end{enumerate}
+	\item The approach of \SectionLink{sec:HandlingLargePayload} must be considered. A large data block should not be read at once into memory.
+\end{itemize}
+
+Due to these constraints, a payload data block definitely is not a candidate to be read at once, even if the user requests it to be read. In the latter case, the same problem as for top-level containers comes in recursively: Either it consists of containers again, or it consists of fields.
+
+The headers and footers are the data blocks that are suitable the most. Reading the fields of payload is another candidate for medium access optimization. The approaches for these candidates are presented in the next sections.
+
+%***********************************************************************************************
+
+\paragraph{Premise of Small Headers}
+\label{sec:PremiseofSmallHeaders}
+
+As described in the sections \SectionLink{sec:IdentifyingTheDataFormatOfContainers} and \SectionLink{sec:IdentifyingTheDataFormatOfContainers}, the maximum size of all possible headers on top-level or within the payload of a container is read at once into memory. This willingly hurts the requirement of not loading large data portions into memory to avoid out-of-memory conditions (see \SectionLink{sec:HandlingLargePayload}). If the longest specified maximum header size is huge, an out-of-memory condition will likely occur.
+
+However, here the premise is made \emph{that header sizes are usually quite small}. The longest headers seen in the wild may comprise about 300 bytes. A data format specifying multiple kilobytes of header size should IMHO be considered as badly designed. However, \LibName{} does not directly define a maximum possible size for headers. Instead, the whole long header size is read, if it is huge, an OutOfMemoryError will occur.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUcrlLargeData{}}
+\label{sec:MeetingHandlingLargePayload}
+
+The reloading design decision in \SectionLink{sec:ReloadingPolicy} already states that out-of-memory conditions should be avoided, if possible. An intended exception of this is the \SectionLink{sec:PremiseofSmallHeaders}. In theory, any data block might have a size up to Long.MAX_VALUE, which is $2^{63}-1$ bytes. Furthermore, a medium may virtually consist of an unlimited number of data blocks, allowing for a possibly unlimited size of the total medium. The usual case for mp3 audio song files currently might range from 3 MB to 10 MB in size, which is perfectly covered by int sizes. The same is true for any metadata. The int range is not suitable for large video files, which might easily exceed 3 gigabytes of size. Nevertheless, the data blocks stored inside might still not exceed Integer.MAX_VALUE. However, it cannot be denied that \LibName{} should potentially be able to deal with long sizes. The challenge now is to have a well-defined behavior for \LibName{} in case of long sizes, especially still having a small memory-footprint.
+
+The corner stones of a small memory footprint in \LibName{} are as follows:
+\begin{itemize}
+	\item The \ACTORuser{} is able to read raw bytes block-wise, see \SectionLink{sec:RawByteRetrieval}.
+	\item The often mentioned lazy loading approach to not read the payload until the \ACTORuser{} requests it helps very much in avoiding out-of-memory conditions. Only headers and footers are read fully into memory, see \SectionLink{sec:PremiseofSmallHeaders}.
+	\item As stated in \SectionLink{sec:CachincPolicy}, there is not much caching in \LibName{}. A temporary caching goes on when reading headers, footers or payload, but only during a limited time period. Therefore this cached data has a lifetime limit, it shall not last any longer than the \ACTORuser{} could possibly need it. Additionally, two special cases need to be considered: For stream-based media, the whole raw data must be kept in main memory to be available later after reading, because the medium part where the data has been originally read from is only available once. Furthermore, read field contents shall be cached in main memory too, to not access the medium again for retrieving a few bytes that have already been read. The \ACTORuser{} must be able to access the raw byte contents of a data block over its whole lifetime. 
+	
+	How to achieve this? Each data block gets a medium reference which points to the place on the medium where the data block is stored. Firstly, in case of a lazily read payload or field data block (only for random-access media), this reference can be used to read the data on \ACTORuser{} request from the medium. For smaller fields, headers, footers from random-access media and for any data block read from a stream-based medium, bytes are stored in the medium cache, too. For each data block, there is an entry in a \texttt{WeakHashMap}, where its key is the medium reference. Whenever the data block is not referenced in the Java application anymore, the cache contents is garbage collected as soon as the data block is. This approach allows for a single way of accessing a data block's raw bytes.
+	\item \LibName{} might avoid to read the payload for once, however, the time will come when the \ACTORuser{} wants to read the details from the large payload previously skipped over. This is of course only relevant for random-access media. Whenever a stream-based medium encounters a too-large payload block, it \emph{will} be read in total and \emph{will} cause an out-of-memory condition. This is then considered a badly encoded piece of media for the purpose of streaming. The two scenarios for the contents of the payload are presented in the next points.
+	\item The large payload may consist of containers. Here the payload of these child containers will again be lazy, avoiding loading into memory. One or a few such child containers might be the ones holding all the large data, or another case might be that the large payload consists of a lot of rather small containers, but their entirety is large. In the latter case, the \ACTORuser{} is responsible for not keeping these little containers too long, but process them step-wise in a loop, allowing the garbage collector to get rid of the already processed ones after one loop pass. This is just nothing more then good programming practice. 
+	\item Another scenario is that the large payload consists partly or entirely of fields. Again, the majority of the bytes might be stored in one large field, or it might be nearly evenly distributed. The large field is issued by a lazy field approach. Whenever a large field is spotted, a kind of pointer to its start and end are stored, without loading any bytes of the large field into memory. What to do with a lot of small fields, that sum up to a large payload? There is a block-wise read approach presented in the next section \SectionLink{sec:MeetingREQUfieldEfficientReading}. What to do with terminated, large fields, who's size is not known in advance? See \SectionLink{sec:TerminatedFieldsandLargePayload}.
+	\item Further measures include the use of stateless classes to avoid a lot of objects hanging around and other techniques. This minimizes the memory footprint of all the \LibName{} classes and objects that to the actual work.
+\end{itemize}
+
+%***********************************************************************************************
+
+\paragraph{Transformations and Large Payload}
+\label{sec:TransformationsandLargePayload}
+
+Transformations transform read bytes into transformed bytes according to specific rules. If they are applied to a large data block, it must be avoided to \emph{store} all of the transformed bytes. Instead, the transformations should be applied block-wise whenever the raw bytes are accessed again.
+
+This approach only yields correct results if the transformation does not exchange the order of bytes or more generally spoken, the transformation must not require all payload bytes at once to create correct results. This cannot be guaranteed for every transformation, e.g. especially not for encryption algorithms.
+
+Therefore a block-wise transformation is not implemented. Instead, all bytes of a data block that must be transformed are read first. Therefore, whenever large payload blocks need to be transformed, \LibName{} cannot provide block-wise transformations, because this would probably undermine the library's correctness.
+
+Therefore transformations of large payload blocks are candidates that might cause out-of-memory-conditions.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUcrlRawByteRetrieval{}}
+\label{sec:MeetingREQUcrlRawByteRetrieval}
+
+The \ACTORuser{} is able to read raw bytes, as they are originally stored on the medium. Originally means that e.g. transformations such as ID3v2.3's unsynchronisation are not yet applied to these bytes.
+
+By using this possibility, the \ACTORuser{} for himself has to care about not reading too much at once. He also needs to do the interpretation of these bytes. To support the \ACTORuser{}, \LibName{} allows for block-wise reading. The \ACTORuser{} may read portions of the data block's raw bytes up to Integer.MAX_VALUE.
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUcrlThreadSafety{}}
+\label{sec:MeetingThreadSafety}
+
+\LibName{} users might want to use the library in multiple threads. One possible usage scenario could be a decoder that decodes multiple frames of a large audio file in parallel, maybe using multiple processors on the machine. The first thread might read the first container. As soon as its size is known, the first thread continues decoding the first container's payload, while the second thread already starts to read and later decode the second container and so on.
+
+Such a scenario leads to following requirements:
+\begin{itemize}
+	\item Two threads should be able to read the same medium at the same time.
+	\item It must not be possible to write to the medium while another thread is reading from the medium.
+	\item It must not be possible to write to the medium while another thread is writing to the medium.
+\end{itemize}
+
+These requirements cannot be fulfilled by letting the read and write methods both be synchronized methods, because a second read call would block on read. Instead, synchronization must be based on a lock object. Whenever a thread starts reading or writing, a write lock is created prohibiting other threads from reading or writing.
+
+\OpenIssue{Multi-threading Approach}{Check approach using the Java threads book.} 
+
+%***********************************************************************************************
+
+\paragraph{Meeting \REQUcrlAvoidInconsistencies{}}
+\label{sec:MeetingAvoidInconsistencies}
+
+The locking design decision in \SectionLink{sec:LockmediumsifPossible} states that a medium lock is acquired, if the underlying medium supports this. If locking is not successful because the medium is already locked by another process, an exception is thrown. If another thread in the same virtual machine tries to lock an already locked medium, another exception should be thrown, too\footnote{At least in the case of a file medium.}. If there is no locking mechanism for the medium at all, the \ACTORuser{} has to ensure that only a single process accesses the medium, otherwise inconsistencies of the medium data and \LibName{} exceptions are very likely. Here, no 100\% safety is possible.
+
+In most cases, this approach should at least avoid that \LibName{} does changes to media that it should not do, and that other threads are not stealing a lock acquired by \LibName{}.
+
+To mitigate or maybe avoid the damage done by concurrent medium accesses, the \COMPmedia{} component detects if the medium has changed since the last medium access. If so, an exception is thrown whenever reading from or writing to the medium again. Depending on the medium implementation, this is not secure as e.g. the last modified date of a file is not representative, as it can be arbitrarily modified by other processes.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Writing Data Blocks}
+\label{sec:ReadingDataBlocks}
+
+%-----------------------------------------------------------------------------------------------
+%		Test Cases
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Test Cases}
+\label{sec:TestCasesCOMPdataPartManagement}
+
+The test strategy for \texttt{IDataBlockAccessor} is as follows:
+\begin{itemize}
+	\item For a single test scenario, a single file is the source, for which reading from all media types is tested. E.g. reading from a file medium, reading from a memory medium (by loading the whole file content into memory), reading from a stream (by treating the file as a stream)
+	\item The following behavior is tested:
+	\begin{itemize}
+		\item Every data block with expected id appears under the expected parent and
+		in the expected order
+		\item Every data block has exactly its expected size
+		\item Data read from every data block at various offsets matches the file content at that 	offset
+		\item If the data block is a field, its interpreted value matches the expected value.
+	\end{itemize}
+\end{itemize}
+
+The test approach must also support files that contain multiple top-level data blocks belonging to different data formats.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Csv Test Data Solution}
+\label{sec:CsvTestDataSolution}
+
+The solution uses a csv format for expected data. The class structure is shown in the following figure:
+
+\OpenIssue{Add figure}{Add figure}
+
+A new concrete test class must subclass the \texttt{IDataBlockAccessorTest} class and provide a test file. The \texttt{IDataBlockAccessorTest} uses a \texttt{AbstractDataFormatExpectationProvider} instance for each data format of each expected top-level block. This instance returns all the expected data. One of its implementations reads the expected data from a standardized csv file.
+
+Templates for those csv files could be generated using the data format specification. 
+
+%-----------------------------------------------------------------------------------------------
+
+\subsubsection{Reading Large Data Tests}
+\label{sec:ReadingLargeDataTests}
+
+TODO
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################

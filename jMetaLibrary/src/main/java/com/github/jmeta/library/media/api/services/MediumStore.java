@@ -260,15 +260,15 @@ public interface MediumStore {
 	 * {@link MediumOffset}s within the removed range "fall back" to the start
 	 * {@link MediumOffset} of the removed range, i.e. are set to this
 	 * {@link MediumOffset}.</li>
-	 * <li>For {@link MediumActionType#REPLACE}: Let <tt>n</tt> be the number of
-	 * replaced bytes and <tt>m</tt> be the number of replacement bytes. For
-	 * inserting replaces (<tt>n &lt; m</tt>), any previously created
+	 * <li>For {@link MediumActionType#REPLACE}: Let <code>n</code> be the number of
+	 * replaced bytes and <code>m</code> be the number of replacement bytes. For
+	 * inserting replaces (<code>n &lt; m</code>), any previously created
 	 * {@link MediumOffset}s equal to or behind the end of the replaced range are
 	 * shifted forward, i.e. their {@link MediumOffset}s increase correspondingly.
-	 * For removing replaces (<tt>n &gt; m</tt>), any previously created
+	 * For removing replaces (<code>n &gt; m</code>), any previously created
 	 * {@link MediumOffset}s equal to or behind the end of the replaced range are
 	 * shifted backward, i.e. their {@link MediumOffset}s decrease correspondingly.
-	 * For overwriting replaces (<tt>n=m</tt>), any previously created
+	 * For overwriting replaces (<code>n=m</code>), any previously created
 	 * {@link MediumOffset}s equal to or behind the end of the replaced range remain
 	 * unchanged. In any case, {@link MediumOffset}s within the replaced range are
 	 * not changed by such a {@link MediumAction}.
@@ -421,10 +421,10 @@ public interface MediumStore {
 	 *
 	 * You can call this method multiple times with exactly the same
 	 * {@link MediumOffset}. This corresponds to multiple consecutive inserts, i.e.
-	 * first the data of the first call with length <tt>len</tt> is inserted at the
-	 * <tt>offset</tt>, then the data of the second call is inserted at
-	 * <tt>offset+len</tt> and so on. Inserting at the same offset therefore does
-	 * <i>not</i> mean overwriting any data or changing previous inserts.
+	 * first the data of the first call with length <code>len</code> is inserted at
+	 * the <code>offset</code>, then the data of the second call is inserted at
+	 * <code>offset+len</code> and so on. Inserting at the same offset therefore
+	 * does <i>not</i> mean overwriting any data or changing previous inserts.
 	 *
 	 * If data before the given offset is removed, replaced or inserted by prior
 	 * calls to the corresponding methods, the actual insert position is shifted

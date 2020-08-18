@@ -36,7 +36,7 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 
 	/**
 	 * Creates a new {@link AbstractMediumAccessor}.
-	 * 
+	 *
 	 * @param medium the {@link Medium} this {@link AbstractMediumAccessor} works
 	 *               on.
 	 */
@@ -98,57 +98,6 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 	}
 
 	/**
-	 * Concrete core implementation of {@link #close()}.
-	 * 
-	 * @throws IOException in case of anything goes wrong in the concrete
-	 *                     implementation
-	 */
-	protected abstract void mediumSpecificClose() throws IOException;
-
-	/**
-	 * Concrete core implementation of for opening access to the underlying medium.
-	 * 
-	 * @throws IOException in case of anything goes wrong in the concrete
-	 *                     implementation
-	 */
-	protected abstract void mediumSpecificOpen() throws IOException;
-
-	/**
-	 * Concrete core implementation of {@link #read(ByteBuffer)}.
-	 * 
-	 * @param buffer The {@link ByteBuffer} taking the bytes to read
-	 * @throws IOException in case of anything goes wrong in the concrete
-	 *                     implementation
-	 */
-	protected abstract ByteBuffer mediumSpecificRead(int numberOfBytes) throws IOException, EndOfMediumException;
-
-	/**
-	 * Concrete core implementation of {@link #setCurrentPosition(MediumOffset)}
-	 * 
-	 * @param position The new {@link MediumOffset} position to set
-	 * @throws IOException in case of anything goes wrong in the concrete
-	 *                     implementation
-	 */
-	protected abstract void mediumSpecificSetCurrentPosition(MediumOffset position) throws IOException;
-
-	/**
-	 * Concrete core implementation of {@link #truncate()}
-	 * 
-	 * @throws IOException in case of anything goes wrong in the concrete
-	 *                     implementation
-	 */
-	protected abstract void mediumSpecificTruncate() throws IOException;
-
-	/**
-	 * Concrete core implementation of {@link #write(ByteBuffer)}
-	 * 
-	 * @param buffer The {@link ByteBuffer} holding the bytes to write
-	 * @throws IOException in case of anything goes wrong in the concrete
-	 *                     implementation
-	 */
-	protected abstract void mediumSpecificWrite(ByteBuffer buffer) throws IOException;
-
-	/**
 	 * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#open()
 	 */
 	@Override
@@ -160,16 +109,6 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 			isOpened = true;
 		} catch (IOException e) {
 			throw new MediumAccessException("Could not open medium due to exception", e);
-		}
-	}
-
-	/**
-	 * Checks if the underlying {@link Medium} is read-only, and if so, it throws a
-	 * {@link ReadOnlyMediumException}.
-	 */
-	private void preventWriteOnReadyOnlyMedium() {
-		if (getMedium().isReadOnly()) {
-			throw new ReadOnlyMediumException(getMedium(), null);
 		}
 	}
 
@@ -228,16 +167,6 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 	}
 
 	/**
-	 * Updates the position returned by {@link #getCurrentPosition()}.
-	 * 
-	 * @param position The new {@link MediumOffset} position
-	 */
-	protected void updateCurrentPosition(MediumOffset position) {
-
-		currentPosition = position;
-	}
-
-	/**
 	 * @see com.github.jmeta.library.media.impl.mediumAccessor.MediumAccessor#write(java.nio.ByteBuffer)
 	 */
 	@Override
@@ -261,5 +190,76 @@ public abstract class AbstractMediumAccessor<T extends Medium<?>> implements Med
 		finally {
 			buffer.reset();
 		}
+	}
+
+	/**
+	 * Checks if the underlying {@link Medium} is read-only, and if so, it throws a
+	 * {@link ReadOnlyMediumException}.
+	 */
+	private void preventWriteOnReadyOnlyMedium() {
+		if (getMedium().isReadOnly()) {
+			throw new ReadOnlyMediumException(getMedium(), null);
+		}
+	}
+
+	/**
+	 * Concrete core implementation of {@link #close()}.
+	 *
+	 * @throws IOException in case of anything goes wrong in the concrete
+	 *                     implementation
+	 */
+	protected abstract void mediumSpecificClose() throws IOException;
+
+	/**
+	 * Concrete core implementation of for opening access to the underlying medium.
+	 *
+	 * @throws IOException in case of anything goes wrong in the concrete
+	 *                     implementation
+	 */
+	protected abstract void mediumSpecificOpen() throws IOException;
+
+	/**
+	 * Concrete core implementation of {@link #read(int)}.
+	 *
+	 * @param numberOfBytes The number of bytes to read
+	 * @throws IOException in case of anything goes wrong in the concrete
+	 *                     implementation
+	 */
+	protected abstract ByteBuffer mediumSpecificRead(int numberOfBytes) throws IOException, EndOfMediumException;
+
+	/**
+	 * Concrete core implementation of {@link #setCurrentPosition(MediumOffset)}
+	 *
+	 * @param position The new {@link MediumOffset} position to set
+	 * @throws IOException in case of anything goes wrong in the concrete
+	 *                     implementation
+	 */
+	protected abstract void mediumSpecificSetCurrentPosition(MediumOffset position) throws IOException;
+
+	/**
+	 * Concrete core implementation of {@link #truncate()}
+	 *
+	 * @throws IOException in case of anything goes wrong in the concrete
+	 *                     implementation
+	 */
+	protected abstract void mediumSpecificTruncate() throws IOException;
+
+	/**
+	 * Concrete core implementation of {@link #write(ByteBuffer)}
+	 *
+	 * @param buffer The {@link ByteBuffer} holding the bytes to write
+	 * @throws IOException in case of anything goes wrong in the concrete
+	 *                     implementation
+	 */
+	protected abstract void mediumSpecificWrite(ByteBuffer buffer) throws IOException;
+
+	/**
+	 * Updates the position returned by {@link #getCurrentPosition()}.
+	 *
+	 * @param position The new {@link MediumOffset} position
+	 */
+	protected void updateCurrentPosition(MediumOffset position) {
+
+		currentPosition = position;
 	}
 }

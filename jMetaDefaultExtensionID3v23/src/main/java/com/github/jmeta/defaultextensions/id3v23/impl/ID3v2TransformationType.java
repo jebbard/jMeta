@@ -18,15 +18,6 @@ public enum ID3v2TransformationType {
 
 	private int m_writeOrder;
 
-	/**
-	 * Creates a new {@link ID3v2TransformationType}.
-	 * 
-	 * @param id
-	 * @param affectedContainers
-	 * @param isBuiltIn
-	 * @param readOrder
-	 * @param writeOrder
-	 */
 	private ID3v2TransformationType(int readOrder, int writeOrder) {
 		m_readOrder = readOrder;
 		m_writeOrder = writeOrder;

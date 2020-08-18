@@ -140,11 +140,6 @@
 				<version>4.12</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>net.bytebuddy</groupId>
-				<artifactId>byte-buddy</artifactId>
-				<version>LATEST</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -228,6 +223,17 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- SITE generation -->
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.9.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
 			<!-- Code coverage -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -333,12 +339,12 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.17</version>
 			</plugin>
-
+			
 			<!-- JAVADOC: For javadoc generation in sites -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
+				<version>3.2.0</version>
 				<configuration>
 					<author>true</author>
 					<breakiterator>true</breakiterator>
@@ -346,6 +352,7 @@
 					<debug>true</debug>
 					<verbose>true</verbose>
 					<show>private</show>
+					<detectJavaApiLink>false</detectJavaApiLink>
 					<!-- NOTE: Inheriting projects only need to add the <subpackages> tag 
 						here to enable javadoc generation for the given packages. All other configurations 
 						can be skipped. -->

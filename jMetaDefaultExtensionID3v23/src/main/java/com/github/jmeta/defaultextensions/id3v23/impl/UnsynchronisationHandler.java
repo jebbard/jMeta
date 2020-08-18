@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
@@ -35,15 +34,12 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
 	/**
 	 * Creates a new {@link UnsynchronisationHandler}.
 	 *
-	 * @param dbFactory The {@link DataBlockFactory}
+	 * @param dbFactory The {@link ExtendedDataBlockFactory}
 	 */
 	public UnsynchronisationHandler(ExtendedDataBlockFactory dbFactory) {
 		super(ID3v2TransformationType.UNSYNCHRONIZATION, dbFactory);
 	}
 
-	/**
-	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
-	 */
 	@Override
 	public boolean requiresTransform(Container container) {
 
@@ -74,18 +70,12 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
 		return false;
 	}
 
-	/**
-	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
-	 */
 	@Override
 	public boolean requiresUntransform(Container container) {
 
 		return requiresTransform(container);
 	}
 
-	/**
-	 * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
-	 */
 	@Override
 	protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
 
@@ -95,13 +85,13 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
 
 		List<Byte> unsynchronisedByteList = new ArrayList<>(payloadBytes.remaining());
 
-		for (int i = 0; i < (payloadBytes.remaining() - 1); i++) {
+		for (int i = 0; i < payloadBytes.remaining() - 1; i++) {
 			byte firstByte = payloadBytes.get(i);
 			byte secondByte = payloadBytes.get(i + 1);
 
 			unsynchronisedByteList.add(firstByte);
 
-			if ((firstByte == 0xFF) && ((secondByte >= 0xE0) || (secondByte == 0))) {
+			if (firstByte == 0xFF && (secondByte >= 0xE0 || secondByte == 0)) {
 				unsynchronisedByteList.add((byte) 0);
 			}
 		}
@@ -111,9 +101,6 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
 		return new byte[][] { ByteArrayUtils.toArray(unsynchronisedByteList) };
 	}
 
-	/**
-	 * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
-	 */
 	@Override
 	protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 
@@ -127,7 +114,7 @@ public class UnsynchronisationHandler extends AbstractID3v2TransformationHandler
 			byte previousByte = payloadBytes.get(i - 1);
 			byte nextByte = payloadBytes.get(i);
 
-			if ((previousByte == 0xFF) && (nextByte == 0x00)) {
+			if (previousByte == 0xFF && nextByte == 0x00) {
 				synchronisedByteList.add(previousByte);
 			} else {
 				synchronisedByteList.add(nextByte);

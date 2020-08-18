@@ -96,14 +96,14 @@ public abstract class AbstractMediumAccessorTest {
 	}
 
 	/**
-	 * Encapsulates test calls to {@link MediumAccessor#read(ByteBuffer)}, without
+	 * Encapsulates test calls to {@link MediumAccessor#read(int)}, without
 	 * expecting an end of medium during read, i.e. if it occurs, a test failure is
 	 * generated.
 	 *
 	 * @param mediumAccessor The {@link MediumAccessor} to use.
 	 * @param readTestData   The {@link ReadTestData} to use.
 	 * @return The {@link ByteBuffer} of data read, returned by
-	 *         {@link MediumAccessor#read(ByteBuffer)}
+	 *         {@link MediumAccessor#read(int)}
 	 */
 	protected static ByteBuffer performReadNoEOMExpected(MediumAccessor<?> mediumAccessor, ReadTestData readTestData) {
 		mediumAccessor.setCurrentPosition(TestMedia.at(mediumAccessor.getMedium(), readTestData.offsetToRead));
@@ -122,33 +122,6 @@ public abstract class AbstractMediumAccessorTest {
 	}
 
 	private MediumAccessor<?> mediumAccessor;
-
-	/**
-	 * Asserts whether the given bytes read previously in a test case at the given
-	 * zero based test file offset equal the test file contents at that offset.
-	 *
-	 * @param bytesRead  The bytes previously read
-	 * @param fileOffset The zero-based file offset expected to contain the bytes
-	 *                   matching the given bytes read
-	 */
-	protected void assertEqualsFileContent(ByteBuffer bytesRead, int fileOffset) {
-
-		bytesRead.mark();
-
-		int index = 0;
-
-		Assert.assertTrue(
-			(bytesRead.remaining() + fileOffset) <= AbstractMediumAccessorTest.getExpectedMediumContent().length);
-
-		while (bytesRead.hasRemaining()) {
-			Assert.assertEquals(AbstractMediumAccessorTest.getExpectedMediumContent()[fileOffset + index],
-				bytesRead.get());
-
-			index++;
-		}
-
-		bytesRead.reset();
-	}
 
 	/**
 	 * Tests {@link MediumAccessor#close()}.
@@ -179,14 +152,6 @@ public abstract class AbstractMediumAccessorTest {
 
 		Assert.assertFalse(mediumAccessor.isOpened());
 	}
-
-	/**
-	 * Returns the concrete implementation of {@link MediumAccessor } to test. It is
-	 * used for reading and writing from a {@link MediumAccessor}.
-	 *
-	 * @return the concrete implementation of {@link MediumAccessor } to test.
-	 */
-	protected abstract MediumAccessor<?> createImplementationToTest();
 
 	/**
 	 * Tests {@link MediumAccessor#getCurrentPosition()}.
@@ -251,18 +216,6 @@ public abstract class AbstractMediumAccessorTest {
 	}
 
 	/**
-	 * @return the {@link Medium} of the current {@link MediumAccessor} tested
-	 */
-	protected abstract Medium<?> getExpectedMedium();
-
-	/**
-	 * @return The concrete {@link MediumAccessor} currently tested.
-	 */
-	protected MediumAccessor<?> getImplementationToTest() {
-		return mediumAccessor;
-	}
-
-	/**
 	 * Tests {@link MediumAccessor#getMedium()}.
 	 */
 	@Test
@@ -289,27 +242,6 @@ public abstract class AbstractMediumAccessorTest {
 
 		Assert.assertEquals(getExpectedMedium(), mediumAccessor.getMedium());
 	}
-
-	/**
-	 * Returns a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that
-	 * are checked using {@link MediumAccessor#read}. It is checked that the bytes
-	 * read from that offset match the expected bytes from the
-	 * {@link TestMedia#FIRST_TEST_FILE_PATH}. The given size to read is mapped to
-	 * the offset.
-	 *
-	 * @return a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that
-	 *         are checked using {@link MediumAccessor#read}.
-	 */
-	protected abstract List<ReadTestData> getReadTestDataToUse();
-
-	/**
-	 * Returns a {@link ReadTestData} instance ranging from a specific offset until
-	 * exactly the last byte of the medium.
-	 *
-	 * @return a {@link ReadTestData} instance ranging from a specific offset until
-	 *         exactly the last byte of the medium.
-	 */
-	protected abstract ReadTestData getReadTestDataUntilEndOfMedium();
 
 	/**
 	 * Tests {@link MediumAccessor#isAtEndOfMedium()}.
@@ -455,15 +387,6 @@ public abstract class AbstractMediumAccessorTest {
 	}
 
 	/**
-	 * This method is called during {@link #setUp()} to prepare the medium data to
-	 * be tested in a sufficient way. E.g. in case of a file a prototypical test
-	 * file might first be copied before doing the tests.
-	 *
-	 * @param testFileContents The contents of the test file
-	 */
-	protected abstract void prepareMediumData(byte[] testFileContents);
-
-	/**
 	 * Tests {@link MediumAccessor#read(int)}.
 	 */
 	@Test
@@ -586,6 +509,83 @@ public abstract class AbstractMediumAccessorTest {
 				null);
 		}
 	}
+
+	/**
+	 * Asserts whether the given bytes read previously in a test case at the given
+	 * zero based test file offset equal the test file contents at that offset.
+	 *
+	 * @param bytesRead  The bytes previously read
+	 * @param fileOffset The zero-based file offset expected to contain the bytes
+	 *                   matching the given bytes read
+	 */
+	protected void assertEqualsFileContent(ByteBuffer bytesRead, int fileOffset) {
+
+		bytesRead.mark();
+
+		int index = 0;
+
+		Assert.assertTrue(
+			bytesRead.remaining() + fileOffset <= AbstractMediumAccessorTest.getExpectedMediumContent().length);
+
+		while (bytesRead.hasRemaining()) {
+			Assert.assertEquals(AbstractMediumAccessorTest.getExpectedMediumContent()[fileOffset + index],
+				bytesRead.get());
+
+			index++;
+		}
+
+		bytesRead.reset();
+	}
+
+	/**
+	 * Returns the concrete implementation of {@link MediumAccessor } to test. It is
+	 * used for reading and writing from a {@link MediumAccessor}.
+	 *
+	 * @return the concrete implementation of {@link MediumAccessor } to test.
+	 */
+	protected abstract MediumAccessor<?> createImplementationToTest();
+
+	/**
+	 * @return the {@link Medium} of the current {@link MediumAccessor} tested
+	 */
+	protected abstract Medium<?> getExpectedMedium();
+
+	/**
+	 * @return The concrete {@link MediumAccessor} currently tested.
+	 */
+	protected MediumAccessor<?> getImplementationToTest() {
+		return mediumAccessor;
+	}
+
+	/**
+	 * Returns a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that
+	 * are checked using {@link MediumAccessor#read}. It is checked that the bytes
+	 * read from that offset match the expected bytes from the
+	 * {@link TestMedia#FIRST_TEST_FILE_PATH}. The given size to read is mapped to
+	 * the offset.
+	 *
+	 * @return a Map of offsets in the {@link TestMedia#FIRST_TEST_FILE_PATH} that
+	 *         are checked using {@link MediumAccessor#read}.
+	 */
+	protected abstract List<ReadTestData> getReadTestDataToUse();
+
+	/**
+	 * Returns a {@link ReadTestData} instance ranging from a specific offset until
+	 * exactly the last byte of the medium.
+	 *
+	 * @return a {@link ReadTestData} instance ranging from a specific offset until
+	 *         exactly the last byte of the medium.
+	 */
+	protected abstract ReadTestData getReadTestDataUntilEndOfMedium();
+
+	/**
+	 * This method is called during {@link #setUp()} to prepare the medium data to
+	 * be tested in a sufficient way. E.g. in case of a file a prototypical test
+	 * file might first be copied before doing the tests.
+	 *
+	 * @param testFileContents The contents of the test file
+	 */
+	protected abstract void prepareMediumData(byte[] testFileContents);
 
 	/**
 	 * Checks the test {@link Medium} to fulfill any preconditions for the tests.

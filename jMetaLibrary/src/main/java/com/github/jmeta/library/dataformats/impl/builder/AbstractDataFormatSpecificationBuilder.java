@@ -120,35 +120,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 		return withOccurrences(0, 1);
 	}
 
-	protected DataBlockId createId() {
-		return new DataBlockId(getDataFormat(), getGlobalId());
-	}
-
-	/**
-	 * Finishes building of this {@link AbstractDataFormatSpecificationBuilder} by
-	 * creating its {@link DataBlockDescription}, and adding it as child description
-	 * to its parent {@link DataFormatBuilder} as well as to the root builder.
-	 *
-	 * @return The parent {@link DataFormatBuilder}.
-	 */
-	protected P finish() {
-
-		if ((idFieldRef != null) && !idFieldRef.isResolved()) {
-			throw new IllegalArgumentException("Unresolved id field reference: " + idFieldRef);
-		}
-
-		DataBlockDescription myDescription = new DataBlockDescription(createId(), name, description, type,
-			new ArrayList<>(childDescriptions.values()), fieldProperties, minimumOccurrences, maximumOccurrences,
-			minimumByteLength, maximumByteLength, isGeneric, idFieldRef == null ? null : idFieldRef.getId());
-
-		parentBuilder.addChildDescription(myDescription);
-
-		getRootBuilder().putDataBlockDescription(myDescription, parentBuilder.getGlobalId() == null,
-			this.isDefaultNestedContainer);
-
-		return parentBuilder;
-	}
-
 	/**
 	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataFormatBuilder#getDataFormat()
 	 */
@@ -174,13 +145,6 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 	}
 
 	/**
-	 * @return whether the data block built is generic or not
-	 */
-	protected boolean isGeneric() {
-		return isGeneric;
-	}
-
-	/**
 	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#referencedAs(com.github.jmeta.library.dataformats.api.types.DataBlockCrossReference)
 	 */
 	@SuppressWarnings("unchecked")
@@ -191,6 +155,68 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 		reference.resolve(createId());
 
 		return (C) this;
+	}
+
+	/**
+	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withDescription(java.lang.String,
+	 *      java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public C withDescription(String name, String description) {
+		this.name = name;
+		this.description = description;
+		return (C) this;
+	}
+
+	/**
+	 * Note that this method implements
+	 * {@link DynamicOccurrenceBuilder#withOccurrences(long, long)} without claiming
+	 * to override it (as it comes deeper down into the interface hierarchy). This
+	 * way, it is possible to provide the occurrence methods just for a selected
+	 * group of builders only.
+	 */
+	@SuppressWarnings("unchecked")
+	public C withOccurrences(long minimumOccurrences, long maximumOccurrences) {
+		this.minimumOccurrences = minimumOccurrences;
+		this.maximumOccurrences = maximumOccurrences;
+		return (C) this;
+	}
+
+	protected DataBlockId createId() {
+		return new DataBlockId(getDataFormat(), getGlobalId());
+	}
+
+	/**
+	 * Finishes building of this {@link AbstractDataFormatSpecificationBuilder} by
+	 * creating its {@link DataBlockDescription}, and adding it as child description
+	 * to its parent {@link DataFormatBuilder} as well as to the root builder.
+	 *
+	 * @return The parent {@link DataFormatBuilder}.
+	 */
+	protected P finish() {
+
+		if (idFieldRef != null && !idFieldRef.isResolved()) {
+			throw new IllegalArgumentException("Unresolved id field reference: " + idFieldRef);
+		}
+
+		DataBlockDescription myDescription = new DataBlockDescription(createId(), name, description, type,
+			new ArrayList<>(childDescriptions.values()), fieldProperties, minimumOccurrences, maximumOccurrences,
+			minimumByteLength, maximumByteLength, isGeneric, idFieldRef == null ? null : idFieldRef.getId());
+
+		parentBuilder.addChildDescription(myDescription);
+
+		getRootBuilder().putDataBlockDescription(myDescription, parentBuilder.getGlobalId() == null,
+			this.isDefaultNestedContainer);
+
+		return parentBuilder;
+	}
+
+	/**
+	 * @return whether the data block built is generic or not
+	 */
+	protected boolean isGeneric() {
+		return isGeneric;
 	}
 
 	/**
@@ -231,7 +257,7 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 	 * Allows to set the id field's {@link DataBlockCrossReference} of this generic
 	 * container
 	 *
-	 * @param the id field's {@link DataBlockCrossReference}
+	 * @param idFieldRef the id field's {@link DataBlockCrossReference}
 	 */
 	protected void setIdFieldRef(DataBlockCrossReference idFieldRef) {
 		this.idFieldRef = idFieldRef;
@@ -246,31 +272,5 @@ public abstract class AbstractDataFormatSpecificationBuilder<P extends DataForma
 	protected void setLengths(long minimumByteLength, long maximumByteLength) {
 		this.minimumByteLength = minimumByteLength;
 		this.maximumByteLength = maximumByteLength;
-	}
-
-	/**
-	 * @see com.github.jmeta.library.dataformats.api.services.builder.DataBlockDescriptionBuilder#withDescription(java.lang.String,
-	 *      java.lang.String)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public C withDescription(String name, String description) {
-		this.name = name;
-		this.description = description;
-		return (C) this;
-	}
-
-	/**
-	 * Note that this method implements
-	 * {@link DynamicOccurrenceBuilder#withOccurrences(long, long)} without claiming
-	 * to override it (as it comes deeper down into the interface hierarchy). This
-	 * way, it is possible to provide the occurrence methods just for a selected
-	 * group of builders only.
-	 */
-	@SuppressWarnings("unchecked")
-	public C withOccurrences(long minimumOccurrences, long maximumOccurrences) {
-		this.minimumOccurrences = minimumOccurrences;
-		this.maximumOccurrences = maximumOccurrences;
-		return (C) this;
 	}
 }

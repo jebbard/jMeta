@@ -1,0 +1,37 @@
+<map id="ClassDiagramDatablocks_map" name="ClassDiagramDatablocks_map">
+<area shape="rect" id="id1" href="java:com.github.jmeta.library.datablocks.api.types.Payload" title="java:com.github.jmeta.library.datablocks.api.types.Payload" alt="" coords="6500,2303,6576,2351"/>
+<area shape="rect" id="id2" href="java:com.sun.xml.internal.ws.Closeable" title="java:com.sun.xml.internal.ws.Closeable" alt="" coords="8729,105,8818,153"/>
+<area shape="rect" id="id3" href="java:java.lang.AutoCloseable" title="java:java.lang.AutoCloseable" alt="" coords="8854,105,8968,153"/>
+<area shape="rect" id="id4" href="java:com.github.jmeta.library.datablocks.api.types.Header" title="java:com.github.jmeta.library.datablocks.api.types.Header" alt="" coords="7299,2296,7399,2357"/>
+<area shape="rect" id="id5" href="java:com.github.jmeta.library.datablocks.api.types.FieldBasedPayload" title="java:com.github.jmeta.library.datablocks.api.types.FieldBasedPayload" alt="" coords="6944,2474,7083,2522"/>
+<area shape="rect" id="id6" href="java:com.github.jmeta.library.datablocks.api.types.FieldSequence" title="java:com.github.jmeta.library.datablocks.api.types.FieldSequence" alt="" coords="7859,2087,7994,2148"/>
+<area shape="rect" id="id7" href="java:com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator" title="java:com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator" alt="" coords="8682,386,8869,451"/>
+<area shape="rect" id="id8" href="java:com.github.jmeta.library.datablocks.api.types.Field" title="java:com.github.jmeta.library.datablocks.api.types.Field" alt="" coords="6242,571,6412,664"/>
+<area shape="rect" id="id9" href="java:com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload" title="java:com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload" alt="" coords="6169,2467,6469,2529"/>
+<area shape="rect" id="id10" href="java:com.github.jmeta.library.datablocks.api.services.CountProvider" title="java:com.github.jmeta.library.datablocks.api.services.CountProvider" alt="" coords="4841,1795,5180,1856"/>
+<area shape="rect" id="id11" href="java:com.github.jmeta.library.datablocks.api.services.SizeProvider" title="java:com.github.jmeta.library.datablocks.api.services.SizeProvider" alt="" coords="4369,1795,4806,1856"/>
+<area shape="rect" id="id12" href="java:com.github.jmeta.library.datablocks.api.types.Container" title="java:com.github.jmeta.library.datablocks.api.types.Container" alt="" coords="6662,1760,6876,1891"/>
+<area shape="rect" id="id13" href="java:com.github.jmeta.library.datablocks.api.services.DataBlockService" title="java:com.github.jmeta.library.datablocks.api.services.DataBlockService" alt="" coords="8179,84,8577,173"/>
+<area shape="rect" id="id14" href="java:com.github.jmeta.library.datablocks.api.types.DataBlock" title="java:com.github.jmeta.library.datablocks.api.types.DataBlock" alt="" coords="6415,334,6626,507"/>
+<area shape="rect" id="id15" href="java:com.github.jmeta.library.datablocks.api.services.DataBlockAccessor" title="java:com.github.jmeta.library.datablocks.api.services.DataBlockAccessor" alt="" coords="13,91,603,166"/>
+<area shape="rect" id="id16" href="java:com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService" title="java:com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService" alt="" coords="8172,362,8584,479"/>
+<area shape="rect" id="id17" href="java:com.github.jmeta.library.datablocks.impl.MediumDataProvider" title="java:com.github.jmeta.library.datablocks.impl.MediumDataProvider" alt="" coords="1840,1753,2199,1898"/>
+<area shape="rect" id="id18" href="java:com.github.jmeta.library.datablocks.impl.FieldTerminationFinder" title="java:com.github.jmeta.library.datablocks.impl.FieldTerminationFinder" alt="" coords="9003,84,9695,173"/>
+<area shape="rect" id="id19" href="java:com.github.jmeta.library.datablocks.impl.ContainerBasedLazyPayload" title="java:com.github.jmeta.library.datablocks.impl.ContainerBasedLazyPayload" alt="" coords="3081,2653,3844,2756"/>
+<area shape="rect" id="id20" href="java:com.github.jmeta.library.datablocks.impl.PayloadContainerIterator" title="java:com.github.jmeta.library.datablocks.impl.PayloadContainerIterator" alt="" coords="6013,1726,6485,1926"/>
+<area shape="rect" id="id21" href="java:com.github.jmeta.library.datablocks.impl.FieldBasedLazyPayload" title="java:com.github.jmeta.library.datablocks.impl.FieldBasedLazyPayload" alt="" coords="6678,2639,7417,2770"/>
+<area shape="rect" id="id22" href="java:com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader" title="java:com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader" alt="" coords="804,1767,1734,1884"/>
+<area shape="rect" id="id23" href="java:com.github.jmeta.library.datablocks.impl.StandardDataBlockAccessor" title="java:com.github.jmeta.library.datablocks.impl.StandardDataBlockAccessor" alt="" coords="6,328,610,514"/>
+<area shape="rect" id="id24" href="java:com.github.jmeta.library.datablocks.api.services.DataBlockFactory" title="java:com.github.jmeta.library.datablocks.api.services.DataBlockFactory" alt="" coords="3200,1767,4334,1884"/>
+<area shape="rect" id="id25" href="java:com.github.jmeta.library.datablocks.impl.StandardDataBlockFactory" title="java:com.github.jmeta.library.datablocks.impl.StandardDataBlockFactory" alt="" coords="3193,2059,4341,2176"/>
+<area shape="rect" id="id26" href="java:com.github.jmeta.library.datablocks.impl.BackwardDataBlockReader" title="java:com.github.jmeta.library.datablocks.impl.BackwardDataBlockReader" alt="" coords="2235,1753,3165,1898"/>
+<area shape="rect" id="id27" href="java:com.github.jmeta.library.datablocks.impl.StandardHeader" title="java:com.github.jmeta.library.datablocks.impl.StandardHeader" alt="" coords="7118,2419,8065,2577"/>
+<area shape="rect" id="id28" href="java:com.github.jmeta.library.datablocks.impl.TopLevelContainerIterator" title="java:com.github.jmeta.library.datablocks.impl.TopLevelContainerIterator" alt="" coords="5216,1712,5978,1939"/>
+<area shape="rect" id="id29" href="java:com.github.jmeta.library.datablocks.api.services.DataBlockReader" title="java:com.github.jmeta.library.datablocks.api.services.DataBlockReader" alt="" coords="1794,2018,2692,2218"/>
+<area shape="rect" id="id30" href="java:com.github.jmeta.library.datablocks.impl.StandardContainer" title="java:com.github.jmeta.library.datablocks.impl.StandardContainer" alt="" coords="6662,2031,7824,2204"/>
+<area shape="rect" id="id31" href="java:com.github.jmeta.library.datablocks.impl.LazyField" title="java:com.github.jmeta.library.datablocks.impl.LazyField" alt="" coords="3867,328,4961,514"/>
+<area shape="rect" id="id32" href="java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock" title="java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock" alt="" coords="6014,8,6870,249"/>
+<area shape="rect" id="id33" href="java:com.github.jmeta.library.datablocks.api.types.ContainerContext" title="java:com.github.jmeta.library.datablocks.api.types.ContainerContext" alt="" coords="5120,1288,5933,1571"/>
+<area shape="rect" id="id34" href="java:com.github.jmeta.library.datablocks.impl.StandardField" title="java:com.github.jmeta.library.datablocks.impl.StandardField" alt="" coords="5721,722,6488,1147"/>
+<area shape="rect" id="id35" href="java:com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader" title="java:com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader" alt="" coords="2218,1226,3182,1633"/>
+</map>

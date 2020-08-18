@@ -23,15 +23,15 @@ public interface StringFieldBuilder<P> extends FieldBuilder<P, String, StringFie
 
 	/**
 	 * Sets the termination character this field uses.
-	 * 
-	 * @param terminationChar The termination character to use or null
+	 *
+	 * @param charset The charset to use
 	 * @return This builder
 	 */
 	StringFieldBuilder<P> withFixedCharset(Charset charset);
 
 	/**
 	 * Sets the termination character this field uses.
-	 * 
+	 *
 	 * @param terminationChar The termination character to use or null
 	 * @return This builder
 	 */

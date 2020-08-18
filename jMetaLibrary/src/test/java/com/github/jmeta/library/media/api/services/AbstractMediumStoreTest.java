@@ -107,92 +107,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 	protected MediumChangeManager mediumChangeManagerSpy;
 
 	/**
-	 * Checks whether the given {@link ByteBuffer} matches the medium content in the
-	 * specified range
-	 *
-	 * @param returnedData         The {@link ByteBuffer} to check
-	 * @param rangeStartOffset     The start offset of the compared range
-	 * @param rangeSize            The size of the compared range
-	 * @param currentMediumContent The current content of the {@link Medium}
-	 */
-	protected void assertByteBufferMatchesMediumRange(ByteBuffer returnedData, MediumOffset rangeStartOffset,
-		int rangeSize, String currentMediumContent) {
-
-		Reject.ifNull(currentMediumContent, "currentMediumContent");
-		Reject.ifNull(rangeStartOffset, "rangeStartOffset");
-		Reject.ifNull(returnedData, "returnedData");
-
-		Assert.assertEquals(rangeSize, returnedData.remaining());
-		byte[] byteBufferData = new byte[rangeSize];
-		returnedData.asReadOnlyBuffer().get(byteBufferData);
-
-		String returnedDataAsString = new String(byteBufferData, Charsets.CHARSET_UTF8);
-
-		String expectedReturnedData = rangeStartOffset.getAbsoluteMediumOffset() > currentMediumContent.length() ? ""
-			: currentMediumContent.substring((int) rangeStartOffset.getAbsoluteMediumOffset(),
-				(int) (rangeStartOffset.getAbsoluteMediumOffset() + rangeSize));
-		Assert.assertEquals(expectedReturnedData, returnedDataAsString);
-	}
-
-	/**
-	 * Ensures that the cache contains the given bytes (in string form) at the given
-	 * offset.
-	 *
-	 * @param offset               The start {@link MediumOffset} to check
-	 * @param expectedCacheContent The expected content of the cache at the given
-	 *                             offset
-	 */
-	private void assertCacheContainsStringAt(MediumOffset offset, String expectedCacheContent) {
-		int rangeSize = expectedCacheContent.length();
-		String actualRangeString = getCacheContentInRangeAsString(offset, rangeSize);
-
-		Assert.assertEquals(expectedCacheContent, actualRangeString);
-	}
-
-	/**
-	 * Verifies that the medium cache is currently empty.
-	 */
-	protected void assertCacheIsEmpty() {
-		Assert.assertEquals(0, mediumCacheSpy.getAllCachedRegions().size());
-		Assert.assertEquals(0, mediumCacheSpy.calculateCurrentCacheSizeInBytes());
-	}
-
-	/**
-	 * Ensures the given range is actually fully cached, filled with content from
-	 * the external medium in the given range. It assumes that the first region in
-	 * range returned exactly starts at the given range offset and the last region
-	 * in range returned from the cache exactly ends at the end of the range.
-	 *
-	 * @param rangeStartOffset           The start {@link MediumOffset} of the range
-	 * @param rangeSize                  The size of the range
-	 * @param totalExpectedMediumContent The expected content of the whole medium as
-	 *                                   string
-	 */
-	protected void assertRangeIsCachedFromExternalMedium(MediumOffset rangeStartOffset, int rangeSize,
-		String totalExpectedMediumContent) {
-
-		int startIndex = (int) rangeStartOffset.getAbsoluteMediumOffset();
-
-		String expectedRangeString = totalExpectedMediumContent.substring(startIndex, startIndex + rangeSize);
-
-		assertCacheContainsStringAt(rangeStartOffset, expectedRangeString);
-	}
-
-	/**
-	 * Ensures the given range is not cached.
-	 *
-	 * @param rangeStartOffset The start {@link MediumOffset} of the range
-	 * @param rangeSize        The size of the range
-	 */
-	protected void assertRangeIsNotCached(MediumOffset rangeStartOffset, int rangeSize) {
-		List<MediumRegion> regions = mediumCacheSpy.getRegionsInRange(rangeStartOffset, rangeSize);
-
-		for (MediumRegion mediumRegion : regions) {
-			Assert.assertFalse(mediumRegion.isCached());
-		}
-	}
-
-	/**
 	 * Tests {@link MediumStore#cache(MediumOffset, int)}.
 	 */
 	@Test(expected = MediumStoreClosedException.class)
@@ -348,8 +262,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
 		MediumOffset expectedActualCacheStartOffset = TestMedia.at(currentMedium, 595);
 		int expectedCachedByteCount = AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE
-			- (AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE
-				% AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
+			- AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE
+				% AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
 
 		Assert.assertEquals(0, mediumStoreUnderTest.getCachedByteCountAt(cacheOffset));
 		Assert.assertEquals(expectedCachedByteCount,
@@ -373,8 +287,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 		mediumStoreUnderTest.open();
 
 		int expectedReadCount = 4;
-		int cacheSize = ((expectedReadCount - 1) * AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE)
-			+ 1;
+		int cacheSize = (expectedReadCount - 1) * AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 1;
 		MediumOffset cacheOffset = TestMedia.at(currentMedium, 0);
 		cacheNoEOMExpected(cacheOffset, cacheSize);
 
@@ -399,21 +312,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 	}
 
 	/**
-	 * Calls {@link MediumStore#cache(MediumOffset, int)} and expects no end of
-	 * medium.
-	 *
-	 * @param offset    The offset to use
-	 * @param byteCount The number of bytes to cache
-	 */
-	protected void cacheNoEOMExpected(MediumOffset offset, int byteCount) {
-		try {
-			mediumStoreUnderTest.cache(offset, byteCount);
-		} catch (EndOfMediumException e) {
-			throw new RuntimeException("Unexpected end of medium", e);
-		}
-	}
-
-	/**
 	 * Tests {@link MediumStore#close()}.
 	 */
 	@Test
@@ -429,177 +327,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 		Mockito.verify(mediumCacheSpy).clear();
 		Mockito.verify(mediumAccessorSpy).close();
 		Mockito.verify(mediumReferenceFactorySpy).clear();
-	}
-
-	/**
-	 * Creates an empty {@link Medium} for testing, i.e. with zero bytes.
-	 *
-	 * For writable media, be sure to only return a copy of the original medium such
-	 * that the original medium is not modified by writing tests and all tests
-	 * remain repeatable.
-	 *
-	 * @param testMethodName the name of the current test method, can be used to
-	 *                       create a copy of the original medium with the given
-	 *                       name
-	 *
-	 * @return an empty {@link Medium} for testing
-	 *
-	 * @throws IOException In case of any errors creating the {@link Medium}
-	 */
-	protected abstract T createEmptyMedium(String testMethodName) throws IOException;
-
-	/**
-	 * Creates a {@link MediumStore} based on an empty {@link Medium}.
-	 *
-	 * @return a {@link MediumStore} based on an empty {@link Medium}
-	 */
-	protected MediumStore createEmptyMediumStore() {
-		try {
-			currentMedium = createEmptyMedium(testName.getMethodName());
-
-			return createMediumStoreToTest(currentMedium);
-		} catch (IOException e) {
-			throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
-		}
-	}
-
-	/**
-	 * Creates a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
-	 * as content, backed or not backed by a cache with the given maximum cache and
-	 * cache region size as well as the given maximum read write block size.
-	 * Implementing test classes who's medium type does not support caching must
-	 * return null.
-	 *
-	 * For writable media, be sure to only return a copy of the original medium such
-	 * that the original medium is not modified by writing tests and all tests
-	 * remain repeatable.
-	 *
-	 * @param testMethodName        the name of the current test method, can be used
-	 *                              to create a copy of the original medium with the
-	 *                              given name
-	 * @param maxCacheSize          the maximum cache size in bytes
-	 * @param maxReadWriteBlockSize the maximum read write block size in bytes
-	 * @return a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
-	 *         as content with the given configuration parameters
-	 *
-	 * @throws IOException In case of any errors creating the {@link Medium}
-	 */
-	protected abstract T createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
-		throws IOException;
-
-	/**
-	 * Creates a {@link MediumStore} based on a {@link Medium} containing
-	 * {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a cache,
-	 * where the cache is (much) bigger than the overall {@link Medium} size. The
-	 * read-write block size is set to same value (to ensure only single reads
-	 * during the test cases when testing
-	 * {@link MediumStore#cache(MediumOffset, int)}) and an also quite big max cache
-	 * region size. This method must be called at the beginning of a test case to
-	 * create the {@link MediumStore} to test and its return value must be assigned
-	 * to {@link #mediumStoreUnderTest}. It is used for testing cases where data
-	 * read is expected to always end up in the cache due to its big size.
-	 *
-	 * @return a {@link MediumStore} based on a {@link Medium} containing
-	 *         {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a big
-	 *         cache, or null if the current implementation does not support this
-	 */
-	protected MediumStore createFilledMediumStoreWithBigCache() {
-		try {
-			int maxRWBSize = TestMedia.FIRST_TEST_FILE_CONTENT.length() + 1000;
-			currentMedium = createFilledMedium(testName.getMethodName(), 2 * maxRWBSize, maxRWBSize);
-
-			return createMediumStoreToTest(currentMedium);
-		} catch (IOException e) {
-			throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
-		}
-	}
-
-	/**
-	 * Creates a {@link MediumStore} based on a {@link Medium} containing
-	 * {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a cache,
-	 * where the cache is smaller than the overall {@link Medium} size, in detail,
-	 * it has a size of {@link #MAX_CACHE_SIZE_FOR_SMALL_CACHE}. In line with that,
-	 * the maximum read write block size is set to
-	 * {@link #MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE}. This method must be
-	 * called at the beginning of a test case to create the {@link MediumStore} to
-	 * test and its return value must be assigned to {@link #mediumStoreUnderTest}.
-	 * It is used for testing cases where data is read into the cache but then
-	 * automatically purged due to the limited cache size.
-	 *
-	 * @return a {@link MediumStore} based on a {@link Medium} containing
-	 *         {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a
-	 *         small cache, or null if the current implementation does not support
-	 *         this
-	 */
-	protected MediumStore createFilledMediumStoreWithSmallCache() {
-		try {
-			currentMedium = createFilledMedium(testName.getMethodName(),
-				AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE,
-				AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
-
-			return createMediumStoreToTest(currentMedium);
-		} catch (IOException e) {
-			throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
-		}
-	}
-
-	/**
-	 * Creates a test class implementation specific {@link MediumAccessor} to use
-	 * for testing.
-	 *
-	 * @param mediumToUse The {@link Medium} to use for the {@link MediumStore}.
-	 * @return a {@link MediumAccessor} to use based on a given {@link Medium}.
-	 */
-	protected abstract MediumAccessor<T> createMediumAccessor(T mediumToUse);
-
-	/**
-	 * Creates a {@link MediumStore} to test based on a given {@link Medium}.
-	 *
-	 * @param mediumToUse The {@link Medium} to use for the {@link MediumStore}.
-	 * @return a {@link MediumStore} to test based on a given {@link Medium}.
-	 */
-	private MediumStore createMediumStoreToTest(T mediumToUse) {
-		Reject.ifNull(mediumToUse, "mediumToUse");
-
-		mediumAccessorSpy = Mockito.spy(createMediumAccessor(mediumToUse));
-
-		mediumCacheSpy = Mockito.spy(new MediumCache(mediumToUse, mediumToUse.getMaxCacheSizeInBytes(),
-			mediumToUse.getMaxReadWriteBlockSizeInBytes()));
-		mediumReferenceFactorySpy = Mockito.spy(new MediumOffsetFactory(mediumToUse));
-		mediumChangeManagerSpy = Mockito.spy(new MediumChangeManager(mediumReferenceFactorySpy));
-
-		return new StandardMediumStore<>(mediumAccessorSpy, mediumCacheSpy, mediumReferenceFactorySpy,
-			mediumChangeManagerSpy);
-	}
-
-	/**
-	 * Returns the exact content of the cache in the given range as string, ensuring
-	 * (by assertion) that the total range is really actually cached.
-	 *
-	 * @param offset    The start offset of the range
-	 * @param rangeSize The size of the range
-	 * @return A string representation of the total cache content in the range, with
-	 *         size rangeSize
-	 */
-	protected String getCacheContentInRangeAsString(MediumOffset offset, int rangeSize) {
-		List<MediumRegion> regions = mediumCacheSpy.getRegionsInRange(offset, rangeSize);
-
-		ByteBuffer mergedBytes = ByteBuffer.allocate(rangeSize);
-
-		for (MediumRegion mediumRegion : regions) {
-			Assert.assertTrue(mediumRegion.isCached());
-
-			mergedBytes.put(mediumRegion.getBytes());
-		}
-
-		mergedBytes.rewind();
-
-		byte[] bufferBytes = new byte[rangeSize];
-
-		mergedBytes.get(bufferBytes);
-
-		String actualRangeString = new String(bufferBytes, Charsets.CHARSET_ASCII);
-		return actualRangeString;
 	}
 
 	/**
@@ -886,7 +613,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
 		long getDataStartOffset = AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE - 1;
 		MediumOffset getDataOffset = TestMedia.at(currentMedium, getDataStartOffset);
-		int getDataSize = (8 * AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE) + 2;
+		int getDataSize = 8 * AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 2;
 
 		testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
 
@@ -910,7 +637,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
 		long getDataStartOffset = 0;
 		MediumOffset getDataOffset = TestMedia.at(currentMedium, getDataStartOffset);
-		int getDataSize = (3 * AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE) + 4;
+		int getDataSize = 3 * AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE + 4;
 
 		testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
 
@@ -939,8 +666,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
 		MediumOffset expectedActualCacheStartOffset = TestMedia.at(currentMedium, 595);
 		int expectedCachedByteCount = AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE
-			- (AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE
-				% AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
+			- AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE
+				% AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE;
 
 		testGetData_returnsExpectedData(getDataOffset, getDataSize, currentMediumContent);
 
@@ -991,41 +718,6 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 
 		getDataNoEOMExpected(TestMedia.at(TestMedia.OTHER_MEDIUM, 10), 10);
 	}
-
-	/**
-	 * Calls {@link MediumStore#getData(MediumOffset, int)} and expects no end of
-	 * medium.
-	 *
-	 * @param offset    The offset to use
-	 * @param byteCount The number of bytes to cache
-	 *
-	 * @return The result data
-	 */
-	protected ByteBuffer getDataNoEOMExpected(MediumOffset offset, int byteCount) {
-		try {
-			return mediumStoreUnderTest.getData(offset, byteCount);
-		} catch (EndOfMediumException e) {
-			throw new RuntimeException("Unexpected end of medium", e);
-		}
-	}
-
-	/**
-	 * Returns the current content of the given {@link Medium} as string
-	 * representation. Implementations should implement a strategy to get this
-	 * content that is independent of the classes under test. They can distinguish
-	 * the media by medium name to identify them. This method is used to check the
-	 * current medium content against the expected medium content.
-	 *
-	 * In test cases, you should only call this method either BEFORE opening the
-	 * medium (to get the initial content) or AFTER the closing of the medium (to
-	 * get the changed content), otherwise you might run into exception because the
-	 * medium is still locked by the {@link MediumStore} and it cannot be accessed.
-	 *
-	 * @param medium The medium to use
-	 *
-	 * @return the current content of the filled {@link Medium}
-	 */
-	protected abstract String getMediumContentAsString(T medium);
 
 	/**
 	 * Tests {@link MediumStore#isAtEndOfMedium(MediumOffset)}.
@@ -1085,10 +777,317 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 	 */
 	@After
 	public void tearDown() {
-		if ((mediumStoreUnderTest != null) && mediumStoreUnderTest.isOpened()) {
+		if (mediumStoreUnderTest != null && mediumStoreUnderTest.isOpened()) {
 			mediumStoreUnderTest.close();
 		}
 	}
+
+	/**
+	 * Ensures that the cache contains the given bytes (in string form) at the given
+	 * offset.
+	 *
+	 * @param offset               The start {@link MediumOffset} to check
+	 * @param expectedCacheContent The expected content of the cache at the given
+	 *                             offset
+	 */
+	private void assertCacheContainsStringAt(MediumOffset offset, String expectedCacheContent) {
+		int rangeSize = expectedCacheContent.length();
+		String actualRangeString = getCacheContentInRangeAsString(offset, rangeSize);
+
+		Assert.assertEquals(expectedCacheContent, actualRangeString);
+	}
+
+	/**
+	 * Creates a {@link MediumStore} to test based on a given {@link Medium}.
+	 *
+	 * @param mediumToUse The {@link Medium} to use for the {@link MediumStore}.
+	 * @return a {@link MediumStore} to test based on a given {@link Medium}.
+	 */
+	private MediumStore createMediumStoreToTest(T mediumToUse) {
+		Reject.ifNull(mediumToUse, "mediumToUse");
+
+		mediumAccessorSpy = Mockito.spy(createMediumAccessor(mediumToUse));
+
+		mediumCacheSpy = Mockito.spy(new MediumCache(mediumToUse, mediumToUse.getMaxCacheSizeInBytes(),
+			mediumToUse.getMaxReadWriteBlockSizeInBytes()));
+		mediumReferenceFactorySpy = Mockito.spy(new MediumOffsetFactory(mediumToUse));
+		mediumChangeManagerSpy = Mockito.spy(new MediumChangeManager(mediumReferenceFactorySpy));
+
+		return new StandardMediumStore<>(mediumAccessorSpy, mediumCacheSpy, mediumReferenceFactorySpy,
+			mediumChangeManagerSpy);
+	}
+
+	/**
+	 * Checks whether the given {@link ByteBuffer} matches the medium content in the
+	 * specified range
+	 *
+	 * @param returnedData         The {@link ByteBuffer} to check
+	 * @param rangeStartOffset     The start offset of the compared range
+	 * @param rangeSize            The size of the compared range
+	 * @param currentMediumContent The current content of the {@link Medium}
+	 */
+	protected void assertByteBufferMatchesMediumRange(ByteBuffer returnedData, MediumOffset rangeStartOffset,
+		int rangeSize, String currentMediumContent) {
+
+		Reject.ifNull(currentMediumContent, "currentMediumContent");
+		Reject.ifNull(rangeStartOffset, "rangeStartOffset");
+		Reject.ifNull(returnedData, "returnedData");
+
+		Assert.assertEquals(rangeSize, returnedData.remaining());
+		byte[] byteBufferData = new byte[rangeSize];
+		returnedData.asReadOnlyBuffer().get(byteBufferData);
+
+		String returnedDataAsString = new String(byteBufferData, Charsets.CHARSET_UTF8);
+
+		String expectedReturnedData = rangeStartOffset.getAbsoluteMediumOffset() > currentMediumContent.length() ? ""
+			: currentMediumContent.substring((int) rangeStartOffset.getAbsoluteMediumOffset(),
+				(int) (rangeStartOffset.getAbsoluteMediumOffset() + rangeSize));
+		Assert.assertEquals(expectedReturnedData, returnedDataAsString);
+	}
+
+	/**
+	 * Verifies that the medium cache is currently empty.
+	 */
+	protected void assertCacheIsEmpty() {
+		Assert.assertEquals(0, mediumCacheSpy.getAllCachedRegions().size());
+		Assert.assertEquals(0, mediumCacheSpy.calculateCurrentCacheSizeInBytes());
+	}
+
+	/**
+	 * Ensures the given range is actually fully cached, filled with content from
+	 * the external medium in the given range. It assumes that the first region in
+	 * range returned exactly starts at the given range offset and the last region
+	 * in range returned from the cache exactly ends at the end of the range.
+	 *
+	 * @param rangeStartOffset           The start {@link MediumOffset} of the range
+	 * @param rangeSize                  The size of the range
+	 * @param totalExpectedMediumContent The expected content of the whole medium as
+	 *                                   string
+	 */
+	protected void assertRangeIsCachedFromExternalMedium(MediumOffset rangeStartOffset, int rangeSize,
+		String totalExpectedMediumContent) {
+
+		int startIndex = (int) rangeStartOffset.getAbsoluteMediumOffset();
+
+		String expectedRangeString = totalExpectedMediumContent.substring(startIndex, startIndex + rangeSize);
+
+		assertCacheContainsStringAt(rangeStartOffset, expectedRangeString);
+	}
+
+	/**
+	 * Ensures the given range is not cached.
+	 *
+	 * @param rangeStartOffset The start {@link MediumOffset} of the range
+	 * @param rangeSize        The size of the range
+	 */
+	protected void assertRangeIsNotCached(MediumOffset rangeStartOffset, int rangeSize) {
+		List<MediumRegion> regions = mediumCacheSpy.getRegionsInRange(rangeStartOffset, rangeSize);
+
+		for (MediumRegion mediumRegion : regions) {
+			Assert.assertFalse(mediumRegion.isCached());
+		}
+	}
+
+	/**
+	 * Calls {@link MediumStore#cache(MediumOffset, int)} and expects no end of
+	 * medium.
+	 *
+	 * @param offset    The offset to use
+	 * @param byteCount The number of bytes to cache
+	 */
+	protected void cacheNoEOMExpected(MediumOffset offset, int byteCount) {
+		try {
+			mediumStoreUnderTest.cache(offset, byteCount);
+		} catch (EndOfMediumException e) {
+			throw new RuntimeException("Unexpected end of medium", e);
+		}
+	}
+
+	/**
+	 * Creates an empty {@link Medium} for testing, i.e. with zero bytes.
+	 *
+	 * For writable media, be sure to only return a copy of the original medium such
+	 * that the original medium is not modified by writing tests and all tests
+	 * remain repeatable.
+	 *
+	 * @param testMethodName the name of the current test method, can be used to
+	 *                       create a copy of the original medium with the given
+	 *                       name
+	 *
+	 * @return an empty {@link Medium} for testing
+	 *
+	 * @throws IOException In case of any errors creating the {@link Medium}
+	 */
+	protected abstract T createEmptyMedium(String testMethodName) throws IOException;
+
+	/**
+	 * Creates a {@link MediumStore} based on an empty {@link Medium}.
+	 *
+	 * @return a {@link MediumStore} based on an empty {@link Medium}
+	 */
+	protected MediumStore createEmptyMediumStore() {
+		try {
+			currentMedium = createEmptyMedium(testName.getMethodName());
+
+			return createMediumStoreToTest(currentMedium);
+		} catch (IOException e) {
+			throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
+		}
+	}
+
+	/**
+	 * Creates a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
+	 * as content, backed or not backed by a cache with the given maximum cache and
+	 * cache region size as well as the given maximum read write block size.
+	 * Implementing test classes who's medium type does not support caching must
+	 * return null.
+	 *
+	 * For writable media, be sure to only return a copy of the original medium such
+	 * that the original medium is not modified by writing tests and all tests
+	 * remain repeatable.
+	 *
+	 * @param testMethodName        the name of the current test method, can be used
+	 *                              to create a copy of the original medium with the
+	 *                              given name
+	 * @param maxCacheSize          the maximum cache size in bytes
+	 * @param maxReadWriteBlockSize the maximum read write block size in bytes
+	 * @return a {@link Medium} containing {@link TestMedia#FIRST_TEST_FILE_CONTENT}
+	 *         as content with the given configuration parameters
+	 *
+	 * @throws IOException In case of any errors creating the {@link Medium}
+	 */
+	protected abstract T createFilledMedium(String testMethodName, long maxCacheSize, int maxReadWriteBlockSize)
+		throws IOException;
+
+	/**
+	 * Creates a {@link MediumStore} based on a {@link Medium} containing
+	 * {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a cache,
+	 * where the cache is (much) bigger than the overall {@link Medium} size. The
+	 * read-write block size is set to same value (to ensure only single reads
+	 * during the test cases when testing
+	 * {@link MediumStore#cache(MediumOffset, int)}) and an also quite big max cache
+	 * region size. This method must be called at the beginning of a test case to
+	 * create the {@link MediumStore} to test and its return value must be assigned
+	 * to {@link #mediumStoreUnderTest}. It is used for testing cases where data
+	 * read is expected to always end up in the cache due to its big size.
+	 *
+	 * @return a {@link MediumStore} based on a {@link Medium} containing
+	 *         {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a big
+	 *         cache, or null if the current implementation does not support this
+	 */
+	protected MediumStore createFilledMediumStoreWithBigCache() {
+		try {
+			int maxRWBSize = TestMedia.FIRST_TEST_FILE_CONTENT.length() + 1000;
+			currentMedium = createFilledMedium(testName.getMethodName(), 2 * maxRWBSize, maxRWBSize);
+
+			return createMediumStoreToTest(currentMedium);
+		} catch (IOException e) {
+			throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
+		}
+	}
+
+	/**
+	 * Creates a {@link MediumStore} based on a {@link Medium} containing
+	 * {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a cache,
+	 * where the cache is smaller than the overall {@link Medium} size, in detail,
+	 * it has a size of {@link #MAX_CACHE_SIZE_FOR_SMALL_CACHE}. In line with that,
+	 * the maximum read write block size is set to
+	 * {@link #MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE}. This method must be
+	 * called at the beginning of a test case to create the {@link MediumStore} to
+	 * test and its return value must be assigned to {@link #mediumStoreUnderTest}.
+	 * It is used for testing cases where data is read into the cache but then
+	 * automatically purged due to the limited cache size.
+	 *
+	 * @return a {@link MediumStore} based on a {@link Medium} containing
+	 *         {@link TestMedia#FIRST_TEST_FILE_CONTENT} as content, backed by a
+	 *         small cache, or null if the current implementation does not support
+	 *         this
+	 */
+	protected MediumStore createFilledMediumStoreWithSmallCache() {
+		try {
+			currentMedium = createFilledMedium(testName.getMethodName(),
+				AbstractMediumStoreTest.MAX_CACHE_SIZE_FOR_SMALL_CACHE,
+				AbstractMediumStoreTest.MAX_READ_WRITE_BLOCK_SIZE_FOR_SMALL_CACHE);
+
+			return createMediumStoreToTest(currentMedium);
+		} catch (IOException e) {
+			throw new InvalidTestDataException("Could not create filled medium due to IO Exception", e);
+		}
+	}
+
+	/**
+	 * Creates a test class implementation specific {@link MediumAccessor} to use
+	 * for testing.
+	 *
+	 * @param mediumToUse The {@link Medium} to use for the {@link MediumStore}.
+	 * @return a {@link MediumAccessor} to use based on a given {@link Medium}.
+	 */
+	protected abstract MediumAccessor<T> createMediumAccessor(T mediumToUse);
+
+	/**
+	 * Returns the exact content of the cache in the given range as string, ensuring
+	 * (by assertion) that the total range is really actually cached.
+	 *
+	 * @param offset    The start offset of the range
+	 * @param rangeSize The size of the range
+	 * @return A string representation of the total cache content in the range, with
+	 *         size rangeSize
+	 */
+	protected String getCacheContentInRangeAsString(MediumOffset offset, int rangeSize) {
+		List<MediumRegion> regions = mediumCacheSpy.getRegionsInRange(offset, rangeSize);
+
+		ByteBuffer mergedBytes = ByteBuffer.allocate(rangeSize);
+
+		for (MediumRegion mediumRegion : regions) {
+			Assert.assertTrue(mediumRegion.isCached());
+
+			mergedBytes.put(mediumRegion.getBytes());
+		}
+
+		mergedBytes.rewind();
+
+		byte[] bufferBytes = new byte[rangeSize];
+
+		mergedBytes.get(bufferBytes);
+
+		String actualRangeString = new String(bufferBytes, Charsets.CHARSET_ASCII);
+		return actualRangeString;
+	}
+
+	/**
+	 * Calls {@link MediumStore#getData(MediumOffset, int)} and expects no end of
+	 * medium.
+	 *
+	 * @param offset    The offset to use
+	 * @param byteCount The number of bytes to cache
+	 *
+	 * @return The result data
+	 */
+	protected ByteBuffer getDataNoEOMExpected(MediumOffset offset, int byteCount) {
+		try {
+			return mediumStoreUnderTest.getData(offset, byteCount);
+		} catch (EndOfMediumException e) {
+			throw new RuntimeException("Unexpected end of medium", e);
+		}
+	}
+
+	/**
+	 * Returns the current content of the given {@link Medium} as string
+	 * representation. Implementations should implement a strategy to get this
+	 * content that is independent of the classes under test. They can distinguish
+	 * the media by medium name to identify them. This method is used to check the
+	 * current medium content against the expected medium content.
+	 *
+	 * In test cases, you should only call this method either BEFORE opening the
+	 * medium (to get the initial content) or AFTER the closing of the medium (to
+	 * get the changed content), otherwise you might run into exception because the
+	 * medium is still locked by the {@link MediumStore} and it cannot be accessed.
+	 *
+	 * @param medium The medium to use
+	 *
+	 * @return the current content of the filled {@link Medium}
+	 */
+	protected abstract String getMediumContentAsString(T medium);
 
 	/**
 	 * Tests {@link MediumStore#cache(MediumOffset, int)} for throwing an
@@ -1168,7 +1167,7 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 			long getDataStartOffset = getDataOffset.getAbsoluteMediumOffset();
 
 			MediumOffset expectedReadOffset = TestMedia.at(currentMedium, getDataStartOffset
-				+ (chunkSizeToUse * (int) ((currentMediumContent.length() - getDataStartOffset) / chunkSizeToUse)));
+				+ chunkSizeToUse * (int) ((currentMediumContent.length() - getDataStartOffset) / chunkSizeToUse));
 
 			long expectedByteCountActuallyRead = (currentMediumContent.length() - getDataStartOffset) % chunkSizeToUse;
 
@@ -1187,9 +1186,8 @@ public abstract class AbstractMediumStoreTest<T extends Medium<?>> {
 	}
 
 	/**
-	 * Verifies that there were exactly N calls to
-	 * {@link MediumAccessor#read(ByteBuffer)} without {@link EndOfMediumException},
-	 * no matter which parameters used.
+	 * Verifies that there were exactly N calls to {@link MediumAccessor#read(int)}
+	 * without {@link EndOfMediumException}, no matter which parameters used.
 	 *
 	 * @param N The number of expected calls
 	 */

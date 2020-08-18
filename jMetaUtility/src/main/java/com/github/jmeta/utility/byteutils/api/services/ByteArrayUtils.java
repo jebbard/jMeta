@@ -71,7 +71,7 @@ public class ByteArrayUtils {
 	/**
 	 * Determines the offset of the first occurrence of a sub-array within a given
 	 * array of the same type.
-	 * 
+	 *
 	 * @param array       The array to search in. Its length must be equal or longer
 	 *                    than the length of the array to find plus the given start
 	 *                    offset.
@@ -99,7 +99,7 @@ public class ByteArrayUtils {
 		Reject.ifTrue(increase < 1, "increase < 1");
 		Reject.ifNotInInterval(startOffset, 0, array.length - 1, "startOffset");
 
-		if ((subArray.length + startOffset) > array.length) {
+		if (subArray.length + startOffset > array.length) {
 			return -1;
 		}
 
@@ -118,11 +118,11 @@ public class ByteArrayUtils {
 
 			// Find inside
 			else {
-				for (int i = startOffset; (offset == -1) && ((i + subArray.length) <= array.length); i += increase) {
+				for (int i = startOffset; offset == -1 && i + subArray.length <= array.length; i += increase) {
 					int elementsEqual = 0;
 
 					// Count equal elements in both arrays for each index
-					for (int k = 0; (k < subArray.length) && (subArray[k] == array[i + k]); k++) {
+					for (int k = 0; k < subArray.length && subArray[k] == array[i + k]; k++) {
 						elementsEqual++;
 					}
 
@@ -180,7 +180,8 @@ public class ByteArrayUtils {
 	 * string exceeds {@link Integer#MAX_VALUE}, the
 	 *
 	 * Valid string representations are:
-	 * <table summary="hallo">
+	 * <table>
+	 * <caption>caption</caption>
 	 * <tr>
 	 * <td>String expression</td>
 	 * <td>Corresponding Java array</td>
@@ -224,7 +225,8 @@ public class ByteArrayUtils {
 	 * </table>
 	 * <p>
 	 * Invalid string representations are:
-	 * <table summary="hallo">
+	 * <table>
+	 * <caption>caption</caption>
 	 * <tr>
 	 * <td>String expression</td>
 	 * <td>Why invalid?</td>
@@ -286,7 +288,7 @@ public class ByteArrayUtils {
 	 * <td>Number of digits in multiplicity must not be bigger than 10.</td>
 	 * </tr>
 	 * </table>
-	 * 
+	 *
 	 * @param arrayAsString A String representation of the array
 	 * @return A byte array corresponding to the given array string representation.
 	 * @throws InvalidArrayStringFormatException If the given array string
@@ -308,7 +310,7 @@ public class ByteArrayUtils {
 		String multiplicity = matcher.group(2);
 
 		// Empty array
-		if ((arrayContents == null) || arrayContents.isEmpty()) {
+		if (arrayContents == null || arrayContents.isEmpty()) {
 			return new byte[0];
 		}
 
@@ -316,7 +318,7 @@ public class ByteArrayUtils {
 
 		int times = 1;
 
-		if ((multiplicity != null) && !multiplicity.isEmpty()) {
+		if (multiplicity != null && !multiplicity.isEmpty()) {
 			times = Integer.parseInt(multiplicity);
 		}
 
@@ -328,7 +330,7 @@ public class ByteArrayUtils {
 			for (int i = 0; i < splitArrayContents.length; i++) {
 				byte arrayItem = Byte.parseByte(splitArrayContents[i].trim());
 
-				returnedBytes[(j * splitArrayContents.length) + i] = arrayItem;
+				returnedBytes[j * splitArrayContents.length + i] = arrayItem;
 			}
 		}
 

@@ -1,0 +1,453 @@
+@startuml
+interface DataBlockAccessor [[java:com.github.jmeta.library.datablocks.api.services.DataBlockAccessor]] {
+	AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
+	AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
+}
+interface DataBlockFactory [[java:com.github.jmeta.library.datablocks.api.services.DataBlockFactory]] {
+	Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers, Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber)
+	Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber)
+	Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference, ByteBuffer fieldBytes, int sequenceNumber, ContainerContext containerContext)
+	Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader, int sequenceNumber, ContainerContext containerContext)
+	Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader, ContainerContext containerContext)
+}
+interface SizeProvider [[java:com.github.jmeta.library.datablocks.api.services.SizeProvider]] {
+	long getSizeOf(DataBlockId id, int sequenceNumber, ContainerContext containerContext)
+}
+interface DataBlockService [[java:com.github.jmeta.library.datablocks.api.services.DataBlockService]] {
+	ContainerDataFormat getDataFormat()
+	DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec)
+	DataBlockReader getBackwardDataBlockReader(DataFormatSpecification spec)
+}
+abstract class AbstractDataBlockService [[java:com.github.jmeta.library.datablocks.api.services.AbstractDataBlockService]] {
+	-ContainerDataFormat m_myDataFormat
+	+AbstractDataBlockService(ContainerDataFormat myDataFormat)
+	+DataBlockReader getForwardDataBlockReader(DataFormatSpecification spec)
+	+DataBlockReader getBackwardDataBlockReader(DataFormatSpecification spec)
+	+ContainerDataFormat getDataFormat()
+}
+interface DataBlockService [[java:com.github.jmeta.library.datablocks.api.services.DataBlockService]] {
+}
+DataBlockService <|.. AbstractDataBlockService
+interface DataBlockReader [[java:com.github.jmeta.library.datablocks.api.services.DataBlockReader]] {
+	boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent, long remainingDirectParentByteCount)
+	boolean identifiesDataFormat(MediumOffset reference)
+	ByteBuffer readBytes(MediumOffset reference, int size)
+	List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, long remainingDirectParentByteCount, ContainerContext containerContext)
+	List<Header> readHeadersOrFootersWithId(MediumOffset startOffset, DataBlockId headerOrFooterId, boolean isFooter, ContainerContext containerContext)
+	Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId, long remainingDirectParentByteCount, ContainerContext containerContext)
+	Container readContainerWithId(MediumOffset reference, DataBlockId id, Payload parent, long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext)
+	void setMediumStore(MediumStore mediumStore)
+	void setCustomSizeProvider(SizeProvider sizeProvider)
+	void setCustomCountProvider(CountProvider countProvider)
+	DataFormatSpecification getSpecification()
+}
+interface CountProvider [[java:com.github.jmeta.library.datablocks.api.services.CountProvider]] {
+	long getCountOf(DataBlockId id, ContainerContext containerContext)
+}
+abstract class "AbstractDataBlockIterator<T>" as AbstractDataBlockIterator_T_ [[java:com.github.jmeta.library.datablocks.api.services.AbstractDataBlockIterator]] {
+	+void remove()
+}
+interface "Iterator<T>" as Iterator_T_ {
+}
+Iterator_T_ <|.. AbstractDataBlockIterator_T_
+interface Closeable [[java:com.sun.xml.internal.ws.Closeable]] {
+}
+Closeable <|.. AbstractDataBlockIterator_T_
+interface AutoCloseable [[java:java.lang.AutoCloseable]] {
+}
+AutoCloseable <|.. AbstractDataBlockIterator_T_
+abstract class AbstractDataBlock [[java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock]] {
+	-int sequenceNumber
+	-MediumOffset m_mediumReference
+	-DataBlockId m_id
+	+AbstractDataBlock(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader dataBlockReader, int sequenceNumber, ContainerContext containerContext)
+	+ContainerContext getContainerContext()
+	+int getSequenceNumber()
+	+ByteBuffer getBytes(long offset, int size)
+	+MediumOffset getMediumReference()
+	+DataBlock getParent()
+	+DataBlockId getId()
+	+void initParent(DataBlock parent)
+	+String toString()
+	+void setBytes(byte[][] bytes)
+	#DataBlockReader getDataBlockReader()
+}
+class ContainerContext [[java:com.github.jmeta.library.datablocks.api.types.ContainerContext]] {
+}
+AbstractDataBlock --> "1" ContainerContext : containerContext
+class DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+}
+AbstractDataBlock --> "1" DataBlock : m_parent
+class DataBlockReader [[java:com.github.jmeta.library.datablocks.api.services.DataBlockReader]] {
+}
+AbstractDataBlock --> "1" DataBlockReader : m_dataBlockReader
+interface DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+}
+DataBlock <|.. AbstractDataBlock
+interface FieldSequence [[java:com.github.jmeta.library.datablocks.api.types.FieldSequence]] {
+	List<Field<?>> getFields()
+}
+interface ContainerBasedPayload [[java:com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload]] {
+	AbstractDataBlockIterator<Container> getContainerIterator()
+}
+interface Payload [[java:com.github.jmeta.library.datablocks.api.types.Payload]] {
+}
+Payload <|-- ContainerBasedPayload
+class ContainerContext [[java:com.github.jmeta.library.datablocks.api.types.ContainerContext]] {
+	-DataFormatSpecification spec
+	-FieldFunctionStore<Long,SizeOf> sizes
+	-FieldFunctionStore<Long,SummedSizeOf> summedSizes
+	-FieldFunctionStore<Long,CountOf> counts
+	-FieldFunctionStore<Flags,PresenceOf> presences
+	-FieldFunctionStore<String,ByteOrderOf> byteOrders
+	-FieldFunctionStore<String,CharacterEncodingOf> characterEncodings
+	+ContainerContext(DataFormatSpecification spec, ContainerContext parentContainerContext, SizeProvider customSizeProvider, CountProvider customCountProvider)
+	+DataFormatSpecification getDataFormatSpecification()
+	+ContainerContext getParentContainerContext()
+	+Container getContainer()
+	+void initContainer(Container container)
+	+void addFieldFunctions(Field<?> field)
+	+long getSizeOf(DataBlockId id, int sequenceNumber)
+	+long getOccurrencesOf(DataBlockId id)
+	+ByteOrder getByteOrderOf(DataBlockId id, int sequenceNumber)
+	+Charset getCharacterEncodingOf(DataBlockId id, int sequenceNumber)
+}
+class Container [[java:com.github.jmeta.library.datablocks.api.types.Container]] {
+}
+ContainerContext --> "1" Container : container
+class SizeProvider [[java:com.github.jmeta.library.datablocks.api.services.SizeProvider]] {
+}
+ContainerContext --> "1" SizeProvider : customSizeProvider
+class CountProvider [[java:com.github.jmeta.library.datablocks.api.services.CountProvider]] {
+}
+ContainerContext --> "1" CountProvider : customCountProvider
+class ContainerContext [[java:com.github.jmeta.library.datablocks.api.types.ContainerContext]] {
+}
+ContainerContext --> "1" ContainerContext : parentContainerContext
+interface DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+	MediumOffset getMediumReference()
+	long getTotalSize()
+	ByteBuffer getBytes(long offset, int size)
+	DataBlockId getId()
+	int getSequenceNumber()
+	ContainerContext getContainerContext()
+	DataBlock getParent()
+	void initParent(DataBlock parent)
+	void setBytes(byte[][] bytes)
+}
+interface Payload [[java:com.github.jmeta.library.datablocks.api.types.Payload]] {
+}
+interface DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+}
+DataBlock <|-- Payload
+interface Header [[java:com.github.jmeta.library.datablocks.api.types.Header]] {
+	boolean isFooter()
+}
+interface DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+}
+DataBlock <|-- Header
+interface FieldSequence [[java:com.github.jmeta.library.datablocks.api.types.FieldSequence]] {
+}
+FieldSequence <|-- Header
+interface "Field<T>" as Field_T_ [[java:com.github.jmeta.library.datablocks.api.types.Field]] {
+	T getInterpretedValue()
+	ByteBuffer getBinaryValue()
+	String getStringRepresentation()
+}
+interface DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+}
+DataBlock <|-- Field_T_
+interface Container [[java:com.github.jmeta.library.datablocks.api.types.Container]] {
+	Payload getPayload()
+	List<Header> getHeaders()
+	List<Header> getFooters()
+	void setPayload(Payload payload)
+	void addHeader(int index, Header header)
+	void addFooter(int index, Header footer)
+}
+interface DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+}
+DataBlock <|-- Container
+interface FieldBasedPayload [[java:com.github.jmeta.library.datablocks.api.types.FieldBasedPayload]] {
+}
+interface Payload [[java:com.github.jmeta.library.datablocks.api.types.Payload]] {
+}
+Payload <|-- FieldBasedPayload
+interface FieldSequence [[java:com.github.jmeta.library.datablocks.api.types.FieldSequence]] {
+}
+FieldSequence <|-- FieldBasedPayload
+class StandardDataBlockFactory [[java:com.github.jmeta.library.datablocks.impl.StandardDataBlockFactory]] {
+	+Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers, Payload payload, List<Header> footers, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber)
+	+Container createContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber)
+	+Field<T> createFieldFromBytes(DataBlockId id, DataFormatSpecification spec, MediumOffset reference, ByteBuffer fieldBytes, int sequenceNumber, ContainerContext containerContext)
+	+Payload createPayloadAfterRead(DataBlockId id, MediumOffset reference, long totalSize, DataBlockReader reader, ContainerContext containerContext)
+	+Header createHeaderOrFooter(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader reader, int sequenceNumber, ContainerContext containerContext)
+}
+interface DataBlockFactory [[java:com.github.jmeta.library.datablocks.api.services.DataBlockFactory]] {
+}
+DataBlockFactory <|.. StandardDataBlockFactory
+class StandardHeader [[java:com.github.jmeta.library.datablocks.impl.StandardHeader]] {
+	-List<Field<?>> m_fields
+	-boolean m_isFooter
+	+StandardHeader(DataBlockId id, MediumOffset reference, List<Field<?>> fields, boolean isFooter, DataBlockReader dataBlockReader, int sequenceNumber, ContainerContext containerContext)
+	+boolean isFooter()
+	+List<Field<?>> getFields()
+	+long getTotalSize()
+	+void setFields(List<Field<?>> fields)
+	-void addField(Field<?> field)
+}
+class AbstractDataBlock [[java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock]] {
+}
+AbstractDataBlock <|-- StandardHeader
+interface Header [[java:com.github.jmeta.library.datablocks.api.types.Header]] {
+}
+Header <|.. StandardHeader
+class "StandardField<T>" as StandardField_T_ [[java:com.github.jmeta.library.datablocks.impl.StandardField]] {
+	-int sequenceNumber
+	-FieldConverter<T> m_fieldConverter
+	-DataBlockDescription m_desc
+	-Charset m_characterEncoding
+	-ByteOrder m_byteOrder
+	-MediumOffset m_mediumReference
+	-long m_totalSize
+	-ByteBuffer m_byteValue
+	-T m_interpretedValue
+	+int getSequenceNumber()
+	-StandardField(DataBlockDescription fieldDesc, MediumOffset reference, int sequenceNumber, ContainerContext containerContext)
+	+StandardField(DataBlockDescription fieldDesc, T interpretedValue, MediumOffset reference, int sequenceNumber, ContainerContext containerContext)
+	+StandardField(DataBlockDescription fieldDesc, ByteBuffer byteValue, MediumOffset reference, int sequenceNumber, ContainerContext containerContext)
+	+String getStringRepresentation()
+	+ByteBuffer getBytes(long offset, int size)
+	+ByteBuffer getBinaryValue()
+	+MediumOffset getMediumReference()
+	+DataBlock getParent()
+	+DataBlockId getId()
+	+long getTotalSize()
+	+void initParent(DataBlock parent)
+	+T getInterpretedValue()
+	-T convertToInterpreted()
+	+ContainerContext getContainerContext()
+	-ByteBuffer convertToBinary()
+	+void setBytes(byte[][] bytes)
+	+String toString()
+}
+class ContainerContext [[java:com.github.jmeta.library.datablocks.api.types.ContainerContext]] {
+}
+StandardField_T_ --> "1" ContainerContext : containerContext
+class DataBlock [[java:com.github.jmeta.library.datablocks.api.types.DataBlock]] {
+}
+StandardField_T_ --> "1" DataBlock : m_parent
+interface "Field<T>" as Field_T_ {
+}
+Field_T_ <|.. StandardField_T_
+class BackwardDataBlockReader [[java:com.github.jmeta.library.datablocks.impl.BackwardDataBlockReader]] {
+	#DataBlockReader getForwardReader()
+	+BackwardDataBlockReader(DataFormatSpecification spec, DataBlockReader forwardReader)
+	+void setMediumStore(MediumStore mediumStore)
+	+Container readContainerWithId(MediumOffset currentOffset, DataBlockId id, Payload parent, long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext)
+	+Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId, long remainingDirectParentByteCount, ContainerContext containerContext)
+	#boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey, long remainingDirectParentByteCount)
+	#List<MagicKey> getMagicKeys(DataBlockDescription containerDesc)
+}
+class DataBlockReader [[java:com.github.jmeta.library.datablocks.api.services.DataBlockReader]] {
+}
+BackwardDataBlockReader --> "1" DataBlockReader : forwardReader
+class AbstractDataBlockReader [[java:com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader]] {
+}
+AbstractDataBlockReader <|-- BackwardDataBlockReader
+class LazyField [[java:com.github.jmeta.library.datablocks.impl.LazyField]] {
+	-Field<Object> m_wrappedField
+	-DataBlockDescription m_fieldDesc
+	-long m_totalSize
+	+String getStringRepresentation()
+	+LazyField(DataBlockDescription fieldDesc, MediumOffset reference, DataBlock parent, long totalSize, DataBlockFactory factory, DataBlockReader dataBlockReader, int sequenceNumber, ContainerContext containerContext)
+	+void convert(DataFormatSpecification spec, ByteOrder byteOrder, Charset characterEncoding, long fieldByteCount)
+	+Object getInterpretedValue()
+	+long getTotalSize()
+	+ByteBuffer getBinaryValue()
+	-void lazilyReadField()
+}
+class DataBlockFactory [[java:com.github.jmeta.library.datablocks.api.services.DataBlockFactory]] {
+}
+LazyField --> "1" DataBlockFactory : m_dbFactory
+class AbstractDataBlock [[java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock]] {
+}
+AbstractDataBlock <|-- LazyField
+interface "Field<Object>" as Field_Object_ {
+}
+Field_Object_ <|.. LazyField
+class StandardContainer [[java:com.github.jmeta.library.datablocks.impl.StandardContainer]] {
+	+StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, List<Header> headers, Payload payload, List<Header> footers, DataBlockReader dataBlockReader, ContainerContext containerContext, int sequenceNumber)
+	+StandardContainer(DataBlockId id, DataBlock parent, MediumOffset reference, DataBlockReader reader, ContainerContext containerContext, int sequenceNumber)
+	+void addFooter(int index, Header footer)
+	+void addHeader(int index, Header header)
+	+void setPayload(Payload payload)
+	+List<Header> getHeaders()
+	+List<Header> getFooters()
+	+Payload getPayload()
+	+long getTotalSize()
+}
+class Header [[java:com.github.jmeta.library.datablocks.api.types.Header]] {
+}
+StandardContainer --> "*" Header : m_headers
+class Header [[java:com.github.jmeta.library.datablocks.api.types.Header]] {
+}
+StandardContainer --> "*" Header : m_footers
+class Payload [[java:com.github.jmeta.library.datablocks.api.types.Payload]] {
+}
+StandardContainer --> "1" Payload : m_payload
+class AbstractDataBlock [[java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock]] {
+}
+AbstractDataBlock <|-- StandardContainer
+interface Container [[java:com.github.jmeta.library.datablocks.api.types.Container]] {
+}
+Container <|.. StandardContainer
+class ContainerBasedLazyPayload [[java:com.github.jmeta.library.datablocks.impl.ContainerBasedLazyPayload]] {
+	-long totalSize
+	+ContainerBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader, ContainerContext containerContext)
+	+long getTotalSize()
+	+AbstractDataBlockIterator<Container> getContainerIterator()
+}
+class AbstractDataBlock [[java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock]] {
+}
+AbstractDataBlock <|-- ContainerBasedLazyPayload
+interface ContainerBasedPayload [[java:com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload]] {
+}
+ContainerBasedPayload <|.. ContainerBasedLazyPayload
+class MediumDataProvider [[java:com.github.jmeta.library.datablocks.impl.MediumDataProvider]] {
+	-{static}Logger LOGGER
+	-MediumStore mediumStore
+	+MediumDataProvider(MediumStore mediumStore)
+	+MediumStore getMediumStore()
+	+void bufferBeforeRead(MediumOffset startOffset, long size)
+	+ByteBuffer getData(MediumOffset startOffset, int size)
+	+FieldDataProvider createFieldDataProvider(MediumOffset startOffset)
+}
+class FieldBasedLazyPayload [[java:com.github.jmeta.library.datablocks.impl.FieldBasedLazyPayload]] {
+	-long totalSize
+	-List<Field<?>> fields
+	+FieldBasedLazyPayload(DataBlockId id, MediumOffset offset, long totalSize, DataBlockReader dataBlockReader, ContainerContext containerContext)
+	+long getTotalSize()
+	+List<Field<?>> getFields()
+	-void addField(Field<?> field)
+}
+class AbstractDataBlock [[java:com.github.jmeta.library.datablocks.api.types.AbstractDataBlock]] {
+}
+AbstractDataBlock <|-- FieldBasedLazyPayload
+interface FieldBasedPayload [[java:com.github.jmeta.library.datablocks.api.types.FieldBasedPayload]] {
+}
+FieldBasedPayload <|.. FieldBasedLazyPayload
+class PayloadContainerIterator [[java:com.github.jmeta.library.datablocks.impl.PayloadContainerIterator]] {
+	-Map<DataBlockId,Integer> nextSequenceNumber
+	-long m_remainingParentSize
+	-MediumOffset m_nextContainerReference
+	-List<DataBlockDescription> m_containerDescs
+	+void close()
+	+PayloadContainerIterator(Payload parent, DataBlockReader reader, MediumOffset reference)
+	+boolean hasNext()
+	-List<DataBlockDescription> getNestedContainerDescsWithMagicKeys()
+	+Container next()
+	-Container readNextContainer(DataBlockId containerId)
+	-void updateProgress(Container container)
+}
+class Payload [[java:com.github.jmeta.library.datablocks.api.types.Payload]] {
+}
+PayloadContainerIterator --> "1" Payload : m_parent
+class DataBlockReader [[java:com.github.jmeta.library.datablocks.api.services.DataBlockReader]] {
+}
+PayloadContainerIterator --> "1" DataBlockReader : m_reader
+class "AbstractDataBlockIterator<Container>" as AbstractDataBlockIterator_Container_ {
+}
+AbstractDataBlockIterator_Container_ <|-- PayloadContainerIterator
+class FieldTerminationFinder [[java:com.github.jmeta.library.datablocks.impl.FieldTerminationFinder]] {
+	+long getSizeUntilTermination(Charset charset, Character terminationCharacter, FieldDataProvider dataProvider, long limit, int readBlockSize)
+	-ByteBuffer getNextEncodedBytes(ByteBuffer previousEncodedBytes, FieldDataProvider dataProvider, int readBlockSize)
+	-long getSizeToAddOfCurrentBlock(Charset charset, int lenUpToTermination, String bufferString, boolean isFollowUpBlock)
+}
+class TopLevelContainerIterator [[java:com.github.jmeta.library.datablocks.impl.TopLevelContainerIterator]] {
+	-MediumOffset currentOffset
+	-boolean forwardRead
+	-MediumStore mediumStore
+	-List<ContainerDataFormat> dataFormatPrecedence
+	-Map<ContainerDataFormat,DataBlockReader> readers
+	-Map<DataBlockId,Integer> nextSequenceNumber
+	+TopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat,DataBlockReader> readers, MediumStore mediumStore, boolean forwardRead)
+	+boolean hasNext()
+	+Container next()
+	+void close()
+	+long getBytesToAdvanceToNextContainer(Container currentContainer)
+	-ContainerDataFormat identifyDataFormat(MediumOffset reference)
+	-void setMediumStore()
+}
+class "AbstractDataBlockIterator<Container>" as AbstractDataBlockIterator_Container_ {
+}
+AbstractDataBlockIterator_Container_ <|-- TopLevelContainerIterator
+class StandardDataBlockAccessor [[java:com.github.jmeta.library.datablocks.impl.StandardDataBlockAccessor]] {
+	-{static}Logger LOGGER
+	-DataFormatRepository m_repository
+	-MediaAPI m_mediumFactory
+	-Map<ContainerDataFormat,DataBlockReader> forwardReaders
+	-Map<ContainerDataFormat,DataBlockReader> backwardReaders
+	-ExtensionManager extManager
+	+StandardDataBlockAccessor()
+	-void addDataBlockExtensions(Extension iExtension2, DataBlockService dataBlocksExtensions)
+	+AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
+	+AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
+}
+interface DataBlockAccessor [[java:com.github.jmeta.library.datablocks.api.services.DataBlockAccessor]] {
+}
+DataBlockAccessor <|.. StandardDataBlockAccessor
+abstract class AbstractDataBlockReader [[java:com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader]] {
+	-{static}Logger LOGGER
+	-{static}String LOGGING_BINARY_TO_INTERPRETED_FAILED
+	-DataFormatSpecification spec
+	+AbstractDataBlockReader(DataFormatSpecification spec)
+	+boolean hasContainerWithId(MediumOffset reference, DataBlockId id, Payload parent, long remainingDirectParentByteCount)
+	+boolean identifiesDataFormat(MediumOffset reference)
+	+ByteBuffer readBytes(MediumOffset reference, int size)
+	+List<Field<?>> readFields(MediumOffset reference, DataBlockId parentId, long remainingDirectParentByteCount, ContainerContext containerContext)
+	+List<Header> readHeadersOrFootersWithId(MediumOffset startOffset, DataBlockId headerOrFooterId, boolean isFooter, ContainerContext containerContext)
+	+void setMediumStore(MediumStore mediumStore)
+	+void setCustomSizeProvider(SizeProvider sizeProvider)
+	+void setCustomCountProvider(CountProvider countProvider)
+	+DataFormatSpecification getSpecification()
+	+MediumDataProvider getMediumDataProvider()
+	#{abstract}boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey, long remainingDirectParentByteCount)
+	#{abstract}List<MagicKey> getMagicKeys(DataBlockDescription containerDesc)
+	#DataBlockFactory getDataBlockFactory()
+	#SizeProvider getCustomSizeProvider()
+	#CountProvider getCustomCountProvider()
+	#DataBlockDescription getPayloadDescription(DataBlockDescription containerDesc)
+	#DataBlockId determineConcreteContainerId(MediumOffset currentOffset, DataBlockId genericContainerId, long remainingParentByteCount, int sequenceNumber, ContainerContext containerContext)
+	-DataBlockId concreteBlockIdFromGenericId(DataBlockId genericBlockId, Field<?> headerField)
+	-DataBlockDescription createUnknownFieldDescription(DataBlockId parentId)
+	-long determineActualFieldSize(DataBlockDescription fieldDesc, long remainingDirectParentByteCount, MediumOffset reference, int sequenceNumber, ContainerContext containerContext)
+	-long getSizeUpToTerminationBytes(MediumOffset reference, Charset charset, Character terminationCharacter, long remainingDirectParentByteCount)
+	-Field<?> readField(MediumOffset reference, DataBlockDescription fieldDesc, long fieldSize, int sequenceNumber, ContainerContext containerContext)
+}
+class DataBlockFactory [[java:com.github.jmeta.library.datablocks.api.services.DataBlockFactory]] {
+}
+AbstractDataBlockReader --> "1" DataBlockFactory : dataBlockFactory
+class SizeProvider [[java:com.github.jmeta.library.datablocks.api.services.SizeProvider]] {
+}
+AbstractDataBlockReader --> "1" SizeProvider : customSizeProvider
+class CountProvider [[java:com.github.jmeta.library.datablocks.api.services.CountProvider]] {
+}
+AbstractDataBlockReader --> "1" CountProvider : customCountProvider
+class MediumDataProvider [[java:com.github.jmeta.library.datablocks.impl.MediumDataProvider]] {
+}
+AbstractDataBlockReader --> "1" MediumDataProvider : mediumDataProvider
+interface DataBlockReader [[java:com.github.jmeta.library.datablocks.api.services.DataBlockReader]] {
+}
+DataBlockReader <|.. AbstractDataBlockReader
+class ForwardDataBlockReader [[java:com.github.jmeta.library.datablocks.impl.ForwardDataBlockReader]] {
+	+ForwardDataBlockReader(DataFormatSpecification spec)
+	+Container readContainerWithId(MediumOffset currentOffset, DataBlockId id, Payload parent, long remainingDirectParentByteCount, int sequenceNumber, ContainerContext containerContext)
+	+Payload readPayload(MediumOffset reference, DataBlockId id, DataBlockId parentId, long remainingDirectParentByteCount, ContainerContext containerContext)
+	#boolean hasEnoughBytesForMagicKey(MediumOffset reference, MagicKey magicKey, long remainingDirectParentByteCount)
+	#List<MagicKey> getMagicKeys(DataBlockDescription containerDesc)
+}
+class AbstractDataBlockReader [[java:com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader]] {
+}
+AbstractDataBlockReader <|-- ForwardDataBlockReader
+@enduml

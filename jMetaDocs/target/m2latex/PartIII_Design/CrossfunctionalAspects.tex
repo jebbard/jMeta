@@ -1,0 +1,452 @@
+%===============================================================================================
+%		Basic Aspects
+%===============================================================================================
+
+\chapter{Cross-functional Aspects}
+\label{sec:BasicAspects}
+
+This chapter covers cross-functional aspects of the \LibName{} design which are not implemented in a single component only but cover the whole library, i.e. these are the so called \emph{cross-cutting concerns}.
+
+%-----------------------------------------------------------------------------------------------
+%		General Error Handling
+%-----------------------------------------------------------------------------------------------
+
+\section{General Error Handling}
+\label{sec:GeneralErrorHandling}
+
+Here, the general approach to error handling is presented. The basics of error handling are only slightly touched here. This section deals with errors that occur during the runtime of \LibName{}. This section does not describe concrete errors of concrete \LibName{} components. Instead, it defines guidelines used throughout \LibName{}.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Abnormal Events vs. Operation Errors}
+\label{sec:AbnormalEvengtVsOperationErrors}
+
+According to \cite{Sied06}, errors can be categorized as follows:
+\begin{itemize}
+\item \emph{Abnormal events:} Events that should only rarely occur and require a special handling.
+\begin{itemize}
+\item Connection to a server is lost
+\item A file operation fails
+\item A configuration file, table or any other data item that is expected to exist is not present
+\item An external memory or the main memory lacks enough space to handle a request
+\end{itemize}
+\item \emph{Operation Errors:} An operation can be completed with success or error. Errors can be distinguished from abnormal events in that they are more likely or even expected to happen and that they can be handled directly by the caller of the operation.
+\begin{itemize}
+\item Invalid user input, e.g. an input value is out of range
+\item The state to call the operation is not yet established internally, the method must be called later or multiple times. This is e.g. very common in embedded programming.
+\item The previous case can be seen as a precondition that must be established to call the method. However, a precondition is rather something \emph{the user can establish} from the outside by e.g. calling another operation before.
+\end{itemize}
+\end{itemize}
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Error Handling Approaches}
+\label{sec:ErrorHandlingApproaches}
+
+There are several different approaches to deal with the error categories, that are sometimes even used intermixed:
+\begin{itemize}
+\item \emph{Error codes:} In procedural system programming APIs, e.g. the Linux or Windows API, operations usually return error codes. One code is reserved with the semantics "`no error"'. Other codes are defined with special semantics that describe the kind of error.
+\item \emph{Error handlers:} Some APIs allow to specify error handlers that are called back by the system in case of an error. The error handler, as the name suggests, needs to do something with the error condition. For this to work, it usually needs context information such as the kind of error that occurred.
+\item \emph{Exceptions:} Mostly in object-oriented programming, exceptions are objects that usually represent errors and can contain context information about the error. They are thrown by an operation which changes the order the operations code is executed. They need to be catched somewhere in the call hierarchy of the operation, either within the operation itself or in one of its active parent callers. If they are not catched, they terminate the process the operation was running in. So throwing is the raising of the error, thereby assuming that further code in the operation is not allowed to be executed as the current state prohibits that. Catching equals handling the error. Some object-oriented programming languages like Java and C++ distinguish between checked and unchecked exceptions.
+\end{itemize}
+
+Each approach has pros and cons. In object-oriented programs, usually the exception mechanism is used.
+
+%-----------------------------------------------------------------------------------------------
+
+\subsection{Error Handling in \LibName{}}
+\label{sec:ErrorHandlingLibName}
+
+\LibName{} as an object-oriented application uses the exception error handling approach. There are no error handlers in \LibName{}. The return values of \LibName{} methods will never have the semantics of an error.
+
+%***********************************************************************************************
+
+\subsubsection{General Exception Usage Guidelines}
+\label{sec:GeneralExceptionUsageGuidelines}
+
+For each special category of error, a single exception class is defined. The exception class has a meaningful name the describes the error category. The name must end with \texttt{Exception}. The class stores as much context information as necessary to be able to handle the exception. This information is passed to the constructor of the exception when throwing it. It can be requested using special getters in the exception class.
+
+\LibName{} does not forward checked exceptions that are coming from internally used 3rd party libraries, such as the Java standard API. Instead, such errors are always wrapped by an own, meaningful \LibName{} exception.
+
+\LibName{} cannot handle all unchecked exceptions that might occur when calling a 3rd party library. So it might happen that such an exception propagates up to the \LibName{} library user. There is no means of a "`catch all"' implemented in \LibName{}, as there is not even a central common ground this could be implemented in.
+
+If a \LibName{} exception was caused by another exception, the causing exception must be specified in the \LibName{} exception.
+
+%***********************************************************************************************
+
+\subsubsection{Treating Abnormal Events}
+\label{sec:HandlingAbnormalEvents}
+
+In case that \LibName{} detects an abnormal event, it throws a \LibName{} unchecked runtime exception. \LibName{} unchecked runtime exceptions must provide information about causing exceptions and a message. The message text may further describe the exact properties of the error. By now, message texts must be given in british English.
+
+As mentioned before, the use of \LibName{} might also cause 3rd party unchecked runtime exceptions that are not under control of \LibName{}.
+
+How should \LibName{} users treat abnormal events? As the name and description of abnormal events suggest, there are usually only a few possible actions, but there might be also specialized handlings. A well-written application should not simply terminate in case of an abnormal event. It should at least have a catch all section that handles unchecked runtime errors. This section may show the error to their users in a dialog box or at least log them. In some cases, the users of that application might be able to retry the action, or choose another element on which to apply the action (e.g. in cased of a locked or read-only file). Depending on the kind of runtime error, a more sophisticated automated error handling can be set up by such an application. E.g. if a server connection had been lost, it might try to reconnect in a parallel thread, if the event happens during a database transaction, the database is of course rolled back and so on.
+
+%***********************************************************************************************
+
+\subsubsection{Treating Operation Errors}
+\label{sec:TreatingOperationErrors}
+
+Treating operation errors is not only done with the approach that every operation error is signaled by a checked exception. Most cases where checked exceptions could be used can well be covered with the design-by-contract paradigm. Some rare cases require checked exceptions, though. This is treated in the following sections.
+
+\paragraph{Design-by-Contract}
+\label{sec:DesignByContract}
+
+Design-by-contract, as originally created by Betrandt Meyer, states that each interface a client uses\footnote{Might be a OO class or interface as well as the interface of a module etc.} must define a contract. The contract includes the constraints and possibilities for the user (i.e. what he must provide or which state he has to establish) as well as the duty of the interface to behave as specified. This has multiple advantages:
+\begin{itemize}
+\item The interface clearly defines how it needs to be used. It is therefore easier to understand and also easier to test. The contract is most of the time the basis for test cases of the interface.
+\item If the interface implementation directly rejects wrong input according to its precondition, it strongly supports a defensive programming style. E.g. there are no NullPointerExceptions that are thrown from just anywhere in the implemention. Instead, the user input is checked immediately and pinpointed as the source of error. 
+\end{itemize}
+
+Violating the contract on the side of the user is clearly a programming error.\footnote{In theory, with a formal approach, such programming errors could even be checked at compile-time.} If the implementation violates the contract, it is simply not implementing its interface correctly.
+
+Design-by-contract distinguishes:
+\begin{itemize}
+\item \emph{Preconditions} that must be established by the user before calling a method
+\item \emph{Postconditions} that the implementation must establish after a method call
+\item \emph{Invariants}, i.e. state conditions for the interface that must be fulfilled before and after a method is called, but nut during a method call.
+\end{itemize}
+
+\paragraph{\LibName{} and Design-by-Contract}:
+\label{sec:LibNameDesignByContract}
+
+We define: 
+%%%% DD --> %%%%
+\DD{dd:205}
+{% Title
+Checking preconditions
+}
+{% Short description
+In the Java implementation of \LibName{}, an invalid parameter range leads to an \texttt{IllegalArgumentException}, while a precondition that can only be checked by calling a method before-hand causes a \texttt{PreconditionUnfulfilledException} if not established. Every violation of a precondition contains a british English message that describes the error using detailed argument values.
+}
+{% Rationale
+Fail fast is good and easy to implement
+}
+{% Disadvantes
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+\paragraph{Design-by-Contract vs. Multithreading}
+\label{sec:DbcMultithreading}
+
+In case of multithreaded use of \LibName{}, the approach of actively checking the precondition at the beginning of each method can be outperformed. If a first thread finds that the precondition is established, but a second thread e.g. removes an item after that, leading to the precondition not being established anymore, the first thread will run into an error. The design-by-contract front-line is therefore not water-proof. However, this is not a problem of the approach itself, but a general multithreading issue. \LibName{} itself refuses to lock the code of every method for multiple threads at once to avoid decreased performance. Instead, multithreaded applications must ensure that multiple threads properly work together.
+
+\paragraph{Checked Exceptions}
+\label{sec:CheckedExceptions}
+
+Checked exceptions are only rarely used in \LibName{}, in exactly those cases where neither runtime exceptions nor preconditions are appropriate or applicable.
+
+Whenever the caller can handle an error that is quite likely to happen, this is reflected as a checked exception. The caller catches the exception and does an appropriate handling. An example for this is an end of file condition, which may always occur and simply indicates that the client should stop reading. Another example is a class loading some data in its constructor. However, the program functions even if this data contains errors and cannot be loaded. In that case, the constructor could throw a checked exception.
+
+%-----------------------------------------------------------------------------------------------
+
+\section{Logging in \LibName{}}
+\label{sec:LoggingLibName}
+
+Logging is also used in \LibName{} as suggested by the following design decision:
+
+\DD{dd:206}
+{% Title
+\LibName{} maintains a log file logging the most important events and errors
+}
+{% Short description
+Logging is used in \LibName{} at least in \COMPcontext{} to protocol the startup loading of the library. In other components, logging is just used in exceptional cases, e.g. for error handling. The logging can be set on class basis by configuration done by the user, and it can also be fully disabled.
+}
+{% Rationale
+In sufficiently complex system it is simply necessary to log status information. The user can disable and fully configure it to his needs. 
+}
+{% Disadvantages
+No disadvantages known
+}
+
+The question now is: What are the logging levels used?
+
+%%%% DD --> %%%%
+\DD{dd:206a}
+{% Title
+Informative output is given on INFO level, details on DEBUG and errors on ERROR level
+}
+{% Short description
+\LibName{} logs the following output:
+\begin{itemize}
+\item \texttt{INFO}: Every informative output related to system environment, versioning etc.
+\item \texttt{DEBUG}: Detailed output for progress of specific startup activities or complex operations are logged during every call.
+\item \texttt{ERROR}: If necessary, additional diagnostic information is logged in case of errors on ERROR level.
+\end{itemize}
+}
+{% Rationale
+There is no arbitrary but unnecessary logging. Complex background operations might require detailed log output for debugging. When errors at runtime occur within the library itself, debugging can be made easier by including addition information in logfiles.
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+In addition, we have to define how the logging framework looks like:
+
+%%%% DD --> %%%%
+\DD{dd:206b}
+{% Title
+There is no self-made logging component, but \LibName{} uses \emph{slf4j} wherever necessary
+}
+{% Short description
+Instead of a dedicated, hand-crafted and tested technical logging component which is known by every other component, and which encapsulates another logging library, \LibName{} code directly uses slf4j with a user-provided provider anywhere necessary. I.e. a direct dependency to slf4j is allowed from everywhere in the library.
+}
+{% Rationale
+An own component wastes time and effort, in addition, every other component must somehow get an instance of it. Furthermore, innovations of the logging framework encapsulated usually remain encapsulated until you also provide it at your outside interface. slf4j is already a wrapper shielding you from details of other logging frameworks. You do not need to rewrite a logging framework today yourself, there is more precious time to spent if you do not. \LibName{} reuses the great logging providers already out there directly. 
+}
+{% Disadvantages
+No disadvantages known
+}
+%%%% <-- DD %%%%
+
+The question is how to deal with technical runtime exceptions? Should they be logged, if so, where? This is clarified in the following design decision:
+
+%%%% DD --> %%%%
+\DD{dd:206c}
+{% Title
+\LibName{} code logs an error message before throwing a runtime exception
+}
+{% Short description
+Before \LibName{} code itself throws a runtime exception, it logs a corresponding error message, preferably the exception itself, such that its message and stack trace get protocolled in the logs. This is done on ERROR level. For jMeta's own exceptions - including precondition checks - the logging is done in the exception constructor itself. A generic base class \texttt{JMetaRuntimeException} is used for this.
+
+\LibName{} code does not log anything if it throws a checked exception.
+}
+{% Rationale
+There is no ``catch all'' in \LibName{} possible or reasonable, so if runtime exceptions are thrown, they are not captured in the \LibName{} logs. This is usually fine, unless \LibName{} itself throws such exceptions. We do not want to rely on the arbitrary logs of users of \LibName{}, but we want to be able to analyze what was going on in the \LibName{} code. The most important aspect of this is seeing where which exceptions originated from the library itself.
+
+Not logging anything for checked exceptions because they are in some way expected. If they become unexpected, a JMeta runtime exception can do the logging again.
+}
+{% Disadvantages
+Even during usual unit tests, there is logging output, i.e. probably file I/O
+}
+%%%% <-- DD %%%%
+
+The last topic to handle here is whether we use tracing or not:
+%%%% DD --> %%%%
+\DD{dd:206d}
+{% Title
+\LibName{} does not use tracing anywhere
+}
+{% Short description
+With tracing, we mean very fine grained log statements usually at the beginning and end of every method. This can be e.g. service facade methods only, or in the most extreme case any public, protected, default or private method called. Some applications log the input and output parameters in addition.
+}
+{% Rationale
+Even though in rare cases tracing can give a lot of very important hints to debug a problem based on logs, it has also several drawbacks. Either you have to add it all manually. If you do, you might forget it, or you might write it in a way that is ``repeating itself'', making general changes harder. And, in addition, the code is cluttered with statements, probably statements such as ``if logging enabled, then log''. This makes the code barely readable. An alternative is to use aspect-oriented libraries. However, here it might be not always entirely clear how to only log \emph{those specific methods} you want to trace. And there is a third-party dependency.
+}
+{% Disadvantages
+In some cases, it might be hard to track down runtime errors if no tracing logs can be created and analyzed
+}
+%%%% <-- DD %%%%
+
+
+% -------------------------------------------------------------------------------------------------------
+%  Configuration
+% -------------------------------------------------------------------------------------------------------
+\section{Configuration}%
+\label{sec:Konfiguration}%
+
+With the term \emph{configuration} in \LibName{}, we understand the change of specific parameters, which customize the behaviour of \LibName{} at runtime. This is quite vague and the difference to usual specialized setters is unclear.
+
+Thus we want to give some more criteria for configuration:
+\begin{itemize}
+\item Configuration is part of the public API of \LibName{}, i.e. it can be changed by the user.
+\item It is generic and thus extensible for further releases, i.e. adding new configuration parameters means to add a new constant to the API and update the documentation; the API for setting and retrieving the configuration parameter - as it is generic - does not change by adding new, changing existing or removing old parameters
+\item Configuration parameters usually have global effect and usually are just used once; but, of course in theory we could also make them dynamically changeable by users at runtime, and their scope could also be limited, e.g. to individual media
+\end{itemize}
+
+For now it turned out that there is no need in \LibName{} for such dynamic configuration parameters a.k.a properties, neither globally, nor for individual components. We thus summarize as follows:
+
+%%%% DD --> %%%%
+\DD{dd:207a}
+{% Title
+\LibName{} offers no generic configuration mechanism
+}
+{% Short description
+\LibName{} offers no generic mechanism for (global or local) configuration, especiall it currently defines no properties that influence the behaviour of the library. All necessary ``configurations'' for customizing the behaviour of a component are passed by the user via specialized (i.e. non-generic) setters or constructor  parameters.
+}
+{% Rationale
+There is no need for the bigger flexibility yet.
+}
+{% Disadvantages
+No disadvantages known.
+}
+%%%% <-- DD %%%%
+
+
+% TODO: Old state with configuration, probably revive again 
+
+% %%%% DD --> %%%%
+% \DD{dd:207}
+% {% Title
+% \LibName{} bietet einen generischen und erweiterbaren Konfigurationsmechanismus über die öffentliche API an
+% }
+% {% Short description
+% Die Library über ihre öffentliche API Mittel zum Setzen und Abfragen von Konfigurationsparametern an. Die verfügbaren Konfigurationsparameter werden über die API als Konstanten repräsentiert und in der Dokumentation aufgeführt.
+
+% In \LibName{} kann prinzipiell jede Klasse einzeln konfigurierbar sein, d.h. der Sichtbarkeitsbereich der Konfigurationen muss in keinster Weise global sein.
+% }
+% {% Rationale
+% Dies gewährt Flexibilität in vielerlei Hinsicht:
+% \begin{itemize}
+% \item Zukünftige Versionen von \LibName{} können einfach um weitere Konfigurationsmöglichkeiten erweitert werden, ohne die API anpassen zu müssen (bis auf die neue Konfigurationskonstante)
+% \item Konfigurationen mit globaler Gültigkeit machen meist wenig Sinn, sondern sind eher hinderlich, häufig erzeugt die Library einzelne Objekte (z.B. pro Sitzung oder pro Medium), die unabhängig voneinander konfiguriert werden müssen.
+% \end{itemize}
+% }
+% {% Disadvantages
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Darüber hinaus gilt:
+% %%%% DD --> %%%%
+% \DD{dd:208}
+% {% Title
+% Konfiguration zur Laufzeit, keine properties-Dateien
+% }
+% {% Short description
+% \LibName{} kann über Laufzeitaufrufe konfiguriert werden, und nicht über properties-Dateien
+% }
+% {% Rationale
+% Properties-Dateien mögen in einigen Anwendungsfällen sinnvoll sein, aber nicht für eine dynamisch anpassbare Konfiguration. Sie sind eben nur statisch, und Änderungen erfordern i.d.R. den Neustart der Applikation. Natürlich können properties in Zukunft als Initial-Konfiguration dienen, die dann dynamisch nachjustiert werden kann. In der aktuellen \LibName{}-Version wird allerdings keine Notwendigkeit für statische Konfiguration gesehen.
+% }
+% {% Disadvantages
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Für die Konfigurationsparameter selbst gilt:
+% %%%% DD --> %%%%
+% \DD{dd:209}
+% {% Title
+% Jeder Konfigurationsparamater hat einen Gültigkeitsbereich und einen Standardwert
+% }
+% {% Short description
+% Jeder Konfigurationsparameter bei \LibName{} ist in dem Sinne verpflichtend, dass er immer einen Wert (in seinem Scope) hat. Dazu wird für jeden Parameter ein sinnvoller Standardwert definiert, der gilt, wenn kein explizites Setzen durchgeführt worden ist.
+
+% Zudem hat jeder Konfigurationsparameter einen gültigen Wertebereich, z.B. Minimum und Maximum bzw. gültige Werte.
+% }
+% {% Rationale
+% Standardwerte sind immer wichtig, denn keiner will den Anwender zwingen, explizit zu konfigurieren. Die Standardwerte sollten so gewählt sein, dass das Verhalten der Library dem 80\%-Fall genügt und stabil funktioniert.
+
+% Wertebereiche kommunizieren dem Anwender bereits klar, welche Werte gültig sind und können für Plausibilitätsprüfungen genutzt werden.
+% }
+% {% Disadvantages
+% Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% Schließlich legen wir noch fest:
+% %%%% DD --> %%%%
+% \DD{dd:210}
+% {% Title
+% Für Konfigurationen wird die Utility-API \SectionLink{sec:ConfigurationAPI} genutzt.
+% }
+% {% Short description
+% \LibName{} nutzt eine API der Komponente \COMPutility{}, die auch prinzipiell von beliebigen anderen Projekten verwendet werden kann, um Konfigurationen anzubieten.
+% }
+% {% Rationale
+% Konfiguration kann über eine generische API erfolgen. Die Notwendigkeit von Konfiguration ist nichts \LibName{}-spezifisches, sondern generell von Bedeutung. Daher macht das Aufbauen von wiederverwendbaren Komponenten in einem Utility-Anteil Sinn. Dies fördert auch die Einheitlichkeit: Die API für Konfiguration sieht für alle Komponenten von \LibName{} gleich aus.
+% }
+% {% Disadvantages
+% %Keine bekannten Nachteile
+% }
+% %%%% <-- DD %%%%
+
+% -------------------------------------------------------------------------------------------------------
+%  Naming Conventions and Project Structure
+% -------------------------------------------------------------------------------------------------------
+\section{Naming Conventions and Project Structure}%
+\label{sec:NamingConventions}%
+
+% =======================================================================================================
+\subsection{Java Naming Conventions}%
+\label{sec:JavaNamingConventions}%
+
+We use the standard Java naming and formatting conventions as defined by Sun. Only small addition: If there is a service interface with only one implementation, this implementation is having the prefix \texttt{Standard}. E.g. the default implementation for the \texttt{MediumStore} interface is named \texttt{StandardMediumStore}.
+
+
+% =======================================================================================================
+\subsection{Package Naming Conventions}%
+\label{sec:PackageNamingConventions}%
+
+Here, we quickly define the package naming to be used for the library and extensions of the library.
+
+% =======================================================================================================
+\subsubsection{Core Library}%
+\label{sec:CoreLibrary}%
+
+All packages for the core library start with \texttt{com.github.\LibNamePackage{}}, according to the Java naming conventions. The reason is that the library is hosted on Github. Below this core name, the following sub-packages are used:
+\begin{itemize}
+\item \texttt{.library.<component>} for all core components of the library, where ``\texttt{<component>}'' is replaced by the actual component name
+\item \texttt{.utility.<component>} for all technical utility code needed for the library, where ``\texttt{<component>}'' is replaced by the actual category name
+\item \texttt{.defaultextensions.<extension name>} for all extensions delivered by default bundled with \LibName{}, where ``\texttt{<extension name>}'' is the name of the extension, usually a single data format name; see also the next section for third-party extensions
+\end{itemize}
+
+Below these package names, there is another hierarchy:
+\begin{itemize}
+\item \texttt{.api} containing the public interface of the component, utility or extension; this package itself should not contain classes directly, but is further subdivided into:
+\begin{itemize}
+\item \texttt{.services} containing the function interfaces the user needs to use to work with the component, utility or extension
+\item \texttt{.types} containing any transport objects, data types or the like for the component, utility or extension
+\item \texttt{.exceptions} containing any public exceptions of the component, utility or extension
+\end{itemize}
+\item \texttt{.impl} containing the private implementation of the component, utility or extension; sub-divisions into further packages below it  are possible, but component-specific and not standardized
+\end{itemize}
+
+% =======================================================================================================
+\subsubsection{Extensions}%
+\label{sec:Extensions}%
+
+As mentioned already, the default extensions delivered together with \LibName{} of course also use a package naming convention quite similar to the core library package names. For any third party extensions, there is of course no definition of how the packages should be named, but it is up to the creators of the extension.
+
+However, extension providers should follow the standard Java package naming conventions, and they should ensure that their package names do not clash with package names of other \LibName{} extensions.
+
+
+% =======================================================================================================
+\subsection{Project Naming and Structure}%
+\label{sec:ProjectNamingandStructure}%
+
+Every IDE project containing code for \LibName{} starts has the form \texttt{\LibName{}<LibraryPart>[Extension]}, where \texttt{<LibraryPart>} is:
+\begin{itemize}
+\item \texttt{Library:} The core library with the main user API, without any extension specific parts
+\item \texttt{Utility:} Any utility the core library and extensions need, but no classes the library user must depend on, i.e. just internal library utility
+\item \texttt{DefaultExtension:} For all projects building an extension that is already bundled by default with the core library.
+\item \texttt{Tools:} For any supporting, development or testing tools, i.e. mostly Java applications that can either be used by library users or by library developers
+\item \texttt{Docs:} For any documentation of the library, no source code here (except for docs, e.g. tex files)
+\end{itemize}
+
+\texttt{[Extension]} is only used for the \texttt{DefaultExtension} library part. Each extension needs its own project and build unit. The reason is requirement \SectionLink{sec:REQ010SchreibenInAnderesAusgabemediumUnterstuetzt}. This allows us to depoly individual JARs for each single extension. In addition, there is an integration testing projects for testing media that contain multiple different formats.
+
+Below, you can see the actual projects currently existing and their allowed dependencies:
+TODO
+
+% \begin{figure}[H]
+% 	\centering
+% 		\includegraphics[width=1.00\textwidth]{Figures/Part_II/II_1_ProjectStructure.pdf}
+% 		\caption{Project structure of \LibName{}}
+% 	\label{fig:5_3_SCH_ProjStruct}
+% \end{figure}
+
+
+% =======================================================================================================
+\subsection{Build Module Structure and Dependencies}%
+\label{sec:ModuleStructureandDependencies}%
+
+The Maven build module structure is of course aligned with the project structure: There is exactly one Maven module per project, having the same dependencies as depicted above. One exception might be the Docs project as it contains no sources. In addition, there is a single parent POM for general dependencies and aggregate builds.
+
+
+%###############################################################################################
+%###############################################################################################
+%
+%		File end
+%
+%###############################################################################################
+%###############################################################################################
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../EasyTag_DesignConcept"
+%%% End:

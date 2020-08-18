@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
-import com.github.jmeta.library.datablocks.api.services.DataBlockFactory;
 import com.github.jmeta.library.datablocks.api.services.ExtendedDataBlockFactory;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.Field;
@@ -38,15 +37,12 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
 	/**
 	 * Creates a new {@link CompressionHandler}.
 	 *
-	 * @param dbFactory The {@link DataBlockFactory}
+	 * @param dbFactory The {@link ExtendedDataBlockFactory}
 	 */
 	public CompressionHandler(ExtendedDataBlockFactory dbFactory) {
 		super(ID3v2TransformationType.COMPRESSION, dbFactory);
 	}
 
-	/**
-	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresTransform(com.github.jmeta.library.datablocks.api.types.Container)
-	 */
 	@Override
 	public boolean requiresTransform(Container container) {
 		Reject.ifNull(container, "container");
@@ -78,9 +74,6 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
 		return false;
 	}
 
-	/**
-	 * @see com.github.jmeta.defaultextensions.id3v23.impl.AbstractID3v2TransformationHandler#requiresUntransform(com.github.jmeta.library.datablocks.api.types.Container)
-	 */
 	@Override
 	public boolean requiresUntransform(Container container) {
 
@@ -89,9 +82,6 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
 		return requiresTransform(container);
 	}
 
-	/**
-	 * @see AbstractID3v2TransformationHandler#transformRawBytes(byte[])
-	 */
 	@Override
 	protected byte[][] transformRawBytes(ByteBuffer payloadBytes) {
 
@@ -118,9 +108,6 @@ public class CompressionHandler extends AbstractID3v2TransformationHandler {
 		return new byte[][] { bos.toByteArray() };
 	}
 
-	/**
-	 * @see AbstractID3v2TransformationHandler#untransformRawBytes(byte[])
-	 */
 	@Override
 	protected byte[][] untransformRawBytes(ByteBuffer payloadBytes) {
 

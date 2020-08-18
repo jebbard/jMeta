@@ -59,6 +59,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
 						<configuration>
@@ -71,19 +72,11 @@
 							</arguments>
 						</configuration>
 						<id>ppt-save-as</id>
-						<phase>prepare-package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Create figures for design concept -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<executions>
 					<execution>
 						<configuration>
 							<executable>C:\Python27\python</executable>
@@ -98,7 +91,7 @@
 							</environmentVariables>
 						</configuration>
 						<id>python-build</id>
-						<phase>prepare-package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
