@@ -106,9 +106,8 @@ The library is currently using OpenJDK 14. We tried to ensure that jMeta uses as
 
 | **Library/Framework/API/Tool** | **Version** | **Category**   | **Purpose** | **Link** |
 | ---                            | ---         | ---            | ---         | ---      |
-| ByteBuddy                      | LATEST      | Runtime        | Only necessary to ensure mockito works with OpenJDK14            |  |
 | jUnit                          | 4.12      | Testing        | Default test runner and assertions | [https://junit.org/junit4/](https://junit.org/junit4/) |
-| log4j 2                       | 2.10.0      | Runtime        | Logging Implementation | [https://logging.apache.org/log4j/2.x/](https://logging.apache.org/log4j/2.x/) |
+| log4j 2                       | 2.13.3      | Runtime        | Logging Implementation | [https://logging.apache.org/log4j/2.x/](https://logging.apache.org/log4j/2.x/) |
 | Mockito                        | 3.3.3    | Testing        | Mocking dependencies for unit testing | [https://site.mockito.org/](https://site.mockito.org/) |
 | OpenJDK                        | 14          | Runtime        | JVM | [https://openjdk.java.net/projects/jdk/14/](https://openjdk.java.net/projects/jdk/14/) |
 | slf4j                       | 1.7.21      | Runtime        | Logging API | [http://www.slf4j.org/manual.html](http://www.slf4j.org/manual.html) |
