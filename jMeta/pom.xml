@@ -206,8 +206,8 @@
 				<version>2.3.2</version>
 				<configuration>
 					<!-- Java compiler and runtime version -->
-					<source>9</source>
-					<target>9</target>
+					<source>8</source>
+					<target>8</target>
 				</configuration>
 			</plugin>
 			<!-- JAR: Build a test jar for test reuse -->
