@@ -11,6 +11,7 @@ package com.github.jmeta.library.startup.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -232,7 +233,7 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 	/**
 	 * Loads and returns the version properties. If there are any errors during
 	 * this, they are logged and null is returned.
-	 * 
+	 *
 	 * @return the version properties or null if they could not be loaded
 	 */
 	private Properties getVersionProperties() {
@@ -255,7 +256,7 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 			return null;
 		}
 
-		List<String> properties = List.of(StandardLibraryJMeta.PROPERTY_LIBRARY_VERSION,
+		List<String> properties = Arrays.asList(StandardLibraryJMeta.PROPERTY_LIBRARY_VERSION,
 			StandardLibraryJMeta.PROPERTY_BUILD_NUMBER, StandardLibraryJMeta.PROPERTY_BUILD_TIMESTAMP,
 			StandardLibraryJMeta.PROPERTY_JAR_NAME);
 
@@ -272,7 +273,7 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 
 	/**
 	 * Logs infos about an {@link Extension}.
-	 * 
+	 *
 	 * @param extension The {@link Extension}
 	 */
 	private void logExtensionInfo(Extension extension) {

@@ -11,6 +11,7 @@ package com.github.jmeta.defaultextensions.mp3.impl;
 
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -60,67 +61,6 @@ public class MP3Extension implements Extension {
 	private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
 		.lookupService(DataFormatSpecificationBuilderFactory.class);
 
-	private DataFormatSpecification createSpecification() {
-		final int mp3HeaderByteLength = 4;
-
-		// Data blocks
-		/*
-		 * Bit layout of the MPEG-1 Audio header Byte: -- 00 -- -- 01 -- -- 02 -- -- 03
-		 * -- Bit index in byte: 76543210 76543210 76543210 76543210 Bit contents:
-		 * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM Description: A: Frame sync B: MPEG audio
-		 * version ID C: Layer description D: Protection bit E: Bitrate index F:
-		 * Sampling rate frequency index G: Padding bit H: Private bit I: Channel mode
-		 * J: Mode extension K: Copyright L: Original M: Emphasis
-		 */
-		DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(MP3Extension.MP3);
-
-		// @formatter:off
-		DataBlockCrossReference crcReference = new DataBlockCrossReference("CRC");
-		builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
-			.addHeader("header", "MP3 header", "The MP3 header")
-			.addFlagsField("content", "MP3 header contents", "The MP3 header contents")
-			.withStaticLengthOf(mp3HeaderByteLength).withFlagSpecification(mp3HeaderByteLength, ByteOrder.BIG_ENDIAN)
-			.withDefaultFlagBytes(new byte[] { -1, -32, 0, 0 }) // 11 one bits
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_FRAME_SYNC, new BitAddress(0, 0), "", 11, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_NO_PROTECTION_BIT, new BitAddress(1, 0), "", 1, null))
-			.addFlagDescription(new FlagDescription(MP3Extension.HEADER_FLAGS_LAYER, new BitAddress(1, 1), "", 2,
-				List.of("reserved", "Layer III", "Layer II", "Layer I")))
-			.addFlagDescription(new FlagDescription(MP3Extension.HEADER_FLAGS_ID, new BitAddress(1, 3), "", 2,
-				List.of("MPEG Version 2.5", "reserved", "MPEG Version 2 (ISO/IEC 13818-3)",
-					"MPEG Version 1 (ISO/IEC 11172-3)")))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_PRIVATE_BIT, new BitAddress(2, 0), "", 1, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_PADDING_BIT, new BitAddress(2, 1), "", 1, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_SAMPLING_FREQUENCY, new BitAddress(2, 2), "", 2, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_BITRATE_INDEX, new BitAddress(2, 4), "", 4, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_EMPHASIS_BIT, new BitAddress(3, 0), "", 2, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_ORIGINAL_OR_COPY, new BitAddress(3, 2), "", 1, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_COPYRIGHT_BIT, new BitAddress(3, 3), "", 1, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_MODE_EXTENSION_BIT, new BitAddress(3, 4), "", 2, null))
-			.addFlagDescription(
-				new FlagDescription(MP3Extension.HEADER_FLAGS_MODE_BIT, new BitAddress(3, 6), "", 2, null))
-			.finishFlagSpecification()
-			.withFieldFunction(new PresenceOf(crcReference, MP3Extension.HEADER_FLAGS_NO_PROTECTION_BIT, 0))
-			.asMagicKeyWithOddBitLength(11).finishField().finishHeader().addHeader("crc", "MP3 CRC", "The MP3 CRC")
-			.referencedAs(crcReference).asOptional().addBinaryField("data", "MP3 CRC data", "The MP3 CRC data")
-			.withStaticLengthOf(2).finishField().finishHeader().getPayload().referencedAs(MP3Extension.REF_PAYLOAD)
-			.addBinaryField("data", "payloadData", "The MP3 payload data").withLengthOf(1, 998).finishField()
-			.finishFieldBasedPayload().finishContainer().withByteOrders(ByteOrder.BIG_ENDIAN)
-			.withCharsets(Charsets.CHARSET_ISO);
-		// @formatter:on
-
-		return builder.build();
-	}
-
 	/**
 	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
 	 */
@@ -151,6 +91,69 @@ public class MP3Extension implements Extension {
 	@Override
 	public String getExtensionId() {
 		return "DEFAULT_de.je.jmeta.defext.datablocks.impl.MP3DataBlocksExtension";
+	}
+
+	private DataFormatSpecification createSpecification() {
+		final int mp3HeaderByteLength = 4;
+
+		// Data blocks
+		/*
+		 * Bit layout of the MPEG-1 Audio header Byte: -- 00 -- -- 01 -- -- 02 -- -- 03
+		 * -- Bit index in byte: 76543210 76543210 76543210 76543210 Bit contents:
+		 * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM Description: A: Frame sync B: MPEG audio
+		 * version ID C: Layer description D: Protection bit E: Bitrate index F:
+		 * Sampling rate frequency index G: Padding bit H: Private bit I: Channel mode
+		 * J: Mode extension K: Copyright L: Original M: Emphasis
+		 */
+		DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(MP3Extension.MP3);
+
+		// @formatter:off
+		DataBlockCrossReference crcReference = new DataBlockCrossReference("CRC");
+		List<String> headerFlags = Arrays.asList("reserved", "Layer III", "Layer II", "Layer I");
+		List<String> headerFlagDescriptions = Arrays.asList("MPEG Version 2.5", "reserved",
+			"MPEG Version 2 (ISO/IEC 13818-3)", "MPEG Version 1 (ISO/IEC 11172-3)");
+		builder.addContainerWithFieldBasedPayload("mp3", "MP3 Frame", "The MP3 Frame")
+			.addHeader("header", "MP3 header", "The MP3 header")
+			.addFlagsField("content", "MP3 header contents", "The MP3 header contents")
+			.withStaticLengthOf(mp3HeaderByteLength).withFlagSpecification(mp3HeaderByteLength, ByteOrder.BIG_ENDIAN)
+			.withDefaultFlagBytes(new byte[] { -1, -32, 0, 0 }) // 11 one bits
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_FRAME_SYNC, new BitAddress(0, 0), "", 11, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_NO_PROTECTION_BIT, new BitAddress(1, 0), "", 1, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_LAYER, new BitAddress(1, 1), "", 2, headerFlags))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_ID, new BitAddress(1, 3), "", 2, headerFlagDescriptions))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_PRIVATE_BIT, new BitAddress(2, 0), "", 1, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_PADDING_BIT, new BitAddress(2, 1), "", 1, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_SAMPLING_FREQUENCY, new BitAddress(2, 2), "", 2, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_BITRATE_INDEX, new BitAddress(2, 4), "", 4, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_EMPHASIS_BIT, new BitAddress(3, 0), "", 2, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_ORIGINAL_OR_COPY, new BitAddress(3, 2), "", 1, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_COPYRIGHT_BIT, new BitAddress(3, 3), "", 1, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_MODE_EXTENSION_BIT, new BitAddress(3, 4), "", 2, null))
+			.addFlagDescription(
+				new FlagDescription(MP3Extension.HEADER_FLAGS_MODE_BIT, new BitAddress(3, 6), "", 2, null))
+			.finishFlagSpecification()
+			.withFieldFunction(new PresenceOf(crcReference, MP3Extension.HEADER_FLAGS_NO_PROTECTION_BIT, 0))
+			.asMagicKeyWithOddBitLength(11).finishField().finishHeader().addHeader("crc", "MP3 CRC", "The MP3 CRC")
+			.referencedAs(crcReference).asOptional().addBinaryField("data", "MP3 CRC data", "The MP3 CRC data")
+			.withStaticLengthOf(2).finishField().finishHeader().getPayload().referencedAs(MP3Extension.REF_PAYLOAD)
+			.addBinaryField("data", "payloadData", "The MP3 payload data").withLengthOf(1, 998).finishField()
+			.finishFieldBasedPayload().finishContainer().withByteOrders(ByteOrder.BIG_ENDIAN)
+			.withCharsets(Charsets.CHARSET_ISO);
+		// @formatter:on
+
+		return builder.build();
 	}
 
 }
