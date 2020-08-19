@@ -2,7 +2,14 @@
 <br />
 # jMeta
 
-jMeta is an extensible Java library for reading and writing multimedia metadata and container formats. Currently, jMeta is in an alpha status and supports the following data formats:
+jMeta is an extensible Java library for reading and writing multimedia metadata and container formats. It is intended for use for multimedia-heavy Java applications that do not want to dive too deep into the details of each format they support. jMeta relieves these applications of the burden to study, understand and implement the tricky details of each format out there and is itself extensible, which keeps applications based on jMeta also extensible. Examples of targeted applications are: Audio studio applications, multimedia (image, audio, video) collection applications, editing applications among others.
+
+jMeta supports three basic types of _Media_, which is the term used for supported datasources used throughout the library:
+* **File:** A usual file stored on external media, random-access and basically read-write
+* **Byte-Array:** Allows to use jMeta also for data already present in-memory; random-access and read-write
+* **InputStream:** The most general way to input any data; sequential and not random-access and read-only - On the plus side, this allows jMeta to be used for internet media streams, zipped files, files sent over REST APIs and read from databases and tons of other options
+
+Currently, jMeta is in an alpha status and supports the following data formats:
 * MP3
 * OGG
 * ID3v1 and ID3v1.1
@@ -104,15 +111,15 @@ Above all, there is the **jMeta** project containing the parent POM with aggrega
 
 ### jMeta Dependencies
 
-The library is currently using OpenJDK 14. We tried to ensure that jMeta uses as few 3rd-level dependencies as possible and therefor has both a small memory and startup footprint as well as no compatibility and other common dependency issues.
+The library is currently based on OpenJDK 8 and tested (using Travis CI) with all OpenJDKs and Oracle JDKs from 8 to 14. We tried to ensure that jMeta uses as few 3rd-level dependencies as possible and therefor has both a small memory and startup footprint as well as no compatibility and other common dependency issues.
 
 | **Library/Framework/API/Tool** | **Version** | **Category**   | **Purpose** | **Link** |
 | ---                            | ---         | ---            | ---         | ---      |
-| jUnit                          | 4.12      | Testing        | Default test runner and assertions | [https://junit.org/junit4/](https://junit.org/junit4/) |
-| log4j 2                       | 2.13.3      | Runtime        | Logging Implementation | [https://logging.apache.org/log4j/2.x/](https://logging.apache.org/log4j/2.x/) |
-| Mockito                        | 3.3.3    | Testing        | Mocking dependencies for unit testing | [https://site.mockito.org/](https://site.mockito.org/) |
-| OpenJDK                        | 14          | Runtime        | JVM | [https://openjdk.java.net/projects/jdk/14/](https://openjdk.java.net/projects/jdk/14/) |
-| slf4j                       | 1.7.21      | Runtime        | Logging API | [http://www.slf4j.org/manual.html](http://www.slf4j.org/manual.html) |
+| jUnit    | 4.12   | Testing    | Default test runner and assertions | [https://junit.org/junit4/](https://junit.org/junit4/) |
+| log4j 2  | 2.13.3 | Runtime    | Logging Implementation | [https://logging.apache.org/log4j/2.x/](https://logging.apache.org/log4j/2.x/) |
+| Mockito  | 3.3.3  | Testing    | Mocking dependencies for unit testing | [https://site.mockito.org/](https://site.mockito.org/) |
+| OpenJDK  | 8      | Runtime    | JVM | [https://openjdk.java.net/projects/jdk/8/](https://openjdk.java.net/projects/jdk/8/) |
+| slf4j    | 1.7.21 | Runtime    | Logging API | [http://www.slf4j.org/manual.html](http://www.slf4j.org/manual.html) |
 
 All of these versions can be found in the [POM.xml](jMeta/pom.xml).
 
@@ -133,7 +140,7 @@ The project's documentation is consisting of some LaTeX documents (design concep
 mvn clean site
 ```
 
-Note that, currently, for the site lifecycle to run, this requires an installation of Microsoft PowerPoint as it generates figures from PPT slides using a PowerPoint ActiveX object.
+Note that, currently, for the site lifecycle to run, this requires both an installation of Python 2.7 as a Python script is used to crop PDF figure files and an installation of Microsoft PowerPoint as it generates figures from PPT slides using a PowerPoint ActiveX object.
 
 ## Project Planning
 
@@ -143,3 +150,17 @@ The following main topics are on the road map as high-level next steps for the p
 * Finish writing functionality for generic interface
 * Support for MPEG-4/JPEG 2000, QuickTime, RIFF, Matroska, ID3v2.4, VorbisComment, Lyrics3v1 and APEv1
 * Concept for High-Level API (Interface/Annotation-based)
+
+### Project Roadmap
+
+The following table lists all currently planned next milestone releases on the project roadmap:
+
+| **Version**               | **Content** |
+| ---                       | ---         |
+| **0.1 (current version)** | Reading metadata (ID3v1 and ID3v1.1, ID3v2.3, APEv2, Lyrics3v2) and container (MP3, Ogg) data formats |
+| 0.2                       | Generic writing of container and metadata formats |
+| 0.3                       | Support for ISO-Base Media File Format (MPEG-4, 3GP, 3GP2, JPEG 2000) and QuickTime |
+| 0.4                       | Reusable container definitions for similar and related formats |
+| 0.5                       | Support for RIFF, Matroska, ID3v2.4, APEv1, Lyrics3v1, VorbisComment |
+| 0.6                       | High-level annotation and interface-based extension APIs |
+| 0.7                       | High-level tag management API |
