@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/jebbard/jMeta.svg?branch=master)](https://travis-ci.com/jebbard/jMeta.svg?branch=master)
+<br />
 # jMeta
 
 jMeta is an extensible Java library for reading and writing multimedia metadata and container formats. Currently, jMeta is in an alpha status and supports the following data formats:
