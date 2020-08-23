@@ -43,7 +43,7 @@ During design phase of jMeta, a general metamodel for (binary) containerized dat
 
 The metamodel is displayed in the following figure:
 
-![Metamodel](jMetaDocs/DesignConcept/figures/II_GeneralModel.pdf)
+![Metamodel](jMetaDocs/readme/DomainModel.PNG)
 
 The main building block is the **Container**. A container is the general skeleton for holding precious **Payload** data. Usually, payload data is enclosed by one or several **Headers** and/or **Footers**. These define some important parsing metadata necessary to interpret the follow-up data correctly. If the data format is intended to be parsed front-to-back (as usual), it might prefer headers, otherwise footers. There are two types of payloads:
 * **Container-based payload** is a means to further structure a container hierarchically - this payload is again built-up by containers which may or may not have the same structure as the top-level container
@@ -55,7 +55,7 @@ The main building block is the **Container**. A container is the general skeleto
 
 The jMeta components and their dependencies are displayed in the following figure:
 
-![Components](jMetaDocs/DesignConcept/figures/II_FunctionalArchitecture.pdf)
+![Components](jMetaDocs/readme/FunctionalArchitecture.PNG)
 
 They are subdivided into three parts:
 * **Technical base** are some functionality-agnostic technical helper components
@@ -73,7 +73,7 @@ The components displayed are described in the following bullet-point list:
 
 What is a component actually? A component is a software module consisting of a public and a private part, encapsulating a lot of its implementation details in the private part. The following figure tries to visualize this:
 
-![Component Structure](jMetaDocs/DesignConcept/figures/II_ComponentStructure.pdf)
+![Component Structure](jMetaDocs/readme/ComponentStructure.PNG)
 
 ### Extension Architecture
 
@@ -97,7 +97,7 @@ Once the jMeta startup runs, it will load all extensions that fulfill these requ
 
 The following figure shows the projects and their dependencies:
 
-![ProjectStructure](jMetaDocs/DesignConcept/figures/II_ProjectStructure.pdf)
+![ProjectStructure](jMetaDocs/readme/ProjectStructure.PNG)
 
 Here is the explanation:
 * **jMetaLibrary** is the library core, which is agnostic of concrete extensions
