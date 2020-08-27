@@ -32,7 +32,7 @@ public interface LibraryJMeta {
 	/**
 	 * Returns an {@link DataBlockAccessor} for accessing data blocks of a specific
 	 * medium.
-	 * 
+	 *
 	 * @return an {@link DataBlockAccessor} for accessing data blocks of a specific
 	 *         medium.
 	 */
@@ -41,7 +41,7 @@ public interface LibraryJMeta {
 	/**
 	 * Returns an {@link DataFormatRepository} for accessing the properties of all
 	 * supported data formats.
-	 * 
+	 *
 	 * @return an {@link DataFormatRepository} for accessing the properties of all
 	 *         supported data formats.
 	 */

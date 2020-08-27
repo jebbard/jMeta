@@ -163,7 +163,7 @@ public class DataFormatsSmoke_ReverseReading {
 			System.out.println("All data blocks in the AbstractMedium: " + medium);
 			System.out.println("***********************************************************************");
 
-			printContainers(accessor.getReverseContainerIterator(medium, false), Integer.valueOf(1));
+			printContainers(accessor.getReverseContainerIterator(medium), Integer.valueOf(1));
 		}
 	}
 

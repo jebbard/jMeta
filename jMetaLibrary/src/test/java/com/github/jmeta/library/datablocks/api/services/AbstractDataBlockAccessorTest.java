@@ -97,13 +97,13 @@ public abstract class AbstractDataBlockAccessorTest {
 	}
 
 	/**
-	 * Checks {@link DataBlockAccessor#getContainerIterator(Medium, boolean)} for a
+	 * Checks {@link DataBlockAccessor#getContainerIterator(Medium)} for a
 	 * given medium.
 	 *
 	 * @param medium The medium to check
 	 */
 	private void assertGetContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
-		try (TopLevelContainerIterator topLevelContainerIterator = getTestling().getContainerIterator(medium, false)) {
+		try (TopLevelContainerIterator topLevelContainerIterator = getTestling().getContainerIterator(medium)) {
 
 			Assert.assertNotNull(topLevelContainerIterator);
 
@@ -116,14 +116,14 @@ public abstract class AbstractDataBlockAccessorTest {
 	}
 
 	/**
-	 * Checks {@link DataBlockAccessor#getReverseContainerIterator(Medium, boolean)}
+	 * Checks {@link DataBlockAccessor#getReverseContainerIterator(Medium)}
 	 * for a given medium.
 	 *
 	 * @param medium The medium to check
 	 */
 	private void assertGetReverseContainerIteratorReturnsContainersAndFieldsInExpectedOrder(Medium<?> medium) {
 		try (TopLevelContainerIterator topLevelReverseContainerIterator = getTestling()
-			.getReverseContainerIterator(medium, false)) {
+			.getReverseContainerIterator(medium)) {
 
 			Assert.assertNotNull(topLevelReverseContainerIterator);
 

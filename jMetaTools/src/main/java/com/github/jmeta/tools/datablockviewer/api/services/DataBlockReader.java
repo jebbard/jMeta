@@ -41,6 +41,6 @@ public class DataBlockReader {
 
 		DataBlockAccessor accessor = m_context.getDataBlockAccessor();
 
-		return accessor.getContainerIterator(new FileMedium(file.toPath(), true), false);
+		return accessor.getContainerIterator(new FileMedium(file.toPath(), true));
 	}
 }

@@ -31,19 +31,14 @@ public interface DataBlockAccessor {
 	 *
 	 * @param medium              the {@link AbstractMedium} for which to get the
 	 *                            top-level {@link DataBlock}s.
-	 * @param forceMediumReadOnly true if the {@link AbstractMedium} should be
-	 *                            treated as read-only {@link AbstractMedium} in any
-	 *                            case, false if the default behavior should be
-	 *                            chosen.
 	 * @return the {@link Iterator} for iterating all the top-level
 	 *         {@link DataBlock}s of the {@link AbstractMedium}.
 	 */
-	TopLevelContainerIterator getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly);
+	TopLevelContainerIterator getContainerIterator(Medium<?> medium);
 
 	/**
 	 * @param medium
-	 * @param forceMediumReadOnly
 	 * @return a reverse {@link ContainerIterator}
 	 */
-	TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly);
+	TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium);
 }

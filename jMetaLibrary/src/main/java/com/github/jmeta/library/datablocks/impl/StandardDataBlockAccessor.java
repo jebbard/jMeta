@@ -107,8 +107,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 	 * @see DataBlockAccessor#getContainerIterator
 	 */
 	@Override
-	public TopLevelContainerIterator getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
-
+	public TopLevelContainerIterator getContainerIterator(Medium<?> medium) {
 		Reject.ifNull(medium, "medium");
 
 		MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
@@ -118,7 +117,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 	}
 
 	@Override
-	public TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly) {
+	public TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium) {
 		Reject.ifNull(medium, "medium");
 
 		if (!medium.isRandomAccess()) {

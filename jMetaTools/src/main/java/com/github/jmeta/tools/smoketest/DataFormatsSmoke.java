@@ -173,7 +173,7 @@ public class DataFormatsSmoke {
 			DataFormatsSmoke.PRIVATE_LOGGER
 				.info("***********************************************************************");
 
-			printContainers(accessor.getContainerIterator(medium, false), Integer.valueOf(1));
+			printContainers(accessor.getContainerIterator(medium), Integer.valueOf(1));
 		}
 	}
 

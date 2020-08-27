@@ -31,7 +31,68 @@ Note that writing these data formats is currently in alpha status while also a h
 
 ## Usage Examples
 
-tbd.
+Read all top-level containers of an MP3 file and print their IDs:
+
+```java
+LibraryJMeta jMeta = LibraryJMeta.getLibrary();
+Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), false);
+
+try (TopLevelContainerIterator containerIterator = jMeta.getDataBlockAccessor().getContainerIterator(medium)) {
+    while (containerIterator.hasNext()) {
+        Container container = containerIterator.next();
+
+        System.out.println("Next container on top level has data format: " + container.getId().getDataFormat()
+            + ", and id: " + container.getId());
+    }
+} catch (IOException e) {
+    throw new RuntimeException("Error closing file medium", e);
+}
+```
+
+Read an ID3v2.3 tag at the end of a multimedia file (if present) and print id and value of every text-based frame in the tag - note that there will be a high-level API in later versions of the library that encapsulates all these details for more convenient access to tags:
+
+```java
+		LibraryJMeta jMeta = LibraryJMeta.getLibrary();
+		Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), false);
+
+		try (TopLevelContainerIterator containerIterator = jMeta.getDataBlockAccessor()
+			.getReverseContainerIterator(medium)) {
+			while (containerIterator.hasNext()) {
+				Container container = containerIterator.next();
+
+				if (container.getId().getDataFormat() == ID3v23Extension.ID3v23) {
+					System.out.println("Found ID3v2.3 tag");
+
+					ContainerBasedPayload frames = (ContainerBasedPayload) container.getPayload();
+
+					ContainerIterator frameIterator = frames.getContainerIterator();
+
+					while (frameIterator.hasNext()) {
+						Container frame = frameIterator.next();
+
+						// It is a text frame
+						if (frame.getId().getLocalId().startsWith("T")) {
+							FieldBasedPayload framePayload = (FieldBasedPayload) frame.getPayload();
+
+							List<Field<?>> fields = framePayload.getFields();
+
+							for (Field<?> field : fields) {
+								if (field.getId().getLocalId().equals("information")) {
+									try {
+										System.out.println(field.getInterpretedValue().toString());
+									} catch (BinaryValueConversionException e) {
+										throw new RuntimeException("Could not convert binary field value", e);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Error closing file medium", e);
+		}
+```
 
 ## Architecture
 
