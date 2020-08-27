@@ -28,62 +28,61 @@ import com.github.jmeta.library.media.api.types.Medium;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 
 /**
- * {@link SampleReadID3v23Frames} demonstrates how to read and print all
- * top-level containers.
+ * {@link SampleReadID3v23Frames} demonstrates how to read and print all ID3v2.3 text frames of a multimedia file.
  */
 public class SampleReadID3v23Frames {
 
-	public static void main(String[] args) {
-		Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), false);
-		SampleReadID3v23Frames.forEachTopLevelContainer(medium, SampleReadID3v23Frames::printTextFrames);
-	}
+   public static void main(String[] args) {
+      Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), false);
+      SampleReadID3v23Frames.forEachTopLevelContainer(medium, SampleReadID3v23Frames::printTextFrames);
+   }
 
-	private static void forEachTopLevelContainer(Medium<?> medium, Consumer<Container> containerConsumer) {
-		LibraryJMeta jMeta = LibraryJMeta.getLibrary();
+   private static void forEachTopLevelContainer(Medium<?> medium, Consumer<Container> containerConsumer) {
+      LibraryJMeta jMeta = LibraryJMeta.getLibrary();
 
-		try (TopLevelContainerIterator containerIterator = jMeta.getDataBlockAccessor()
-			.getReverseContainerIterator(medium)) {
-			while (containerIterator.hasNext()) {
-				Container container = containerIterator.next();
-				containerConsumer.accept(container);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Error closing file medium", e);
-		}
-	}
+      try (TopLevelContainerIterator containerIterator = jMeta.getDataBlockAccessor()
+         .getReverseContainerIterator(medium)) {
+         while (containerIterator.hasNext()) {
+            Container container = containerIterator.next();
+            containerConsumer.accept(container);
+         }
+      } catch (IOException e) {
+         throw new RuntimeException("Error closing file medium", e);
+      }
+   }
 
-	private static void printTextFrame(Container frame) {
-		FieldBasedPayload framePayload = (FieldBasedPayload) frame.getPayload();
+   private static void printTextFrame(Container frame) {
+      FieldBasedPayload framePayload = (FieldBasedPayload) frame.getPayload();
 
-		List<Field<?>> fields = framePayload.getFields();
+      List<Field<?>> fields = framePayload.getFields();
 
-		for (Field<?> field : fields) {
-			if (field.getId().getLocalId().equals("information")) {
-				try {
-					System.out.println(field.getInterpretedValue().toString());
-				} catch (BinaryValueConversionException e) {
-					throw new RuntimeException("Could not convert binary field value", e);
-				}
-			}
-		}
-	}
+      for (Field<?> field : fields) {
+         if (field.getId().getLocalId().equals("information")) {
+            try {
+               System.out.println(field.getInterpretedValue().toString());
+            } catch (BinaryValueConversionException e) {
+               throw new RuntimeException("Could not convert binary field value", e);
+            }
+         }
+      }
+   }
 
-	private static void printTextFrames(Container container) {
-		if (container.getId().getDataFormat() == ID3v23Extension.ID3v23) {
-			System.out.println("Found ID3v2.3 tag");
+   private static void printTextFrames(Container container) {
+      if (container.getId().getDataFormat() == ID3v23Extension.ID3v23) {
+         System.out.println("Found ID3v2.3 tag");
 
-			ContainerBasedPayload frames = (ContainerBasedPayload) container.getPayload();
+         ContainerBasedPayload frames = (ContainerBasedPayload) container.getPayload();
 
-			ContainerIterator frameIterator = frames.getContainerIterator();
+         ContainerIterator frameIterator = frames.getContainerIterator();
 
-			while (frameIterator.hasNext()) {
-				Container frame = frameIterator.next();
+         while (frameIterator.hasNext()) {
+            Container frame = frameIterator.next();
 
-				// It is a text frame
-				if (frame.getId().getLocalId().startsWith("T")) {
-					SampleReadID3v23Frames.printTextFrame(frame);
-				}
-			}
-		}
-	}
+            // It is a text frame
+            if (frame.getId().getLocalId().startsWith("T")) {
+               SampleReadID3v23Frames.printTextFrame(frame);
+            }
+         }
+      }
+   }
 }
