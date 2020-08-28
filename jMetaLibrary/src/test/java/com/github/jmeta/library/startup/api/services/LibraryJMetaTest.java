@@ -21,7 +21,7 @@ import com.github.jmeta.utility.testsetup.api.services.JMetaTestBasics;
 public class LibraryJMetaTest {
 
 	/**
-	 * Tests {@link LibraryJMeta#getDataBlockAccessor()}.
+	 * Tests {@link LibraryJMeta#getLowLevelAPI()}.
 	 */
 	@Test
 	public void getDataBlockAccessor_returnsNonNullObject() {
@@ -29,7 +29,7 @@ public class LibraryJMetaTest {
 
 		LibraryJMeta library = LibraryJMeta.getLibrary();
 
-		Assert.assertNotNull(library.getDataBlockAccessor());
+		Assert.assertNotNull(library.getLowLevelAPI());
 
 		JMetaTestBasics.performGeneralLogCheck(JMetaTestBasics.DEFAULT_UNITTEST_LOG_FILE);
 	}

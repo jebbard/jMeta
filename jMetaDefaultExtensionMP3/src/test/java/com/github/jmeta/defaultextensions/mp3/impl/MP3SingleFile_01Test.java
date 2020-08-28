@@ -10,14 +10,14 @@ package com.github.jmeta.defaultextensions.mp3.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractLowLevelAPITest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link MP3SingleFile_01Test} tests reading a single MP3 file.
  */
 // TODO mp3: Add test cases for CRC and padding
-public class MP3SingleFile_01Test extends AbstractDataBlockAccessorTest {
+public class MP3SingleFile_01Test extends AbstractLowLevelAPITest {
 
 	private final static Path THE_FILE = TestResourceHelper.resourceToFile(MP3SingleFile_01Test.class,
 		"MP3_FILE_01.txt");

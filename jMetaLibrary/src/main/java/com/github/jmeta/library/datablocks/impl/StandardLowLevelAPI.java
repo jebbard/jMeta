@@ -1,5 +1,5 @@
 /**
- * {@link StandardDataBlockAccessor}.java
+ * {@link StandardLowLevelAPI}.java
  *
  * @author Jens Ebert
  * @date 31.12.10 19:47:08 (December 31, 2010)
@@ -15,9 +15,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
+import com.github.jmeta.library.datablocks.api.services.LowLevelAPI;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
-import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
+import com.github.jmeta.library.datablocks.api.services.MediumContainerIterator;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.dataformats.api.services.DataFormatSpecification;
 import com.github.jmeta.library.dataformats.api.types.ContainerDataFormat;
@@ -34,9 +34,9 @@ import com.github.jmeta.utility.logging.api.services.LoggingConstants;
 /**
  *
  */
-public class StandardDataBlockAccessor implements DataBlockAccessor {
+public class StandardLowLevelAPI implements LowLevelAPI {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(StandardDataBlockAccessor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StandardLowLevelAPI.class);
 
 	private final DataFormatRepository m_repository;
 
@@ -47,9 +47,9 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 	private final ExtensionManager extManager;
 
 	/**
-	 * Creates a new {@link StandardDataBlockAccessor}.
+	 * Creates a new {@link StandardLowLevelAPI}.
 	 */
-	public StandardDataBlockAccessor() {
+	public StandardLowLevelAPI() {
 
 		extManager = ComponentRegistry.lookupService(ExtensionManager.class);
 
@@ -61,7 +61,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 
 		String validatingExtensions = "Validating registered data blocks extensions" + LoggingConstants.SUFFIX_TASK;
 
-		StandardDataBlockAccessor.LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
+		StandardLowLevelAPI.LOGGER.info(LoggingConstants.PREFIX_TASK_STARTING + validatingExtensions);
 
 		for (Extension iExtension2 : extBundles) {
 			List<DataBlockService> bundleDataBlocksExtensions = iExtension2
@@ -73,9 +73,9 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 				if (extensionDataFormat == null) {
 					final String message = "The extension " + dataBlocksExtension
 						+ " must not return null for its data format.";
-					StandardDataBlockAccessor.LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED
+					StandardLowLevelAPI.LOGGER.error(LoggingConstants.PREFIX_TASK_FAILED
 						+ LoggingConstants.PREFIX_CRITICAL_ERROR + validatingExtensions);
-					StandardDataBlockAccessor.LOGGER.error(message);
+					StandardLowLevelAPI.LOGGER.error(message);
 					throw new InvalidExtensionException(message, iExtension2);
 				}
 
@@ -89,7 +89,7 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 				}
 
 				if (dataBlockServices.containsKey(extensionDataFormat)) {
-					StandardDataBlockAccessor.LOGGER.warn(
+					StandardLowLevelAPI.LOGGER.warn(
 						"The custom data blocks extension <%1$s> is NOT REGISTERED and therefore ignored because it provides the data format <%2$s> that is already provided by another custom extension with id <%3$s>.",
 						iExtension2.getExtensionId(), extensionDataFormat, iExtension2.getExtensionId());
 				}
@@ -100,24 +100,24 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 			}
 		}
 
-		StandardDataBlockAccessor.LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
+		StandardLowLevelAPI.LOGGER.info(LoggingConstants.PREFIX_TASK_DONE_NEUTRAL + validatingExtensions);
 	}
 
 	/**
-	 * @see DataBlockAccessor#getContainerIterator
+	 * @see LowLevelAPI#getContainerIterator
 	 */
 	@Override
-	public TopLevelContainerIterator getContainerIterator(Medium<?> medium) {
+	public MediumContainerIterator getContainerIterator(Medium<?> medium) {
 		Reject.ifNull(medium, "medium");
 
 		MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
 		mediumStore.open();
 
-		return new StandardTopLevelContainerIterator(mediumStore, true, new HashSet<>(dataBlockServices.values()));
+		return new StandardMediumContainerIterator(mediumStore, true, new HashSet<>(dataBlockServices.values()));
 	}
 
 	@Override
-	public TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium) {
+	public MediumContainerIterator getReverseContainerIterator(Medium<?> medium) {
 		Reject.ifNull(medium, "medium");
 
 		if (!medium.isRandomAccess()) {
@@ -127,6 +127,6 @@ public class StandardDataBlockAccessor implements DataBlockAccessor {
 		MediumStore mediumStore = m_mediumFactory.createMediumStore(medium);
 		mediumStore.open();
 
-		return new StandardTopLevelContainerIterator(mediumStore, false, new HashSet<>(dataBlockServices.values()));
+		return new StandardMediumContainerIterator(mediumStore, false, new HashSet<>(dataBlockServices.values()));
 	}
 }

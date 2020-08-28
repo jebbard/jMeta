@@ -942,7 +942,7 @@ Here, an {@link IContainer} consists of an arbitrary number of optional headers 
             </ownedParameter>
           </ownedOperation>
         </packagedElement>
-        <packagedElement xmi:type="uml:Interface" xmi:id="_fMhzyBBOEeCWwuTUj8c31Q" name="IDataBlockAccessor" clientDependency="_j7x-xRHbEeC8O4a4uHjcTw _l7v0tRKGEeCmY8FE9I3w_w _IcMppBKKEeCmY8FE9I3w_w _NDCKhRKNEeCmY8FE9I3w_w">
+        <packagedElement xmi:type="uml:Interface" xmi:id="_fMhzyBBOEeCWwuTUj8c31Q" name="ILowLevelAPI" clientDependency="_j7x-xRHbEeC8O4a4uHjcTw _l7v0tRKGEeCmY8FE9I3w_w _IcMppBKKEeCmY8FE9I3w_w _NDCKhRKNEeCmY8FE9I3w_w">
           <ownedComment xmi:id="_P9nSIBOGEeCftvNWGQmhpw">
             <body>This interface is the starting point when accessing the {@link IDataBlock}s of a {@link Medium}. For any existing {@link Medium}, it returns an {@link Iterator} &#xD;
 that allows to iterate the top-level {@link IDataBlock}s of that {@link Medium}.</body>
@@ -1298,7 +1298,7 @@ The #next() method might throw an {@link UnknownDataFormatException} which is a 
             </ownedParameter>
             <ownedParameter xmi:id="_WNCG0BKLEeCmY8FE9I3w_w" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q">
               <ownedComment xmi:id="_F9h4UBS6EeCCdI4pKGnu6Q">
-                <body>The {@link IDataBlockAccessor}.</body>
+                <body>The {@link ILowLevelAPI}.</body>
               </ownedComment>
             </ownedParameter>
           </ownedOperation>
@@ -1494,12 +1494,12 @@ Derived classes represent the concrete value types a {@link Field} can have.</bo
           <generalization xmi:id="_Xoe6QxfzEeC60oqmlxIBhA" general="_Yt9eyBBXEeCWwuTUj8c31Q"/>
           <interfaceRealization xmi:id="_5Mhb0xBXEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="__q7yGBBJEeCWwuTUj8c31Q" client="_w_28YBBXEeCWwuTUj8c31Q" contract="__q7yGBBJEeCWwuTUj8c31Q"/>
         </packagedElement>
-        <packagedElement xmi:type="uml:Class" xmi:id="_n1heWBBYEeCWwuTUj8c31Q" name="StandardDataBlockAccessor" clientDependency="_qi0yFRBYEeCWwuTUj8c31Q _3YxjtBJvEeCQ6KaJ3EOFKQ">
+        <packagedElement xmi:type="uml:Class" xmi:id="_n1heWBBYEeCWwuTUj8c31Q" name="StandardLowLevelAPI" clientDependency="_qi0yFRBYEeCWwuTUj8c31Q _3YxjtBJvEeCQ6KaJ3EOFKQ">
           <interfaceRealization xmi:id="_qi0yFRBYEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="_fMhzyBBOEeCWwuTUj8c31Q" client="_n1heWBBYEeCWwuTUj8c31Q" contract="_fMhzyBBOEeCWwuTUj8c31Q"/>
         </packagedElement>
-        <packagedElement xmi:type="uml:Class" xmi:id="__7vJBxBbEeCWwuTUj8c31Q" name="TopLevelContainerIterator">
+        <packagedElement xmi:type="uml:Class" xmi:id="__7vJBxBbEeCWwuTUj8c31Q" name="MediumContainerIterator">
           <generalization xmi:id="_djz7YxJwEeCQ6KaJ3EOFKQ" general="_WYHJuBJwEeCQ6KaJ3EOFKQ"/>
-          <ownedOperation xmi:id="_JKuBEhBcEeCWwuTUj8c31Q" name="TopLevelContainerIterator">
+          <ownedOperation xmi:id="_JKuBEhBcEeCWwuTUj8c31Q" name="MediumContainerIterator">
             <ownedParameter xmi:id="_N-kxoBBcEeCWwuTUj8c31Q" name="mediumAccessor" type="_6BizOAO9EeCYKaNo9SPZvQ"/>
             <ownedParameter xmi:id="_-jKyMBKNEeCmY8FE9I3w_w" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q"/>
             <ownedParameter xmi:id="_z5ibwBaYEeCNZOI8PyuHiQ" name="dataFormatHints">
@@ -1729,7 +1729,7 @@ bytes with magic key bytes of format (in list order)</body>
                   <type xmi:type="uml:PrimitiveType" href="../../GeneratorTemplates/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
                 </argument>
               </message>
-              <message xmi:id="_Y9cNGBtLEeC9cZmFpNV5dw" name="TopLevelContainerIterator" receiveEvent="_Y9cNFhtLEeC9cZmFpNV5dw" sendEvent="_Y9cNFRtLEeC9cZmFpNV5dw">
+              <message xmi:id="_Y9cNGBtLEeC9cZmFpNV5dw" name="MediumContainerIterator" receiveEvent="_Y9cNFhtLEeC9cZmFpNV5dw" sendEvent="_Y9cNFRtLEeC9cZmFpNV5dw">
                 <argument xmi:type="uml:LiteralString" xmi:id="_ZbGZcBtLEeC9cZmFpNV5dw" name="mediumAccessor" type="_6BizOAO9EeCYKaNo9SPZvQ" value="accessor"/>
                 <argument xmi:type="uml:LiteralString" xmi:id="_ZbGZcRtLEeC9cZmFpNV5dw" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q" value="blockAccessor"/>
                 <argument xmi:type="uml:LiteralString" xmi:id="_jlqZ4BtUEeC9cZmFpNV5dw" name="dataFormatHints">

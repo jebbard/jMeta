@@ -1,5 +1,5 @@
 /**
- * {@link StandardTopLevelContainerIterator}.java
+ * {@link StandardMediumContainerIterator}.java
  *
  * @author Jens Ebert
  * @date 31.12.10 19:47:08 (December 31, 2010)
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import com.github.jmeta.library.datablocks.api.exceptions.UnknownDataFormatException;
 import com.github.jmeta.library.datablocks.api.services.DataBlockReader;
 import com.github.jmeta.library.datablocks.api.services.DataBlockService;
-import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
+import com.github.jmeta.library.datablocks.api.services.MediumContainerIterator;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.impl.events.DataBlockEvent;
 import com.github.jmeta.library.datablocks.impl.events.DataBlockEventBus;
@@ -37,13 +37,13 @@ import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link StandardTopLevelContainerIterator} is used to read all top-level
+ * {@link StandardMediumContainerIterator} is used to read all top-level
  * {@link Container}s present in a {@link Medium}. It can be operated in two
  * modes: Forward reading (the default mode) where the medium is iterated with
  * increasing offsets and backward reading for reading a medium (mainly: files
  * or byte arrays) from back to front.
  */
-public class StandardTopLevelContainerIterator implements TopLevelContainerIterator, DataBlockEventListener {
+public class StandardMediumContainerIterator implements MediumContainerIterator, DataBlockEventListener {
 
 	private DataBlockEventBus eventBus = new DataBlockEventBus();
 
@@ -61,7 +61,7 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
 	private final DataFormatRepository m_repository;
 
 	/**
-	 * Creates a new {@link StandardTopLevelContainerIterator}.
+	 * Creates a new {@link StandardMediumContainerIterator}.
 	 *
 	 * @param mediumStore       The {@link MediumStore} used to read from the
 	 *                          {@link Medium}, must not be null
@@ -69,7 +69,7 @@ public class StandardTopLevelContainerIterator implements TopLevelContainerItera
 	 * @param dataBlockServices All {@link DataBlockReader}s per supported
 	 *                          {@link ContainerDataFormat}, must not be null
 	 */
-	public StandardTopLevelContainerIterator(MediumStore mediumStore, boolean forwardRead,
+	public StandardMediumContainerIterator(MediumStore mediumStore, boolean forwardRead,
 		Set<DataBlockService> dataBlockServices) {
 		Reject.ifNull(mediumStore, "mediumStore");
 		Reject.ifNull(dataBlockServices, "dataBlockServices");

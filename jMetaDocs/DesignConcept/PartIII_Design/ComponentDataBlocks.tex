@@ -1761,14 +1761,14 @@ No disadvantages known
 \rowcolor[gray]{.9}\textbf{Operation} & \textbf{Description} \\
 \endhead
 \hline
-\texttt{TopLevelContainerIterator}\linebreak\texttt{.close()} & Closes the use of the iterator for top-level container retrieval and writing. Once this is done, the instance must not be used anymore. It also closes the access to the underlying medium and cleans up any further resources. \\
+\texttt{MediumContainerIterator}\linebreak\texttt{.close()} & Closes the use of the iterator for top-level container retrieval and writing. Once this is done, the instance must not be used anymore. It also closes the access to the underlying medium and cleans up any further resources. \\
 \hline
-\texttt{TopLevelContainerIterator}\linebreak\texttt{.writeAllChanges()} & Flushes all previously made changes (removals, inserts and modifications) to the external medium. \\
+\texttt{MediumContainerIterator}\linebreak\texttt{.writeAllChanges()} & Flushes all previously made changes (removals, inserts and modifications) to the external medium. \\
 \hline
-\texttt{TopLevelContainerIterator}\linebreak\texttt{.resetAllChanges()} & Resets all previously made changes (removals, inserts and modifications) as if they never happened. \\
+\texttt{MediumContainerIterator}\linebreak\texttt{.resetAllChanges()} & Resets all previously made changes (removals, inserts and modifications) as if they never happened. \\
 \hline
-\caption{Operations of the \texttt{TopLevelContainerIterator} interface}
-\label{tab:DBOpsTopLevelContainerIterator}
+\caption{Operations of the \texttt{MediumContainerIterator} interface}
+\label{tab:DBOpsMediumContainerIterator}
 \end{longtable}
 \end{landscape}
 \normalsize
@@ -1950,7 +1950,7 @@ No disadvantages known
 \end{landscape}
 \normalsize
 
-TODO: DataBlockAccessor + DataBlockService
+TODO: LowLevelAPI + DataBlockService
 
 %###############################################################################################
 %###############################################################################################

@@ -10,14 +10,14 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractLowLevelAPITest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link ID3v23SingleFile_05_UnknownFrameTest} tests reading a single ID3v23
  * tag with an unspecified ID3v23 frame.
  */
-public class ID3v23SingleFile_05_UnknownFrameTest extends AbstractDataBlockAccessorTest {
+public class ID3v23SingleFile_05_UnknownFrameTest extends AbstractLowLevelAPITest {
 
 	private final static Path THE_FILE = TestResourceHelper.resourceToFile(ID3v23SingleFile_05_UnknownFrameTest.class,
 		"ID3v23_FILE_05_UnknownFrame.txt");

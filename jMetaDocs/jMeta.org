@@ -58,21 +58,21 @@
      :END:
 
 Zu beachtende Punkte:
- - [X] Scope und Features der ersten veröffentlichten Version festlegen:
+ - [X] Scope und Features der ersten verï¿½ffentlichten Version festlegen:
    - [X] Lesen und Schreiben?
-   - [X] Welche Formate werden von v1.0 unterstützt?
+   - [X] Welche Formate werden von v1.0 unterstï¿½tzt?
    - [X] Strukturierte Textformate (XML): Ja oder nein?
    - [X] Streaming: Ja oder Nein?
    - [X] Nur Grund-library oder format-spezifische?
    - [X] Fehlertoleranz?
-   - [X] Lesen großer Datenblöcke
+   - [X] Lesen groï¿½er Datenblï¿½cke
  - [X] Grundlegende Architekturentscheidungen:
    - [X] Caching: Ja oder nein
-   - [X] Nur binärer Datablock-Parser? Aufteilung in binär vs. Text?
-   - [X] Überlebt Component Registry?
-   - [X] Überlebt Plugin-Framework?
-   - [X] Überlebt eigenes Logging und eigene Konfiguration?
- - [X] Endgültigen Namen festlegen: jMeta
+   - [X] Nur binï¿½rer Datablock-Parser? Aufteilung in binï¿½r vs. Text?
+   - [X] ï¿½berlebt Component Registry?
+   - [X] ï¿½berlebt Plugin-Framework?
+   - [X] ï¿½berlebt eigenes Logging und eigene Konfiguration?
+ - [X] Endgï¿½ltigen Namen festlegen: jMeta
 
 **** DONE Namensgebung:
       :LOGBOOK:  
@@ -82,7 +82,7 @@ Zu beachtende Punkte:
  - EasyTag: Ist bereits durch ein Tagging-Programm vergeben
  - jEasyTag, EasyTagLib sind evtl. zu nah dran
  - jEasyTagLib ist zu kompliziert
- - jMeta ist zu generisch? Außerdem ist der Name auch schon durch eine andersartige Library vergeben...
+ - jMeta ist zu generisch? Auï¿½erdem ist der Name auch schon durch eine andersartige Library vergeben...
    - Aber: Das ist nur ein sehr unbedeutendes Tool zum Generieren von Meta-Tags
  - TagLib ist bereits vergeben, jTagLib wieder sehr nahe dran
 
@@ -97,14 +97,14 @@ Voting:
 | jTagLib    |      2 |
 |            |        |
 
---> Endgültiger Name ist jMeta!
+--> Endgï¿½ltiger Name ist jMeta!
 
-**** DONE Unterstützte Formate fest definieren
+**** DONE Unterstï¿½tzte Formate fest definieren
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2016-03-15 Di 19:00]
      :END:      
 
-**** DONE Prüfung und Dokumentation: SimpleComponentRegistry?
+**** DONE Prï¿½fung und Dokumentation: SimpleComponentRegistry?
       :LOGBOOK:  
       - State "DONE"       from "IN PROGRESS" [2016-04-01 Fr 08:08]
       :END:      
@@ -151,15 +151,15 @@ Noch zu tun:
        - State "TODO"       from ""           [2016-03-15 Di 18:36]
        :END:      
 
-  - [X] Discard: Was kann man wie löschen?
-  - [ ] Interne Datenstrukturen für das Caching
-  - [ ] Interne Datenstrukturen für MEdium References
-  - [ ] Interne Datenstrukturen für das zweistufige Schreiben
+  - [X] Discard: Was kann man wie lï¿½schen?
+  - [ ] Interne Datenstrukturen fï¿½r das Caching
+  - [ ] Interne Datenstrukturen fï¿½r MEdium References
+  - [ ] Interne Datenstrukturen fï¿½r das zweistufige Schreiben
   - [ ] Attribute des IMediumStore
   - [ ] Umsetzung flush() inkl. nachfolgendes Lesen
-  - [ ] Verfügbare Konfigurationsparameter
-  - [ ] Schätzung aktualisieren
-**** DONE Schätzung Media
+  - [ ] Verfï¿½gbare Konfigurationsparameter
+  - [ ] Schï¿½tzung aktualisieren
+**** DONE Schï¿½tzung Media
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2016-04-22 Fr 14:54]
      :END:      
@@ -169,7 +169,7 @@ Noch zu tun:
      :END:      
 
 
-**** DONE Warnungen im WKS größtenteils beseitigen
+**** DONE Warnungen im WKS grï¿½ï¿½tenteils beseitigen
      DEADLINE: <2016-04-05 Di>
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2016-04-24 So 07:00]
@@ -181,12 +181,12 @@ Noch zu tun:
      CLOCK: [2016-04-22 Fr 15:19]--[2016-04-22 Fr 16:28] =>  1:09
      :END:      
 
-**** DONE Prüfung und Dokumentation: slf4j löst Logging ab?
+**** DONE Prï¿½fung und Dokumentation: slf4j lï¿½st Logging ab?
      DEADLINE: <2016-04-10 So>
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2016-06-18 Sa 13:29]
      :END:      
-**** DONE Prüfung und Dokumentation: Alternative Konfiguration statt Config-Komponente?
+**** DONE Prï¿½fung und Dokumentation: Alternative Konfiguration statt Config-Komponente?
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2016-05-16 Mo 08:18]
      :END:      
@@ -212,7 +212,7 @@ Noch zu tun:
      CLOCK: [2016-04-24 So 10:34]--[2016-04-24 So 13:12] =>  2:38
      :END:      
 
-**** IN PROGRESS Prüfung und Dokumentation: Was sind die wirklichen Detailanforderungen und notwendigen Anpassungen an ExtensionManagement?
+**** IN PROGRESS Prï¿½fung und Dokumentation: Was sind die wirklichen Detailanforderungen und notwendigen Anpassungen an ExtensionManagement?
      :CLOCK:    
      CLOCK: [2016-05-01 So 19:52]--[2016-05-01 So 21:00] =>  1:08
      :END:      
@@ -251,7 +251,7 @@ Noch zu tun:
 
 *** Metadata Compendium fertigstellen
 
-**** DONE v1.0 veröffentlichen
+**** DONE v1.0 verï¿½ffentlichen
      :CLOCK:    
      CLOCK: [2018-02-18 So 12:15]--[2018-02-18 So 12:50] =>  0:35
      :END:      
@@ -355,7 +355,7 @@ Todos:
  - [X] Grafiken werden richtig dargestellt
  - [X] Design-Konzept kann erzeugt werden
  - [X] Utility-Migration abbilden (andere includes)
- - [X] Schöne Design-Decisions
+ - [X] Schï¿½ne Design-Decisions
  - [X] Korrekte Links auf Design Decisions
 
 **** DONE SimpleComponentRegistry in Doku nachziehen
@@ -380,7 +380,7 @@ Todos:
      CLOCK: [2017-11-28 Di 08:45]--[2017-11-28 Di 09:15] =>  0:30
      :END:      
 
-**** DONE Übersetzung Design Doc
+**** DONE ï¿½bersetzung Design Doc
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 19:45]
      :END:      
@@ -420,7 +420,7 @@ Todos:
     :END:      
 
 Noch offen:
- - [X] Abschnitt "Übergreifende Aspekte"
+ - [X] Abschnitt "ï¿½bergreifende Aspekte"
  - [X] Abschnitt "Scope"
  - [X] Abschnitt "Anforderungen"
  - [X] Abschnitt "General Design Decisions"
@@ -447,7 +447,7 @@ Noch offen:
      - State "IN PROGRESS" from "TODO"       [2017-11-05 So 15:16]
      :END:
 
-**** DONE Paper für Flush-Algorithmus
+**** DONE Paper fï¿½r Flush-Algorithmus
      :CLOCK:    
      CLOCK: [2018-02-18 So 20:25]--[2018-02-18 So 20:33] =>  0:08
      CLOCK: [2017-12-20 Mi 10:20]--[2017-12-20 Mi 14:20] =>  4:00
@@ -492,7 +492,7 @@ Noch offen:
     :END:
 *** TODO Maven-Site deployen
 
-Relative Links von übergeordneter Site funzen nicht:
+Relative Links von ï¿½bergeordneter Site funzen nicht:
 https://maven.apache.org/plugins/maven-site-plugin/examples/multimodule.html
 
 Stattdessen muss man das Ding "deployen".
@@ -500,10 +500,10 @@ Stattdessen muss man das Ding "deployen".
 Dies sollte in EasyTag_Docs erfolgen.
 *** TODO Umstieg auf junit 5
 *** TODO Consider using Weak/SoftReferences for MediumOffsetFactory
-*** TODO Build-Number für property project.build.buildNumber generieren
+*** TODO Build-Number fï¿½r property project.build.buildNumber generieren
 
-z.B: über Jenkins und in Maven-Build reingeben, oder über das Maven Build Number Plugin
-*** DONE Alle Unittests auf Linux (Ubuntu 16.04) erfolgreich ausführen
+z.B: ï¿½ber Jenkins und in Maven-Build reingeben, oder ï¿½ber das Maven Build Number Plugin
+*** DONE Alle Unittests auf Linux (Ubuntu 16.04) erfolgreich ausfï¿½hren
     :CLOCK:    
     CLOCK: [2017-12-15 Fr 07:20]--[2017-12-15 Fr 08:15] =>  0:55
     :END:      
@@ -517,7 +517,7 @@ z.B: über Jenkins und in Maven-Build reingeben, oder über das Maven Build Number
     - State "DONE"       from "TODO"       [2017-12-13 Mi 15:36]
     :END:      
 
-*** DONE Umstieg auf UTF-8 für alle Source-Files!
+*** DONE Umstieg auf UTF-8 fï¿½r alle Source-Files!
     :CLOCK:    
     CLOCK: [2017-12-13 Mi 12:50]--[2017-12-13 Mi 15:00] =>  2:10
     CLOCK: [2017-12-11 Mo 10:03]--[2017-12-11 Mo 10:16] =>  0:13
@@ -527,7 +527,7 @@ z.B: über Jenkins und in Maven-Build reingeben, oder über das Maven Build Number
     - State "DONE"       from "IN PROGRESS" [2017-12-13 Mi 15:36]
     - State "IN PROGRESS" from "TODO"       [2017-12-11 Mo 10:02]
     :END:      
-*** DONE SonarLint,jdepend und findbugs (bzw. Ähnliches) in Build einbinden
+*** DONE SonarLint,jdepend und findbugs (bzw. ï¿½hnliches) in Build einbinden
     :CLOCK:    
     CLOCK: [2017-11-05 So 14:50]--[2017-11-05 So 15:15] =>  0:25
     CLOCK: [2017-10-31 Di 09:25]--[2017-10-31 Di 09:45] =>  0:20
@@ -569,7 +569,7 @@ z.B: über Jenkins und in Maven-Build reingeben, oder über das Maven Build Number
     :PROPERTIES:
     :Effort:   8:00
     :END:
-*** CANCELED Einführung Integrationstests mit Maven
+*** CANCELED Einfï¿½hrung Integrationstests mit Maven
     :LOGBOOK:  
     - State "CANCELED"   from "DONE"       [2017-11-01 Mi 14:29]
     - State "DONE"       from "TODO"       [2017-11-01 Mi 14:29]
@@ -605,12 +605,12 @@ Nach Vorbild des JavaUtils Build
    - State "IN PROGRESS" from "TODO"       [2017-10-19 Do 19:00]
    :END:      
 
-Nächste Schritte:
+Nï¿½chste Schritte:
  - [X] Common und COnfig nach jMetaUtility
  - [X] Component Registry nach jMetaUtility
  - [X] Alle anderen notwendigen Utilities nach jMetaUtility mit neuen, sinnvollen Package-Namen
- - [X] Reste von BasicUtility zurück nach javaUtils
- - [X] Maven POMs und Dependencies aufäumen
+ - [X] Reste von BasicUtility zurï¿½ck nach javaUtils
+ - [X] Maven POMs und Dependencies aufï¿½umen
  - [X] Maven group IDs etc. umbenennen
  - [X] Projekte umbenennen
 
@@ -619,7 +619,7 @@ Nächste Schritte:
    - State "DONE"       from "TODO"       [2017-10-22 So 08:18]
    :END:      
 
-Package-Namen, Klassenzugehörigkeit zu Utility
+Package-Namen, Klassenzugehï¿½rigkeit zu Utility
 
 *** DONE ExtensionManagement Redesign: Vereinfachung/Verbesserung
     :CLOCK:    
@@ -681,7 +681,7 @@ Package-Namen, Klassenzugehörigkeit zu Utility
     - State "TODO"       from ""           [2015-11-14 Sa 16:44]
     :END:      
 
-*** DONE Nutzung von Emacs für Tex-Doku
+*** DONE Nutzung von Emacs fï¿½r Tex-Doku
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2015-12-20 So 10:16]
      - State "IN PROGRESS" from "TODO"       [2015-11-14 Sa 16:57]
@@ -696,7 +696,7 @@ Package-Namen, Klassenzugehörigkeit zu Utility
     - State "DONE"       from "IN PROGRESS" [2017-09-20 Mi 18:07]
     - State "IN PROGRESS" from "TODO"       [2017-09-19 Di 21:02]
     :END:      
-*** DONE Abhängigkeitsstruktur der Maven-Projekte sauber ziehen
+*** DONE Abhï¿½ngigkeitsstruktur der Maven-Projekte sauber ziehen
      SCHEDULED: <2015-12-22 Di>
      :CLOCK:    
      CLOCK: [2015-11-29 So 09:20]--[2015-11-29 So 09:58] =>  0:38
@@ -708,31 +708,31 @@ Package-Namen, Klassenzugehörigkeit zu Utility
      - State "TODO"       from ""           [2015-11-15 So 13:45]
      :END:      
 
-Ein Parent-POM, von dem alle Utility-Projekte ableiten, und eines für alle EasyTag-Projekte
+Ein Parent-POM, von dem alle Utility-Projekte ableiten, und eines fï¿½r alle EasyTag-Projekte
 ** Komponente "Media"
 
-*** Schätzung
+*** Schï¿½tzung
 
-Ursprüngliche Summe der Erstschätzung: 170 h
+Ursprï¿½ngliche Summe der Erstschï¿½tzung: 170 h
 
-| Themengebiet              | Aktivität                                                              | Status | Implementierte               | Aufwand |   Tats. | Begründung Abweichung |
+| Themengebiet              | Aktivitï¿½t                                                              | Status | Implementierte               | Aufwand |   Tats. | Begrï¿½ndung Abweichung |
 |                           | <70>                                                                   |        | Designentscheidungen         |  gesch. | Aufwand | <20>                 |
 |                           |                                                                        |        |                              |     (h) |     (h) |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
 | Hilfskomponenten          | Design Configuration Helper                                            | DONE   | 089                          |       2 |       4 |                      |
-|                           | Implementierung und Test Configuration Helper                          | DONE   | 089                          |       4 |    13.5 | Mehr Features als ursprünglich gedacht |
+|                           | Implementierung und Test Configuration Helper                          | DONE   | 089                          |       4 |    13.5 | Mehr Features als ursprï¿½nglich gedacht |
 |                           | javadocs                                                               | DONE   |                              |       1 |       2 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
-| IMedium                   | Überprüfung und ggf. Anpassung inkl. Tests                             | DONE   | 025-028, 051, 052, 053       |    0.25 |    0.25 |                      |
-|                           | Konfiguration über IMedium ermöglichen                                 | DONE   | 091                          |    0.25 |    1.75 | Maven-Abhängigkeit fehlte, LongConfigParam fehlte, Tests aufwändiger zu schreiben als gedacht |
+| IMedium                   | ï¿½berprï¿½fung und ggf. Anpassung inkl. Tests                             | DONE   | 025-028, 051, 052, 053       |    0.25 |    0.25 |                      |
+|                           | Konfiguration ï¿½ber IMedium ermï¿½glichen                                 | DONE   | 091                          |    0.25 |    1.75 | Maven-Abhï¿½ngigkeit fehlte, LongConfigParam fehlte, Tests aufwï¿½ndiger zu schreiben als gedacht |
 |                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |     0.5 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
-| MediumReference           | Überprüfung und ggf. Anpassung, inkl. Tests                            | DONE   | 054-057                      |    0.25 |    0.25 |                      |
-|                           | Setter für Ändern der Position                                         | DONE   |                              |    0.25 |       0 |                      |
+| MediumReference           | ï¿½berprï¿½fung und ggf. Anpassung, inkl. Tests                            | DONE   | 054-057                      |    0.25 |    0.25 |                      |
+|                           | Setter fï¿½r ï¿½ndern der Position                                         | DONE   |                              |    0.25 |       0 |                      |
 |                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |       0 |                      |
 |                           | Ensure advance and calculateEndReference can be used with Factory      | DONE   |                              |       4 |     0.5 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
-| MediumRegion              | Umbenennen, EndReference durch size ersetzen, alle Tests bleiben lauffähig | DONE   | 076                          |     0.5 |    0.25 |                      |
+| MediumRegion              | Umbenennen, EndReference durch size ersetzen, alle Tests bleiben lauffï¿½hig | DONE   | 076                          |     0.5 |    0.25 |                      |
 |                           | Neue Methode isCached inkl. Tests                                      | DONE   | 076                          |    0.25 |    0.25 |                      |
 |                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |    0.75 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
@@ -746,18 +746,18 @@ Ursprüngliche Summe der Erstschätzung: 170 h
 |                           | Implementierung updateReferences inkl. Tests                           | DONE   | 058, 075                     |       3 |     1.5 |                      |
 |                           | Implementierung clearAll inkl. Tests                                   | DONE   | 075                          |     0.5 |       0 |                      |
 |                           | javadocs                                                               | DONE   |                              |       2 |    0.75 |                      |
-|                           | Änderungen an updateReferences (DES 073) wegen Änderungen an replace   | DONE   |                              |       4 |    1.25 |                      |
+|                           | ï¿½nderungen an updateReferences (DES 073) wegen ï¿½nderungen an replace   | DONE   |                              |       4 |    1.25 |                      |
 |                           | Langzeittest: Speicherausnutzung mit und ohne WeakReferences           | NO     |                              |       8 |         |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
 | MediumChangeManager       | Implementierung interne Datenstruktur und iterator inkl. Tests         | DONE   | 083, 084                     |     0.5 |     0.5 |                      |
 |                           | Implementierung scheduleInsert inkl. Tests                             | DONE   | 062, 063, 066, 084           |       2 |    3.75 | Siehe scheduleRemove |
-|                           | Implementierung scheduleRemove inkl. Tests                             | DONE   | 062, 065, 066, 084           |       2 |    8.25 | Aufwände und Komplexität vollkommen unterschätzt, Lücken in Spezifikation |
+|                           | Implementierung scheduleRemove inkl. Tests                             | DONE   | 062, 065, 066, 084           |       2 |    8.25 | Aufwï¿½nde und Komplexitï¿½t vollkommen unterschï¿½tzt, Lï¿½cken in Spezifikation |
 |                           | Anforderungen DataBlocks an Media beim Schreiben                       | DONE   |                              |       4 |     3.5 |                      |
 |                           | Implementierung scheduleReplace inkl. Tests                            | DONE   | 062, 064, 066, 084           |       2 |       7 | Siehe scheduleRemove |
 |                           | Implementierung undo inkl. Tests                                       | DONE   | 036, 084                     |     0.5 |       3 |                      |
 |                           | Implementierung clearAll inkl. Tests                                   | DONE   | 084                          |     0.5 |    0.25 |                      |
 |                           | Implementierung createFlushPlan inkl. Tests                            | DONE   | 087, 090                     |      12 |    34.5 |                      |
-|                           | Mehrere überlagerte MediumActions unterstützen                         | DONE   |                              |       4 |     0.5 |                      |
+|                           | Mehrere ï¿½berlagerte MediumActions unterstï¿½tzen                         | DONE   |                              |       4 |     0.5 |                      |
 |                           | javadocs                                                               | DONE   |                              |       2 |    1.25 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
 | MediumCache               | Implementierung interne Datenstruktur und getAllCachedRegions inkl. Tests | DONE   | 077, 078                     |    1.25 |     1.5 |                      |
@@ -770,28 +770,28 @@ Ursprüngliche Summe der Erstschätzung: 170 h
 |                           | Implementierung addRegion                                              | DONE   | 077, 079, 080, 081           |       8 |   16.75 |                      |
 |                           | javadocs                                                               | DONE   |                              |       2 |       1 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
-| IMediumAccessor           | Überprüfung aktueller Stand und ggf. Anpassung, inkl. Tests            | DONE   | 071                          |       2 |       1 |                      |
+| IMediumAccessor           | ï¿½berprï¿½fung aktueller Stand und ggf. Anpassung, inkl. Tests            | DONE   | 071                          |       2 |       1 |                      |
 |                           | Implementierung isOpened inkl. Tests                                   | DONE   |                              |     0.5 |       0 |                      |
-|                           | Prüfen und Refactoring aktueller Testcases                             | DONE   |                              |       6 |    5.75 |                      |
+|                           | Prï¿½fen und Refactoring aktueller Testcases                             | DONE   |                              |       6 |    5.75 |                      |
 |                           | Umbau auf FileChannel                                                  | DONE   |                              |       4 |     1.5 |                      |
 |                           | Evaluierung truncate bei Dateien                                       | DONE   | 071                          |       2 |       0 |                      |
 |                           | Implementierung truncate inkl. Tests                                   | DONE   | 071                          |       2 |       1 |                      |
 |                           | Implementierung skip inkl. Tests                                       | DONE   | 041, 071                     |       1 |       1 |                      |
-|                           | Locking überprüfen und ggf. anpassen                                   | DONE   | 029-031                      |       3 |       0 |                      |
+|                           | Locking ï¿½berprï¿½fen und ggf. anpassen                                   | DONE   | 029-031                      |       3 |       0 |                      |
 |                           | Refactoring existierender Code                                         | DONE   |                              |       4 |     3.5 |                      |
 |                           | Anpassung javadocs                                                     | DONE   |                              |       2 |       0 |                      |
 |                           | Refactoring Timeout Tests                                              | DONE   |                              |       4 |    0.75 |                      |
-|                           | Evaluierung alternative Varianten für timeout                          | DONE   |                              |       3 |         |                      |
-|                           | Überprüfung, ggf. Anpassung und Test der Timeouts bei InputStreams     | DONE   | 050, 091                     |       4 |         |                      |
+|                           | Evaluierung alternative Varianten fï¿½r timeout                          | DONE   |                              |       3 |         |                      |
+|                           | ï¿½berprï¿½fung, ggf. Anpassung und Test der Timeouts bei InputStreams     | DONE   | 050, 091                     |       4 |         |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
-| IMediumStore              | Basisimplementierung Gerüst des Interfaces                             | DONE   | 032, 033, 039, 068           |     0.5 |       0 |                      |
+| IMediumStore              | Basisimplementierung Gerï¿½st des Interfaces                             | DONE   | 032, 033, 039, 068           |     0.5 |       0 |                      |
 |                           | Explizites Dokumentieren der Performance-Nachteile von lesenden Byte-Streams | DONE   | 042                          |     0.5 |       0 |                      |
-|                           | Überprüfung discard inkl. Anpassung der Tests                          | DONE   | 040, 048                     |       3 |       0 |                      |
+|                           | ï¿½berprï¿½fung discard inkl. Anpassung der Tests                          | DONE   | 040, 048                     |       3 |       0 |                      |
 |                           | Struktur der Tests                                                     | DONE   |                              |         |   12.75 |                      |
 |                           | Neue Exceptions                                                        | DONE   | 070                          |       2 |       0 |                      |
 |                           | Implementierung createMediumReference inkl. Tests                      | DONE   | 059, 068                     |       2 |       0 |                      |
 |                           | Implementierung close inkl. Tests                                      | DONE   | 067, 068                     |       2 |    1.25 |                      |
-|                           | Überprüfung isAtEndOfMedium inkl. Anpassung der Tests                  | DONE   | 068                          |     0.5 |    1.25 |                      |
+|                           | ï¿½berprï¿½fung isAtEndOfMedium inkl. Anpassung der Tests                  | DONE   | 068                          |     0.5 |    1.25 |                      |
 |                           | Implementierung cache und getCachedByteCountAt inkl. Anpassung der Tests | DONE   | 037, 038, 043, 046, 068      |       4 |       4 |                      |
 |                           | Implementierung getData inkl. Anpassung der Tests                      | DONE   | 045, 047, 048, 049, 050, 068 |       8 |      22 |                      |
 |                           | Sonderbehandlungen byte-Arrays                                         | DONE   | 027, 031, 044, 053           |       4 |       0 |                      |
@@ -802,16 +802,16 @@ Ursprüngliche Summe der Erstschätzung: 170 h
 |                           | Implementierung flush inkl. Tests                                      | DONE   | 033, 034, 086-091            |      16 |    69.5 |                      |
 |                           | Anpassung javadocs                                                     | DONE   |                              |       4 |       0 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
-| IMediaAPI                 | Überprüfung aktueller Stand und ggf. Anpassung, inkl. Tests            | DONE   | 069                          |       1 |       0 |                      |
+| IMediaAPI                 | ï¿½berprï¿½fung aktueller Stand und ggf. Anpassung, inkl. Tests            | DONE   | 069                          |       1 |       0 |                      |
 |                           | Implementierung createMediumStore inkl. Tests                          | DONE   | 069, 070                     |       2 |       0 |                      |
 |                           | Anpassung javadocs                                                     | DONE   |                              |     0.5 |       0 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
-| Anpassungen Caching       | Prüfung: Effizienteres split - nur referenz statt kopieren             | DONE   |                              |     0.5 |     0.5 |                      |
+| Anpassungen Caching       | Prï¿½fung: Effizienteres split - nur referenz statt kopieren             | DONE   |                              |     0.5 |     0.5 |                      |
 |                           | MediumAccessor erzeugt selbst ByteBuffer                               | DONE   |                              |       1 |    1.75 |                      |
 |                           | Umbau InMemoryMediumAccessor komplett auf ByteBuffer                   | DONE   |                              |       1 |    2.25 |                      |
-|                           | Minimale/Standard Cache-Größe einbauen                                 | DONE   |                              |     0.5 |       0 |                      |
+|                           | Minimale/Standard Cache-Grï¿½ï¿½e einbauen                                 | DONE   |                              |     0.5 |       0 |                      |
 |                           | Is Cached: Deaktivierbarkeit entfernen + Inmemory auch immer Cached    | DONE   |                              |       2 |    1.25 |                      |
-|                           | Is Cached: Testfälle ausdünnen                                         | DONE   |                              |       2 |     0.5 |                      |
+|                           | Is Cached: Testfï¿½lle ausdï¿½nnen                                         | DONE   |                              |       2 |     0.5 |                      |
 |                           | Anpassungen Design Doku                                                | DONE   |                              |       2 |    0.25 |                      |
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
 |---------------------------+------------------------------------------------------------------------+--------+------------------------------+---------+---------+----------------------|
@@ -842,7 +842,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
      - State "DONE"       from ""           [2017-09-19 Di 12:46]
      :END:      
 
-***** DONE Überprüfung und ggf. Anpassung inkl. Tests
+***** DONE ï¿½berprï¿½fung und ggf. Anpassung inkl. Tests
       :CLOCK:    
       CLOCK: [2016-05-16 Mo 08:36]--[2016-05-16 Mo 08:44] =>  0:08
       :END:      
@@ -855,7 +855,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       :Effort:   0:15
       :END:
 
-***** DONE Konfiguration über IMedium ermöglichen
+***** DONE Konfiguration ï¿½ber IMedium ermï¿½glichen
       :CLOCK:    
       CLOCK: [2016-05-16 Mo 08:44]--[2016-05-16 Mo 10:26] =>  1:42
       :END:      
@@ -886,7 +886,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
      - State "DONE"       from ""           [2017-09-19 Di 12:46]
      :END:      
 
-***** DONE Überprüfung und ggf. Anpassung, inkl. Tests 
+***** DONE ï¿½berprï¿½fung und ggf. Anpassung, inkl. Tests 
       :CLOCK:    
       CLOCK: [2016-05-18 Mi 21:31]--[2016-05-18 Mi 21:46] =>  0:15
       :END:      
@@ -898,7 +898,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       :Effort:   0:15
       :END:
 
-***** DONE Setter für Ändern der Position
+***** DONE Setter fï¿½r ï¿½ndern der Position
       :LOGBOOK:  
       - State "DONE"       from "TODO"       [2016-05-18 Mi 21:44]
       :END:      
@@ -925,7 +925,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
      - State "DONE"       from ""           [2017-09-19 Di 12:46]
      :END:      
 
-***** DONE Umbenennen, EndReference durch size ersetzen, alle Tests bleiben lauffähig
+***** DONE Umbenennen, EndReference durch size ersetzen, alle Tests bleiben lauffï¿½hig
       :CLOCK:    
       CLOCK: [2016-05-19 Do 05:50]--[2016-05-19 Do 06:10] =>  0:20
       :END:      
@@ -1038,7 +1038,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       - State "IN PROGRESS" from "TODO"       [2016-05-21 Sa 11:07]
       :END:
 
-***** DONE Änderungen an updateReferences (DES 073) wegen Änderungen an replace
+***** DONE ï¿½nderungen an updateReferences (DES 073) wegen ï¿½nderungen an replace
       :CLOCK:    
       CLOCK: [2016-06-16 Do 18:00]--[2016-06-16 Do 18:35] =>  0:35
       CLOCK: [2016-06-13 Mo 20:20]--[2016-06-13 Mo 20:58] =>  0:38
@@ -1228,7 +1228,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       CLOCK: [2016-06-04 Sa 19:36]--[2016-06-04 Sa 20:43] =>  1:07
       CLOCK: [2016-06-04 Sa 09:32]--[2016-06-04 Sa 09:35] =>  0:03
       :END:
-***** DONE Mehrere überlagerte MediumActions unterstützen
+***** DONE Mehrere ï¿½berlagerte MediumActions unterstï¿½tzen
       :CLOCK:    
       CLOCK: [2016-06-04 Sa 21:40]--[2016-06-04 Sa 22:10] =>  0:30
       CLOCK: [2016-06-04 Sa 20:43]--[2016-06-04 Sa 20:44] =>  0:01
@@ -1369,7 +1369,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
      - State "DONE"       from "IN PROGRESS" [2017-10-16 Mo 06:17]
      :END:      
 
-***** DONE Überprüfung, ggf. Anpassung und Test der Timeouts bei InputStreams
+***** DONE ï¿½berprï¿½fung, ggf. Anpassung und Test der Timeouts bei InputStreams
       :CLOCK:    
       CLOCK: [2017-10-04 Mi 06:30]--[2017-10-04 Mi 07:10] =>  0:40
       CLOCK: [2016-05-16 Mo 10:521]--[2016-05-16 Mo 11:13] =>  0:21
@@ -1379,7 +1379,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       - State "IN PROGRESS" from "TODO"       [2016-05-16 Mo 10:52]
       :END:      
 
-***** DONE Prüfen und Refactoring aktueller Testcases                         
+***** DONE Prï¿½fen und Refactoring aktueller Testcases                         
       :CLOCK:    
       CLOCK: [2017-10-08 So 16:15]--[2017-10-08 So 16:19] =>  0:04
       CLOCK: [2017-10-08 So 14:30]--[2017-10-08 So 15:25] =>  0:55
@@ -1445,7 +1445,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       - State "IN PROGRESS" from "TODO"       [2017-10-14 Sa 07:34]
       - State "TODO"       from ""           [2017-10-08 So 16:19]
       :END:      
-***** DONE Locking überprüfen und ggf. anpassen                               
+***** DONE Locking ï¿½berprï¿½fen und ggf. anpassen                               
       :LOGBOOK:  
       - State "DONE"       from "TODO"       [2017-10-14 Sa 16:48]
       :END:      
@@ -1465,11 +1465,11 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       - State "IN PROGRESS" from "TODO"       [2017-10-09 Mo 19:32]
       - State "TODO"       from ""           [2017-10-08 So 16:19]
       :END:      
-***** DONE Evaluierung alternative Varianten für timeout                      
+***** DONE Evaluierung alternative Varianten fï¿½r timeout                      
       :LOGBOOK:  
       - State "DONE"       from "TODO"       [2017-10-14 Sa 16:49]
       :END:      
-***** DONE Überprüfung, ggf. Anpassung und Test der Timeouts bei InputStreams 
+***** DONE ï¿½berprï¿½fung, ggf. Anpassung und Test der Timeouts bei InputStreams 
       :LOGBOOK:  
       - State "DONE"       from "TODO"       [2017-10-14 Sa 16:49]
       :END:      
@@ -1509,7 +1509,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       CLOCK: [2017-11-01 Mi 07:55]--[2017-11-01 Mi 09:15] =>  1:20
       :END:      
 
-***** DONE Überprüfung isAtEndOfMedium inkl. Anpassung der Tests
+***** DONE ï¿½berprï¿½fung isAtEndOfMedium inkl. Anpassung der Tests
       :CLOCK:    
       CLOCK: [2017-11-03 Fr 12:08]--[2017-11-03 Fr 12:17] =>  0:09
       CLOCK: [2017-11-03 Fr 06:43]--[2017-11-03 Fr 07:45] =>  1:02
@@ -1649,13 +1649,13 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       - State "DONE"       from "TODO"       [2017-12-14 Do 13:50]
       :END:      
 
-**** DONE Anpassungen für optimales Lesen
+**** DONE Anpassungen fï¿½r optimales Lesen
      :LOGBOOK:  
      - State "DONE"       from "IN PROGRESS" [2018-05-11 Fr 11:16]
      - State "IN PROGRESS" from "TODO"       [2018-05-06 So 08:46]
      :END:      
 
-***** DONE Minimale/Standard Cache-Größe einbauen
+***** DONE Minimale/Standard Cache-Grï¿½ï¿½e einbauen
       :LOGBOOK:  
       - State "DONE"       from ""           [2018-05-11 Fr 11:16]
       :END:      
@@ -1682,7 +1682,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       - State "IN PROGRESS" from ""           [2018-05-08 Di 06:10]
       :END:      
 
-***** DONE Prüfung: Effizienteres split - nur referenz statt kopieren
+***** DONE Prï¿½fung: Effizienteres split - nur referenz statt kopieren
       :LOGBOOK:  
       - State "DONE"       from "IN PROGRESS" [2018-05-06 So 17:45]
       - State "IN PROGRESS" from ""           [2018-05-06 So 17:45]
@@ -1702,7 +1702,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
       - State "IN PROGRESS" from ""           [2018-05-06 So 18:57]
       :END:      
 
-***** DONE Is Cached: Testfälle ausdünnen
+***** DONE Is Cached: Testfï¿½lle ausdï¿½nnen
       :CLOCK:    
       CLOCK: [2018-05-06 So 21:08]--[2018-05-06 So 21:35] =>  0:27
       :END:      
@@ -1751,7 +1751,7 @@ Ursprüngliche Summe der Erstschätzung: 170 h
    - State "IN PROGRESS" from ""           [2017-11-04 Sa 07:32]
    :END:      
 
-Zu prüfen:
+Zu prï¿½fen:
 
  - Id Hierarchie und Instance IDs
  - FieldFunctions
@@ -1761,30 +1761,30 @@ Folgende:
 
 1.) Vereinfachung Umgang mit generischen Containern und IDs
 
- - Prüfung: Generischer Datenblock muss mindestens ein generisches Pattern enthalten {$FRAME}
+ - Prï¿½fung: Generischer Datenblock muss mindestens ein generisches Pattern enthalten {$FRAME}
  - Dazu wird jedem konkreten Datenblock eine generische Basis-ID statisch zugeordnet (max. eine)
  - 
 
-2.) String list field type nötig für ID3v24
+2.) String list field type nï¿½tig fï¿½r ID3v24
 
 3.) DataBlockDescriptionBuilder
 
-5.) Felder: Sind nicht mehr generisch, speichern nicht mehr den "Interpreted Value", sondern bieten nur eine generische convert-Methode mit Übergabe des passenden FieldConverter<T>
+5.) Felder: Sind nicht mehr generisch, speichern nicht mehr den "Interpreted Value", sondern bieten nur eine generische convert-Methode mit ï¿½bergabe des passenden FieldConverter<T>
 
-*** Schätzung
+*** Schï¿½tzung
 
-| Themengebiet         | Aktivität                                          | Status    | Implementierte       | Aufwand |   Tats. | Begründung Abweichung |
+| Themengebiet         | Aktivitï¿½t                                          | Status    | Implementierte       | Aufwand |   Tats. | Begrï¿½ndung Abweichung |
 |                      | <50>                                               |           | Designentscheidungen |  gesch. | Aufwand | <15>            |
 |                      |                                                    |           |                      |     (h) |     (h) |                 |
 |----------------------+----------------------------------------------------+-----------+----------------------+---------+---------+-----------------|
 | Konzeptvereinfachung | Design Verbesserungsideen                          | IN PROGR. |                      |      30 |         |                 |
-|                      | ContainerDataFormat einführen                      | DONE      |                      |       1 |    0.25 |                 |
+|                      | ContainerDataFormat einfï¿½hren                      | DONE      |                      |       1 |    0.25 |                 |
 |                      | FieldBased / ContainerBasedPayload                 | DONE      | 123                  |      10 |       4 |                 |
 |                      | BinaryValue entfernen                              | DONE      |                      |       3 |    3.75 |                 |
 |                      | Transformation Handler nur in ID3v23 extension     | DONE      |                      |       2 |     2.5 |                 |
 |                      | MagicKeys split up                                 | DONE      | 134 - 143            |       8 |   16.25 |                 |
 |                      | LocationProperties restlos entfernen               | DONE      |                      |       1 |       1 |                 |
-|                      | Prüfung min/max length/occurrences auf Plausi      | DONE      | 147, 148             |       1 |     0.5 |                 |
+|                      | Prï¿½fung min/max length/occurrences auf Plausi      | DONE      | 147, 148             |       1 |     0.5 |                 |
 |                      | Auto-Derive byte offset in container               | DONE      |                      |       1 |    0.25 |                 |
 |                      | Vereinfachung Umgang mit generischen Containern und IDs |           |                      |       2 |         |                 |
 |                      | Design DataFormats                                 |           |                      |      48 |         |                 |
@@ -1810,14 +1810,14 @@ Folgende:
       :END:      
 
 Implementierungstaktik:
- 1. Neue Typen FIELD_BASED_PAYLOAD und CONTAINER_BASED_PAYLOAD in PhysicalBlockType einführen
- 2. Neue Interfaces extends Payload einführen mit den jeweiligen Methoden
- 3. LazyPayload durch Kopie in zwei deutlich schönere Klassen aufteilen
+ 1. Neue Typen FIELD_BASED_PAYLOAD und CONTAINER_BASED_PAYLOAD in PhysicalBlockType einfï¿½hren
+ 2. Neue Interfaces extends Payload einfï¿½hren mit den jeweiligen Methoden
+ 3. LazyPayload durch Kopie in zwei deutlich schï¿½nere Klassen aufteilen
  4. Tests laufen sicherlich noch
  5. DataBlockFactory anpassen: Entweder das eine oder das andere erzeugen
  6. PAYLOAD entfernen
  7. An allen Stellen durch die entsprechend im FIXME angegebene Ersetzung entfernen
- 8. Alle Tests ausführen und fixen
+ 8. Alle Tests ausfï¿½hren und fixen
 
 ***** DONE ChildOrder entfernen
       :CLOCK:    
@@ -1879,14 +1879,14 @@ Implementierungstaktik:
       :END:      
 
 Schritte:
- 1. [X] Lyrics3v2: Überschreiben der Implementierung, um Payload-Länge ohne "Exclusion Key" ermitteln zu können (hasContainerWithId überschreiben) - hasContainerWithId überschreiben
- 2. [X] Default nested container einführen
- 3. [X] Logik umbauen top-level: Wenn kein Container anhand Magic key gefunden, dann vermute die Präsenz des Default Containers
- 4. [X] Magic Key Klassen aufräumen: Exclusion Keys wegschmeißen
- 5. [X] ID3v1: Überschreiben der Parser-Impl für Rückwärts-Lesen + Rausnehmen von "Offset for Backward Reading"
- 6. [X] TopLevelContainerIterator und TopLevelReverseContainerIterator vereinfachen und von gemeinsamer Basis ableiten
+ 1. [X] Lyrics3v2: ï¿½berschreiben der Implementierung, um Payload-Lï¿½nge ohne "Exclusion Key" ermitteln zu kï¿½nnen (hasContainerWithId ï¿½berschreiben) - hasContainerWithId ï¿½berschreiben
+ 2. [X] Default nested container einfï¿½hren
+ 3. [X] Logik umbauen top-level: Wenn kein Container anhand Magic key gefunden, dann vermute die Prï¿½senz des Default Containers
+ 4. [X] Magic Key Klassen aufrï¿½umen: Exclusion Keys wegschmeiï¿½en
+ 5. [X] ID3v1: ï¿½berschreiben der Parser-Impl fï¿½r Rï¿½ckwï¿½rts-Lesen + Rausnehmen von "Offset for Backward Reading"
+ 6. [X] MediumContainerIterator und TopLevelReverseContainerIterator vereinfachen und von gemeinsamer Basis ableiten
  7. [X] Magic Keys direkt von Feldern ableiten
- 8. [X] Unknown Container analog Unknown Field nötig (?)
+ 8. [X] Unknown Container analog Unknown Field nï¿½tig (?)
 
 ***** DONE Transformation Handler -> ID3v23
       :CLOCK:    
@@ -1908,7 +1908,7 @@ Schritte:
       - State "IN PROGRESS" from ""           [2018-05-11 Fr 15:49]
       :END:      
 
-***** DONE Prüfung min/max length/occurrences auf Plausi
+***** DONE Prï¿½fung min/max length/occurrences auf Plausi
       :CLOCK:    
       CLOCK: [2018-05-12 Sa 06:40]--[2018-05-12 Sa 07:10] =>  0:30
       :END:      
@@ -2020,26 +2020,26 @@ Schritte:
       :ORDERED:  t
       :END:
 
- - [X] Prüfen: isGeneric als Feld in DataBlockDescription?
- - [X] Prüfen: Mergen von DataBlockDescription und FieldProperties?
- - [X] Prüfen: DataBlockDescription - Setter reinnehmen?
+ - [X] Prï¿½fen: isGeneric als Feld in DataBlockDescription?
+ - [X] Prï¿½fen: Mergen von DataBlockDescription und FieldProperties?
+ - [X] Prï¿½fen: DataBlockDescription - Setter reinnehmen?
  - [X] TopLevel: createGeneric*Container umsetzen
  - [X] TopLevel* Interface rausziehen
  - [X] TopLevel* liefert direkt Ergebnis
- - [X] byte orders und charsets mit builder hinzufügen
+ - [X] byte orders und charsets mit builder hinzufï¿½gen
  - [X] DescriptionCOllector: getAllDescriptions() rausnehmen, d.h. MagicKey-Sonderfall bei MP3 loswerden
- - [X] Plausi-Check: Exception werfen, wenn builder noch net fertig bestückt (finish nicht aufgerufen)
- - [X] Prüfen: Child descriptions direkt in DBDesc + getChildDescOf type als direkte Funktion?
+ - [X] Plausi-Check: Exception werfen, wenn builder noch net fertig bestï¿½ckt (finish nicht aufgerufen)
+ - [X] Prï¿½fen: Child descriptions direkt in DBDesc + getChildDescOf type als direkte Funktion?
  - [X] Validierung: Plausi von DataBlockDescriptions (Standalone)
  - [X] Clone umsetzen
- - [X] Nicht mehr lauffähigen Testfall wieder lauffähig machen
+ - [X] Nicht mehr lauffï¿½higen Testfall wieder lauffï¿½hig machen
  - [X] Dokumentation Builder (Design Docs)
  - [X] Magic-Key-Sonderfall bei MP3 endlich loswerden...
  - [X] Dokumentation Builder (Javadocs)
  - [X] FieldConverter nach DataFormats
- - [X] Größen: Undefiniert
- - [X] InvalidSpecificationException überall einsetzen
- - [X] Vater-Größen von Kindern automatisch ableiten + Längenprüfung
+ - [X] Grï¿½ï¿½en: Undefiniert
+ - [X] InvalidSpecificationException ï¿½berall einsetzen
+ - [X] Vater-Grï¿½ï¿½en von Kindern automatisch ableiten + Lï¿½ngenprï¿½fung
  - [X] Finalisierung DataBlockDescription & FieldProperties (Refactoring)
  - [X] Finalisierung DataBlockDescription & FieldProperties (Doku)
  - [X] Extensions: IDs nicht duplizieren, sondern via Konstanten die local ids definieren
@@ -2061,20 +2061,20 @@ Schritte:
       - State "IN PROGRESS" from ""           [2018-03-06 Di 17:43]
       :END:
 ** Komponente "DataBlocks"
-*** Schätzung
+*** Schï¿½tzung
 **** Lesen
 
-  | Themengebiet    | Aktivität                                          | Status | Implementierte       | Aufwand |   Tats. | Begründung Abweichung |
+  | Themengebiet    | Aktivitï¿½t                                          | Status | Implementierte       | Aufwand |   Tats. | Begrï¿½ndung Abweichung |
   |                 | <50>                                               |        | Designentscheidungen |  gesch. | Aufwand | <15>            |
   |                 |                                                    |        |                      |     (h) |     (h) |                 |
   |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
-  | Vorwärts-Lesen  | Überprüfung Vorwärts-Lesen                         |        |                      |       6 |    3.25 |                 |
-  |                 | Design Vorwärts-Lesen                              |        |                      |      12 |   20.25 |                 |
-  |                 | Testfälle Streaming Media                          |        |                      |       4 |     3.5 |                 |
-  |                 | Implementierungsanpassungen Vorwärts-Lesen         |        |                      |         |      44 |                 |
+  | Vorwï¿½rts-Lesen  | ï¿½berprï¿½fung Vorwï¿½rts-Lesen                         |        |                      |       6 |    3.25 |                 |
+  |                 | Design Vorwï¿½rts-Lesen                              |        |                      |      12 |   20.25 |                 |
+  |                 | Testfï¿½lle Streaming Media                          |        |                      |       4 |     3.5 |                 |
+  |                 | Implementierungsanpassungen Vorwï¿½rts-Lesen         |        |                      |         |      44 |                 |
   |                 | Weitere Anpassungen (Design + Impl) nach Schreiben |        |                      |      16 |         |                 |
   |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
-  | Rückwärts-Lesen |                                                    |        |                      |       8 |     4.5 |                 |
+  | Rï¿½ckwï¿½rts-Lesen |                                                    |        |                      |       8 |     4.5 |                 |
   |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
   |-----------------+----------------------------------------------------+--------+----------------------+---------+---------+-----------------|
   |                 |                                                    |        | SUMME                |      46 |     71. |                 |
@@ -2083,13 +2083,13 @@ Schritte:
 
 **** Schreiben
 
-| Themengebiet         | Aktivität                                                              | Status    | Aufwand |   Tats. | Implementierte       | Begründung Abweichung |
+| Themengebiet         | Aktivitï¿½t                                                              | Status    | Aufwand |   Tats. | Implementierte       | Begrï¿½ndung Abweichung |
 |                      | <70>                                                                   |           |  gesch. | Aufwand | Designentscheidungen | <20>                 |
 |                      |                                                                        |           |     (h) |     (h) |                      |                      |
 |----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
 | Vor-Restrukturierung | Lebensyzklus DataBlockReader und Factory umstellen (1 Reader pro Medium, 1 Factory pro Reader) | DONE      |       4 |    1.25 |                      |                      |
 |                      | DataBlockEvent(Bus, Listener) inkl. javadocs                           | DONE      |     0.5 |     0.5 |                      |                      |
-|                      | DataBlockState einführen, auch in Factory                              | DONE      |     0.5 |    0.25 |                      |                      |
+|                      | DataBlockState einfï¿½hren, auch in Factory                              | DONE      |     0.5 |    0.25 |                      |                      |
 |                      | Methoden DataBlockFactory                                              | IN PROGR. |       1 |         |                      |                      |
 |                      | Validierung gegen Spec in Factory                                      |           |     0.5 |         |                      |                      |
 |                      | Bus Lebenszyklus und alle registrieren sich                            |           |     0.5 |         |                      |                      |
@@ -2097,14 +2097,14 @@ Schritte:
 | FieldFunctions       | ContainerContext: INSERTED, REMOVED, MODIFIED (target block)           |           |       1 |         |                      |                      |
 |                      | ContainerContext: MODIFIED (field func. ByteOrder / CharEnc)           |           |       4 |         |                      |                      |
 |----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
-| Einfügen             | Basistestfälle                                                         |           |     0.5 |         |                      |                      |
+| Einfï¿½gen             | Basistestfï¿½lle                                                         |           |     0.5 |         |                      |                      |
 |                      | insertContainer                                                        |           |       2 |         |                      |                      |
 |                      | insertHeader                                                           |           |       2 |         |                      |                      |
 |                      | insertFooter                                                           |           |       2 |         |                      |                      |
 |                      | insertField                                                            |           |       2 |         |                      |                      |
 |                      | setPayload                                                             |           |       2 |         |                      |                      |
 |----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
-| Löschen              | removeContainer                                                        |           |       2 |         |                      |                      |
+| Lï¿½schen              | removeContainer                                                        |           |       2 |         |                      |                      |
 |                      | removeFooter                                                           |           |       2 |         |                      |                      |
 |                      | removeHeader                                                           |           |       2 |         |                      |                      |
 |                      | removeField                                                            |           |       2 |         |                      |                      |
@@ -2118,13 +2118,13 @@ Schritte:
 |----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
 | Sonstiges            | Alle javadocs anpassen                                                 |           |       3 |         |                      |                      |
 |                      | Design Docs anpassen                                                   |           |       2 |         |                      |                      |
-|                      | Aufräumen                                                              |           |       3 |         |                      |                      |
+|                      | Aufrï¿½umen                                                              |           |       3 |         |                      |                      |
 |----------------------+------------------------------------------------------------------------+-----------+---------+---------+----------------------+----------------------|
 |                      |                                                                        |           |    49.5 |         |                      |                      |
 #+TBLFM: $4=vsum(@I$4..@-I$4)
 
 
-*** DONE Überprüfung Vorwärts-Lesen
+*** DONE ï¿½berprï¿½fung Vorwï¿½rts-Lesen
     :CLOCK:    
     CLOCK: [2019-01-30 Mi 21:00]--[2019-01-30 Mi 21:25] =>  0:25
     CLOCK: [2019-01-30 Mi 20:30]--[2019-01-30 Mi 20:55] =>  0:25
@@ -2141,47 +2141,47 @@ Schritte:
     :END:      
 
 Macht Caching in Media-Komponente jetzt insgesamt Sinn oder nicht?
- -> Geht so: Caching ist immer entweder aktiv (min. Cache-Größe > 0) oder es ist eh ein Byte-Array
+ -> Geht so: Caching ist immer entweder aktiv (min. Cache-Grï¿½ï¿½e > 0) oder es ist eh ein Byte-Array
 
 Ziele:
  - Doku des Lese-Vorgehens
  - Lese-Vorgehen sinnvoll auf Media-Komponente abgestimmt
- - Komplexitätsverringerung, insb. Code-Vereinfachung und Verkürzung
- - Basis für schreibende Zugriffe legen
+ - Komplexitï¿½tsverringerung, insb. Code-Vereinfachung und Verkï¿½rzung
+ - Basis fï¿½r schreibende Zugriffe legen
 
 Vorgehen:
  - Code-Review inkl. Klassendiagramm
- - Ideen-Skizze nach Review überarbeiten
- - Basierend auf existierender Doku das Design-Konzept für das Vorwärts-Lesen basierend auf einfachen Designentscheidungen Schritt für Schritt aufbauen
- - Schätzung für Implementierungsanpassungen
- - Danach Design für Rückwärts-Lesen
+ - Ideen-Skizze nach Review ï¿½berarbeiten
+ - Basierend auf existierender Doku das Design-Konzept fï¿½r das Vorwï¿½rts-Lesen basierend auf einfachen Designentscheidungen Schritt fï¿½r Schritt aufbauen
+ - Schï¿½tzung fï¿½r Implementierungsanpassungen
+ - Danach Design fï¿½r Rï¿½ckwï¿½rts-Lesen
 
-Idee Vorwärts-Lesen:
+Idee Vorwï¿½rts-Lesen:
  1. Bestimme Block-Typ:
-    a. Maximale Header-Größe aus allen unterstützten Datenformaten lesen und entsprechend viele Bytes cachen
-    b. Falls End-Of-Medium: Datenformat ausschließen
+    a. Maximale Header-Grï¿½ï¿½e aus allen unterstï¿½tzten Datenformaten lesen und entsprechend viele Bytes cachen
+    b. Falls End-Of-Medium: Datenformat ausschlieï¿½en
     c. Identifikation des Datenformats anhand Magic Key
  2. Nur Streaming-Media:
-    a. Bei Aufruf von "next()": Fülle Payload-Bytes in den Cache durch expliziten Aufruf von "cache()": Tut nichts bei Byte-Array, bei Datei und Stream liest es bis zur maximalen Cache-Größe alles rein
+    a. Bei Aufruf von "next()": Fï¿½lle Payload-Bytes in den Cache durch expliziten Aufruf von "cache()": Tut nichts bei Byte-Array, bei Datei und Stream liest es bis zur maximalen Cache-Grï¿½ï¿½e alles rein
  3. Lazy Payload:
     a. Nur bei Random-Access-Medien
-    b. Daten werden erst gelesen, wenn zum ersten Mal auf die Inhalte zugegriffen wird über getData()
+    b. Daten werden erst gelesen, wenn zum ersten Mal auf die Inhalte zugegriffen wird ï¿½ber getData()
     c. Resultiert evtl. in einer InvalidMediumOffsetException falls keine Daten mehr vorhanden sind
  4. Lazy Field:
-    a. Ab einer bestimmten Mindestgröße werden auch Felder mit bekannter Größe erst in den Speicher gelesen, wenn explizit angefragt
+    a. Ab einer bestimmten Mindestgrï¿½ï¿½e werden auch Felder mit bekannter Grï¿½ï¿½e erst in den Speicher gelesen, wenn explizit angefragt
     b. Nur bei Random-Access-Medien?
  5. Felder lesen im Detail: TODO
  6. Offene Punkte:
     a. Feldkonvertierung wie?
-    b. Brauch man den ganzen "Listener"-Scheiß noch?
+    b. Brauch man den ganzen "Listener"-Scheiï¿½ noch?
     c. Der FieldFunctionStack: Muss das wirklich sein?
     d. Identifikationshilfen zum Datenformat nutzen? (z.B. Dateiendung, Infos des Streams etc.)
-    e. Eingriffs-/Konfigurationsmöglichkeiten Anwender?
-    f. Eingriffs-/Konfigurationsmöglichkeiten Extension?
+    e. Eingriffs-/Konfigurationsmï¿½glichkeiten Anwender?
+    f. Eingriffs-/Konfigurationsmï¿½glichkeiten Extension?
 
-Rückwärts-Lesen?
+Rï¿½ckwï¿½rts-Lesen?
 
-*** DONE Design-Vorwärts-Lesen
+*** DONE Design-Vorwï¿½rts-Lesen
     :LOGBOOK:
     - State "DONE"       from "IN PROGRESS" [2019-03-26 Di 06:23]
     - State "IN PROGRESS" from "TODO"       [2019-02-04 Mo 19:25]
@@ -2210,7 +2210,7 @@ Rückwärts-Lesen?
     CLOCK: [2019-02-04 Mo 19:00]--[2019-02-04 Mo 19:53] =>  0:53
     :END:
 
-*** DONE Implementierungsanpassungen Vorwärts-Lesen
+*** DONE Implementierungsanpassungen Vorwï¿½rts-Lesen
     :LOGBOOK:
     - State "DONE"       from "IN PROGRESS" [2019-03-26 Di 06:23]
     - State "IN PROGRESS" from "TODO"       [2019-02-11 Mo 20:19]
@@ -2237,7 +2237,7 @@ Rückwärts-Lesen?
     CLOCK: [2019-02-13 Mi 22:14]--[2019-02-13 Mi 22:26] =>  0:12
     CLOCK: [2019-02-13 Mi 20:28]--[2019-02-13 Mi 20:40] =>  0:12
     :END:
-**** DONE FieldFunctionStack aufräumen
+**** DONE FieldFunctionStack aufrï¿½umen
      :LOGBOOK:
      - State "DONE"       from "IN PROGRESS" [2019-03-21 Do 21:10]
      :END:
@@ -2280,22 +2280,22 @@ Rückwärts-Lesen?
      CLOCK: [2019-02-20 Mi 05:52]--[2019-02-20 Mi 07:15] =>  1:23
      :END:
 
-Nächste Schritte:
+Nï¿½chste Schritte:
   - [X] MetadataCompendium: Flags genau darstellen (bildlich, Position und Typ des Flags)
   - [X] Expected_ID3v23_FILE_06_ExtendedHeader.csv fertig: Nur noch erwartete Flag-Bytes fehlen
   - [X] ID3v23_FILE_06_ExtendedHeader.txt fertig: Tag-Flags (ext header presnt) und Flag-Bytes in extended header (0x61, 0x61) fehlen
   - [X] SyncSafeIntegerConverter: Mini Programm in Main, dass die interaktive Konvertierung erlaubt
-  - [X] Ext header mit dyn. Länge
+  - [X] Ext header mit dyn. Lï¿½nge
   - [X] ID_OF als FieldFunction ersetzen durch isId()
-  - [X] Aufräumen und dokumentieren AbstractFieldFunction
-  - [X] Aufräumen und dokumentieren ContainerContext
-  - [X] Aufräumen und dokumentieren CustomCount/SizeProvide
+  - [X] Aufrï¿½umen und dokumentieren AbstractFieldFunction
+  - [X] Aufrï¿½umen und dokumentieren ContainerContext
+  - [X] Aufrï¿½umen und dokumentieren CustomCount/SizeProvide
   - [X] APE is optional fixen
-  - [X] Verwendung von ByteOrders und Charsets überprüfenr
-  - [X] AbstractChecksumOf einführen mit CRCOf als Subklasse; nutzen in MP3 und ID3v2.3 ext header
+  - [X] Verwendung von ByteOrders und Charsets ï¿½berprï¿½fenr
+  - [X] AbstractChecksumOf einfï¿½hren mit CRCOf als Subklasse; nutzen in MP3 und ID3v2.3 ext header
   - [X] Validieren von CustomSizeOf
 
-*** DONE Testfälle Streaming Media
+*** DONE Testfï¿½lle Streaming Media
     :LOGBOOK:
     - State "DONE"       from "IN PROGRESS" [2019-02-20 Mi 21:47]
     - State "IN PROGRESS" from "TODO"       [2019-02-11 Mo 19:44]
@@ -2311,7 +2311,7 @@ Nächste Schritte:
     CLOCK: [2019-02-06 Mi 19:10]--[2019-02-06 Mi 19:38] =>  0:28
       :END:
 
-*** DONE Design + Impl Rückwärts-Lesen
+*** DONE Design + Impl Rï¿½ckwï¿½rts-Lesen
     :CLOCK:
     CLOCK: [2019-03-26 Di 21:30]--[2019-03-26 Di 22:20] =>  0:50
     CLOCK: [2019-03-24 So 19:58]--[2019-03-24 So 22:10] =>  2:12
@@ -2331,11 +2331,11 @@ Idee:
  - Neue Klasse BackwardDataBlockReader
  - Unterschiede werden in readContainerWithId implementiert
 
-Nächste Schritte:
- - [X] Statische Footer-Länge
- - [X] Statische Header-Länge
+Nï¿½chste Schritte:
+ - [X] Statische Footer-Lï¿½nge
+ - [X] Statische Header-Lï¿½nge
  - [X] Design-Doku
- - [X] Javadocs + Aufräumen
+ - [X] Javadocs + Aufrï¿½umen
 
 *** DONE Design Schreiben
     :LOGBOOK:
@@ -2396,13 +2396,13 @@ Nächste Schritte:
      :END:
 
  - [X] Lebensyzklus DataBlockReader und Factory umstellen
- - [X] DataBlockState einführen, auch in Factory         
+ - [X] DataBlockState einfï¿½hren, auch in Factory         
  - [X] DataBlockEvent(Bus, Listener) inkl. javadocs      
  - [ ] Methoden DataBlockFactory                         
  - [ ] Validierung gegen Spec in Factory                 
  - [ ] Bus Lebenszyklus und alle registrieren sich       
 
-*** IN PROGRESS Weitere Themen Vorwärts-Lesen
+*** IN PROGRESS Weitere Themen Vorwï¿½rts-Lesen
     :LOGBOOK:
     - State "IN PROGRESS" from              [2019-03-26 Di 06:21]
     :END:
@@ -2413,12 +2413,12 @@ Themen:
  - [ ] Generelle Fehlerbehandlungsstrategie beim Lesen
  - [ ] Design Docs lese-API
  - [ ] Feldkonvertierung
- - [ ] Umgang mit Parent Datenblöcken?
+ - [ ] Umgang mit Parent Datenblï¿½cken?
    - Kann man Parents eliminieren (aktuell braucht man die nicht wirklich)
- - [ ] Umgang mit generischen Blöcken?
+ - [ ] Umgang mit generischen Blï¿½cken?
    - Idee: Base id des generischen Blocks in dataBlockId bei Erzeugung speichern
-   - Problem: Was macht man für einen völlig neuen und unbekannten Container-Block?
- - [ ] DataBlockReader-Subklassen eliminieren? -> ContainerReader Interface als Ersatz für das Ableiten von DataBlockReader, wird implementiert von ID3v1 und Lyrics3v2 sowie ID3v2.4 (für Rückwärtslesen - damit die Optionalität und dynamische Länge des extended header berücksichtigt werden kann)
+   - Problem: Was macht man fï¿½r einen vï¿½llig neuen und unbekannten Container-Block?
+ - [ ] DataBlockReader-Subklassen eliminieren? -> ContainerReader Interface als Ersatz fï¿½r das Ableiten von DataBlockReader, wird implementiert von ID3v1 und Lyrics3v2 sowie ID3v2.4 (fï¿½r Rï¿½ckwï¿½rtslesen - damit die Optionalitï¿½t und dynamische Lï¿½nge des extended header berï¿½cksichtigt werden kann)
 
 ** Komponente "startup"
 *** DONE jMeta Startup: Logging, Design Decisions, test case
@@ -2432,7 +2432,7 @@ Themen:
 
 ** Komponente "Logging"
 
-*** DONE Schätzung
+*** DONE Schï¿½tzung
      :CLOCK:    
      CLOCK: [2016-06-18 Sa 13:25]--[2016-06-18 Sa 13:35] =>  0:10
      :END:      
@@ -2441,13 +2441,13 @@ Themen:
      - State "IN PROGRESS" from ""           [2016-06-18 Sa 13:28]
      :END:      
 
-| Themengebiet            | Aktivität                                                              | Status | Implementierte       | Aufwand |   Tats. | Begründung Abweichung |
+| Themengebiet            | Aktivitï¿½t                                                              | Status | Implementierte       | Aufwand |   Tats. | Begrï¿½ndung Abweichung |
 |                         | <70>                                                                   |        | Designentscheidungen |  gesch. | Aufwand | <20>                 |
 |                         |                                                                        |        |                      |     (h) |     (h) |                      |
 |-------------------------+------------------------------------------------------------------------+--------+----------------------+---------+---------+----------------------|
-| Schätzung Logging       | Schätzung erstellen                                                    | DONE   |                      |     0.5 |    0.25 |                      |
+| Schï¿½tzung Logging       | Schï¿½tzung erstellen                                                    | DONE   |                      |     0.5 |    0.25 |                      |
 |-------------------------+------------------------------------------------------------------------+--------+----------------------+---------+---------+----------------------|
-| Design Logging          | Aktuelle Designentscheidungen prüfen                                   | DONE   |                      |     0.5 |       0 |                      |
+| Design Logging          | Aktuelle Designentscheidungen prï¿½fen                                   | DONE   |                      |     0.5 |       0 |                      |
 |                         | Allgemeine Regeln wann was auf welchem Detailgrad geloggt wird         | DONE   |                      |     0.5 |     0.5 |                      |
 |                         | Evaluierung slf4j                                                      | DONE   |                      |       2 |    1.25 |                      |
 |-------------------------+------------------------------------------------------------------------+--------+----------------------+---------+---------+----------------------|
@@ -2464,7 +2464,7 @@ Gesamtaufwand: 5h
 
 **** Design
 
-***** DONE Aktuelle Designentscheidungen prüfen
+***** DONE Aktuelle Designentscheidungen prï¿½fen
       :CLOCK:    
       CLOCK: [2016-06-18 Sa 13:35]--[2016-06-18 Sa 14:05] =>  0:30
       :END:      

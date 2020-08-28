@@ -22,6 +22,7 @@ import com.github.jmeta.library.media.api.types.AbstractMedium;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.InMemoryMedium;
 import com.github.jmeta.library.media.api.types.InputStreamMedium;
+import com.github.jmeta.library.media.api.types.MediumAccessType;
 import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledException;
 
 /**
@@ -29,96 +30,92 @@ import com.github.jmeta.utility.dbc.api.exceptions.PreconditionUnfullfilledExcep
  */
 public class StandardMediaAPITest {
 
-	/**
-	 * {@link FakeMediumClass} is a fake class for testing
-	 * {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}
-	 */
-	private class FakeMediumClass extends AbstractMedium<Object> {
+   /**
+    * {@link FakeMediumClass} is a fake class for testing
+    * {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}
+    */
+   private class FakeMediumClass extends AbstractMedium<Object> {
 
-		/**
-		 * Creates a new {@link FakeMediumClass}.
-		 *
-		 * @param medium The fake medium
-		 */
-		public FakeMediumClass(Object medium) {
-			super(medium, "Fake test medium", false, false, MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES,
-				MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
-		}
+      /**
+       * Creates a new {@link FakeMediumClass}.
+       *
+       * @param medium
+       *           The fake medium
+       */
+      public FakeMediumClass(Object medium) {
+         super(medium, "Fake test medium", false, MediumAccessType.READ_WRITE, MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES,
+            MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      }
 
-		/**
-		 * @see com.github.jmeta.library.media.api.types.Medium#getCurrentLength()
-		 */
-		@Override
-		public long getCurrentLength() {
-			return 0;
-		}
-	}
+      /**
+       * @see com.github.jmeta.library.media.api.types.Medium#getCurrentLength()
+       */
+      @Override
+      public long getCurrentLength() {
+         return 0;
+      }
+   }
 
-	/**
-	 * Tests
-	 * {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
-	 */
-	@Test
-	public void createMediumStore_forFileMedium_returnsProperStoreInstance() {
-		MediaAPI mediaAPI = new StandardMediaAPI();
+   /**
+    * Tests {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
+    */
+   @Test
+   public void createMediumStore_forFileMedium_returnsProperStoreInstance() {
+      MediaAPI mediaAPI = new StandardMediaAPI();
 
-		FileMedium mediumDefinition = new FileMedium(TestMedia.EMPTY_TEST_FILE_PATH, false,
-			MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      FileMedium mediumDefinition = new FileMedium(TestMedia.EMPTY_TEST_FILE_PATH, MediumAccessType.READ_WRITE,
+         MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
 
-		MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
+      MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 
-		Assert.assertNotNull(store);
-		Assert.assertEquals(mediumDefinition, store.getMedium());
-	}
+      Assert.assertNotNull(store);
+      Assert.assertEquals(mediumDefinition, store.getMedium());
+   }
 
-	/**
-	 * Tests
-	 * {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
-	 */
-	@Test
-	public void createMediumStore_forInMemoryMedium_returnsProperStoreInstance() {
-		MediaAPI mediaAPI = new StandardMediaAPI();
+   /**
+    * Tests {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
+    */
+   @Test
+   public void createMediumStore_forInMemoryMedium_returnsProperStoreInstance() {
+      MediaAPI mediaAPI = new StandardMediaAPI();
 
-		InMemoryMedium mediumDefinition = new InMemoryMedium(new byte[] { 100 }, "My Medium", false,
-			MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      InMemoryMedium mediumDefinition = new InMemoryMedium(new byte[] { 100 }, "My Medium", MediumAccessType.READ_WRITE,
+         MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
 
-		MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
+      MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 
-		Assert.assertNotNull(store);
-		Assert.assertEquals(mediumDefinition, store.getMedium());
-	}
+      Assert.assertNotNull(store);
+      Assert.assertEquals(mediumDefinition, store.getMedium());
+   }
 
-	/**
-	 * Tests
-	 * {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
-	 */
-	@Test
-	public void createMediumStore_forInputStreamMedium_returnsProperStoreInstance() {
-		MediaAPI mediaAPI = new StandardMediaAPI();
+   /**
+    * Tests {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
+    */
+   @Test
+   public void createMediumStore_forInputStreamMedium_returnsProperStoreInstance() {
+      MediaAPI mediaAPI = new StandardMediaAPI();
 
-		InputStreamMedium mediumDefinition;
-		try {
-			mediumDefinition = new InputStreamMedium(new FileInputStream(TestMedia.EMPTY_TEST_FILE_PATH.toFile()),
-				"My Medium", MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES,
-				MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Unexpected exception", e);
-		}
+      InputStreamMedium mediumDefinition;
+      try {
+         mediumDefinition = new InputStreamMedium(new FileInputStream(TestMedia.EMPTY_TEST_FILE_PATH.toFile()),
+            "My Medium", MediumStore.MINIMUM_CACHE_SIZE_IN_BYTES, MediumStore.MINIMUM_READ_WRITE_BLOCK_SIZE_IN_BYTES);
+      } catch (FileNotFoundException e) {
+         throw new RuntimeException("Unexpected exception", e);
+      }
 
-		MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
+      MediumStore store = mediaAPI.createMediumStore(mediumDefinition);
 
-		Assert.assertNotNull(store);
-		Assert.assertEquals(mediumDefinition, store.getMedium());
-	}
+      Assert.assertNotNull(store);
+      Assert.assertEquals(mediumDefinition, store.getMedium());
+   }
 
-	/**
-	 * Tests
-	 * {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
-	 */
-	@Test(expected = PreconditionUnfullfilledException.class)
-	public void createMediumStore_forUnsupportedMediumType_throwsException() {
-		MediaAPI mediaAPI = new StandardMediaAPI();
+   /**
+    * Tests {@link MediaAPI#createMediumStore(com.github.jmeta.library.media.api.types.Medium)}.
+    */
+   @Test(expected = PreconditionUnfullfilledException.class)
+   public void createMediumStore_forUnsupportedMediumType_throwsException() {
+      MediaAPI mediaAPI = new StandardMediaAPI();
 
-		mediaAPI.createMediumStore(new FakeMediumClass("test"));
-	}
+      mediaAPI.createMediumStore(new FakeMediumClass("test"));
+   }
 }

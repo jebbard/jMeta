@@ -10,13 +10,13 @@ package com.github.jmeta.defaultextensions.ogg.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractLowLevelAPITest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
  * {@link OggSingleFile_01_Test} tests reading a single ogg file.
  */
-public class OggSingleFile_01_Test extends AbstractDataBlockAccessorTest {
+public class OggSingleFile_01_Test extends AbstractLowLevelAPITest {
 
 	private final static Path THE_FILE = TestResourceHelper.resourceToFile(OggSingleFile_01_Test.class,
 		"OGG_FILE_01.txt");

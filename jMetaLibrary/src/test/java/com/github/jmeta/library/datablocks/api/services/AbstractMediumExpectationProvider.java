@@ -27,7 +27,7 @@ import com.github.jmeta.utility.testsetup.api.exceptions.InvalidTestDataExceptio
 /**
  * {@link AbstractMediumExpectationProvider} provides expected test data for a
  * single top-level data block of a single {@link ContainerDataFormat} for
- * testing {@link DataBlockAccessor} instances.
+ * testing {@link LowLevelAPI} instances.
  */
 public abstract class AbstractMediumExpectationProvider {
 

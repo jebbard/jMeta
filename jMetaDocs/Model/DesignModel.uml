@@ -1250,7 +1250,7 @@ Here, an {@link IContainer} consists of an arbitrary number of optional headers 
             </ownedParameter>
           </ownedOperation>
         </packagedElement>
-        <packagedElement xmi:type="uml:Interface" xmi:id="_fMhzyBBOEeCWwuTUj8c31Q" name="IDataBlockAccessor" clientDependency="_j7x-xRHbEeC8O4a4uHjcTw _l7v0tRKGEeCmY8FE9I3w_w _IcMppBKKEeCmY8FE9I3w_w _NDCKhRKNEeCmY8FE9I3w_w">
+        <packagedElement xmi:type="uml:Interface" xmi:id="_fMhzyBBOEeCWwuTUj8c31Q" name="ILowLevelAPI" clientDependency="_j7x-xRHbEeC8O4a4uHjcTw _l7v0tRKGEeCmY8FE9I3w_w _IcMppBKKEeCmY8FE9I3w_w _NDCKhRKNEeCmY8FE9I3w_w">
           <ownedComment xmi:id="_P9nSIBOGEeCftvNWGQmhpw">
             <body>This interface is the starting point when accessing the {@link IDataBlock}s of a {@link Medium}. For any existing {@link Medium}, it returns an {@link Iterator} &#xD;
 that allows to iterate the top-level {@link IDataBlock}s of that {@link Medium}.</body>
@@ -1591,7 +1591,7 @@ The #next() method might throw an {@link UnknownDataFormatException} which is a 
             </ownedParameter>
             <ownedParameter xmi:id="_WNCG0BKLEeCmY8FE9I3w_w" name="blockAccessor" type="_fMhzyBBOEeCWwuTUj8c31Q">
               <ownedComment xmi:id="_F9h4UBS6EeCCdI4pKGnu6Q">
-                <body>The {@link IDataBlockAccessor}.</body>
+                <body>The {@link ILowLevelAPI}.</body>
               </ownedComment>
             </ownedParameter>
           </ownedOperation>
@@ -1777,12 +1777,12 @@ Derived classes represent the concrete value types a {@link Field} can have.</bo
           <ownedOperation xmi:id="_wEwNUh0AEeCTjboh27C6Gg" name="getTotalSize"/>
           <ownedOperation xmi:id="_wxv2Mh0AEeCTjboh27C6Gg" name="getBytes"/>
         </packagedElement>
-        <packagedElement xmi:type="uml:Class" xmi:id="_n1heWBBYEeCWwuTUj8c31Q" name="StandardDataBlockAccessor" clientDependency="_qi0yFRBYEeCWwuTUj8c31Q _3YxjtBJvEeCQ6KaJ3EOFKQ">
+        <packagedElement xmi:type="uml:Class" xmi:id="_n1heWBBYEeCWwuTUj8c31Q" name="StandardLowLevelAPI" clientDependency="_qi0yFRBYEeCWwuTUj8c31Q _3YxjtBJvEeCQ6KaJ3EOFKQ">
           <interfaceRealization xmi:id="_qi0yFRBYEeCWwuTUj8c31Q" name="InterfaceRealization1" supplier="_fMhzyBBOEeCWwuTUj8c31Q" client="_n1heWBBYEeCWwuTUj8c31Q" contract="_fMhzyBBOEeCWwuTUj8c31Q"/>
         </packagedElement>
-        <packagedElement xmi:type="uml:Class" xmi:id="__7vJBxBbEeCWwuTUj8c31Q" name="TopLevelContainerIterator">
+        <packagedElement xmi:type="uml:Class" xmi:id="__7vJBxBbEeCWwuTUj8c31Q" name="MediumContainerIterator">
           <generalization xmi:id="_djz7YxJwEeCQ6KaJ3EOFKQ" general="_WYHJuBJwEeCQ6KaJ3EOFKQ"/>
-          <ownedOperation xmi:id="_JKuBEhBcEeCWwuTUj8c31Q" name="TopLevelContainerIterator">
+          <ownedOperation xmi:id="_JKuBEhBcEeCWwuTUj8c31Q" name="MediumContainerIterator">
             <ownedParameter xmi:id="_N-kxoBBcEeCWwuTUj8c31Q" name="medium" type="_4q50YAYCEeC-MfabKwExLQ"/>
             <ownedParameter xmi:id="_-jKyMBKNEeCmY8FE9I3w_w" name="dfFactory" type="_vhUF6Bz8EeCTjboh27C6Gg"/>
             <ownedParameter xmi:id="_z5ibwBaYEeCNZOI8PyuHiQ" name="dataFormatHints">
@@ -2068,7 +2068,7 @@ m_longestMinHeaderSize</body>
                   <type xmi:type="uml:PrimitiveType" href="../../CommonUMLModels/models/CommonElements.uml#_3j57cHL-Ed6ZZvimjx0tAA"/>
                 </argument>
               </message>
-              <message xmi:id="_xeq7ux0CEeCTjboh27C6Gg" name="TopLevelContainerIterator" receiveEvent="_xeq7uR0CEeCTjboh27C6Gg" sendEvent="_xeq7uB0CEeCTjboh27C6Gg">
+              <message xmi:id="_xeq7ux0CEeCTjboh27C6Gg" name="MediumContainerIterator" receiveEvent="_xeq7uR0CEeCTjboh27C6Gg" sendEvent="_xeq7uB0CEeCTjboh27C6Gg">
                 <argument xmi:type="uml:InstanceValue" xmi:id="_0kHCoh0CEeCTjboh27C6Gg" name="medium" type="_4q50YAYCEeC-MfabKwExLQ" instance="_zq8mMCIJEeCW2oLqF1cqfQ"/>
                 <argument xmi:type="uml:LiteralString" xmi:id="_mQ_3oCILEeCW2oLqF1cqfQ" name="dfFactory" type="_vhUF6Bz8EeCTjboh27C6Gg" value="dfFactory"/>
                 <argument xmi:type="uml:LiteralString" xmi:id="_0kHCoR0CEeCTjboh27C6Gg" name="dataFormatHints" value="hints">
@@ -2566,7 +2566,7 @@ nextHeader != null</body>
           <ownedOperation xmi:id="_j5KMohXNEeCXQf6TsXGXXw" name="getDataFormatRepository">
             <ownedParameter xmi:id="_lP4vABXNEeCXQf6TsXGXXw" name="return" type="_PcHQ4A9PEeC5mKKa1YlKHQ" direction="return"/>
           </ownedOperation>
-          <ownedOperation xmi:id="_nsf7YhXNEeCXQf6TsXGXXw" name="getDataBlockAccessor">
+          <ownedOperation xmi:id="_nsf7YhXNEeCXQf6TsXGXXw" name="getLowLevelAPI">
             <ownedParameter xmi:id="_pKOdoBXNEeCXQf6TsXGXXw" name="return" direction="return">
               <type xmi:type="uml:Interface" href="../../Utility/model/Utility.uml#_sbroB6COEd6zlNXooB-z8A"/>
             </ownedParameter>
@@ -2964,7 +2964,7 @@ nextHeader != null</body>
       <packagedElement xmi:type="uml:Package" xmi:id="_vw_XoI2tEeCvTfdL1Zn0Rg" name="de.je.jmeta.datablocks">
         <packagedElement xmi:type="uml:Package" xmi:id="_xyVkUI2tEeCvTfdL1Zn0Rg" name="iface"/>
         <packagedElement xmi:type="uml:Package" xmi:id="_ydGYkI2tEeCvTfdL1Zn0Rg" name="impl">
-          <packagedElement xmi:type="uml:Class" xmi:id="_4IPWcI2tEeCvTfdL1Zn0Rg" name="IDataBlockAccessorTest" clientDependency="_KYYQho2vEeCvTfdL1Zn0Rg" isAbstract="true">
+          <packagedElement xmi:type="uml:Class" xmi:id="_4IPWcI2tEeCvTfdL1Zn0Rg" name="ILowLevelAPITest" clientDependency="_KYYQho2vEeCvTfdL1Zn0Rg" isAbstract="true">
             <ownedAttribute xmi:id="_N5-vAI2vEeCvTfdL1Zn0Rg" name="" type="_L0llQI2uEeCvTfdL1Zn0Rg" isUnique="false" aggregation="composite" association="_N6IgAI2vEeCvTfdL1Zn0Rg">
               <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_N5-vAY2vEeCvTfdL1Zn0Rg" value="1"/>
               <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_N5-vAo2vEeCvTfdL1Zn0Rg" value="1"/>
@@ -3079,23 +3079,23 @@ nextHeader != null</body>
             </ownedAttribute>
           </packagedElement>
           <packagedElement xmi:type="uml:Dependency" xmi:id="_KYYQho2vEeCvTfdL1Zn0Rg" name="Dependency1" supplier="_74e4cI2uEeCvTfdL1Zn0Rg" client="_4IPWcI2tEeCvTfdL1Zn0Rg"/>
-          <packagedElement xmi:type="uml:Association" xmi:id="_N6IgAI2vEeCvTfdL1Zn0Rg" name="A_&lt;iDataBlockAccessorTest>_&lt;abstractDataFormatExpectationProvider>" memberEnd="_N6IgAY2vEeCvTfdL1Zn0Rg _N5-vAI2vEeCvTfdL1Zn0Rg">
+          <packagedElement xmi:type="uml:Association" xmi:id="_N6IgAI2vEeCvTfdL1Zn0Rg" name="A_&lt;iLowLevelAPITest>_&lt;abstractDataFormatExpectationProvider>" memberEnd="_N6IgAY2vEeCvTfdL1Zn0Rg _N5-vAI2vEeCvTfdL1Zn0Rg">
             <ownedEnd xmi:id="_N6IgAY2vEeCvTfdL1Zn0Rg" name="" type="_4IPWcI2tEeCvTfdL1Zn0Rg" isUnique="false" association="_N6IgAI2vEeCvTfdL1Zn0Rg">
               <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_N6IgAo2vEeCvTfdL1Zn0Rg" value="*"/>
               <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_N6IgA42vEeCvTfdL1Zn0Rg" value="1"/>
             </ownedEnd>
           </packagedElement>
           <packagedElement xmi:type="uml:Dependency" xmi:id="_i2suoI2xEeCvTfdL1Zn0Rg" name="Dependency2" supplier="_74e4cI2uEeCvTfdL1Zn0Rg" client="_L0llQI2uEeCvTfdL1Zn0Rg"/>
-          <packagedElement xmi:type="uml:Class" xmi:id="_m2aFcI2xEeCvTfdL1Zn0Rg" name="ConcreteDataBlockAccessorTest1" clientDependency="_OKl5sI22EeCvTfdL1Zn0Rg">
+          <packagedElement xmi:type="uml:Class" xmi:id="_m2aFcI2xEeCvTfdL1Zn0Rg" name="ConcreteLowLevelAPITest1" clientDependency="_OKl5sI22EeCvTfdL1Zn0Rg">
             <generalization xmi:id="_qW-CII2xEeCvTfdL1Zn0Rg" general="_4IPWcI2tEeCvTfdL1Zn0Rg"/>
           </packagedElement>
-          <packagedElement xmi:type="uml:Class" xmi:id="_rQGXoI2zEeCvTfdL1Zn0Rg" name="AbstractSingleBlockDataBlockAccessorTest" clientDependency="_MwcP4I22EeCvTfdL1Zn0Rg">
+          <packagedElement xmi:type="uml:Class" xmi:id="_rQGXoI2zEeCvTfdL1Zn0Rg" name="AbstractSingleBlockLowLevelAPITest" clientDependency="_MwcP4I22EeCvTfdL1Zn0Rg">
             <generalization xmi:id="_w9n7II2zEeCvTfdL1Zn0Rg" general="_4IPWcI2tEeCvTfdL1Zn0Rg"/>
             <nestedClassifier xmi:type="uml:Class" xmi:id="_sHOz8I2zEeCvTfdL1Zn0Rg" name="AbstractDataFormatExpectationProvider" isAbstract="true">
               <ownedOperation xmi:id="_sHOz8Y2zEeCvTfdL1Zn0Rg" name="Operation1"/>
             </nestedClassifier>
           </packagedElement>
-          <packagedElement xmi:type="uml:Class" xmi:id="_ytYokI2zEeCvTfdL1Zn0Rg" name="ConcreteDataBlockAccessorTest2">
+          <packagedElement xmi:type="uml:Class" xmi:id="_ytYokI2zEeCvTfdL1Zn0Rg" name="ConcreteLowLevelAPITest2">
             <generalization xmi:id="_25KFcI2zEeCvTfdL1Zn0Rg" general="_rQGXoI2zEeCvTfdL1Zn0Rg"/>
           </packagedElement>
           <packagedElement xmi:type="uml:Class" xmi:id="_4qHFsI2zEeCvTfdL1Zn0Rg" name="CsvDataFormatExpectationProvider">

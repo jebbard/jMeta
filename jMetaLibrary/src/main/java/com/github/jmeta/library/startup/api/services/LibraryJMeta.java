@@ -9,7 +9,7 @@
  */
 package com.github.jmeta.library.startup.api.services;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
+import com.github.jmeta.library.datablocks.api.services.LowLevelAPI;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.startup.impl.StandardLibraryJMeta;
 
@@ -30,13 +30,13 @@ public interface LibraryJMeta {
 	}
 
 	/**
-	 * Returns an {@link DataBlockAccessor} for accessing data blocks of a specific
+	 * Returns an {@link LowLevelAPI} for accessing data blocks of a specific
 	 * medium.
 	 *
-	 * @return an {@link DataBlockAccessor} for accessing data blocks of a specific
+	 * @return an {@link LowLevelAPI} for accessing data blocks of a specific
 	 *         medium.
 	 */
-	DataBlockAccessor getDataBlockAccessor();
+	LowLevelAPI getLowLevelAPI();
 
 	/**
 	 * Returns an {@link DataFormatRepository} for accessing the properties of all

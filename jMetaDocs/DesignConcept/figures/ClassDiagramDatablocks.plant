@@ -1,5 +1,5 @@
 @startuml
-interface DataBlockAccessor [[java:com.github.jmeta.library.datablocks.api.services.DataBlockAccessor]] {
+interface LowLevelAPI [[java:com.github.jmeta.library.datablocks.api.services.LowLevelAPI]] {
 	AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
 	AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
 }
@@ -364,14 +364,14 @@ class FieldTerminationFinder [[java:com.github.jmeta.library.datablocks.impl.Fie
 	-ByteBuffer getNextEncodedBytes(ByteBuffer previousEncodedBytes, FieldDataProvider dataProvider, int readBlockSize)
 	-long getSizeToAddOfCurrentBlock(Charset charset, int lenUpToTermination, String bufferString, boolean isFollowUpBlock)
 }
-class TopLevelContainerIterator [[java:com.github.jmeta.library.datablocks.impl.TopLevelContainerIterator]] {
+class MediumContainerIterator [[java:com.github.jmeta.library.datablocks.impl.MediumContainerIterator]] {
 	-MediumOffset currentOffset
 	-boolean forwardRead
 	-MediumStore mediumStore
 	-List<ContainerDataFormat> dataFormatPrecedence
 	-Map<ContainerDataFormat,DataBlockReader> readers
 	-Map<DataBlockId,Integer> nextSequenceNumber
-	+TopLevelContainerIterator(Medium<?> medium, Map<ContainerDataFormat,DataBlockReader> readers, MediumStore mediumStore, boolean forwardRead)
+	+MediumContainerIterator(Medium<?> medium, Map<ContainerDataFormat,DataBlockReader> readers, MediumStore mediumStore, boolean forwardRead)
 	+boolean hasNext()
 	+Container next()
 	+void close()
@@ -381,22 +381,22 @@ class TopLevelContainerIterator [[java:com.github.jmeta.library.datablocks.impl.
 }
 class "AbstractDataBlockIterator<Container>" as AbstractDataBlockIterator_Container_ {
 }
-AbstractDataBlockIterator_Container_ <|-- TopLevelContainerIterator
-class StandardDataBlockAccessor [[java:com.github.jmeta.library.datablocks.impl.StandardDataBlockAccessor]] {
+AbstractDataBlockIterator_Container_ <|-- MediumContainerIterator
+class StandardLowLevelAPI [[java:com.github.jmeta.library.datablocks.impl.StandardLowLevelAPI]] {
 	-{static}Logger LOGGER
 	-DataFormatRepository m_repository
 	-MediaAPI m_mediumFactory
 	-Map<ContainerDataFormat,DataBlockReader> forwardReaders
 	-Map<ContainerDataFormat,DataBlockReader> backwardReaders
 	-ExtensionManager extManager
-	+StandardDataBlockAccessor()
+	+StandardLowLevelAPI()
 	-void addDataBlockExtensions(Extension iExtension2, DataBlockService dataBlocksExtensions)
 	+AbstractDataBlockIterator<Container> getContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
 	+AbstractDataBlockIterator<Container> getReverseContainerIterator(Medium<?> medium, boolean forceMediumReadOnly)
 }
-interface DataBlockAccessor [[java:com.github.jmeta.library.datablocks.api.services.DataBlockAccessor]] {
+interface LowLevelAPI [[java:com.github.jmeta.library.datablocks.api.services.LowLevelAPI]] {
 }
-DataBlockAccessor <|.. StandardDataBlockAccessor
+LowLevelAPI <|.. StandardLowLevelAPI
 abstract class AbstractDataBlockReader [[java:com.github.jmeta.library.datablocks.impl.AbstractDataBlockReader]] {
 	-{static}Logger LOGGER
 	-{static}String LOGGING_BINARY_TO_INTERPRETED_FAILED

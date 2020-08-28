@@ -885,7 +885,7 @@ To mitigate or maybe avoid the damage done by concurrent medium accesses, the \C
 \subsection{Test Cases}
 \label{sec:TestCasesCOMPdataPartManagement}
 
-The test strategy for \texttt{IDataBlockAccessor} is as follows:
+The test strategy for \texttt{ILowLevelAPI} is as follows:
 \begin{itemize}
 	\item For a single test scenario, a single file is the source, for which reading from all media types is tested. E.g. reading from a file medium, reading from a memory medium (by loading the whole file content into memory), reading from a stream (by treating the file as a stream)
 	\item The following behavior is tested:
@@ -909,7 +909,7 @@ The solution uses a csv format for expected data. The class structure is shown i
 
 \OpenIssue{Add figure}{Add figure}
 
-A new concrete test class must subclass the \texttt{IDataBlockAccessorTest} class and provide a test file. The \texttt{IDataBlockAccessorTest} uses a \texttt{AbstractDataFormatExpectationProvider} instance for each data format of each expected top-level block. This instance returns all the expected data. One of its implementations reads the expected data from a standardized csv file.
+A new concrete test class must subclass the \texttt{ILowLevelAPITest} class and provide a test file. The \texttt{ILowLevelAPITest} uses a \texttt{AbstractDataFormatExpectationProvider} instance for each data format of each expected top-level block. This instance returns all the expected data. One of its implementations reads the expected data from a standardized csv file.
 
 Templates for those csv files could be generated using the data format specification. 
 

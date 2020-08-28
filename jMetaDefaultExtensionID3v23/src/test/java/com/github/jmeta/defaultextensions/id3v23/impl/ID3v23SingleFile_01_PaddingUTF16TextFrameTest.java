@@ -10,7 +10,7 @@ package com.github.jmeta.defaultextensions.id3v23.impl;
 
 import java.nio.file.Path;
 
-import com.github.jmeta.library.datablocks.api.services.AbstractDataBlockAccessorTest;
+import com.github.jmeta.library.datablocks.api.services.AbstractLowLevelAPITest;
 import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
 
 /**
@@ -18,7 +18,7 @@ import com.github.jmeta.utility.testsetup.api.services.TestResourceHelper;
  * ID3v23 tag that contains a usual amount of padding bytes and UTF-16 encoded
  * text frames.
  */
-public class ID3v23SingleFile_01_PaddingUTF16TextFrameTest extends AbstractDataBlockAccessorTest {
+public class ID3v23SingleFile_01_PaddingUTF16TextFrameTest extends AbstractLowLevelAPITest {
 
 	private final static Path THE_FILE = TestResourceHelper
 		.resourceToFile(ID3v23SingleFile_01_PaddingUTF16TextFrameTest.class, "ID3v23_FILE_01_PaddingUTF16Chars.txt");

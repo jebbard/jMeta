@@ -39,97 +39,98 @@ import com.github.jmeta.utility.extmanager.api.types.ExtensionDescription;
  */
 public class ID3v23Extension implements Extension {
 
-	public static final ContainerDataFormat ID3v23 = new ContainerDataFormat("ID3v2.3", new HashSet<String>(),
-		new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
+   public static final String TEXT_FRAME_INFORMATION = "information";
 
-	static final String FRAME_FLAGS_COMPRESSION = "Compression";
-	static final String FRAME_FLAGS_ENCRYPTION = "Encryption";
-	static final String FRAME_FLAGS_FILE_ALTER_PRESERVATION = "File Alter Preservation";
-	static final String FRAME_FLAGS_GROUP_IDENTITY = "Group Identity";
-	static final String FRAME_FLAGS_READ_ONLY = "Read Only";
-	static final String FRAME_FLAGS_TAG_ALTER_PRESERVATION = "Tag Alter Preservation";
+   public static final ContainerDataFormat ID3v23 = new ContainerDataFormat("ID3v2.3", new HashSet<String>(),
+      new HashSet<String>(), new ArrayList<String>(), "M. Nilsson", new Date());
 
-	static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
+   static final String FRAME_FLAGS_COMPRESSION = "Compression";
+   static final String FRAME_FLAGS_ENCRYPTION = "Encryption";
+   static final String FRAME_FLAGS_FILE_ALTER_PRESERVATION = "File Alter Preservation";
+   static final String FRAME_FLAGS_GROUP_IDENTITY = "Group Identity";
+   static final String FRAME_FLAGS_READ_ONLY = "Read Only";
+   static final String FRAME_FLAGS_TAG_ALTER_PRESERVATION = "Tag Alter Preservation";
 
-	static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
-	static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
-	static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
+   static final String EXT_HEADER_FLAG_CRC_DATA_PRESENT = "CRC data present";
 
-	static final DataBlockCrossReference REF_EXT_HEADER = new DataBlockCrossReference("Extended header");
-	static final DataBlockCrossReference REF_TAG_HEADER_FLAGS = new DataBlockCrossReference("Header flags");
-	static final DataBlockCrossReference REF_GENERIC_FRAME_HEADER_FLAGS = new DataBlockCrossReference(
-		"Generic frame header flags");
+   static final String TAG_FLAGS_EXPERIMENTAL_INDICATOR = "Experimental Indicator";
+   static final String TAG_FLAGS_EXTENDED_HEADER = "Extended Header";
+   static final String TAG_FLAGS_UNSYNCHRONIZATION = "Unsynchronization";
 
-	private static final SyncSafeIntegerConverter SYNC_SAFE_INTEGER_CONVERTER = new SyncSafeIntegerConverter();
+   static final DataBlockCrossReference REF_EXT_HEADER = new DataBlockCrossReference("Extended header");
+   static final DataBlockCrossReference REF_TAG_HEADER_FLAGS = new DataBlockCrossReference("Header flags");
+   static final DataBlockCrossReference REF_GENERIC_FRAME_HEADER_FLAGS = new DataBlockCrossReference(
+      "Generic frame header flags");
 
-	private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
-		.lookupService(DataFormatSpecificationBuilderFactory.class);
+   private static final SyncSafeIntegerConverter SYNC_SAFE_INTEGER_CONVERTER = new SyncSafeIntegerConverter();
 
-	/**
-	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
-		List<T> serviceProviders = new ArrayList<>();
+   private final DataFormatSpecificationBuilderFactory specFactory = ComponentRegistry
+      .lookupService(DataFormatSpecificationBuilderFactory.class);
 
-		if (serviceInterface == DataFormatSpecification.class) {
-			serviceProviders.add((T) createSpecification());
-		} else if (serviceInterface == DataBlockService.class) {
-			serviceProviders.add((T) new ID3v23DataBlocksService());
-		}
-		return serviceProviders;
-	}
+   /**
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getAllServiceProviders(java.lang.Class)
+    */
+   @SuppressWarnings("unchecked")
+   @Override
+   public <T> List<T> getAllServiceProviders(Class<T> serviceInterface) {
+      List<T> serviceProviders = new ArrayList<>();
 
-	/**
-	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
-	 */
-	@Override
-	public ExtensionDescription getExtensionDescription() {
-		return new ExtensionDescription("ID3v23", "jMeta", "1.0", null, "ID3v23 extension", null, null);
-	}
+      if (serviceInterface == DataFormatSpecification.class) {
+         serviceProviders.add((T) createSpecification());
+      } else if (serviceInterface == DataBlockService.class) {
+         serviceProviders.add((T) new ID3v23DataBlocksService());
+      }
+      return serviceProviders;
+   }
 
-	/**
-	 * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
-	 */
-	@Override
-	public String getExtensionId() {
-		return "DEFAULT_de.je.jmeta.defext.datablocks.impl.ID3v23DataBlocksExtension";
-	}
+   /**
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionDescription()
+    */
+   @Override
+   public ExtensionDescription getExtensionDescription() {
+      return new ExtensionDescription("ID3v23", "jMeta", "1.0", null, "ID3v23 extension", null, null);
+   }
 
-	private DataFormatSpecification createSpecification() {
+   /**
+    * @see com.github.jmeta.utility.extmanager.api.services.Extension#getExtensionId()
+    */
+   @Override
+   public String getExtensionId() {
+      return "DEFAULT_de.je.jmeta.defext.datablocks.impl.ID3v23DataBlocksExtension";
+   }
 
-		final byte[] id3v23TagVersionBytes = new byte[] { 3, 0 };
-		final byte[] id3v23TagIdBytes = new byte[] { 'I', 'D', '3' };
-		final byte[] id3v23TagMagicKeyBytes = new byte[id3v23TagIdBytes.length + id3v23TagVersionBytes.length];
+   private DataFormatSpecification createSpecification() {
 
-		for (int i = 0; i < id3v23TagIdBytes.length; i++) {
-			id3v23TagMagicKeyBytes[i] = id3v23TagIdBytes[i];
-		}
+      final byte[] id3v23TagVersionBytes = new byte[] { 3, 0 };
+      final byte[] id3v23TagIdBytes = new byte[] { 'I', 'D', '3' };
+      final byte[] id3v23TagMagicKeyBytes = new byte[id3v23TagIdBytes.length + id3v23TagVersionBytes.length];
 
-		for (int i = 0; i < id3v23TagVersionBytes.length; i++) {
-			id3v23TagMagicKeyBytes[id3v23TagIdBytes.length + i] = id3v23TagVersionBytes[i];
-		}
+      for (int i = 0; i < id3v23TagIdBytes.length; i++) {
+         id3v23TagMagicKeyBytes[i] = id3v23TagIdBytes[i];
+      }
 
-		DataFormatSpecificationBuilder builder = specFactory
-			.createDataFormatSpecificationBuilder(ID3v23Extension.ID3v23);
+      for (int i = 0; i < id3v23TagVersionBytes.length; i++) {
+         id3v23TagMagicKeyBytes[id3v23TagIdBytes.length + i] = id3v23TagVersionBytes[i];
+      }
 
-		DataBlockCrossReference frameReference = new DataBlockCrossReference("Frame");
-		DataBlockCrossReference textFrameReference = new DataBlockCrossReference("Text Frame");
-		DataBlockCrossReference crcReference = new DataBlockCrossReference("CRC");
-		DataBlockCrossReference decompressedSizeReference = new DataBlockCrossReference("Decompressed size");
-		DataBlockCrossReference groupIdReference = new DataBlockCrossReference("Group id");
-		DataBlockCrossReference encryptionMethodReference = new DataBlockCrossReference("Encryption method");
-		DataBlockCrossReference informationReference = new DataBlockCrossReference("Information");
-		DataBlockCrossReference payloadReference = new DataBlockCrossReference("Tag Payload");
-		DataBlockCrossReference framePayloadReference = new DataBlockCrossReference("Frame payload");
-		DataBlockCrossReference dataFieldReference = new DataBlockCrossReference("Data");
-		DataBlockCrossReference paddingReference = new DataBlockCrossReference("Padding");
-		DataBlockCrossReference paddingSizeReference = new DataBlockCrossReference("Padding Size");
-		DataBlockCrossReference extHeaderFlagsReference = new DataBlockCrossReference("Ext Header Flags");
+      DataFormatSpecificationBuilder builder = specFactory.createDataFormatSpecificationBuilder(ID3v23Extension.ID3v23);
 
-		DataBlockCrossReference frameIdReference = new DataBlockCrossReference("Frame Id");
-		// @formatter:off
+      DataBlockCrossReference frameReference = new DataBlockCrossReference("Frame");
+      DataBlockCrossReference textFrameReference = new DataBlockCrossReference("Text Frame");
+      DataBlockCrossReference crcReference = new DataBlockCrossReference("CRC");
+      DataBlockCrossReference decompressedSizeReference = new DataBlockCrossReference("Decompressed size");
+      DataBlockCrossReference groupIdReference = new DataBlockCrossReference("Group id");
+      DataBlockCrossReference encryptionMethodReference = new DataBlockCrossReference("Encryption method");
+      DataBlockCrossReference informationReference = new DataBlockCrossReference("Information");
+      DataBlockCrossReference payloadReference = new DataBlockCrossReference("Tag Payload");
+      DataBlockCrossReference framePayloadReference = new DataBlockCrossReference("Frame payload");
+      DataBlockCrossReference dataFieldReference = new DataBlockCrossReference("Data");
+      DataBlockCrossReference paddingReference = new DataBlockCrossReference("Padding");
+      DataBlockCrossReference paddingSizeReference = new DataBlockCrossReference("Padding Size");
+      DataBlockCrossReference extHeaderFlagsReference = new DataBlockCrossReference("Ext Header Flags");
+
+      DataBlockCrossReference frameIdReference = new DataBlockCrossReference("Frame Id");
+      // @formatter:off
 		return builder
 			.addContainerWithContainerBasedPayload("id3v23", "id3v23 tag", "The id3v23 tag")
 				.addHeader("header", "id3v23 tag header", "The id3v23 tag header")
@@ -249,7 +250,7 @@ public class ID3v23Extension implements Extension {
 								.addEnumeratedValue(new byte[] { 0 }, Charsets.CHARSET_ISO.name())
 								.addEnumeratedValue(new byte[] { 1 }, Charsets.CHARSET_UTF16.name())
 							.finishField()
-							.addStringField("information", "Information", "Information")
+							.addStringField(ID3v23Extension.TEXT_FRAME_INFORMATION, "Information", "Information")
 								.referencedAs(informationReference)
 								.withTerminationCharacter('\u0000').withLengthOf(1, DataBlockDescription.UNDEFINED)
 							.finishField()
@@ -286,5 +287,5 @@ public class ID3v23Extension implements Extension {
 			.withByteOrders(ByteOrder.BIG_ENDIAN)
 			.withCharsets(Charsets.CHARSET_ISO, Charsets.CHARSET_UTF16).build();
 		// @formatter:on
-	}
+   }
 }

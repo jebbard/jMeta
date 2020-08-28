@@ -31,7 +31,7 @@ Note that writing these data formats is currently in alpha status while also a h
 
 ## Usage Examples
 
-Read all top-level containers of an MP3 file and print their IDs:
+Read all containers on the top level of the medium - an MP3 file - and print their IDs:
 
 ```java
 package com.github.jmeta.library.samples;
@@ -41,31 +41,34 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
-import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
+import com.github.jmeta.library.datablocks.api.services.LowLevelAPI;
+import com.github.jmeta.library.datablocks.api.services.MediumContainerIterator;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumAccessType;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 
 /**
- * {@link SampleReadAllTopLevelContainers} demonstrates how to read and print all top-level containers.
+ * {@link SampleReadAllMediumContainers} demonstrates how to read and print all 
+ * medium containers.
  */
-public class SampleReadAllTopLevelContainers {
+public class SampleReadAllMediumContainers {
 
    public static void main(String[] args) {
-      Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), false);
-      SampleReadAllTopLevelContainers.forEachTopLevelContainer(medium,
-         SampleReadAllTopLevelContainers::printContainerInfo);
+      Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), 
+         MediumAccessType.READ_WRITE);
+      SampleReadAllMediumContainers.forEachMediumContainer(medium, 
+         SampleReadAllMediumContainers::printContainerInfo);
    }
 
-   private static void forEachTopLevelContainer(Medium<?> medium, 
-      Consumer<Container> containerConsumer) {
+   private static void forEachMediumContainer(Medium<?> medium, 
+    Consumer<Container> containerConsumer) {
       LibraryJMeta jMeta = LibraryJMeta.getLibrary();
 
-      DataBlockAccessor dataBlockAccessor = jMeta.getDataBlockAccessor();
-      try (TopLevelContainerIterator containerIterator = 
-         dataBlockAccessor.getContainerIterator(medium)) {
+      LowLevelAPI lowLevelApi = jMeta.getLowLevelAPI();
+      try (MediumContainerIterator containerIterator = 
+        lowLevelApi.getContainerIterator(medium)) {
          while (containerIterator.hasNext()) {
             Container container = containerIterator.next();
 
@@ -77,7 +80,7 @@ public class SampleReadAllTopLevelContainers {
    }
 
    private static void printContainerInfo(Container container) {
-      System.out.println("Next container on top level has data format: " 
+      System.out.println("Next container on top level has data format: "
          + container.getId().getDataFormat() + ", and id: " + container.getId());
    }
 }
@@ -97,13 +100,14 @@ import java.util.function.Consumer;
 import com.github.jmeta.defaultextensions.id3v23.impl.ID3v23Extension;
 import com.github.jmeta.library.datablocks.api.exceptions.BinaryValueConversionException;
 import com.github.jmeta.library.datablocks.api.services.ContainerIterator;
-import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
+import com.github.jmeta.library.datablocks.api.services.MediumContainerIterator;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.datablocks.api.types.ContainerBasedPayload;
 import com.github.jmeta.library.datablocks.api.types.Field;
 import com.github.jmeta.library.datablocks.api.types.FieldBasedPayload;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumAccessType;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 
 /**
@@ -113,23 +117,40 @@ import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 public class SampleReadID3v23Frames {
 
    public static void main(String[] args) {
-      Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), false);
+      Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), 
+         MediumAccessType.READ_WRITE);
       SampleReadID3v23Frames.forEachTopLevelContainer(medium, 
-        SampleReadID3v23Frames::printTextFrames);
+         SampleReadID3v23Frames::printTextFrames);
    }
 
    private static void forEachTopLevelContainer(Medium<?> medium, 
       Consumer<Container> containerConsumer) {
       LibraryJMeta jMeta = LibraryJMeta.getLibrary();
 
-      try (TopLevelContainerIterator containerIterator = jMeta.getDataBlockAccessor()
-         .getReverseContainerIterator(medium)) {
+      try (MediumContainerIterator containerIterator = jMeta.getLowLevelAPI().
+         getReverseContainerIterator(medium)) {
          while (containerIterator.hasNext()) {
             Container container = containerIterator.next();
             containerConsumer.accept(container);
          }
       } catch (IOException e) {
          throw new RuntimeException("Error closing file medium", e);
+      }
+   }
+
+   private static void printTextFrame(Container frame) {
+      FieldBasedPayload framePayload = (FieldBasedPayload) frame.getPayload();
+
+      List<Field<?>> fields = framePayload.getFields();
+
+      for (Field<?> field : fields) {
+         if (field.getId().getLocalId().equals(ID3v23Extension.TEXT_FRAME_INFORMATION)) {
+            try {
+               System.out.println(field.getInterpretedValue().toString());
+            } catch (BinaryValueConversionException e) {
+               throw new RuntimeException("Could not convert binary field value", e);
+            }
+         }
       }
    }
 
@@ -147,22 +168,6 @@ public class SampleReadID3v23Frames {
             // It is a text frame
             if (frame.getId().getLocalId().startsWith("T")) {
                SampleReadID3v23Frames.printTextFrame(frame);
-            }
-         }
-      }
-   }
-
-   private static void printTextFrame(Container frame) {
-      FieldBasedPayload framePayload = (FieldBasedPayload) frame.getPayload();
-
-      List<Field<?>> fields = framePayload.getFields();
-
-      for (Field<?> field : fields) {
-         if (field.getId().getLocalId().equals("information")) {
-            try {
-               System.out.println(field.getInterpretedValue().toString());
-            } catch (BinaryValueConversionException e) {
-               throw new RuntimeException("Could not convert binary field value", e);
             }
          }
       }

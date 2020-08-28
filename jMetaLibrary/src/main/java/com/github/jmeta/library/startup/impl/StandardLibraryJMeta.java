@@ -18,7 +18,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
+import com.github.jmeta.library.datablocks.api.services.LowLevelAPI;
 import com.github.jmeta.library.dataformats.api.services.DataFormatRepository;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 import com.github.jmeta.utility.compregistry.api.services.ComponentRegistry;
@@ -163,7 +163,7 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 		StandardLibraryJMeta.LOGGER.info(StandardLibraryJMeta.startingTask(taskLoadComponents));
 
 		try {
-			getDataBlockAccessor();
+			getLowLevelAPI();
 			getDataFormatRepository();
 		}
 
@@ -183,12 +183,12 @@ public class StandardLibraryJMeta implements LibraryJMeta {
 	}
 
 	/**
-	 * @see com.github.jmeta.library.startup.api.services.LibraryJMeta#getDataBlockAccessor()
+	 * @see com.github.jmeta.library.startup.api.services.LibraryJMeta#getLowLevelAPI()
 	 */
 	@Override
-	public DataBlockAccessor getDataBlockAccessor() {
+	public LowLevelAPI getLowLevelAPI() {
 
-		return ComponentRegistry.lookupService(DataBlockAccessor.class);
+		return ComponentRegistry.lookupService(LowLevelAPI.class);
 	}
 
 	/**

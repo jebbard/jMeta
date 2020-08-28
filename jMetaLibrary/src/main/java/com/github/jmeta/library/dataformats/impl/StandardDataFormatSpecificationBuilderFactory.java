@@ -26,6 +26,6 @@ public class StandardDataFormatSpecificationBuilderFactory implements DataFormat
 	 */
 	@Override
 	public DataFormatSpecificationBuilder createDataFormatSpecificationBuilder(ContainerDataFormat dataFormat) {
-		return new TopLevelContainerSequenceBuilder(dataFormat);
+		return new MediumContainerSequenceBuilder(dataFormat);
 	}
 }

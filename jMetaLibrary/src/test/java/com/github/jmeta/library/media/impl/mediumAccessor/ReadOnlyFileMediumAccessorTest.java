@@ -15,74 +15,74 @@ import org.junit.Test;
 import com.github.jmeta.library.media.api.exceptions.MediumAccessException;
 import com.github.jmeta.library.media.api.helper.TestMedia;
 import com.github.jmeta.library.media.api.types.FileMedium;
+import com.github.jmeta.library.media.api.types.MediumAccessType;
 
 /**
  * Tests the class {@link FileMediumAccessor} for a read-only medium.
  */
 public class ReadOnlyFileMediumAccessorTest extends AbstractReadOnlyMediumAccessorTest {
 
-	/**
-	 * @see AbstractMediumAccessorTest#getImplementationToTest()
-	 */
-	@Override
-	protected MediumAccessor<?> createImplementationToTest() {
-		return new FileMediumAccessor(getExpectedMedium());
-	}
+   /**
+    * Tests the creation and opening of a new {@link FileMediumAccessor} on an already locked medium.
+    */
+   @Test(expected = MediumAccessException.class)
+   public void createNewFileMediumAccessor_forAlreadyLockedMedium_throwsException() {
 
-	/**
-	 * Tests the creation and opening of a new {@link FileMediumAccessor} on an
-	 * already locked medium.
-	 */
-	@Test(expected = MediumAccessException.class)
-	public void createNewFileMediumAccessor_forAlreadyLockedMedium_throwsException() {
+      MediumAccessor<?> mediumAccessor = getImplementationToTest();
 
-		MediumAccessor<?> mediumAccessor = getImplementationToTest();
+      mediumAccessor.open();
 
-		mediumAccessor.open();
+      // Create second instance on the same medium
+      new FileMediumAccessor(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, MediumAccessType.READ_ONLY)).open();
+   }
 
-		// Create second instance on the same medium
-		new FileMediumAccessor(new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true)).open();
-	}
+   /**
+    * @see AbstractMediumAccessorTest#getImplementationToTest()
+    */
+   @Override
+   protected MediumAccessor<?> createImplementationToTest() {
+      return new FileMediumAccessor(getExpectedMedium());
+   }
 
-	/**
-	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
-	 */
-	@Override
-	protected FileMedium getExpectedMedium() {
-		return new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, true);
-	}
+   /**
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getExpectedMedium()
+    */
+   @Override
+   protected FileMedium getExpectedMedium() {
+      return new FileMedium(TestMedia.FIRST_TEST_FILE_PATH, MediumAccessType.READ_ONLY);
+   }
 
-	/**
-	 * @see AbstractMediumAccessorTest#getReadTestDataToUse()
-	 */
-	@Override
-	protected List<ReadTestData> getReadTestDataToUse() {
+   /**
+    * @see AbstractMediumAccessorTest#getReadTestDataToUse()
+    */
+   @Override
+   protected List<ReadTestData> getReadTestDataToUse() {
 
-		List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
+      List<ReadTestData> readOffsetsAndSizes = new ArrayList<>();
 
-		readOffsetsAndSizes.add(new ReadTestData(16, 7));
-		readOffsetsAndSizes.add(new ReadTestData(93, 157));
-		readOffsetsAndSizes.add(new ReadTestData(610, 133));
-		readOffsetsAndSizes.add(new ReadTestData(0, 17));
-		readOffsetsAndSizes.add(new ReadTestData(211, 45));
+      readOffsetsAndSizes.add(new ReadTestData(16, 7));
+      readOffsetsAndSizes.add(new ReadTestData(93, 157));
+      readOffsetsAndSizes.add(new ReadTestData(610, 133));
+      readOffsetsAndSizes.add(new ReadTestData(0, 17));
+      readOffsetsAndSizes.add(new ReadTestData(211, 45));
 
-		return readOffsetsAndSizes;
-	}
+      return readOffsetsAndSizes;
+   }
 
-	/**
-	 * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
-	 */
-	@Override
-	protected ReadTestData getReadTestDataUntilEndOfMedium() {
-		return new ReadTestData(550, AbstractMediumAccessorTest.getExpectedMediumContent().length - 550);
-	}
+   /**
+    * @see com.github.jmeta.library.media.impl.mediumAccessor.AbstractMediumAccessorTest#getReadTestDataUntilEndOfMedium()
+    */
+   @Override
+   protected ReadTestData getReadTestDataUntilEndOfMedium() {
+      return new ReadTestData(550, AbstractMediumAccessorTest.getExpectedMediumContent().length - 550);
+   }
 
-	/**
-	 * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
-	 */
-	@Override
-	protected void prepareMediumData(byte[] testFileContents) {
-		// Intentionally empty
-	}
+   /**
+    * @see AbstractMediumAccessorTest#prepareMediumData(byte[])
+    */
+   @Override
+   protected void prepareMediumData(byte[] testFileContents) {
+      // Intentionally empty
+   }
 
 }

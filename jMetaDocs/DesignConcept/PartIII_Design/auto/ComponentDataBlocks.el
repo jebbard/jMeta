@@ -29,7 +29,7 @@
     "sec:APIDesign"
     "tab:DBOpsDatablock"
     "tab:DBOpsContainerIterator"
-    "tab:DBOpsTopLevelContainerIterator"
+    "tab:DBOpsMediumContainerIterator"
     "tab:DBOpsContainerContext"
     "tab:DBOpsContainer"
     "tab:DBOpsFieldSequence"

@@ -1,5 +1,5 @@
 /**
- * {@link DataBlockAccessor}.java
+ * {@link LowLevelAPI}.java
  *
  * @author Jens Ebert
  * @date 31.12.10 19:47:11 (December 31, 2010)
@@ -21,7 +21,7 @@ import com.github.jmeta.library.media.api.types.Medium;
  * an {@link Iterator} that allows to iterate the top-level {@link DataBlock}s
  * of that {@link AbstractMedium}.
  */
-public interface DataBlockAccessor {
+public interface LowLevelAPI {
 
 	/**
 	 * Returns the {@link Iterator} for retrieving all the top-level
@@ -34,11 +34,11 @@ public interface DataBlockAccessor {
 	 * @return the {@link Iterator} for iterating all the top-level
 	 *         {@link DataBlock}s of the {@link AbstractMedium}.
 	 */
-	TopLevelContainerIterator getContainerIterator(Medium<?> medium);
+	MediumContainerIterator getContainerIterator(Medium<?> medium);
 
 	/**
 	 * @param medium
 	 * @return a reverse {@link ContainerIterator}
 	 */
-	TopLevelContainerIterator getReverseContainerIterator(Medium<?> medium);
+	MediumContainerIterator getReverseContainerIterator(Medium<?> medium);
 }

@@ -1,6 +1,6 @@
 /**
  *
- * {@link SampleReadAllTopLevelContainers}.java
+ * {@link SampleReadAllMediumContainers}.java
  *
  * @author Jens Ebert
  *
@@ -14,29 +14,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
-import com.github.jmeta.library.datablocks.api.services.DataBlockAccessor;
-import com.github.jmeta.library.datablocks.api.services.TopLevelContainerIterator;
+import com.github.jmeta.library.datablocks.api.services.LowLevelAPI;
+import com.github.jmeta.library.datablocks.api.services.MediumContainerIterator;
 import com.github.jmeta.library.datablocks.api.types.Container;
 import com.github.jmeta.library.media.api.types.FileMedium;
 import com.github.jmeta.library.media.api.types.Medium;
+import com.github.jmeta.library.media.api.types.MediumAccessType;
 import com.github.jmeta.library.startup.api.services.LibraryJMeta;
 
 /**
- * {@link SampleReadAllTopLevelContainers} demonstrates how to read and print all top-level containers.
+ * {@link SampleReadAllMediumContainers} demonstrates how to read and print all medium containers.
  */
-public class SampleReadAllTopLevelContainers {
+public class SampleReadAllMediumContainers {
 
    public static void main(String[] args) {
-      Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), false);
-      SampleReadAllTopLevelContainers.forEachTopLevelContainer(medium,
-         SampleReadAllTopLevelContainers::printContainerInfo);
+      Medium<Path> medium = new FileMedium(Paths.get("/path/to/my/file.mp3"), MediumAccessType.READ_WRITE);
+      SampleReadAllMediumContainers.forEachMediumContainer(medium, SampleReadAllMediumContainers::printContainerInfo);
    }
 
-   private static void forEachTopLevelContainer(Medium<?> medium, Consumer<Container> containerConsumer) {
+   private static void forEachMediumContainer(Medium<?> medium, Consumer<Container> containerConsumer) {
       LibraryJMeta jMeta = LibraryJMeta.getLibrary();
 
-      DataBlockAccessor dataBlockAccessor = jMeta.getDataBlockAccessor();
-      try (TopLevelContainerIterator containerIterator = dataBlockAccessor.getContainerIterator(medium)) {
+      LowLevelAPI lowLevelApi = jMeta.getLowLevelAPI();
+      try (MediumContainerIterator containerIterator = lowLevelApi.getContainerIterator(medium)) {
          while (containerIterator.hasNext()) {
             Container container = containerIterator.next();
 

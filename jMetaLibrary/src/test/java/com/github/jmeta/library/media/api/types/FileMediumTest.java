@@ -16,80 +16,77 @@ import java.nio.file.Path;
 import com.github.jmeta.library.media.api.helper.TestMedia;
 
 /**
- * {@link FileMediumTest} tests the {@link FileMedium} class with an existing
- * file.
+ * {@link FileMediumTest} tests the {@link FileMedium} class with an existing file.
  */
 public class FileMediumTest extends AbstractMediumTest<Path> {
 
-	private static final Path WRAPPED_MEDIUM = TestMedia.FIRST_TEST_FILE_PATH;
+   private static final Path WRAPPED_MEDIUM = TestMedia.FIRST_TEST_FILE_PATH;
 
-	private static final boolean READ_ONLY = false;
+   /**
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedAccessType()
+    */
+   @Override
+   protected MediumAccessType getExpectedAccessType() {
 
-	/**
-	 * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedExternalName()
-	 */
-	@Override
-	protected String getExpectedExternalName() {
+      return MediumAccessType.READ_WRITE;
+   }
 
-		return FileMediumTest.WRAPPED_MEDIUM.toAbsolutePath().toString();
-	}
+   /**
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedExternalName()
+    */
+   @Override
+   protected String getExpectedExternalName() {
 
-	/**
-	 * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedLength()
-	 */
-	@Override
-	protected long getExpectedLength() {
+      return FileMediumTest.WRAPPED_MEDIUM.toAbsolutePath().toString();
+   }
 
-		try {
-			return Files.size(FileMediumTest.WRAPPED_MEDIUM);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+   /**
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedLength()
+    */
+   @Override
+   protected long getExpectedLength() {
 
-	/**
-	 * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedWrappedMedium()
-	 */
-	@Override
-	protected Path getExpectedWrappedMedium() {
+      try {
+         return Files.size(FileMediumTest.WRAPPED_MEDIUM);
+      } catch (IOException e) {
+         throw new RuntimeException(e);
+      }
+   }
 
-		return FileMediumTest.WRAPPED_MEDIUM;
-	}
+   /**
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getExpectedWrappedMedium()
+    */
+   @Override
+   protected Path getExpectedWrappedMedium() {
 
-	/**
-	 * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getMediumToTest()
-	 */
-	@Override
-	protected Medium<Path> getMediumToTest() {
+      return FileMediumTest.WRAPPED_MEDIUM;
+   }
 
-		return new FileMedium(FileMediumTest.WRAPPED_MEDIUM, FileMediumTest.READ_ONLY);
-	}
+   /**
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#getMediumToTest()
+    */
+   @Override
+   protected Medium<Path> getMediumToTest() {
 
-	/**
-	 * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsExisting()
-	 */
-	@Override
-	protected boolean isExpectedAsExisting() {
+      return new FileMedium(FileMediumTest.WRAPPED_MEDIUM, MediumAccessType.READ_WRITE);
+   }
 
-		return true;
-	}
+   /**
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsExisting()
+    */
+   @Override
+   protected boolean isExpectedAsExisting() {
 
-	/**
-	 * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsRandomAccess()
-	 */
-	@Override
-	protected boolean isExpectedAsRandomAccess() {
+      return true;
+   }
 
-		return true;
-	}
+   /**
+    * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsRandomAccess()
+    */
+   @Override
+   protected boolean isExpectedAsRandomAccess() {
 
-	/**
-	 * @see com.github.jmeta.library.media.api.types.AbstractMediumTest#isExpectedAsReadOnly()
-	 */
-	@Override
-	protected boolean isExpectedAsReadOnly() {
-
-		return FileMediumTest.READ_ONLY;
-	}
+      return true;
+   }
 
 }

@@ -1,6 +1,6 @@
 /**
  *
- * {@link TopLevelContainerIterator}.java
+ * {@link MediumContainerIterator}.java
  *
  * @author Jens Ebert
  *
@@ -12,9 +12,9 @@ package com.github.jmeta.library.datablocks.api.services;
 import java.io.Closeable;
 
 /**
- * {@link TopLevelContainerIterator}
+ * {@link MediumContainerIterator}
  *
  */
-public interface TopLevelContainerIterator extends ContainerIterator, Closeable, AutoCloseable {
+public interface MediumContainerIterator extends ContainerIterator, Closeable, AutoCloseable {
 	// Intentionally empty
 }

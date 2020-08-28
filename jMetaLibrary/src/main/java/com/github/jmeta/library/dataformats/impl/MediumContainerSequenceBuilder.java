@@ -1,6 +1,6 @@
 /**
  *
- * {@link TopLevelContainerSequenceBuilder}.java
+ * {@link MediumContainerSequenceBuilder}.java
  *
  * @author Jens Ebert
  *
@@ -30,10 +30,10 @@ import com.github.jmeta.library.dataformats.impl.builder.StandardFieldBasedPaylo
 import com.github.jmeta.utility.dbc.api.services.Reject;
 
 /**
- * {@link TopLevelContainerSequenceBuilder} builds a
+ * {@link MediumContainerSequenceBuilder} builds a
  * {@link DataFormatSpecification}.
  */
-public class TopLevelContainerSequenceBuilder implements DataFormatSpecificationBuilder {
+public class MediumContainerSequenceBuilder implements DataFormatSpecificationBuilder {
 
 	private final Map<DataBlockId, DataBlockDescription> overallDescriptions = new HashMap<>();
 	private final Map<DataBlockId, DataBlockDescription> genericDescriptions = new HashMap<>();
@@ -44,12 +44,12 @@ public class TopLevelContainerSequenceBuilder implements DataFormatSpecification
 	private final List<Charset> supportedCharacterEncodings = new ArrayList<>();
 
 	/**
-	 * Creates a new {@link TopLevelContainerSequenceBuilder}.
+	 * Creates a new {@link MediumContainerSequenceBuilder}.
 	 * 
 	 * @param dataFormat The {@link ContainerDataFormat} for which to build the
 	 *                   {@link DataFormatSpecification}.
 	 */
-	public TopLevelContainerSequenceBuilder(ContainerDataFormat dataFormat) {
+	public MediumContainerSequenceBuilder(ContainerDataFormat dataFormat) {
 		Reject.ifNull(dataFormat, "dataFormat");
 
 		this.dataFormat = dataFormat;
